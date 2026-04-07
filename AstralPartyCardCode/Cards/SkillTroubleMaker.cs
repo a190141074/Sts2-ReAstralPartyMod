@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using BaseLib.Extensions;
 using BaseLib.Utils;
-using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -18,6 +17,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
 public class SkillTroubleMaker : AstralPartyCardModel
 {
     private static readonly LocString SelectionPrompt = new("cards", "SKILL_TROUBLE_MAKER.select_prompt");
+    private static int _choosePromptOverrideDepth;
 
     private int _cardsToShow = 2;
 
@@ -61,14 +61,16 @@ public class SkillTroubleMaker : AstralPartyCardModel
 
         if (offeredCards.Count == 0) return;
 
-        var prefs = new CardSelectorPrefs(SelectionPrompt, 1)
+        BeginChoosePromptOverride();
+        CardModel? selectedCard;
+        try
         {
-            Cancelable = false,
-            PretendCardsCanBePlayed = true
-        };
-
-        var selectedCard = (await CardSelectCmd.FromSimpleGrid(choiceContext, offeredCards, Owner, prefs))
-            .FirstOrDefault();
+            selectedCard = await CardSelectCmd.FromChooseACardScreen(choiceContext, offeredCards, Owner, false);
+        }
+        finally
+        {
+            EndChoosePromptOverride();
+        }
 
         if (selectedCard == null) return;
 
@@ -77,5 +79,22 @@ public class SkillTroubleMaker : AstralPartyCardModel
 
         var cardToPlay = CombatState.CreateCard(selectedCard.CanonicalInstance, Owner);
         await CardCmd.AutoPlay(choiceContext, cardToPlay, Owner.Creature, AutoPlayType.Default, false, true);
+    }
+
+    public static bool ShouldOverrideChoosePrompt => _choosePromptOverrideDepth > 0;
+
+    public static string GetChoosePromptText()
+    {
+        return LocManager.Instance.SmartFormat(SelectionPrompt, []);
+    }
+
+    private static void BeginChoosePromptOverride()
+    {
+        _choosePromptOverrideDepth++;
+    }
+
+    private static void EndChoosePromptOverride()
+    {
+        _choosePromptOverrideDepth = Math.Max(0, _choosePromptOverrideDepth - 1);
     }
 }
