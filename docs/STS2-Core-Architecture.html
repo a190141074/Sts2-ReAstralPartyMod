@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>杀戮尖塔2 (STS2) Core 代码库结构与开发指南</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --fg: #c9d1d9;
+    --heading: #e6edf3;
+    --link: #58a6ff;
+    --border: #30363d;
+    --code-bg: #161b22;
+    --table-bg: #161b22;
+    --table-border: #30363d;
+    --accent: #1f6feb;
+    --blockquote-border: #3b82f6;
+    --blockquote-bg: #161b22;
+    --inline-code-bg: #1c2330;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.7;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+  h1 { color: var(--heading); font-size: 2rem; border-bottom: 2px solid var(--accent); padding-bottom: .5rem; margin-bottom: 1rem; }
+  h2 { color: var(--heading); font-size: 1.5rem; margin-top: 2.5rem; margin-bottom: .8rem; border-bottom: 1px solid var(--border); padding-bottom: .3rem; }
+  h3 { color: var(--heading); font-size: 1.2rem; margin-top: 2rem; margin-bottom: .6rem; }
+  h4 { color: var(--heading); font-size: 1.05rem; margin-top: 1.5rem; margin-bottom: .5rem; }
+  p { margin-bottom: .8rem; }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  blockquote {
+    border-left: 4px solid var(--blockquote-border);
+    background: var(--blockquote-bg);
+    padding: .8rem 1rem;
+    margin: 1rem 0;
+    border-radius: 0 6px 6px 0;
+  }
+  blockquote p { margin-bottom: .3rem; }
+  code {
+    font-family: "Fira Code", "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+    font-size: .9em;
+    background: var(--inline-code-bg);
+    padding: .15em .4em;
+    border-radius: 4px;
+  }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    overflow-x: auto;
+    margin: .8rem 0 1.2rem;
+    line-height: 1.5;
+  }
+  pre code { background: none; padding: 0; font-size: .85em; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: .8rem 0 1.2rem;
+  }
+  th, td {
+    border: 1px solid var(--table-border);
+    padding: .5rem .8rem;
+    text-align: left;
+  }
+  th { background: var(--table-bg); color: var(--heading); font-weight: 600; }
+  td { background: var(--bg); }
+  tr:hover td { background: var(--table-bg); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 2rem 0; }
+  ul, ol { padding-left: 1.8rem; margin-bottom: .8rem; }
+  li { margin-bottom: .3rem; }
+  ul ul { margin-top: .3rem; margin-bottom: .3rem; }
+  .toc { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 1.2rem 1.5rem; margin: 1.5rem 0; }
+  .toc ul { list-style: none; padding-left: 0; margin-bottom: 0; }
+  .toc ul ul { padding-left: 1.5rem; }
+  .toc li { margin-bottom: .25rem; }
+  strong { color: var(--heading); }
+</style>
+</head>
+<body>
+
+<h1>杀戮尖塔2 (STS2) Core 代码库结构与开发指南</h1>
+
+<blockquote>
+  <p>源码路径: <code>G:\p\newsts2\src\Core\</code></p>
+  <p>引擎: Godot (C# / .NET)</p>
+  <p>命名空间根: <code>MegaCrit.Sts2.Core</code></p>
+  <p>总文件数: ~3284 个 .cs 文件</p>
+  <p>核心设计模式: Model/Entity/Node 三层分离、Command 模式、Hook 系统、Action 队列</p>
+</blockquote>
+
+<hr>
+
+<h2>目录</h2>
+<div class="toc">
+<ul>
+  <li><a href="#sec1">一、目录结构（按重要性排序）</a>
+    <ul>
+      <li><a href="#sec1-1">1. Models/ — 游戏数据模型层</a></li>
+      <li><a href="#sec1-2">2. Nodes/ — UI/场景节点层</a></li>
+      <li><a href="#sec1-3">3. Combat/ — 战斗核心管理</a></li>
+      <li><a href="#sec1-4">4. Commands/ — 命令 API</a></li>
+      <li><a href="#sec1-5">5. Entities/ — 实体定义和枚举</a></li>
+      <li><a href="#sec1-6">6. GameActions/ — 游戏行动队列系统</a></li>
+      <li><a href="#sec1-7">7. Hooks/ — Hook 事件系统</a></li>
+      <li><a href="#sec1-8">8. Runs/ — 游戏运行管理</a></li>
+      <li><a href="#sec1-9">9. Rooms/ — 房间系统</a></li>
+      <li><a href="#sec1-10">10. Modding/ — Mod 系统</a></li>
+      <li><a href="#sec1-11">11. 其他重要模块</a></li>
+    </ul>
+  </li>
+  <li><a href="#sec2">二、核心架构模式</a></li>
+  <li><a href="#sec3">三、关键单例</a></li>
+  <li><a href="#sec4">四、卡牌开发完整模板</a></li>
+  <li><a href="#sec5">五、常用 API 速查</a></li>
+</ul>
+</div>
+
+<hr>
+
+<h2 id="sec1">一、目录结构（按重要性排序）</h2>
+
+<!-- 1. Models -->
+<h3 id="sec1-1">1. <code>Models/</code> (1638 文件) — 游戏数据模型层</h3>
+<p>所有游戏对象的数据定义。<strong>每个卡牌/遗物/药水/怪物/力量都是一个独立的 .cs 类</strong>。</p>
+
+<table>
+  <thead><tr><th>子目录</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>Cards/</code></td><td>所有卡牌定义 (Bash, Strike, Defend...)</td></tr>
+    <tr><td><code>Powers/</code></td><td>所有力量/Buff/Debuff (VulnerablePower, StrengthPower...)</td></tr>
+    <tr><td><code>Relics/</code></td><td>所有遗物 (Akabeko, Anchor...)</td></tr>
+    <tr><td><code>Potions/</code></td><td>所有药水</td></tr>
+    <tr><td><code>Monsters/</code></td><td>所有怪物</td></tr>
+    <tr><td><code>Encounters/</code></td><td>战斗遭遇配置</td></tr>
+    <tr><td><code>Events/</code></td><td>事件定义</td></tr>
+    <tr><td><code>Characters/</code></td><td>角色定义</td></tr>
+    <tr><td><code>Acts/</code></td><td>章节定义</td></tr>
+    <tr><td><code>Enchantments/</code></td><td>附魔系统</td></tr>
+    <tr><td><code>Afflictions/</code></td><td>诅咒/负面效果</td></tr>
+    <tr><td><code>CardPools/</code></td><td>卡池配置</td></tr>
+    <tr><td><code>RelicPools/</code> / <code>PotionPools/</code></td><td>遗物池/药水池</td></tr>
+    <tr><td><code>Orbs/</code></td><td>球系统（Defect 类角色）</td></tr>
+    <tr><td><code>Modifiers/</code></td><td>修改器</td></tr>
+    <tr><td><code>Singleton/</code></td><td>全局单例模型</td></tr>
+  </tbody>
+</table>
+
+<blockquote><p>注：多个子目录包含 <code>Mocks/</code> 文件夹，用于测试。</p></blockquote>
+
+<h4>关键基类继承树</h4>
+<pre><code>AbstractModel                  &lt;- 所有模型的基类
+  ├── CardModel               &lt;- 所有卡牌继承
+  ├── RelicModel              &lt;- 所有遗物继承
+  ├── PowerModel              &lt;- 所有力量继承
+  ├── PotionModel             &lt;- 所有药水继承
+  ├── MonsterModel            &lt;- 所有怪物继承
+  ├── EncounterModel          &lt;- 遭遇定义
+  ├── EventModel              &lt;- 事件定义
+  ├── EnchantmentModel        &lt;- 附魔
+  ├── CharacterModel          &lt;- 角色
+  ├── AfflictionModel         &lt;- 诅咒/负面
+  ├── ActModel                &lt;- 章节
+  ├── AchievementModel        &lt;- 成就
+  ├── CardPoolModel           &lt;- 卡池
+  ├── OrbModel                &lt;- 球
+  ├── ModifierModel           &lt;- 修改器
+  ├── SingletonModel          &lt;- 全局单例
+  └── ...</code></pre>
+
+<h4>Canonical vs Mutable 模式</h4>
+<p>这是 STS2 模型系统的核心设计：</p>
+<ul>
+  <li>每个模型有一个 <strong>Canonical（只读原型）</strong> 实例，存储在 <code>ModelDb</code> 中</li>
+  <li>运行时使用 <code>ToMutable()</code> 创建可变副本</li>
+  <li>通过 <code>AssertMutable()</code> / <code>AssertCanonical()</code> 保护数据一致性</li>
+  <li><code>ModelId</code> 由 Category + Entry 两部分组成，用于标识每个模型</li>
+</ul>
+<pre><code class="language-csharp">// 获取 canonical 实例
+CardModel canonical = ModelDb.Card&lt;Bash&gt;();
+
+// 创建可变副本
+CardModel mutable = canonical.ToMutable();
+mutable.AssertMutable(); // OK</code></pre>
+
+<h4>ModelDb — 模型数据库</h4>
+<p><code>ModelDb</code> 是静态类，管理所有模型的注册和查询：</p>
+<pre><code class="language-csharp">ModelDb.Card&lt;Bash&gt;()           // 获取卡牌
+ModelDb.Power&lt;VulnerablePower&gt;()  // 获取力量
+ModelDb.Monster&lt;Cultist&gt;()     // 获取怪物
+ModelDb.AllCards                // 所有卡牌
+ModelDb.AllRelics              // 所有遗物
+ModelDb.AllPowers              // 所有力量
+ModelDb.AllPotions             // 所有药水</code></pre>
+<p>模型类型通过 <code>[GenerateSubtypes]</code> 源码生成器自动注册，同时支持反射加载 Mod 中的子类型。</p>
+
+<hr>
+
+<!-- 2. Nodes -->
+<h3 id="sec1-2">2. <code>Nodes/</code> (672 文件) — UI/场景节点层 (Godot Node)</h3>
+<p>对应 Godot 的 Node 系统，处理所有视觉和场景逻辑。命名约定以 <code>N</code> 前缀开头。</p>
+
+<table>
+  <thead><tr><th>子目录</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>Cards/</code></td><td>卡牌 UI 节点 (NCard 等)</td></tr>
+    <tr><td><code>Combat/</code></td><td>战斗场景 UI (NCombatRoom, NCreature 等)</td></tr>
+    <tr><td><code>Rooms/</code></td><td>房间场景节点</td></tr>
+    <tr><td><code>Screens/</code></td><td>各种界面（地图、菜单...）</td></tr>
+    <tr><td><code>Rewards/</code></td><td>奖励界面</td></tr>
+    <tr><td><code>Relics/</code></td><td>遗物 UI</td></tr>
+    <tr><td><code>Potions/</code></td><td>药水 UI</td></tr>
+    <tr><td><code>Orbs/</code></td><td>球 UI</td></tr>
+    <tr><td><code>Events/</code></td><td>事件界面</td></tr>
+    <tr><td><code>Vfx/</code></td><td>特效节点</td></tr>
+    <tr><td><code>Animation/</code></td><td>动画系统</td></tr>
+    <tr><td><code>TopBar/</code></td><td>顶部状态栏</td></tr>
+    <tr><td><code>HoverTips/</code></td><td>悬浮提示</td></tr>
+    <tr><td><code>Multiplayer/</code></td><td>多人相关 UI</td></tr>
+    <tr><td><code>CommonUi/</code></td><td>通用 UI 组件</td></tr>
+    <tr><td><code>Pooling/</code></td><td>对象池</td></tr>
+    <tr><td><code>Ftue/</code></td><td>新手引导</td></tr>
+    <tr><td><code>Debug/</code></td><td>调试 UI</td></tr>
+    <tr><td><code>RestSite/</code></td><td>篝火 UI</td></tr>
+    <tr><td><code>TreasureRooms/</code></td><td>宝箱房 UI</td></tr>
+    <tr><td><code>Reaction/</code></td><td>反应/响应 UI</td></tr>
+    <tr><td><code>GodotExtensions/</code></td><td>Godot 扩展方法</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- 3. Combat -->
+<h3 id="sec1-3">3. <code>Combat/</code> (24 文件) — 战斗核心管理</h3>
+
+<table>
+  <thead><tr><th>文件</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>CombatManager.cs</code></td><td><strong>战斗系统核心</strong>（单例），管理整个战斗生命周期</td></tr>
+    <tr><td><code>CombatState.cs</code></td><td>战斗状态数据（玩家、敌人、回合数等）</td></tr>
+    <tr><td><code>CombatSide.cs</code></td><td>阵营枚举 (<code>Player</code> / <code>Enemy</code>)</td></tr>
+    <tr><td><code>CombatStateTracker.cs</code></td><td>战斗状态变化追踪</td></tr>
+    <tr><td><code>History/</code></td><td>战斗历史记录系统（24 种历史条目类型）</td></tr>
+  </tbody>
+</table>
+
+<h4>战斗历史条目类型</h4>
+<pre><code>BlockGainedEntry, CardAfflictedEntry, CardDiscardedEntry,
+CardDrawnEntry, CardExhaustedEntry, CardGeneratedEntry,
+CardPlayFinishedEntry, CardPlayStartedEntry, CreatureAttackedEntry,
+DamageReceivedEntry, EnergySpentEntry, MonsterPerformedMoveEntry,
+OrbChanneledEntry, PotionUsedEntry, PowerReceivedEntry,
+StarsModifiedEntry, SummonedEntry</code></pre>
+
+<h4>完整战斗流程 (<code>CombatManager</code>)</h4>
+<pre><code>SetUpCombat(state)
+  ├── 为每个玩家 ResetCombatState() + PopulateCombatState()
+  ├── 注册所有 Creature
+  └── 触发 CombatSetUp 事件
+
+AfterCombatRoomLoaded() → StartCombatInternal()
+  ├── 播放 BGM
+  ├── AfterCreatureAdded() — 初始化每个 Creature
+  ├── 暂停 ActionExecutor
+  ├── Hook.BeforeCombatStart()
+  ├── 显示战斗开始横幅
+  └── StartTurn()
+
+StartTurn()
+  ├── BeforeTurnStart() — 每个 Creature
+  ├── Hook.BeforeSideTurnStart()
+  │
+  ├── [玩家回合]
+  │   ├── 清空 ready 状态
+  │   ├── 显示玩家回合横幅
+  │   ├── 敌人 PrepareForNextTurn()（准备意图）
+  │   ├── SetupPlayerTurn() — 每个玩家
+  │   │   ├── 重置能量
+  │   │   ├── Hook.BeforeHandDraw / ModifyHandDraw
+  │   │   ├── 处理 Innate 卡牌置顶
+  │   │   ├── CardPileCmd.Draw() — 抽牌
+  │   │   └── Hook.AfterPlayerTurnStart()
+  │   ├── Orb 回合开始处理
+  │   ├── Hook.BeforePlayPhaseStart()
+  │   ├── ActionExecutor.Unpause() — 开始接受玩家操作
+  │   └── IsPlayPhase = true, 触发 TurnStarted 事件
+  │
+  └── [敌人回合]
+      ├── 显示敌人回合横幅
+      ├── ExecuteEnemyTurn()
+      │   ├── 遍历每个敌人
+      │   │   ├── PerformIntent() — 展示意图动画
+      │   │   ├── TakeTurn() — 执行行动
+      │   │   └── CheckWinCondition()
+      │   └── EndEnemyTurn()
+      └── SwitchSides() → StartTurn() — 回到玩家回合
+
+结束玩家回合流程:
+  SetReadyToEndTurn()
+    → AllPlayersReadyToEndTurn()
+    → AfterAllPlayersReadyToEndTurn()
+      → EndPlayerTurnPhaseOneInternal()
+      │   ├── Hook.BeforeTurnEnd()
+      │   ├── Orb 回合结束处理
+      │   ├── 虚无卡牌耗尽
+      │   ├── TurnEnd 手牌效果触发
+      │   └── Hook.BeforeFlush()
+      → ReadyToBeginEnemyTurnAction
+      → AfterAllPlayersReadyToBeginEnemyTurn()
+        → EndPlayerTurnPhaseTwoInternal()
+        │   ├── 保留 (Retain) 卡牌处理
+        │   ├── 非保留卡牌弃牌
+        │   ├── EndOfTurnCleanup()
+        │   └── Hook.AfterTurnEnd()
+        → SwitchFromPlayerToEnemySide()
+          ├── 检查额外回合 (ShouldTakeExtraTurn)
+          ├── SwitchSides()
+          └── StartTurn()
+
+胜负判定:
+  CheckWinCondition()
+    ├── 有 _pendingLoss → ProcessPendingLoss() → CombatEnded 事件
+    └── IsEnding (所有主要敌人死亡) → EndCombatInternal()
+        ├── 复活玩家
+        ├── Hook.AfterCombatEnd() / AfterCombatVictory()
+        ├── 保存回放
+        ├── CombatWon / CombatEnded 事件
+        └── 返回地图</code></pre>
+
+<hr>
+
+<!-- 4. Commands -->
+<h3 id="sec1-4">4. <code>Commands/</code> (22 文件) — 命令 API</h3>
+<p><strong>静态工具类</strong>，是开发中最常用的 API 层。所有游戏逻辑操作都通过这些命令类进行。</p>
+
+<table>
+  <thead><tr><th>命令类</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>Cmd.cs</code></td><td>基础命令 — <code>Wait()</code> 等待、<code>CustomScaledWait()</code> 按速度缩放等待</td></tr>
+    <tr><td><code>DamageCmd.cs</code></td><td>伤害命令 — 创建 <code>AttackCommand</code> Builder</td></tr>
+    <tr><td><code>PowerCmd.cs</code></td><td>力量施加/修改/移除</td></tr>
+    <tr><td><code>CardCmd.cs</code></td><td>卡牌操作（打出、耗尽、升级...）</td></tr>
+    <tr><td><code>CardPileCmd.cs</code></td><td>牌堆操作（抽牌、弃牌、洗牌、添加到牌堆...）</td></tr>
+    <tr><td><code>CardSelectCmd.cs</code></td><td>卡牌选择 UI</td></tr>
+    <tr><td><code>PlayerCmd.cs</code></td><td>玩家操作（能量增减、金币增减、星星...）</td></tr>
+    <tr><td><code>CreatureCmd.cs</code></td><td>生物操作（召唤怪物、添加到战场...）</td></tr>
+    <tr><td><code>OrbCmd.cs</code></td><td>球操作（引导、激发...）</td></tr>
+    <tr><td><code>PotionCmd.cs</code></td><td>药水操作</td></tr>
+    <tr><td><code>RelicCmd.cs</code></td><td>遗物操作</td></tr>
+    <tr><td><code>RelicSelectCmd.cs</code></td><td>遗物选择</td></tr>
+    <tr><td><code>RewardsCmd.cs</code></td><td>奖励操作</td></tr>
+    <tr><td><code>SfxCmd.cs</code></td><td>音效播放</td></tr>
+    <tr><td><code>VfxCmd.cs</code></td><td>特效播放</td></tr>
+    <tr><td><code>TalkCmd.cs</code></td><td>对话气泡</td></tr>
+    <tr><td><code>ThinkCmd.cs</code></td><td>思考气泡</td></tr>
+    <tr><td><code>MapCmd.cs</code></td><td>地图操作</td></tr>
+    <tr><td><code>ForgeCmd.cs</code></td><td>锻造操作</td></tr>
+    <tr><td><code>OstyCmd.cs</code></td><td>Osty 相关</td></tr>
+  </tbody>
+</table>
+
+<h4>AttackCommand Builder 模式（流式 API）</h4>
+<p><code>DamageCmd.Attack()</code> 返回 <code>AttackCommand</code> 对象，使用 Builder 模式链式调用：</p>
+<pre><code class="language-csharp">await DamageCmd.Attack(8m)           // 每次命中伤害
+    .FromCard(this)                   // 来源：卡牌
+    .Targeting(cardPlay.Target)       // 目标
+    .WithHitFx("vfx/...", null, "blunt_attack.mp3")  // 命中特效+音效
+    .Execute(choiceContext);          // 执行
+
+// 多段攻击
+await DamageCmd.Attack(2m)
+    .FromCard(this)
+    .Targeting(target)
+    .HitCount(5)                     // 5 次命中
+    .Execute(choiceContext);
+
+// 来自怪物的攻击
+await DamageCmd.Attack(12m)
+    .FromMonster(this)
+    .Targeting(players)
+    .Execute(choiceContext);</code></pre>
+
+<h4>AttackCommand 内部属性</h4>
+<pre><code>Attacker          — 攻击者 Creature
+ModelSource       — 来源 Model（卡牌或怪物）
+_damagePerHit     — 每次命中伤害
+_hitCount         — 命中次数
+_singleTarget     — 单体目标
+_shouldPlayAnimation — 是否播放攻击动画
+_attackerAnimName — 攻击者动画名
+各种 VFX/SFX 配置</code></pre>
+
+<hr>
+
+<!-- 5. Entities -->
+<h3 id="sec1-5">5. <code>Entities/</code> (120 文件) — 实体定义和枚举</h3>
+<p>游戏对象的运行时实体、枚举和关联类型。</p>
+
+<h4><code>Cards/</code> — 卡牌相关枚举和类</h4>
+<table>
+  <thead><tr><th>类型</th><th>值</th></tr></thead>
+  <tbody>
+    <tr><td><code>CardType</code></td><td><code>None, Attack, Skill, Power, Status, Curse, Quest</code></td></tr>
+    <tr><td><code>CardRarity</code></td><td><code>None, Basic, Common, Uncommon, Rare, Ancient, Event, Token, Status, Curse, Quest</code></td></tr>
+    <tr><td><code>CardKeyword</code></td><td><code>None, Exhaust, Ethereal, Innate, Unplayable, Retain, Sly, Eternal</code></td></tr>
+    <tr><td><code>TargetType</code></td><td>目标类型（AnyEnemy, AllEnemies, Self, None...）</td></tr>
+    <tr><td><code>PileType</code></td><td>牌堆类型（Draw, Hand, Discard, Exhaust, Play）</td></tr>
+    <tr><td><code>CardPile</code></td><td>牌堆运行时数据结构</td></tr>
+    <tr><td><code>CardPlay</code></td><td>卡牌打出上下文（目标、能量花费等）</td></tr>
+    <tr><td><code>CardEnergyCost</code></td><td>能量花费管理</td></tr>
+    <tr><td><code>CardScope</code></td><td>卡牌作用域</td></tr>
+    <tr><td><code>CardTag</code></td><td>卡牌标签</td></tr>
+    <tr><td><code>CostModifiers</code></td><td>费用修改器系统</td></tr>
+  </tbody>
+</table>
+
+<h4><code>Creatures/</code> — 核心战斗实体</h4>
+<p><code>Creature</code> 是战斗中所有实体（玩家角色和怪物）的统一类：</p>
+<pre><code class="language-csharp">public class Creature
+{
+    int Block           // 格挡值
+    int CurrentHp       // 当前生命
+    int MaxHp           // 最大生命
+    List&lt;PowerModel&gt; _powers  // 身上的力量列表
+
+    bool IsAlive / IsDead
+    bool IsEnemy / IsMonster
+    bool IsPrimaryEnemy
+    Monster? Monster    // 如果是怪物，关联的 MonsterModel
+    Player? PetOwner    // 如果是宠物，主人
+
+    // 事件
+    event BlockChanged
+    event CurrentHpChanged
+    event MaxHpChanged
+}</code></pre>
+
+<h4><code>Players/</code> — 玩家运行时</h4>
+<p>管理玩家的战斗状态和运行状态。</p>
+
+<h4><code>Powers/</code> — 力量枚举</h4>
+<pre><code class="language-csharp">enum PowerType    // 力量类型分类
+enum PowerStackType  // 叠加类型</code></pre>
+
+<h4><code>Relics/</code> — 遗物枚举</h4>
+<pre><code class="language-csharp">enum RelicRarity  // 遗物稀有度
+enum RelicStatus  // 遗物状态</code></pre>
+
+<h4>其他子目录</h4>
+<table>
+  <thead><tr><th>子目录</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>Intents/</code></td><td>怪物意图系统</td></tr>
+    <tr><td><code>Orbs/</code></td><td>球系统运行时</td></tr>
+    <tr><td><code>Enchantments/</code></td><td>附魔运行时</td></tr>
+    <tr><td><code>Encounters/</code></td><td>遭遇运行时</td></tr>
+    <tr><td><code>Actions/</code></td><td>行动相关</td></tr>
+    <tr><td><code>Characters/</code></td><td>角色相关</td></tr>
+    <tr><td><code>Ancients/</code></td><td>远古系统</td></tr>
+    <tr><td><code>Ascension/</code></td><td>攀升系统</td></tr>
+    <tr><td><code>Gold/</code></td><td>金币系统</td></tr>
+    <tr><td><code>Merchant/</code></td><td>商人系统</td></tr>
+    <tr><td><code>RestSite/</code></td><td>篝火系统</td></tr>
+    <tr><td><code>Rewards/</code></td><td>奖励系统</td></tr>
+    <tr><td><code>Rngs/</code></td><td>随机数生成器</td></tr>
+    <tr><td><code>Text/</code></td><td>文本系统</td></tr>
+    <tr><td><code>CardRewardAlternatives/</code></td><td>卡牌奖励替代选项</td></tr>
+    <tr><td><code>TreasureRelicPicking/</code></td><td>宝箱遗物选择</td></tr>
+    <tr><td><code>Multiplayer/</code></td><td>多人实体</td></tr>
+    <tr><td><code>Models/</code></td><td>实体模型</td></tr>
+    <tr><td><code>UI/</code></td><td>UI 相关实体</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- 6. GameActions -->
+<h3 id="sec1-6">6. <code>GameActions/</code> (38 文件) — 游戏行动队列系统</h3>
+<p>异步行动执行引擎，用于处理需要同步的游戏操作。</p>
+
+<h4>GameAction 基类</h4>
+<pre><code class="language-csharp">public abstract class GameAction
+{
+    GameActionState State;  // None → WaitingForExecution → Executing → Finished
+                            //                            → GatheringPlayerChoice → ReadyToResumeExecuting
+    ulong OwnerId;          // 行动所有者 ID
+    GameActionType ActionType; // 行动类型
+    uint? Id;               // 行动唯一 ID
+    Task CompletionTask;    // 完成时的 Task
+
+    abstract Task ExecuteAction();  // 子类实现具体逻辑
+    void PauseForPlayerChoice();    // 暂停等待玩家选择
+    void Cancel();                  // 取消行动
+    abstract INetAction ToNetAction(); // 序列化为网络行动
+}</code></pre>
+
+<h4>ActionExecutor — 行动执行器</h4>
+<ul>
+  <li>从 <code>ActionQueueSet</code> 取出就绪行动并执行</li>
+  <li>支持暂停/恢复</li>
+  <li>每次行动完成后检查 <code>CheckWinCondition()</code></li>
+  <li>与 Godot 帧循环同步</li>
+</ul>
+
+<h4>具体行动类型</h4>
+<table>
+  <thead><tr><th>行动</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>PlayCardAction</code></td><td>出牌</td></tr>
+    <tr><td><code>EndPlayerTurnAction</code></td><td>结束回合</td></tr>
+    <tr><td><code>UsePotionAction</code></td><td>使用药水</td></tr>
+    <tr><td><code>DiscardPotionGameAction</code></td><td>丢弃药水</td></tr>
+    <tr><td><code>PickRelicAction</code></td><td>选择遗物</td></tr>
+    <tr><td><code>MoveToMapCoordAction</code></td><td>移动到地图坐标</td></tr>
+    <tr><td><code>ReadyToBeginEnemyTurnAction</code></td><td>准备开始敌人回合</td></tr>
+    <tr><td><code>UndoEndPlayerTurnAction</code></td><td>撤销结束回合</td></tr>
+    <tr><td><code>VoteForMapCoordAction</code></td><td>投票选择地图路径</td></tr>
+    <tr><td><code>VoteToMoveToNextActAction</code></td><td>投票进入下一章</td></tr>
+    <tr><td><code>GenericHookGameAction</code></td><td>通用 Hook 行动</td></tr>
+  </tbody>
+</table>
+
+<h4>多人同步子系统 (<code>Multiplayer/</code>)</h4>
+<table>
+  <thead><tr><th>文件</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>ActionQueueSet</code></td><td>多队列管理</td></tr>
+    <tr><td><code>ActionQueueSynchronizer</code></td><td>行动同步器</td></tr>
+    <tr><td><code>PlayerChoiceSynchronizer</code></td><td>玩家选择同步</td></tr>
+    <tr><td><code>PlayerChoiceContext</code></td><td>选择上下文</td></tr>
+    <tr><td><code>INetAction</code></td><td>网络行动接口</td></tr>
+    <tr><td><code>NetCombatCardDb</code></td><td>网络卡牌数据库</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- 7. Hooks -->
+<h3 id="sec1-7">7. <code>Hooks/</code> (2 文件) — Hook 事件系统</h3>
+<p><code>Hook.cs</code> 是一个<strong>巨大的静态类</strong>，提供所有游戏事件钩子。</p>
+
+<h4>工作原理</h4>
+<p>每个钩子遍历 <code>CombatState.IterateHookListeners()</code> 返回的所有 <code>AbstractModel</code>（包括遗物、力量、怪物等），调用对应的虚方法：</p>
+<pre><code class="language-csharp">// Hook.cs 中的典型模式
+public static async Task BeforeAttack(CombatState combatState, AttackCommand command)
+{
+    foreach (AbstractModel model in combatState.IterateHookListeners())
+    {
+        await model.BeforeAttack(command);
+        model.InvokeExecutionFinished();
+    }
+}</code></pre>
+
+<h4>关键钩子列表</h4>
+<p><strong>战斗生命周期</strong>:</p>
+<pre><code>BeforeCombatStart / AfterCombatEnd / AfterCombatVictory</code></pre>
+
+<p><strong>攻击相关</strong>:</p>
+<pre><code>BeforeAttack / AfterAttack
+AfterBlockBroken / AfterBlockCleared
+BeforeBlockGained</code></pre>
+
+<p><strong>回合相关</strong>:</p>
+<pre><code>BeforeSideTurnStart / AfterSideTurnStart
+BeforeTurnEnd / AfterTurnEnd
+BeforePlayPhaseStart
+AfterPlayerTurnStart</code></pre>
+
+<p><strong>卡牌相关</strong>:</p>
+<pre><code>BeforeHandDraw / AfterHandEmptied
+AfterCardRetained
+ModifyHandDraw</code></pre>
+
+<p><strong>能量相关</strong>:</p>
+<pre><code>ModifyEnergyGain
+AfterEnergyReset</code></pre>
+
+<p><strong>流程控制</strong>:</p>
+<pre><code>ShouldFlush — 是否弃掉手牌
+ShouldEtherealTrigger — 虚无是否触发
+ShouldTakeExtraTurn — 是否获得额外回合
+ShouldPlayerResetEnergy — 是否重置能量
+ShouldStopCombatFromEnding — 是否阻止战斗结束</code></pre>
+
+<p><strong>其他</strong>:</p>
+<pre><code>AfterActEntered
+BeforeFlush
+AfterTakingExtraTurn
+AfterModifyingHandDraw / AfterModifyingEnergyGain</code></pre>
+
+<h4>如何在模型中接收钩子</h4>
+<p>在 <code>AbstractModel</code> 的子类中重写对应的虚方法：</p>
+<pre><code class="language-csharp">public class MyRelic : RelicModel
+{
+    public override bool ShouldReceiveCombatHooks =&gt; true;
+
+    public override async Task BeforeAttack(AttackCommand command)
+    {
+        // 在攻击前做一些事情
+    }
+
+    public override async Task AfterCombatEnd()
+    {
+        // 战斗结束后做一些事情
+    }
+}</code></pre>
+
+<hr>
+
+<!-- 8. Runs -->
+<h3 id="sec1-8">8. <code>Runs/</code> (38 文件) — 游戏运行管理</h3>
+<table>
+  <thead><tr><th>文件/子模块</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>RunManager.cs</code></td><td><strong>运行管理核心</strong>（单例），管理整个 Run 的生命周期</td></tr>
+    <tr><td><code>IRunState</code></td><td>运行状态接口</td></tr>
+    <tr><td><code>History/</code></td><td>运行历史记录</td></tr>
+    <tr><td><code>Metrics/</code></td><td>运行指标/统计</td></tr>
+  </tbody>
+</table>
+
+<p><code>RunManager</code> 持有：</p>
+<ul>
+  <li><code>ActionExecutor</code> — 行动执行器</li>
+  <li><code>ActionQueueSynchronizer</code> — 行动同步器</li>
+  <li><code>ActionQueueSet</code> — 行动队列集</li>
+  <li><code>NetService</code> — 网络服务</li>
+  <li><code>ChecksumTracker</code> — 校验和追踪</li>
+</ul>
+
+<hr>
+
+<!-- 9. Rooms -->
+<h3 id="sec1-9">9. <code>Rooms/</code> (14 文件) — 房间系统</h3>
+
+<h4>继承树</h4>
+<pre><code>AbstractRoom
+  ├── CombatRoom      &lt;- 战斗房间
+  ├── EventRoom       &lt;- 事件房间
+  ├── MerchantRoom    &lt;- 商店
+  ├── RestSiteRoom    &lt;- 篝火
+  ├── TreasureRoom    &lt;- 宝箱房
+  └── MapRoom         &lt;- 地图</code></pre>
+
+<h4>RoomType 枚举</h4>
+<pre><code>Boss, Elite, Normal, Event, Merchant, RestSite, Treasure, Map, ...</code></pre>
+
+<hr>
+
+<!-- 10. Modding -->
+<h3 id="sec1-10">10. <code>Modding/</code> (10 文件) — Mod 系统</h3>
+<table>
+  <thead><tr><th>文件</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>ModManager.cs</code></td><td>Mod 加载管理器（静态类）</td></tr>
+    <tr><td><code>Mod.cs</code></td><td>Mod 实例</td></tr>
+    <tr><td><code>ModManifest.cs</code></td><td>Mod 清单文件（JSON）</td></tr>
+    <tr><td><code>ModHelper.cs</code></td><td>Mod 辅助工具</td></tr>
+    <tr><td><code>ModInitializerAttribute.cs</code></td><td>Mod 入口点标记属性</td></tr>
+    <tr><td><code>ModSettings.cs</code></td><td>Mod 设置</td></tr>
+    <tr><td><code>ModSource.cs</code></td><td>Mod 来源（本地目录 / Steam Workshop）</td></tr>
+    <tr><td><code>SettingsSaveMod.cs</code></td><td>Mod 设置保存</td></tr>
+    <tr><td><code>IModManagerFileIo.cs</code></td><td>文件 IO 接口</td></tr>
+    <tr><td><code>ModManagerFileIo.cs</code></td><td>文件 IO 实现</td></tr>
+  </tbody>
+</table>
+
+<h4>Mod 加载流程</h4>
+<ol>
+  <li>扫描 <code>{游戏目录}/mods/</code> 文件夹 + Steam Workshop</li>
+  <li>读取每个 Mod 的 <code>ModManifest.json</code></li>
+  <li>按用户设置排序</li>
+  <li>加载 DLL 程序集</li>
+  <li>查找并调用 <code>[ModInitializer]</code> 标记的方法</li>
+  <li>使用 <strong>HarmonyLib</strong> 进行方法补丁</li>
+</ol>
+<pre><code class="language-csharp">[ModInitializer]
+public static void Initialize()
+{
+    // Mod 入口点
+}</code></pre>
+
+<hr>
+
+<!-- 11. 其他重要模块 -->
+<h3 id="sec1-11">11. 其他重要模块</h3>
+<table>
+  <thead><tr><th>模块</th><th>文件数</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>Multiplayer/</code></td><td>144</td><td>多人联机系统（大厅、P2P、回放...）</td></tr>
+    <tr><td><code>Saves/</code></td><td>103</td><td>存档系统（运行存档、偏好设置、进度...）</td></tr>
+    <tr><td><code>Timeline/</code></td><td>74</td><td>时间线/赛季系统</td></tr>
+    <tr><td><code>Localization/</code></td><td>57</td><td>本地化系统（DynamicVars 动态变量插值）</td></tr>
+    <tr><td><code>DevConsole/</code></td><td>53</td><td>开发者控制台</td></tr>
+    <tr><td><code>AutoSlay/</code></td><td>30</td><td>自动游玩/AI 系统</td></tr>
+    <tr><td><code>Platform/</code></td><td>26</td><td>平台抽象层 (Steam 等)</td></tr>
+    <tr><td><code>MonsterMoves/</code></td><td>24</td><td>怪物 AI 状态机</td></tr>
+    <tr><td><code>Helpers/</code></td><td>24</td><td>工具类</td></tr>
+    <tr><td><code>RichTextTags/</code></td><td>16</td><td>富文本标签系统</td></tr>
+    <tr><td><code>Map/</code></td><td>14</td><td>地图生成和导航</td></tr>
+    <tr><td><code>Debug/</code></td><td>14</td><td>调试工具</td></tr>
+    <tr><td><code>Bindings/</code></td><td>13</td><td>原生绑定 (MegaSpine 等)</td></tr>
+    <tr><td><code>ControllerInput/</code></td><td>12</td><td>手柄输入</td></tr>
+    <tr><td><code>Assets/</code></td><td>12</td><td>资源管理</td></tr>
+    <tr><td><code>Rewards/</code></td><td>11</td><td>奖励系统</td></tr>
+    <tr><td><code>Events/</code></td><td>10</td><td>事件触发器</td></tr>
+    <tr><td><code>Logging/</code></td><td>9</td><td>日志系统</td></tr>
+    <tr><td><code>HoverTips/</code></td><td>7</td><td>悬浮提示</td></tr>
+    <tr><td><code>TestSupport/</code></td><td>6</td><td>测试支持</td></tr>
+    <tr><td><code>Odds/</code></td><td>6</td><td>概率/赔率计算</td></tr>
+    <tr><td><code>Leaderboard/</code></td><td>5</td><td>排行榜</td></tr>
+    <tr><td><code>Audio/</code></td><td>5</td><td>音频系统</td></tr>
+    <tr><td><code>ValueProps/</code></td><td>4</td><td>值属性系统</td></tr>
+    <tr><td><code>Settings/</code></td><td>3</td><td>设置管理</td></tr>
+    <tr><td><code>Factories/</code></td><td>3</td><td>工厂类</td></tr>
+    <tr><td><code>Extensions/</code></td><td>3</td><td>扩展方法</td></tr>
+    <tr><td><code>Exceptions/</code></td><td>3</td><td>自定义异常</td></tr>
+    <tr><td><code>Daily/</code></td><td>3</td><td>每日挑战</td></tr>
+    <tr><td><code>Achievements/</code></td><td>3</td><td>成就系统</td></tr>
+    <tr><td><code>Unlocks/</code></td><td>2</td><td>解锁系统</td></tr>
+    <tr><td><code>Random/</code></td><td>2</td><td>随机数系统 (<code>Rng</code>)</td></tr>
+    <tr><td><code>Animation/</code></td><td>2</td><td>动画辅助</td></tr>
+    <tr><td><code>Context/</code></td><td>1</td><td><code>LocalContext</code> — 本地玩家上下文</td></tr>
+    <tr><td><code>CardSelection/</code></td><td>1</td><td>卡牌选择</td></tr>
+    <tr><td><code>TextEffects/</code></td><td>1</td><td>文字特效</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- 二、核心架构模式 -->
+<h2 id="sec2">二、核心架构模式</h2>
+
+<h3>Model-Entity-Node 三层架构</h3>
+<pre><code>Models/   → 数据定义层（CardModel, RelicModel...）  — 定义"是什么"
+Entities/ → 运行时实体层（Creature, CardPile...）   — 定义"怎么运作"
+Nodes/    → 表现层 Godot Node（NCard, NCombatRoom...）— 定义"怎么显示"</code></pre>
+<ul>
+  <li><strong>Models</strong> 定义游戏对象的属性和行为逻辑</li>
+  <li><strong>Entities</strong> 管理运行时状态和枚举类型</li>
+  <li><strong>Nodes</strong> 处理 Godot 场景树中的视觉表现</li>
+</ul>
+
+<h3>数值系统</h3>
+<ul>
+  <li><strong>所有游戏数值使用 <code>decimal</code> 类型</strong>（非 int 或 float），确保精度</li>
+  <li><code>DynamicVar</code> 系统处理数值定义、修改和 UI 显示</li>
+  <li><code>DynamicVarSet</code> 是每个模型拥有的动态变量集合</li>
+  <li><code>ValueProp</code> 标记数值属性类别（用于 Hook 修改判断）</li>
+</ul>
+<p>常见 DynamicVar 子类型：</p>
+<pre><code class="language-csharp">DamageVar(8m, ValueProp.Move)      // 伤害变量
+BlockVar(5m)                        // 格挡变量
+PowerVar&lt;VulnerablePower&gt;(2m)       // 力量层数变量
+MagicVar(3m)                        // 通用数值变量
+EnergyVar(1m)                       // 能量变量</code></pre>
+
+<h3>异步编程模式</h3>
+<p>STS2 大量使用 <code>async/await</code>，与 Godot 帧循环结合：</p>
+<pre><code class="language-csharp">// 等待 Godot 帧信号
+await Engine.GetMainLoop().ToSignal(Engine.GetMainLoop(), SceneTree.SignalName.ProcessFrame);
+
+// 等待指定时间（受速度设置影响）
+await Cmd.Wait(0.5f);
+await Cmd.CustomScaledWait(fastSeconds: 0.3f, standardSeconds: 0.6f);
+
+// PlayerChoiceContext — 处理玩家交互等待
+HookPlayerChoiceContext ctx = new HookPlayerChoiceContext(player, netId, actionType);
+Task task = SomeAsyncOperation(ctx);
+await ctx.AssignTaskAndWaitForPauseOrCompletion(task);</code></pre>
+
+<h3>速度模式</h3>
+<p>游戏支持三种速度模式，影响等待时间：</p>
+<pre><code class="language-csharp">enum FastModeType { Normal, Fast, Instant }</code></pre>
+
+<hr>
+
+<!-- 三、关键单例 -->
+<h2 id="sec3">三、关键单例</h2>
+<table>
+  <thead><tr><th>单例</th><th>访问方式</th><th>说明</th></tr></thead>
+  <tbody>
+    <tr><td><code>CombatManager</code></td><td><code>CombatManager.Instance</code></td><td>战斗管理（状态、回合、胜负）</td></tr>
+    <tr><td><code>RunManager</code></td><td><code>RunManager.Instance</code></td><td>运行管理（行动队列、网络、存档）</td></tr>
+    <tr><td><code>SaveManager</code></td><td><code>SaveManager.Instance</code></td><td>存档管理（偏好设置、进度、运行存档）</td></tr>
+    <tr><td><code>ModelDb</code></td><td><code>ModelDb.XXX</code> (静态类)</td><td>模型数据库（查询所有游戏对象）</td></tr>
+    <tr><td><code>LocalContext</code></td><td><code>LocalContext.XXX</code> (静态类)</td><td>本地玩家上下文</td></tr>
+    <tr><td><code>ModManager</code></td><td><code>ModManager.XXX</code> (静态类)</td><td>Mod 管理（加载、列表）</td></tr>
+  </tbody>
+</table>
+
+<hr>
+
+<!-- 四、卡牌开发完整模板 -->
+<h2 id="sec4">四、卡牌开发完整模板</h2>
+<pre><code class="language-csharp">using System.Collections.Generic;
+using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
+using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.ValueProps;
+
+namespace MegaCrit.Sts2.Core.Models.Cards;
+
+public sealed class MyCard : CardModel
+{
+    // 悬浮提示（显示关联的力量/关键词说明）
+    protected override IEnumerable&lt;IHoverTip&gt; ExtraHoverTips =&gt;
+        new[] { HoverTipFactory.FromPower&lt;VulnerablePower&gt;() };
+
+    // 动态变量定义（用于描述文本中 {damage} {vulnerable} 的插值）
+    protected override IEnumerable&lt;DynamicVar&gt; CanonicalVars =&gt; new DynamicVar[]
+    {
+        new DamageVar(8m, ValueProp.Move),
+        new PowerVar&lt;VulnerablePower&gt;(2m)
+    };
+
+    // 构造函数：能量费用, 卡牌类型, 稀有度, 目标类型
+    public MyCard()
+        : base(2, CardType.Attack, CardRarity.Common, TargetType.AnyEnemy)
+    {
+    }
+
+    // 打出效果
+    protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        // 造成伤害
+        await DamageCmd.Attack(base.DynamicVars.Damage.BaseValue)
+            .FromCard(this)
+            .Targeting(cardPlay.Target)
+            .WithHitFx("vfx/vfx_attack_blunt", null, "blunt_attack.mp3")
+            .Execute(choiceContext);
+
+        // 施加易伤
+        await PowerCmd.Apply&lt;VulnerablePower&gt;(
+            cardPlay.Target,
+            base.DynamicVars.Vulnerable.BaseValue,
+            base.Owner.Creature,
+            this);
+    }
+
+    // 升级效果
+    protected override void OnUpgrade()
+    {
+        base.DynamicVars.Damage.UpgradeValueBy(2m);
+        base.DynamicVars.Vulnerable.UpgradeValueBy(1m);
+    }
+}</code></pre>
+
+<hr>
+
+<!-- 五、常用 API 速查 -->
+<h2 id="sec5">五、常用 API 速查</h2>
+
+<h3>伤害</h3>
+<pre><code class="language-csharp">// 单体攻击
+await DamageCmd.Attack(damage).FromCard(card).Targeting(target).Execute(ctx);
+
+// 多段攻击
+await DamageCmd.Attack(damage).FromCard(card).Targeting(target).HitCount(5).Execute(ctx);
+
+// 全体攻击
+await DamageCmd.Attack(damage).FromCard(card).Targeting(allEnemies).Execute(ctx);</code></pre>
+
+<h3>格挡</h3>
+<pre><code class="language-csharp">await CreatureCmd.GainBlock(creature, amount, cardSource, choiceContext);</code></pre>
+
+<h3>力量</h3>
+<pre><code class="language-csharp">// 施加力量
+await PowerCmd.Apply&lt;StrengthPower&gt;(target, amount, applier, cardSource);
+
+// 对多个目标施加
+await PowerCmd.Apply&lt;VulnerablePower&gt;(targets, amount, applier, cardSource);</code></pre>
+
+<h3>卡牌操作</h3>
+<pre><code class="language-csharp">// 抽牌
+await CardPileCmd.Draw(ctx, count, player);
+
+// 耗尽
+await CardCmd.Exhaust(ctx, card);
+
+// 添加到弃牌堆
+await CardPileCmd.Add(card, PileType.Discard.GetPile(player));</code></pre>
+
+<h3>能量</h3>
+<pre><code class="language-csharp">await PlayerCmd.GainEnergy(amount, player);
+await PlayerCmd.LoseEnergy(amount, player);</code></pre>
+
+<h3>音效和特效</h3>
+<pre><code class="language-csharp">SfxCmd.Play("event:/sfx/ui/gain_energy");
+await VfxCmd.Play("vfx/some_effect", position);</code></pre>
+
+<hr>
+
+<blockquote>
+  <p>本文档基于对 <code>G:\p\newsts2\src\Core\</code> 源码的分析生成。</p>
+</blockquote>
+
+</body>
+</html>

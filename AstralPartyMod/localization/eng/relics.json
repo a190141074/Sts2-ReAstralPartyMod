@@ -1,0 +1,8 @@
+{
+  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.title": "[Persona: Steamed Egg]",
+  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.description": "Shows a counter from 1 to 3 in combat. At the end of every 3rd turn, add 1 [card]Trouble Maker[/card] to your hand.",
+  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.flavor": "It always finds the perfect beat for the worst possible idea.",
+  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.title": "[Persona: Samurai Prawn]",
+  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.description": "Shows a counter from 1 to 3 in combat. At the end of every 3rd turn, add 1 [card]Famous Blade[/card] to your hand. The first time each turn you attack an enemy, gain 1 stack of [power]Sword Aura[/power]. The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks.",
+  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.flavor": "A single slash settles the stance. The third slash settles the battle."
+}

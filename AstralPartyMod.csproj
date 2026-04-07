@@ -1,0 +1,95 @@
+<Project Sdk="Godot.NET.Sdk/4.5.1">
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<ImplicitUsings>true</ImplicitUsings>
+		<LangVersion>12.0</LangVersion>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+		<!-- 改成你的杀戮尖塔2目录 -->
+		<Sts2Dir>D:\Steam\steamapps\common\Slay the Spire 2</Sts2Dir>
+		<Sts2DataDir>$(Sts2Dir)\data_sts2_windows_x86_64</Sts2DataDir>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Reference Include="sts2">
+			<HintPath>$(Sts2DataDir)\sts2.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+
+		<Reference Include="0Harmony">
+			<HintPath>$(Sts2DataDir)\0Harmony.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+
+		<!-- 本地引用，注意路径是否正确 -->
+		<Reference Include="BaseLib">
+			<HintPath>$(Sts2Dir)/mods/BaseLib/BaseLib.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
+
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="AstralPartyMod\images\card_portraits\event_angels_descent.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_crowded_passage.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_deus_ex_machina.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_equality.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_fight_fun.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_food_safety.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_gift_from_sky.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_hand_erase.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_player_representative.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_red_heat_warning.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_sprint.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\event_thunder_strike.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_medium.png" />
+		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_large.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_extra_large.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_gawu_cutter.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\skill_famous_blade.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\skill_trouble_maker.png" />
+		<Content Include="AstralPartyMod\images\powers\star_light_power.png"/>
+		<Content Include="AstralPartyMod\images\powers\sword_aura_power.png"/>
+		<Content Include="AstralPartyMod\images\relic\person_mousy_lian.png" />
+		<Content Include="AstralPartyMod\images\relic\person_proprietress.png" />
+		<Content Include="AstralPartyMod\images\relic\person_samurai_prawn.png" />
+		<Content Include="AstralPartyMod\images\relic\person_slime_lulu.png" />
+		<Content Include="AstralPartyMod\images\relic\person_weird_egg.png"/>
+		<Content Include="AstralPartyMod\localization\eng\cards.json"/>
+		<Content Include="AstralPartyMod\localization\eng\card_keywords.json"/>
+		<Content Include="AstralPartyMod\localization\eng\powers.json"/>
+		<Content Include="AstralPartyMod\localization\eng\relics.json"/>
+		<Content Include="AstralPartyMod\localization\eng\modifiers.json.block"/>
+		<Content Include="AstralPartyMod\localization\zhs\cards.json"/>
+		<Content Include="AstralPartyMod\localization\zhs\card_keywords.json"/>
+		<Content Include="AstralPartyMod\localization\zhs\powers.json"/>
+		<Content Include="AstralPartyMod\localization\zhs\relics.json"/>
+		<Content Include="AstralPartyMod\localization\zhs\modifiers.json.block"/>
+		<Content Include="help\CardRarity.md"/>
+		<Content Include="help\CardSelectCmd.FromSimpleGrid.md" />
+		<Content Include="help\TargetType.md"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove=".godot\**\*.cs"/>
+		<Compile Remove="tmp_inspect\**\*.cs"/>
+		<Compile Remove="tmp_inspect2\**\*.cs"/>
+		<Compile Remove="tmp_inspect3\**\*.cs"/>
+		<Compile Remove="tmp_inspect4.cs"/>
+		<Compile Remove="tmp_reflect\**\*.cs"/>
+		<Compile Remove="AstralPartyCardCode\Keywords\MyKeywords.cs"/>
+		<Compile Include="AstralPartyCardCode\Modifiers\PersonWeirdEggStartModifier.cs.block"/>
+		<Compile Include="AstralPartyCardCode\Patches\ModifierRegistrationPatch.cs.block"/>
+	</ItemGroup>
+
+	<!-- 自动复制dll和json -->
+	<Target Name="Copy Mod" AfterTargets="PostBuildEvent">
+		<Message Text="Copying mod to Slay the Spire 2 mods folder..." Importance="high"/>
+		<MakeDir Directories="$(Sts2Dir)\mods\"/>
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Sts2Dir)\mods\$(MSBuildProjectName)\"/>
+		<Copy SourceFiles="$(MSBuildProjectName).json" DestinationFolder="$(Sts2Dir)/mods/$(MSBuildProjectName)/"/>
+	</Target>
+</Project>

@@ -1,0 +1,8 @@
+﻿{
+  "PERSON_WEIRD_EGG.title": "【人格：蒸蛋】",
+  "PERSON_WEIRD_EGG.description": "· 每 3 回合结束时，将 1 张[gold]麻烦制造者[/gold]加入手牌。",
+  "PERSON_WEIRD_EGG.flavor": "搜索，解析，确定。",
+  "PERSON_SAMURAI_PRAWN.title": "【人格：太刀虾】",
+  "PERSON_SAMURAI_PRAWN.description": "· 每 3 回合结束时，将 1 张[gold]名刀[/gold]加入手牌。\n· 每回合你第一次攻击敌人时，获得 1 层[gold]剑气[/gold]，最多 3 层。",
+  "PERSON_SAMURAI_PRAWN.flavor": "虾!"
+}
