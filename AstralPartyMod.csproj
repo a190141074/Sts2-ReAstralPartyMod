@@ -8,8 +8,11 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Sts2Dir>D:\Steam\steamapps\common\Slay the Spire 2</Sts2Dir>
+		<!-- <Sts2Dir>E:\Steam\steamapps\common\Slay the Spire 2</Sts2Dir> -->
 		<Sts2DataDir>$(Sts2Dir)\data_sts2_windows_x86_64</Sts2DataDir>
 		<GodotPath>D:\MOD\杀戮尖塔2mod制作\megadot-4.5.1-m.8-windows-x86_64-llvm-editor-csharp\MegaDot_v4.5.1-stable_mono_win64_console.exe</GodotPath>
+		<!-- <GodotPath>D:\Visual Studio IDE\megadot-4.5.1-m.9-windows-x86_64-llvm-editor-csharp\MegaDot_v4.5.1-stable_mono_win64_console.exe</GodotPath> -->
+		<!-- <GodotPath>D:\Visual Studio IDE\Godot_v4.5.1-stable_mono_win64\Godot_v4.5.1-stable_mono_win64_console.exe</GodotPath> -->
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,6 +27,7 @@
 		</Reference>
 
 		<Reference Include="BaseLib">
+			<!-- <HintPath>$(Sts2Dir)\mods\BaseLib\BaseLib.dll</HintPath> -->
 			<HintPath>$(Sts2Dir)\mods\BaseLib\BaseLib.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
@@ -49,8 +53,12 @@
 		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_gawu_cutter.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_famous_blade.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_trouble_maker.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\skill_healing_slime.png"/>
+		<Content Include="AstralPartyMod\images\powers\half_life_heal_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\star_light_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\sword_aura_power.png"/>
+		<Content Include="AstralPartyMod\images\powers\ling_hun_lian_jie_power.png"/>
+		<Content Include="AstralPartyMod\images\relic\person_bionic_jasmine.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_mousy_lian.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_proprietress.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_samurai_prawn.png"/>
@@ -65,7 +73,6 @@
 		<Content Include="AstralPartyMod\localization\zhs\card_keywords.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\powers.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\relics.json"/>
-		<Content Include="AstralPartyMod\localization\zhs\modifiers.json.block"/>
 		<Content Include="help\CardRarity.md"/>
 		<Content Include="help\CardSelectCmd.FromSimpleGrid.md"/>
 		<Content Include="help\TargetType.md"/>
@@ -79,20 +86,31 @@
 		<Compile Remove="tmp_inspect4.cs"/>
 		<Compile Remove="tmp_reflect\**\*.cs"/>
 		<Compile Remove="AstralPartyCardCode\Keywords\MyKeywords.cs"/>
-		<Compile Include="AstralPartyCardCode\Modifiers\PersonWeirdEggStartModifier.cs.block"/>
-		<Compile Include="AstralPartyCardCode\Patches\ModifierRegistrationPatch.cs.block"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="AstralPartyCardCode\Modifiers\"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="dnlib" Version="3.6.0"/>
 	</ItemGroup>
 
 	<Target Name="Copy Mod" AfterTargets="PostBuildEvent">
 		<Message Text="Copying mod to Slay the Spire 2 mods folder..." Importance="high"/>
-		<MakeDir Directories="$(Sts2Dir)\mods\"/>
+		<MakeDir Directories="$(Sts2Dir)\mods\$(MSBuildProjectName)\"/>
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(Sts2Dir)\mods\$(MSBuildProjectName)\"/>
 		<Copy SourceFiles="$(MSBuildProjectName).json" DestinationFolder="$(Sts2Dir)\mods\$(MSBuildProjectName)\"/>
+		<!-- <ItemGroup> -->
+		<!-- <ImageFiles Include="$(ProjectDir)\AstralPartyMod\images\**\*.*" /> -->
+		<!-- <LocalizationFiles Include="$(ProjectDir)\AstralPartyMod\localization\**\*.json" /> -->
+		<!-- </ItemGroup> -->
+		<!-- <Copy SourceFiles="@(ImageFiles)" DestinationFolder="$(Sts2Dir)\mods\$(MSBuildProjectName)\AstralPartyMod\images\%(RecursiveDir)" SkipUnchangedFiles="true"/> -->
+		<!-- <Copy SourceFiles="@(LocalizationFiles)" DestinationFolder="$(Sts2Dir)\mods\$(MSBuildProjectName)\AstralPartyMod\localization\%(RecursiveDir)" SkipUnchangedFiles="true"/> -->
 	</Target>
 
 	<Target Name="ExportPck" AfterTargets="Copy Mod" Condition="Exists('$(GodotPath)')">
 		<Message Text="Exporting Godot .pck to mods folder..." Importance="high"/>
-		<Exec Command="&quot;$(GodotPath)&quot; --headless --path &quot;$(MSBuildProjectDirectory)&quot; --export-pack &quot;Windows Desktop&quot; &quot;$(Sts2Dir)\mods\$(MSBuildProjectName)\$(MSBuildProjectName).pck&quot;"
-		      ContinueOnError="WarnAndContinue"/>
+		<Exec Command="&quot;$(GodotPath)&quot; --headless --path &quot;$(MSBuildProjectDirectory)&quot; --export-pack &quot;Windows Desktop&quot; &quot;$(Sts2Dir)\mods\$(MSBuildProjectName)\$(MSBuildProjectName).pck&quot;" ContinueOnError="WarnAndContinue"/>
 	</Target>
 </Project>

@@ -52,8 +52,6 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     public override string PortraitPath => GetPortraitPath();
 
-    public override string? CustomPortraitPath => PortraitPath;
-
     public SkillFamousBlade() : base(
         0,
         CardType.Attack,
@@ -77,20 +75,16 @@ public class SkillFamousBlade : AstralPartyCardModel
         var attackCmd = CommonActions.CardAttack(this, cardPlay, 1);
         await attackCmd.Execute(choiceContext);
 
-        int auraToConsume = Math.Min(MaxAuraToConsume, Owner.Creature.GetPowerAmount<SwordAuraPower>());
+        var auraToConsume = Math.Min(MaxAuraToConsume, Owner.Creature.GetPowerAmount<SwordAuraPower>());
         if (auraToConsume > 0)
         {
             var auraPower = Owner.Creature.GetPower<SwordAuraPower>();
-            if (auraPower != null)
-            {
-                await PowerCmd.ModifyAmount(auraPower, -auraToConsume, Owner.Creature, this, false);
-            }
+            if (auraPower != null) await PowerCmd.ModifyAmount(auraPower, -auraToConsume, Owner.Creature, this, false);
 
             BuffFromPlay(auraToConsume);
         }
 
         if (Owner.Creature.GetPowerAmount<SwordAuraPower>() < 3)
-        {
             await PowerCmd.Apply(
                 ModelDb.Power<SwordAuraPower>().ToMutable(),
                 Owner.Creature,
@@ -98,7 +92,6 @@ public class SkillFamousBlade : AstralPartyCardModel
                 Owner.Creature,
                 this,
                 false);
-        }
 
         UpdateDamage();
     }
@@ -114,7 +107,7 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     public void UpdateDamage()
     {
-        int increasedDamage = GetDisplayIncrease();
+        var increasedDamage = GetDisplayIncrease();
         _increasedDamage = increasedDamage;
         _currentDamage = 1 + increasedDamage;
 
@@ -127,7 +120,7 @@ public class SkillFamousBlade : AstralPartyCardModel
     public string GetDisplayTitle(string language)
     {
         UpdateDamage();
-        int damage = CurrentDamage;
+        var damage = CurrentDamage;
 
         return language switch
         {
@@ -154,15 +147,15 @@ public class SkillFamousBlade : AstralPartyCardModel
     {
         if (ReferenceEquals(CanonicalInstance, this)) return 0;
 
-        int damage = Owner?.GetRelic<PersonSamuraiPrawn>()?.GetFamousBladeDamage() ?? 1;
+        var damage = Owner?.GetRelic<PersonSamuraiPrawn>()?.GetFamousBladeDamage() ?? 1;
         return Math.Max(0, damage - 1);
     }
 
     private string GetPortraitPath()
     {
         UpdateDamage();
-        int damage = CurrentDamage;
-        string suffix = damage switch
+        var damage = CurrentDamage;
+        var suffix = damage switch
         {
             <= 2 => "skill_famous_blade",
             <= 4 => "famous_blade_medium",

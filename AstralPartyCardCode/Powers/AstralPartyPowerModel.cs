@@ -29,17 +29,16 @@ public abstract partial class AstralPartyPowerModel : CustomPowerModel
 
     protected virtual string ResolveIconPath()
     {
-        foreach (string path in GetCandidateIconPaths())
-        {
-            if (ResourceLoader.Exists(path)) return path;
-        }
+        foreach (var path in GetCandidateIconPaths())
+            if (ResourceLoader.Exists(path))
+                return path;
 
         return "res://AstralPartyMod/images/powers/power.png";
     }
 
     protected virtual IEnumerable<string> GetCandidateIconPaths()
     {
-        string idEntry = NormalizePowerImageId(Id.Entry);
+        var idEntry = NormalizePowerImageId(Id.Entry);
         yield return $"res://AstralPartyMod/images/powers/{idEntry}.png";
         yield return $"res://AstralPartyMod/images/power/{idEntry}.png";
         yield return $"res://AstralPartyMod/images/powers/{PowerId}.png";
@@ -49,11 +48,8 @@ public abstract partial class AstralPartyPowerModel : CustomPowerModel
 
     protected virtual string NormalizePowerImageId(string idEntry)
     {
-        int prefixSeparator = idEntry.IndexOf('-');
-        if (prefixSeparator >= 0 && prefixSeparator < idEntry.Length - 1)
-        {
-            idEntry = idEntry[(prefixSeparator + 1)..];
-        }
+        var prefixSeparator = idEntry.IndexOf('-');
+        if (prefixSeparator >= 0 && prefixSeparator < idEntry.Length - 1) idEntry = idEntry[(prefixSeparator + 1)..];
 
         return idEntry.ToLowerInvariant();
     }

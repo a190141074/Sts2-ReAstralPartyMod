@@ -1,8 +1,14 @@
 {
-  "STAR_LIGHT_POWER.title": "StarLight",
-  "STAR_LIGHT_POWER.description": "At the end of this combat, gain Gold equal to this power's amount.",
-  "STAR_LIGHT_POWER.smartDescription": "At the end of this combat, gain Gold equal to this power's amount.",
-  "SWORD_AURA_POWER.title": "Sword Aura",
-  "SWORD_AURA_POWER.description": "The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks.",
-  "SWORD_AURA_POWER.smartDescription": "The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks."
+  "ASTRALPARTYMOD-STAR_LIGHT_POWER.title": "StarLight",
+  "ASTRALPARTYMOD-STAR_LIGHT_POWER.description": "At the end of this combat, gain Gold equal to this power's amount.",
+  "ASTRALPARTYMOD-STAR_LIGHT_POWER.smartDescription": "At the end of this combat, gain Gold equal to this power's amount.",
+  "ASTRALPARTYMOD-SWORD_AURA_POWER.title": "Sword Aura",
+  "ASTRALPARTYMOD-SWORD_AURA_POWER.description": "The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks.",
+  "ASTRALPARTYMOD-SWORD_AURA_POWER.smartDescription": "The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks.",
+  "ASTRALPARTYMOD-HALF_LIFE_HEAL_POWER.title": "Half Life Heal",
+  "ASTRALPARTYMOD-HALF_LIFE_HEAL_POWER.description": "At the start of your turn, heal for the amount shown. The healing is halved each turn.",
+  "ASTRALPARTYMOD-HALF_LIFE_HEAL_POWER.smartDescription": "Heal for the amount shown at the start of your turn. Halves each turn.",
+  "ASTRALPARTYMOD-LING_HUN_LIAN_JIE_POWER.title": "Soul Link",
+  "ASTRALPARTYMOD-LING_HUN_LIAN_JIE_POWER.description": "Soul Link power description.",
+  "ASTRALPARTYMOD-LING_HUN_LIAN_JIE_POWER.smartDescription": "Soul Link."
 }

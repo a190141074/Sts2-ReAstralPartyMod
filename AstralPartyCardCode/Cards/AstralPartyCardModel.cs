@@ -16,18 +16,6 @@ public abstract partial class AstralPartyCardModel : CustomCardModel
 
     public override string PortraitPath => $"{PortraitBasePath}.png";
 
-    public override string? CustomPortraitPath => $"{PortraitBasePath}.png";
-
-    public override Texture2D? CustomFrame
-    {
-        get
-        {
-            var framePath = $"{FrameBasePath}.png";
-            if (ResourceLoader.Exists(framePath)) return ResourceLoader.Load<Texture2D>(framePath);
-            return null;
-        }
-    }
-
     protected AstralPartyCardModel(int baseCost, CardType type, CardRarity rarity, TargetType target,
         bool showInCardLibrary = true, bool autoAdd = true)
         : base(baseCost, type, rarity, target, showInCardLibrary, autoAdd)

@@ -20,9 +20,10 @@ public class EventGiftFromSky : AstralPartyCardModel
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new CardsVar(1), new IntVar("StarLight", 3)];
-    
-    protected override IEnumerable<IHoverTip> ExtraHoverTips => [
-        HoverTipFactory.FromPower<StarLightPower>(),
+
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        HoverTipFactory.FromPower<StarLightPower>()
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
@@ -33,7 +34,6 @@ public class EventGiftFromSky : AstralPartyCardModel
         CardRarity.Rare,
         TargetType.AllAllies)
     {
-        DynamicVars["StarLight"].WithTooltip("ASTRALPARTYMOD-STAR_LIGHT_POWER", "powers");
     }
 
     protected override void OnUpgrade()

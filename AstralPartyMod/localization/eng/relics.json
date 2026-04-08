@@ -1,8 +1,14 @@
 {
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.title": "[Persona: Steamed Egg]",
-  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.description": "Shows a counter from 1 to 3 in combat. At the end of every 3rd turn, add 1 [card]Trouble Maker[/card] to your hand.",
+  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.description": "At the start of every 3rd turn, add 1 [card]Trouble Maker[/card] to your hand.",
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.flavor": "It always finds the perfect beat for the worst possible idea.",
   "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.title": "[Persona: Samurai Prawn]",
-  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.description": "Shows a counter from 1 to 3 in combat. At the end of every 3rd turn, add 1 [card]Famous Blade[/card] to your hand. The first time each turn you attack an enemy, gain 1 stack of [power]Sword Aura[/power]. The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks.",
-  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.flavor": "A single slash settles the stance. The third slash settles the battle."
+  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.description": "At the start of every 3rd turn, add 1 [card]Famous Blade[/card] to your hand. The first time each turn you attack an enemy, gain 1 stack of [power]Sword Aura[/power]. The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks.",
+  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.flavor": "A single slash settles the stance. The third slash settles the battle.",
+  "ASTRALPARTYMOD-PERSON_SLIME_LULU.title": "[Persona: Slime Lulu]",
+  "ASTRALPARTYMOD-PERSON_SLIME_LULU.description": "Lose 10 Max HP. When taking damage, gain 1 stack of [power]Half Life Heal[/power] and reduce this effect's cooldown by 1 turn. At the start of every 3rd turn, add 1 [card]Healing Slime[/card] to your hand.",
+  "ASTRALPARTYMOD-PERSON_SLIME_LULU.flavor": "Slurpee~",
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.title": "[Persona: Bionic Jasmine]",
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.description": "Gain steps when entering rooms (varies by room type). At combat start, lose 1 Strength and 1 Dexterity. Every 13 steps gained grants 1 Strength/Dexterity (alternating). Lose combat-gained Strength/Dexterity after combat ends.",
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.flavor": "Precision calculation, precise execution."
 }

@@ -1,8 +1,14 @@
 ﻿{
-  "PERSON_WEIRD_EGG.title": "【人格：蒸蛋】",
-  "PERSON_WEIRD_EGG.description": "· 每 3 回合结束时，将 1 张[gold]麻烦制造者[/gold]加入手牌。",
-  "PERSON_WEIRD_EGG.flavor": "搜索，解析，确定。",
-  "PERSON_SAMURAI_PRAWN.title": "【人格：太刀虾】",
-  "PERSON_SAMURAI_PRAWN.description": "· 每 3 回合结束时，将 1 张[gold]名刀[/gold]加入手牌。\n· 每回合你第一次攻击敌人时，获得 1 层[gold]剑气[/gold]，最多 3 层。",
-  "PERSON_SAMURAI_PRAWN.flavor": "虾!"
+  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.title": "【人格：蒸蛋】",
+  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.description": "· 每 3 回合开始时，将 1 张[gold]麻烦制造者[/gold]加入手牌。",
+  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.flavor": "搜索，解析，确定。",
+  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.title": "【人格：太刀虾】",
+  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.description": "· 每 3 回合开始时，将 1 张[gold]名刀[/gold]加入手牌。\n· 每回合你第一次攻击敌人时，获得 1 层[gold]剑气[/gold]，最多 3 层。",
+  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.flavor": "虾!",
+  "ASTRALPARTYMOD-PERSON_SLIME_LULU.title": "【人格：史莱姆】",
+  "ASTRALPARTYMOD-PERSON_SLIME_LULU.description": "· 失去 10 点最大生命。\n· 受到伤害时，获得 1 层[gold]治疗[/gold]，并使该效果的冷却减少 1 回合。\n· 每 3 回合开始时，将 1 张[gold]治愈粘液[/gold]加入手牌。",
+  "ASTRALPARTYMOD-PERSON_SLIME_LULU.flavor": "奶一口！",
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.title": "【人格：绿油油】",
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.description": "· 战斗开始时，[red]敏捷[/red]-1，[red]力量[/red]-1。\n· 战斗开始时，每13步交替获得[gold]力量[/gold]+1、[gold]敏捷[/gold]+1。\n· 不同的房间会提供不同的步数。",
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.flavor": "Happy！Happy！Happy！"
 }

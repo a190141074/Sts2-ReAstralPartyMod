@@ -1,17 +1,15 @@
 using BaseLib.Utils;
+using AstralPartyMod.AstralPartyCardCode.Relics;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
-using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
-using MegaCrit.Sts2.Core.Rewards;
 
 namespace AstralPartyMod.AstralPartyCardCode.cards;
 
-// 7. 疾跑：给所有友方单位获得3点临时敏捷
 [Pool(typeof(ColorlessCardPool))]
 public class EventSprint : AstralPartyCardModel
 {
@@ -38,9 +36,19 @@ public class EventSprint : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (CombatState == null) return;
+        if (CombatState == null)
+            return;
 
         foreach (var player in CombatState.Players)
+        {
             await PowerCmd.Apply<DexterityPower>(player.Creature, DynamicVars["Dexterity"].BaseValue, null, null);
+
+            var bionicJasmine = player.GetRelic<PersonBionicJasmine>();
+            if (bionicJasmine == null)
+                continue;
+            //茉莉获得随机步数
+            var randomSteps = Owner.RunState.Rng.Niche.NextInt(1, 7);
+            bionicJasmine.AddSteps(randomSteps);
+        }
     }
 }

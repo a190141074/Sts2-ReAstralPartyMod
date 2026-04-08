@@ -33,12 +33,8 @@ public class EventPlayerRepresentative : AstralPartyCardModel
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
-    public override string? CustomPortraitPath => PortraitPath;
-
     public EventPlayerRepresentative() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
     {
-        DynamicVars["SelfStarLight"].WithTooltip("ASTRALPARTYMOD-STAR_LIGHT_POWER", "powers");
-        DynamicVars["TeamStarLight"].WithTooltip("ASTRALPARTYMOD-STAR_LIGHT_POWER", "powers");
     }
 
     protected override void OnUpgrade()

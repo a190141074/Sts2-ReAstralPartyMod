@@ -13,7 +13,7 @@ public static class SkillFamousBladeTitlePatch
     {
         if (__instance is not SkillFamousBlade famousBlade) return;
 
-        string language = LocManager.Instance?.Language ?? "eng";
+        var language = LocManager.Instance?.Language ?? "eng";
         __result = famousBlade.GetDisplayTitle(language);
     }
 }

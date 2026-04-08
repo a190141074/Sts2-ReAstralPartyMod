@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using AstralPartyMod.AstralPartyCardCode.cards;
 using BaseLib.Utils;
@@ -17,19 +19,23 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(SharedRelicPool))]
 public class PersonSamuraiPrawn : AstralPartyRelicModel
 {
-    [SavedProperty] public int AstralParty_PersonSamuraiPrawnCounter { get; set; } = 1;
+    private const int MaxCounter = 4;
 
-    [SavedProperty] public bool AstralParty_PersonSamuraiPrawnOpenedThisCombat { get; set; }
+    [SavedProperty]
+    public int AstralParty_PersonSamuraiPrawnCounter { get; set; } = 1;
 
-    [SavedProperty] public bool AstralParty_PersonSamuraiPrawnFirstAttackTriggered { get; set; }
+    [SavedProperty]
+    public bool AstralParty_PersonSamuraiPrawnFirstAttackTriggered { get; set; }
 
-    [SavedProperty] public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura { get; set; }
+    [SavedProperty]
+    public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
     public override bool ShowCounter => Owner?.Creature?.CombatState != null;
 
-    public override int DisplayAmount => (AstralParty_PersonSamuraiPrawnCounter - 1) % 3 + 1;
+    // Use the real cooldown value instead of a modulo view of an ever-growing counter.
+    public override int DisplayAmount => GetClampedCounter();
 
     public override bool ShouldReceiveCombatHooks => true;
 
@@ -37,78 +43,81 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonSamuraiPrawnCounter = 1;
-        AstralParty_PersonSamuraiPrawnOpenedThisCombat = false;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
         AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura = 0;
         InvokeDisplayAmountChanged();
     }
 
-    public override async Task BeforeCombatStart()
+    public override Task BeforeCombatStart()
     {
-        AstralParty_PersonSamuraiPrawnOpenedThisCombat = false;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext,
-        MegaCrit.Sts2.Core.Entities.Players.Player player)
+    public override async Task AfterPlayerTurnStart(
+        PlayerChoiceContext choiceContext,
+        MegaCrit.Sts2.Core.Entities.Players.Player player
+    )
     {
-        if (player != Owner) return;
-        if (Owner?.Creature?.CombatState == null) return;
+        if (player != Owner || Owner?.Creature?.CombatState == null)
+            return;
 
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
 
-        if ((AstralParty_PersonSamuraiPrawnCounter - 1) % 3 == 0)
-        {
-            if (AstralParty_PersonSamuraiPrawnOpenedThisCombat) return;
+        // Reaching the cap means the relic is ready to generate its card and restart the cooldown.
+        if (GetClampedCounter() < MaxCounter)
+            return;
 
-            Flash();
-            var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBlade>(), Owner);
-            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
-            AstralParty_PersonSamuraiPrawnOpenedThisCombat = true;
-        }
+        Flash();
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBlade>(), Owner);
+        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
 
-        await Task.CompletedTask;
+        AstralParty_PersonSamuraiPrawnCounter = 1;
+        InvokeDisplayAmountChanged();
     }
 
     public override async Task BeforeAttack(AttackCommand command)
     {
-        if (Owner?.Creature == null) return;
-        if (AstralParty_PersonSamuraiPrawnFirstAttackTriggered) return;
-        if (command.Attacker != Owner.Creature) return;
-        if (command.TargetSide == Owner.Creature.Side) return;
+        if (Owner?.Creature == null)
+            return;
+
+        if (AstralParty_PersonSamuraiPrawnFirstAttackTriggered)
+            return;
+
+        if (command.Attacker != Owner.Creature || command.TargetSide == Owner.Creature.Side)
+            return;
 
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = true;
 
-        if (Owner.Creature.GetPowerAmount<SwordAuraPower>() >= 3) return;
+        if (Owner.Creature.GetPowerAmount<SwordAuraPower>() >= 3)
+            return;
 
         Flash();
-
         await PowerCmd.Apply(
             ModelDb.Power<SwordAuraPower>().ToMutable(),
             Owner.Creature,
             1,
             Owner.Creature,
             null,
-            false);
+            false
+        );
     }
 
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
-        if (Owner?.Creature?.CombatState == null) return;
-        if (side != Owner.Creature.Side) return;
+        if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
+            return Task.CompletedTask;
 
-        AstralParty_PersonSamuraiPrawnCounter++;
+        AdvanceCounter();
         InvokeDisplayAmountChanged();
+        return Task.CompletedTask;
     }
 
-    public override async Task AfterCombatEnd(CombatRoom room)
+    public override Task AfterCombatEnd(CombatRoom room)
     {
-        AstralParty_PersonSamuraiPrawnOpenedThisCombat = false;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
-        AstralParty_PersonSamuraiPrawnCounter++;
         InvokeDisplayAmountChanged();
-        await Task.CompletedTask;
+        return Task.CompletedTask;
     }
 
     public int GetFamousBladeDamage()
@@ -118,7 +127,19 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
     public void IncreaseFamousBladeConsumedAura(int amount)
     {
-        if (amount <= 0) return;
+        if (amount <= 0)
+            return;
+
         AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura += amount;
+    }
+
+    private int GetClampedCounter()
+    {
+        return Math.Clamp(AstralParty_PersonSamuraiPrawnCounter, 1, MaxCounter);
+    }
+
+    private void AdvanceCounter()
+    {
+        AstralParty_PersonSamuraiPrawnCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
     }
 }

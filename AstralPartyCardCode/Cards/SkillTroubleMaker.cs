@@ -33,7 +33,6 @@ public class SkillTroubleMaker : AstralPartyCardModel
         CardRarity.Rare,
         TargetType.Self)
     {
-        DynamicVars["StarLight"].WithTooltip("ASTRALPARTYMOD-STAR_LIGHT_POWER", "powers");
     }
 
     protected override void OnUpgrade()

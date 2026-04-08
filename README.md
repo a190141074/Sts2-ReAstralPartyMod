@@ -2,7 +2,7 @@
 
 `AstralPartyMod` 是一个基于 `BaseLib` 的《杀戮尖塔 2》模组工程，用于扩展卡牌、事件、遗物与能力内容。
 
-**使用ai 进行开发。**
+- **使用 ai 进行开发。**
 
 ## 模组内容
 
@@ -45,6 +45,13 @@
 | 星光 | `StarLightPower` | 本场战斗结束后，获得等同于星光层数的金币。 |
 | 剑气 | `SwordAuraPower` | 每层使你的攻击额外造成 1 点伤害；第 3 层额外造成 2 点伤害；最多 3 层。 |
 
+## 感谢
+
+- 教程：[GlitchedReme](https://github.com/GlitchedReme/)
+- 代码：[YuWan886](https://github.com/YuWan886/)
+- 代码：猫妖の舞
+
+
 ## 依赖
 
-- `BaseLib`
+- [BaseLib](https://github.com/Alchyr/BaseLib-StS2)
