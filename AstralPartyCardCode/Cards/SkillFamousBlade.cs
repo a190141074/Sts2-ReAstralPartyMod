@@ -52,8 +52,6 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     public override string PortraitPath => GetPortraitPath();
 
-    public override string? CustomPortraitPath => PortraitPath;
-
     public SkillFamousBlade() : base(
         0,
         CardType.Attack,

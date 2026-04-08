@@ -23,8 +23,6 @@ public class EventDeusExMachina : AstralPartyCardModel
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
-    public override string? CustomPortraitPath => PortraitPath;
-
     public EventDeusExMachina() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
     {
     }

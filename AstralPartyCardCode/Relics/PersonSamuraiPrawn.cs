@@ -19,8 +19,6 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 {
     [SavedProperty] public int AstralParty_PersonSamuraiPrawnCounter { get; set; } = 1;
 
-    [SavedProperty] public bool AstralParty_PersonSamuraiPrawnOpenedThisCombat { get; set; }
-
     [SavedProperty] public bool AstralParty_PersonSamuraiPrawnFirstAttackTriggered { get; set; }
 
     [SavedProperty] public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura { get; set; }
@@ -37,7 +35,6 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonSamuraiPrawnCounter = 1;
-        AstralParty_PersonSamuraiPrawnOpenedThisCombat = false;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
         AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura = 0;
         InvokeDisplayAmountChanged();
@@ -45,7 +42,6 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
     public override async Task BeforeCombatStart()
     {
-        AstralParty_PersonSamuraiPrawnOpenedThisCombat = false;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
         await Task.CompletedTask;
     }
@@ -58,14 +54,12 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
 
+        // 第1、4、7...回合触发 (计数器为1,4,7...)
         if ((AstralParty_PersonSamuraiPrawnCounter - 1) % 3 == 0)
         {
-            if (AstralParty_PersonSamuraiPrawnOpenedThisCombat) return;
-
             Flash();
             var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBlade>(), Owner);
             await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
-            AstralParty_PersonSamuraiPrawnOpenedThisCombat = true;
         }
 
         await Task.CompletedTask;
@@ -100,13 +94,12 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
         AstralParty_PersonSamuraiPrawnCounter++;
         InvokeDisplayAmountChanged();
+        await Task.CompletedTask;
     }
 
     public override async Task AfterCombatEnd(CombatRoom room)
     {
-        AstralParty_PersonSamuraiPrawnOpenedThisCombat = false;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
-        AstralParty_PersonSamuraiPrawnCounter++;
         InvokeDisplayAmountChanged();
         await Task.CompletedTask;
     }

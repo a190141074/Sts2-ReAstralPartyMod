@@ -1,8 +1,8 @@
-﻿{
-  "STAR_LIGHT_POWER.title": "星光",
-  "STAR_LIGHT_POWER.description": "本场战斗结束后，获得等同于[gold]星光[/gold]层数的[gold]金币[/gold]。",
-  "STAR_LIGHT_POWER.smartDescription": "本场战斗结束后，获得等同于[gold]星光[/gold]层数的[gold]金币[/gold]。",
-  "SWORD_AURA_POWER.title": "剑气",
-  "SWORD_AURA_POWER.description": "每层使你的攻击额外造成 1 点伤害。\n第 3 层额外造成 2 点伤害。\n最多 3 层。",
-  "SWORD_AURA_POWER.smartDescription": "每层使你的攻击额外造成 1 点伤害。\n第 3 层额外造成 2 点伤害。\n最多 3 层。"
+{
+  "ASTRALPARTYMOD-STAR_LIGHT_POWER.title": "星光",
+  "ASTRALPARTYMOD-STAR_LIGHT_POWER.description": "本场战斗结束后，获得等同于[gold]星光[/gold]层数的[gold]金币[/gold]。",
+  "ASTRALPARTYMOD-STAR_LIGHT_POWER.smartDescription": "本场战斗结束后，获得等同于[gold]星光[/gold]层数的[gold]金币[/gold]。",
+  "ASTRALPARTYMOD-SWORD_AURA_POWER.title": "剑气",
+  "ASTRALPARTYMOD-SWORD_AURA_POWER.description": "每层使你的攻击额外造成 1 点伤害。\n第 3 层额外造成 2 点伤害。\n最多 3 层。",
+  "ASTRALPARTYMOD-SWORD_AURA_POWER.smartDescription": "每层使你的攻击额外造成 1 点伤害。\n第 3 层额外造成 2 点伤害。\n最多 3 层。"
 }

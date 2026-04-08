@@ -33,7 +33,6 @@ public class EventGiftFromSky : AstralPartyCardModel
         CardRarity.Rare,
         TargetType.AllAllies)
     {
-        DynamicVars["StarLight"].WithTooltip("ASTRALPARTYMOD-STAR_LIGHT_POWER", "powers");
     }
 
     protected override void OnUpgrade()
