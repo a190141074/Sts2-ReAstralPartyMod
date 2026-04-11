@@ -1,57 +1,99 @@
-# AstralPartyMod/星引擎patryMOD
+# AstralPartyMod / 星引派对 MOD
 
-`AstralPartyMod` 是一个基于 `BaseLib` 的《杀戮尖塔 2》模组工程，用于扩展卡牌、事件、遗物与能力内容。
+`AstralPartyMod` 是一个基于 `BaseLib` 的《杀戮尖塔 2》Mod 工程，当前主要扩展了事件卡、人格遗物、技能卡、药水、能力与关键词内容。
 
-- **使用 ai 进行开发。**
+- 定位：多人联机向的 星引擎 风格内容扩展
+- 工具：Codex（**使用ai进行开发**）
 
 ## 模组内容
 
 ### 事件卡
 
-| 名称 | 类名 | 效果                                                         |
+| 名称 | 类名 | 效果概览 |
 | --- | --- | --- |
 | 天使降临 | `EventAngelsDescent` | 所有单位回复生命。 |
 | 拥挤通道 | `EventCrowdedPassage` | 所有玩家获得缓冲与易伤。 |
-| 天降神兵 | `EventDeusExMachina` | 从其他事件牌中选择 1 张，发动 2 次。 |
+| 天降神兵 | `EventDeusExMachina` | 从其他事件卡中选择 1 张并发动 2 次。 |
 | 人人平等 | `EventEquality` | 所有玩家生命值降为 1，并获得格挡。 |
 | 战斗，爽！ | `EventFightFun` | 所有玩家获得一张巨石+。 |
 | 食品安全 | `EventFoodSafety` | 所有单位获得中毒。 |
 | 天降之物 | `EventGiftFromSky` | 所有玩家抽牌并获得星光。 |
-| 手牌抹除 | `EventHandErase` | 所有玩家弃置手牌中最右边的一张牌。 |
-| 玩家代表 | `EventPlayerRepresentative` | 进行一次判定，不同结果会让自己与队友分别受到伤害或获得星光。 |
-| 红温警告 | `EventRedHeatWarning` | 所有玩家获得火力。 |
+| 手牌抹除 | `EventHandErase` | 所有玩家弃置手牌中最右侧的一张牌。 |
+| 玩家代表 | `EventPlayerRepresentative` | 进行一次判定，不同结果会造成伤害或给予星光。 |
+| 红温警告 | `EventRedHeatWarning` | 所有玩家获得力量。 |
 | 疾跑 | `EventSprint` | 所有玩家获得敏捷。 |
 | 天打雷劈 | `EventThunderStrike` | 所有单位受到伤害。 |
 
 ### 技能卡
 
-| 名称 | 类名 | 效果 | 角色 |
+| 名称 | 类名 | 效果概览 | 来源 |
 | --- | --- | --- | --- |
-| 名刀 | `SkillFamousBlade` | 造成伤害，至多消耗 2 层剑气；每累计消耗 2 层剑气，本局游戏中此牌永久增加 1 点伤害；使用后获得 1 层剑气。 | 【人格：蒸蛋】 |
-| 占位牌 | `SkillStarShop` | 未实现 | 【人格：老板娘】 |
-| 麻烦制造者 | `SkillTroubleMaker` | 展示 2 张随机其他事件牌，选择 1 张立刻发动，并获得星光。 | 【人格：太刀虾】 |
+| 麻烦制造者 | `SkillTroubleMaker` | 展示随机事件卡并选择 1 张立即发动，同时获得星光。 | 【人格：蒸蛋】 |
+| 名刀 | `SkillFamousBlade` | 攻击目标，消耗剑气强化自身，并在使用后补充剑气。 | 【人格：太刀虾】 |
+| 治愈粘液 | `SkillHealingSlime` | 给予目标治疗层数。 | 【人格：史莱姆】 |
 
-### 遗物
+### 人格遗物
 
-| 名称 | 类名 | 效果 |
+| 名称 | 类名 | 效果概览 |
 | --- | --- | --- |
-| 【人格：蒸蛋】 | `PersonWeirdEgg` | 每 3 回合结束时，将 1 张麻烦制造者加入手牌。 |
-| 【人格：太刀虾】 | `PersonSamuraiPrawn` | 每 3 回合结束时，将 1 张名刀加入手牌；每回合你第一次攻击敌人时，获得 1 层剑气，最多 3 层。 |
+| 【人格：蒸蛋】 | `PersonWeirdEgg` | 每 3 回合开始时，将 1 张麻烦制造者加入手牌。战斗结束时也会额外推进 1 回合。 |
+| 【人格：太刀虾】 | `PersonSamuraiPrawn` | 每 3 回合开始时，将 1 张名刀加入手牌。每回合第一次攻击敌人时获得 1 层剑气，最多 3 层。战斗结束时也会额外推进 1 回合。 |
+| 【人格：史莱姆】 | `PersonSlimeLulu` | 失去 10 点最大生命；每 3 回合开始时，将 1 张治愈粘液加入手牌；受伤时获得治疗，并更快获得下一张治愈粘液；战斗结束时也会额外推进 1 回合。 |
+| 【人格：绿油油】 | `PersonBionicJasmine` | 进入不同房间获得步数；战斗开始时力量与敏捷各 -1；每累计 13 步交替获得力量或敏捷。 |
+| 【人格：老板娘】 | `PersonProprietress` | 进入商店时按已进入商店次数获得金币；只要任意玩家持有此遗物，商店中的卡牌、药水、遗物与移除服务都有概率变为原价的 30%；战斗结束时也会额外推进 1 回合；战斗效果仍在补完中。 |
+
+### 药水
+
+| 名称 | 类名 | 效果概览 |
+| --- | --- | --- |
+| 人格宝箱 | `PersonChestChoose` | 只能在战斗外使用。随机展示 3 个人格遗物，并从中选择 1 个获得。新开局时会自动加入玩家药水栏，多人模式同样生效。 |
 
 ### 能力
 
-| 中文牌名 | 类名 | 中文效果 |
+| 名称 | 类名 | 效果概览 |
 | --- | --- | --- |
-| 星光 | `StarLightPower` | 本场战斗结束后，获得等同于星光层数的金币。 |
-| 剑气 | `SwordAuraPower` | 每层使你的攻击额外造成 1 点伤害；第 3 层额外造成 2 点伤害；最多 3 层。 |
+| 星光 | `StarLightPower` | 战斗结束后，按层数获得额外金币奖励。 |
+| 剑气 | `SwordAuraPower` | 强化攻击伤害，层数越高收益越高，最多按 3 层结算。 |
+| 治疗 | `HalfLifeHealPower` | 回合开始时回复等同于层数的生命，随后层数减半。 |
+| 灵魂链接 | `LingHunLianJiePower` | 预留能力，占位中。 |
 
-## 感谢
+### 关键词
 
-- 教程：[GlitchedReme](https://github.com/GlitchedReme/)
-- 代码：[YuWan886](https://github.com/YuWan886/)
-- 代码：猫妖の舞
+| 名称 | 标识 | 说明 |
+| --- | --- | --- |
+| 事件牌 | `ASTRAL_EVENT` | 用于标记 Astral Party 模组中的事件卡。 |
+| 步数 | `ASTRAL_STEPS` | 用于说明【人格：绿油油】在不同房间中获得的步数。普通房间 / 商店 / 宝箱 / 休息处 / 地图为 2，事件为 3，精英为 6，Boss 为 10。 |
 
+## 开发中内容
+
+下列内容已经有文件或接口预留，但仍未完全实装：
+
+| 内容 | 当前状态 |
+| --- | --- |
+| 【人格：老板娘】战斗效果 | 已有 3 回合计数器和触发骨架，具体效果仍是 `TODO`。 |
+| `SkillStarShop` | 仍为占位卡，暂未启用。 |
+| `LingHunLianJiePower` | 仍为占位能力，尚未补充实际效果。 |
+
+## 目录概览
+
+| 路径 | 说明 |
+| --- | --- |
+| `AstralPartyCardCode/Cards` | 卡牌实现 |
+| `AstralPartyCardCode/Relics` | 人格遗物实现 |
+| `AstralPartyCardCode/Potions` | 药水实现 |
+| `AstralPartyCardCode/Powers` | 能力实现 |
+| `AstralPartyCardCode/Keywords` | 自定义关键词 |
+| `AstralPartyCardCode/Patches` | Harmony / 交互层补丁 |
+| `AstralPartyMod/localization` | 本地化文本 |
+| `docs` | 开发参考文档。 |
 
 ## 依赖
 
 - [BaseLib](https://github.com/Alchyr/BaseLib-StS2)
+
+## 感谢
+
+- 教程参考：[GlitchedReme](https://github.com/GlitchedReme/)
+- 代码参考：[YuWan886](https://github.com/YuWan886/)
+- 代码协助：猫妖の舞
+- 其他协作与灵感支持：项目内署名贡献者与测试同伴

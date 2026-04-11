@@ -19,8 +19,9 @@ public class PersonWeirdEgg : AstralPartyRelicModel
 {
     private const int MaxCounter = 4;
 
-    [SavedProperty]
-    public int AstralParty_PersonWeirdEggCounter { get; set; } = 1;
+    [SavedProperty] public int AstralParty_PersonWeirdEggCounter { get; set; } = 1;
+
+    [SavedProperty] public bool AstralParty_PersonWeirdEggPendingCombatStartCard { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
@@ -33,6 +34,17 @@ public class PersonWeirdEgg : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonWeirdEggCounter = 1;
+        AstralParty_PersonWeirdEggPendingCombatStartCard = false;
+        InvokeDisplayAmountChanged();
+    }
+
+    public override async Task BeforeCombatStart()
+    {
+        if (Owner?.Creature?.CombatState == null || !AstralParty_PersonWeirdEggPendingCombatStartCard)
+            return;
+
+        await GrantTroubleMaker();
+        AstralParty_PersonWeirdEggPendingCombatStartCard = false;
         InvokeDisplayAmountChanged();
     }
 
@@ -48,11 +60,9 @@ public class PersonWeirdEgg : AstralPartyRelicModel
         if (GetClampedCounter() < MaxCounter)
             return;
 
-        Flash();
-        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTroubleMaker>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
-
+        await GrantTroubleMaker();
         AstralParty_PersonWeirdEggCounter = 1;
+        AstralParty_PersonWeirdEggPendingCombatStartCard = false;
         InvokeDisplayAmountChanged();
     }
 
@@ -68,7 +78,7 @@ public class PersonWeirdEgg : AstralPartyRelicModel
 
     public override Task AfterCombatEnd(CombatRoom room)
     {
-        // Preserve progress between combats; only the in-combat display needs to refresh.
+        AdvanceCounterAfterCombatEnd();
         InvokeDisplayAmountChanged();
         return Task.CompletedTask;
     }
@@ -81,5 +91,30 @@ public class PersonWeirdEgg : AstralPartyRelicModel
     private void AdvanceCounter()
     {
         AstralParty_PersonWeirdEggCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+    }
+
+    private void AdvanceCounterAfterCombatEnd()
+    {
+        if (AstralParty_PersonWeirdEggPendingCombatStartCard)
+            return;
+
+        if (GetClampedCounter() >= MaxCounter - 1)
+        {
+            AstralParty_PersonWeirdEggCounter = 1;
+            AstralParty_PersonWeirdEggPendingCombatStartCard = true;
+            return;
+        }
+
+        AdvanceCounter();
+    }
+
+    private async Task GrantTroubleMaker()
+    {
+        if (Owner?.Creature?.CombatState == null)
+            return;
+
+        Flash();
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTroubleMaker>(), Owner);
+        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
     }
 }

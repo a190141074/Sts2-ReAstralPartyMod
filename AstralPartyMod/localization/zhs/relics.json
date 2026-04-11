@@ -6,9 +6,12 @@
   "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.description": "· 每 3 回合开始时，将 1 张[gold]名刀[/gold]加入手牌。\n· 每回合你第一次攻击敌人时，获得 1 层[gold]剑气[/gold]，最多 3 层。",
   "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.flavor": "虾!",
   "ASTRALPARTYMOD-PERSON_SLIME_LULU.title": "【人格：史莱姆】",
-  "ASTRALPARTYMOD-PERSON_SLIME_LULU.description": "· 失去 10 点最大生命。\n· 受到伤害时，获得 1 层[gold]治疗[/gold]，并使该效果的冷却减少 1 回合。\n· 每 3 回合开始时，将 1 张[gold]治愈粘液[/gold]加入手牌。",
+  "ASTRALPARTYMOD-PERSON_SLIME_LULU.description": "· 失去 10 点最大生命。\n· 每 3 回合开始时，将 1 张[gold]治愈粘液[/gold]加入手牌。\n· 受到伤害时，获得 1 层[gold]治疗[/gold]，并使遗物冷却减少 1 回合。",
   "ASTRALPARTYMOD-PERSON_SLIME_LULU.flavor": "奶一口！",
   "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.title": "【人格：绿油油】",
-  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.description": "· 战斗开始时，[red]敏捷[/red]-1，[red]力量[/red]-1。\n· 战斗开始时，每13步交替获得[gold]力量[/gold]+1、[gold]敏捷[/gold]+1。\n· 不同的房间会提供不同的步数。",
-  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.flavor": "Happy！Happy！Happy！"
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.description": "· 战斗开始时，[red]敏捷[/red]-1，[red]力量[/red]-1。\n· 战斗开始时，每13步交替获得[gold]力量[/gold]+1、[gold]敏捷[/gold]+1。\n· 不同的房间会提供不同的[gold]步数[/gold]。",
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.flavor": "Happy！Happy！Happy！",
+  "ASTRALPARTYMOD-PERSON_PROPRIETRESS.title": "【人格：老板娘】",
+  "ASTRALPARTYMOD-PERSON_PROPRIETRESS.description": "· 进入商店时10 的金币。\n· 只要任意玩家持有此遗物，所有玩家商店中的卡牌、药水、遗物和卡牌移除服务都有 3% 的概率变为原价的 30%。\n· 每经过 1 个商店，获得金币+10，打折概率提高 3%。",
+  "ASTRALPARTYMOD-PERSON_PROPRIETRESS.flavor": "来财。"
 }

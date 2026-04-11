@@ -21,14 +21,13 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 {
     private const int MaxCounter = 4;
 
-    [SavedProperty]
-    public int AstralParty_PersonSamuraiPrawnCounter { get; set; } = 1;
+    [SavedProperty] public int AstralParty_PersonSamuraiPrawnCounter { get; set; } = 1;
 
-    [SavedProperty]
-    public bool AstralParty_PersonSamuraiPrawnFirstAttackTriggered { get; set; }
+    [SavedProperty] public bool AstralParty_PersonSamuraiPrawnPendingCombatStartCard { get; set; }
 
-    [SavedProperty]
-    public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura { get; set; }
+    [SavedProperty] public bool AstralParty_PersonSamuraiPrawnFirstAttackTriggered { get; set; }
+
+    [SavedProperty] public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
@@ -43,15 +42,22 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonSamuraiPrawnCounter = 1;
+        AstralParty_PersonSamuraiPrawnPendingCombatStartCard = false;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
         AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura = 0;
         InvokeDisplayAmountChanged();
     }
 
-    public override Task BeforeCombatStart()
+    public override async Task BeforeCombatStart()
     {
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
-        return Task.CompletedTask;
+
+        if (Owner?.Creature?.CombatState == null || !AstralParty_PersonSamuraiPrawnPendingCombatStartCard)
+            return;
+
+        await GrantFamousBlade();
+        AstralParty_PersonSamuraiPrawnPendingCombatStartCard = false;
+        InvokeDisplayAmountChanged();
     }
 
     public override async Task AfterPlayerTurnStart(
@@ -68,11 +74,9 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         if (GetClampedCounter() < MaxCounter)
             return;
 
-        Flash();
-        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBlade>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
-
+        await GrantFamousBlade();
         AstralParty_PersonSamuraiPrawnCounter = 1;
+        AstralParty_PersonSamuraiPrawnPendingCombatStartCard = false;
         InvokeDisplayAmountChanged();
     }
 
@@ -116,6 +120,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     public override Task AfterCombatEnd(CombatRoom room)
     {
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
+        AdvanceCounterAfterCombatEnd();
         InvokeDisplayAmountChanged();
         return Task.CompletedTask;
     }
@@ -141,5 +146,30 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     private void AdvanceCounter()
     {
         AstralParty_PersonSamuraiPrawnCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+    }
+
+    private void AdvanceCounterAfterCombatEnd()
+    {
+        if (AstralParty_PersonSamuraiPrawnPendingCombatStartCard)
+            return;
+
+        if (GetClampedCounter() >= MaxCounter - 1)
+        {
+            AstralParty_PersonSamuraiPrawnCounter = 1;
+            AstralParty_PersonSamuraiPrawnPendingCombatStartCard = true;
+            return;
+        }
+
+        AdvanceCounter();
+    }
+
+    private async Task GrantFamousBlade()
+    {
+        if (Owner?.Creature?.CombatState == null)
+            return;
+
+        Flash();
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBlade>(), Owner);
+        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
     }
 }

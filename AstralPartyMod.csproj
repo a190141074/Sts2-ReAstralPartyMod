@@ -58,6 +58,7 @@
 		<Content Include="AstralPartyMod\images\powers\star_light_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\sword_aura_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\ling_hun_lian_jie_power.png"/>
+		<Content Include="AstralPartyMod\images\potion\person_chest_choose.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_bionic_jasmine.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_mousy_lian.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_proprietress.png"/>
@@ -66,16 +67,19 @@
 		<Content Include="AstralPartyMod\images\relic\person_weird_egg.png"/>
 		<Content Include="AstralPartyMod\localization\eng\cards.json"/>
 		<Content Include="AstralPartyMod\localization\eng\card_keywords.json"/>
+		<Content Include="AstralPartyMod\localization\eng\potions.json"/>
 		<Content Include="AstralPartyMod\localization\eng\powers.json"/>
 		<Content Include="AstralPartyMod\localization\eng\relics.json"/>
 		<Content Include="AstralPartyMod\localization\eng\modifiers.json.block"/>
 		<Content Include="AstralPartyMod\localization\zhs\cards.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\card_keywords.json"/>
+		<Content Include="AstralPartyMod\localization\zhs\potions.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\powers.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\relics.json"/>
 		<Content Include="help\CardRarity.md"/>
 		<Content Include="help\CardSelectCmd.FromSimpleGrid.md"/>
 		<Content Include="help\TargetType.md"/>
+		<Content Include="README.md" />
 	</ItemGroup>
 
 	<ItemGroup>

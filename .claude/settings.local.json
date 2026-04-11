@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(grep -n \"zhs\\\\\\\\modifiers\")",
+      "Bash(where ilspycmd:*)",
+      "Bash(where dotnet-ilspy:*)",
+      "Bash(where dnspy:*)",
+      "Bash(where dotnet:*)",
+      "Bash(dotnet --version)",
+      "Bash(dotnet tool:*)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet run:*)",
+      "Bash(dotnet clean:*)"
+    ]
+  }
+}

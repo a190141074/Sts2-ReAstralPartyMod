@@ -1,4 +1,6 @@
 {
-  "ASTRALPARTYMOD-ASTRAL_EVENT.title": "天象事件",
-  "ASTRALPARTYMOD-ASTRAL_EVENT.description": "来自 Astral Party 事件系统的特殊卡牌。"
+  "ASTRALPARTYMOD-ASTRAL_EVENT.title": "事件牌",
+  "ASTRALPARTYMOD-ASTRAL_EVENT.description": "来自星引擎MOD[gold]事件[/gold]系统的特殊卡牌。",
+  "ASTRALPARTYMOD-ASTRAL_STEPS.title": "步数",
+  "ASTRALPARTYMOD-ASTRAL_STEPS.description": "【人格：绿油油】进入房间时获得的步数。其他、休息处、商店、宝箱、普通房间提供 2 步；\n事件房间提供 3 步；\n精英房间提供 6 步；\nBoss 房间提供 10 步。"
 }

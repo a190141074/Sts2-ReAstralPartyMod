@@ -1,14 +1,17 @@
 {
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.title": "[Persona: Steamed Egg]",
-  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.description": "At the start of every 3rd turn, add 1 [card]Trouble Maker[/card] to your hand.",
+  "ASTRALPARTYMOD-PERSON_WEIRD_EGG.description": "At the start of every 3rd turn, add 1 [card]Trouble Maker[/card] to your hand. Combat end also reduces this relic's cooldown by 1 turn.",
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.flavor": "It always finds the perfect beat for the worst possible idea.",
   "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.title": "[Persona: Samurai Prawn]",
-  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.description": "At the start of every 3rd turn, add 1 [card]Famous Blade[/card] to your hand. The first time each turn you attack an enemy, gain 1 stack of [power]Sword Aura[/power]. The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks.",
+  "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.description": "At the start of every 3rd turn, add 1 [card]Famous Blade[/card] to your hand. Combat end also reduces this relic's cooldown by 1 turn. The first time each turn you attack an enemy, gain 1 stack of [power]Sword Aura[/power]. The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks.",
   "ASTRALPARTYMOD-PERSON_SAMURAI_PRAWN.flavor": "A single slash settles the stance. The third slash settles the battle.",
   "ASTRALPARTYMOD-PERSON_SLIME_LULU.title": "[Persona: Slime Lulu]",
-  "ASTRALPARTYMOD-PERSON_SLIME_LULU.description": "Lose 10 Max HP. When taking damage, gain 1 stack of [power]Half Life Heal[/power] and reduce this effect's cooldown by 1 turn. At the start of every 3rd turn, add 1 [card]Healing Slime[/card] to your hand.",
+  "ASTRALPARTYMOD-PERSON_SLIME_LULU.description": "Lose 10 Max HP. When taking damage, gain 1 stack of [power]Half Life Heal[/power] and reduce this effect's cooldown by 1 turn. Combat end also reduces this relic's cooldown by 1 turn. At the start of every 3rd turn, add 1 [card]Healing Slime[/card] to your hand.",
   "ASTRALPARTYMOD-PERSON_SLIME_LULU.flavor": "Slurpee~",
   "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.title": "[Persona: Bionic Jasmine]",
-  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.description": "Gain steps when entering rooms (varies by room type). At combat start, lose 1 Strength and 1 Dexterity. Every 13 steps gained grants 1 Strength/Dexterity (alternating). Lose combat-gained Strength/Dexterity after combat ends.",
-  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.flavor": "Precision calculation, precise execution."
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.description": "Gain [gold]Steps[/gold] when entering rooms. At combat start, lose 1 Strength and 1 Dexterity. Every 13 steps gained grants 1 Strength/Dexterity (alternating). Lose combat-gained Strength/Dexterity after combat ends.",
+  "ASTRALPARTYMOD-PERSON_BIONIC_JASMINE.flavor": "Precision calculation, precise execution.",
+  "ASTRALPARTYMOD-PERSON_PROPRIETRESS.title": "[Persona: Proprietress]",
+  "ASTRALPARTYMOD-PERSON_PROPRIETRESS.description": "When entering a shop, gain gold equal to 10 times the number of shops you have entered this run. While any player has this relic, every player's shop cards, potions, relics, and card removal service each have a 3% chance to cost only 30% of their normal price. This chance increases by 3% each time you pass through a shop. Combat end also reduces this relic's cooldown by 1 turn. At the start of every 3rd turn, trigger this relic's combat effect.",
+  "ASTRALPARTYMOD-PERSON_PROPRIETRESS.flavor": "Business is business. Bargains are personal."
 }
