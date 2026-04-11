@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Models;
 namespace AstralPartyMod.AstralPartyCardCode.Patches;
 
 [HarmonyPatch(typeof(CardModel), nameof(CardModel.Title), MethodType.Getter)]
+//名刀动态标题补丁
 public static class SkillFamousBladeTitlePatch
 {
     [HarmonyPostfix]

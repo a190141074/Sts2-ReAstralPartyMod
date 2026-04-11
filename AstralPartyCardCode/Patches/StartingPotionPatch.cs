@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Models;
 namespace AstralPartyMod.AstralPartyCardCode.Patches;
 
 [HarmonyPatch(typeof(Player), "PopulateStartingInventory")]
+//开局自动加药水
 public static class StartingPotionPatch
 {
     [HarmonyPostfix]

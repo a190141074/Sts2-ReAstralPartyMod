@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Nodes.Screens;
 
 namespace AstralPartyMod.AstralPartyCardCode.Patches;
 
+//遗物选择界面标题替换
 [HarmonyPatch(typeof(NChooseARelicSelection), "_Ready")]
 public static class ChooseRelicHeaderPatch
 {

@@ -1,5 +1,6 @@
 namespace AstralPartyMod.AstralPartyCardCode.Patches;
 
+//人格遗物选择标题上下文
 public static class RelicSelectionHeaderContext
 {
     private static string? _currentHeaderText;
