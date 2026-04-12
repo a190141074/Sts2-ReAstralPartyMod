@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
@@ -27,6 +28,13 @@ public class PersonWeirdEgg : AstralPartyRelicModel
 
     public override bool ShowCounter => Owner?.Creature?.CombatState != null;
 
+    public override bool ShouldReceiveCombatHooks => true;
+
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        HoverTipFactory.FromCard<SkillTroubleMaker>()
+    ];
+
     // Keep the stored value aligned with the shown value so the cooldown is easy to reason about.
     public override int DisplayAmount => GetClampedCounter();
 
@@ -34,7 +42,8 @@ public class PersonWeirdEgg : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonWeirdEggCounter = 1;
-        AstralParty_PersonWeirdEggPendingCombatStartCard = false;
+        // Newly obtained cooldown relics should grant their first card on the next combat start.
+        AstralParty_PersonWeirdEggPendingCombatStartCard = true;
         InvokeDisplayAmountChanged();
     }
 

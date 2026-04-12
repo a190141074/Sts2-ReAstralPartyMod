@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
@@ -33,6 +34,11 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
     public override bool ShowCounter => Owner?.Creature?.CombatState != null;
 
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        HoverTipFactory.FromCard<SkillFamousBlade>()
+    ];
+
     // Use the real cooldown value instead of a modulo view of an ever-growing counter.
     public override int DisplayAmount => GetClampedCounter();
 
@@ -42,7 +48,8 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonSamuraiPrawnCounter = 1;
-        AstralParty_PersonSamuraiPrawnPendingCombatStartCard = false;
+        // Newly obtained cooldown relics should grant their first card on the next combat start.
+        AstralParty_PersonSamuraiPrawnPendingCombatStartCard = true;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
         AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura = 0;
         InvokeDisplayAmountChanged();

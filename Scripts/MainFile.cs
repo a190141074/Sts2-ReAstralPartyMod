@@ -1,5 +1,4 @@
-// 在您的MainFile.cs中
-
+using System.Reflection;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Modding;
@@ -18,6 +17,11 @@ public partial class MainFile : Node
     {
         Harmony harmony = new(ModId);
         harmony.PatchAll();
-        Logger.Info("AstralPartyMod initialized");
+        var buildMarker =
+            typeof(MainFile).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion
+            ?? typeof(MainFile).Assembly.GetName().Version?.ToString()
+            ?? "unknown";
+        Logger.Info($"AstralPartyMod initialized | build={buildMarker}");
     }
 }

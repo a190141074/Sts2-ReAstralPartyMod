@@ -1,4 +1,4 @@
-using System.Linq;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
@@ -35,19 +35,7 @@ public class EventDeusExMachina : AstralPartyCardModel
     {
         if (CombatState == null || Owner == null) return;
 
-        var offeredCards = ModelDb.AllCards
-            .Where(card => card is AstralPartyCardModel)
-            .Where(card => card.GetType().Name.StartsWith("Event"))
-            .Where(card => card.GetType() != typeof(EventDeusExMachina))
-            .Where(card => card.GetType() != typeof(SkillTroubleMaker))
-            .OrderBy(_ => Owner.RunState.Rng.Niche.NextInt(int.MaxValue))
-            .Select(card =>
-            {
-                var mutableCard = card.ToMutable();
-                mutableCard.Owner = Owner;
-                return mutableCard;
-            })
-            .ToList();
+        var offeredCards = AstralEventCardPool.CreateMutableEventCardsForPlayer(Owner, typeof(EventDeusExMachina));
 
         if (offeredCards.Count == 0) return;
 

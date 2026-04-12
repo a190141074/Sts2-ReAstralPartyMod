@@ -41,7 +41,7 @@ public class PersonChestChoose : AstralPartyPotionModel
         // Shuffle with the run RNG so the revealed relic set stays deterministic.
         var relicOptions = availableRelics.ToList();
         relicOptions.UnstableShuffle(Owner.RunState.Rng.Niche);
-        relicOptions = relicOptions.Take(Math.Min(3, relicOptions.Count)).ToList();
+        relicOptions = relicOptions.Take(Math.Min(4, relicOptions.Count)).ToList();
 
         // Override the generic relic picker banner so the player sees a persona-specific title here.
         using var _ = RelicSelectionHeaderContext.Push(
@@ -66,7 +66,11 @@ public class PersonChestChoose : AstralPartyPotionModel
                 ModelDb.Relic<PersonWeirdEgg>(),
                 ModelDb.Relic<PersonSamuraiPrawn>(),
                 ModelDb.Relic<PersonSlimeLulu>(),
-                ModelDb.Relic<PersonBionicJasmine>()
+                ModelDb.Relic<PersonBionicJasmine>(),
+                ModelDb.Relic<PersonProprietress>(),
+                ModelDb.Relic<PersonMousyLian>(),
+                ModelDb.Relic<PersonBlueWhale>(),
+                ModelDb.Relic<PersonOasisQueen>()
             }
             .Where(relic => !ownedRelicIds.Contains(relic.Id))
             .ToList();

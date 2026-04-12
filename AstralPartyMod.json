@@ -1,9 +1,9 @@
-{
+﻿{
   "id": "AstralPartyMod",
   "name": "AstralPartyMod",
   "author": "雒邪",
-  "description": "引入星引擎相关内容",
-  "version": "0.01",
+  "description": "测试",
+  "version": "0.0.9",
   "has_pck": true,
   "has_dll": true,
   "dependencies": ["BaseLib"],

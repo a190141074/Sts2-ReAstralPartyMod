@@ -7,7 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Powers;
 namespace AstralPartyMod.AstralPartyCardCode.Powers;
 
 /// <summary>
-/// 半条命治疗 - 回合开始时恢复生命，治疗量每回合减半
+/// Heals at the start of the owner's side turn, then halves its amount.
 /// </summary>
 public class HalfLifeHealPower : AstralPartyPowerModel
 {
@@ -19,24 +19,19 @@ public class HalfLifeHealPower : AstralPartyPowerModel
 
     public override async Task AfterSideTurnStart(CombatSide side, CombatState combatState)
     {
-        // 只在拥有者回合开始时触发
         if (Owner == null || side != Owner.Side)
             return;
 
         if (Amount <= 0)
             return;
 
-        // 记录当前治疗量
-        decimal healAmount = Amount;
+        var healAmount = Amount;
 
-        // 显示动画
         Flash();
-
-        // 恢复生命
         await CreatureCmd.Heal(Owner, healAmount, true);
 
-        // 治疗量减半（向下取整，最小为0）
-        Amount = Math.Max((int)Math.Floor(Amount / 2m), 0);
+        // Round up so 3 becomes 2 and 1 stays 1.
+        Amount = Math.Max((int)Math.Ceiling(Amount / 2m), 0);
         InvokeDisplayAmountChanged();
     }
 }

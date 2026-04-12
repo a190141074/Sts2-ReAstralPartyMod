@@ -2,5 +2,7 @@
   "ASTRALPARTYMOD-ASTRAL_EVENT.title": "Astral Event",
   "ASTRALPARTYMOD-ASTRAL_EVENT.description": "A special card originating from the Astral Party event system.",
   "ASTRALPARTYMOD-ASTRAL_STEPS.title": "Steps",
-  "ASTRALPARTYMOD-ASTRAL_STEPS.description": "Steps gained from room entry for [Persona: Bionic Jasmine]. Unassigned, Rest Site, Shop, Treasure, Monster, and Map rooms grant 2. Event rooms grant 3. Elite rooms grant 6. Boss rooms grant 10."
+  "ASTRALPARTYMOD-ASTRAL_STEPS.description": "Steps gained from room entry for [Persona: Bionic Jasmine]. Unassigned, Rest Site, Shop, Treasure, Monster, and Map rooms grant 2. Event rooms grant 3. Elite rooms grant 6. Boss rooms grant 10.",
+  "ASTRALPARTYMOD-ASTRAL_TEMPORARY.title": "Temporary",
+  "ASTRALPARTYMOD-ASTRAL_TEMPORARY.description": "Discard this card at the end of turn. This keyword is removed after the card enters the discard pile."
 }

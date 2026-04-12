@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
@@ -28,8 +29,8 @@ public class SkillHealingSlime : AstralPartyCardModel
     public SkillHealingSlime() : base(
         0,
         CardType.Skill,
-        CardRarity.Uncommon,
-        TargetType.Self
+        CardRarity.Rare,
+        TargetType.AnyAlly
     )
     {
     }
@@ -41,11 +42,12 @@ public class SkillHealingSlime : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        var target = cardPlay.Target ?? Owner?.Creature;
+        ArgumentNullException.ThrowIfNull(cardPlay.Target, nameof(cardPlay.Target));
+
+        var target = cardPlay.Target;
         if (target == null || Owner?.Creature == null)
             return;
 
-        // Self-target cards may not populate cardPlay.Target, so fall back to the owner creature.
         await PowerCmd.Apply<HalfLifeHealPower>(
             target,
             DynamicVars["HalfLifeHealPower"].BaseValue,

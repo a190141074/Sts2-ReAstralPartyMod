@@ -1,15 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using AstralPartyMod.AstralPartyCardCode.cards;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Merchant;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
@@ -20,7 +25,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(SharedRelicPool))]
 public class PersonProprietress : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int MaxCounter = 3;
     private const int ShopGoldGainStep = 10;
     private const int DiscountChancePerShopPercent = 3;
     private const decimal DiscountedPriceMultiplier = 0.3m;
@@ -38,6 +43,13 @@ public class PersonProprietress : AstralPartyRelicModel
 
     public override bool ShowCounter => Owner?.Creature?.CombatState != null;
 
+    public override bool ShouldReceiveCombatHooks => true;
+
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        HoverTipFactory.FromCard<SkillTransfer>()
+    ];
+
     // Keep the combat display aligned with the actual cooldown progress.
     public override int DisplayAmount => GetClampedCounter();
 
@@ -45,9 +57,13 @@ public class PersonProprietress : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonProprietressCounter = 1;
-        AstralParty_PersonProprietressPendingCombatStartTrigger = false;
+        // Newly obtained cooldown relics should grant their first card on the next combat start.
+        AstralParty_PersonProprietressPendingCombatStartTrigger = true;
         AstralParty_PersonProprietressVisitedShops = 0;
         InvokeDisplayAmountChanged();
+
+        if (Owner.GetRelic<PersonalityDerivativeProprietressWealthism>() == null)
+            await RelicCmd.Obtain(ModelDb.Relic<PersonalityDerivativeProprietressWealthism>().ToMutable(), Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -55,13 +71,9 @@ public class PersonProprietress : AstralPartyRelicModel
         if (Owner?.Creature?.CombatState == null || !AstralParty_PersonProprietressPendingCombatStartTrigger)
             return;
 
-        Flash();
-
-        // TODO: Trigger PersonProprietress's combat effect immediately when a queued cooldown completes between combats.
-
+        await GrantTransfer();
         AstralParty_PersonProprietressPendingCombatStartTrigger = false;
         InvokeDisplayAmountChanged();
-        await Task.CompletedTask;
     }
 
     public override async Task AfterRoomEntered(AbstractRoom room)
@@ -70,7 +82,7 @@ public class PersonProprietress : AstralPartyRelicModel
             return;
 
         AstralParty_PersonProprietressVisitedShops++;
-        var goldToGain = AstralParty_PersonProprietressVisitedShops * ShopGoldGainStep;
+        var goldToGain = ShopGoldGainStep;
         Flash();
         await PlayerCmd.GainGold(goldToGain, Owner);
     }
@@ -83,14 +95,10 @@ public class PersonProprietress : AstralPartyRelicModel
         if (GetClampedCounter() < MaxCounter)
             return;
 
-        Flash();
-
-        // TODO: Implement PersonProprietress's combat effect when the 3-turn cooldown completes.
-
+        await GrantTransfer();
         AstralParty_PersonProprietressCounter = 1;
         AstralParty_PersonProprietressPendingCombatStartTrigger = false;
         InvokeDisplayAmountChanged();
-        await Task.CompletedTask;
     }
 
     public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
@@ -115,10 +123,11 @@ public class PersonProprietress : AstralPartyRelicModel
         if (Owner?.RunState is not { CurrentRoom: MerchantRoom })
             return originalPrice;
 
-        if (GetDiscountController(Owner.RunState) != Owner)
+        var discountController = GetDiscountController(Owner.RunState);
+        if (discountController?.Owner != Owner)
             return originalPrice;
 
-        var chancePercent = GetDiscountChancePercent();
+        var chancePercent = GetDiscountChancePercent(discountController);
         if (chancePercent <= 0)
             return originalPrice;
 
@@ -153,10 +162,13 @@ public class PersonProprietress : AstralPartyRelicModel
         AdvanceCounter();
     }
 
-    private int GetDiscountChancePercent()
+    private static int GetDiscountChancePercent(PersonProprietress? controller)
     {
+        if (controller == null)
+            return 0;
+
         return Math.Clamp(
-            AstralParty_PersonProprietressVisitedShops * DiscountChancePerShopPercent,
+            controller.AstralParty_PersonProprietressVisitedShops * DiscountChancePerShopPercent,
             0,
             100
         );
@@ -184,11 +196,18 @@ public class PersonProprietress : AstralPartyRelicModel
         return state.IsDiscounted;
     }
 
-    private static Player? GetDiscountController(IRunState runState)
+    private static PersonProprietress? GetDiscountController(IRunState runState)
     {
-        return runState
-            .Players.Where(player => player.GetRelic<PersonProprietress>() != null)
-            .OrderBy(player => player.NetId)
+        return runState.Players
+            .Select(player => new
+            {
+                Player = player,
+                Relic = player.GetRelic<PersonProprietress>()
+            })
+            .Where(entry => entry.Relic != null)
+            .OrderByDescending(entry => entry.Relic!.AstralParty_PersonProprietressVisitedShops)
+            .ThenBy(entry => entry.Player.NetId)
+            .Select(entry => entry.Relic)
             .FirstOrDefault();
     }
 
@@ -206,6 +225,16 @@ public class PersonProprietress : AstralPartyRelicModel
             MerchantCardRemovalEntry => "card_removal",
             _ => entry.GetType().FullName ?? entry.GetType().Name
         };
+    }
+
+    private async Task GrantTransfer()
+    {
+        if (Owner?.Creature?.CombatState == null)
+            return;
+
+        Flash();
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTransfer>(), Owner);
+        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
     }
 
     private sealed class DiscountRollState

@@ -22,7 +22,7 @@ public class EventRedHeatWarning : AstralPartyCardModel
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
-    protected override IEnumerable<IHoverTip> ExtraHoverTips => [HoverTipFactory.FromPower<StrengthPower>()];
+    protected override IEnumerable<IHoverTip> ExtraHoverTips => [HoverTipFactory.FromPower<VigorPower>()];
 
 
     public EventRedHeatWarning() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AllAllies)

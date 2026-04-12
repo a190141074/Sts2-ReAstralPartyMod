@@ -1,12 +1,9 @@
-using System.Linq;
-using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
-using BaseLib.Extensions;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
@@ -16,10 +13,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
 [Pool(typeof(ColorlessCardPool))]
 public class SkillTroubleMaker : AstralPartyCardModel
 {
-    private static readonly LocString SelectionPrompt = new("cards", "SKILL_TROUBLE_MAKER.select_prompt");
-    private static int _choosePromptOverrideDepth;
-
-    private int _cardsToShow = 2;
+    private int _cardsToShow = 3;
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
@@ -44,32 +38,11 @@ public class SkillTroubleMaker : AstralPartyCardModel
     {
         if (CombatState == null || Owner == null) return;
 
-        var offeredCards = ModelDb.AllCards
-            .Where(card => card is AstralPartyCardModel)
-            .Where(card => card.GetType().Name.StartsWith("Event"))
-            .Where(card => card.GetType() != typeof(SkillTroubleMaker))
-            .OrderBy(_ => Owner.RunState.Rng.Niche.NextInt(int.MaxValue))
-            .Select(card =>
-            {
-                var mutableCard = card.ToMutable();
-                mutableCard.Owner = Owner;
-                return mutableCard;
-            })
-            .Take(_cardsToShow)
-            .ToList();
+        var offeredCards = AstralEventCardPool.CreateRandomMutableEventCardsForPlayer(Owner, _cardsToShow);
 
         if (offeredCards.Count == 0) return;
 
-        BeginChoosePromptOverride();
-        CardModel? selectedCard;
-        try
-        {
-            selectedCard = await CardSelectCmd.FromChooseACardScreen(choiceContext, offeredCards, Owner, false);
-        }
-        finally
-        {
-            EndChoosePromptOverride();
-        }
+        var selectedCard = await CardSelectCmd.FromChooseACardScreen(choiceContext, offeredCards, Owner, false);
 
         if (selectedCard == null) return;
 
@@ -78,22 +51,5 @@ public class SkillTroubleMaker : AstralPartyCardModel
 
         var cardToPlay = CombatState.CreateCard(selectedCard.CanonicalInstance, Owner);
         await CardCmd.AutoPlay(choiceContext, cardToPlay, Owner.Creature, AutoPlayType.Default, false, true);
-    }
-
-    public static bool ShouldOverrideChoosePrompt => _choosePromptOverrideDepth > 0;
-
-    public static string GetChoosePromptText()
-    {
-        return LocManager.Instance.SmartFormat(SelectionPrompt, []);
-    }
-
-    private static void BeginChoosePromptOverride()
-    {
-        _choosePromptOverrideDepth++;
-    }
-
-    private static void EndChoosePromptOverride()
-    {
-        _choosePromptOverrideDepth = Math.Max(0, _choosePromptOverrideDepth - 1);
     }
 }

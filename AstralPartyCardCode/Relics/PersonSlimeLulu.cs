@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
@@ -33,6 +34,11 @@ public class PersonSlimeLulu : AstralPartyRelicModel
 
     public override bool ShowCounter => Owner?.Creature?.CombatState != null;
 
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        HoverTipFactory.FromCard<SkillHealingSlime>()
+    ];
+
     public override int DisplayAmount => GetClampedCounter();
 
     public override bool ShouldReceiveCombatHooks => true;
@@ -42,7 +48,8 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         await base.AfterObtained();
 
         AstralParty_PersonSlimeLuluCounter = 1;
-        AstralParty_PersonSlimeLuluPendingCombatStartCard = false;
+        // Newly obtained cooldown relics should grant their first card on the next combat start.
+        AstralParty_PersonSlimeLuluPendingCombatStartCard = true;
         AstralParty_PersonSlimeLuluHealingSlimeUses = 0;
         RefreshCounterDisplay();
 
