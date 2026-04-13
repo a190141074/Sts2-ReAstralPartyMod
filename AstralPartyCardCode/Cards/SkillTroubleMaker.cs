@@ -31,7 +31,7 @@ public class SkillTroubleMaker : AstralPartyCardModel
 
     protected override void OnUpgrade()
     {
-        _cardsToShow += 1;
+
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

@@ -16,7 +16,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
 [Pool(typeof(ColorlessCardPool))]
 public class EventRedHeatWarning : AstralPartyCardModel
 {
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<StrengthPower>(5m)];
+    protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<VigorPower>(5m)];
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
@@ -38,7 +38,7 @@ public class EventRedHeatWarning : AstralPartyCardModel
         if (CombatState == null) return;
 
         foreach (var player in CombatState.Players)
-            await PowerCmd.Apply<StrengthPower>(player.Creature, DynamicVars["StrengthPower"].BaseValue, Owner.Creature,
+            await PowerCmd.Apply<VigorPower>(player.Creature, DynamicVars["VigorPower"].BaseValue, Owner.Creature,
                 this);
     }
 }

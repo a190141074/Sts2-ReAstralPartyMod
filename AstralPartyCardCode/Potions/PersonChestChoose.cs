@@ -70,7 +70,9 @@ public class PersonChestChoose : AstralPartyPotionModel
                 ModelDb.Relic<PersonProprietress>(),
                 ModelDb.Relic<PersonMousyLian>(),
                 ModelDb.Relic<PersonBlueWhale>(),
-                ModelDb.Relic<PersonOasisQueen>()
+                ModelDb.Relic<PersonOasisQueen>(),
+                ModelDb.Relic<PersonInkShadowHunter>(),
+                ModelDb.Relic<PersonMascotGirlMimi>(),
             }
             .Where(relic => !ownedRelicIds.Contains(relic.Id))
             .ToList();
