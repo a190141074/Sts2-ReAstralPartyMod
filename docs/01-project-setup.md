@@ -22,18 +22,100 @@
 
 **BaseLib 核心功能**：
 - `CustomCardModel`：自定义卡牌基类
+- `ConstructedCardModel`：链式 API 卡牌基类（推荐）
 - `CustomCharacterModel`：自定义角色基类
 - `CustomRelicModel`：自定义遗物基类
 - `CustomPowerModel`：自定义能力基类
 - `CustomPotionModel`：自定义药水基类
 - `CustomAncientModel`：自定义先古之民基类
+- `CustomMonsterModel`：自定义怪物基类
+- `CustomEncounterModel`：自定义遭遇基类
+- `CustomPetModel`：自定义宠物基类
+- `CustomCardPoolModel`：自定义卡牌池基类
+- `CustomRelicPoolModel`：自定义遗物池基类
+- `CustomPotionPoolModel`：自定义药水池基类
+- `CustomSingletonModel`：持续接收钩子的单例模型基类
+- `CustomOrbModel`：自定义球体基类
+- `CustomPile`：自定义牌堆基类
 - `PoolAttribute`：内容池属性标记
 - `CommonActions`：常用游戏动作工具（支持 `CalculatedDamageVar` 优先）
-- `GodotUtils`：Godot 节点和场景处理工具
+- `NodeFactory<T>`：节点工厂（推荐，替代 GodotUtils）
+- `GodotUtils`：Godot 节点和场景处理工具（部分已弃用）
 - `ShaderUtils`：着色器生成工具
 - `WeightedList`：加权随机列表
 - `SpireField`：Harmony 自定义字段
 - `SavedProperty`：自动持久化属性（使用 `GetProperties` 检查）
+
+## 项目配置 (csproj 设置)
+
+BaseLib 提供了自动化的项目配置系统，可以自动检测游戏路径。
+
+### Sts2PathDiscovery.props
+
+BaseLib 包含 `Sts2PathDiscovery.props` 文件，可以自动检测不同操作系统上的游戏安装路径：
+
+**Windows**:
+1. 首先尝试从注册表读取 Steam 卸载位置（App ID: 2868840）
+2. 然后尝试 `%SteamPath%\steamapps`
+3. 最后回退到 `C:\Program Files (x86)\Steam\steamapps`
+
+**Linux**:
+- 默认路径：`~/.local/share/Steam/steamapps`
+
+**macOS**:
+- 默认路径：`~/Library/Application Support/Steam/steamapps`
+
+**自动设置的属性**：
+
+| 属性 | 说明 |
+|------|------|
+| `SteamLibraryPath` | Steam 库路径 |
+| `Sts2Path` | 游戏安装路径 |
+| `Sts2DataDir` | 游戏数据目录（包含托管程序集） |
+| `ModsPath` | 模组输出路径 |
+
+### local.props 本地配置
+
+创建 `local.props` 文件（已被 .gitignore 忽略）来覆盖默认路径：
+
+```xml
+<Project>
+    <PropertyGroup>
+        <!-- 游戏安装路径 -->
+        <Sts2Path>Path\To\SteamLibrary\steamapps\common\Slay the Spire 2</Sts2Path>
+        
+        <!-- 可选：覆盖托管数据文件夹 -->
+        <!-- <Sts2DataDir>$(Sts2Path)\data_sts2_windows_x86_64</Sts2DataDir> -->
+        
+        <!-- 可选：MegaDot / Godot 4.5.1 mono 可执行文件路径（用于 --export-pack） -->
+        <!-- <GodotPath>Z:\Projects\sts2\megadot\MegaDot_v4.5.1-stable_mono_win64.exe</GodotPath> -->
+    </PropertyGroup>
+</Project>
+```
+
+### 在 csproj 中导入
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <!-- 其他配置 -->
+    </PropertyGroup>
+
+    <!-- 导入 BaseLib 的路径发现配置 -->
+    <Import Project="path\to\BaseLib-StS2-master\Sts2PathDiscovery.props" />
+    
+    <!-- 可选：导入本地配置覆盖 -->
+    <Import Project="local.props" Condition="Exists('local.props')" />
+
+    <!-- 使用自动检测的路径 -->
+    <ItemGroup>
+        <Reference Include="sts2">
+            <HintPath>$(Sts2DataDir)\sts2.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+</Project>
+```
 
 ## 基本结构
 
@@ -87,36 +169,73 @@ YourMod/
 
 ```
 YuWanCard/
-├── YuWanCardCode/
-│   ├── Cards/                 # 20+ 张卡牌定义
-│   │   ├── YuWanCardModel.cs  # 卡牌基类
-│   │   ├── PigHurt.cs         # 猪受伤
-│   │   ├── PigAngry.cs        # 猪愤怒
-│   │   ├── RainDark.cs        # 雨落狂流之暗
+├── YuWanCardCode/               # 模组源代码目录
+│   ├── Ancients/                # 先古之民定义
+│   │   └── PigPig.cs            # 猪猪先古之民
+│   ├── Cards/                   # 卡牌定义（50+ 张卡牌）
+│   │   ├── YuWanCardModel.cs    # 卡牌基类
+│   │   ├── PigStrike.cs         # 猪打击
+│   │   ├── PigAngry.cs          # 猪愤怒
+│   │   ├── RainDark.cs          # 雨落狂流之暗
 │   │   └── ...
-│   ├── Powers/                # 6 个能力定义
-│   │   ├── YuWanPowerModel.cs # 能力基类
-│   │   ├── PigDoubtPower.cs   # 猪疑惑
-│   │   ├── RainDarkPower.cs   # 雨落狂流
+│   ├── Characters/              # 角色定义
+│   │   ├── Pig.cs               # 猪角色
+│   │   ├── PigCardPool.cs       # 猪卡牌池
+│   │   ├── PigRelicPool.cs      # 猪遗物池
+│   │   └── PigPotionPool.cs     # 猪药水池
+│   ├── Powers/                  # 能力定义（12 个能力）
+│   │   ├── YuWanPowerModel.cs   # 能力基类
+│   │   ├── PigDoubtPower.cs     # 猪疑惑
+│   │   ├── RainDarkPower.cs     # 雨落狂流
 │   │   └── ...
-│   ├── Relics/                # 13 个遗物定义
-│   │   ├── YuWanRelicModel.cs # 遗物基类
+│   ├── Relics/                  # 遗物定义（18 个遗物）
+│   │   ├── YuWanRelicModel.cs   # 遗物基类
 │   │   ├── RingOfSevenCurses.cs # 七咒之戒
-│   │   ├── TenYearBamboo.cs   # 10 年孤竹
+│   │   ├── TenYearBamboo.cs     # 10 年孤竹
 │   │   └── ...
-│   ├── Ancients/
-│   │   └── PigPig.cs          # 猪猪先古之民
-│   ├── Modifiers/
-│   │   └── EndlessModifier.cs # 无尽模式
-│   ├── Monsters/
-│   │   └── Killer.cs          # 杀手精英怪
-│   ├── Encounters/
-│   │   └── KillerElite.cs     # 杀手遭遇
-│   └── Patches/               # Harmony 补丁
-│       ├── NeowSevenCursesPatch.cs
-│       ├── KillerRegistrationPatch.cs
-│       └── ...
-└── YuWanCard/                 # 资源目录
+│   ├── Modifiers/               # 修改器定义
+│   │   ├── YuWanModifierModel.cs # 修改器基类
+│   │   ├── EndlessModifier.cs   # 无尽模式
+│   │   └── VakuuTowerModifier.cs # Vakuu塔
+│   ├── Monsters/                # 怪物定义
+│   │   ├── YuWanMonsterModel.cs # 怪物基类
+│   │   ├── Killer.cs            # 杀手精英怪
+│   │   └── PigMinion.cs         # 猪随从
+│   ├── Encounters/              # 遭遇定义
+│   │   └── KillerElite.cs       # 杀手遭遇
+│   ├── Enchantments/            # 附魔定义
+│   │   ├── ArthropodKiller.cs   # 节肢动物杀手
+│   │   ├── Loyal.cs             # 忠诚
+│   │   └── ...
+│   ├── Events/                  # 事件定义
+│   │   └── Blacksmith.cs        # 铁匠事件
+│   ├── Orbs/                    # 能量球定义
+│   │   └── LittleCrownPrinceOrb.cs # 小王子能量球
+│   ├── GameActions/             # 自定义游戏动作
+│   │   └── RetreatVoteAction.cs # 撤退投票动作
+│   ├── Multiplayer/             # 多人游戏相关
+│   │   ├── TeammatePayMessageHandler.cs
+│   │   └── TeammatePayMessages.cs
+│   ├── RestSite/                # 休息处选项
+│   │   └── RoastPorkRestSiteOption.cs
+│   ├── UI/                      # UI 组件
+│   │   ├── ShoppingCartPopup.cs
+│   │   └── ...
+│   ├── Patches/                 # Harmony 补丁
+│   │   ├── NeowSevenCursesPatch.cs
+│   │   ├── KillerRegistrationPatch.cs
+│   │   └── ...
+│   ├── Utils/                   # 工具类
+│   │   ├── GameVersionCompat.cs # 版本兼容性
+│   │   ├── PowerSafetyUtils.cs  # 能力安全性检查
+│   │   └── ...
+│   ├── Vfx/                     # 视觉效果
+│   │   └── VfxGlitchController.cs
+│   ├── Config/                  # 配置
+│   │   └── YuWanCardConfig.cs
+│   └── Commands/                # 调试命令
+│       └── YwDebugCmd.cs
+└── YuWanCard/                   # 资源目录
     ├── images/
     ├── localization/zhs/
     └── ...

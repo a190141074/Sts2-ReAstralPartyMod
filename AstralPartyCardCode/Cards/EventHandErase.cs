@@ -12,7 +12,7 @@ using MegaCrit.Sts2.Core.Rewards;
 namespace AstralPartyMod.AstralPartyCardCode.cards;
 
 // 6. 手牌抹除：给所有友方单位弃掉从右往左第一张牌
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventHandErase : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

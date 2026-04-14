@@ -13,7 +13,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
  * 红温警告
  * 所有玩家获得5活力
  */
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventRedHeatWarning : AstralPartyCardModel
 {
     protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<VigorPower>(5m)];

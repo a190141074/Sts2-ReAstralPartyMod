@@ -14,7 +14,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
  * 天降神兵
  * 从所有的事件中(除了机械降神)选择一张事件卡，打出两次
  */
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventDeusExMachina : AstralPartyCardModel
 {
     private static readonly LocString SelectionPrompt = new("cards", "EVENT_DEUS_EX_MACHINA.select_prompt");

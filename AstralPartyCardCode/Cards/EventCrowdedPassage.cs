@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace AstralPartyMod.AstralPartyCardCode.cards;
 
 // 4. 拥挤通道：给所有友方单位上一层缓冲+易伤
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventCrowdedPassage : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

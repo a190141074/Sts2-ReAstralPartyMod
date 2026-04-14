@@ -18,7 +18,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
  * 4~6你获得6星光，其他玩家获得3星光
  * 1~3你受到4伤害，其他玩家受到2伤害
  */
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventPlayerRepresentative : AstralPartyCardModel
 {
     protected override IEnumerable<DynamicVar> CanonicalVars =>

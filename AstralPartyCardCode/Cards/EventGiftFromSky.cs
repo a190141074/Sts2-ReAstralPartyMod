@@ -14,7 +14,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 namespace AstralPartyMod.AstralPartyCardCode.cards;
 
 // 5. 天降之物：给所有友方单位抽牌并获得星光
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventGiftFromSky : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

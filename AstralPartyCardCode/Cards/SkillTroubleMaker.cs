@@ -10,7 +10,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace AstralPartyMod.AstralPartyCardCode.cards;
 
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class SkillTroubleMaker : AstralPartyCardModel
 {
     private int _cardsToShow = 3;

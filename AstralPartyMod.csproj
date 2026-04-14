@@ -95,6 +95,7 @@
 		<Content Include="AstralPartyMod\localization\zhs\potions.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\powers.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\relics.json"/>
+		<Content Include="help\CardPool.md" />
 		<Content Include="help\CardRarity.md"/>
 		<Content Include="help\CardSelectCmd.FromSimpleGrid.md"/>
 		<Content Include="help\TargetType.md"/>

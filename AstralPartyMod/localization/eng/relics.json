@@ -31,6 +31,11 @@
   "ASTRALPARTYMOD-PERSON_INK_SHADOW_HUNTER.flavor": "A small shadow is still enough to leave a mark.",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.title": "[Persona Derivative: Wealth]",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.description": "Every 2 rooms, gain Gold equal to this relic\u0027s counter. [card]Transfer[/card] increases that counter by 1. This counter has no cap.",
-  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.flavor": "Money likes finding its way back with friends."
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.flavor": "Money likes finding its way back with friends.",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.stats_title": "Wealth Stats",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.stats_description": "Income: {0} Gold\nSpent: {1} Gold",
+  "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.title": "[Persona: Superman Megas]",
+  "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.description": "At the start of every 3rd turn, add 1 [card]Orbital Bombardment[/card] to your hand. Combat end also reduces this relic's cooldown by 1 turn. At turn end, if you have fewer than 5 cards in hand, draw 1 extra card next turn. After playing [card]Orbital Bombardment[/card], draw 1 card.",
+  "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.flavor": "Less in hand. More from orbit."
 }
 

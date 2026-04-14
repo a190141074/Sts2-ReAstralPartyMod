@@ -13,7 +13,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace AstralPartyMod.AstralPartyCardCode.cards;
 
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class SkillHealingSlime : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

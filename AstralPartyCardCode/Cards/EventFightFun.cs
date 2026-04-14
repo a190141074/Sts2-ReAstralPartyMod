@@ -16,7 +16,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
 /*
  * 战斗，爽！：给所有友方单位发一张原版游戏卡牌：巨石(Giant Rock)（消耗+虚无）
  */
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventFightFun : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

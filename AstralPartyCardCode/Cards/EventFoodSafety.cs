@@ -13,7 +13,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
 /*
  * 食品安全：全场单位获得中毒
  */
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventFoodSafety : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

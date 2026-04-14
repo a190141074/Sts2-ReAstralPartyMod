@@ -1,8 +1,10 @@
-{
+﻿{
   "ASTRALPARTYMOD-ASTRAL_EVENT.title": "事件牌",
   "ASTRALPARTYMOD-ASTRAL_EVENT.description": "来自星引擎MOD[gold]事件[/gold]系统的特殊卡牌。",
   "ASTRALPARTYMOD-ASTRAL_STEPS.title": "步数",
   "ASTRALPARTYMOD-ASTRAL_STEPS.description": "【人格：绿油油】进入房间时获得的步数。其他、休息处、商店、宝箱、普通房间提供 2 步；\n事件房间提供 3 步；\n精英房间提供 6 步；\nBoss 房间提供 10 步。",
   "ASTRALPARTYMOD-ASTRAL_TEMPORARY.title": "临时",
-  "ASTRALPARTYMOD-ASTRAL_TEMPORARY.description": "回合结束时自动弃置，进入弃牌堆后此关键词自动消除。"
+  "ASTRALPARTYMOD-ASTRAL_TEMPORARY.description": "回合结束时自动弃置，进入弃牌堆后此关键词自动消除。",
+  "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.title": "轨道轰炸",
+  "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.description": "[gold]无视格挡[/gold]\n每弃置2张牌，额外轰炸1次。\n每有3点被弃牌的总能量费用，此伤害+1;被弃置的0费牌按1点计算，X费牌按你当前能量计算。"
 }

@@ -13,7 +13,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
  */
 
 // 加入哪个卡池
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventAngelsDescent : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

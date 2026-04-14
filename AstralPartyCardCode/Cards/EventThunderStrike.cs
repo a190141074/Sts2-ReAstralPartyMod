@@ -14,7 +14,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
  * 天打雷劈：全场单位受到伤害
  */
 
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventThunderStrike : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

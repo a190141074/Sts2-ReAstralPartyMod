@@ -13,7 +13,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace AstralPartyMod.AstralPartyCardCode.cards;
 
 // 8. 人人平等：所有人的生命降低为一点，并获得50点护盾
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class EventEquality : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

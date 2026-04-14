@@ -49,5 +49,7 @@
   "ASTRALPARTYMOD-SKILL_PRODUCT_RESTOCKING.title": "商品补货",
   "ASTRALPARTYMOD-SKILL_PRODUCT_RESTOCKING.description": "弃置所有手牌，抽取原手牌数量+1张的卡牌。",
   "ASTRALPARTYMOD-SKILL_SHADOW_FUSION.title": "暗影融合",
-  "ASTRALPARTYMOD-SKILL_SHADOW_FUSION.description": "吸收所有[gold]双生之影[/gold]。\n每吸收一个影子使你本回合内力量+1。"
+  "ASTRALPARTYMOD-SKILL_SHADOW_FUSION.description": "吸收所有[gold]双生之影[/gold]。\n每吸收一个影子使你本回合内力量+1。",
+  "ASTRALPARTYMOD-SKILL_SOLAR_BOMBARDMENT.title": "轨道轰炸",
+  "ASTRALPARTYMOD-SKILL_SOLAR_BOMBARDMENT.description": "弃置所有手牌,对随机敌人进行基础{Damage:diff()}点伤害的[gold]轨道轰炸[/gold]，共{Repeat:diff()}次。"
 }

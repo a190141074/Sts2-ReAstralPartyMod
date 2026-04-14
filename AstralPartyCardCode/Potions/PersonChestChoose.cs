@@ -19,6 +19,23 @@ namespace AstralPartyMod.AstralPartyCardCode.Potions;
 [Pool(typeof(SharedPotionPool))]
 public class PersonChestChoose : AstralPartyPotionModel
 {
+    private const int RevealCount = 4;
+
+    private static readonly RelicModel[] PersonaRelics =
+    [
+        ModelDb.Relic<PersonWeirdEgg>(),
+        ModelDb.Relic<PersonSamuraiPrawn>(),
+        ModelDb.Relic<PersonSlimeLulu>(),
+        ModelDb.Relic<PersonBionicJasmine>(),
+        ModelDb.Relic<PersonProprietress>(),
+        ModelDb.Relic<PersonMousyLian>(),
+        ModelDb.Relic<PersonBlueWhale>(),
+        ModelDb.Relic<PersonOasisQueen>(),
+        ModelDb.Relic<PersonInkShadowHunter>(),
+        ModelDb.Relic<PersonMascotGirlMimi>(),
+        ModelDb.Relic<PersonSupermanMegas>(),
+    ];
+
     public PersonChestChoose() : base(true)
     {
     }
@@ -30,18 +47,23 @@ public class PersonChestChoose : AstralPartyPotionModel
     public override TargetType TargetType => TargetType.Self;
 
     public override bool PassesCustomUsabilityCheck =>
-        CombatManager.Instance?.IsInProgress != true && GetAvailablePersonaRelics().Count > 0;
+        Owner != null
+        && CombatManager.Instance?.IsInProgress != true
+        && GetAvailablePersonaRelics(Owner).Count > 0;
 
     protected override async Task OnUse(PlayerChoiceContext choiceContext, Creature? target)
     {
-        var availableRelics = GetAvailablePersonaRelics();
+        if (Owner == null)
+            return;
+
+        var availableRelics = GetAvailablePersonaRelics(Owner);
         if (availableRelics.Count == 0)
             return;
 
         // Shuffle with the run RNG so the revealed relic set stays deterministic.
         var relicOptions = availableRelics.ToList();
         relicOptions.UnstableShuffle(Owner.RunState.Rng.Niche);
-        relicOptions = relicOptions.Take(Math.Min(4, relicOptions.Count)).ToList();
+        relicOptions = relicOptions.Take(Math.Min(RevealCount, relicOptions.Count)).ToList();
 
         // Override the generic relic picker banner so the player sees a persona-specific title here.
         using var _ = RelicSelectionHeaderContext.Push(
@@ -55,25 +77,16 @@ public class PersonChestChoose : AstralPartyPotionModel
         await RelicCmd.Obtain(selectedRelic.ToMutable(), Owner);
     }
 
-    private IReadOnlyList<RelicModel> GetAvailablePersonaRelics()
+    private static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(MegaCrit.Sts2.Core.Entities.Players.Player owner)
     {
-        var ownedRelicIds = Owner.Relics
+        var ownedRelicIds = owner.Relics
             .Select(relic => relic.CanonicalInstance.Id)
             .ToHashSet();
 
-        return new List<RelicModel>
-            {
-                ModelDb.Relic<PersonWeirdEgg>(),
-                ModelDb.Relic<PersonSamuraiPrawn>(),
-                ModelDb.Relic<PersonSlimeLulu>(),
-                ModelDb.Relic<PersonBionicJasmine>(),
-                ModelDb.Relic<PersonProprietress>(),
-                ModelDb.Relic<PersonMousyLian>(),
-                ModelDb.Relic<PersonBlueWhale>(),
-                ModelDb.Relic<PersonOasisQueen>(),
-                ModelDb.Relic<PersonInkShadowHunter>(),
-                ModelDb.Relic<PersonMascotGirlMimi>(),
-            }
+        // Keep the source list canonical and still de-duplicate by Id as a safety net
+        // so the picker cannot ever reveal duplicate persona relics.
+        return PersonaRelics
+            .DistinctBy(relic => relic.Id)
             .Where(relic => !ownedRelicIds.Contains(relic.Id))
             .ToList();
     }

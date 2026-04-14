@@ -12,7 +12,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace AstralPartyMod.AstralPartyCardCode.cards;
 
-[Pool(typeof(ColorlessCardPool))]
+[Pool(typeof(EventCardPool))]
 public class SkillFamousBlade : AstralPartyCardModel
 {
     private const int MaxAuraToConsume = 2;
