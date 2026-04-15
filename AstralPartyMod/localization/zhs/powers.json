@@ -29,4 +29,14 @@
   "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.title": "暗影额度",
   "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.description": "显示本回合还能通过攻击牌施加几次[gold]双生之影[/gold]。",
   "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.smartDescription": "显示本回合还能通过攻击牌施加几次[gold]双生之影[/gold]。"
+,
+  "ASTRALPARTYMOD-DRAGON_AWAKENING_POWER.title": "觉醒",
+  "ASTRALPARTYMOD-DRAGON_AWAKENING_POWER.description": "战斗结束时，[gold]跃龙门[/gold]会按层数减少[gold]七十二天雷[/gold]。",
+  "ASTRALPARTYMOD-DRAGON_AWAKENING_POWER.smartDescription": "战斗结束时，[gold]跃龙门[/gold]会按层数减少[gold]七十二天雷[/gold]。",
+  "ASTRALPARTYMOD-TRUE_DRAGON_FORM_POWER.title": "真龙形态",
+  "ASTRALPARTYMOD-TRUE_DRAGON_FORM_POWER.description": "伤害+4，获得2点[red]力量[/red]、1点[green]敏捷[/green]，并永久获得2点最大生命。不可叠加。",
+  "ASTRALPARTYMOD-TRUE_DRAGON_FORM_POWER.smartDescription": "伤害+4，获得2点[red]力量[/red]、1点[green]敏捷[/green]，并永久获得2点最大生命。不可叠加。",
+  "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.title": "龙吼护体",
+  "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.description": "在敌方行动开始前，免疫敌方来源的伤害。",
+  "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.smartDescription": "在敌方行动开始前，免疫敌方来源的伤害。"
 }

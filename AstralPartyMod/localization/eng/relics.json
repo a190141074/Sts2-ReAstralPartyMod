@@ -37,5 +37,15 @@
   "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.title": "[Persona: Superman Megas]",
   "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.description": "At the start of every 3rd turn, add 1 [card]Orbital Bombardment[/card] to your hand. Combat end also reduces this relic's cooldown by 1 turn. At turn end, if you have fewer than 5 cards in hand, draw 1 extra card next turn. After playing [card]Orbital Bombardment[/card], draw 1 card.",
   "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.flavor": "Less in hand. More from orbit."
+,
+  "ASTRALPARTYMOD-PERSON_XIAO_LEI.title": "[Persona: Xiao Lei]",
+  "ASTRALPARTYMOD-PERSON_XIAO_LEI.description": "At the start of every 3rd turn, add 1 [card]Chain Reaction[/card] to your hand. Whenever you cause another player to gain a card, gain 1 [power]Dragon Awakening[/power]. After enduring Seventy-Two Heavenly Thunders and Thirty-Six Heavenly Fires, unlock [power]True Dragon Form[/power].",
+  "ASTRALPARTYMOD-PERSON_XIAO_LEI.flavor": "No dragon crosses the gate before surviving the storm.",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.title": "[Persona Derivative: Dragon Gate]",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.description": "At the end of combat, reduce Seventy-Two Heavenly Thunders by your [power]Dragon Awakening[/power]. Whenever you take damage, reduce Thirty-Six Heavenly Fires by 1. Once both trials reach 0, at the start of each combat gain [power]True Dragon Form[/power] and add 1 [card]Dragon\u0027s Roar[/card] to your hand.",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.flavor": "The gate yields only after thunder and fire have both been spent.",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.progress_title": "Dragon Gate Progress",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.progress_description": "Seventy-Two Heavenly Thunders: {0}\nThirty-Six Heavenly Fires: {1}\nTrue Dragon Form: {2}",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.unlocked": "Unlocked",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.locked": "Locked"
 }
-

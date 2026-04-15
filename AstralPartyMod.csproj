@@ -53,6 +53,9 @@
 		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_extra_large.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_gawu_cutter.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_famous_blade.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\skill_bite.png" />
+		<Content Include="AstralPartyMod\images\card_portraits\skill_chain_reaction.png" />
+		<Content Include="AstralPartyMod\images\card_portraits\skill_dragons_roar.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_fate_guidance.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_fate_weak_mprint.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_product_restocking.png" />
@@ -63,6 +66,7 @@
 		<Content Include="AstralPartyMod\images\card_portraits\skill_trouble_maker.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_healing_slime.png"/>
 		<Content Include="AstralPartyMod\images\powers\counter_power.png"/>
+		<Content Include="AstralPartyMod\images\powers\dragon_awakening_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\fate_weak_imprint_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\half_life_heal_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\mark_lock_power.png"/>
@@ -73,6 +77,7 @@
 		<Content Include="AstralPartyMod\images\powers\ling_hun_lian_jie_power.png"/>
 		<Content Include="AstralPartyMod\images\potion\person_chest_choose.png"/>
 		<Content Include="AstralPartyMod\images\powers\twin_shadows_power.png" />
+		<Content Include="AstralPartyMod\images\powers\true_dragon_form_power.png" />
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_bionic_jasmine.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_blue_whale.png"/>
@@ -83,7 +88,9 @@
 		<Content Include="AstralPartyMod\images\relic\person_proprietress.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_samurai_prawn.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_slime_lulu.png"/>
+		<Content Include="AstralPartyMod\images\relic\person_xiao_lei.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_weird_egg.png"/>
+		<Content Include="AstralPartyMod\images\relic\personality_derivative_xiao_lei_loong_gate.png"/>
 		<Content Include="AstralPartyMod\localization\eng\cards.json"/>
 		<Content Include="AstralPartyMod\localization\eng\card_keywords.json"/>
 		<Content Include="AstralPartyMod\localization\eng\potions.json"/>

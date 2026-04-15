@@ -34,6 +34,7 @@ public class PersonChestChoose : AstralPartyPotionModel
         ModelDb.Relic<PersonInkShadowHunter>(),
         ModelDb.Relic<PersonMascotGirlMimi>(),
         ModelDb.Relic<PersonSupermanMegas>(),
+        ModelDb.Relic<PersonXiaoLei>(),
     ];
 
     public PersonChestChoose() : base(true)

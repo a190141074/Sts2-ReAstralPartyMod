@@ -52,4 +52,11 @@
   "ASTRALPARTYMOD-SKILL_SHADOW_FUSION.description": "Count all enemy [power]Twin Shadows[/power]. Gain 1 temporary [green]Strength[/green] this turn for each separate shadow, then remove all enemy [power]Twin Shadows[/power].",
   "ASTRALPARTYMOD-SKILL_SOLAR_BOMBARDMENT.title": "Orbital Bombardment",
   "ASTRALPARTYMOD-SKILL_SOLAR_BOMBARDMENT.description": "Discard all cards in your hand. Deal {Damage:diff()} damage to a random enemy {Repeat:diff()} times. For every 2 discarded cards, deal damage 1 additional time. For every 3 total Energy cost among the discarded cards, increase this damage by 1. Discarded 0-cost cards count as 1 Energy. Discarded X-cost cards count as your current Energy."
+,
+  "ASTRALPARTYMOD-SKILL_CHAIN_REACTION.title": "Chain Reaction",
+  "ASTRALPARTYMOD-SKILL_CHAIN_REACTION.description": "Each other player draws 1 card. If that player's hand has fewer than 4 cards, they draw 2 instead. Then add 1 [card]Bite[/card] to your hand.",
+  "ASTRALPARTYMOD-SKILL_BITE.title": "Bite",
+  "ASTRALPARTYMOD-SKILL_BITE.description": "Gain 1 stack of [power]Dragon Awakening[/power]. Then gain temporary [red]Strength[/red] equal to your current [power]Dragon Awakening[/power], up to 4.",
+  "ASTRALPARTYMOD-SKILL_DRAGONS_ROAR.title": "Dragon's Roar",
+  "ASTRALPARTYMOD-SKILL_DRAGONS_ROAR.description": "Apply 1 [vulnerable]Vulnerable[/vulnerable] and 1 [weak]Weak[/weak]. Gain 3 temporary [red]Strength[/red], and until the enemy turn starts, ignore damage from enemy sources."
 }

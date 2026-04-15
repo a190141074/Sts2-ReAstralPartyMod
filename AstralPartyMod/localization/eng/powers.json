@@ -29,4 +29,14 @@
   "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.title": "Shadow Quota",
   "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.description": "Shows how many more times this turn your Attack cards can apply [power]Twin Shadows[/power].",
   "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.smartDescription": "Shows how many more times this turn your Attack cards can apply [power]Twin Shadows[/power]."
+,
+  "ASTRALPARTYMOD-DRAGON_AWAKENING_POWER.title": "Dragon Awakening",
+  "ASTRALPARTYMOD-DRAGON_AWAKENING_POWER.description": "At the end of combat, [relic]Dragon Gate[/relic] reduces its Thunder counter by this amount.",
+  "ASTRALPARTYMOD-DRAGON_AWAKENING_POWER.smartDescription": "At the end of combat, [relic]Dragon Gate[/relic] reduces its Thunder counter by this amount.",
+  "ASTRALPARTYMOD-TRUE_DRAGON_FORM_POWER.title": "True Dragon Form",
+  "ASTRALPARTYMOD-TRUE_DRAGON_FORM_POWER.description": "Damage +4. Gain 2 [red]Strength[/red], 1 [green]Dexterity[/green], and permanently gain 2 Max HP. Does not stack.",
+  "ASTRALPARTYMOD-TRUE_DRAGON_FORM_POWER.smartDescription": "Damage +4. Gain 2 [red]Strength[/red], 1 [green]Dexterity[/green], and permanently gain 2 Max HP. Does not stack.",
+  "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.title": "Dragon Roar Ward",
+  "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.description": "Until the enemy turn starts, ignore damage from enemy sources.",
+  "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.smartDescription": "Until the enemy turn starts, ignore damage from enemy sources."
 }
