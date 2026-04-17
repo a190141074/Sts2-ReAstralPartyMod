@@ -36,6 +36,10 @@
 
 	<ItemGroup>
 		<Content Include="AstralPartyMod.json" />
+		<Content Include="AstralPartyMod\images\card_portraits\events_covert_investigation_a.png" />
+		<Content Include="AstralPartyMod\images\card_portraits\events_covert_investigation_b.png" />
+		<Content Include="AstralPartyMod\images\card_portraits\events_covert_investigation_c.png" />
+		<Content Include="AstralPartyMod\images\card_portraits\events_covert_investigation_d.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\event_angels_descent.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\event_crowded_passage.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\event_deus_ex_machina.png"/>
@@ -58,10 +62,13 @@
 		<Content Include="AstralPartyMod\images\card_portraits\skill_dragons_roar.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_fate_guidance.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_fate_weak_mprint.png" />
+		<Content Include="AstralPartyMod\images\card_portraits\skill_iron_virgin.png" />
+		<Content Include="AstralPartyMod\images\card_portraits\skill_mixed_cocktails.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_product_restocking.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_royal_prerogative.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_save_me_mousy.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_shadow_fusion.png" />
+		<Content Include="AstralPartyMod\images\card_portraits\skill_solar_bombardment.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_transfer.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_trouble_maker.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_healing_slime.png"/>

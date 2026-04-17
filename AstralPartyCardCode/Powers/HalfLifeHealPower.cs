@@ -31,7 +31,9 @@ public class HalfLifeHealPower : AstralPartyPowerModel
         await CreatureCmd.Heal(Owner, healAmount, true);
 
         // Round up so 3 becomes 2 and 1 stays 1.
-        Amount = Math.Max((int)Math.Ceiling(Amount / 2m), 0);
-        InvokeDisplayAmountChanged();
+        var newAmount = Math.Max((int)Math.Ceiling(Amount / 2m), 0);
+        var delta = newAmount - Amount;
+        if (delta != 0)
+            await PowerCmd.ModifyAmount(this, delta, Owner, null, true);
     }
 }

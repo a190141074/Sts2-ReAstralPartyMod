@@ -51,12 +51,16 @@
   "ASTRALPARTYMOD-SKILL_SHADOW_FUSION.title": "暗影融合",
   "ASTRALPARTYMOD-SKILL_SHADOW_FUSION.description": "吸收所有[gold]双生之影[/gold]。\n每吸收一个影子使你本回合内力量+1。",
   "ASTRALPARTYMOD-SKILL_SOLAR_BOMBARDMENT.title": "轨道轰炸",
-  "ASTRALPARTYMOD-SKILL_SOLAR_BOMBARDMENT.description": "弃置所有手牌,对随机敌人进行基础{Damage:diff()}点伤害的[gold]轨道轰炸[/gold]，共{Repeat:diff()}次。"
-,
+  "ASTRALPARTYMOD-SKILL_SOLAR_BOMBARDMENT.description": "弃置所有手牌,对随机敌人进行基础{Damage:diff()}点伤害的[gold]轨道轰炸[/gold]，共{Repeat:diff()}次。",
   "ASTRALPARTYMOD-SKILL_CHAIN_REACTION.title": "连锁反应",
   "ASTRALPARTYMOD-SKILL_CHAIN_REACTION.description": "使除了自己以外的所有玩家抽1张牌；若其手牌少于4张，则改为抽2张牌。\n然后将1张[gold]撕咬[/gold]加入你的手中。",
   "ASTRALPARTYMOD-SKILL_BITE.title": "撕咬",
   "ASTRALPARTYMOD-SKILL_BITE.description": "获得1层[gold]觉醒[/gold]。根据你当前的[gold]觉醒[/gold]层数，获得至多4点临时[red]力量[/red]。",
   "ASTRALPARTYMOD-SKILL_DRAGONS_ROAR.title": "龙之咆哮",
-  "ASTRALPARTYMOD-SKILL_DRAGONS_ROAR.description": "施加1层[gold]易伤[/gold]和1层[gold]虚弱[/gold]。\n获得3点临时[green]力量[/green]，1层[gold]龙吼护体[/gold]。"
+  "ASTRALPARTYMOD-SKILL_DRAGONS_ROAR.description": "施加1层[gold]易伤[/gold]和1层[gold]虚弱[/gold]。\n获得3点临时[green]力量[/green]，1层[gold]龙吼护体[/gold]。",
+  "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.title": "调制饮料",
+  "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.description": "单人模式下对自己生效；多人模式下选择一名友方单位。\n弃置至多3张手牌，按[gold]调制[/gold]为目标提供效果，然后抽取等于弃置数量的卡牌。",
+  "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.select_prompt": "选择至多3张要弃置的手牌",
+  "ASTRALPARTYMOD-SKILL_IRON_VIRGIN.title": "铁处女",
+  "ASTRALPARTYMOD-SKILL_IRON_VIRGIN.description": "获得1层[gold]铁处女[/gold]，直到下一回合开始前免疫伤害。\n如果当前回合还未触发[gold]边界强化[/gold]，则额外获得3点临时[red]力量[/red]。"
 }

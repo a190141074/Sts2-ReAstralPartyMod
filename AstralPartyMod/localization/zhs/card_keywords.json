@@ -6,5 +6,7 @@
   "ASTRALPARTYMOD-ASTRAL_TEMPORARY.title": "临时",
   "ASTRALPARTYMOD-ASTRAL_TEMPORARY.description": "回合结束时自动弃置，进入弃牌堆后此关键词自动消除。",
   "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.title": "轨道轰炸",
-  "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.description": "[gold]无视格挡[/gold]\n每弃置2张牌，额外轰炸1次。\n每有3点被弃牌的总能量费用，此伤害+1;被弃置的0费牌按1点计算，X费牌按你当前能量计算。"
+  "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.description": "[gold]无视格挡[/gold]\n每弃置2张牌，额外轰炸1次。\n每有3点被弃牌的总能量费用，此伤害+1;被弃置的0费牌按1点计算，X费牌按你当前能量计算。",
+  "ASTRALPARTYMOD-ASTRAL_MIXED.title": "调制",
+  "ASTRALPARTYMOD-ASTRAL_MIXED.description": "攻击牌：+1临时力量\n防御牌：+1临时敏捷\n技能牌（无格挡）：回复1生命\n能力牌：获得1能量\n状态牌：抽一张牌\n诅咒牌：回复1生命，获得1格挡"
 }

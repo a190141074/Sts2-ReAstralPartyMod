@@ -28,8 +28,10 @@
   "ASTRALPARTYMOD-TWIN_SHADOWS_POWER.smartDescription": "Lose 1 HP at the start of your turn. Lasts 2 turns.",
   "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.title": "Shadow Quota",
   "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.description": "Shows how many more times this turn your Attack cards can apply [power]Twin Shadows[/power].",
-  "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.smartDescription": "Shows how many more times this turn your Attack cards can apply [power]Twin Shadows[/power]."
-,
+  "ASTRALPARTYMOD-SHADOWS_LIMIT_POWER.smartDescription": "Shows how many more times this turn your Attack cards can apply [power]Twin Shadows[/power].",
+  "ASTRALPARTYMOD-HUNTERS_FEAST_POWER.title": "Hunter's Feast",
+  "ASTRALPARTYMOD-HUNTERS_FEAST_POWER.description": "At the end of this combat, permanently increase your [power]Shadow Quota[/power] limit by this amount.",
+  "ASTRALPARTYMOD-HUNTERS_FEAST_POWER.smartDescription": "At the end of this combat, permanently increase your [power]Shadow Quota[/power] limit by this amount.",
   "ASTRALPARTYMOD-DRAGON_AWAKENING_POWER.title": "Dragon Awakening",
   "ASTRALPARTYMOD-DRAGON_AWAKENING_POWER.description": "At the end of combat, [relic]Dragon Gate[/relic] reduces its Thunder counter by this amount.",
   "ASTRALPARTYMOD-DRAGON_AWAKENING_POWER.smartDescription": "At the end of combat, [relic]Dragon Gate[/relic] reduces its Thunder counter by this amount.",
@@ -38,5 +40,14 @@
   "ASTRALPARTYMOD-TRUE_DRAGON_FORM_POWER.smartDescription": "Damage +4. Gain 2 [red]Strength[/red], 1 [green]Dexterity[/green], and permanently gain 2 Max HP. Does not stack.",
   "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.title": "Dragon Roar Ward",
   "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.description": "Until the enemy turn starts, ignore damage from enemy sources.",
-  "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.smartDescription": "Until the enemy turn starts, ignore damage from enemy sources."
+  "ASTRALPARTYMOD-DRAGON_ROAR_WARD_POWER.smartDescription": "Until the enemy turn starts, ignore damage from enemy sources.",
+  "ASTRALPARTYMOD-MIXED_COCKTAILS_POWER.title": "Mixed Cocktails",
+  "ASTRALPARTYMOD-MIXED_COCKTAILS_POWER.description": "This [card]Mixed Cocktails[/card] granted:\nTemporary Strength: {TemporaryStrength}\nTemporary Dexterity: {TemporaryDexterity}\nExtra Dexterity: {Dexterity}\nHealing: {Heal}\nEnergy: {Energy}\nCard Draw: {Draw}\nBlock: {Block}",
+  "ASTRALPARTYMOD-MIXED_COCKTAILS_POWER.smartDescription": "This [card]Mixed Cocktails[/card] granted:\nTemporary Strength: {TemporaryStrength}\nTemporary Dexterity: {TemporaryDexterity}\nExtra Dexterity: {Dexterity}\nHealing: {Heal}\nEnergy: {Energy}\nCard Draw: {Draw}\nBlock: {Block}",
+  "ASTRALPARTYMOD-BOUNDARY_REINFORCEMENT_POWER.title": "Boundary Reinforcement",
+  "ASTRALPARTYMOD-BOUNDARY_REINFORCEMENT_POWER.description": "Lasts 2 turns. It does nothing on the turn you gain it. If you take no damage from the time you gain it until your next turn starts, gain 3 temporary [red]Strength[/red] at the start of that turn. If you take damage during that window, remove this power.",
+  "ASTRALPARTYMOD-BOUNDARY_REINFORCEMENT_POWER.smartDescription": "If you avoid all damage until your next turn starts, gain 3 temporary [red]Strength[/red]; otherwise remove this power.",
+  "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.title": "Iron Virgin Ward",
+  "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.description": "Ignore all damage until your next turn starts.",
+  "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.smartDescription": "Ignore all damage until your next turn starts."
 }

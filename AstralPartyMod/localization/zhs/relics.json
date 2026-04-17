@@ -27,7 +27,7 @@
   "ASTRALPARTYMOD-PERSON_OASIS_QUEEN.description": "· 每3回合开始时，将1张[gold]女王特权[/gold]加入手中。\n· 造成伤害时，手牌中每有1张带有[gold]临时[/gold]的牌，伤害+1，最多+3。",
   "ASTRALPARTYMOD-PERSON_OASIS_QUEEN.flavor": "这是你逼我的！",
   "ASTRALPARTYMOD-PERSON_INK_SHADOW_HUNTER.title": "【人格：小猎手】",
-  "ASTRALPARTYMOD-PERSON_INK_SHADOW_HUNTER.description": "· 每3回合开始时，将1张[gold]暗影融合[/gold]加入手中。\n· 回合开始时，为1名随机敌人施加1道[gold]双生之影[/gold]。\n· 当你对敌方打出1到3费的攻击牌时，为目标施加1道[gold]双生之影[/gold];施加的次数，等于你当前的能量上限。",
+  "ASTRALPARTYMOD-PERSON_INK_SHADOW_HUNTER.description": "· 每3回合开始时，将1张[gold]暗影融合[/gold]加入手中。\n· 回合开始时，为1名随机敌人施加1道[gold]双生之影[/gold]。\n· 当你对敌方打出1到3费的攻击牌时，为目标施加1道[gold]双生之影[/gold]；施加次数等于你当前的[gold]暗影额度[/gold]上限。\n· 进入精英房时，获得1层[gold]掠食[/gold]；进入Boss房时，获得3层[gold]掠食[/gold]。\n· 本场战斗结束时，每层[gold]掠食[/gold]会使你的[gold]暗影额度[/gold]上限永久+1。",
   "ASTRALPARTYMOD-PERSON_INK_SHADOW_HUNTER.flavor": "墨影猎手。",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.title": "【人格衍生：财富】",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.description": "· 每经过两个房间，获得等于[gold]财富[gold]层数的金币。",
@@ -36,8 +36,7 @@
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.stats_description": "累计收入：{0} 金币\n累计转账：{1} 金币",
   "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.title": "【人格：美甲师】",
   "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.description": "· 每3回合开始时，将1张[gold]轨道轰炸[/gold]加入手中。\n· 回合结束时，若你的手牌少于5张，则下回合额外抽1张牌。\n· 打出[gold]轨道轰炸[/gold]后，抽1张牌。",
-  "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.flavor": "手越空，火力越满。"
-,
+  "ASTRALPARTYMOD-PERSON_SUPERMAN_MEGAS.flavor": "手越空，火力越满。",
   "ASTRALPARTYMOD-PERSON_XIAO_LEI.title": "【人格：小雷】",
   "ASTRALPARTYMOD-PERSON_XIAO_LEI.description": "· 每3回合开始时，将1张[gold]连锁反应[/gold]加入手中。\n· 当你使其他角色获得卡牌时，你获得1层[gold]觉醒[/gold]。\n· 经历七十二天雷，三十六天火后，解锁[gold]真龙形态[/gold]。",
   "ASTRALPARTYMOD-PERSON_XIAO_LEI.flavor": "龙门未跃，雷火先行。",
@@ -47,5 +46,11 @@
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.progress_title": "跃龙门进度",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.progress_description": "七十二天雷：{0}\n三十六天火：{1}\n真龙形态：{2}",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.unlocked": "已解锁",
-  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.locked": "未解锁"
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.locked": "未解锁",
+  "ASTRALPARTYMOD-PERSON_JILL_STEINLE.title": "【人格：调酒师】",
+  "ASTRALPARTYMOD-PERSON_JILL_STEINLE.description": "· 每3回合开始时，将1张[gold]调制饮料[/gold]加入手中。\n· 若恰好弃置3张不同类型的牌，你获得3星光。\n· 若恰好弃置3张相同类型的牌，目标额外获得3敏捷。",
+  "ASTRALPARTYMOD-PERSON_JILL_STEINLE.flavor": "今晚喝点什么？",
+  "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.title": "【人格：社恐修女】",
+  "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.description": "· 每3回合开始时，将1张[gold]铁处女[/gold]加入手中。\n· 每回合开始时，施加1层[gold]边界强化[/gold]。",
+  "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.flavor": "。"
 }
