@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Patches;
 using AstralPartyMod.AstralPartyCardCode.Relics;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -13,7 +14,6 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.PotionPools;
-using MegaCrit.Sts2.Core.Runs;
 
 namespace AstralPartyMod.AstralPartyCardCode.Potions;
 
@@ -76,10 +76,7 @@ public class PersonChestChoose : AstralPartyPotionModel
         if (selectedRelic == null)
             return;
 
-        // Mirror the standard reward flow so multiplayer peers record the same obtained relic
-        // before the local player actually adds it to their relic inventory.
-        RunManager.Instance?.RewardSynchronizer?.SyncLocalObtainedRelic(selectedRelic);
-        await RelicCmd.Obtain(selectedRelic.ToMutable(), Owner);
+        await RewardSyncHelper.ObtainRelicAsReward(Owner, selectedRelic);
     }
 
     private static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(MegaCrit.Sts2.Core.Entities.Players.Player owner)

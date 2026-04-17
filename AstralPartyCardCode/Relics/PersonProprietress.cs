@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -63,7 +64,7 @@ public class PersonProprietress : AstralPartyRelicModel
         InvokeDisplayAmountChanged();
 
         if (Owner.GetRelic<PersonalityDerivativeProprietressWealthism>() == null)
-            await RelicCmd.Obtain(ModelDb.Relic<PersonalityDerivativeProprietressWealthism>().ToMutable(), Owner);
+            await RewardSyncHelper.ObtainRelicAsReward(Owner, ModelDb.Relic<PersonalityDerivativeProprietressWealthism>());
     }
 
     public override async Task BeforeCombatStart()

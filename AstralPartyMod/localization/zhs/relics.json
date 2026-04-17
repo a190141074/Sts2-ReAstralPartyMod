@@ -27,7 +27,7 @@
   "ASTRALPARTYMOD-PERSON_OASIS_QUEEN.description": "· 每3回合开始时，将1张[gold]女王特权[/gold]加入手中。\n· 造成伤害时，手牌中每有1张带有[gold]临时[/gold]的牌，伤害+1，最多+3。",
   "ASTRALPARTYMOD-PERSON_OASIS_QUEEN.flavor": "这是你逼我的！",
   "ASTRALPARTYMOD-PERSON_INK_SHADOW_HUNTER.title": "【人格：小猎手】",
-  "ASTRALPARTYMOD-PERSON_INK_SHADOW_HUNTER.description": "· 每3回合开始时，将1张[gold]暗影融合[/gold]加入手中。\n· 回合开始时，为1名随机敌人施加1道[gold]双生之影[/gold]。\n· 当你对敌方打出1到3费的攻击牌时，为目标施加1道[gold]双生之影[/gold]；施加次数等于你当前的[gold]暗影额度[/gold]上限。\n· 进入精英房时，获得1层[gold]掠食[/gold]；进入Boss房时，获得3层[gold]掠食[/gold]。\n· 本场战斗结束时，每层[gold]掠食[/gold]会使你的[gold]暗影额度[/gold]上限永久+1。",
+  "ASTRALPARTYMOD-PERSON_INK_SHADOW_HUNTER.description": "· 每3回合开始时，将1张[gold]暗影融合[/gold]加入手中。\n· 回合开始时，为1名随机敌人施加1道[gold]双生之影[/gold]。\n· 当你对敌方打出1到3费的攻击牌时，为目标施加1道[gold]双生之影[/gold]；施加次数等于你当前的[gold]暗影额度[/gold]上限。",
   "ASTRALPARTYMOD-PERSON_INK_SHADOW_HUNTER.flavor": "墨影猎手。",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.title": "【人格衍生：财富】",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_PROPRIETRESS_WEALTHISM.description": "· 每经过两个房间，获得等于[gold]财富[gold]层数的金币。",

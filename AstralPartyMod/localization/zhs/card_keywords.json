@@ -8,5 +8,5 @@
   "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.title": "轨道轰炸",
   "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.description": "[gold]无视格挡[/gold]\n每弃置2张牌，额外轰炸1次。\n每有3点被弃牌的总能量费用，此伤害+1;被弃置的0费牌按1点计算，X费牌按你当前能量计算。",
   "ASTRALPARTYMOD-ASTRAL_MIXED.title": "调制",
-  "ASTRALPARTYMOD-ASTRAL_MIXED.description": "攻击牌：+1临时力量\n防御牌：+1临时敏捷\n技能牌（无格挡）：回复1生命\n能力牌：获得1能量\n状态牌：抽一张牌\n诅咒牌：回复1生命，获得1格挡"
+  "ASTRALPARTYMOD-ASTRAL_MIXED.description": "【攻击牌】临时[green]力量[/green](1)\n【防御牌】临时[green]敏捷[/green](1)\n【技能牌】：回复[green]生命[/green](1)\n【能力牌】获得[green]能量[/green](1)\n【状态牌】[green]抽牌[/green](1)\n【诅咒牌】回复[green]生命[/green](1)，获得[green]格挡[/green](1)"
 }
