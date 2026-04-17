@@ -1,5 +1,5 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1776438836
+::res://::1776439560
 AstralPartyMod.json::JSON::-1::1776366926::0::1::::<><><>0<>0<><>::
 export_presets.cfg::TextFile::-1::1775677124::0::1::::<><><>0<>0<><>::
 icon.ico::OtherFile::-1::1775663854::0::1::::<><><>0<>0<><>::
@@ -48,7 +48,7 @@ StartingPotionPatch.cs::CSharpScript::1650932195212590757::1775931895::0::1::::<
 TemporaryCardHighlightPatch.cs::CSharpScript::-1::1775995206::0::1::::<><><>0<>0<><>::
 ::res://AstralPartyCardCode/Potions/::1776366928
 AstralPartyPotionModel.cs::CSharpScript::1589220857997726020::1775923676::0::1::::<><><>0<>0<><>::
-PersonChestChoose.cs::CSharpScript::1649983439350373547::1776366928::0::1::::<><><>0<>0<><>::
+PersonChestChoose.cs::CSharpScript::1649983439350373547::1776439532::0::1::::<><><>0<>0<><>::
 ::res://AstralPartyCardCode/Powers/::1776369417
 AstralPartyPowerModel.cs::CSharpScript::230621176882018267::1775919247::0::1::::<><><>0<>0<><>::
 BoundaryReinforcementPower.cs::CSharpScript::4858544167173014295::1776436664::0::1::::<><><>0<>0<><>::
@@ -206,6 +206,13 @@ CardPool.md::TextFile::-1::1776276438::0::1::::<><><>0<>0<><>::
 CardRarity.md::TextFile::-1::1775663854::0::1::::<><><>0<>0<><>::
 CardSelectCmd.FromSimpleGrid.md::TextFile::-1::1775663854::0::1::::<><><>0<>0<><>::
 TargetType.md::TextFile::-1::1775663854::0::1::::<><><>0<>0<><>::
+::res://obj/::1776439648
+project.assets.json::JSON::-1::1776439305::0::1::::<><><>0<>0<><>::
+::res://obj/Debug/::1776439305
+::res://obj/Debug/net9.0/::1776439648
+.NETCoreApp,Version=v9.0.AssemblyAttributes.cs::CSharpScript::1164883911487486266::1776439305::0::1::::<><><>0<>0<><>::
+::res://obj/Debug/net9.0/ref/::1776439305
+::res://obj/Debug/net9.0/refint/::1776439305
 ::res://objtmp/::1775918037
 ::res://packages/::1775657964
 ::res://packages/alchyr.sts2.modanalyzers/::1775657963
