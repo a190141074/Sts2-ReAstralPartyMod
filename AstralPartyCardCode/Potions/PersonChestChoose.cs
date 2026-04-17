@@ -2,7 +2,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Patches;
 using AstralPartyMod.AstralPartyCardCode.Relics;
-using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -76,7 +75,7 @@ public class PersonChestChoose : AstralPartyPotionModel
         if (selectedRelic == null)
             return;
 
-        await RewardSyncHelper.ObtainRelicAsReward(Owner, selectedRelic);
+        await RelicCmd.Obtain(selectedRelic.ToMutable(), Owner);    
     }
 
     private static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(MegaCrit.Sts2.Core.Entities.Players.Player owner)

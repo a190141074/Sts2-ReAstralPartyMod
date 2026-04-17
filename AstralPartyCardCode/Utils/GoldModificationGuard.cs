@@ -1,5 +1,4 @@
 using MegaCrit.Sts2.Core.Entities.Players;
-using YuWanCard.Utils;
 
 namespace AstralPartyMod.AstralPartyCardCode.Utils;
 
