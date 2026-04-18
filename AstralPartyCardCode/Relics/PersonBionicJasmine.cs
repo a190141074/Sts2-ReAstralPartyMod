@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -25,7 +26,11 @@ public class PersonBionicJasmine : AstralPartyRelicModel
 
     [SavedProperty] public int AstralParty_PersonBionicJasmineDexterity { get; set; }
 
+    [SavedProperty] public bool AstralParty_PersonBionicJasminePendingTurnStartSetup { get; set; } = true;
+
     public override RelicRarity Rarity => RelicRarity.Ancient;
+
+    public override bool ShouldReceiveCombatHooks => true;
 
     public override bool ShowCounter => true;
 
@@ -38,14 +43,16 @@ public class PersonBionicJasmine : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonBionicJasmineSteps = 0;
+        AstralParty_PersonBionicJasminePendingTurnStartSetup = true;
         InvokeDisplayAmountChanged();
     }
 
-    public override async Task BeforeCombatStart()
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
-        if (Owner?.Creature == null)
+        if (player != Owner || Owner?.Creature == null || !AstralParty_PersonBionicJasminePendingTurnStartSetup)
             return;
 
+        AstralParty_PersonBionicJasminePendingTurnStartSetup = false;
         Flash();
         await PowerCmd.Apply<DexterityPower>(Owner.Creature, -1m, Owner.Creature, null);
         await PowerCmd.Apply<StrengthPower>(Owner.Creature, -1m, Owner.Creature, null);
@@ -95,6 +102,7 @@ public class PersonBionicJasmine : AstralPartyRelicModel
 
         AstralParty_PersonBionicJasmineStrength = 0;
         AstralParty_PersonBionicJasmineDexterity = 0;
+        AstralParty_PersonBionicJasminePendingTurnStartSetup = true;
     }
 
     public override Task AfterRoomEntered(AbstractRoom room)

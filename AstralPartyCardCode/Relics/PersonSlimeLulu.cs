@@ -48,7 +48,7 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         await base.AfterObtained();
 
         AstralParty_PersonSlimeLuluCounter = 1;
-        // Newly obtained cooldown relics should grant their first card on the next combat start.
+        // Newly obtained cooldown relics should grant their first card on the next player turn start.
         AstralParty_PersonSlimeLuluPendingCombatStartCard = true;
         AstralParty_PersonSlimeLuluHealingSlimeUses = 0;
         RefreshCounterDisplay();
@@ -61,16 +61,6 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         );
     }
 
-    public override async Task BeforeCombatStart()
-    {
-        if (Owner?.Creature?.CombatState == null || !AstralParty_PersonSlimeLuluPendingCombatStartCard)
-            return;
-
-        await GrantHealingSlime();
-        AstralParty_PersonSlimeLuluPendingCombatStartCard = false;
-        RefreshCounterDisplay();
-    }
-
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
         if (player != Owner)
@@ -78,6 +68,14 @@ public class PersonSlimeLulu : AstralPartyRelicModel
 
         if (Owner?.Creature?.CombatState == null)
             return;
+
+        if (AstralParty_PersonSlimeLuluPendingCombatStartCard)
+        {
+            await GrantHealingSlime();
+            AstralParty_PersonSlimeLuluPendingCombatStartCard = false;
+            RefreshCounterDisplay();
+            return;
+        }
 
         if (GetClampedCounter() >= MaxCounter)
         {

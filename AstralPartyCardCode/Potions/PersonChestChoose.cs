@@ -41,7 +41,7 @@ public class PersonChestChoose : AstralPartyPotionModel
         // ModelDb.Relic<PersonProprietress>(),
 
         // 人格：鼠鼠
-        // ModelDb.Relic<PersonMousyLian>(),
+        ModelDb.Relic<PersonMousyLian>(),
 
         // 人格：大虎鲸
         ModelDb.Relic<PersonBlueWhale>(),

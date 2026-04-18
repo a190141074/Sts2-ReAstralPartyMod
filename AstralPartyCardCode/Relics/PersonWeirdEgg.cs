@@ -43,18 +43,8 @@ public class PersonWeirdEgg : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonWeirdEggCounter = 1;
-        // Newly obtained cooldown relics should grant their first card on the next combat start.
+        // Newly obtained cooldown relics should grant their first card on the next player turn start.
         AstralParty_PersonWeirdEggPendingCombatStartCard = true;
-        InvokeDisplayAmountChanged();
-    }
-
-    public override async Task BeforeCombatStart()
-    {
-        if (Owner?.Creature?.CombatState == null || !AstralParty_PersonWeirdEggPendingCombatStartCard)
-            return;
-
-        await GrantTroubleMaker();
-        AstralParty_PersonWeirdEggPendingCombatStartCard = false;
         InvokeDisplayAmountChanged();
     }
 
@@ -65,6 +55,14 @@ public class PersonWeirdEgg : AstralPartyRelicModel
     {
         if (player != Owner || Owner?.Creature?.CombatState == null)
             return;
+
+        if (AstralParty_PersonWeirdEggPendingCombatStartCard)
+        {
+            await GrantTroubleMaker();
+            AstralParty_PersonWeirdEggPendingCombatStartCard = false;
+            InvokeDisplayAmountChanged();
+            return;
+        }
 
         // Reaching the cap means the relic is ready to generate its card and start a fresh cycle.
         if (GetClampedCounter() < MaxCounter)

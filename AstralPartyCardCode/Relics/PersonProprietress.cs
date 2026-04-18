@@ -57,7 +57,7 @@ public class PersonProprietress : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonProprietressCounter = 1;
-        // Newly obtained cooldown relics should grant their first card on the next combat start.
+        // Newly obtained cooldown relics should grant their first card on the next player turn start.
         AstralParty_PersonProprietressPendingCombatStartTrigger = true;
         AstralParty_PersonProprietressVisitedShops = 0;
         InvokeDisplayAmountChanged();
@@ -67,16 +67,6 @@ public class PersonProprietress : AstralPartyRelicModel
                 ModelDb.Relic<PersonalityDerivativeProprietressWealthism>().ToMutable(),
                 Owner
             );
-    }
-
-    public override async Task BeforeCombatStart()
-    {
-        if (Owner?.Creature?.CombatState == null || !AstralParty_PersonProprietressPendingCombatStartTrigger)
-            return;
-
-        await GrantTransfer();
-        AstralParty_PersonProprietressPendingCombatStartTrigger = false;
-        InvokeDisplayAmountChanged();
     }
 
     public override async Task AfterRoomEntered(AbstractRoom room)
@@ -94,6 +84,14 @@ public class PersonProprietress : AstralPartyRelicModel
     {
         if (player != Owner || Owner?.Creature?.CombatState == null)
             return;
+
+        if (AstralParty_PersonProprietressPendingCombatStartTrigger)
+        {
+            await GrantTransfer();
+            AstralParty_PersonProprietressPendingCombatStartTrigger = false;
+            InvokeDisplayAmountChanged();
+            return;
+        }
 
         if (GetClampedCounter() < MaxCounter)
             return;

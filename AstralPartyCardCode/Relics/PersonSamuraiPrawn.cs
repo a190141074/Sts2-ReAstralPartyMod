@@ -48,22 +48,10 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_PersonSamuraiPrawnCounter = 1;
-        // Newly obtained cooldown relics should grant their first card on the next combat start.
+        // Newly obtained cooldown relics should grant their first card on the next player turn start.
         AstralParty_PersonSamuraiPrawnPendingCombatStartCard = true;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
         AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura = 0;
-        InvokeDisplayAmountChanged();
-    }
-
-    public override async Task BeforeCombatStart()
-    {
-        AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
-
-        if (Owner?.Creature?.CombatState == null || !AstralParty_PersonSamuraiPrawnPendingCombatStartCard)
-            return;
-
-        await GrantFamousBlade();
-        AstralParty_PersonSamuraiPrawnPendingCombatStartCard = false;
         InvokeDisplayAmountChanged();
     }
 
@@ -76,6 +64,14 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
             return;
 
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
+
+        if (AstralParty_PersonSamuraiPrawnPendingCombatStartCard)
+        {
+            await GrantFamousBlade();
+            AstralParty_PersonSamuraiPrawnPendingCombatStartCard = false;
+            InvokeDisplayAmountChanged();
+            return;
+        }
 
         // Reaching the cap means the relic is ready to generate its card and restart the cooldown.
         if (GetClampedCounter() < MaxCounter)
