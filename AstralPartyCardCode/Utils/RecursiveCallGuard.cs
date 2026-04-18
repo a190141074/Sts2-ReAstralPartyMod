@@ -1,3 +1,6 @@
+using System;
+using System.Threading.Tasks;
+
 namespace AstralPartyMod.AstralPartyCardCode.Utils;
 
 public class RecursiveCallGuard<T>(Func<T, Task> action, Func<T, bool>? shouldProcess = null)
