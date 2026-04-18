@@ -31,8 +31,6 @@
   "ASTRALPARTYMOD-EVENT_PLAYER_REPRESENTATIVE.description": "只有你进行判定。\n若结果为1-3，你受到{SelfDamage:diff()}点伤害，队友受到{TeamDamage:diff()}点伤害；\n若结果为4-6，你获得{SelfStarLight:diff()}点[gold]星光[/gold]，队友获得{TeamStarLight:diff()}点[gold]星光[/gold]。",
   "ASTRALPARTYMOD-SKILL_FAMOUS_BLADE.title": "名刀",
   "ASTRALPARTYMOD-SKILL_FAMOUS_BLADE.description": "造成{CalculatedDamage:diff()}点伤害。\n打出后，至多消耗2层[gold]剑气[/gold]。每累计消耗2层[gold]剑气[/gold]，此牌伤害永久+1。\n获得1层[gold]剑气[/gold]。",
-  "ASTRALPARTYMOD-SKILL_STAR_SHOP.title": "占位牌",
-  "ASTRALPARTYMOD-SKILL_STAR_SHOP.description": "由[gold]人格：武士虾[/gold]生成的临时占位牌，目前没有实际效果。",
   "ASTRALPARTYMOD-SKILL_HEALING_SLIME.title": "治愈黏液",
   "ASTRALPARTYMOD-SKILL_HEALING_SLIME.description": "获得{HalfLifeHealPower:diff()}层[gold]治愈[/gold]。",
   "ASTRALPARTYMOD-SKILL_HEALING_SLIME.smartDescription": "获得{HalfLifeHealPower:diff()}层[gold]治愈[/gold]。",
