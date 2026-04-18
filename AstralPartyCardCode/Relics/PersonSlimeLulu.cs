@@ -5,6 +5,7 @@ using AstralPartyMod.AstralPartyCardCode.Powers;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -30,6 +31,25 @@ public class PersonSlimeLulu : AstralPartyRelicModel
 
     [SavedProperty] public int AstralParty_PersonSlimeLuluHealingSlimeUses { get; set; }
 
+    // Preserve legacy wire/save names so older SlimeLulu runs still hydrate correctly.
+    public int CombatsLeft
+    {
+        get => AstralParty_PersonSlimeLuluCounter;
+        set => AstralParty_PersonSlimeLuluCounter = value;
+    }
+
+    public int CardsAdded
+    {
+        get => AstralParty_PersonSlimeLuluHealingSlimeUses;
+        set => AstralParty_PersonSlimeLuluHealingSlimeUses = value;
+    }
+
+    public bool Skin
+    {
+        get => AstralParty_PersonSlimeLuluPendingCombatStartCard;
+        set => AstralParty_PersonSlimeLuluPendingCombatStartCard = value;
+    }
+
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
     public override bool ShowCounter => Owner?.Creature?.CombatState != null;
@@ -46,6 +66,8 @@ public class PersonSlimeLulu : AstralPartyRelicModel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
+        if (Owner?.Creature == null)
+            return;
 
         AstralParty_PersonSlimeLuluCounter = 1;
         // Newly obtained cooldown relics should grant their first card on the next player turn start.
@@ -53,12 +75,13 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         AstralParty_PersonSlimeLuluHealingSlimeUses = 0;
         RefreshCounterDisplay();
 
-        await CreatureCmd.LoseMaxHp(
-            new ThrowingPlayerChoiceContext(),
-            Owner.Creature,
-            10m,
-            false
-        );
+        if (LocalContext.IsMe(Owner))
+            await CreatureCmd.LoseMaxHp(
+                new ThrowingPlayerChoiceContext(),
+                Owner.Creature,
+                10m,
+                false
+            );
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -118,7 +141,7 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         if (Owner?.Creature == null || target != Owner.Creature)
             return;
 
-        if (result.TotalDamage <= 0)
+        if (result.UnblockedDamage <= 0)
             return;
 
         Flash();

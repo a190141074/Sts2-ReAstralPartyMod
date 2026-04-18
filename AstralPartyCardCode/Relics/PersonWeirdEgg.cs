@@ -21,9 +21,56 @@ public class PersonWeirdEgg : AstralPartyRelicModel
 {
     private const int MaxCounter = 4;
 
-    [SavedProperty] public int AstralParty_PersonWeirdEggCounter { get; set; } = 1;
+    private int _counter = 1;
+    private bool _pendingCombatStartCard;
+    private bool _hasCanonicalCounter;
+    private bool _hasCanonicalPendingCombatStartCard;
 
-    [SavedProperty] public bool AstralParty_PersonWeirdEggPendingCombatStartCard { get; set; }
+    [SavedProperty]
+    public int AstralParty_PersonWeirdEggCounter
+    {
+        get => _counter;
+        set
+        {
+            _counter = value;
+            _hasCanonicalCounter = true;
+        }
+    }
+
+    [SavedProperty]
+    public bool AstralParty_PersonWeirdEggPendingCombatStartCard
+    {
+        get => _pendingCombatStartCard;
+        set
+        {
+            _pendingCombatStartCard = value;
+            _hasCanonicalPendingCombatStartCard = true;
+        }
+    }
+
+    // Read the old save field without writing it back into newly saved runs.
+    [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
+    public int FurCoatCoordsSet
+    {
+        get => default;
+        set
+        {
+            if (!_hasCanonicalCounter && value != default)
+                _counter = value;
+        }
+    }
+
+    // Read the old save field without writing it back into newly saved runs.
+    [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
+    public bool StarsSpent
+    {
+        get => default;
+        set
+        {
+            if (!_hasCanonicalPendingCombatStartCard && value)
+                _pendingCombatStartCard = true;
+        }
+    }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

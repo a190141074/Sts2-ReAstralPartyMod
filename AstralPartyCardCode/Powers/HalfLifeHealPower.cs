@@ -1,13 +1,14 @@
 using System;
 using System.Threading.Tasks;
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 
 namespace AstralPartyMod.AstralPartyCardCode.Powers;
 
 /// <summary>
-/// Heals at the start of the owner's side turn, then halves its amount.
+/// Heals at the start of the owner's next turn, then halves its amount.
 /// </summary>
 public class HalfLifeHealPower : AstralPartyPowerModel
 {
@@ -17,21 +18,25 @@ public class HalfLifeHealPower : AstralPartyPowerModel
 
     public override bool ShouldReceiveCombatHooks => true;
 
-    public override async Task AfterSideTurnStart(CombatSide side, CombatState combatState)
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
-        if (Owner == null || side != Owner.Side)
+        if (Owner == null || Owner.Player != player)
             return;
 
-        if (Amount <= 0)
+        var healAmount = AmountOnTurnStart;
+        if (healAmount <= 0)
             return;
-
-        var healAmount = Amount;
 
         Flash();
         await CreatureCmd.Heal(Owner, healAmount, true);
 
-        // Round up so 3 becomes 2 and 1 stays 1.
-        var newAmount = Math.Max((int)Math.Ceiling(Amount / 2m), 0);
+        var newAmount = healAmount / 2;
+        if (newAmount <= 0)
+        {
+            await PowerCmd.Remove(this);
+            return;
+        }
+
         var delta = newAmount - Amount;
         if (delta != 0)
             await PowerCmd.ModifyAmount(this, delta, Owner, null, true);

@@ -29,7 +29,7 @@ public class PersonChestChoose : AstralPartyPotionModel
         ModelDb.Relic<PersonWeirdEgg>(),
 
         // 人格：太刀虾
-        ModelDb.Relic<PersonSamuraiPrawn>(),
+        // ModelDb.Relic<PersonSamuraiPrawn>(),
 
         // 人格：史莱姆
         ModelDb.Relic<PersonSlimeLulu>(),
@@ -59,10 +59,10 @@ public class PersonChestChoose : AstralPartyPotionModel
         ModelDb.Relic<PersonSupermanMegas>(),
 
         // 人格：小雷
-        ModelDb.Relic<PersonXiaoLei>(),
+        ModelDb.Relic<PersonXiaoLei>()
 
         //人格：社恐修女
-        ModelDb.Relic<PersonSocialFearNun>(),
+        // ModelDb.Relic<PersonSocialFearNun>(),
 
         // 人格：调酒师
         // ModelDb.Relic<PersonJillSteinle>(), 
