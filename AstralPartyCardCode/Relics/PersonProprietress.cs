@@ -39,6 +39,28 @@ public class PersonProprietress : AstralPartyRelicModel
 
     [SavedProperty] public int AstralParty_PersonProprietressVisitedShops { get; set; }
 
+    // Preserve legacy wire/save names so older Proprietress runs still hydrate correctly.
+    [SavedProperty]
+    public int CurrentDamage
+    {
+        get => AstralParty_PersonProprietressCounter;
+        set => AstralParty_PersonProprietressCounter = value;
+    }
+
+    [SavedProperty]
+    public bool IncreasedDamage
+    {
+        get => AstralParty_PersonProprietressPendingCombatStartTrigger;
+        set => AstralParty_PersonProprietressPendingCombatStartTrigger = value;
+    }
+
+    [SavedProperty]
+    public int CharacterModel
+    {
+        get => AstralParty_PersonProprietressVisitedShops;
+        set => AstralParty_PersonProprietressVisitedShops = value;
+    }
+
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
     public override bool ShowCounter => Owner?.Creature?.CombatState != null;

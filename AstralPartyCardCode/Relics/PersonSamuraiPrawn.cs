@@ -30,6 +30,10 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
     [SavedProperty] public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura { get; set; }
 
+    // Preserve a removed legacy flag from older saves without polluting new runs.
+    [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
+    public bool IsMelted { get; set; }
+
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
     public override bool ShowCounter => Owner?.Creature?.CombatState != null;
