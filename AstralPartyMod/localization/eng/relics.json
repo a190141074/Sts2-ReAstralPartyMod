@@ -1,4 +1,5 @@
 ﻿{
+  "ASTRALPARTYMOD-PERSONA_RELIC_COLLECTION_SUBCATEGORY": "Persona Relics",
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.title": "[Persona: Steamed Egg]",
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.description": "At the start of every 3rd turn, add 1 [card]Trouble Maker[/card] to your hand. Combat end also reduces this relic's cooldown by 1 turn.",
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.flavor": "It always finds the perfect beat for the worst possible idea.",
@@ -52,5 +53,14 @@
   "ASTRALPARTYMOD-PERSON_JILL_STEINLE.flavor": "What are you drinking tonight?",
   "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.title": "[Persona: Social Fear Nun]",
   "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.description": "At the start of every 3rd turn, add 1 [card]Iron Virgin[/card] to your hand. At the start of each turn, apply [power]Boundary Reinforcement[/power].",
-  "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.flavor": "Do not come any closer."
+  "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.flavor": "Do not come any closer.",
+  "ASTRALPARTYMOD-RELIC_BLUE_OCTAHEDRAL_DIE.title": "Blue Octahedral Die",
+  "ASTRALPARTYMOD-RELIC_BLUE_OCTAHEDRAL_DIE.description": "Whenever you end combat on exactly a multiple of 8 turns, gain 8 [gold]StarLight[/gold].",
+  "ASTRALPARTYMOD-RELIC_BLUE_OCTAHEDRAL_DIE.flavor": "One roll. Eight stars.",
+  "ASTRALPARTYMOD-RELIC_BLUE_PIGGY_BANK.title": "Blue Piggy Bank",
+  "ASTRALPARTYMOD-RELIC_BLUE_PIGGY_BANK.description": "Whenever you spend 6 Energy, gain 3 [gold]StarLight[/gold].",
+  "ASTRALPARTYMOD-RELIC_BLUE_PIGGY_BANK.flavor": "Bank the effort first. Cash out the sparkle later.",
+  "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.title": "Star Coin Hammer",
+  "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.description": "If you have at least 150 Gold, the first time each turn you deal damage, spend 20 Gold and deal bonus damage to that target equal to 7.5% of your current Gold.",
+  "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.flavor": "The heavier the purse, the harder the swing."
 }

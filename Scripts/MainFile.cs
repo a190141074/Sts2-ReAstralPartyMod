@@ -42,26 +42,18 @@ public partial class MainFile : Node
             );
 
             if (File.Exists(pckPath))
-            {
                 Logger.Info(
                     $"AstralPartyMod artifacts | pck={pckPath} | pck_sha256={ComputeSha256(pckPath)}"
                 );
-            }
             else
-            {
                 Logger.Warn($"AstralPartyMod artifacts | pck missing at {pckPath}");
-            }
 
             if (File.Exists(manifestPath))
-            {
                 Logger.Info(
                     $"AstralPartyMod artifacts | manifest={manifestPath} | manifest_sha256={ComputeSha256(manifestPath)}"
                 );
-            }
             else
-            {
                 Logger.Warn($"AstralPartyMod artifacts | manifest missing at {manifestPath}");
-            }
         }
         catch (Exception ex)
         {

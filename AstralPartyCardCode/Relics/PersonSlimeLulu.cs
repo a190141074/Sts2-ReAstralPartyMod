@@ -19,7 +19,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace AstralPartyMod.AstralPartyCardCode.Relics;
 
-[Pool(typeof(SharedRelicPool))]
+[Pool(typeof(EventRelicPool))]
 public class PersonSlimeLulu : AstralPartyRelicModel
 {
     private const int MaxCounter = 4;

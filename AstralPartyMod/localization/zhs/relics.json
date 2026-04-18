@@ -1,4 +1,5 @@
 ﻿{
+  "ASTRALPARTYMOD-PERSONA_RELIC_COLLECTION_SUBCATEGORY": "人格遗物",
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.title": "【人格：蒸蛋】",
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.description": "· 每3回合开始时，将1张[gold]麻烦制造者[/gold]加入手中。",
   "ASTRALPARTYMOD-PERSON_WEIRD_EGG.flavor": "搜索，解析，确定。",
@@ -52,5 +53,14 @@
   "ASTRALPARTYMOD-PERSON_JILL_STEINLE.flavor": "今晚喝点什么？",
   "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.title": "【人格：社恐修女】",
   "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.description": "· 每3回合开始时，将1张[gold]铁处女[/gold]加入手中。\n· 每回合开始时，施加1层[gold]边界强化[/gold]。",
-  "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.flavor": "。"
+  "ASTRALPARTYMOD-PERSON_SOCIAL_FEAR_NUN.flavor": "。",
+  "ASTRALPARTYMOD-RELIC_BLUE_OCTAHEDRAL_DIE.title": "八面骰子",
+  "ASTRALPARTYMOD-RELIC_BLUE_OCTAHEDRAL_DIE.description": "每当你正好以8的倍数回合结束战斗时，获得8点[gold]星光[/gold]。",
+  "ASTRALPARTYMOD-RELIC_BLUE_OCTAHEDRAL_DIE.flavor": "八面一掷，八星临门。",
+  "ASTRALPARTYMOD-RELIC_BLUE_PIGGY_BANK.title": "小猪存钱罐",
+  "ASTRALPARTYMOD-RELIC_BLUE_PIGGY_BANK.description": "你每消耗6点能量，获得3点[gold]星光[/gold]。",
+  "ASTRALPARTYMOD-RELIC_BLUE_PIGGY_BANK.flavor": "+3！",
+  "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.title": "星币锤",
+  "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.description": "若你的金币不少于150，每回合第一次造成伤害时，消耗20金币，对目标追加一次等于你当前金币数量7.5%的伤害。",
+  "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.flavor": "金币越沉，锤子越狠。"
 }

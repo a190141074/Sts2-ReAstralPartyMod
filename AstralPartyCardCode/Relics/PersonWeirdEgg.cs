@@ -15,7 +15,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 
 namespace AstralPartyMod.AstralPartyCardCode.Relics;
 
-[Pool(typeof(SharedRelicPool))]
+[Pool(typeof(EventRelicPool))]
 public class PersonWeirdEgg : AstralPartyRelicModel
 {
     private const int MaxCounter = 4;

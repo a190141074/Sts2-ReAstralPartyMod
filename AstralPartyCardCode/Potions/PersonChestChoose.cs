@@ -46,7 +46,9 @@ public class PersonChestChoose : AstralPartyPotionModel
         // 人格：美甲师
         ModelDb.Relic<PersonSupermanMegas>(),
         // 人格：小雷
-        ModelDb.Relic<PersonXiaoLei>(),
+        ModelDb.Relic<PersonXiaoLei>()
+        // 人格：调酒师
+        // ModelDb.Relic<PersonJillSteinle>(), 
     ];
 
     public PersonChestChoose() : base(true)
@@ -87,7 +89,7 @@ public class PersonChestChoose : AstralPartyPotionModel
         if (selectedRelic == null)
             return;
 
-        await RelicCmd.Obtain(selectedRelic.ToMutable(), Owner);    
+        await RelicCmd.Obtain(selectedRelic.ToMutable(), Owner);
     }
 
     private static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(MegaCrit.Sts2.Core.Entities.Players.Player owner)

@@ -12,13 +12,11 @@ public static class AstralKeywords
     public static CardKeyword AstralSteps;
 
     [CustomEnum("ASTRAL_TEMPORARY")] [KeywordProperties(AutoKeywordPosition.Before)]
-    public static CardKeyword AstralTemporary;    
+    public static CardKeyword AstralTemporary;
 
     [CustomEnum("ASTRAL_MIXED")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword AstralMixed;
-    
+
     [CustomEnum("SOLAR_BOMBARDMENT")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword SolarBombardment;
-    
-    
 }
