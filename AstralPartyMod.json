@@ -2,8 +2,8 @@
   "id": "AstralPartyMod",
   "name": "AstralPartyMod",
   "author": "雒邪",
-  "description": "测试",
-  "version": "0.0.9f3",
+  "description": "引入星引擎的角色转换为人格作为遗物；\n引入原版筹码；\n部分人格没有为单人模式兼容（如鼠鼠、老板娘",
+  "version": "0.0.9f6",
   "has_pck": true,
   "has_dll": true,
   "dependencies": [

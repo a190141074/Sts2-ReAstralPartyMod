@@ -30,10 +30,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     public int AstralParty_PersonSamuraiPrawnCounter
     {
         get => _counter;
-        set
-        {
-            _counter = NormalizeLegacyCounter(value);
-        }
+        set => _counter = NormalizeLegacyCounter(value);
     }
 
     [SavedProperty]
@@ -108,7 +105,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
 
         if (AstralParty_PersonSamuraiPrawnPendingCombatStartCard)
-        {   
+        {
             await GrantFamousBlade();
             AstralParty_PersonSamuraiPrawnPendingCombatStartCard = false;
             InvokeDisplayAmountChanged();
@@ -201,7 +198,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         if (counter <= MaxCounter)
             return counter;
 
-        return ((counter - 1) % 3) + 1;
+        return (counter - 1) % 3 + 1;
     }
 
     private void AdvanceCounter()
