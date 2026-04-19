@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Keywords;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -17,7 +17,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace AstralPartyMod.AstralPartyCardCode.Relics;
 
 [Pool(typeof(EventRelicPool))]
-public class PersonWeirdEgg : AstralPartyRelicModel
+public class PersonMousyLian : AstralPartyRelicModel
 {
     private const int MaxCounter = 4;
 
@@ -27,7 +27,7 @@ public class PersonWeirdEgg : AstralPartyRelicModel
     private bool _hasCanonicalPendingCombatStartCard;
 
     [SavedProperty]
-    public int AstralParty_PersonWeirdEggCounter
+    public int AstralParty_PersonMousyLianCounter
     {
         get => _counter;
         set
@@ -38,7 +38,7 @@ public class PersonWeirdEgg : AstralPartyRelicModel
     }
 
     [SavedProperty]
-    public bool AstralParty_PersonWeirdEggPendingCombatStartCard
+    public bool AstralParty_PersonMousyLianPendingCombatStartCard
     {
         get => _pendingCombatStartCard;
         set
@@ -48,8 +48,8 @@ public class PersonWeirdEgg : AstralPartyRelicModel
         }
     }
 
-    // Read the old save field without writing it back into newly saved runs.
-    public int FurCoatCoordsSet
+    // Preserve legacy wire/save names so mixed builds and older saves resolve to the same state.
+    public int CurrentBlock
     {
         get => default;
         set
@@ -59,8 +59,27 @@ public class PersonWeirdEgg : AstralPartyRelicModel
         }
     }
 
-    // Read the old save field without writing it back into newly saved runs.
-    public bool StarsSpent
+    public bool IncreasedBlock
+    {
+        get => default;
+        set
+        {
+            if (!_hasCanonicalPendingCombatStartCard && value)
+                _pendingCombatStartCard = true;
+        }
+    }
+
+    public int CombatsSeen
+    {
+        get => default;
+        set
+        {
+            if (!_hasCanonicalCounter && value != default)
+                _counter = value;
+        }
+    }
+
+    public bool TinkerTimeType
     {
         get => default;
         set
@@ -78,18 +97,17 @@ public class PersonWeirdEgg : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<SkillTroubleMaker>()
+        HoverTipFactory.FromCard<SkillSaveMeMousy>()
     ];
 
-    // Keep the stored value aligned with the shown value so the cooldown is easy to reason about.
     public override int DisplayAmount => GetClampedCounter();
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonWeirdEggCounter = 1;
+        AstralParty_PersonMousyLianCounter = 1;
         // Newly obtained cooldown relics should grant their first card on the next player turn start.
-        AstralParty_PersonWeirdEggPendingCombatStartCard = true;
+        AstralParty_PersonMousyLianPendingCombatStartCard = true;
         InvokeDisplayAmountChanged();
     }
 
@@ -101,21 +119,20 @@ public class PersonWeirdEgg : AstralPartyRelicModel
         if (player != Owner || Owner?.Creature?.CombatState == null)
             return;
 
-        if (AstralParty_PersonWeirdEggPendingCombatStartCard)
+        if (AstralParty_PersonMousyLianPendingCombatStartCard)
         {
-            await GrantTroubleMaker();
-            AstralParty_PersonWeirdEggPendingCombatStartCard = false;
+            await GrantSaveMeMousy();
+            AstralParty_PersonMousyLianPendingCombatStartCard = false;
             InvokeDisplayAmountChanged();
             return;
         }
 
-        // Reaching the cap means the relic is ready to generate its card and start a fresh cycle.
         if (GetClampedCounter() < MaxCounter)
             return;
 
-        await GrantTroubleMaker();
-        AstralParty_PersonWeirdEggCounter = 1;
-        AstralParty_PersonWeirdEggPendingCombatStartCard = false;
+        await GrantSaveMeMousy();
+        AstralParty_PersonMousyLianCounter = 1;
+        AstralParty_PersonMousyLianPendingCombatStartCard = false;
         InvokeDisplayAmountChanged();
     }
 
@@ -138,36 +155,36 @@ public class PersonWeirdEgg : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonWeirdEggCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonMousyLianCounter, 1, MaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonWeirdEggCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonMousyLianCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
     }
 
     private void AdvanceCounterAfterCombatEnd()
     {
-        if (AstralParty_PersonWeirdEggPendingCombatStartCard)
+        if (AstralParty_PersonMousyLianPendingCombatStartCard)
             return;
 
         if (GetClampedCounter() >= MaxCounter - 1)
         {
-            AstralParty_PersonWeirdEggCounter = 1;
-            AstralParty_PersonWeirdEggPendingCombatStartCard = true;
+            AstralParty_PersonMousyLianCounter = 1;
+            AstralParty_PersonMousyLianPendingCombatStartCard = true;
             return;
         }
 
         AdvanceCounter();
     }
 
-    private async Task GrantTroubleMaker()
+    private async Task GrantSaveMeMousy()
     {
         if (Owner?.Creature?.CombatState == null)
             return;
 
         Flash();
-        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTroubleMaker>(), Owner);
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillSaveMeMousy>(), Owner);
         await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
     }
 }

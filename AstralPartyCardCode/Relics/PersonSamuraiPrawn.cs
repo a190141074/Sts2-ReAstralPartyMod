@@ -22,13 +22,55 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 {
     private const int MaxCounter = 4;
 
-    [SavedProperty] public int AstralParty_PersonSamuraiPrawnCounter { get; set; } = 1;
+    private int _counter = 1;
+    private bool _pendingCombatStartCard;
+    private bool _hasCanonicalPendingCombatStartCard;
 
-    [SavedProperty] public bool AstralParty_PersonSamuraiPrawnPendingCombatStartCard { get; set; }
+    [SavedProperty]
+    public int AstralParty_PersonSamuraiPrawnCounter
+    {
+        get => _counter;
+        set
+        {
+            _counter = NormalizeLegacyCounter(value);
+        }
+    }
+
+    [SavedProperty]
+    public bool AstralParty_PersonSamuraiPrawnPendingCombatStartCard
+    {
+        get => _pendingCombatStartCard;
+        set
+        {
+            _pendingCombatStartCard = value;
+            _hasCanonicalPendingCombatStartCard = true;
+        }
+    }
 
     [SavedProperty] public bool AstralParty_PersonSamuraiPrawnFirstAttackTriggered { get; set; }
 
     [SavedProperty] public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura { get; set; }
+
+    // Preserve the earliest Samurai Prawn save field so older runs can migrate into the new cooldown model.
+    public bool AstralParty_PersonSamuraiPrawnOpenedThisCombat
+    {
+        get => default;
+        set
+        {
+            if (_hasCanonicalPendingCombatStartCard)
+                return;
+
+            _counter = NormalizeLegacyCounter(_counter);
+            _pendingCombatStartCard = !value && IsLegacyGrantCounter(_counter);
+        }
+    }
+
+    // Keep the removed legacy flag name so old saves can still deserialize without polluting SavedProperty sync.
+    public new bool IsMelted
+    {
+        get => default;
+        set { }
+    }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
@@ -66,7 +108,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
 
         if (AstralParty_PersonSamuraiPrawnPendingCombatStartCard)
-        {
+        {   
             await GrantFamousBlade();
             AstralParty_PersonSamuraiPrawnPendingCombatStartCard = false;
             InvokeDisplayAmountChanged();
@@ -144,6 +186,22 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     private int GetClampedCounter()
     {
         return Math.Clamp(AstralParty_PersonSamuraiPrawnCounter, 1, MaxCounter);
+    }
+
+    private static bool IsLegacyGrantCounter(int counter)
+    {
+        return counter == 1;
+    }
+
+    private static int NormalizeLegacyCounter(int counter)
+    {
+        if (counter <= 1)
+            return 1;
+
+        if (counter <= MaxCounter)
+            return counter;
+
+        return ((counter - 1) % 3) + 1;
     }
 
     private void AdvanceCounter()

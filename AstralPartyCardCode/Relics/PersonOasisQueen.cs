@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AstralPartyMod.AstralPartyCardCode.Keywords;
 using AstralPartyMod.AstralPartyCardCode.cards;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -13,32 +17,29 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using MegaCrit.Sts2.Core.ValueProps;
 
 namespace AstralPartyMod.AstralPartyCardCode.Relics;
 
 [Pool(typeof(EventRelicPool))]
-public class PersonWeirdEgg : AstralPartyRelicModel
+public class PersonOasisQueen : AstralPartyRelicModel
 {
     private const int MaxCounter = 4;
+    private const int MaxTemporaryDamageBonus = 3;
 
     private int _counter = 1;
     private bool _pendingCombatStartCard;
-    private bool _hasCanonicalCounter;
     private bool _hasCanonicalPendingCombatStartCard;
 
     [SavedProperty]
-    public int AstralParty_PersonWeirdEggCounter
+    public int AstralParty_PersonOasisQueenCounter
     {
         get => _counter;
-        set
-        {
-            _counter = value;
-            _hasCanonicalCounter = true;
-        }
+        set => _counter = value;
     }
 
     [SavedProperty]
-    public bool AstralParty_PersonWeirdEggPendingCombatStartCard
+    public bool AstralParty_PersonOasisQueenPendingCombatStartCard
     {
         get => _pendingCombatStartCard;
         set
@@ -48,19 +49,8 @@ public class PersonWeirdEgg : AstralPartyRelicModel
         }
     }
 
-    // Read the old save field without writing it back into newly saved runs.
-    public int FurCoatCoordsSet
-    {
-        get => default;
-        set
-        {
-            if (!_hasCanonicalCounter && value != default)
-                _counter = value;
-        }
-    }
-
-    // Read the old save field without writing it back into newly saved runs.
-    public bool StarsSpent
+    // Preserve the original wire/save name so older Oasis Queen saves remain readable.
+    public bool CurrentBlock
     {
         get => default;
         set
@@ -72,50 +62,46 @@ public class PersonWeirdEgg : AstralPartyRelicModel
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
-    public override bool ShowCounter => Owner?.Creature?.CombatState != null;
-
     public override bool ShouldReceiveCombatHooks => true;
+
+    public override bool ShowCounter => Owner?.Creature?.CombatState != null;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<SkillTroubleMaker>()
+        HoverTipFactory.FromCard<SkillRoyalPrerogative>(),
+        HoverTipFactory.FromKeyword(AstralKeywords.AstralTemporary)
     ];
 
-    // Keep the stored value aligned with the shown value so the cooldown is easy to reason about.
     public override int DisplayAmount => GetClampedCounter();
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonWeirdEggCounter = 1;
+        AstralParty_PersonOasisQueenCounter = 1;
         // Newly obtained cooldown relics should grant their first card on the next player turn start.
-        AstralParty_PersonWeirdEggPendingCombatStartCard = true;
+        AstralParty_PersonOasisQueenPendingCombatStartCard = true;
         InvokeDisplayAmountChanged();
     }
 
-    public override async Task AfterPlayerTurnStart(
-        PlayerChoiceContext choiceContext,
-        MegaCrit.Sts2.Core.Entities.Players.Player player
-    )
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
         if (player != Owner || Owner?.Creature?.CombatState == null)
             return;
 
-        if (AstralParty_PersonWeirdEggPendingCombatStartCard)
+        if (AstralParty_PersonOasisQueenPendingCombatStartCard)
         {
-            await GrantTroubleMaker();
-            AstralParty_PersonWeirdEggPendingCombatStartCard = false;
+            await GrantRoyalPrerogative();
+            AstralParty_PersonOasisQueenPendingCombatStartCard = false;
             InvokeDisplayAmountChanged();
             return;
         }
 
-        // Reaching the cap means the relic is ready to generate its card and start a fresh cycle.
         if (GetClampedCounter() < MaxCounter)
             return;
 
-        await GrantTroubleMaker();
-        AstralParty_PersonWeirdEggCounter = 1;
-        AstralParty_PersonWeirdEggPendingCombatStartCard = false;
+        await GrantRoyalPrerogative();
+        AstralParty_PersonOasisQueenCounter = 1;
+        AstralParty_PersonOasisQueenPendingCombatStartCard = false;
         InvokeDisplayAmountChanged();
     }
 
@@ -136,38 +122,59 @@ public class PersonWeirdEgg : AstralPartyRelicModel
         return Task.CompletedTask;
     }
 
+    public override decimal ModifyDamageAdditive(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (Owner?.Creature?.CombatState == null || Owner.Creature == null)
+            return 0m;
+        if (target == null || target.Side == Owner.Creature.Side)
+            return 0m;
+        if (amount <= 0m)
+            return 0m;
+        if (dealer != Owner.Creature && cardSource?.Owner != Owner)
+            return 0m;
+
+        var hand = PileType.Hand.GetPile(Owner);
+        var temporaryCards = hand.Cards.Count(card => card.Keywords.Contains(AstralKeywords.AstralTemporary));
+        return Math.Min(temporaryCards, MaxTemporaryDamageBonus);
+    }
+
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonWeirdEggCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonOasisQueenCounter, 1, MaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonWeirdEggCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonOasisQueenCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
     }
 
     private void AdvanceCounterAfterCombatEnd()
     {
-        if (AstralParty_PersonWeirdEggPendingCombatStartCard)
+        if (AstralParty_PersonOasisQueenPendingCombatStartCard)
             return;
 
         if (GetClampedCounter() >= MaxCounter - 1)
         {
-            AstralParty_PersonWeirdEggCounter = 1;
-            AstralParty_PersonWeirdEggPendingCombatStartCard = true;
+            AstralParty_PersonOasisQueenCounter = 1;
+            AstralParty_PersonOasisQueenPendingCombatStartCard = true;
             return;
         }
 
         AdvanceCounter();
     }
 
-    private async Task GrantTroubleMaker()
+    private async Task GrantRoyalPrerogative()
     {
         if (Owner?.Creature?.CombatState == null)
             return;
 
         Flash();
-        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTroubleMaker>(), Owner);
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillRoyalPrerogative>(), Owner);
         await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
     }
 }

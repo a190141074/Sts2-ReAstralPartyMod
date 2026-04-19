@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Powers;
 using BaseLib.Utils;
-using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -17,7 +19,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace AstralPartyMod.AstralPartyCardCode.Relics;
 
 [Pool(typeof(EventRelicPool))]
-public class PersonWeirdEgg : AstralPartyRelicModel
+public class PersonXiaoLei : AstralPartyRelicModel
 {
     private const int MaxCounter = 4;
 
@@ -27,7 +29,7 @@ public class PersonWeirdEgg : AstralPartyRelicModel
     private bool _hasCanonicalPendingCombatStartCard;
 
     [SavedProperty]
-    public int AstralParty_PersonWeirdEggCounter
+    public int AstralParty_PersonXiaoLeiCounter
     {
         get => _counter;
         set
@@ -38,7 +40,7 @@ public class PersonWeirdEgg : AstralPartyRelicModel
     }
 
     [SavedProperty]
-    public bool AstralParty_PersonWeirdEggPendingCombatStartCard
+    public bool AstralParty_PersonXiaoLeiPendingCombatStartCard
     {
         get => _pendingCombatStartCard;
         set
@@ -48,8 +50,8 @@ public class PersonWeirdEgg : AstralPartyRelicModel
         }
     }
 
-    // Read the old save field without writing it back into newly saved runs.
-    public int FurCoatCoordsSet
+    // Preserve legacy wire/save names so older XiaoLei runs still hydrate correctly.
+    public int TimesLifted
     {
         get => default;
         set
@@ -59,8 +61,7 @@ public class PersonWeirdEgg : AstralPartyRelicModel
         }
     }
 
-    // Read the old save field without writing it back into newly saved runs.
-    public bool StarsSpent
+    public bool GoldenPathAct
     {
         get => default;
         set
@@ -76,46 +77,50 @@ public class PersonWeirdEgg : AstralPartyRelicModel
 
     public override bool ShouldReceiveCombatHooks => true;
 
+    public override int DisplayAmount => GetClampedCounter();
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<SkillTroubleMaker>()
+        HoverTipFactory.FromCard<SkillChainReaction>(),
+        HoverTipFactory.FromPower<DragonAwakeningPower>(),
+        HoverTipFactory.FromPower<TrueDragonFormPower>()
     ];
-
-    // Keep the stored value aligned with the shown value so the cooldown is easy to reason about.
-    public override int DisplayAmount => GetClampedCounter();
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonWeirdEggCounter = 1;
+
+        AstralParty_PersonXiaoLeiCounter = 1;
         // Newly obtained cooldown relics should grant their first card on the next player turn start.
-        AstralParty_PersonWeirdEggPendingCombatStartCard = true;
+        AstralParty_PersonXiaoLeiPendingCombatStartCard = true;
         InvokeDisplayAmountChanged();
+
+        if (Owner.GetRelic<PersonalityDerivativeXiaoLeiDragonGate>() == null)
+            await RelicCmd.Obtain(
+                ModelDb.Relic<PersonalityDerivativeXiaoLeiDragonGate>().ToMutable(),
+                Owner
+            );
     }
 
-    public override async Task AfterPlayerTurnStart(
-        PlayerChoiceContext choiceContext,
-        MegaCrit.Sts2.Core.Entities.Players.Player player
-    )
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
         if (player != Owner || Owner?.Creature?.CombatState == null)
             return;
 
-        if (AstralParty_PersonWeirdEggPendingCombatStartCard)
+        if (AstralParty_PersonXiaoLeiPendingCombatStartCard)
         {
-            await GrantTroubleMaker();
-            AstralParty_PersonWeirdEggPendingCombatStartCard = false;
+            await GrantChainReaction();
+            AstralParty_PersonXiaoLeiPendingCombatStartCard = false;
             InvokeDisplayAmountChanged();
             return;
         }
 
-        // Reaching the cap means the relic is ready to generate its card and start a fresh cycle.
         if (GetClampedCounter() < MaxCounter)
             return;
 
-        await GrantTroubleMaker();
-        AstralParty_PersonWeirdEggCounter = 1;
-        AstralParty_PersonWeirdEggPendingCombatStartCard = false;
+        await GrantChainReaction();
+        AstralParty_PersonXiaoLeiCounter = 1;
+        AstralParty_PersonXiaoLeiPendingCombatStartCard = false;
         InvokeDisplayAmountChanged();
     }
 
@@ -136,38 +141,49 @@ public class PersonWeirdEgg : AstralPartyRelicModel
         return Task.CompletedTask;
     }
 
+    public async Task GrantDragonAwakening(int amount)
+    {
+        if (amount <= 0)
+            return;
+        if (Owner?.Creature == null)
+            return;
+
+        Flash();
+        await PowerCmd.Apply<DragonAwakeningPower>(Owner.Creature, amount, Owner.Creature, null, false);
+    }
+
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonWeirdEggCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonXiaoLeiCounter, 1, MaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonWeirdEggCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonXiaoLeiCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
     }
 
     private void AdvanceCounterAfterCombatEnd()
     {
-        if (AstralParty_PersonWeirdEggPendingCombatStartCard)
+        if (AstralParty_PersonXiaoLeiPendingCombatStartCard)
             return;
 
         if (GetClampedCounter() >= MaxCounter - 1)
         {
-            AstralParty_PersonWeirdEggCounter = 1;
-            AstralParty_PersonWeirdEggPendingCombatStartCard = true;
+            AstralParty_PersonXiaoLeiCounter = 1;
+            AstralParty_PersonXiaoLeiPendingCombatStartCard = true;
             return;
         }
 
         AdvanceCounter();
     }
 
-    private async Task GrantTroubleMaker()
+    private async Task GrantChainReaction()
     {
         if (Owner?.Creature?.CombatState == null)
             return;
 
         Flash();
-        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTroubleMaker>(), Owner);
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillChainReaction>(), Owner);
         await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
     }
 }

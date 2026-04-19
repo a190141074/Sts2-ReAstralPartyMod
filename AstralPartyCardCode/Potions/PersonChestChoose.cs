@@ -29,10 +29,10 @@ public class PersonChestChoose : AstralPartyPotionModel
         ModelDb.Relic<PersonWeirdEgg>(),
 
         // 人格：太刀虾
-        // ModelDb.Relic<PersonSamuraiPrawn>(),
+        ModelDb.Relic<PersonSamuraiPrawn>(),
 
         // 人格：史莱姆
-        ModelDb.Relic<PersonSlimeLulu>(),
+        // ModelDb.Relic<PersonSlimeLulu>(),
 
         // 人格：绿油油
         ModelDb.Relic<PersonBionicJasmine>(),

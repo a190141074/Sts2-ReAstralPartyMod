@@ -33,32 +33,75 @@ public class PersonProprietress : AstralPartyRelicModel
     private static readonly ConditionalWeakTable<MerchantEntry, DiscountRollState> DiscountRollCache =
         new();
 
-    [SavedProperty] public int AstralParty_PersonProprietressCounter { get; set; } = 1;
+    private int _counter = 1;
+    private bool _pendingCombatStartTrigger;
+    private int _visitedShops;
+    private bool _hasCanonicalCounter;
+    private bool _hasCanonicalPendingCombatStartTrigger;
+    private bool _hasCanonicalVisitedShops;
 
-    [SavedProperty] public bool AstralParty_PersonProprietressPendingCombatStartTrigger { get; set; }
+    [SavedProperty]
+    public int AstralParty_PersonProprietressCounter
+    {
+        get => _counter;
+        set
+        {
+            _counter = value;
+            _hasCanonicalCounter = true;
+        }
+    }
 
-    [SavedProperty] public int AstralParty_PersonProprietressVisitedShops { get; set; }
+    [SavedProperty]
+    public bool AstralParty_PersonProprietressPendingCombatStartTrigger
+    {
+        get => _pendingCombatStartTrigger;
+        set
+        {
+            _pendingCombatStartTrigger = value;
+            _hasCanonicalPendingCombatStartTrigger = true;
+        }
+    }
+
+    [SavedProperty]
+    public int AstralParty_PersonProprietressVisitedShops
+    {
+        get => _visitedShops;
+        set
+        {
+            _visitedShops = value;
+            _hasCanonicalVisitedShops = true;
+        }
+    }
 
     // Preserve legacy wire/save names so older Proprietress runs still hydrate correctly.
-    [SavedProperty]
     public int CurrentDamage
     {
-        get => AstralParty_PersonProprietressCounter;
-        set => AstralParty_PersonProprietressCounter = value;
+        get => default;
+        set
+        {
+            if (!_hasCanonicalCounter && value != default)
+                _counter = value;
+        }
     }
 
-    [SavedProperty]
     public bool IncreasedDamage
     {
-        get => AstralParty_PersonProprietressPendingCombatStartTrigger;
-        set => AstralParty_PersonProprietressPendingCombatStartTrigger = value;
+        get => default;
+        set
+        {
+            if (!_hasCanonicalPendingCombatStartTrigger && value)
+                _pendingCombatStartTrigger = true;
+        }
     }
 
-    [SavedProperty]
     public int CharacterModel
     {
-        get => AstralParty_PersonProprietressVisitedShops;
-        set => AstralParty_PersonProprietressVisitedShops = value;
+        get => default;
+        set
+        {
+            if (!_hasCanonicalVisitedShops && value != default)
+                _visitedShops = value;
+        }
     }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
