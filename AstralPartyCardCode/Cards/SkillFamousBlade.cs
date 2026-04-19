@@ -15,40 +15,17 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
 [Pool(typeof(EventCardPool))]
 public class SkillFamousBlade : AstralPartyCardModel
 {
+    private const int BaseDamage = 2;
     private const int MaxAuraToConsume = 2;
-    private int _currentDamage = 1;
-    private int _increasedDamage;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(1m, ValueProp.Move),
-        new ExtraDamageVar(0m),
-        new CalculationBaseVar(1m),
-        new CalculationExtraVar(0m),
-        new CalculatedDamageVar(ValueProp.Move).WithMultiplier((_, _) => 1m)
+        new DamageVar(BaseDamage, ValueProp.Move)
     ];
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust, CardKeyword.Retain];
-
-    public int CurrentDamage
-    {
-        get
-        {
-            UpdateDamage();
-            return _currentDamage;
-        }
-    }
-
-    public int IncreasedDamage
-    {
-        get
-        {
-            UpdateDamage();
-            return _increasedDamage;
-        }
-    }
 
     public override string PortraitPath => GetPortraitPath();
 
@@ -59,7 +36,6 @@ public class SkillFamousBlade : AstralPartyCardModel
         TargetType.AnyEnemy,
         false)
     {
-        UpdateDamage();
     }
 
     protected override void OnUpgrade()
@@ -70,8 +46,6 @@ public class SkillFamousBlade : AstralPartyCardModel
     {
         if (Owner?.Creature == null || cardPlay.Target == null) return;
 
-        UpdateDamage();
-
         var attackCmd = CommonActions.CardAttack(this, cardPlay, 1);
         await attackCmd.Execute(choiceContext);
 
@@ -80,8 +54,6 @@ public class SkillFamousBlade : AstralPartyCardModel
         {
             var auraPower = Owner.Creature.GetPower<SwordAuraPower>();
             if (auraPower != null) await PowerCmd.ModifyAmount(auraPower, -auraToConsume, Owner.Creature, this, false);
-
-            BuffFromPlay(auraToConsume);
         }
 
         if (Owner.Creature.GetPowerAmount<SwordAuraPower>() < 3)
@@ -93,77 +65,80 @@ public class SkillFamousBlade : AstralPartyCardModel
                 this,
                 false);
 
-        UpdateDamage();
-    }
-
-    public void BuffFromPlay(int consumedAura)
-    {
-        if (consumedAura <= 0) return;
-
-        var relic = Owner?.GetRelic<PersonSamuraiPrawn>();
-        relic?.IncreaseFamousBladeConsumedAura(consumedAura);
-        UpdateDamage();
-    }
-
-    public void UpdateDamage()
-    {
-        var increasedDamage = GetDisplayIncrease();
-        _increasedDamage = increasedDamage;
-        _currentDamage = 1 + increasedDamage;
-
-        DynamicVars["Damage"].BaseValue = 1m;
-        DynamicVars["ExtraDamage"].BaseValue = increasedDamage;
-        DynamicVars["CalculationBase"].BaseValue = 1m;
-        DynamicVars["CalculationExtra"].BaseValue = increasedDamage;
+        var swordIntent = Owner.GetRelic<PersonalityDerivativeSwordIntent>();
+        if (swordIntent != null)
+            await swordIntent.OnFamousBladePlayed(choiceContext, cardPlay.Target, auraToConsume, this);
     }
 
     public string GetDisplayTitle(string language)
     {
-        UpdateDamage();
-        var damage = CurrentDamage;
-
-        return language switch
+        return GetDisplayTier() switch
         {
-            "zhs" => damage switch
+            FamousBladeDisplayTier.Medium => language switch
             {
-                <= 2 => "\u540d\u5200",
-                <= 4 => "\u540d\u5200\u00b7\u4e2d",
-                <= 7 => "\u540d\u5200\u00b7\u5927",
-                <= 11 => "\u540d\u5200\u00b7\u7279\u5927",
-                _ => "\u540d\u5200\u00b7\u560e\u545c\u5207"
+                "zhs" => "\u540d\u5200\u00b7\u4e2d",
+                _ => "Famous Blade (Medium)"
             },
-            _ => damage switch
+            FamousBladeDisplayTier.Large => language switch
             {
-                <= 2 => "Famous Blade",
-                <= 4 => "Famous Blade (Medium)",
-                <= 7 => "Famous Blade (Large)",
-                <= 11 => "Famous Blade (Extra Large)",
+                "zhs" => "\u540d\u5200\u00b7\u5927",
+                _ => "Famous Blade (Large)"
+            },
+            FamousBladeDisplayTier.ExtraLarge => language switch
+            {
+                "zhs" => "\u540d\u5200\u00b7\u7279\u5927",
+                _ => "Famous Blade (Extra Large)"
+            },
+            FamousBladeDisplayTier.GawuCutter => language switch
+            {
+                "zhs" => "\u540d\u5200\u00b7\u560e\u545c\u5207",
                 _ => "Famous Blade (Gawu-Cutter)"
+            },
+            _ => language switch
+            {
+                "zhs" => "名刀",
+                _ => "Famous Blade"
             }
         };
     }
 
-    private int GetDisplayIncrease()
+    private int GetSwordIntentCounter()
     {
-        if (ReferenceEquals(CanonicalInstance, this)) return 0;
+        return Owner?.GetRelic<PersonalityDerivativeSwordIntent>()?.AstralParty_PersonalityDerivativeSwordIntentCounter ?? 0;
+    }
 
-        var damage = Owner?.GetRelic<PersonSamuraiPrawn>()?.GetFamousBladeDamage() ?? 1;
-        return Math.Max(0, damage - 1);
+    private FamousBladeDisplayTier GetDisplayTier()
+    {
+        var counter = GetSwordIntentCounter();
+
+        return counter switch
+        {
+            <= 1 => FamousBladeDisplayTier.Basic,
+            <= 3 => FamousBladeDisplayTier.Medium,
+            <= 6 => FamousBladeDisplayTier.Large,
+            <= 10 => FamousBladeDisplayTier.ExtraLarge,
+            _ => FamousBladeDisplayTier.GawuCutter
+        };
     }
 
     private string GetPortraitPath()
     {
-        UpdateDamage();
-        var damage = CurrentDamage;
-        var suffix = damage switch
+        return GetDisplayTier() switch
         {
-            <= 2 => "skill_famous_blade",
-            <= 4 => "famous_blade_medium",
-            <= 7 => "famous_blade_large",
-            <= 11 => "famous_blade_extra_large",
-            _ => "famous_blade_gawu_cutter"
+            FamousBladeDisplayTier.Medium => "res://AstralPartyMod/images/card_portraits/famous_blade_medium.png",
+            FamousBladeDisplayTier.Large => "res://AstralPartyMod/images/card_portraits/famous_blade_large.png",
+            FamousBladeDisplayTier.ExtraLarge => "res://AstralPartyMod/images/card_portraits/famous_blade_extra_large.png",
+            FamousBladeDisplayTier.GawuCutter => "res://AstralPartyMod/images/card_portraits/famous_blade_gawu_cutter.png",
+            _ => "res://AstralPartyMod/images/card_portraits/skill_famous_blade.png"
         };
+    }
 
-        return $"res://AstralPartyMod/images/card_portraits/{suffix}.png";
+    private enum FamousBladeDisplayTier
+    {
+        Basic,
+        Medium,
+        Large,
+        ExtraLarge,
+        GawuCutter
     }
 }

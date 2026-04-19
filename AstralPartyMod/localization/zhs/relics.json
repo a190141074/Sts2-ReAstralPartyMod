@@ -53,6 +53,9 @@
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.progress_description": "七十二天雷：{0}\n三十六天火：{1}\n真龙形态：{2}",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.unlocked": "已解锁",
   "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_XIAO_LEI_DRAGON_GATE.locked": "未解锁",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_SWORD_INTENT.title": "【人格衍生：剑意】",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_SWORD_INTENT.description": "· 名刀每累计消耗2层[gold]剑气[/gold]，此遗物层数+1。\n· 每次打出[gold]名刀[/gold]后，对目标追加一次等于剑意层数的伤害。",
+  "ASTRALPARTYMOD-PERSONALITY_DERIVATIVE_SWORD_INTENT.flavor": "刀出有意，意成有痕。",
   "ASTRALPARTYMOD-PERSON_JILL_STEINLE.title": "【人格：调酒师】",
   "ASTRALPARTYMOD-PERSON_JILL_STEINLE.description": "· 每3回合开始时，将1张[gold]调制饮料[/gold]加入手中。\n· 若恰好弃置3张不同类型的牌，你获得3星光。\n· 若恰好弃置3张相同类型的牌，目标额外获得3敏捷。",
   "ASTRALPARTYMOD-PERSON_JILL_STEINLE.flavor": "今晚喝点什么？",
@@ -66,6 +69,6 @@
   "ASTRALPARTYMOD-RELIC_BLUE_PIGGY_BANK.description": "你每消耗6点能量，获得3点[gold]星光[/gold]。",
   "ASTRALPARTYMOD-RELIC_BLUE_PIGGY_BANK.flavor": "+3！",
   "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.title": "星币锤",
-  "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.description": "若你的金币不少于150，每回合第一次造成伤害时，消耗20金币，对目标追加一次等于你当前金币数量7.5%的伤害。",
+  "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.description": "若你的金币不少于[gold]150[/gold]，每回合第一次造成伤害时：\n消耗20金币，对目标追加一次等于你当前金币数量[green]7.5%[/green]的伤害。",
   "ASTRALPARTYMOD-RELIC_GOLD_STAR_COIN_HAMMER.flavor": "金币越沉，锤子越狠。"
 }

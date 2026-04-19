@@ -46,7 +46,13 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
     [SavedProperty] public bool AstralParty_PersonSamuraiPrawnFirstAttackTriggered { get; set; }
 
-    [SavedProperty] public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura { get; set; }
+    // Keep the removed legacy save field name so older runs can deserialize after Famous Blade growth
+    // moved entirely onto PersonalityDerivativeSwordIntent.
+    public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura
+    {
+        get => default;
+        set { }
+    }
 
     // Preserve the earliest Samurai Prawn save field so older runs can migrate into the new cooldown model.
     public bool AstralParty_PersonSamuraiPrawnOpenedThisCombat
@@ -90,8 +96,13 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         // Newly obtained cooldown relics should grant their first card on the next player turn start.
         AstralParty_PersonSamuraiPrawnPendingCombatStartCard = true;
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
-        AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura = 0;
         InvokeDisplayAmountChanged();
+
+        if (Owner.GetRelic<PersonalityDerivativeSwordIntent>() == null)
+            await RelicCmd.Obtain(
+                ModelDb.Relic<PersonalityDerivativeSwordIntent>().ToMutable(),
+                Owner
+            );
     }
 
     public override async Task AfterPlayerTurnStart(
@@ -101,6 +112,8 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
     {
         if (player != Owner || Owner?.Creature?.CombatState == null)
             return;
+
+        await EnsureSwordIntentRelic();
 
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
 
@@ -167,19 +180,6 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         return Task.CompletedTask;
     }
 
-    public int GetFamousBladeDamage()
-    {
-        return 1 + AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura / 2;
-    }
-
-    public void IncreaseFamousBladeConsumedAura(int amount)
-    {
-        if (amount <= 0)
-            return;
-
-        AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura += amount;
-    }
-
     private int GetClampedCounter()
     {
         return Math.Clamp(AstralParty_PersonSamuraiPrawnCounter, 1, MaxCounter);
@@ -229,5 +229,16 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBlade>(), Owner);
         await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+    }
+
+    private async Task EnsureSwordIntentRelic()
+    {
+        if (Owner == null || Owner.GetRelic<PersonalityDerivativeSwordIntent>() != null)
+            return;
+
+        await RelicCmd.Obtain(
+            ModelDb.Relic<PersonalityDerivativeSwordIntent>().ToMutable(),
+            Owner
+        );
     }
 }

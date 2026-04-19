@@ -90,6 +90,7 @@
 		<Content Include="AstralPartyMod\images\powers\twin_shadows_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\true_dragon_form_power.png"/>
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png"/>
+		<Content Include="AstralPartyMod\images\relic\personality_derivative_sword_intent.png"/>
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_xiao_lei_dragon_gate.png"/>
 		<Content Include="AstralPartyMod\images\relic\relic_blue_octahedral_die.png"/>
 		<Content Include="AstralPartyMod\images\relic\relic_blue_piggy_bank.png"/>
@@ -141,6 +142,7 @@
 
 	<ItemGroup>
 		<Folder Include="AstralPartyCardCode\Modifiers\"/>
+		<Folder Include="AstralPartyMod\images\events\" />
 	</ItemGroup>
 
 	<ItemGroup>
