@@ -18,7 +18,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace AstralPartyMod.AstralPartyCardCode.Relics;
 
 [Pool(typeof(SharedRelicPool))]
-public class RelicGoldStarCoinHammer : AstralPartyRelicModel
+public class TokenGoldStarCoinHammer : AstralPartyRelicModel
 {
     private const int TriggerGoldThreshold = 150;
     private const int GoldCostPerTrigger = 20;

@@ -57,7 +57,7 @@ public class SkillTransfer : AstralPartyCardModel
         var ownerCreature = Owner!.Creature!;
         var resolvedTarget = target!;
         await PlayerCmd.LoseGold(TransferGoldCost, Owner, GoldLossType.Spent);
-        Owner.GetRelic<RelicGoldStarCoinHammer>()?.RefreshDisplayedBonusDamage();
+        Owner.GetRelic<TokenGoldStarCoinHammer>()?.RefreshDisplayedBonusDamage();
         Owner.GetRelic<PersonalityDerivativeProprietressWealthism>()?.RecordTransferSpend(TransferGoldCost);
         await PowerCmd.Apply(
             ModelDb.Power<StarLightPower>().ToMutable(),

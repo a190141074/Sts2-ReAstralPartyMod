@@ -12,7 +12,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace AstralPartyMod.AstralPartyCardCode.Relics;
 
 [Pool(typeof(SharedRelicPool))]
-public class RelicBlueOctahedralDie : AstralPartyRelicModel
+public class TokenBlueOctahedralDie : AstralPartyRelicModel
 {
     private const int TriggerRoundMultiple = 8;
     private const int StarLightRewardAmount = 8;

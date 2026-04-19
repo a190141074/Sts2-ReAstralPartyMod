@@ -13,7 +13,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace AstralPartyMod.AstralPartyCardCode.Relics;
 
 [Pool(typeof(SharedRelicPool))]
-public class RelicBluePiggyBank : AstralPartyRelicModel
+public class TokenBluePiggyBank : AstralPartyRelicModel
 {
     private const int EnergyThreshold = 6;
     private const decimal StarLightPerTrigger = 3m;

@@ -76,22 +76,22 @@ public class SkillFamousBlade : AstralPartyCardModel
         {
             FamousBladeDisplayTier.Medium => language switch
             {
-                "zhs" => "\u540d\u5200\u00b7\u4e2d",
+                "zhs" => "名刀·中",
                 _ => "Famous Blade (Medium)"
             },
             FamousBladeDisplayTier.Large => language switch
             {
-                "zhs" => "\u540d\u5200\u00b7\u5927",
+                "zhs" => "名刀·大",
                 _ => "Famous Blade (Large)"
             },
             FamousBladeDisplayTier.ExtraLarge => language switch
             {
-                "zhs" => "\u540d\u5200\u00b7\u7279\u5927",
+                "zhs" => "名刀·特大",
                 _ => "Famous Blade (Extra Large)"
             },
             FamousBladeDisplayTier.GawuCutter => language switch
             {
-                "zhs" => "\u540d\u5200\u00b7\u560e\u545c\u5207",
+                "zhs" => "名刀·嘎呜切",
                 _ => "Famous Blade (Gawu-Cutter)"
             },
             _ => language switch
@@ -104,6 +104,9 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     private int GetSwordIntentCounter()
     {
+        if (ReferenceEquals(CanonicalInstance, this))
+            return 0;
+
         return Owner?.GetRelic<PersonalityDerivativeSwordIntent>()?.AstralParty_PersonalityDerivativeSwordIntentCounter ?? 0;
     }
 
