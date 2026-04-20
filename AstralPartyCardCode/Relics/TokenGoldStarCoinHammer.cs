@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using AstralPartyMod.AstralPartyCardCode.Keywords;
+using AstralPartyMod.AstralPartyCardCode.Powers;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -9,6 +12,7 @@ using MegaCrit.Sts2.Core.Entities.Gold;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
@@ -20,9 +24,12 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(SharedRelicPool))]
 public class TokenGoldStarCoinHammer : AstralPartyRelicModel
 {
-    private const int TriggerGoldThreshold = 150;
-    private const int GoldCostPerTrigger = 20;
-    private const decimal BonusDamageGoldRatio = 0.075m;
+    private const int EternalStarlightToGrant = 15;
+    private const int TriggerEternalStarlightThreshold = 40;
+    private const int TriggerGoldThreshold = 100;
+    private const int GoldCostPerTrigger = 15;
+    private const decimal BonusDamageGoldRatio = 0.10m;
+    private const decimal StarLightOnKill = 6m;
 
     private static int _activeBonusHits;
 
@@ -36,10 +43,19 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
 
     public override int DisplayAmount => GetDisplayedBonusDamage();
 
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        TokenEternalStarlight.BuildReferenceHoverTip(),
+        HoverTipFactory.FromKeyword(AstralKeywords.AstralEternalStarlightSet),
+        HoverTipFactory.FromPower<StarLightPower>()
+    ];
+
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
         AstralParty_RelicGoldStarCoinHammerTriggeredThisTurn = false;
+        if (Owner != null)
+            await TokenEternalStarlight.GrantStacks(Owner, EternalStarlightToGrant);
         InvokeDisplayAmountChanged();
     }
 
@@ -86,7 +102,7 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
         await PlayerCmd.LoseGold(GoldCostPerTrigger, Owner, GoldLossType.Spent);
         InvokeDisplayAmountChanged();
 
-        var bonusDamage = CalculateBonusDamage(Owner!.Gold);
+        var bonusDamage = CalculateBonusDamageAfterCost(Owner!.Gold);
         if (bonusDamage <= 0m)
             return;
 
@@ -101,6 +117,18 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
                 Owner.Creature,
                 null
             );
+
+            if (!target.IsAlive)
+            {
+                await PowerCmd.Apply(
+                    ModelDb.Power<StarLightPower>().ToMutable(),
+                    Owner.Creature,
+                    StarLightOnKill,
+                    Owner.Creature,
+                    null,
+                    false
+                );
+            }
         }
         finally
         {
@@ -123,20 +151,28 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
         if (result.TotalDamage <= 0)
             return false;
 
-        return Owner.Gold >= TriggerGoldThreshold;
+        return Owner.Gold >= TriggerGoldThreshold
+               && GetEternalStarlightAmount() >= TriggerEternalStarlightThreshold;
     }
 
-    private static decimal CalculateBonusDamage(int currentGold)
+    private static decimal CalculateBonusDamageAfterCost(int goldAfterPayment)
     {
-        return Math.Floor(currentGold * BonusDamageGoldRatio);
+        return Math.Floor(Math.Max(goldAfterPayment, 0) * BonusDamageGoldRatio);
     }
 
     private int GetDisplayedBonusDamage()
     {
         if (Owner == null || Owner.Gold < TriggerGoldThreshold)
             return 0;
+        if (GetEternalStarlightAmount() < TriggerEternalStarlightThreshold)
+            return 0;
 
-        return (int)CalculateBonusDamage(Owner.Gold);
+        return (int)CalculateBonusDamageAfterCost(Owner.Gold - GoldCostPerTrigger);
+    }
+
+    private int GetEternalStarlightAmount()
+    {
+        return Owner?.GetRelic<TokenEternalStarlight>()?.GetStacks() ?? 0;
     }
 
     public void RefreshDisplayedBonusDamage()

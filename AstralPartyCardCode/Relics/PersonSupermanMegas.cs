@@ -99,7 +99,8 @@ public class PersonSupermanMegas : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<SkillSolarBombardment>()
+        HoverTipFactory.FromCard<SkillSolarBombardment>(),
+        HoverTipFactory.FromPower<DrawCardsNextTurnPower>()
     ];
 
     public override int DisplayAmount => GetClampedCounter();

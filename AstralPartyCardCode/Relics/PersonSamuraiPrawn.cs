@@ -81,7 +81,8 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<SkillFamousBlade>()
+        HoverTipFactory.FromCard<SkillFamousBlade>(),
+        HoverTipFactory.FromPower<SwordAuraPower>()
     ];
 
     // Use the real cooldown value instead of a modulo view of an ever-growing counter.

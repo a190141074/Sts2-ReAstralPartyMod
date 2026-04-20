@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AstralPartyMod.AstralPartyCardCode.cards;
 using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
@@ -32,6 +33,7 @@ public class PersonalityDerivativeProprietressWealthism : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
+        HoverTipFactory.FromCard<SkillTransfer>(),
         BuildStatsHoverTip()
     ];
 

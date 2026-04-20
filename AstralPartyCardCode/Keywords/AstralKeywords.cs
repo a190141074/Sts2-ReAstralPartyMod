@@ -17,6 +17,9 @@ public static class AstralKeywords
     [CustomEnum("ASTRAL_MIXED")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword AstralMixed;
 
+    [CustomEnum("ASTRAL_ETERNAL_STARLIGHT_SET")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralEternalStarlightSet;
+
     [CustomEnum("SOLAR_BOMBARDMENT")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword SolarBombardment;
 }

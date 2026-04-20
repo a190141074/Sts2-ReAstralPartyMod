@@ -56,7 +56,8 @@ public class PersonSlimeLulu : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<SkillHealingSlime>()
+        HoverTipFactory.FromCard<SkillHealingSlime>(),
+        HoverTipFactory.FromPower<HalfLifeHealPower>()
     ];
 
     public override int DisplayAmount => GetClampedCounter();
