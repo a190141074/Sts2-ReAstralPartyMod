@@ -50,6 +50,8 @@
   "ASTRALPARTYMOD-SKILL_SHADOW_FUSION.description": "Count all enemy [power]Twin Shadows[/power]. Gain 1 temporary [green]Strength[/green] this turn for each separate shadow, then remove all enemy [power]Twin Shadows[/power].",
   "ASTRALPARTYMOD-SKILL_SOLAR_BOMBARDMENT.title": "Orbital Bombardment",
   "ASTRALPARTYMOD-SKILL_SOLAR_BOMBARDMENT.description": "Discard all cards in your hand. Deal {Damage:diff()} damage to a random enemy {Repeat:diff()} times. For every 2 discarded cards, deal damage 1 additional time. For every 3 total Energy cost among the discarded cards, increase this damage by 1. Discarded 0-cost cards count as 1 Energy. Discarded X-cost cards count as your current Energy.",
+  "ASTRALPARTYMOD-BASE_ABILITY_ORBITAL_RAILGUN.title": "Orbital Railgun",
+  "ASTRALPARTYMOD-BASE_ABILITY_ORBITAL_RAILGUN.description": "Deal {Damage:diff()} damage to the target. [gold]Unblockable[/gold].\nWhen used as [gold]Orbital Bombardment Material[/gold], this card counts as [blue]2[/blue] cards and its cost counts as [blue]3[/blue].",
   "ASTRALPARTYMOD-SKILL_CHAIN_REACTION.title": "Chain Reaction",
   "ASTRALPARTYMOD-SKILL_CHAIN_REACTION.description": "Each other player draws 1 card. If that player's hand has fewer than 4 cards, they draw 2 instead. Then add 1 [card]Bite[/card] to your hand.",
   "ASTRALPARTYMOD-SKILL_BITE.title": "Bite",

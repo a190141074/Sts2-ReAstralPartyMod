@@ -22,4 +22,7 @@ public static class AstralKeywords
 
     [CustomEnum("SOLAR_BOMBARDMENT")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword SolarBombardment;
+
+    [CustomEnum("ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralOrbitalBombardmentMaterial;
 }

@@ -20,6 +20,8 @@ public class SkillSolarBombardment : AstralPartyCardModel
     private const int ExtraHitDiscardStep = 2;
     private const int BaseDamage = 3;
     private const int DamageIncreaseCostStep = 3;
+    private const int RailgunMaterialCount = 2;
+    private const int RailgunMaterialCost = 3;
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
@@ -27,7 +29,7 @@ public class SkillSolarBombardment : AstralPartyCardModel
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(BaseDamage, ValueProp.Unblockable),
+        new DamageVar(BaseDamage, ValueProp.Move | ValueProp.Unblockable),
         new RepeatVar(BaseHitCount)
     ];
 
@@ -54,33 +56,71 @@ public class SkillSolarBombardment : AstralPartyCardModel
             return;
 
         var handCards = PileType.Hand.GetPile(Owner).Cards.ToList();
-        var discardedCardCount = handCards.Count;
-        var discardedCostTotal = handCards.Sum(GetEffectiveDiscardCost);
+        var discardedCardCount = handCards.Sum(GetBombardmentMaterialCount);
+        var discardedCostTotal = handCards.Sum(GetBombardmentDamageCost);
+        var cardsToExhaust = handCards.Where(ShouldExhaustWhenBombarded).ToList();
+        var cardsToDiscard = handCards.Where(card => !ShouldExhaustWhenBombarded(card)).ToList();
 
-        if (discardedCardCount > 0)
-            await CardCmd.Discard(choiceContext, handCards);
+        if (cardsToDiscard.Count > 0)
+            await CardCmd.Discard(choiceContext, cardsToDiscard);
+
+        foreach (var card in cardsToExhaust)
+            await CardCmd.Exhaust(choiceContext, card, false, false);
 
         var hitCount = BaseHitCount + discardedCardCount / ExtraHitDiscardStep;
         var damage = BaseDamage + discardedCostTotal / DamageIncreaseCostStep;
         if (hitCount <= 0 || damage <= 0)
             return;
 
+        await FireBombardment(choiceContext, Owner, this, hitCount, damage);
+    }
+
+    private static int GetBombardmentMaterialCount(CardModel card)
+    {
+        return IsOrbitalRailgun(card) ? RailgunMaterialCount : 1;
+    }
+
+    private int GetBombardmentDamageCost(CardModel card)
+    {
+        return IsOrbitalRailgun(card) ? RailgunMaterialCost : GetEffectiveDiscardCost(card);
+    }
+
+    public static async Task FireBaseBombardment(
+        PlayerChoiceContext choiceContext,
+        MegaCrit.Sts2.Core.Entities.Players.Player owner,
+        CardModel? sourceCard,
+        int hitCount = 1
+    )
+    {
+        await FireBombardment(choiceContext, owner, sourceCard, hitCount, BaseDamage);
+    }
+
+    public static async Task FireBombardment(
+        PlayerChoiceContext choiceContext,
+        MegaCrit.Sts2.Core.Entities.Players.Player owner,
+        CardModel? sourceCard,
+        int hitCount,
+        int damage
+    )
+    {
+        if (owner.Creature?.CombatState == null || hitCount <= 0 || damage <= 0)
+            return;
+
         for (var i = 0; i < hitCount; i++)
         {
-            var target = Owner.RunState.Rng.CombatTargets.NextItem(
-                CombatState.GetOpponentsOf(Owner.Creature).Where(creature => creature.IsAlive)
+            var target = owner.RunState.Rng.CombatTargets.NextItem(
+                owner.Creature.CombatState.GetOpponentsOf(owner.Creature).Where(creature => creature.IsAlive)
             );
             if (target == null)
                 break;
 
-            await CreatureCmd.Damage(
-                choiceContext,
-                target,
-                damage,
-                ValueProp.Move | ValueProp.Unblockable,
-                Owner.Creature,
-                this
-            );
+            if (sourceCard != null)
+            {
+                await CommonActions.CardAttack(sourceCard, target, damage, hitCount: 1).Execute(choiceContext);
+                continue;
+            }
+
+            await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable, owner.Creature);
         }
     }
 
@@ -90,5 +130,15 @@ public class SkillSolarBombardment : AstralPartyCardModel
             return Owner?.PlayerCombatState?.Energy ?? 0;
 
         return Math.Max(1, card.EnergyCost.GetResolved());
+    }
+
+    private static bool ShouldExhaustWhenBombarded(CardModel card)
+    {
+        return IsOrbitalRailgun(card);
+    }
+
+    private static bool IsOrbitalRailgun(CardModel card)
+    {
+        return card is BaseAbilityOrbitalRailgun;
     }
 }

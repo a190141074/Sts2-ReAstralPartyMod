@@ -1,0 +1,15 @@
+using BaseLib.Utils;
+using MegaCrit.Sts2.Core.Entities.Relics;
+using MegaCrit.Sts2.Core.Models.RelicPools;
+
+namespace AstralPartyMod.AstralPartyCardCode.Relics;
+
+[Pool(typeof(SharedRelicPool))]
+public class TokenGoldMembersReferenceUltimate : TokenMembersReferenceRelicBase
+{
+    protected override int CardsToDraw => 2;
+
+    protected override int EnergyToGain => 2;
+
+    public override RelicRarity Rarity => RelicRarity.Rare;
+}
