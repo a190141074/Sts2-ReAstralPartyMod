@@ -49,5 +49,11 @@
   "ASTRALPARTYMOD-BOUNDARY_REINFORCEMENT_POWER.smartDescription": "If you avoid all damage until your next turn starts, gain 3 temporary [red]Strength[/red]; otherwise remove this power.",
   "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.title": "Iron Virgin Ward",
   "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.description": "Ignore all damage until your next turn starts.",
-  "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.smartDescription": "Ignore all damage until your next turn starts."
+  "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.smartDescription": "Ignore all damage until your next turn starts.",
+  "ASTRALPARTYMOD-REVERSED_SCALES_HOLOGRAPHIC_POWER.title": "Phantom Reverse Scales",
+  "ASTRALPARTYMOD-REVERSED_SCALES_HOLOGRAPHIC_POWER.description": "Each stack reduces HP loss you take by [blue]1[/blue].",
+  "ASTRALPARTYMOD-REVERSED_SCALES_HOLOGRAPHIC_POWER.smartDescription": "Each stack reduces HP loss you take by [blue]1[/blue].",
+  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.title": "Phantom Reverse Scales",
+  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.description": "Each stack reduces HP loss you take by [blue]2[/blue]. Whenever you gain [blue]1[/blue] stack, gain [blue]2[/blue] temporary [red]Strength[/red].",
+  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.smartDescription": "Each stack reduces HP loss you take by [blue]2[/blue]. Whenever you gain [blue]1[/blue] stack, gain [blue]2[/blue] temporary [red]Strength[/red]."
 }

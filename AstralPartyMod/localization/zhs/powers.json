@@ -49,5 +49,11 @@
   "ASTRALPARTYMOD-BOUNDARY_REINFORCEMENT_POWER.smartDescription": "若直到下一个自身回合开始前都未受到伤害，则在下一个自身回合开始时获得3点临时[red]力量[/red]；若期间受伤则移除此能力。",
   "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.title": "铁处女",
   "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.description": "直到你的下一回合开始前，免疫所有伤害。",
-  "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.smartDescription": "直到你的下一回合开始前，免疫所有伤害。"
+  "ASTRALPARTYMOD-IRON_VIRGIN_WARD_POWER.smartDescription": "直到你的下一回合开始前，免疫所有伤害。",
+  "ASTRALPARTYMOD-REVERSED_SCALES_HOLOGRAPHIC_POWER.title": "幻影·逆鳞",
+  "ASTRALPARTYMOD-REVERSED_SCALES_HOLOGRAPHIC_POWER.description": "每层使你获得[blue]1[/blue]点伤害减免。",
+  "ASTRALPARTYMOD-REVERSED_SCALES_HOLOGRAPHIC_POWER.smartDescription": "每层使你获得[blue]1[/blue]点伤害减免。",
+  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.title": "幻影·逆鳞",
+  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.description": "每层使你获得[blue]2[/blue]点伤害减免。每次获得[blue]1[/blue]层时，获得[blue]2[/blue]点临时[red]力量[/red]。",
+  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.smartDescription": "每层使你获得[blue]2[/blue]点伤害减免。每次获得[blue]1[/blue]层时，获得[blue]2[/blue]点临时[red]力量[/red]。"
 }
