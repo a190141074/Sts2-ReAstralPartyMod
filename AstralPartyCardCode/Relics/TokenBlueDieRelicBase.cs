@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AstralPartyMod.AstralPartyCardCode.Keywords;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
@@ -18,7 +19,11 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 
 public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
 {
-    private const int TriggerCountForNewDieRelic = 3;
+    private const int BaseTriggerCountForNewDieRelic = 3;
+    private const int TwoDieSetCount = 2;
+    private const int FiveDieSetCount = 5;
+    private const int TwoDieSetReduction = 1;
+    private const int FiveDieSetReduction = 2;
 
     [SavedProperty] public int AstralParty_PendingBlueDieStarLight { get; set; }
     [SavedProperty] public int AstralParty_BlueDieTriggerProgress { get; set; }
@@ -49,7 +54,8 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromKeyword(AstralKeywords.AstralDiceSet)
     ];
 
     public override async Task AfterObtained()
@@ -72,11 +78,11 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
         AstralParty_PendingBlueDieStarLight += StarLightRewardAmount;
         AstralParty_BlueDieTriggerProgress = System.Math.Min(
             AstralParty_BlueDieTriggerProgress + 1,
-            TriggerCountForNewDieRelic
+            GetRequiredTriggerCountForNewDieRelic()
         );
         Flash();
 
-        if (AstralParty_BlueDieTriggerProgress >= TriggerCountForNewDieRelic
+        if (AstralParty_BlueDieTriggerProgress >= GetRequiredTriggerCountForNewDieRelic()
             && await TryObtainMissingDieRelic())
         {
             AstralParty_BlueDieTriggerProgress = 0;
@@ -212,5 +218,39 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
 
         await RewardSyncHelper.ObtainRelicAsReward(Owner, ModelDb.Relic<T>());
         return true;
+    }
+
+    private int GetRequiredTriggerCountForNewDieRelic()
+    {
+        var ownedDiceCount = CountOwnedDieRelics();
+        var reduction = ownedDiceCount >= FiveDieSetCount
+            ? FiveDieSetReduction
+            : ownedDiceCount >= TwoDieSetCount
+                ? TwoDieSetReduction
+                : 0;
+
+        return System.Math.Max(1, BaseTriggerCountForNewDieRelic - reduction);
+    }
+
+    private int CountOwnedDieRelics()
+    {
+        if (Owner == null)
+            return 0;
+
+        var count = 0;
+        if (Owner.GetRelic<TokenBlueDie4>() != null)
+            count++;
+        if (Owner.GetRelic<TokenBlueDie6>() != null)
+            count++;
+        if (Owner.GetRelic<TokenBlueDie8>() != null)
+            count++;
+        if (Owner.GetRelic<TokenBlueDie10>() != null)
+            count++;
+        if (Owner.GetRelic<TokenBlueDie12>() != null)
+            count++;
+        if (Owner.GetRelic<TokenBlueDie20>() != null)
+            count++;
+
+        return count;
     }
 }

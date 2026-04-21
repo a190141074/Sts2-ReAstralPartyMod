@@ -56,6 +56,7 @@
 		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_large.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_extra_large.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\famous_blade_gawu_cutter.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\skill_channel_energy.png" />
 		<Content Include="AstralPartyMod\images\card_portraits\skill_famous_blade.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_bite.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_chain_reaction.png"/>
@@ -82,13 +83,17 @@
 		<Content Include="AstralPartyMod\images\powers\mark_lock_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\mixed_cocktails_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\mouse_shield_power.png"/>
+		<Content Include="AstralPartyMod\images\powers\reversed_scales_holographic_power.png" />
+		<Content Include="AstralPartyMod\images\powers\reversed_scales_power.png" />
 		<Content Include="AstralPartyMod\images\powers\shadows_limit_power.png"/>
+		<Content Include="AstralPartyMod\images\powers\star_fragment_power.png" />
 		<Content Include="AstralPartyMod\images\powers\star_light_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\sword_aura_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\ling_hun_lian_jie_power.png"/>
 		<Content Include="AstralPartyMod\images\potion\person_chest_choose.png"/>
 		<Content Include="AstralPartyMod\images\powers\twin_shadows_power.png"/>
 		<Content Include="AstralPartyMod\images\powers\true_dragon_form_power.png"/>
+		<Content Include="AstralPartyMod\images\powers\conserve_energy_power.png" />
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_masters_chips.png" />
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png"/>
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_sword_intent.png"/>
@@ -128,6 +133,7 @@
 		<Content Include="AstralPartyMod\images\relic\person_superman_megas.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_xiao_lei.png"/>
 		<Content Include="AstralPartyMod\images\relic\person_weird_egg.png"/>
+		<Content Include="AstralPartyMod\images\relic\person_cheongsam_lady.png" />
 		<Content Include="AstralPartyMod\localization\eng\cards.json"/>
 		<Content Include="AstralPartyMod\localization\eng\card_keywords.json"/>
 		<Content Include="AstralPartyMod\localization\eng\potions.json"/>
