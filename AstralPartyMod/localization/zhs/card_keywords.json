@@ -9,6 +9,8 @@
   "ASTRALPARTYMOD-ASTRAL_ETERNAL_STARLIGHT_SET.description": "进入商店时，根据永恒星光层数获得额外效果：\n· 如果永恒星光达到[blue]10[/blue]以上，进入商店获得[blue]5[/blue]金币\n· 如果永恒星光达到[blue]25[/blue]以上，进入商店获得[blue]15[/blue]金币\n· 如果永恒星光达到[blue]40[/blue]以上，进入商店获得[blue]25[/blue]金币\n· 如果永恒星光达到[blue]56[/blue]以上，进入商店获得[blue]25[/blue]金币；立即获得会员卡",
   "ASTRALPARTYMOD-ASTRAL_DICE_SET.title": "【套装·骰子】",
   "ASTRALPARTYMOD-ASTRAL_DICE_SET.description": "当你拥有任意[blue]2[/blue]件骰子时，靠触发骰子获取骰子系列遗物的需求-[blue]1[/blue]。\n当你拥有任意[blue]5[/blue]件骰子时，靠触发骰子获取骰子系列遗物的需求-[blue]2[/blue]。",
+  "ASTRALPARTYMOD-ASTRAL_COLLECTION.title": "典藏",
+  "ASTRALPARTYMOD-ASTRAL_COLLECTION.description": "特殊卡组，主要具备纪念意义。",
   "ASTRALPARTYMOD-ASTRAL_UNIQUE.title": "唯一",
   "ASTRALPARTYMOD-ASTRAL_UNIQUE.description": "手牌中只能存在[blue]1[/blue]张唯一。若手牌中已存在同名的[gold]唯一[/gold]牌，后加入手牌的那张会自动[gold]消耗[/gold]。",
   "ASTRALPARTYMOD-ASTRAL_COOLDOWN.title": "冷却",
