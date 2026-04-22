@@ -22,7 +22,7 @@ public class SkillIronVirgin : AstralPartyCardModel
         HoverTipFactory.FromPower<BoundaryReinforcementPower>()
     ];
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust, CardKeyword.Retain];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralCooldown];
 
     public SkillIronVirgin() : base(1, CardType.Skill, CardRarity.Rare, TargetType.Self)
     {

@@ -28,4 +28,10 @@ public static class AstralKeywords
 
     [CustomEnum("ASTRAL_DICE_SET")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword AstralDiceSet;
+
+    [CustomEnum("ASTRAL_UNIQUE")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralUnique;
+
+    [CustomEnum("ASTRAL_COOLDOWN")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralCooldown;
 }

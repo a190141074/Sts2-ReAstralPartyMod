@@ -1,8 +1,10 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Keywords;
+using MegaCrit.Sts2.Core.Commands;
 using BaseLib.Abstracts;
 using Godot;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
 
@@ -29,7 +31,7 @@ public abstract partial class AstralPartyCardModel : CustomCardModel
     {
     }
 
-    public override Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
+    public override async Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
     {
         if (
                 card == this
@@ -40,7 +42,35 @@ public abstract partial class AstralPartyCardModel : CustomCardModel
             // keyword whenever the card actually lands in discard instead of only Hand -> Discard.
             RemoveKeyword(AstralKeywords.AstralTemporary);
 
-        return base.AfterCardChangedPiles(card, oldPileType, source);
+        await base.AfterCardChangedPiles(card, oldPileType, source);
+
+        if (card == this && Pile?.Type == PileType.Hand && oldPileType != PileType.Hand)
+            await ExhaustIfDuplicateUniqueInHand();
+    }
+
+    private async Task ExhaustIfDuplicateUniqueInHand()
+    {
+        if (!HasUniqueConstraintKeyword(this))
+            return;
+        if (Owner == null)
+            return;
+
+        var handCards = PileType.Hand.GetPile(Owner).Cards;
+        var hasEarlierDuplicate = handCards.Any(other =>
+            !ReferenceEquals(other, this)
+            && HasUniqueConstraintKeyword(other)
+            && string.Equals(other.Title, Title, System.StringComparison.Ordinal));
+
+        if (!hasEarlierDuplicate)
+            return;
+
+        await CardCmd.Exhaust(new ThrowingPlayerChoiceContext(), this, false, false);
+    }
+
+    private static bool HasUniqueConstraintKeyword(CardModel card)
+    {
+        return card.Keywords.Contains(AstralKeywords.AstralUnique)
+               || card.Keywords.Contains(AstralKeywords.AstralCooldown);
     }
 
     [GeneratedRegex(@"([a-z])([A-Z])", RegexOptions.Compiled)]

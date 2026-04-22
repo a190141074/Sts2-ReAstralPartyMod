@@ -25,7 +25,7 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust, CardKeyword.Retain];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralCooldown];
 
     public override string PortraitPath => GetPortraitPath();
 

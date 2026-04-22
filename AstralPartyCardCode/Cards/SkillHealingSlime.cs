@@ -21,7 +21,7 @@ public class SkillHealingSlime : AstralPartyCardModel
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         new List<DynamicVar> { new PowerVar<HalfLifeHealPower>(3m) };
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust, CardKeyword.Retain];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralCooldown];
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
         new List<IHoverTip> { HoverTipFactory.FromPower<HalfLifeHealPower>() };

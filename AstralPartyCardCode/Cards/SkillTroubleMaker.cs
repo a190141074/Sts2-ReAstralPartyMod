@@ -17,7 +17,7 @@ public class SkillTroubleMaker : AstralPartyCardModel
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust, CardKeyword.Retain];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralCooldown];
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new IntVar("StarLight", 3)];
 
