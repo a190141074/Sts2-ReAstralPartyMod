@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -9,21 +10,29 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace AstralPartyMod.AstralPartyCardCode.Powers;
 
-public class MarkLockPower : AstralPartyPowerModel
+public class GiantAnchorPower : AstralPartyPowerModel
 {
-    public override PowerType Type => PowerType.Debuff;
+    public override PowerType Type => PowerType.Buff;
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props, Creature? dealer,
+    public override decimal ModifyDamageAdditive(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
         CardModel? cardSource)
     {
-        // Add damage before block is processed so the extra point also applies when the hit is fully blocked.
-        if (target != Owner) return 0m;
-        if (Amount <= 0) return 0m;
-        if (amount <= 0m) return 0m;
+        if (Owner == null || dealer != Owner)
+            return 0m;
+        if (target == null || target.Side == Owner.Side)
+            return 0m;
+        if (amount <= 0m)
+            return 0m;
+        if (cardSource?.Type != CardType.Attack)
+            return 0m;
 
-        return 1m;
+        return Amount;
     }
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)

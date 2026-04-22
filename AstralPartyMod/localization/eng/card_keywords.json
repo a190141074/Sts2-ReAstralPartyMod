@@ -9,6 +9,8 @@
   "ASTRALPARTYMOD-ASTRAL_ETERNAL_STARLIGHT_SET.description": "When you enter a shop, gain extra effects based on your Eternal Starlight stacks:\n· If Eternal Starlight is at least [blue]10[/blue], gain [blue]5[/blue] Gold\n· If Eternal Starlight is at least [blue]25[/blue], gain [blue]15[/blue] Gold\n· If Eternal Starlight is at least [blue]40[/blue], gain [blue]25[/blue] Gold\n· If Eternal Starlight is at least [blue]56[/blue], gain [blue]25[/blue] Gold and immediately obtain Membership Card",
   "ASTRALPARTYMOD-ASTRAL_DICE_SET.title": "Set: Dice",
   "ASTRALPARTYMOD-ASTRAL_DICE_SET.description": "When you own any [blue]2[/blue] dice relics, reduce the trigger requirement to obtain another die relic by [blue]1[/blue].\nWhen you own any [blue]5[/blue] dice relics, reduce the trigger requirement to obtain another die relic by [blue]2[/blue].",
+  "ASTRALPARTYMOD-ASTRAL_FLASHLIGHT_SET.title": "Set: Flashlight",
+  "ASTRALPARTYMOD-ASTRAL_FLASHLIGHT_SET.description": "As long as you own at least [blue]1[/blue] Flashlight relic, at the start of combat apply [blue]1[/blue] [gold]Exposure[/gold] to all enemies.\nWhen you kill an enemy with [gold]Exposure[/gold], gain [blue]1[/blue] stack of [gold]Eternal Starlight[/gold].",
   "ASTRALPARTYMOD-ASTRAL_COLLECTION.title": "Collection",
   "ASTRALPARTYMOD-ASTRAL_COLLECTION.description": "A special card pool mainly intended for commemorative value.",
   "ASTRALPARTYMOD-ASTRAL_UNIQUE.title": "Unique",
