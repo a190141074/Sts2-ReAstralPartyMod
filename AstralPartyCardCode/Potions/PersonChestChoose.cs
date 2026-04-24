@@ -25,47 +25,38 @@ public class PersonChestChoose : AstralPartyPotionModel
 
     private static readonly RelicModel[] PersonaRelics =
     [
-        // 人格：蒸蛋
+        // 【人格：蒸蛋】
         ModelDb.Relic<PersonWeirdEgg>(),
-
-        // 人格：太刀虾
+        // 【人格：太刀虾】
         ModelDb.Relic<PersonSamuraiPrawn>(),
-
-        // 人格：史莱姆
-        // ModelDb.Relic<PersonSlimeLulu>(),
-
-        // 人格：绿油油
+        // 【人格：史莱姆】
+        ModelDb.Relic<PersonSlimeLulu>(),
+        // 【人格：绿油油】
         ModelDb.Relic<PersonBionicJasmine>(),
-
-        // 人格：老板娘
+        // 【人格：老板娘】
         ModelDb.Relic<PersonProprietress>(),
-
-        // 人格：鼠鼠
+        // 【人格：鼠鼠】
         ModelDb.Relic<PersonMousyLian>(),
-
-        // 人格：大虎鲸
+        // 【人格：大虎鲸】
         ModelDb.Relic<PersonBlueWhale>(),
-
-        // 人格：绿洲女王
+        // 【人格：绿洲女王】
         ModelDb.Relic<PersonOasisQueen>(),
-
-        // 人格：小猎手
+        // 【人格：小猎手】
         ModelDb.Relic<PersonInkShadowHunter>(),
-
-        // 人格：米米
+        // 【人格：米米】
         ModelDb.Relic<PersonMascotGirlMimi>(),
-
-        // 人格：美甲师
+        // 【人格：美甲师】
         ModelDb.Relic<PersonSupermanMegas>(),
-
-        // 人格：小雷
-        ModelDb.Relic<PersonXiaoLei>()
-
-        //人格：社恐修女
-        // ModelDb.Relic<PersonSocialFearNun>(),
-
-        // 人格：调酒师
-        // ModelDb.Relic<PersonJillSteinle>(), 
+        // 【人格：小雷】
+        ModelDb.Relic<PersonXiaoLei>(),
+        // 【人格：社恐修女】
+        ModelDb.Relic<PersonSocialFearNun>(),
+        // 【人格：调酒师】
+        ModelDb.Relic<PersonJillSteinle>(),
+        // 【人格：阿尔】
+        ModelDb.Relic<PersonShadowScion>(),
+        // 【人格：邦妮】
+        ModelDb.Relic<PersonPoisonedApple>()
     ];
 
     public PersonChestChoose() : base(true)

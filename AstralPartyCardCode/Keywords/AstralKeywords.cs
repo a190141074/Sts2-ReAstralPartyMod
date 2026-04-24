@@ -43,4 +43,7 @@ public static class AstralKeywords
 
     [CustomEnum("ASTRAL_COOLDOWN")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword AstralCooldown;
+
+    [CustomEnum("ASTRAL_INVESTIGATION_PROGRESS")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralInvestigationProgress;
 }

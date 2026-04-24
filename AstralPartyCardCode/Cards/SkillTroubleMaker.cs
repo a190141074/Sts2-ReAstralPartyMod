@@ -40,7 +40,7 @@ public class SkillTroubleMaker : AstralPartyCardModel
     {
         if (CombatState == null || Owner == null) return;
 
-        var offeredCards = AstralEventCardPool.CreateRandomMutableEventCardsForPlayer(Owner, _cardsToShow);
+        var offeredCards = AstralEventCardPool.CreateTroubleMakerCardsForPlayer(Owner, _cardsToShow);
 
         if (offeredCards.Count == 0) return;
 

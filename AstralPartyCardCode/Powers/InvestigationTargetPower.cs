@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AstralPartyMod.AstralPartyCardCode.Powers;
 using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
-using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -61,11 +58,12 @@ public class InvestigationTargetPower : AstralPartyPowerModel
         if (!result.WasTargetKilled)
             return;
 
-        var triggerPlayer = dealer?.Player ?? dealer?.PetOwner ?? cardSource?.Owner ?? Applier?.Player;
-        if (triggerPlayer?.Creature?.CombatState == null)
+        var controllerPlayer = Applier?.Player ?? cardSource?.Owner;
+        var triggerPlayer = dealer?.Player ?? dealer?.PetOwner ?? controllerPlayer;
+        if (controllerPlayer?.Creature?.CombatState == null || triggerPlayer?.Creature?.CombatState == null)
             return;
 
         Flash();
-        await ConcealingInvestigationHelper.TriggerRandomInvestigationEvent(choiceContext, triggerPlayer);
+        await ConcealingInvestigationHelper.ResolveInvestigationTrigger(choiceContext, controllerPlayer, triggerPlayer);
     }
 }

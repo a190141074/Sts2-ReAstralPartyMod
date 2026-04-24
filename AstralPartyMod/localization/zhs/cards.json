@@ -69,14 +69,15 @@
   "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.title": "调制饮料",
   "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.description": "单人模式下对自己生效；多人模式下选择一名友方单位。\n弃置至多3张手牌，按[gold]调制[/gold]为目标提供效果，然后抽取等于弃置数量的卡牌。",
   "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.select_prompt": "选择至多3张要弃置的手牌",
+  "ASTRALPARTYMOD-SKILL_CONCEALING_OPERATION.title": "隐匿行动",
+  "ASTRALPARTYMOD-SKILL_CONCEALING_OPERATION.description": "对目标施加[gold]调查目标[/gold]和[blue]2[/blue]层[gold]标记[/gold]。\n你获得等同于目标当前[gold]标记[/gold]层数×[blue]2[/blue]的[gold]星光[/gold]。\n详见[gold]调查进度[/gold]。",
   "ASTRALPARTYMOD-SKILL_POWERFUL_PITY.title": "强者怜悯",
   "ASTRALPARTYMOD-SKILL_POWERFUL_PITY.description": "指定一名玩家，选择手中的至多[blue]3[/blue]张牌，复制到其手中。\n你获得等同于复制数量的[gold]星光[/gold]，弃置所选牌，并获得[blue]1[/blue]层[gold]永恒星光[/gold]。",
   "ASTRALPARTYMOD-SKILL_POWERFUL_PITY.select_prompt": "选择至多3张要复制并弃置的手牌",
   "ASTRALPARTYMOD-SKILL_IRON_VIRGIN.title": "铁处女",
   "ASTRALPARTYMOD-SKILL_IRON_VIRGIN.description": "获得1层[gold]铁处女[/gold]，直到下一回合开始前免疫伤害。\n如果当前回合还未触发[gold]边界强化[/gold]，则额外获得3点临时[red]力量[/red]。",
   "ASTRALPARTYMOD-COLLECTORS_CARD_I_AM_DRAGON.title": "我是龙！",
-  "ASTRALPARTYMOD-COLLECTORS_CARD_I_AM_DRAGON.description": "对所有敌人造成{Damage:diff()}点伤害，临时减少其{StrengthLoss:diff()}点[red]力量[/red]。\n使用后，当你受到伤害时，会从[gold]消耗牌堆[/gold]中自动打出，然后再次进入[gold]消耗牌堆[/gold]。\n如果你本回合失去过生命，额外造成{BonusDamage:diff()}点伤害。"
-,
+  "ASTRALPARTYMOD-COLLECTORS_CARD_I_AM_DRAGON.description": "对所有敌人造成{Damage:diff()}点伤害，临时减少其{StrengthLoss:diff()}点[red]力量[/red]。\n使用后，当你受到伤害时，会从[gold]消耗牌堆[/gold]中自动打出，然后再次进入[gold]消耗牌堆[/gold]。\n如果你本回合失去过生命，额外造成{BonusDamage:diff()}点伤害。",
   "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.title": "静滞协议",
   "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.description": "获得[gold]静滞协议[/gold]。"
 }

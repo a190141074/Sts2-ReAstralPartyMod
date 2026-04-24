@@ -19,6 +19,8 @@
   "ASTRALPARTYMOD-ASTRAL_UNIQUE.description": "手牌中只能存在[blue]1[/blue]张唯一。若手牌中已存在同名的[gold]唯一[/gold]牌，后加入手牌的那张会自动[gold]消耗[/gold]。",
   "ASTRALPARTYMOD-ASTRAL_COOLDOWN.title": "冷却",
   "ASTRALPARTYMOD-ASTRAL_COOLDOWN.description": "这张牌同时拥有[gold]唯一[/gold]、[gold]保留[/gold]和[gold]消耗[/gold]效果。",
+  "ASTRALPARTYMOD-ASTRAL_INVESTIGATION_PROGRESS.title": "调查进度",
+  "ASTRALPARTYMOD-ASTRAL_INVESTIGATION_PROGRESS.description": "每当拥有[gold]调查目标[/gold]的目标被击杀时，击杀者会触发当前阶段的[gold]隐匿调查[/gold]事件牌，【人格：邦尼】持有者获得[blue]5[/blue]点[gold]星光[/gold]。\n每成功触发[blue]6[/blue]次，阶段向前推进：[gold]阶段1[/gold] -> [gold]阶段2[/gold] -> [gold]阶段3[/gold] -> [gold]真相揭露[/gold]。\n当[gold]真相揭露[/gold]再成功触发[blue]6[/blue]次后，对精英或Boss使用[gold]隐匿行动[/gold]时，会直接触发[gold]真相揭露[/gold]。",
   "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.title": "轨道轰炸",
   "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.description": "轨道系列伤害[gold]无视格挡[/gold]\n每弃置[blue]2[/blue]张牌，额外轰炸[blue]1[/blue]次；\n每有{energyPrefix:energyIcons(3)}的被弃牌总费用，此伤害+[blue]1[/blue];\n被弃置的[blue]0[/blue]费牌按{energyPrefix:energyIcons(1)}计算，X费牌按你当前能量计算。",
   "ASTRALPARTYMOD-ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.title": "轨道炮",

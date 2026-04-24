@@ -69,6 +69,8 @@
   "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.title": "Mixed Cocktails",
   "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.description": "In single-player, this affects you. In multiplayer, choose an ally.\nDiscard up to 3 cards from your hand. Apply effects to the target based on [gold]Mixed[/gold], then draw cards equal to the number discarded.",
   "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.select_prompt": "Choose up to 3 cards to discard",
+  "ASTRALPARTYMOD-SKILL_CONCEALING_OPERATION.title": "Concealing Operation",
+  "ASTRALPARTYMOD-SKILL_CONCEALING_OPERATION.description": "Apply [power]Investigation Target[/power] and [blue]2[/blue] [power]Mark[/power] to the target.\nGain [gold]StarLight[/gold] equal to [blue]2[/blue] times that target's current [power]Mark[/power].\nSee [gold]Investigation Progress[/gold].",
   "ASTRALPARTYMOD-SKILL_POWERFUL_PITY.title": "Powerful Pity",
   "ASTRALPARTYMOD-SKILL_POWERFUL_PITY.description": "Choose a player. Select up to [blue]3[/blue] cards from your hand and copy them into that player's hand.\nGain [gold]StarLight[/gold] equal to the number copied, discard the chosen cards, and gain [blue]1[/blue] stack of [gold]Eternal Starlight[/gold].",
   "ASTRALPARTYMOD-SKILL_POWERFUL_PITY.select_prompt": "Choose up to 3 cards to copy and discard",

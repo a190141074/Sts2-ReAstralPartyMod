@@ -154,7 +154,7 @@ public class SkillMixedCocktails : AstralPartyCardModel
         if (Owner == null || handCards.Count == 0)
             return [];
 
-        var prefs = new CardSelectorPrefs(SelectionPrompt, Math.Min(MaxDiscardCount, handCards.Count))
+        var prefs = new CardSelectorPrefs(SelectionPrompt, 0, Math.Min(MaxDiscardCount, handCards.Count))
         {
             Cancelable = true
         };

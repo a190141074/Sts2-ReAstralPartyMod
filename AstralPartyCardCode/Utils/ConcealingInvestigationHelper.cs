@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using AstralPartyMod.AstralPartyCardCode.Relics;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -18,25 +20,118 @@ namespace AstralPartyMod.AstralPartyCardCode.Utils;
 
 public static class ConcealingInvestigationHelper
 {
-    private static readonly CardModel[] InvestigationCards =
-    [
-        ModelDb.Card<EventsConcealingInvestigationA>(),
-        ModelDb.Card<EventsConcealingInvestigationB>(),
-        ModelDb.Card<EventsConcealingInvestigationC>(),
-        ModelDb.Card<EventsConcealingInvestigationD>()
-    ];
-
     private static readonly string[] BonnieTokens = ["BONNIE", "BUNNY", "\u90A6\u5C3C"];
+    private const int StageAdvanceThreshold = 6;
+    private const decimal BonnieTriggerStarLightAmount = 5m;
+    private static readonly AsyncLocal<Player?> CurrentControllerPlayer = new();
+    private static readonly AsyncLocal<Player?> CurrentTriggerPlayer = new();
 
-    public static async Task TriggerRandomInvestigationEvent(PlayerChoiceContext choiceContext, Player triggerPlayer)
+    public static async Task ResolveInvestigationTrigger(
+        PlayerChoiceContext choiceContext,
+        Player controllerPlayer,
+        Player triggerPlayer
+    )
     {
         var combatState = triggerPlayer.Creature?.CombatState;
-        if (combatState == null || InvestigationCards.Length == 0)
+        if (combatState == null)
             return;
 
-        var cardModel = InvestigationCards[triggerPlayer.RunState.Rng.CombatTargets.NextInt(InvestigationCards.Length)];
+        var poisonedApple = controllerPlayer.GetRelic<PersonPoisonedApple>();
+        var stage = poisonedApple?.GetCurrentInvestigationStage() ?? InvestigationStage.Stage1;
+        var cardModel = GetInvestigationCardForStage(stage);
         var cardToPlay = combatState.CreateCard(cardModel, triggerPlayer);
+
+        var previousController = CurrentControllerPlayer.Value;
+        var previousTrigger = CurrentTriggerPlayer.Value;
+        CurrentControllerPlayer.Value = controllerPlayer;
+        CurrentTriggerPlayer.Value = triggerPlayer;
+
+        try
+        {
+            await CardCmd.AutoPlay(choiceContext, cardToPlay, triggerPlayer.Creature, AutoPlayType.Default, false, true);
+        }
+        finally
+        {
+            CurrentControllerPlayer.Value = previousController;
+            CurrentTriggerPlayer.Value = previousTrigger;
+        }
+
+        if (poisonedApple != null)
+        {
+            if (controllerPlayer.Creature != null && controllerPlayer.Creature.IsAlive)
+                await PowerCmd.Apply<StarLightPower>(
+                    controllerPlayer.Creature,
+                    BonnieTriggerStarLightAmount,
+                    controllerPlayer.Creature,
+                    null,
+                    false
+                );
+
+            poisonedApple.RecordInvestigationTrigger();
+        }
+    }
+
+    public static async Task TryTriggerTruthUnveiledOnSpecialTarget(
+        PlayerChoiceContext choiceContext,
+        Player controllerPlayer,
+        Player triggerPlayer,
+        CardModel? source
+    )
+    {
+        var poisonedApple = controllerPlayer.GetRelic<PersonPoisonedApple>();
+        if (poisonedApple == null || !poisonedApple.HasCompletedTruthRevealProgress())
+            return;
+
+        var roomType = triggerPlayer.Creature?.CombatState?.Encounter?.RoomType;
+        if (roomType is not (RoomType.Elite or RoomType.Boss))
+            return;
+
+        var cardToPlay = triggerPlayer.Creature!.CombatState!.CreateCard(ModelDb.Card<EventsConcealingInvestigationD>(), triggerPlayer);
         await CardCmd.AutoPlay(choiceContext, cardToPlay, triggerPlayer.Creature, AutoPlayType.Default, false, true);
+    }
+
+    public static async Task ApplyInvestigationTarget(
+        Creature target,
+        Player controllerPlayer,
+        CardModel? source
+    )
+    {
+        if (controllerPlayer.Creature == null)
+            return;
+
+        await PowerCmd.Apply<InvestigationTargetPower>(target, 1m, controllerPlayer.Creature, source, false);
+    }
+
+    public static InvestigationStage GetInvestigationStageForTriggerCount(int triggerCount)
+    {
+        return triggerCount switch
+        {
+            < StageAdvanceThreshold => InvestigationStage.Stage1,
+            < StageAdvanceThreshold * 2 => InvestigationStage.Stage2,
+            < StageAdvanceThreshold * 3 => InvestigationStage.Stage3,
+            _ => InvestigationStage.TruthUnveiled
+        };
+    }
+
+    public static int GetProgressWithinStage(int triggerCount)
+    {
+        return Math.Min(triggerCount % StageAdvanceThreshold, StageAdvanceThreshold);
+    }
+
+    public static int GetStageAdvanceThreshold()
+    {
+        return StageAdvanceThreshold;
+    }
+
+    public static CardModel GetInvestigationCardForStage(InvestigationStage stage)
+    {
+        return stage switch
+        {
+            InvestigationStage.Stage1 => ModelDb.Card<EventsConcealingInvestigationA>(),
+            InvestigationStage.Stage2 => ModelDb.Card<EventsConcealingInvestigationB>(),
+            InvestigationStage.Stage3 => ModelDb.Card<EventsConcealingInvestigationC>(),
+            _ => ModelDb.Card<EventsConcealingInvestigationD>()
+        };
     }
 
     public static async Task ApplyMarkToRandomEligibleEnemy(
@@ -154,11 +249,12 @@ public static class ConcealingInvestigationHelper
     private static IEnumerable<Player> GetTriggerAndBonniePlayers(Player triggerPlayer)
     {
         var players = new List<Player>();
-        var bonniePlayer = FindBonniePlayer(triggerPlayer);
+        var runtimeTriggerPlayer = CurrentTriggerPlayer.Value ?? triggerPlayer;
+        var bonniePlayer = CurrentControllerPlayer.Value ?? FindBonniePlayer(triggerPlayer);
         if (bonniePlayer != null)
             players.Add(bonniePlayer);
-        if (!players.Contains(triggerPlayer))
-            players.Add(triggerPlayer);
+        if (!players.Contains(runtimeTriggerPlayer))
+            players.Add(runtimeTriggerPlayer);
 
         return players;
     }
@@ -275,5 +371,13 @@ public static class ConcealingInvestigationHelper
 
             await relic.HandleObservedCardGain(recipient, card);
         }
+    }
+
+    public enum InvestigationStage
+    {
+        Stage1,
+        Stage2,
+        Stage3,
+        TruthUnveiled
     }
 }

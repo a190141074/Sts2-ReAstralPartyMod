@@ -66,6 +66,7 @@
 		<Content Include="AstralPartyMod\images\card_portraits\skill_iron_virgin.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_mixed_cocktails.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_powerful_pity.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\skill_concealing_operation.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_product_restocking.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_royal_prerogative.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_save_me_mousy.png"/>
@@ -166,6 +167,7 @@
 		<Content Include="AstralPartyMod\images\relic\person_mousy_lian.png" />
 		<Content Include="AstralPartyMod\images\relic\person_oasis_queen.png" />
 		<Content Include="AstralPartyMod\images\relic\person_proprietress.png" />
+		<Content Include="AstralPartyMod\images\relic\person_poisoned_apple.png" />
 		<Content Include="AstralPartyMod\images\relic\person_samurai_prawn.png" />
 		<Content Include="AstralPartyMod\images\relic\person_shadow_scion.png" />
 		<Content Include="AstralPartyMod\images\relic\person_slime_lulu.png" />
