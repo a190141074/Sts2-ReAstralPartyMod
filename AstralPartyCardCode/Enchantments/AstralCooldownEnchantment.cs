@@ -6,7 +6,8 @@ namespace AstralPartyMod.AstralPartyCardCode.Enchantments;
 
 public class AstralCooldownEnchantment : CustomEnchantmentModel
 {
-    protected override string? CustomIconPath => "res://AstralPartyMod/images/enchantments/astral_cooldown_enchantment.png";
+    protected override string? CustomIconPath =>
+        "res://AstralPartyMod/images/enchantments/astral_cooldown_enchantment.png";
 
     public override bool CanEnchant(CardModel card)
     {

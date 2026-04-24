@@ -73,7 +73,10 @@ public class SkillShadowFusion : AstralPartyCardModel
         HoverTipFactory.FromPower<StrengthPower>()
     ];
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralCooldown];
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralUnique];
+
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
     public SkillShadowFusion() : base(
         1,

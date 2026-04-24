@@ -112,7 +112,6 @@ public static class SavedPropertyCompatibilityPatch
             return true;
 
         if (rawValue is IConvertible && typeof(IConvertible).IsAssignableFrom(targetType))
-        {
             try
             {
                 convertedValue = Convert.ChangeType(rawValue, targetType, CultureInfo.InvariantCulture);
@@ -121,7 +120,6 @@ public static class SavedPropertyCompatibilityPatch
             catch
             {
             }
-        }
 
         convertedValue = null;
         return false;

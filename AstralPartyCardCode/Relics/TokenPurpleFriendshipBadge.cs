@@ -45,13 +45,9 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
         Flash();
 
         if (canonicalPower is HalfLifeHealPower)
-        {
             modifiedAmount += 1m;
-        }
         else
-        {
             _pendingHealTargets.Add(target);
-        }
 
         if (Owner?.Creature != null && target != Owner.Creature)
             _pendingOwnerHeal = true;

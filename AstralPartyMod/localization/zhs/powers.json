@@ -21,8 +21,8 @@
   "ASTRALPARTYMOD-EXPOSURE_POWER.description": "被拥有手电筒系列遗物的玩家击杀时，击杀者获得[blue]1[/blue]层[gold]永恒星光[/gold]。",
   "ASTRALPARTYMOD-EXPOSURE_POWER.smartDescription": "被拥有手电筒系列遗物的玩家击杀时，击杀者获得[blue]1[/blue]层[gold]永恒星光[/gold]。",
   "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.title": "大铁锚",
-  "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.description": "每层使你的攻击牌伤害+[blue]1[/blue]。每回合减少[blue]1[/blue]层。",
-  "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.smartDescription": "每层使你的攻击牌伤害+[blue]1[/blue]。每回合减少[blue]1[/blue]层。",
+  "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.description": "每层使你获得[blue]1[/blue]点临时[red]力量[/red]。你的回合结束时减少[blue]1[/blue]层。",
+  "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.smartDescription": "每层使你获得[blue]1[/blue]点临时[red]力量[/red]。你的回合结束时减少[blue]1[/blue]层。",
   "ASTRALPARTYMOD-COUNTER_POWER.title": "反击",
   "ASTRALPARTYMOD-COUNTER_POWER.description": "受到未被格挡的伤害后，消耗1层反击，对攻击来源造成等量伤害。",
   "ASTRALPARTYMOD-COUNTER_POWER.smartDescription": "受到未被格挡的伤害后，消耗1层反击，对攻击来源造成等量伤害。",
@@ -61,5 +61,11 @@
   "ASTRALPARTYMOD-REVERSED_SCALES_HOLOGRAPHIC_POWER.smartDescription": "每层使你获得[blue]1[/blue]点伤害减免。",
   "ASTRALPARTYMOD-REVERSED_SCALES_POWER.title": "幻影·逆鳞",
   "ASTRALPARTYMOD-REVERSED_SCALES_POWER.description": "每层使你获得[blue]2[/blue]点伤害减免。每次获得[blue]1[/blue]层时，获得[blue]2[/blue]点临时[red]力量[/red]。",
-  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.smartDescription": "每层使你获得[blue]2[/blue]点伤害减免。每次获得[blue]1[/blue]层时，获得[blue]2[/blue]点临时[red]力量[/red]。"
+  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.smartDescription": "每层使你获得[blue]2[/blue]点伤害减免。每次获得[blue]1[/blue]层时，获得[blue]2[/blue]点临时[red]力量[/red]。",
+  "ASTRALPARTYMOD-ELEGANT_FEATHER_POWER.title": "优雅之羽",
+  "ASTRALPARTYMOD-ELEGANT_FEATHER_POWER.description": "每层使你获得[blue]1[/blue]点临时[red]力量[/red]。受到未被格挡的伤害时，减少[blue]1[/blue]层。",
+  "ASTRALPARTYMOD-ELEGANT_FEATHER_POWER.smartDescription": "每层使你获得[blue]1[/blue]点临时[red]力量[/red]。受到未被格挡的伤害时，减少[blue]1[/blue]层。",
+  "ASTRALPARTYMOD-I_AM_DRAGON_TEMPORARY_STRENGTH_LOSS_POWER.title": "龙威压制",
+  "ASTRALPARTYMOD-I_AM_DRAGON_TEMPORARY_STRENGTH_LOSS_POWER.description": "本回合内，力量-[blue]{Amount}[/blue]。回合结束时恢复。",
+  "ASTRALPARTYMOD-I_AM_DRAGON_TEMPORARY_STRENGTH_LOSS_POWER.smartDescription": "本回合内，力量-[blue]{Amount}[/blue]。回合结束时恢复。"
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Keywords;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -24,7 +25,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonOasisQueen : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
     private const int MaxTemporaryDamageBonus = 3;
 
     private int _counter = 1;
@@ -96,7 +97,7 @@ public class PersonOasisQueen : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantRoyalPrerogative();
@@ -145,12 +146,17 @@ public class PersonOasisQueen : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonOasisQueenCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonOasisQueenCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonOasisQueenCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonOasisQueenCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -158,7 +164,7 @@ public class PersonOasisQueen : AstralPartyRelicModel
         if (AstralParty_PersonOasisQueenPendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonOasisQueenCounter = 1;
             AstralParty_PersonOasisQueenPendingCombatStartCard = true;

@@ -11,6 +11,8 @@
   "ASTRALPARTYMOD-ASTRAL_DICE_SET.description": "When you own any [blue]2[/blue] dice relics, reduce the trigger requirement to obtain another die relic by [blue]1[/blue].\nWhen you own any [blue]5[/blue] dice relics, reduce the trigger requirement to obtain another die relic by [blue]2[/blue].",
   "ASTRALPARTYMOD-ASTRAL_FLASHLIGHT_SET.title": "Set: Flashlight",
   "ASTRALPARTYMOD-ASTRAL_FLASHLIGHT_SET.description": "As long as you own at least [blue]1[/blue] Flashlight relic, at the start of combat apply [blue]1[/blue] [gold]Exposure[/gold] to all enemies.\nWhen you kill an enemy with [gold]Exposure[/gold], gain [blue]1[/blue] stack of [gold]Eternal Starlight[/gold].",
+  "ASTRALPARTYMOD-ASTRAL_BOXING_GLOVES_SET.title": "Set: Boxing Gloves",
+  "ASTRALPARTYMOD-ASTRAL_BOXING_GLOVES_SET.description": "If you own any [blue]2[/blue] Boxing Glove relics, gain [blue]1[/blue] [red]Strength[/red] at combat start.\nIf you own all [blue]3[/blue], gain [blue]3[/blue] [red]Strength[/red] instead.",
   "ASTRALPARTYMOD-ASTRAL_COLLECTION.title": "Collection",
   "ASTRALPARTYMOD-ASTRAL_COLLECTION.description": "A special card pool mainly intended for commemorative value.",
   "ASTRALPARTYMOD-ASTRAL_UNIQUE.title": "Unique",

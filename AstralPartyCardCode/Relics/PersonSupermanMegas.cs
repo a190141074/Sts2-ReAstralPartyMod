@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -20,7 +21,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonSupermanMegas : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
     private const int NextTurnDrawThreshold = 5;
 
     private int _counter = 1;
@@ -127,7 +128,7 @@ public class PersonSupermanMegas : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantSolarBombardment();
@@ -175,12 +176,17 @@ public class PersonSupermanMegas : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonSupermanMegasCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonSupermanMegasCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonSupermanMegasCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonSupermanMegasCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -188,7 +194,7 @@ public class PersonSupermanMegas : AstralPartyRelicModel
         if (AstralParty_PersonSupermanMegasPendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonSupermanMegasCounter = 1;
             AstralParty_PersonSupermanMegasPendingCombatStartCard = true;

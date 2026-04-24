@@ -93,7 +93,8 @@ public class TokenEternalStarlight : AstralPartyRelicModel
         if (room.RoomType != RoomType.Shop)
             return;
 
-        if (!TryGetCurrentSetBonus(AstralParty_TokenEternalStarlightStacks, out var goldReward, out var grantMembership))
+        if (!TryGetCurrentSetBonus(AstralParty_TokenEternalStarlightStacks, out var goldReward,
+                out var grantMembership))
             return;
 
         Flash();
@@ -169,10 +170,14 @@ public class TokenEternalStarlight : AstralPartyRelicModel
     {
         return AstralParty_TokenEternalStarlightStacks switch
         {
-            >= MembershipTierMinStacks => new LocString("relics", "ASTRALPARTYMOD-TOKEN_ETERNAL_STARLIGHT.current_set_line_tier4"),
-            >= ThirdTierMinStacks => new LocString("relics", "ASTRALPARTYMOD-TOKEN_ETERNAL_STARLIGHT.current_set_line_tier3"),
-            >= SecondTierMinStacks => new LocString("relics", "ASTRALPARTYMOD-TOKEN_ETERNAL_STARLIGHT.current_set_line_tier2"),
-            >= FirstTierMinStacks => new LocString("relics", "ASTRALPARTYMOD-TOKEN_ETERNAL_STARLIGHT.current_set_line_tier1"),
+            >= MembershipTierMinStacks => new LocString("relics",
+                "ASTRALPARTYMOD-TOKEN_ETERNAL_STARLIGHT.current_set_line_tier4"),
+            >= ThirdTierMinStacks => new LocString("relics",
+                "ASTRALPARTYMOD-TOKEN_ETERNAL_STARLIGHT.current_set_line_tier3"),
+            >= SecondTierMinStacks => new LocString("relics",
+                "ASTRALPARTYMOD-TOKEN_ETERNAL_STARLIGHT.current_set_line_tier2"),
+            >= FirstTierMinStacks => new LocString("relics",
+                "ASTRALPARTYMOD-TOKEN_ETERNAL_STARLIGHT.current_set_line_tier1"),
             _ => null
         };
     }

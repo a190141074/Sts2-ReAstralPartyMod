@@ -11,6 +11,8 @@
   "ASTRALPARTYMOD-ASTRAL_DICE_SET.description": "当你拥有任意[blue]2[/blue]件骰子时，靠触发骰子获取骰子系列遗物的需求-[blue]1[/blue]。\n当你拥有任意[blue]5[/blue]件骰子时，靠触发骰子获取骰子系列遗物的需求-[blue]2[/blue]。",
   "ASTRALPARTYMOD-ASTRAL_FLASHLIGHT_SET.title": "【套装·手电筒】",
   "ASTRALPARTYMOD-ASTRAL_FLASHLIGHT_SET.description": "只要你拥有至少[blue]1[/blue]件手电筒系列遗物，战斗开始时，为所有敌人施加[blue]1[/blue]层[gold]曝光[/gold]。\n击杀拥有[gold]曝光[/gold]的敌人时，获得[blue]1[/blue]层[gold]永恒星光[/gold]。",
+  "ASTRALPARTYMOD-ASTRAL_BOXING_GLOVES_SET.title": "【套装·拳击手套】",
+  "ASTRALPARTYMOD-ASTRAL_BOXING_GLOVES_SET.description": "当你拥有任意[blue]2[/blue]件拳击手套时，战斗开始获得[blue]1[/blue]点[red]力量[/red]。\n当你拥有[blue]3[/blue]件拳击手套时，改为战斗开始获得[blue]3[/blue]点[red]力量[/red]。",
   "ASTRALPARTYMOD-ASTRAL_COLLECTION.title": "典藏",
   "ASTRALPARTYMOD-ASTRAL_COLLECTION.description": "特殊卡组，主要具备纪念意义。",
   "ASTRALPARTYMOD-ASTRAL_UNIQUE.title": "唯一",

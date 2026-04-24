@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Commands.Builders;
@@ -20,7 +21,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonSamuraiPrawn : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
 
     private int _counter = 1;
     private bool _pendingCombatStartCard;
@@ -127,7 +128,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         }
 
         // Reaching the cap means the relic is ready to generate its card and restart the cooldown.
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantFamousBlade();
@@ -183,7 +184,12 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonSamuraiPrawnCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonSamuraiPrawnCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private static bool IsLegacyGrantCounter(int counter)
@@ -196,7 +202,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         if (counter <= 1)
             return 1;
 
-        if (counter <= MaxCounter)
+        if (counter <= BaseMaxCounter)
             return counter;
 
         return (counter - 1) % 3 + 1;
@@ -204,7 +210,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonSamuraiPrawnCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonSamuraiPrawnCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -212,7 +218,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
         if (AstralParty_PersonSamuraiPrawnPendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonSamuraiPrawnCounter = 1;
             AstralParty_PersonSamuraiPrawnPendingCombatStartCard = true;

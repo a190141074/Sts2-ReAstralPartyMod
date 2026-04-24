@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
 using AstralPartyMod.AstralPartyCardCode.Powers;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -21,7 +22,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonXiaoLei : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
 
     private int _counter = 1;
     private bool _pendingCombatStartCard;
@@ -115,7 +116,7 @@ public class PersonXiaoLei : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantChainReaction();
@@ -154,12 +155,17 @@ public class PersonXiaoLei : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonXiaoLeiCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonXiaoLeiCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonXiaoLeiCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonXiaoLeiCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -167,7 +173,7 @@ public class PersonXiaoLei : AstralPartyRelicModel
         if (AstralParty_PersonXiaoLeiPendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonXiaoLeiCounter = 1;
             AstralParty_PersonXiaoLeiPendingCombatStartCard = true;

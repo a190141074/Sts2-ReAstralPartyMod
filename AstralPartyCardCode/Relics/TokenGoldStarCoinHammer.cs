@@ -119,7 +119,6 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
             );
 
             if (!target.IsAlive)
-            {
                 await PowerCmd.Apply(
                     ModelDb.Power<StarLightPower>().ToMutable(),
                     Owner.Creature,
@@ -128,7 +127,6 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
                     null,
                     false
                 );
-            }
         }
         finally
         {

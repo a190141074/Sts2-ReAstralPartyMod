@@ -25,7 +25,9 @@ public class SkillSolarBombardment : AstralPartyCardModel
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralCooldown];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralKeywords.AstralUnique];
+
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
@@ -116,11 +118,12 @@ public class SkillSolarBombardment : AstralPartyCardModel
 
             if (sourceCard != null)
             {
-                await CommonActions.CardAttack(sourceCard, target, damage, hitCount: 1).Execute(choiceContext);
+                await CommonActions.CardAttack(sourceCard, target, damage, 1).Execute(choiceContext);
                 continue;
             }
 
-            await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable, owner.Creature);
+            await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable,
+                owner.Creature);
         }
     }
 

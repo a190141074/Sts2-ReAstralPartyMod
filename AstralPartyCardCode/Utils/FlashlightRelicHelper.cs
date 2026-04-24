@@ -43,21 +43,12 @@ public static class FlashlightRelicHelper
         await TokenEternalStarlight.GrantStacks(owner, 1);
     }
 
-    public static bool IsTrackedAttackHit(
+    public static bool IsTrackedAttackCard(
         Player owner,
-        Creature? dealer,
-        DamageResult result,
-        Creature target,
         CardModel? cardSource,
         int minimumCost)
     {
         if (owner.Creature == null)
-            return false;
-        if (dealer != owner.Creature)
-            return false;
-        if (target.Side == owner.Creature.Side || !target.IsAlive)
-            return false;
-        if (result.TotalDamage <= 0m)
             return false;
         if (cardSource?.Owner != owner)
             return false;

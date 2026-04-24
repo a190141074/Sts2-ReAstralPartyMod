@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -23,7 +24,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonInkShadowHunter : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
     private const int TwinShadowDuration = 2;
     private const int MinTrackedAttackCost = 1;
     private const int MaxTrackedAttackCost = 3;
@@ -99,7 +100,7 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantShadowFusion();
@@ -160,12 +161,17 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonInkShadowHunterCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonInkShadowHunterCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonInkShadowHunterCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonInkShadowHunterCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -175,7 +181,7 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
         if (AstralParty_PersonInkShadowHunterPendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonInkShadowHunterCounter = 1;
             AstralParty_PersonInkShadowHunterPendingCombatStartCard = true;

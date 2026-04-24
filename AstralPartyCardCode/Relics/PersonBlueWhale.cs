@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -22,7 +23,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonBlueWhale : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
     private const int FateWeakImprintKillGold = 3;
     private const int ExactRoundRewardBase = 6;
     private const int ExactRoundRewardBonusPerRepeat = 2;
@@ -71,7 +72,7 @@ public class PersonBlueWhale : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantFateWeakMprint();
@@ -131,12 +132,17 @@ public class PersonBlueWhale : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonBlueWhaleCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonBlueWhaleCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonBlueWhaleCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonBlueWhaleCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -144,7 +150,7 @@ public class PersonBlueWhale : AstralPartyRelicModel
         if (AstralParty_PersonBlueWhalePendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonBlueWhaleCounter = 1;
             AstralParty_PersonBlueWhalePendingCombatStartCard = true;

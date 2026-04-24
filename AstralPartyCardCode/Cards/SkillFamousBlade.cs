@@ -25,7 +25,10 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralCooldown];
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralUnique];
+
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
     public override string PortraitPath => GetPortraitPath();
 
@@ -107,7 +110,8 @@ public class SkillFamousBlade : AstralPartyCardModel
         if (ReferenceEquals(CanonicalInstance, this))
             return 0;
 
-        return Owner?.GetRelic<PersonalityDerivativeSwordIntent>()?.AstralParty_PersonalityDerivativeSwordIntentCounter ?? 0;
+        return Owner?.GetRelic<PersonalityDerivativeSwordIntent>()
+            ?.AstralParty_PersonalityDerivativeSwordIntentCounter ?? 0;
     }
 
     private FamousBladeDisplayTier GetDisplayTier()
@@ -130,8 +134,10 @@ public class SkillFamousBlade : AstralPartyCardModel
         {
             FamousBladeDisplayTier.Medium => "res://AstralPartyMod/images/card_portraits/famous_blade_medium.png",
             FamousBladeDisplayTier.Large => "res://AstralPartyMod/images/card_portraits/famous_blade_large.png",
-            FamousBladeDisplayTier.ExtraLarge => "res://AstralPartyMod/images/card_portraits/famous_blade_extra_large.png",
-            FamousBladeDisplayTier.GawuCutter => "res://AstralPartyMod/images/card_portraits/famous_blade_gawu_cutter.png",
+            FamousBladeDisplayTier.ExtraLarge =>
+                "res://AstralPartyMod/images/card_portraits/famous_blade_extra_large.png",
+            FamousBladeDisplayTier.GawuCutter =>
+                "res://AstralPartyMod/images/card_portraits/famous_blade_gawu_cutter.png",
             _ => "res://AstralPartyMod/images/card_portraits/skill_famous_blade.png"
         };
     }

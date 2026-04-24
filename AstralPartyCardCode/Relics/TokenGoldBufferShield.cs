@@ -19,7 +19,12 @@ public class TokenGoldBufferShield : AstralPartyRelicModel
     private const decimal HealAmount = 1m;
     private const decimal StarLightAmount = 3m;
 
-    private static readonly PropertyInfo? AttackTargetProperty = typeof(AttackCommand).GetProperty("Target");
+    private static readonly PropertyInfo? AttackTargetProperty =
+        typeof(AttackCommand).GetProperty("Target")
+        ?? typeof(AttackCommand).GetProperty("SingleTarget");
+
+    private static readonly FieldInfo? AttackSingleTargetField =
+        typeof(AttackCommand).GetField("_singleTarget", BindingFlags.Instance | BindingFlags.NonPublic);
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -37,7 +42,12 @@ public class TokenGoldBufferShield : AstralPartyRelicModel
             return;
         if (command.Attacker == null || command.Attacker.Side == Owner.Creature.Side)
             return;
-        if (AttackTargetProperty?.GetValue(command) is not Creature target || target != Owner.Creature)
+        if (command.TargetSide != Owner.Creature.Side)
+            return;
+
+        var target = AttackTargetProperty?.GetValue(command) as Creature
+                     ?? AttackSingleTargetField?.GetValue(command) as Creature;
+        if (target != Owner.Creature)
             return;
 
         Flash();

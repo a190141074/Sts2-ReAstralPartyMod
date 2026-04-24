@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
 using AstralPartyMod.AstralPartyCardCode.Powers;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -21,7 +22,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonSocialFearNun : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
 
     private int _counter = 1;
     private bool _pendingCombatStartCard;
@@ -130,7 +131,7 @@ public class PersonSocialFearNun : AstralPartyRelicModel
             await GrantIronVirgin();
             AstralParty_PersonSocialFearNunPendingCombatStartCard = false;
         }
-        else if (GetClampedCounter() >= MaxCounter)
+        else if (GetClampedCounter() >= GetMaxCounter())
         {
             await GrantIronVirgin();
             AstralParty_PersonSocialFearNunCounter = 1;
@@ -168,12 +169,17 @@ public class PersonSocialFearNun : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonSocialFearNunCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonSocialFearNunCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonSocialFearNunCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonSocialFearNunCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -181,7 +187,7 @@ public class PersonSocialFearNun : AstralPartyRelicModel
         if (AstralParty_PersonSocialFearNunPendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonSocialFearNunCounter = 1;
             AstralParty_PersonSocialFearNunPendingCombatStartCard = true;

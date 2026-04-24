@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Keywords;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -60,7 +61,8 @@ public class PersonBionicJasmine : AstralPartyRelicModel
         AstralParty_PersonBionicJasmineStrength = 0;
         AstralParty_PersonBionicJasmineDexterity = 0;
 
-        var bonusCount = AstralParty_PersonBionicJasmineSteps / 13;
+        var bonusCount = AstralParty_PersonBionicJasmineSteps
+                         / ExtraBatteryRelicHelper.GetAdjustedBionicJasmineStepThreshold(Owner, 13);
         if (bonusCount <= 0)
             return;
 

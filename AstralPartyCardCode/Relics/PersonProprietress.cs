@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -25,7 +26,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonProprietress : AstralPartyRelicModel
 {
-    private const int MaxCounter = 3;
+    private const int BaseMaxCounter = 3;
     private const int ShopGoldGainStep = 10;
     private const int DiscountChancePerShopPercent = 3;
     private const decimal DiscountedPriceMultiplier = 0.3m;
@@ -158,7 +159,7 @@ public class PersonProprietress : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantTransfer();
@@ -205,12 +206,17 @@ public class PersonProprietress : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonProprietressCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonProprietressCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonProprietressCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonProprietressCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -218,7 +224,7 @@ public class PersonProprietress : AstralPartyRelicModel
         if (AstralParty_PersonProprietressPendingCombatStartTrigger)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonProprietressCounter = 1;
             AstralParty_PersonProprietressPendingCombatStartTrigger = true;

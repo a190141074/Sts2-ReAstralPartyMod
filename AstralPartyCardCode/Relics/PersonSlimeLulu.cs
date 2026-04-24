@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
 using AstralPartyMod.AstralPartyCardCode.Powers;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -23,7 +24,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonSlimeLulu : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
 
     [SavedProperty] public int AstralParty_PersonSlimeLuluCounter { get; set; } = 1;
 
@@ -101,7 +102,7 @@ public class PersonSlimeLulu : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() >= MaxCounter)
+        if (GetClampedCounter() >= GetMaxCounter())
         {
             await GrantHealingSlime();
             AstralParty_PersonSlimeLuluCounter = 1;
@@ -161,12 +162,17 @@ public class PersonSlimeLulu : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonSlimeLuluCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonSlimeLuluCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonSlimeLuluCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonSlimeLuluCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -174,7 +180,7 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         if (AstralParty_PersonSlimeLuluPendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonSlimeLuluCounter = 1;
             AstralParty_PersonSlimeLuluPendingCombatStartCard = true;

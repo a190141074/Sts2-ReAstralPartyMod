@@ -22,7 +22,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 public class TokenGoldFlashlightFlashburst : AstralPartyRelicModel
 {
     private const int MinTrackedAttackCost = 1;
-    private const int HitsPerTrigger = 3;
+    private const int CardsPerTrigger = 3;
     private const int EternalStarlightPerDamageBonus = 10;
 
     [SavedProperty] public int AstralParty_TokenGoldFlashlightFlashburstHitProgress { get; set; }
@@ -72,31 +72,36 @@ public class TokenGoldFlashlightFlashburst : AstralPartyRelicModel
     {
         if (Owner?.Creature == null)
             return;
-        if (FlashlightRelicHelper.IsTrackedAttackHit(Owner, dealer, result, target, cardSource, MinTrackedAttackCost))
-        {
-            AstralParty_TokenGoldFlashlightFlashburstHitProgress++;
-            var triggerCount = AstralParty_TokenGoldFlashlightFlashburstHitProgress / HitsPerTrigger;
-            AstralParty_TokenGoldFlashlightFlashburstHitProgress %= HitsPerTrigger;
-            InvokeDisplayAmountChanged();
-
-            if (triggerCount > 0)
-            {
-                Flash();
-                await PowerCmd.Apply(
-                    ModelDb.Power<StarLightPower>().ToMutable(),
-                    Owner.Creature,
-                    triggerCount,
-                    Owner.Creature,
-                    cardSource,
-                    false);
-            }
-        }
-
         if (dealer == Owner.Creature
             && target.Side != Owner.Creature.Side
             && result.WasTargetKilled
             && FlashlightRelicHelper.ShouldHandleSharedSet(this))
             await FlashlightRelicHelper.TryGrantEternalStarlightOnKill(Owner, target);
+    }
+
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        if (Owner?.Creature == null)
+            return;
+        if (!FlashlightRelicHelper.IsTrackedAttackCard(Owner, cardPlay.Card, MinTrackedAttackCost))
+            return;
+
+        AstralParty_TokenGoldFlashlightFlashburstHitProgress++;
+        var triggerCount = AstralParty_TokenGoldFlashlightFlashburstHitProgress / CardsPerTrigger;
+        AstralParty_TokenGoldFlashlightFlashburstHitProgress %= CardsPerTrigger;
+        InvokeDisplayAmountChanged();
+
+        if (triggerCount <= 0)
+            return;
+
+        Flash();
+        await PowerCmd.Apply(
+            ModelDb.Power<StarLightPower>().ToMutable(),
+            Owner.Creature,
+            triggerCount,
+            Owner.Creature,
+            cardPlay.Card,
+            false);
     }
 
     public override decimal ModifyDamageAdditive(

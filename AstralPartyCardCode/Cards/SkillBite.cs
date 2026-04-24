@@ -68,7 +68,10 @@ public class SkillBite : AstralPartyCardModel
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralCooldown];
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        [AstralPartyMod.AstralPartyCardCode.Keywords.AstralKeywords.AstralUnique];
+
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [

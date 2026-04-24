@@ -76,7 +76,7 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
             return;
 
         AstralParty_PendingBlueDieStarLight += StarLightRewardAmount;
-        AstralParty_BlueDieTriggerProgress = System.Math.Min(
+        AstralParty_BlueDieTriggerProgress = Math.Min(
             AstralParty_BlueDieTriggerProgress + 1,
             GetRequiredTriggerCountForNewDieRelic()
         );
@@ -84,9 +84,7 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
 
         if (AstralParty_BlueDieTriggerProgress >= GetRequiredTriggerCountForNewDieRelic()
             && await TryObtainMissingDieRelic())
-        {
             AstralParty_BlueDieTriggerProgress = 0;
-        }
 
         InvokeDisplayAmountChanged();
     }
@@ -145,7 +143,6 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
             return;
 
         if (starLightAmount > 0)
-        {
             await PowerCmd.Apply(
                 ModelDb.Power<StarLightPower>().ToMutable(),
                 Owner.Creature,
@@ -154,7 +151,6 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
                 null,
                 false
             );
-        }
 
         if (energyAmount > 0)
             await PlayerCmd.GainEnergy(energyAmount, Owner);
@@ -170,7 +166,6 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
                 .ToList();
 
             foreach (var enemy in enemies)
-            {
                 await CreatureCmd.Damage(
                     new ThrowingPlayerChoiceContext(),
                     enemy,
@@ -179,7 +174,6 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
                     Owner.Creature,
                     null
                 );
-            }
         }
 
         if (blockAmount > 0)
@@ -229,7 +223,7 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
                 ? TwoDieSetReduction
                 : 0;
 
-        return System.Math.Max(1, BaseTriggerCountForNewDieRelic - reduction);
+        return Math.Max(1, BaseTriggerCountForNewDieRelic - reduction);
     }
 
     private int CountOwnedDieRelics()

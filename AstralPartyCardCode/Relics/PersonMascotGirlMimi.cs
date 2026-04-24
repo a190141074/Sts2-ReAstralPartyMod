@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -21,7 +22,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonMascotGirlMimi : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
 
     [SavedProperty] public int AstralParty_PersonMascotGirlMimiCounter { get; set; } = 1;
 
@@ -63,7 +64,7 @@ public class PersonMascotGirlMimi : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantProductRestocking();
@@ -91,12 +92,17 @@ public class PersonMascotGirlMimi : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonMascotGirlMimiCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonMascotGirlMimiCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonMascotGirlMimiCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonMascotGirlMimiCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -104,7 +110,7 @@ public class PersonMascotGirlMimi : AstralPartyRelicModel
         if (AstralParty_PersonMascotGirlMimiPendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonMascotGirlMimiCounter = 1;
             AstralParty_PersonMascotGirlMimiPendingCombatStartCard = true;

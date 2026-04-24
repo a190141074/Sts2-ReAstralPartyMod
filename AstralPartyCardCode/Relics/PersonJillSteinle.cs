@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Keywords;
 using AstralPartyMod.AstralPartyCardCode.cards;
 using AstralPartyMod.AstralPartyCardCode.Powers;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -23,7 +24,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonJillSteinle : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
 
     [SavedProperty] public int AstralParty_PersonJillSteinleCounter { get; set; } = 1;
 
@@ -67,7 +68,7 @@ public class PersonJillSteinle : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantMixedCocktails();
@@ -95,12 +96,17 @@ public class PersonJillSteinle : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonJillSteinleCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonJillSteinleCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonJillSteinleCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonJillSteinleCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -108,7 +114,7 @@ public class PersonJillSteinle : AstralPartyRelicModel
         if (AstralParty_PersonJillSteinlePendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonJillSteinleCounter = 1;
             AstralParty_PersonJillSteinlePendingCombatStartCard = true;

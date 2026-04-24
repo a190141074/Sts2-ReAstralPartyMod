@@ -32,6 +32,9 @@ public static class AstralKeywords
     [CustomEnum("ASTRAL_FLASHLIGHT_SET")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword AstralFlashlightSet;
 
+    [CustomEnum("ASTRAL_BOXING_GLOVES_SET")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralBoxingGlovesSet;
+
     [CustomEnum("ASTRAL_COLLECTION")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword AstralCollection;
 

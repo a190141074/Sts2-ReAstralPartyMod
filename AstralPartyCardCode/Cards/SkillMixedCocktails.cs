@@ -32,7 +32,9 @@ public class SkillMixedCocktails : AstralPartyCardModel
         new("cards", "ASTRALPARTYMOD-SKILL_MIXED_COCKTAILS.select_prompt");
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
-        [AstralKeywords.AstralCooldown, AstralKeywords.AstralMixed];
+        [AstralKeywords.AstralUnique, AstralKeywords.AstralMixed];
+
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [

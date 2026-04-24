@@ -21,8 +21,8 @@
   "ASTRALPARTYMOD-EXPOSURE_POWER.description": "If this enemy is killed by a player who owns a Flashlight relic, that killer gains [blue]1[/blue] stack of [gold]Eternal Starlight[/gold].",
   "ASTRALPARTYMOD-EXPOSURE_POWER.smartDescription": "Killed by a Flashlight owner: grant [blue]1[/blue] Eternal Starlight.",
   "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.title": "Giant Anchor",
-  "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.description": "Each stack makes your Attack cards deal [blue]1[/blue] extra damage. Loses [blue]1[/blue] stack at the end of each turn.",
-  "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.smartDescription": "Each stack makes your Attack cards deal [blue]1[/blue] extra damage. Loses [blue]1[/blue] stack each turn.",
+  "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.description": "Each stack gives you [blue]1[/blue] temporary [red]Strength[/red]. Lose [blue]1[/blue] stack at the end of your turn.",
+  "ASTRALPARTYMOD-GIANT_ANCHOR_POWER.smartDescription": "Each stack gives you [blue]1[/blue] temporary [red]Strength[/red]. Lose [blue]1[/blue] stack at the end of your turn.",
   "ASTRALPARTYMOD-COUNTER_POWER.title": "Counter",
   "ASTRALPARTYMOD-COUNTER_POWER.description": "When you take unblocked damage, deal that much damage back to the attacker and lose 1 stack.",
   "ASTRALPARTYMOD-COUNTER_POWER.smartDescription": "Retaliate for unblocked damage taken, then lose 1 stack.",
@@ -61,5 +61,11 @@
   "ASTRALPARTYMOD-REVERSED_SCALES_HOLOGRAPHIC_POWER.smartDescription": "Each stack reduces HP loss you take by [blue]1[/blue].",
   "ASTRALPARTYMOD-REVERSED_SCALES_POWER.title": "Phantom Reverse Scales",
   "ASTRALPARTYMOD-REVERSED_SCALES_POWER.description": "Each stack reduces HP loss you take by [blue]2[/blue]. Whenever you gain [blue]1[/blue] stack, gain [blue]2[/blue] temporary [red]Strength[/red].",
-  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.smartDescription": "Each stack reduces HP loss you take by [blue]2[/blue]. Whenever you gain [blue]1[/blue] stack, gain [blue]2[/blue] temporary [red]Strength[/red]."
+  "ASTRALPARTYMOD-REVERSED_SCALES_POWER.smartDescription": "Each stack reduces HP loss you take by [blue]2[/blue]. Whenever you gain [blue]1[/blue] stack, gain [blue]2[/blue] temporary [red]Strength[/red].",
+  "ASTRALPARTYMOD-ELEGANT_FEATHER_POWER.title": "Elegant Feather",
+  "ASTRALPARTYMOD-ELEGANT_FEATHER_POWER.description": "Each stack gives [blue]1[/blue] temporary [red]Strength[/red]. Whenever you take unblocked damage, lose [blue]1[/blue] stack.",
+  "ASTRALPARTYMOD-ELEGANT_FEATHER_POWER.smartDescription": "Each stack gives [blue]1[/blue] temporary [red]Strength[/red]. Whenever you take unblocked damage, lose [blue]1[/blue] stack.",
+  "ASTRALPARTYMOD-I_AM_DRAGON_TEMPORARY_STRENGTH_LOSS_POWER.title": "Dragon Suppression",
+  "ASTRALPARTYMOD-I_AM_DRAGON_TEMPORARY_STRENGTH_LOSS_POWER.description": "Lose [blue]{Amount}[/blue] [red]Strength[/red] this turn. Restore it at end of turn.",
+  "ASTRALPARTYMOD-I_AM_DRAGON_TEMPORARY_STRENGTH_LOSS_POWER.smartDescription": "Lose [blue]{Amount}[/blue] [red]Strength[/red] this turn. Restore it at end of turn."
 }

@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
 using AstralPartyMod.AstralPartyCardCode.Keywords;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -19,7 +20,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 [Pool(typeof(EventRelicPool))]
 public class PersonMousyLian : AstralPartyRelicModel
 {
-    private const int MaxCounter = 4;
+    private const int BaseMaxCounter = 4;
 
     private int _counter = 1;
     private bool _pendingCombatStartCard;
@@ -127,7 +128,7 @@ public class PersonMousyLian : AstralPartyRelicModel
             return;
         }
 
-        if (GetClampedCounter() < MaxCounter)
+        if (GetClampedCounter() < GetMaxCounter())
             return;
 
         await GrantSaveMeMousy();
@@ -155,12 +156,17 @@ public class PersonMousyLian : AstralPartyRelicModel
 
     private int GetClampedCounter()
     {
-        return Math.Clamp(AstralParty_PersonMousyLianCounter, 1, MaxCounter);
+        return Math.Clamp(AstralParty_PersonMousyLianCounter, 1, GetMaxCounter());
+    }
+
+    private int GetMaxCounter()
+    {
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
     }
 
     private void AdvanceCounter()
     {
-        AstralParty_PersonMousyLianCounter = Math.Min(GetClampedCounter() + 1, MaxCounter);
+        AstralParty_PersonMousyLianCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
     }
 
     private void AdvanceCounterAfterCombatEnd()
@@ -168,7 +174,7 @@ public class PersonMousyLian : AstralPartyRelicModel
         if (AstralParty_PersonMousyLianPendingCombatStartCard)
             return;
 
-        if (GetClampedCounter() >= MaxCounter - 1)
+        if (GetClampedCounter() >= GetMaxCounter() - 1)
         {
             AstralParty_PersonMousyLianCounter = 1;
             AstralParty_PersonMousyLianPendingCombatStartCard = true;

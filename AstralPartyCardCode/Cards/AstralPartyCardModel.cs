@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using AstralPartyMod.AstralPartyCardCode.Enchantments;
 using AstralPartyMod.AstralPartyCardCode.Keywords;
 using MegaCrit.Sts2.Core.Commands;
 using BaseLib.Abstracts;
@@ -13,6 +14,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
 public abstract partial class AstralPartyCardModel : CustomCardModel
 {
     private static readonly Regex CamelCaseRegex = MyRegex();
+    protected virtual bool ShouldAutoApplyCooldownEnchantment => false;
 
     protected virtual string CardId => CamelCaseRegex.Replace(GetType().Name, "$1_$2").ToLowerInvariant();
 
@@ -45,7 +47,21 @@ public abstract partial class AstralPartyCardModel : CustomCardModel
         await base.AfterCardChangedPiles(card, oldPileType, source);
 
         if (card == this && Pile?.Type == PileType.Hand && oldPileType != PileType.Hand)
+            await EnsureCooldownEnchantment();
+
+        if (card == this && Pile?.Type == PileType.Hand && oldPileType != PileType.Hand)
             await ExhaustIfDuplicateUniqueInHand();
+    }
+
+    internal Task EnsureCooldownEnchantment()
+    {
+        if (!ShouldAutoApplyCooldownEnchantment)
+            return Task.CompletedTask;
+        if (Keywords.Contains(CardKeyword.Retain) || Keywords.Contains(CardKeyword.Exhaust))
+            return Task.CompletedTask;
+
+        CardCmd.Enchant<AstralCooldownEnchantment>(this, 1m);
+        return Task.CompletedTask;
     }
 
     private async Task ExhaustIfDuplicateUniqueInHand()
@@ -59,7 +75,7 @@ public abstract partial class AstralPartyCardModel : CustomCardModel
         var hasEarlierDuplicate = handCards.Any(other =>
             !ReferenceEquals(other, this)
             && HasUniqueConstraintKeyword(other)
-            && string.Equals(other.Title, Title, System.StringComparison.Ordinal));
+            && string.Equals(other.Title, Title, StringComparison.Ordinal));
 
         if (!hasEarlierDuplicate)
             return;
@@ -69,8 +85,12 @@ public abstract partial class AstralPartyCardModel : CustomCardModel
 
     private static bool HasUniqueConstraintKeyword(CardModel card)
     {
-        return card.Keywords.Contains(AstralKeywords.AstralUnique)
-               || card.Keywords.Contains(AstralKeywords.AstralCooldown);
+        return card.Keywords.Contains(AstralKeywords.AstralUnique);
+    }
+
+    internal static bool ShouldAutoApplyCooldown(CardModel card)
+    {
+        return card is AstralPartyCardModel astralCard && astralCard.ShouldAutoApplyCooldownEnchantment;
     }
 
     [GeneratedRegex(@"([a-z])([A-Z])", RegexOptions.Compiled)]
