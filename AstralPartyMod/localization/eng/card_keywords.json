@@ -20,9 +20,9 @@
   "ASTRALPARTYMOD-ASTRAL_COOLDOWN.title": "Cooldown",
   "ASTRALPARTYMOD-ASTRAL_COOLDOWN.description": "This card also has the effects of [gold]Unique[/gold], [gold]Retain[/gold], and [gold]Exhaust[/gold].",
   "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.title": "Solar Bombardment",
-  "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.description": "Discard all cards in your hand, then bombard random enemies. Base [blue]3[/blue] hits. For every [blue]2[/blue] discarded cards, bombard [blue]1[/blue] extra time. Base damage is [blue]3[/blue] and increases by [blue]1[/blue] for every [blue]3[/blue] total Energy cost among discarded cards. Discarded [blue]0[/blue]-cost cards count as [blue]1[/blue] Energy, and discarded X-cost cards count as your current Energy.",
+  "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.description": "Discard all cards in your hand, then bombard random enemies. Base [blue]3[/blue] hits. For every [blue]2[/blue] discarded cards, bombard [blue]1[/blue] extra time. Base damage is [blue]3[/blue] and increases by [blue]1[/blue] for every {energyPrefix:energyIcons(3)} total cost among discarded cards. Discarded [blue]0[/blue]-cost cards count as {energyPrefix:energyIcons(1)}, and discarded X-cost cards count as your current Energy.",
   "ASTRALPARTYMOD-ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.title": "Orbital Bombardment Material",
-  "ASTRALPARTYMOD-ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.description": "When used as [gold]Orbital Bombardment Material[/gold], this card counts as [blue]2[/blue] cards and its cost counts as [blue]3[/blue].",
+  "ASTRALPARTYMOD-ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.description": "When used as [gold]Orbital Bombardment Material[/gold], this card counts as [blue]2[/blue] cards and its cost counts as {energyPrefix:energyIcons(3)}.",
   "ASTRALPARTYMOD-ASTRAL_MIXED.title": "Mixed",
-  "ASTRALPARTYMOD-ASTRAL_MIXED.description": "Attack: +[blue]1[/blue] temporary Strength\nDefensive Skill: +[blue]1[/blue] temporary Dexterity\nSkill (no Block): Heal [blue]1[/blue] HP\nPower: Gain [blue]1[/blue] Energy\nStatus: Draw [blue]1[/blue] card\nCurse: Heal [blue]1[/blue] HP and gain [blue]1[/blue] Block"
+  "ASTRALPARTYMOD-ASTRAL_MIXED.description": "Attack: +[blue]1[/blue] temporary Strength\nDefensive Skill: +[blue]1[/blue] temporary Dexterity\nSkill (no Block): Heal [blue]1[/blue] HP\nPower: Gain {energyPrefix:energyIcons(1)}\nStatus: Draw [blue]1[/blue] card\nCurse: Heal [blue]1[/blue] HP and gain [blue]1[/blue] Block"
 }

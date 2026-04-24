@@ -19,6 +19,10 @@ public static class AstralEventCardPool
         ModelDb.Card<EventGiftFromSky>(),
         ModelDb.Card<EventHandErase>(),
         ModelDb.Card<EventPlayerRepresentative>(),
+        ModelDb.Card<EventsConcealingInvestigationA>(),
+        ModelDb.Card<EventsConcealingInvestigationB>(),
+        ModelDb.Card<EventsConcealingInvestigationC>(),
+        ModelDb.Card<EventsConcealingInvestigationD>(),
         ModelDb.Card<EventRedHeatWarning>(),
         ModelDb.Card<EventSprint>(),
         ModelDb.Card<EventThunderStrike>()

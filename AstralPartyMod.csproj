@@ -36,10 +36,10 @@
 
 	<ItemGroup>
 		<Content Include="AstralPartyMod.json"/>
-		<Content Include="AstralPartyMod\images\card_portraits\events_covert_investigation_a.png"/>
-		<Content Include="AstralPartyMod\images\card_portraits\events_covert_investigation_b.png"/>
-		<Content Include="AstralPartyMod\images\card_portraits\events_covert_investigation_c.png"/>
-		<Content Include="AstralPartyMod\images\card_portraits\events_covert_investigation_d.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\events_concealing_investigation_a.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\events_concealing_investigation_b.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\events_concealing_investigation_c.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\events_concealing_investigation_d.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\event_angels_descent.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\event_crowded_passage.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\event_deus_ex_machina.png"/>
@@ -65,6 +65,7 @@
 		<Content Include="AstralPartyMod\images\card_portraits\skill_fate_weak_mprint.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_iron_virgin.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_mixed_cocktails.png"/>
+		<Content Include="AstralPartyMod\images\card_portraits\skill_powerful_pity.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_product_restocking.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_royal_prerogative.png"/>
 		<Content Include="AstralPartyMod\images\card_portraits\skill_save_me_mousy.png"/>
@@ -80,6 +81,7 @@
 		<Content Include="AstralPartyMod\images\powers\fate_weak_imprint_power.png" />
 		<Content Include="AstralPartyMod\images\powers\half_life_heal_power.png" />
 		<Content Include="AstralPartyMod\images\powers\hunters_feast_power.png" />
+		<Content Include="AstralPartyMod\images\powers\investigation_target_power.png" />
 		<Content Include="AstralPartyMod\images\powers\iron_virgin_ward_power.png" />
 		<Content Include="AstralPartyMod\images\powers\mark_lock_power.png" />
 		<Content Include="AstralPartyMod\images\powers\mixed_cocktails_power.png" />
@@ -165,6 +167,7 @@
 		<Content Include="AstralPartyMod\images\relic\person_oasis_queen.png" />
 		<Content Include="AstralPartyMod\images\relic\person_proprietress.png" />
 		<Content Include="AstralPartyMod\images\relic\person_samurai_prawn.png" />
+		<Content Include="AstralPartyMod\images\relic\person_shadow_scion.png" />
 		<Content Include="AstralPartyMod\images\relic\person_slime_lulu.png" />
 		<Content Include="AstralPartyMod\images\relic\person_social_fear_nun.png" />
 		<Content Include="AstralPartyMod\images\relic\person_superman_megas.png" />

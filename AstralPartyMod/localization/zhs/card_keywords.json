@@ -20,9 +20,9 @@
   "ASTRALPARTYMOD-ASTRAL_COOLDOWN.title": "冷却",
   "ASTRALPARTYMOD-ASTRAL_COOLDOWN.description": "这张牌同时拥有[gold]唯一[/gold]、[gold]保留[/gold]和[gold]消耗[/gold]效果。",
   "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.title": "轨道轰炸",
-  "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.description": "轨道系列伤害[gold]无视格挡[/gold]\n每弃置[blue]2[/blue]张牌，额外轰炸[blue]1[/blue]次；\n每有[blue]3[/blue]点被弃牌的总能量费用，此伤害+[blue]1[/blue];\n被弃置的[blue]0[/blue]费牌按[blue]1[/blue]点计算，X费牌按你当前能量计算。",
+  "ASTRALPARTYMOD-SOLAR_BOMBARDMENT.description": "轨道系列伤害[gold]无视格挡[/gold]\n每弃置[blue]2[/blue]张牌，额外轰炸[blue]1[/blue]次；\n每有{energyPrefix:energyIcons(3)}的被弃牌总费用，此伤害+[blue]1[/blue];\n被弃置的[blue]0[/blue]费牌按{energyPrefix:energyIcons(1)}计算，X费牌按你当前能量计算。",
   "ASTRALPARTYMOD-ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.title": "轨道炮",
   "ASTRALPARTYMOD-ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.description": "当作为[gold]轨道轰炸素材[/gold]时：\n每张视为[blue]2[/blue]张卡。\n费用计算视为[blue]3[/blue]点。",
   "ASTRALPARTYMOD-ASTRAL_MIXED.title": "调制",
-  "ASTRALPARTYMOD-ASTRAL_MIXED.description": "【攻击牌】临时[green]力量[/green]([blue]1[/blue])\n【防御牌】临时[green]敏捷[/green]([blue]1[/blue])\n【技能牌】：回复[green]生命[/green]([blue]1[/blue])\n【能力牌】获得[green]能量[/green]([blue]1[/blue])\n【状态牌】[green]抽牌[/green]([blue]1[/blue])\n【诅咒牌】回复[green]生命[/green]([blue]1[/blue])，获得[green]格挡[/green]([blue]1[/blue])"
+  "ASTRALPARTYMOD-ASTRAL_MIXED.description": "【攻击牌】临时[green]力量[/green]([blue]1[/blue])\n【防御牌】临时[green]敏捷[/green]([blue]1[/blue])\n【技能牌】：回复[green]生命[/green]([blue]1[/blue])\n【能力牌】获得{energyPrefix:energyIcons(1)}\n【状态牌】[green]抽牌[/green]([blue]1[/blue])\n【诅咒牌】回复[green]生命[/green]([blue]1[/blue])，获得[green]格挡[/green]([blue]1[/blue])"
 }

@@ -14,7 +14,7 @@ public class MouseShieldPower : AstralPartyPowerModel
         public bool ShouldRemove;
     }
 
-    private const decimal DamageReduction = 9m;
+    private const decimal DamageReduction = 999m;
 
     public override PowerType Type => PowerType.Buff;
 
