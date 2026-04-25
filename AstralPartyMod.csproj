@@ -183,12 +183,14 @@
 		<Content Include="AstralPartyMod\localization\eng\card_keywords.json" />
 		<Content Include="AstralPartyMod\localization\eng\potions.json" />
 		<Content Include="AstralPartyMod\localization\eng\powers.json" />
+		<Content Include="AstralPartyMod\localization\eng\relic_collection.json" />
 		<Content Include="AstralPartyMod\localization\eng\relics.json" />
 		<Content Include="AstralPartyMod\localization\eng\modifiers.json.block" />
 		<Content Include="AstralPartyMod\localization\zhs\cards.json" />
 		<Content Include="AstralPartyMod\localization\zhs\card_keywords.json" />
 		<Content Include="AstralPartyMod\localization\zhs\potions.json" />
 		<Content Include="AstralPartyMod\localization\zhs\powers.json" />
+		<Content Include="AstralPartyMod\localization\zhs\relic_collection.json" />
 		<Content Include="AstralPartyMod\localization\zhs\relics.json" />
 		<Content Include="help\CardPool.md" />
 		<Content Include="help\CardRarity.md" />

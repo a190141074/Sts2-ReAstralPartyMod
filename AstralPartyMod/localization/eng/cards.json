@@ -80,5 +80,5 @@
   "ASTRALPARTYMOD-COLLECTORS_CARD_I_AM_DRAGON.description": "Deal {Damage:diff()} damage to all enemies and temporarily reduce their [red]Strength[/red] by {StrengthLoss:diff()}.\nAfter being played, when you take damage, automatically play this card from your [gold]Exhaust Pile[/gold]. Then return it to your [gold]Exhaust Pile[/gold].\nIf you have lost HP this turn, deal {BonusDamage:diff()} extra damage."
 ,
   "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.title": "Stagnant Protocol",
-  "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.description": "Gain [gold]Stagnant Protocol[/gold]."
+  "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.description": "Gain [blue]100[/blue] [gold]Stagnant Protocol[/gold]."
 }

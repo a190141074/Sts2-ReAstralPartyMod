@@ -77,7 +77,7 @@
   "ASTRALPARTYMOD-SKILL_IRON_VIRGIN.title": "铁处女",
   "ASTRALPARTYMOD-SKILL_IRON_VIRGIN.description": "获得1层[gold]铁处女[/gold]，直到下一回合开始前免疫伤害。\n如果当前回合还未触发[gold]边界强化[/gold]，则额外获得3点临时[red]力量[/red]。",
   "ASTRALPARTYMOD-COLLECTORS_CARD_I_AM_DRAGON.title": "我是龙！",
-  "ASTRALPARTYMOD-COLLECTORS_CARD_I_AM_DRAGON.description": "对所有敌人造成{Damage:diff()}点伤害，临时减少其{StrengthLoss:diff()}点[red]力量[/red]。\n使用后，当你受到伤害时，会从[gold]消耗牌堆[/gold]中自动打出，然后再次进入[gold]消耗牌堆[/gold]。\n如果你本回合失去过生命，额外造成{BonusDamage:diff()}点伤害。",
+  "ASTRALPARTYMOD-COLLECTORS_CARD_I_AM_DRAGON.description": "对所有敌人造成{Damage:diff()}点伤害，临时减少其{StrengthLoss:diff()}点[red]力量[/red]。\n当你受到伤害时自动打出\n如果你本回合失去过生命，额外造成{BonusDamage:diff()}点伤害。",
   "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.title": "静滞协议",
-  "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.description": "获得[gold]静滞协议[/gold]。"
+  "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.description": "获得[blue]100[/blue]层[gold]静滞协议[/gold]。"
 }

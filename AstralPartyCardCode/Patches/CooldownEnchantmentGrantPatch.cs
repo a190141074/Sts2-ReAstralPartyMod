@@ -1,3 +1,5 @@
+using System;
+using System.Reflection;
 using AstralPartyMod.AstralPartyCardCode.cards;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
@@ -6,12 +8,23 @@ using MegaCrit.Sts2.Core.Models;
 
 namespace AstralPartyMod.AstralPartyCardCode.Patches;
 
-[HarmonyPatch(
-    typeof(CardPileCmd),
-    nameof(CardPileCmd.AddGeneratedCardToCombat),
-    [typeof(CardModel), typeof(PileType), typeof(bool)])]
+[HarmonyPatch]
 public static class CooldownEnchantmentGrantPatch
 {
+    public static MethodBase? TargetMethod()
+    {
+        return AccessTools.DeclaredMethod(
+                   typeof(CardPileCmd),
+                   nameof(CardPileCmd.AddGeneratedCardToCombat),
+                   [typeof(CardModel), typeof(PileType), typeof(bool), typeof(CardPilePosition)]
+               )
+               ?? AccessTools.DeclaredMethod(
+                   typeof(CardPileCmd),
+                   nameof(CardPileCmd.AddGeneratedCardToCombat),
+                   [typeof(CardModel), typeof(PileType), typeof(bool)]
+               );
+    }
+
     [HarmonyPrefix]
     public static void Prefix(CardModel card)
     {

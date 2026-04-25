@@ -34,6 +34,12 @@ public class CollectorsCardIAmDragon : AstralPartyCardModel
 
     private bool _isAutoPlaying;
 
+    protected override string PortraitBasePath =>
+        "res://AstralPartyMod/images/card_portraits/collectors_card_i_am_dragon";
+
+    protected override string FrameBasePath =>
+        "res://AstralPartyMod/images/card_portraits/collectors_card_i_am_dragon";
+
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
     public override bool ShouldReceiveCombatHooks => true;

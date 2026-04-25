@@ -16,16 +16,16 @@ namespace AstralPartyMod.AstralPartyCardCode.Powers;
 
 public class StagnantCosmosPower : AstralPartyPowerModel
 {
+    private const decimal ProtocolCostPerTrigger = 1m;
+
     private sealed class Data
     {
-        public HashSet<CardModel> EligibleCards { get; } = [];
+        public Dictionary<CardModel, decimal> EligibleCards { get; } = [];
     }
-
-    private const decimal DefaultCap = 100m;
 
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.None;
+    public override PowerStackType StackType => PowerStackType.Counter;
 
     public override int DisplayAmount => (int)Amount;
 
@@ -41,31 +41,12 @@ public class StagnantCosmosPower : AstralPartyPowerModel
         HoverTipFactory.FromPower<CosmosFreezesPower>()
     ];
 
-    public override bool TryModifyPowerAmountReceived(
-        PowerModel canonicalPower,
-        Creature target,
-        decimal amount,
-        Creature? applier,
-        out decimal modifiedAmount)
+    protected override IEnumerable<string> GetCandidateIconPaths()
     {
-        modifiedAmount = amount;
+        yield return "res://AstralPartyMod/images/powers/cosmos_stagnant_power.png";
 
-        if (canonicalPower is not StagnantCosmosPower)
-            return false;
-        if (target != Owner)
-            return false;
-
-        // This protocol is unique: reapplications neither stack nor refresh.
-        modifiedAmount = 0m;
-        return true;
-    }
-
-    public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
-    {
-        if (Owner == null || Amount > 0m)
-            return;
-
-        await PowerCmd.ModifyAmount(this, DefaultCap, applier, cardSource, true);
+        foreach (var path in base.GetCandidateIconPaths())
+            yield return path;
     }
 
     public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -74,10 +55,14 @@ public class StagnantCosmosPower : AstralPartyPowerModel
             return Task.CompletedTask;
         if (cardPlay.Card.Owner?.Creature != Owner)
             return Task.CompletedTask;
-        if (cardPlay.Resources.EnergyValue < 1)
+        if (cardPlay.Card.Type is not CardType.Attack and not CardType.Skill)
             return Task.CompletedTask;
 
-        GetInternalData<Data>().EligibleCards.Add(cardPlay.Card);
+        var paidEnergy = cardPlay.Resources.EnergyValue;
+        if (paidEnergy < 1m)
+            return Task.CompletedTask;
+
+        GetInternalData<Data>().EligibleCards[cardPlay.Card] = paidEnergy;
         return Task.CompletedTask;
     }
 
@@ -89,11 +74,17 @@ public class StagnantCosmosPower : AstralPartyPowerModel
         Creature target,
         CardModel? cardSource)
     {
-        if (!CanApplyStagnation(dealer, result, target, cardSource))
+        if (!TryGetStagnationAmount(dealer, result, target, cardSource, out var stagnationAmount))
+            return;
+        if (stagnationAmount <= 0m)
             return;
 
         Flash();
-        await PowerCmd.Apply<CosmosFreezesPower>(target, 1m, Owner, cardSource, false);
+        await PowerCmd.Apply<CosmosFreezesPower>(target, stagnationAmount, Owner, cardSource, false);
+        await PowerCmd.ModifyAmount(this, -ProtocolCostPerTrigger, Owner, cardSource, true);
+
+        if (Amount <= ProtocolCostPerTrigger)
+            await PowerCmd.Remove(this);
     }
 
     public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
@@ -104,8 +95,15 @@ public class StagnantCosmosPower : AstralPartyPowerModel
         return Task.CompletedTask;
     }
 
-    private bool CanApplyStagnation(Creature? dealer, DamageResult result, Creature target, CardModel? cardSource)
+    private bool TryGetStagnationAmount(
+        Creature? dealer,
+        DamageResult result,
+        Creature target,
+        CardModel? cardSource,
+        out decimal stagnationAmount)
     {
+        stagnationAmount = 0m;
+
         if (Owner == null)
             return false;
         if (dealer != Owner)
@@ -116,7 +114,13 @@ public class StagnantCosmosPower : AstralPartyPowerModel
             return false;
         if (result.TotalDamage <= 0m)
             return false;
+        if (Amount < ProtocolCostPerTrigger)
+            return false;
 
-        return GetInternalData<Data>().EligibleCards.Contains(cardSource);
+        if (!GetInternalData<Data>().EligibleCards.TryGetValue(cardSource, out var cardCost))
+            return false;
+
+        stagnationAmount = cardCost;
+        return stagnationAmount > 0m;
     }
 }

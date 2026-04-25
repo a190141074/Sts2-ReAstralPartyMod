@@ -13,7 +13,7 @@ namespace AstralPartyMod.AstralPartyCardCode.cards;
 [Pool(typeof(ColorlessCardPool))]
 public class CollectorsCardStagnantProtocol : AstralPartyCardModel
 {
-    private const decimal StagnantCap = 100m;
+    private const decimal StagnantProtocolAmount = 100m;
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
@@ -41,7 +41,7 @@ public class CollectorsCardStagnantProtocol : AstralPartyCardModel
 
         await PowerCmd.Apply<StagnantCosmosPower>(
             Owner.Creature,
-            StagnantCap,
+            StagnantProtocolAmount,
             Owner.Creature,
             this,
             false

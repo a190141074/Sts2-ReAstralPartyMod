@@ -6,6 +6,8 @@ namespace AstralPartyMod.AstralPartyCardCode.Powers;
 
 public abstract partial class AstralPartyPowerModel : CustomPowerModel
 {
+    private const string MissingPowerIconPath = "res://images/powers/missing_power.png";
+
     private static readonly Regex CamelCaseRegex = MyRegex();
 
     protected virtual string PowerId => CamelCaseRegex.Replace(GetType().Name, "$1_$2").ToLowerInvariant();
@@ -33,7 +35,7 @@ public abstract partial class AstralPartyPowerModel : CustomPowerModel
             if (ResourceLoader.Exists(path))
                 return path;
 
-        return "res://AstralPartyMod/images/powers/power.png";
+        return MissingPowerIconPath;
     }
 
     protected virtual IEnumerable<string> GetCandidateIconPaths()
@@ -43,7 +45,7 @@ public abstract partial class AstralPartyPowerModel : CustomPowerModel
         yield return $"res://AstralPartyMod/images/power/{idEntry}.png";
         yield return $"res://AstralPartyMod/images/powers/{PowerId}.png";
         yield return $"res://AstralPartyMod/images/power/{PowerId}.png";
-        yield return "res://AstralPartyMod/images/powers/power.png";
+        yield return MissingPowerIconPath;
     }
 
     protected virtual string NormalizePowerImageId(string idEntry)
