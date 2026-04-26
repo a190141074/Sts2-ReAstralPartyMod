@@ -206,6 +206,7 @@
 		<Compile Remove="tmp_inspect3\**\*.cs" />
 		<Compile Remove="tmp_inspect4.cs" />
 		<Compile Remove="tmp_reflect\**\*.cs" />
+		<Compile Remove="docs\**\*.cs" />
 		<Compile Remove="AstralPartyCardCode\Keywords\MyKeywords.cs" />
 	</ItemGroup>
 

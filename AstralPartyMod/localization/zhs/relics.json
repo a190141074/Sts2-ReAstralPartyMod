@@ -60,7 +60,7 @@
   "ASTRALPARTYMOD-PERSON_JILL_STEINLE.description": "· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]调制饮料[/gold]加入手中。\n· 若恰好弃置[blue]3[/blue]张不同类型的牌，你获得[blue]3[/blue]星光。\n· 若恰好弃置[blue]3[/blue]张相同类型的牌，目标额外获得[blue]3[/blue]敏捷。",
   "ASTRALPARTYMOD-PERSON_JILL_STEINLE.flavor": "今晚喝点什么？",
   "ASTRALPARTYMOD-PERSON_SHADOW_SCION.title": "【人格：阿尔】",
-  "ASTRALPARTYMOD-PERSON_SHADOW_SCION.description": "· 获得后的第一场战斗开始时，所有玩家获得[blue]50[/blue]点[gold]星光[/gold]，仅生效一次。\n· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]强者怜悯[/gold]加入手中。\n· 当任意玩家获得卡牌或抽牌时，你与该玩家各获得[blue]1[/blue]点[gold]星光[/gold]。\n· 你每拥有[blue]12[/blue]层[gold]永恒星光[/gold]，战斗开始时便获得[blue]1[/blue]点[red]力量[/red]和[blue]1[/blue]点[green]敏捷[/green]。",
+  "ASTRALPARTYMOD-PERSON_SHADOW_SCION.description": "· 接下来的[blue]2[/blue]场战斗开始时，所有玩家获得[blue]1[/blue]张[gold]女王特权[/gold]。\n· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]强者怜悯[/gold]加入手中。\n· 当任意玩家获得卡牌或抽牌时，你与该玩家各获得[blue]1[/blue]点[gold]星光[/gold]。\n· 你每拥有[blue]12[/blue]层[gold]永恒星光[/gold]，战斗开始时便获得[blue]1[/blue]点[red]力量[/red]和[blue]1[/blue]点[green]敏捷[/green]。",
   "ASTRALPARTYMOD-PERSON_SHADOW_SCION.flavor": "强者会怜悯，但影子只认得代价。",
   "ASTRALPARTYMOD-PERSON_POISONED_APPLE.title": "【人格：邦妮】",
   "ASTRALPARTYMOD-PERSON_POISONED_APPLE.description": "· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]隐匿行动[/gold]加入手中。\n· 将[gold]隐匿调查[/gold]系列事件加入可选卡池；\n· 你的攻击牌对拥有[gold]标记[/gold]的敌人造成伤害时，伤害+[blue]3[/blue]。",

@@ -24,7 +24,7 @@ namespace AstralPartyMod.AstralPartyCardCode.Relics;
 public class PersonShadowScion : AstralPartyRelicModel
 {
     private const int BaseMaxCounter = 4;
-    private const decimal FirstCombatStarLightAmount = 50m;
+    private const int RoyalPrerogativeCombatsOnObtain = 2;
     private const int EternalStarlightPerCombatBonus = 12;
     private const decimal CombatBonusPerThreshold = 1m;
 
@@ -32,7 +32,7 @@ public class PersonShadowScion : AstralPartyRelicModel
 
     [SavedProperty] public bool AstralParty_PersonShadowScionPendingCombatStartCard { get; set; }
 
-    [SavedProperty] public bool AstralParty_PersonShadowScionFirstCombatBonusPending { get; set; }
+    [SavedProperty] public int AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
@@ -45,6 +45,7 @@ public class PersonShadowScion : AstralPartyRelicModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillPowerfulPity>(),
+        HoverTipFactory.FromCard<SkillRoyalPrerogative>(),
         HoverTipFactory.FromPower<StarLightPower>(),
         HoverTipFactory.FromPower<StrengthPower>(),
         HoverTipFactory.FromPower<DexterityPower>(),
@@ -56,7 +57,7 @@ public class PersonShadowScion : AstralPartyRelicModel
         await base.AfterObtained();
         AstralParty_PersonShadowScionCounter = 1;
         AstralParty_PersonShadowScionPendingCombatStartCard = true;
-        AstralParty_PersonShadowScionFirstCombatBonusPending = true;
+        AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats = RoyalPrerogativeCombatsOnObtain;
         InvokeDisplayAmountChanged();
     }
 
@@ -65,22 +66,16 @@ public class PersonShadowScion : AstralPartyRelicModel
         if (Owner?.Creature?.CombatState == null)
             return;
 
-        if (AstralParty_PersonShadowScionFirstCombatBonusPending)
+        if (AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats > 0)
         {
             Flash();
             foreach (var player in Owner.Creature.CombatState.Players)
             {
-                await PowerCmd.Apply(
-                    ModelDb.Power<StarLightPower>().ToMutable(),
-                    player.Creature,
-                    FirstCombatStarLightAmount,
-                    Owner.Creature,
-                    null,
-                    false
-                );
+                var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillRoyalPrerogative>(), player);
+                await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
             }
 
-            AstralParty_PersonShadowScionFirstCombatBonusPending = false;
+            AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats--;
         }
 
         var eternalStarlightStacks = Owner.GetRelic<TokenEternalStarlight>()?.GetStacks() ?? 0;
