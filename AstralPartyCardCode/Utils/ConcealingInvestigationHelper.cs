@@ -48,7 +48,8 @@ public static class ConcealingInvestigationHelper
 
         try
         {
-            await CardCmd.AutoPlay(choiceContext, cardToPlay, triggerPlayer.Creature, AutoPlayType.Default, false, true);
+            await CardCmd.AutoPlay(choiceContext, cardToPlay, triggerPlayer.Creature, AutoPlayType.Default, false,
+                true);
         }
         finally
         {
@@ -86,7 +87,9 @@ public static class ConcealingInvestigationHelper
         if (roomType is not (RoomType.Elite or RoomType.Boss))
             return;
 
-        var cardToPlay = triggerPlayer.Creature!.CombatState!.CreateCard(ModelDb.Card<EventsConcealingInvestigationD>(), triggerPlayer);
+        var cardToPlay =
+            triggerPlayer.Creature!.CombatState!.CreateCard(ModelDb.Card<EventsConcealingInvestigationD>(),
+                triggerPlayer);
         await CardCmd.AutoPlay(choiceContext, cardToPlay, triggerPlayer.Creature, AutoPlayType.Default, false, true);
     }
 
@@ -232,16 +235,12 @@ public static class ConcealingInvestigationHelper
         var creatures = new List<Creature>();
 
         foreach (var player in combatState.Players)
-        {
             if (player.Creature != null && player.Creature.IsAlive && !creatures.Contains(player.Creature))
                 creatures.Add(player.Creature);
-        }
 
         foreach (var enemy in combatState.GetOpponentsOf(ownerCreature))
-        {
             if (enemy.IsAlive && !creatures.Contains(enemy))
                 creatures.Add(enemy);
-        }
 
         return creatures;
     }

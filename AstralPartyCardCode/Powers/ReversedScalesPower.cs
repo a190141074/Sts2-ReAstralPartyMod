@@ -1,9 +1,12 @@
 using System;
 using System.Threading.Tasks;
 using BaseLib.Utils;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
@@ -95,5 +98,13 @@ public class ReversedScalesPower : AstralPartyPowerModel
             return amount;
 
         return Math.Max(amount - Amount * DamageReductionPerStack, 0m);
+    }
+
+    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    {
+        if (Owner == null || side != Owner.Side || Amount <= 0m)
+            return;
+
+        await PowerCmd.Remove(this);
     }
 }

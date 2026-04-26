@@ -46,7 +46,10 @@ public static class PersonaRelicCollectionPatch
         AccessTools.Method(
             typeof(NRelicCollectionCategory),
             "LoadSubcategory",
-            [typeof(NRelicCollection), typeof(LocString), typeof(IEnumerable<RelicModel>), typeof(HashSet<RelicModel>), typeof(HashSet<RelicModel>)]
+            [
+                typeof(NRelicCollection), typeof(LocString), typeof(IEnumerable<RelicModel>),
+                typeof(HashSet<RelicModel>), typeof(HashSet<RelicModel>)
+            ]
         )
         ?? throw new MissingMethodException(typeof(NRelicCollectionCategory).FullName, "LoadSubcategory");
 

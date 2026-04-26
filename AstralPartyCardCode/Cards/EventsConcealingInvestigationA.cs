@@ -39,8 +39,8 @@ public class EventsConcealingInvestigationA : AstralPartyCardModel
         await ConcealingInvestigationHelper.ApplyMarkToRandomEligibleEnemy(
             Owner,
             1m,
-            allowElite: false,
-            allowBoss: false,
+            false,
+            false,
             this
         );
         await ConcealingInvestigationHelper.ApplyConcealingToTriggerAndBonnie(Owner, this);

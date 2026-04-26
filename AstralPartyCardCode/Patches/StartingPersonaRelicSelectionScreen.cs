@@ -29,6 +29,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private const string TreasureRoomScenePath = "rooms/treasure_room";
     private const string TreasureRelicHolderScenePath = "ui/treasure_relic_holder";
+
     private const string BackgroundTexturePath =
         "res://AstralPartyMod/images/background/starting_persona_pelic_selection_screen.png";
 
@@ -180,10 +181,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         var container = relicCollection.GetNode<Control>("Container");
         var currentHolders = new List<NTreasureRoomRelicHolder>();
         foreach (var child in container.GetChildren())
-        {
             if (child is NTreasureRoomRelicHolder holder && holder.Name != "SingleplayerRelicHolder")
                 currentHolders.Add(holder);
-        }
 
         while (currentHolders.Count < optionCount)
         {

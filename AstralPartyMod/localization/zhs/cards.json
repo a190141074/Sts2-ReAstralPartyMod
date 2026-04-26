@@ -79,5 +79,7 @@
   "ASTRALPARTYMOD-COLLECTORS_CARD_I_AM_DRAGON.title": "我是龙！",
   "ASTRALPARTYMOD-COLLECTORS_CARD_I_AM_DRAGON.description": "对所有敌人造成{Damage:diff()}点伤害，临时减少其{StrengthLoss:diff()}点[red]力量[/red]。\n当你受到伤害时自动打出\n如果你本回合失去过生命，额外造成{BonusDamage:diff()}点伤害。",
   "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.title": "静滞协议",
-  "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.description": "获得[blue]100[/blue]层[gold]静滞协议[/gold]。"
+  "ASTRALPARTYMOD-COLLECTORS_CARD_STAGNANT_PROTOCOL.description": "获得[blue]100[/blue]层[gold]静滞协议[/gold]。",
+  "ASTRALPARTYMOD-CURIOUS_CANDY_MACHINE.title": "怪奇糖果机",
+  "ASTRALPARTYMOD-CURIOUS_CANDY_MACHINE.description": "[exhaust]消耗[/exhaust]，[retain]保留[/retain]，[blue]0[/blue]费用。\n使用后扣除[blue]12[/blue]金币，获得随机[blue]1[/blue]种糖果系列药水。"
 }

@@ -35,6 +35,24 @@ public static class AstralKeywords
     [CustomEnum("ASTRAL_BOXING_GLOVES_SET")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword AstralBoxingGlovesSet;
 
+    [CustomEnum("ASTRAL_DREAMSHIP_SERIES")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralDreamshipSeries;
+
+    [CustomEnum("ASTRAL_SPIRIT_FESTIVAL_SERIES")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralSpiritFestivalSeries;
+
+    [CustomEnum("ASTRAL_WATER_TOWN_SERIES")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralWaterTownSeries;
+
+    [CustomEnum("ASTRAL_MAGIC_ACADEMY_SERIES")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralMagicAcademySeries;
+
+    [CustomEnum("ASTRAL_DRAGON_PALACE_SERIES")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralDragonPalaceSeries;
+
+    [CustomEnum("ASTRAL_GHOST_ALLEY_SET")] [KeywordProperties(AutoKeywordPosition.Before)]
+    public static CardKeyword AstralGhostAlleySet;
+
     [CustomEnum("ASTRAL_COLLECTION")] [KeywordProperties(AutoKeywordPosition.Before)]
     public static CardKeyword AstralCollection;
 

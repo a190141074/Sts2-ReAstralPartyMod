@@ -2,5 +2,11 @@
   "ASTRALPARTYMOD-PERSON_CHEST_CHOOSE.title": "Persona Chest",
   "ASTRALPARTYMOD-PERSON_CHEST_CHOOSE.description": "Use only outside combat. Randomly reveal 4 different persona relics you do not own. Choose 1 to obtain.",
   "ASTRALPARTYMOD-PERSON_CHEST_CHOOSE.selectionScreenHeader": "Choose a Persona",
-  "ASTRALPARTYMOD-PERSON_CHEST_CHOOSE.selectionScreenPrompt": "Choose a persona relic to obtain"
+  "ASTRALPARTYMOD-PERSON_CHEST_CHOOSE.selectionScreenPrompt": "Choose a persona relic to obtain",
+  "ASTRALPARTYMOD-CANDY_SUPPORT_GUM.title": "Candy: Support Gum",
+  "ASTRALPARTYMOD-CANDY_SUPPORT_GUM.description": "Use on any player. The target heals [blue]6[/blue] HP, gains {energyPrefix:energyIcons(1)}, and removes [gold]Doom[/gold].",
+  "ASTRALPARTYMOD-CANDY_ENERGY_SUPPLEMENT_BAR.title": "Candy: Energy Supplement Bar",
+  "ASTRALPARTYMOD-CANDY_ENERGY_SUPPLEMENT_BAR.description": "Use only on a player with [gold]Modification[/gold]. The target gains [blue]2[/blue] [gold]Modification[/gold], [blue]2[/blue] [gold]Doom[/gold], [blue]3[/blue] temporary [red]Strength[/red], and [blue]2[/blue] temporary [green]Dexterity[/green] for [blue]2[/blue] turns.",
+  "ASTRALPARTYMOD-CANDY_BIG_BRAIN_GUMMY.title": "Candy: Big Brain Gummy",
+  "ASTRALPARTYMOD-CANDY_BIG_BRAIN_GUMMY.description": "Use on any player. The target draws [blue]3[/blue] cards, then removes [gold]Modification[/gold] and [gold]Doom[/gold]."
 }

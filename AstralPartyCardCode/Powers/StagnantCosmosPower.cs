@@ -41,14 +41,6 @@ public class StagnantCosmosPower : AstralPartyPowerModel
         HoverTipFactory.FromPower<CosmosFreezesPower>()
     ];
 
-    protected override IEnumerable<string> GetCandidateIconPaths()
-    {
-        yield return "res://AstralPartyMod/images/powers/cosmos_stagnant_power.png";
-
-        foreach (var path in base.GetCandidateIconPaths())
-            yield return path;
-    }
-
     public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (Owner == null)

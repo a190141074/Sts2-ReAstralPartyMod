@@ -1,5 +1,5 @@
 63f7b34db8d8cdea90c76aacccf841ec
-::res://::1777112903
+::res://::1777207757
 AstralPartyMod.json::JSON::-1::1776792610::0::1::::<><><>0<>0<><>::
 export_presets.cfg::TextFile::-1::1775677124::0::1::::<><><>0<>0<><>::
 icon.ico::OtherFile::-1::1775663854::0::1::::<><><>0<>0<><>::
@@ -116,7 +116,7 @@ PersonOasisQueen.cs::CSharpScript::1317146729953116886::1777020377::0::1::::<><>
 PersonPoisonedApple.cs::CSharpScript::-1::1777051425::0::1::::<><><>0<>0<><>::
 PersonProprietress.cs::CSharpScript::6083740478015456530::1777020615::0::1::::<><><>0<>0<><>::
 PersonSamuraiPrawn.cs::CSharpScript::8728917633592302640::1777020615::0::1::::<><><>0<>0<><>::
-PersonShadowScion.cs::CSharpScript::6723794178418732295::1777197108::0::1::::<><><>0<>0<><>::
+PersonShadowScion.cs::CSharpScript::6723794178418732295::1777208772::0::1::::<><><>0<>0<><>::
 PersonSlimeLulu.cs::CSharpScript::3771129425240129170::1777020615::0::1::::<><><>0<>0<><>::
 PersonSocialFearNun.cs::CSharpScript::8014329503250619736::1777020615::0::1::::<><><>0<>0<><>::
 PersonSupermanMegas.cs::CSharpScript::1202316707663395513::1777020615::0::1::::<><><>0<>0<><>::
@@ -372,7 +372,7 @@ enchantments.json::JSON::-1::1776868985::0::1::::<><><>0<>0<><>::
 modifiers.json::JSON::-1::1775838636::0::1::::<><><>0<>0<><>::
 potions.json::JSON::-1::1776177919::0::1::::<><><>0<>0<><>::
 powers.json::JSON::-1::1777058469::0::1::::<><><>0<>0<><>::
-relics.json::JSON::-1::1777197139::0::1::::<><><>0<>0<><>::
+relics.json::JSON::-1::1777208793::0::1::::<><><>0<>0<><>::
 relic_collection.json::JSON::-1::1777055733::0::1::::<><><>0<>0<><>::
 ::res://AstralPartyMod/localization/zhs/::1777058266
 cards.json::JSON::-1::1777058266::0::1::::<><><>0<>0<><>::
@@ -381,12 +381,12 @@ enchantments.json::JSON::-1::1776868985::0::1::::<><><>0<>0<><>::
 modifiers.json::JSON::-1::1775838627::0::1::::<><><>0<>0<><>::
 potions.json::JSON::-1::1776002324::0::1::::<><><>0<>0<><>::
 powers.json::JSON::-1::1777058469::0::1::::<><><>0<>0<><>::
-relics.json::JSON::-1::1777197139::0::1::::<><><>0<>0<><>::
+relics.json::JSON::-1::1777208793::0::1::::<><><>0<>0<><>::
 relic_collection.json::JSON::-1::1777055733::0::1::::<><><>0<>0<><>::
 ::res://bin/::1775394889
 ::res://bin/Debug/::1775394889
 ::res://bin/Debug/net9.0/::1775394889
-::res://docs/::1777207276
+::res://docs/::1777208544
 01-project-setup.md::TextFile::-1::1776082702::0::1::::<><><>0<>0<><>::
 02-core-features.md::TextFile::-1::1776082702::0::1::::<><><>0<>0<><>::
 03-config-system.md::TextFile::-1::1776082702::0::1::::<><><>0<>0<><>::
@@ -524,11 +524,11 @@ Icon.png::CompressedTexture2D::5076158486181464494::1770720304::1775658081::1:::
 AssemblyInfo.cs::CSharpScript::597785664723594642::1776770390::0::1::::<><><>0<>0<><>::
 ::res://Scripts/::1776792610
 MainFile.cs::CSharpScript::6749006974391332999::1776792610::0::1::::<><><>0<>0<><>::
-::res://tmp_reflect/::1777195387
-Program.cs::CSharpScript::3683899177296252045::1777195372::0::1::::<><><>0<>0<><>::
+::res://tmp_reflect/::1777208806
+Program.cs::CSharpScript::3683899177296252045::1777208806::0::1::::<><><>0<>0<><>::
 ::res://tmp_reflect/bin/::1776753557
 ::res://tmp_reflect/bin/Debug/::1776753557
-::res://tmp_reflect/bin/Debug/net9.0/::1777195389
+::res://tmp_reflect/bin/Debug/net9.0/::1777208753
 tmp_reflect.deps.json::JSON::-1::1777195389::0::1::::<><><>0<>0<><>::
 tmp_reflect.runtimeconfig.json::JSON::-1::1776753558::0::1::::<><><>0<>0<><>::
 ::res://tmp_reflect/obj/::1776753557
@@ -537,9 +537,9 @@ tmp_reflect.csproj.nuget.dgspec.json::JSON::-1::1776753557::0::1::::<><><>0<>0<>
 ::res://tmp_reflect/obj/Debug/::1776753557
 ::res://tmp_reflect/obj/Debug/net9.0/::1777050383
 .NETCoreApp,Version=v9.0.AssemblyAttributes.cs::CSharpScript::6182743545995376498::1776753558::0::1::::<><><>0<>0<><>::
-tmp_reflect.AssemblyInfo.cs::CSharpScript::1266040539108772319::1777195373::0::1::::<><><>0<>0<><>::
+tmp_reflect.AssemblyInfo.cs::CSharpScript::1266040539108772319::1777208750::0::1::::<><><>0<>0<><>::
 tmp_reflect.csproj.FileListAbsolute.txt::TextFile::-1::1777050386::0::1::::<><><>0<>0<><>::
 tmp_reflect.GlobalUsings.g.cs::CSharpScript::5865207887272425842::1776753557::0::1::::<><><>0<>0<><>::
-tmp_reflect.sourcelink.json::JSON::-1::1777195373::0::1::::<><><>0<>0<><>::
+tmp_reflect.sourcelink.json::JSON::-1::1777208750::0::1::::<><><>0<>0<><>::
 ::res://tmp_reflect/obj/Debug/net9.0/ref/::1776753558
 ::res://tmp_reflect/obj/Debug/net9.0/refint/::1776753558

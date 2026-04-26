@@ -6,7 +6,7 @@ public static class ExtraBatteryRelicHelper
 {
     public static int GetAdjustedCooldownMaxCounter(Player? owner, int baseMaxCounter)
     {
-        if (owner?.GetRelic<AstralPartyMod.AstralPartyCardCode.Relics.TokenGoldExtraBattery>() == null)
+        if (owner?.GetRelic<Relics.TokenGoldExtraBattery>() == null)
             return baseMaxCounter;
 
         return Math.Max(1, baseMaxCounter - 1);
@@ -14,7 +14,7 @@ public static class ExtraBatteryRelicHelper
 
     public static int GetAdjustedBionicJasmineStepThreshold(Player? owner, int baseThreshold)
     {
-        if (owner?.GetRelic<AstralPartyMod.AstralPartyCardCode.Relics.TokenGoldExtraBattery>() == null)
+        if (owner?.GetRelic<Relics.TokenGoldExtraBattery>() == null)
             return baseThreshold;
 
         return Math.Max(1, (int)Math.Ceiling(baseThreshold * 0.75m));

@@ -107,7 +107,8 @@ public static class StartingPersonaRelicSelectionPatch
         var synchronizer = RunManager.Instance.TreasureRoomRelicSynchronizer;
         if (synchronizer.CurrentRelics != null)
         {
-            MainFile.Logger.Warn("Starting persona relic selection skipped because a relic picking session is already active.");
+            MainFile.Logger.Warn(
+                "Starting persona relic selection skipped because a relic picking session is already active.");
             return false;
         }
 
@@ -117,27 +118,23 @@ public static class StartingPersonaRelicSelectionPatch
 
         var votes = (List<TreasureRoomRelicSynchronizer.PlayerVote>)VotesField.GetValue(synchronizer)!;
         votes.Clear();
-        foreach (var player in runState.Players)
-        {
-            votes.Add(CreateInitialVote(runState, player, relicOptions.Count));
-        }
+        foreach (var player in runState.Players) votes.Add(CreateInitialVote(runState, player, relicOptions.Count));
 
         return true;
     }
 
-    private static TreasureRoomRelicSynchronizer.PlayerVote CreateInitialVote(RunState runState, Player player, int optionCount)
+    private static TreasureRoomRelicSynchronizer.PlayerVote CreateInitialVote(RunState runState, Player player,
+        int optionCount)
     {
         if (RunManager.Instance.IsSinglePlayerOrFakeMultiplayer
             && runState.Players.Count > 1
             && player.NetId != RunManager.Instance.NetService.NetId
             && optionCount > 0)
-        {
             return new TreasureRoomRelicSynchronizer.PlayerVote
             {
                 index = runState.Rng.TreasureRoomRelics.NextInt(optionCount),
                 voteReceived = true
             };
-        }
 
         return new TreasureRoomRelicSynchronizer.PlayerVote
         {

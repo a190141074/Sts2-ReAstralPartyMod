@@ -54,9 +54,7 @@ public class SkillConcealingOperation : AstralPartyCardModel
 
         var targetMarks = target.GetPowerAmount<MarkLockPower>();
         if (targetMarks > 0m)
-        {
             await PowerCmd.Apply<StarLightPower>(ownerCreature, targetMarks * 2m, ownerCreature, this, false);
-        }
 
         await ConcealingInvestigationHelper.TryTriggerTruthUnveiledOnSpecialTarget(choiceContext, owner, owner, this);
     }

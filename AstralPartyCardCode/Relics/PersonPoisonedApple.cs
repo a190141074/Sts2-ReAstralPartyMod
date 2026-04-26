@@ -58,7 +58,8 @@ public class PersonPoisonedApple : AstralPartyRelicModel
         InvokeDisplayAmountChanged();
     }
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, MegaCrit.Sts2.Core.Entities.Players.Player player)
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext,
+        MegaCrit.Sts2.Core.Entities.Players.Player player)
     {
         if (player != Owner || Owner?.Creature?.CombatState == null)
             return;
@@ -121,7 +122,8 @@ public class PersonPoisonedApple : AstralPartyRelicModel
     public bool HasCompletedTruthRevealProgress()
     {
         return GetCurrentInvestigationStage() == ConcealingInvestigationHelper.InvestigationStage.TruthUnveiled
-               && AstralParty_PersonPoisonedAppleInvestigationTriggerCount >= ConcealingInvestigationHelper.GetStageAdvanceThreshold() * 4;
+               && AstralParty_PersonPoisonedAppleInvestigationTriggerCount >=
+               ConcealingInvestigationHelper.GetStageAdvanceThreshold() * 4;
     }
 
     public void RecordInvestigationTrigger()

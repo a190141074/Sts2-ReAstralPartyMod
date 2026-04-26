@@ -37,7 +37,8 @@ public class TokenPurpleTastyCandy : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, HealToGainPerCard, Owner.Creature, cardPlay.Card, false);
+        await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, HealToGainPerCard, Owner.Creature, cardPlay.Card,
+            false);
 
         if (Owner.Creature.CurrentHp < Owner.Creature.MaxHp)
             return;

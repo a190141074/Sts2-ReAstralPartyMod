@@ -90,7 +90,8 @@ public class SkillPowerfulPity : AstralPartyCardModel
         CardModel selectedCard,
         MegaCrit.Sts2.Core.Entities.Players.Player targetPlayer)
     {
-        var copiedCard = ownerCreature.CombatState!.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, targetPlayer);
+        var copiedCard =
+            ownerCreature.CombatState!.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, targetPlayer);
         for (var i = 0; i < selectedCard.CurrentUpgradeLevel; i++)
             CardCmd.Upgrade(copiedCard);
 
@@ -102,7 +103,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
         if (Owner == null || handCards.Count == 0)
             return [];
 
-        var prefs = new CardSelectorPrefs(SelectionPrompt, System.Math.Min(MaxSelectedCards, handCards.Count))
+        var prefs = new CardSelectorPrefs(SelectionPrompt, Math.Min(MaxSelectedCards, handCards.Count))
         {
             Cancelable = true
         };

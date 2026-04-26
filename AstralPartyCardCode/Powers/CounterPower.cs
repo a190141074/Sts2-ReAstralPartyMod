@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 
 namespace AstralPartyMod.AstralPartyCardCode.Powers;
@@ -32,7 +33,11 @@ public class CounterPower : AstralPartyPowerModel
         {
             // Retaliation damage should not recursively trigger other retaliation-style effects.
             _activeRetaliations++;
-            await CreatureCmd.Damage(choiceContext, dealer, result.UnblockedDamage,
+            var retaliateDamage = result.UnblockedDamage + Owner.GetPowerAmount<StrengthPower>();
+            if (retaliateDamage <= 0m)
+                return;
+
+            await CreatureCmd.Damage(choiceContext, dealer, retaliateDamage,
                 ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.SkipHurtAnim, Owner, null);
         }
         finally

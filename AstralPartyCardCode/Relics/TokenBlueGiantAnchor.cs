@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AstralPartyMod.AstralPartyCardCode.Keywords;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
@@ -22,7 +23,8 @@ public class TokenBlueGiantAnchor : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<GiantAnchorPower>()
+        HoverTipFactory.FromPower<GiantAnchorPower>(),
+        HoverTipFactory.FromKeyword(AstralKeywords.AstralDreamshipSeries)
     ];
 
     public override async Task AfterDamageReceived(

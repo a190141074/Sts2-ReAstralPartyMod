@@ -182,8 +182,8 @@ public class CollectorsCardIAmDragon : AstralPartyCardModel
     {
         var ownerKey = GetOwnerKey();
         return ownerKey != null
-            && LostHpThisTurnByPlayer.TryGetValue(ownerKey, out var lostHpThisTurn)
-            && lostHpThisTurn;
+               && LostHpThisTurnByPlayer.TryGetValue(ownerKey, out var lostHpThisTurn)
+               && lostHpThisTurn;
     }
 
     private void ResetLostHpThisTurnFlag()

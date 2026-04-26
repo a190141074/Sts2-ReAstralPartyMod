@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
@@ -45,7 +46,7 @@ public class PersonShadowScion : AstralPartyRelicModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillPowerfulPity>(),
-        HoverTipFactory.FromCard<SkillRoyalPrerogative>(),
+        HoverTipFactory.FromCard<Royalties>(),
         HoverTipFactory.FromPower<StarLightPower>(),
         HoverTipFactory.FromPower<StrengthPower>(),
         HoverTipFactory.FromPower<DexterityPower>(),
@@ -71,7 +72,7 @@ public class PersonShadowScion : AstralPartyRelicModel
             Flash();
             foreach (var player in Owner.Creature.CombatState.Players)
             {
-                var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillRoyalPrerogative>(), player);
+                var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<Royalties>(), player);
                 await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
             }
 
@@ -84,8 +85,10 @@ public class PersonShadowScion : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<StrengthPower>(Owner.Creature, combatBonus * CombatBonusPerThreshold, Owner.Creature, null);
-        await PowerCmd.Apply<DexterityPower>(Owner.Creature, combatBonus * CombatBonusPerThreshold, Owner.Creature, null);
+        await PowerCmd.Apply<StrengthPower>(Owner.Creature, combatBonus * CombatBonusPerThreshold, Owner.Creature,
+            null);
+        await PowerCmd.Apply<DexterityPower>(Owner.Creature, combatBonus * CombatBonusPerThreshold, Owner.Creature,
+            null);
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -151,7 +154,6 @@ public class PersonShadowScion : AstralPartyRelicModel
         );
 
         if (recipient != Owner)
-        {
             await PowerCmd.Apply(
                 ModelDb.Power<StarLightPower>().ToMutable(),
                 recipient.Creature,
@@ -160,7 +162,6 @@ public class PersonShadowScion : AstralPartyRelicModel
                 source,
                 false
             );
-        }
     }
 
     private int GetClampedCounter()

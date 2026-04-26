@@ -46,7 +46,7 @@ public class GiantAnchorPower : AstralPartyPowerModel
         return false;
     }
 
-    public override async Task AfterApplied(Creature? applier, MegaCrit.Sts2.Core.Models.CardModel? cardSource)
+    public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
     {
         if (Owner == null || Amount <= 0m)
             return;
@@ -54,7 +54,7 @@ public class GiantAnchorPower : AstralPartyPowerModel
         var data = GetInternalData<Data>();
         var addedAmount = data.PendingAddedAmount > 0m
             ? data.PendingAddedAmount
-            : System.Math.Max(Amount - data.ProcessedAmount, 0m);
+            : Math.Max(Amount - data.ProcessedAmount, 0m);
 
         data.PendingAddedAmount = 0m;
         data.ProcessedAmount = Amount;
@@ -74,6 +74,6 @@ public class GiantAnchorPower : AstralPartyPowerModel
         await PowerCmd.Apply<StrengthPower>(Owner, -1m, Owner, null, true);
 
         var data = GetInternalData<Data>();
-        data.ProcessedAmount = System.Math.Max(0m, Amount - 1m);
+        data.ProcessedAmount = Math.Max(0m, Amount - 1m);
     }
 }

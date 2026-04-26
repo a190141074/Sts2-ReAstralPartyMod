@@ -78,6 +78,7 @@ public class VoidCrystalPower : AstralPartyPowerModel
             await PowerCmd.Decrement(this);
             return;
         }
+
         if (Amount <= 0m)
             return;
 
