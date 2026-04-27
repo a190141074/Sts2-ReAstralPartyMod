@@ -1,0 +1,7 @@
+{
+  "OPTION_INITIAL_POINT.name": "Ascend",
+  "OPTION_INITIAL_POINT.description_stage1": "Spend [gold]60[/gold] Gold to [gold]Ascend[/gold]. Gain [blue]1[/blue] random token relic (excluding special relics) and heal [blue]15[/blue]% Max HP.",
+  "OPTION_INITIAL_POINT.description_stage2": "Spend [gold]90[/gold] Gold to [gold]Ascend[/gold]. Gain [blue]1[/blue] random token relic (excluding special relics) and heal [blue]15[/blue]% Max HP.",
+  "OPTION_INITIAL_POINT.description_stage3": "Spend [gold]120[/gold] Gold to [gold]Ascend[/gold]. Gain [blue]1[/blue] random token relic (excluding special relics) and heal [blue]15[/blue]% Max HP.",
+  "OPTION_INITIAL_POINT.description_maxed": "All [blue]3[/blue] ascensions are complete. This option now only heals [blue]15[/blue]% Max HP."
+}

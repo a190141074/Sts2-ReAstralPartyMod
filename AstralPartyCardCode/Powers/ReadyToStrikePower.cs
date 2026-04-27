@@ -40,7 +40,7 @@ public class ReadyToStrikePower : AstralPartyPowerModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<StrengthPower>(),
-        HoverTipFactory.FromCard<Whirlwind>()
+        HoverTipFactory.FromCard<Omnislice>()
     ];
 
     public override Task BeforeAttack(AttackCommand command)
@@ -72,9 +72,9 @@ public class ReadyToStrikePower : AstralPartyPowerModel
             Flash();
             await CardCmd.Discard(new ThrowingPlayerChoiceContext(), card);
 
-            var whirlwind = MidnightFlashHelper.CreateWhirlwindCard(Owner!.Player!);
-            if (whirlwind != null)
-                await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(whirlwind, true);
+            var omnislice = MidnightFlashHelper.CreateOmnisliceCard(Owner!.Player!);
+            if (omnislice != null)
+                await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(omnislice, true);
         }
         finally
         {
@@ -101,6 +101,6 @@ public class ReadyToStrikePower : AstralPartyPowerModel
         if (card.Pile?.Type != PileType.Hand || oldPileType == PileType.Hand)
             return false;
 
-        return !MidnightFlashHelper.IsWhirlwindCard(card);
+        return !MidnightFlashHelper.IsOmnisliceCard(card);
     }
 }

@@ -43,7 +43,7 @@ public class PersonMidnightFlash : AstralPartyRelicModel
     [
         HoverTipFactory.FromCard<SkillUnstoppable>(),
         HoverTipFactory.FromPower<ReadyToStrikePower>(),
-        HoverTipFactory.FromCard<Whirlwind>()
+        HoverTipFactory.FromCard<Omnislice>()
     ];
 
     public override async Task AfterObtained()

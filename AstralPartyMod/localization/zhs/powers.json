@@ -61,7 +61,7 @@
   "ASTRALPARTYMOD-READY_TO_STRIKE_POWER.smartDescription": "本回合你的攻击牌伤害[gold]无视格挡[/gold]；本回合获得或抽到的非[gold]万向斩[/gold]手牌会被弃置并替换为[gold]万向斩[/gold]。",
   "ASTRALPARTYMOD-BLOODTHIRST_POWER.title": "喋血",
   "ASTRALPARTYMOD-BLOODTHIRST_POWER.description": "你的下一张攻击牌造成伤害时，会将其中的[blue]50[/blue]%转化为回复生命。\n本回合内，部分依赖低生命值的效果会按低于[blue]15[/blue]%生命结算。",
-  "ASTRALPARTYMOD-BLOODTHIRST_POWER.smartDescription": "下一张攻击牌造成伤害时，将其中的[blue]50[/blue]%转化为回复生命。本回合部分低生命值效果会按低于[blue]15[/blue]%生命结算。",
+  "ASTRALPARTYMOD-BLOODTHIRST_POWER.smartDescription": "下一张攻击牌造成伤害时，将其中的[blue]50[/blue]%转化为回复生命。\n本回合内，部分依赖低生命值的效果会按低于[blue]15[/blue]%生命结算。",
   "ASTRALPARTYMOD-CUTE_IS_JUSTICE_POWER.title": "可爱即正义",
   "ASTRALPARTYMOD-CUTE_IS_JUSTICE_POWER.description": "每层获得[blue]1[/blue]点[red]力量[/red]。",
   "ASTRALPARTYMOD-CUTE_IS_JUSTICE_POWER.smartDescription": "每层获得[blue]1[/blue]点[red]力量[/red]。",

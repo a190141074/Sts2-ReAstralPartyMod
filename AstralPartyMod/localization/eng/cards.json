@@ -75,7 +75,7 @@
   "ASTRALPARTYMOD-SKILL_POWERFUL_PITY.description": "Choose a player. Select up to [blue]3[/blue] cards from your hand and copy them into that player's hand.\nGain [gold]StarLight[/gold] equal to the number copied, discard the chosen cards, and gain [blue]1[/blue] stack of [gold]Eternal Starlight[/gold].",
   "ASTRALPARTYMOD-SKILL_POWERFUL_PITY.select_prompt": "Choose up to 3 cards to copy and discard",
   "ASTRALPARTYMOD-SKILL_UNSTOPPABLE.title": "Unstoppable",
-  "ASTRALPARTYMOD-SKILL_UNSTOPPABLE.description": "Gain [power]Ready to Strike[/power].\nDiscard all Attack cards in your hand, then gain that many [card]Whirlwind[/card] cards. Each one has a [blue]50[/blue]% chance to be upgraded.",
+  "ASTRALPARTYMOD-SKILL_UNSTOPPABLE.description": "Gain [power]Ready to Strike[/power].\nDiscard all Attack cards in your hand, then gain that many [card]Omnislice[/card] cards. Each one has a [blue]50[/blue]% chance to be upgraded.",
   "ASTRALPARTYMOD-SKILL_VAMPIRE_BITE.title": "One Little Sip",
   "ASTRALPARTYMOD-SKILL_VAMPIRE_BITE.description": "If your HP is above [blue]50[/blue]% of your current Max HP, take [blue]6[/blue] damage.\nGain [blue]1[/blue] [power]Bloodthirst[/power].",
   "ASTRALPARTYMOD-SKILL_IRON_VIRGIN.title": "Iron Virgin",

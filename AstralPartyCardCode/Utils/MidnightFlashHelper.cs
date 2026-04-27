@@ -8,25 +8,25 @@ namespace AstralPartyMod.AstralPartyCardCode.Utils;
 
 public static class MidnightFlashHelper
 {
-    public static bool IsWhirlwindCard(CardModel? card)
+    public static bool IsOmnisliceCard(CardModel? card)
     {
         if (card == null)
             return false;
 
         var canonicalId = (card.CanonicalInstance ?? card).Id;
-        return canonicalId == ModelDb.Card<Whirlwind>().Id;
+        return canonicalId == ModelDb.Card<Omnislice>().Id;
     }
 
-    public static CardModel? CreateWhirlwindCard(Player owner)
+    public static CardModel? CreateOmnisliceCard(Player owner)
     {
         var combatState = owner.Creature?.CombatState;
         if (combatState == null)
             return null;
 
-        var whirlwind = combatState.CreateCard(ModelDb.Card<Whirlwind>(), owner);
+        var omnislice = combatState.CreateCard(ModelDb.Card<Omnislice>(), owner);
         if (owner.RunState.Rng.Niche.NextInt(2) == 0)
-            CardCmd.Upgrade(whirlwind);
+            CardCmd.Upgrade(omnislice);
 
-        return whirlwind;
+        return omnislice;
     }
 }

@@ -28,7 +28,7 @@ public class SkillUnstoppable : AstralPartyCardModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<ReadyToStrikePower>(),
-        HoverTipFactory.FromCard<Whirlwind>()
+        HoverTipFactory.FromCard<Omnislice>()
     ];
 
     public SkillUnstoppable() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
@@ -56,9 +56,9 @@ public class SkillUnstoppable : AstralPartyCardModel
         await CardCmd.Discard(choiceContext, attackCards);
         foreach (var _ in attackCards)
         {
-            var whirlwind = MidnightFlashHelper.CreateWhirlwindCard(Owner);
-            if (whirlwind != null)
-                await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(whirlwind, true);
+            var omnislice = MidnightFlashHelper.CreateOmnisliceCard(Owner);
+            if (omnislice != null)
+                await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(omnislice, true);
         }
     }
 }

@@ -1,0 +1,7 @@
+{
+  "OPTION_INITIAL_POINT.name": "升星",
+  "OPTION_INITIAL_POINT.description_stage1": "花费[gold]60[/gold]金币[gold]升星[/gold]，获得[blue]1[/blue]个随机筹码遗物（不包括特殊遗物），并恢复[blue]15[/blue]%最大生命值。",
+  "OPTION_INITIAL_POINT.description_stage2": "花费[gold]90[/gold]金币[gold]升星[/gold]，获得[blue]1[/blue]个随机筹码遗物（不包括特殊遗物），并恢复[blue]15[/blue]%最大生命值。",
+  "OPTION_INITIAL_POINT.description_stage3": "花费[gold]120[/gold]金币[gold]升星[/gold]，获得[blue]1[/blue]个随机筹码遗物（不包括特殊遗物），并恢复[blue]15[/blue]%最大生命值。",
+  "OPTION_INITIAL_POINT.description_maxed": "已完成全部[blue]3[/blue]次升星。现在该选项只会恢复你[blue]15[/blue]%最大生命值。"
+}

@@ -101,6 +101,7 @@
 		<Content Include="AstralPartyMod\images\powers\conserve_energy_power.png"/>
 		<Content Include="AstralPartyMod\images\astral_token.png"/>
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_masters_chips.png"/>
+		<Content Include="AstralPartyMod\images\relic\personality_land_center.png"/>
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png"/>
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_sword_intent.png"/>
 		<Content Include="AstralPartyMod\images\relic\personality_derivative_xiao_lei_dragon_gate.png"/>
@@ -186,6 +187,7 @@
 		<Content Include="AstralPartyMod\localization\eng\powers.json"/>
 		<Content Include="AstralPartyMod\localization\eng\relic_collection.json"/>
 		<Content Include="AstralPartyMod\localization\eng\relics.json"/>
+		<Content Include="AstralPartyMod\localization\eng\rest_site_ui.json"/>
 		<Content Include="AstralPartyMod\localization\eng\modifiers.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\cards.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\card_keywords.json"/>
@@ -193,6 +195,7 @@
 		<Content Include="AstralPartyMod\localization\zhs\powers.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\relic_collection.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\relics.json"/>
+		<Content Include="AstralPartyMod\localization\zhs\rest_site_ui.json"/>
 		<Content Include="AstralPartyMod\localization\zhs\modifiers.json"/>
 		<Content Include="help\CardPool.md"/>
 		<Content Include="help\CardRarity.md"/>
@@ -208,6 +211,8 @@
 		<Compile Remove="tmp_inspect3\**\*.cs"/>
 		<Compile Remove="tmp_inspect4.cs"/>
 		<Compile Remove="tmp_reflect\**\*.cs"/>
+		<Compile Remove="tmp_reflect_rest\**\*.cs"/>
+		<Compile Remove="tmp_inspect_rest.cs"/>
 		<Compile Remove="docs\**\*.cs"/>
 		<Compile Remove="AstralPartyCardCode\Keywords\MyKeywords.cs"/>
 	</ItemGroup>
