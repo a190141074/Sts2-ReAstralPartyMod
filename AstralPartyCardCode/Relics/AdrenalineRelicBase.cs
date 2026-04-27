@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AstralPartyMod.AstralPartyCardCode.Powers;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -88,6 +89,9 @@ public abstract class AdrenalineRelicBase : AstralPartyRelicModel
             return 0m;
         if (Owner.Creature.MaxHp <= 0m)
             return 0m;
+
+        if (Owner.Creature.HasPower<BloodthirstPower>())
+            return QuarterHpBonus;
 
         var hpRatio = Owner.Creature.CurrentHp / Owner.Creature.MaxHp;
         if (hpRatio < 0.25m)

@@ -26,7 +26,9 @@ public static class PersonaRelicRegistry
         ModelDb.Relic<PersonSocialFearNun>(),
         ModelDb.Relic<PersonJillSteinle>(),
         ModelDb.Relic<PersonShadowScion>(),
-        ModelDb.Relic<PersonPoisonedApple>()
+        ModelDb.Relic<PersonPoisonedApple>(),
+        ModelDb.Relic<PersonMidnightFlash>(),
+        ModelDb.Relic<PersonVampire>()
     ];
 
     public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelics()

@@ -114,6 +114,20 @@ public static class PersonaRelicHelper
                     );
                     RefreshRelicDisplayAmount(xiaoLei);
                     break;
+                case PersonMidnightFlash midnightFlash:
+                    midnightFlash.AstralParty_PersonMidnightFlashCounter = Math.Min(
+                        midnightFlash.AstralParty_PersonMidnightFlashCounter + amount,
+                        ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(owner, 4)
+                    );
+                    RefreshRelicDisplayAmount(midnightFlash);
+                    break;
+                case PersonVampire vampire:
+                    vampire.AstralParty_PersonVampireCounter = Math.Min(
+                        vampire.AstralParty_PersonVampireCounter + amount,
+                        ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(owner, 4)
+                    );
+                    RefreshRelicDisplayAmount(vampire);
+                    break;
                 case PersonBionicJasmine bionicJasmine:
                     bionicJasmine.AddSteps(amount);
                     break;

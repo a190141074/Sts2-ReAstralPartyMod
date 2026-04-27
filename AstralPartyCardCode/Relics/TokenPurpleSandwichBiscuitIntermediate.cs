@@ -51,8 +51,10 @@ public class TokenPurpleSandwichBiscuitIntermediate : AstralPartyRelicModel
 
     private bool ShouldGrantCounter()
     {
-        return Owner?.Creature != null
-               && Owner.Creature.MaxHp > 0m
-               && Owner.Creature.CurrentHp < Owner.Creature.MaxHp * 0.5m;
+        var creature = Owner?.Creature;
+        if (creature == null || creature.MaxHp <= 0m)
+            return false;
+
+        return creature.HasPower<BloodthirstPower>() || creature.CurrentHp / creature.MaxHp < 0.5m;
     }
 }

@@ -73,7 +73,7 @@ public class SkillSaveMeMousy : AstralPartyCardModel
 
     private bool ShouldGrantEmergencyBackup(Creature target)
     {
-        return target.MaxHp > 0m && target.CurrentHp <= target.MaxHp * 0.5m;
+        return target.MaxHp > 0m && target.CurrentHp / target.MaxHp <= 0.5m;
     }
 
     private async Task GrantEmergencyBackup(PlayerChoiceContext choiceContext, Creature ownerCreature)
