@@ -8,6 +8,9 @@ namespace AstralPartyMod.AstralPartyCardCode.Utils;
 
 public static class GeneratedCardObserver
 {
+    private static readonly HashSet<CardModel> CardsBeingNotified = [];
+    private static readonly HashSet<CardModel> CardsAlreadyNotified = [];
+
     public static async Task AddGeneratedCardToHandAndNotify(CardModel card, bool animate = true,
         CardPilePosition position = CardPilePosition.Top)
     {
@@ -20,14 +23,25 @@ public static class GeneratedCardObserver
         var recipient = card.Owner;
         if (recipient?.Creature?.CombatState == null)
             return;
+        if (!CardsAlreadyNotified.Add(card))
+            return;
+        if (!CardsBeingNotified.Add(card))
+            return;
 
-        foreach (var player in recipient.Creature.CombatState.Players)
+        try
         {
-            var relic = player.GetRelic<PersonShadowScion>();
-            if (relic == null)
-                continue;
+            foreach (var player in recipient.Creature.CombatState.Players)
+            {
+                var relic = player.GetRelic<PersonShadowScion>();
+                if (relic == null)
+                    continue;
 
-            await relic.HandleObservedCardGain(recipient, card);
+                await relic.HandleObservedCardGain(recipient, card);
+            }
+        }
+        finally
+        {
+            CardsBeingNotified.Remove(card);
         }
     }
 }

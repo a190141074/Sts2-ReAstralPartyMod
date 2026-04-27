@@ -2,5 +2,9 @@
   "ASTRALPARTYMOD-PERSON_PRIVATE_START.title": "人格遗物选择",
   "ASTRALPARTYMOD-PERSON_PRIVATE_START.description": "游戏开始时，列出相当于玩家数量的人格遗物供选择",
   "ASTRALPARTYMOD-PERSON_PRIVATE_START.neow_title": "选择一个人格遗物",
-  "ASTRALPARTYMOD-PERSON_PRIVATE_START.neow_description": "从相当于玩家数量的人格遗物中选择一个"
+  "ASTRALPARTYMOD-PERSON_PRIVATE_START.neow_description": "从相当于玩家数量的人格遗物中选择一个",
+  "ASTRALPARTYMOD-STAR_ENGINE_MODE.title": "星引擎模式",
+  "ASTRALPARTYMOD-STAR_ENGINE_MODE.description": "地图上的所有宝箱房仅会出现筹码遗物。",
+  "ASTRALPARTYMOD-STAR_ENGINE_MODE.neow_title": "星引擎模式",
+  "ASTRALPARTYMOD-STAR_ENGINE_MODE.neow_description": "地图上的所有宝箱房仅会出现筹码遗物。"
 }

@@ -73,7 +73,7 @@ public class PersonShadowScion : AstralPartyRelicModel
             foreach (var player in Owner.Creature.CombatState.Players)
             {
                 var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<Royalties>(), player);
-                await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
+                await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true, CardPilePosition.Top);
             }
 
             AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats--;
