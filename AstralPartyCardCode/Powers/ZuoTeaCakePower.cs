@@ -20,6 +20,8 @@ public class ZuoTeaCakePower : AstralPartyPowerModel
     {
         public decimal ProcessedAmount;
         public decimal PendingAddedAmount;
+        public decimal AppliedStrengthThisTurn;
+        public decimal AppliedDexterityThisTurn;
     }
 
     public override PowerType Type => PowerType.Buff;
@@ -71,6 +73,8 @@ public class ZuoTeaCakePower : AstralPartyPowerModel
         if (addedAmount <= 0m)
             return;
 
+        data.AppliedStrengthThisTurn += addedAmount;
+        data.AppliedDexterityThisTurn += addedAmount;
         await PowerCmd.Apply<StrengthPower>(Owner, addedAmount, applier, cardSource, true);
         await PowerCmd.Apply<DexterityPower>(Owner, addedAmount, applier, cardSource, true);
     }
@@ -80,12 +84,17 @@ public class ZuoTeaCakePower : AstralPartyPowerModel
         if (Owner == null || side != Owner.Side || Amount <= 0m)
             return;
 
-        await PowerCmd.Apply<StrengthPower>(Owner, -Amount, Owner, null, true);
-        await PowerCmd.Apply<DexterityPower>(Owner, -Amount, Owner, null, true);
+        var data = GetInternalData<Data>();
+        if (data.AppliedStrengthThisTurn > 0m)
+            await PowerCmd.Apply<StrengthPower>(Owner, -data.AppliedStrengthThisTurn, Owner, null, true);
+        if (data.AppliedDexterityThisTurn > 0m)
+            await PowerCmd.Apply<DexterityPower>(Owner, -data.AppliedDexterityThisTurn, Owner, null, true);
+
         await PowerCmd.Remove(this);
 
-        var data = GetInternalData<Data>();
         data.ProcessedAmount = 0m;
         data.PendingAddedAmount = 0m;
+        data.AppliedStrengthThisTurn = 0m;
+        data.AppliedDexterityThisTurn = 0m;
     }
 }

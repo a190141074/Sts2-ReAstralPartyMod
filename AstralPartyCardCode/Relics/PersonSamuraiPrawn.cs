@@ -235,7 +235,7 @@ public class PersonSamuraiPrawn : AstralPartyRelicModel
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBlade>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private async Task EnsureSwordIntentRelic()

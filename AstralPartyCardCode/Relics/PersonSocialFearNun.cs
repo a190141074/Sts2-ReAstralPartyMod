@@ -204,7 +204,7 @@ public class PersonSocialFearNun : AstralPartyRelicModel
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillIronVirgin>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private async Task ApplyBoundaryReinforcement()

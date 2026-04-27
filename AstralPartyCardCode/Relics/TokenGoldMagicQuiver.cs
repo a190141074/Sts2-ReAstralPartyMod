@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -80,11 +81,15 @@ public class TokenGoldMagicQuiver : AstralPartyRelicModel
 
         await PowerCmd.Apply<MarkLockPower>(target, 1m, Owner?.Creature, cardSource, false);
 
-        var copiedCard = cardSource!.ToMutable();
+        var copiedCard = cardSource!.CreateClone();
         copiedCard.Owner = owner;
-        if (!copiedCard.Keywords.Contains(CardKeyword.Exhaust))
+        if (!cardSource.Keywords.Contains(CardKeyword.Exhaust)
+            && !copiedCard.Keywords.Contains(CardKeyword.Exhaust))
+        {
             copiedCard.AddKeyword(CardKeyword.Exhaust);
-        await CardPileCmd.AddGeneratedCardToCombat(copiedCard, PileType.Hand, true);
+        }
+
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(copiedCard, true);
     }
 
     private bool IsTrackedSkillDamage(Creature? target, decimal amount, Creature? dealer, CardModel? cardSource)

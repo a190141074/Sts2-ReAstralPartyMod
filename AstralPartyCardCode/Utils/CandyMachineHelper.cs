@@ -26,7 +26,7 @@ public static class CandyMachineHelper
             return;
 
         var card = owner.Creature.CombatState.CreateCard(ModelDb.Card<CuriousCandyMachine>(), owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     public static void GrantRandomCandyPotion(Player owner)

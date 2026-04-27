@@ -3,6 +3,7 @@ using AstralPartyMod.AstralPartyCardCode.Relics;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Models;
 
 namespace AstralPartyMod.AstralPartyCardCode.Utils;
@@ -57,7 +58,7 @@ public static class AstralEventCardPool
             .ToList();
     }
 
-    public static List<CardModel> CreateTroubleMakerCardsForPlayer(Player owner, int count)
+    public static List<CardModel> CreateStableTroubleMakerCardsForPlayer(Player owner, CardModel sourceCard, int count)
     {
         var cards = CreateMutableEventCardsForPlayer(owner);
 
@@ -65,9 +66,35 @@ public static class AstralEventCardPool
             cards.AddRange(CreateMutableInvestigationCardsForPlayer(owner));
 
         return cards
-            .OrderBy(_ => owner.RunState.Rng.Niche.NextInt(int.MaxValue))
+            .OrderBy(card => GetTroubleMakerSortKey(owner, sourceCard, card))
+            .ThenBy(card => card.Id.Entry)
             .Take(count)
             .ToList();
+    }
+
+    private static uint GetTroubleMakerSortKey(Player owner, CardModel sourceCard, CardModel candidate)
+    {
+        var key = string.Join(
+            "|",
+            owner.RunState.Rng.StringSeed,
+            owner.NetId,
+            owner.Creature?.CombatState?.RoundNumber ?? 0,
+            sourceCard.Id.Entry,
+            GetCombatPileCount(owner, PileType.Draw),
+            GetCombatPileCount(owner, PileType.Hand),
+            GetCombatPileCount(owner, PileType.Discard),
+            GetCombatPileCount(owner, PileType.Exhaust),
+            candidate.Id.Entry);
+
+        return (uint)StringHelper.GetDeterministicHashCode(key);
+    }
+
+    private static int GetCombatPileCount(Player owner, PileType pileType)
+    {
+        if (owner.Creature?.CombatState == null)
+            return 0;
+
+        return pileType.GetPile(owner).Cards.Count;
     }
 
     public static List<CardModel> CreateMutableInvestigationCardsForPlayer(Player owner)

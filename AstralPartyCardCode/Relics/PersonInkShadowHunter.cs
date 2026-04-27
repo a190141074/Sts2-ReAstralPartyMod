@@ -198,7 +198,7 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillShadowFusion>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private async Task ApplyTwinShadowToRandomEnemy()
@@ -206,18 +206,9 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
         if (Owner?.Creature?.CombatState == null || Owner.Creature == null)
             return;
 
-        var enemies = Owner.Creature.CombatState
-            .GetOpponentsOf(Owner.Creature)
-            .Where(creature => creature.IsAlive)
-            .ToList();
+        var enemies = CombatTargetOrdering.GetLivingOpponentsStable(Owner.Creature);
         if (enemies.Count == 0)
             return;
-
-        enemies = enemies
-            .OrderBy(creature => creature.CombatId ?? uint.MaxValue)
-            .ThenBy(creature => creature.ModelId.ToString())
-            .ThenBy(creature => creature.SlotName ?? string.Empty)
-            .ToList();
 
         var targetIndex = Owner.RunState.Rng.CombatTargets.NextInt(enemies.Count);
         var target = enemies[targetIndex];

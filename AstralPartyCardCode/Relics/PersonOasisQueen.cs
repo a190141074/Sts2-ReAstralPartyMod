@@ -181,6 +181,6 @@ public class PersonOasisQueen : AstralPartyRelicModel
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillRoyalPrerogative>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

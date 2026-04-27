@@ -37,7 +37,7 @@ public class EventFightFun : AstralPartyCardModel
             CardCmd.Upgrade(card);
             card.AddKeyword(CardKeyword.Exhaust);
             card.AddKeyword(CardKeyword.Ethereal);
-            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
             await XiaoLeiAwakeningHelper.TryGrantAwakeningForGrantedCard(Owner, player);
         }
     }

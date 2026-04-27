@@ -4,6 +4,7 @@ using AstralPartyMod.AstralPartyCardCode.Keywords;
 using AstralPartyMod.AstralPartyCardCode.Powers;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
@@ -25,10 +26,8 @@ public class TokenExclusiveTimer : AstralPartyRelicModel
     private const decimal SetDoomPerTurn = 1m;
     private const int ModificationStacksPerTemporaryStrength = 2;
 
-    private int _pendingTemporaryStrength;
-    private bool _flushScheduled;
-
     [SavedProperty] public int AstralParty_TokenExclusiveTimerModificationProgress { get; set; }
+    [SavedProperty] public int AstralParty_TokenExclusiveTimerAppliedStrength { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Common;
 
@@ -53,10 +52,10 @@ public class TokenExclusiveTimer : AstralPartyRelicModel
         return Task.CompletedTask;
     }
 
-    public override Task AfterCombatEnd(CombatRoom room)
+    public override async Task AfterCombatEnd(CombatRoom room)
     {
+        await RemoveAppliedStrength();
         ResetCombatTracking();
-        return Task.CompletedTask;
     }
 
     public override bool TryModifyPowerAmountReceived(
@@ -78,15 +77,18 @@ public class TokenExclusiveTimer : AstralPartyRelicModel
             return false;
 
         modifiedAmount += ExtraModificationOnGain;
-        var gainedStacks = (int)decimal.Floor(modifiedAmount);
-
-        if (gainedStacks > 0)
-        {
-            Flash();
-            RecordModificationGain(gainedStacks);
-        }
+        Flash();
 
         return true;
+    }
+
+    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier,
+        CardModel? cardSource)
+    {
+        if (Owner?.Creature == null || power.Owner != Owner.Creature || power is not ModificationPower)
+            return;
+
+        await SyncStrengthBonus();
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -110,52 +112,37 @@ public class TokenExclusiveTimer : AstralPartyRelicModel
         await PowerCmd.Apply<DoomPower>(Owner.Creature, SetDoomPerTurn, Owner.Creature, null, false);
     }
 
-    private void RecordModificationGain(int gainedStacks)
+    private async Task SyncStrengthBonus()
     {
-        var totalStacks = AstralParty_TokenExclusiveTimerModificationProgress + gainedStacks;
-        _pendingTemporaryStrength += totalStacks / ModificationStacksPerTemporaryStrength;
-        AstralParty_TokenExclusiveTimerModificationProgress =
-            totalStacks % ModificationStacksPerTemporaryStrength;
-
-        if (_pendingTemporaryStrength > 0)
-            ScheduleFlush();
-    }
-
-    private void ScheduleFlush()
-    {
-        if (_flushScheduled)
+        if (Owner?.Creature == null)
             return;
 
-        _flushScheduled = true;
-        _ = FlushPendingTemporaryStrengthAsync();
+        var desiredStrength = (int)(Owner.Creature.GetPowerAmount<ModificationPower>()
+            / ModificationStacksPerTemporaryStrength);
+        var delta = desiredStrength - AstralParty_TokenExclusiveTimerAppliedStrength;
+        if (delta == 0)
+            return;
+
+        AstralParty_TokenExclusiveTimerAppliedStrength = desiredStrength;
+        await PowerCmd.Apply<StrengthPower>(Owner.Creature, delta, Owner.Creature, null, true);
     }
 
-    private async Task FlushPendingTemporaryStrengthAsync()
+    private async Task RemoveAppliedStrength()
     {
-        await Task.Yield();
-
-        if (Owner?.Creature == null || _pendingTemporaryStrength <= 0)
-        {
-            _flushScheduled = false;
+        if (Owner?.Creature == null || AstralParty_TokenExclusiveTimerAppliedStrength == 0)
             return;
-        }
 
-        var pendingTemporaryStrength = _pendingTemporaryStrength;
-        _pendingTemporaryStrength = 0;
-        _flushScheduled = false;
-
-        await BoundaryReinforcementPower.ApplyTemporaryStrength(
+        await PowerCmd.Apply<StrengthPower>(
             Owner.Creature,
-            pendingTemporaryStrength,
+            -AstralParty_TokenExclusiveTimerAppliedStrength,
             Owner.Creature,
-            null
-        );
+            null,
+            true);
     }
 
     private void ResetCombatTracking()
     {
         AstralParty_TokenExclusiveTimerModificationProgress = 0;
-        _pendingTemporaryStrength = 0;
-        _flushScheduled = false;
+        AstralParty_TokenExclusiveTimerAppliedStrength = 0;
     }
 }

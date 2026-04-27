@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.cards;
 using AstralPartyMod.AstralPartyCardCode.Powers;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using Godot;
 using MegaCrit.Sts2.Core.Combat;
@@ -125,7 +126,7 @@ public class PersonalityDerivativeXiaoLeiDragonGate : AstralPartyRelicModel
             return;
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillDragonsRoar>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private HoverTip BuildProgressHoverTip()

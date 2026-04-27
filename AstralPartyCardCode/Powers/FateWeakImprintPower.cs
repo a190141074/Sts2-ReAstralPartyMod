@@ -91,7 +91,7 @@ public class FateWeakImprintPower : AstralPartyPowerModel
 
         // Reward the creature that dealt the killing blow, not necessarily the one that applied the imprint.
         var card = combatState.CreateCard(ModelDb.Card<SkillFateGuidance>(), rewardPlayer);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
         await XiaoLeiAwakeningHelper.TryGrantAwakeningForGrantedCard(Applier?.Player, rewardPlayer);
     }
 }

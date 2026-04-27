@@ -73,7 +73,7 @@ public class PersonShadowScion : AstralPartyRelicModel
             foreach (var player in Owner.Creature.CombatState.Players)
             {
                 var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<Royalties>(), player);
-                await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+                await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
             }
 
             AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats--;
@@ -201,6 +201,6 @@ public class PersonShadowScion : AstralPartyRelicModel
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillPowerfulPity>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

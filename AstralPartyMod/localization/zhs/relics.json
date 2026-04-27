@@ -237,7 +237,7 @@
   "ASTRALPARTYMOD-TOKEN_GOLD_MAGIC_QUIVER.description": "每回合[blue]1[/blue]次，对拥有[gold]标记[/gold]的怪物使用技能牌造成伤害时：施加[blue]1[/blue]层[gold]标记[/gold]，并复制该技能牌返回手牌。",
   "ASTRALPARTYMOD-TOKEN_GOLD_MAGIC_QUIVER.flavor": "箭袋会记得你最顺手的那一发。",
   "ASTRALPARTYMOD-TOKEN_GOLD_NINJA_SHURIKEN.title": "【忍术飞镖】",
-  "ASTRALPARTYMOD-TOKEN_GOLD_NINJA_SHURIKEN.description": "回合开始时，能量上限+{energyPrefix:energyIcons(1)}。\n对敌方目标使用技能牌造成伤害时，使其额外受到等同于[gold]标记[/gold]层数的伤害。",
+  "ASTRALPARTYMOD-TOKEN_GOLD_NINJA_SHURIKEN.description": "战斗开始时，能量上限+{energyPrefix:energyIcons(1)}。\n对敌方目标使用技能牌造成伤害时，使其额外受到等同于[gold]标记[/gold]层数的伤害。",
   "ASTRALPARTYMOD-TOKEN_GOLD_NINJA_SHURIKEN.flavor": "标记不是为了看，是为了补刀。",
   "ASTRALPARTYMOD-TOKEN_BLUE_HANDHELD_FAN_SMALL.title": "【手持风扇·小】",
   "ASTRALPARTYMOD-TOKEN_BLUE_HANDHELD_FAN_SMALL.description": "使用人格技能牌后，对随机怪物施加[blue]1[/blue]层[gold]标记[/gold]。",
@@ -282,7 +282,7 @@
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_SNAKE_DOLL.description": "每次受到伤害时，获得[blue]1[/blue]层[gold]逆鳞[/gold]。\n拥有[gold]【系列·龙宫游乐园】[/gold]效果。",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_SNAKE_DOLL.flavor": "它平时不咬人，但很记仇。",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_CARP_DOLL.title": "【小鲤鱼玩偶】",
-  "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_CARP_DOLL.description": "使用人格技能牌后，获得[blue]1[/blue]层[gold]反击[/gold]。\n反击触发后，获得[blue]1[/blue]层[gold]强化·小鲤鱼玩偶[/gold]。\n拥有[gold]【系列·龙宫游乐园】[/gold]效果。",
+  "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_CARP_DOLL.description": "使用人格技能牌后，获得[blue]1[/blue]层[gold]反击[/gold]。\n触发任何[gold]反击[/gold]时，获得[blue]1[/blue]层[gold]强化·小鲤鱼玩偶[/gold]，每回合限[blue]1[/blue]次。\n拥有[gold]【系列·龙宫游乐园】[/gold]效果。",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_CARP_DOLL.flavor": "先挨一下，再长鳞片。",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_INFINITE_SNAKE.title": "【无限之蛇】",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_INFINITE_SNAKE.description": "战斗开始时，能量上限+{energyPrefix:energyIcons(1)}。\n每回合开始时，如果你的手牌少于[blue]8[/blue]张，则将手牌补至[blue]8[/blue]张。\n拥有[gold]【系列·龙宫游乐园】[/gold]效果。",
@@ -294,6 +294,6 @@
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.description": "每回合开始时，如果你的手里没有[gold]怪奇糖果机[/gold]，则添加[blue]1[/blue]张[gold]怪奇糖果机[/gold]到手中。\n拥有[gold]【系列·幽魂暗巷】[/gold]效果。",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.flavor": "会员证是真的，糖果机也是真的。",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TIMER.title": "【计时器】",
-  "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TIMER.description": "当你获得[gold]改造[/gold]时，额外获得[blue]1[/blue]层。每获得[blue]2[/blue]层[gold]改造[/gold]，获得[blue]1[/blue]点临时[red]力量[/red]。\n拥有[gold]【系列·幽魂暗巷】[/gold]效果。",
+  "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TIMER.description": "当你获得[gold]改造[/gold]时，额外获得[blue]1[/blue]层。每有[blue]2[/blue]层[gold]改造[/gold]，获得[blue]1[/blue]点[red]力量[/red]。\n拥有[gold]【系列·幽魂暗巷】[/gold]效果。",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TIMER.flavor": "每走一格，代价就更近一格。"
 }

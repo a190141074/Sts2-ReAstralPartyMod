@@ -214,10 +214,7 @@ public static class ConcealingInvestigationHelper
         if (!allowElite && roomType == RoomType.Elite)
             return null;
 
-        var enemies = combatState
-            .GetOpponentsOf(ownerCreature)
-            .Where(creature => creature.IsAlive)
-            .ToList();
+        var enemies = CombatTargetOrdering.GetLivingOpponentsStable(ownerCreature);
         if (enemies.Count == 0)
             return null;
 
@@ -358,18 +355,7 @@ public static class ConcealingInvestigationHelper
     private static async Task MoveCardToHand(Player recipient, CardModel card)
     {
         await CardPileCmd.Add(card, PileType.Hand.GetPile(recipient));
-
-        if (recipient.Creature?.CombatState == null)
-            return;
-
-        foreach (var player in recipient.Creature.CombatState.Players)
-        {
-            var relic = player.GetRelic<PersonShadowScion>();
-            if (relic == null)
-                continue;
-
-            await relic.HandleObservedCardGain(recipient, card);
-        }
+        await GeneratedCardObserver.NotifyCardAddedToHand(card);
     }
 
     public enum InvestigationStage

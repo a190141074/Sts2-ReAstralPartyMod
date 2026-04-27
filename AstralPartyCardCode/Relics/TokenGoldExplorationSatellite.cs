@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Keywords;
 using AstralPartyMod.AstralPartyCardCode.cards;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -64,7 +65,7 @@ public class TokenGoldExplorationSatellite : AstralPartyRelicModel
         Flash();
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<BaseAbilityOrbitalRailgun>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)

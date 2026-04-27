@@ -282,7 +282,7 @@
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_SNAKE_DOLL.description": "Whenever you take damage, gain [blue]1[/blue] [gold]Reverse Scales[/gold].\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note.",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_SNAKE_DOLL.flavor": "Quiet toy. Sharp memory.",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_CARP_DOLL.title": "Little Carp Doll",
-  "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_CARP_DOLL.description": "After you play a Persona Skill card, gain [blue]1[/blue] [gold]Counter[/gold].\nAfter Counter triggers, gain [blue]1[/blue] stack of [gold]Empowered Little Carp Doll[/gold].\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note.",
+  "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_CARP_DOLL.description": "After you play a Persona Skill card, gain [blue]1[/blue] [gold]Counter[/gold].\nWhenever any [gold]Counter[/gold] effect triggers, gain [blue]1[/blue] stack of [gold]Empowered Little Carp Doll[/gold], once each turn.\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note.",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_LITTLE_CARP_DOLL.flavor": "Take one hit. Grow one scale.",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_INFINITE_SNAKE.title": "Infinite Snake",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_INFINITE_SNAKE.description": "At combat start, Max Energy +{energyPrefix:energyIcons(1)}.\nAt the start of each turn, if you have fewer than [blue]8[/blue] cards in hand, draw until you have [blue]8[/blue].\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note.",
@@ -294,6 +294,6 @@
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.description": "At the start of each turn, if your hand does not contain [gold]Curious Candy Machine[/gold], add [blue]1[/blue] [gold]Curious Candy Machine[/gold] to your hand.\nThis relic also grants the [gold]Ghost Alley Series[/gold] note.",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.flavor": "The card proves the machine is always open for business.",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TIMER.title": "Timer",
-  "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TIMER.description": "Whenever you gain [gold]Modification[/gold], gain [blue]1[/blue] extra stack. Every [blue]2[/blue] stacks of [gold]Modification[/gold] you gain grant [blue]1[/blue] temporary [red]Strength[/red].\nThis relic also grants the [gold]Ghost Alley Series[/gold] effect.",
+  "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TIMER.description": "Whenever you gain [gold]Modification[/gold], gain [blue]1[/blue] extra stack. For every [blue]2[/blue] stacks of [gold]Modification[/gold] you have, gain [blue]1[/blue] [red]Strength[/red].\nThis relic also grants the [gold]Ghost Alley Series[/gold] effect.",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TIMER.flavor": "Every tick makes the price a little closer."
 }

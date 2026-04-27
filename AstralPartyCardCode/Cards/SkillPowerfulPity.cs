@@ -63,7 +63,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
         foreach (var selectedCard in selectedCards)
         {
             var copiedCard = CreateCopiedCardForTarget(ownerCreature, selectedCard, targetPlayer);
-            await CardPileCmd.AddGeneratedCardToCombat(copiedCard, PileType.Hand, true);
+            await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(copiedCard, true);
         }
 
         if (selectedCards.Count > 0)

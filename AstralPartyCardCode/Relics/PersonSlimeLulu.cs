@@ -6,7 +6,6 @@ using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -77,13 +76,12 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         AstralParty_PersonSlimeLuluHealingSlimeUses = 0;
         RefreshCounterDisplay();
 
-        if (LocalContext.IsMe(Owner))
-            await CreatureCmd.LoseMaxHp(
-                new ThrowingPlayerChoiceContext(),
-                Owner.Creature,
-                10m,
-                false
-            );
+        await CreatureCmd.LoseMaxHp(
+            new ThrowingPlayerChoiceContext(),
+            Owner.Creature,
+            10m,
+            false
+        );
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -198,7 +196,7 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         Flash();
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillHealingSlime>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private void RefreshCounterDisplay()

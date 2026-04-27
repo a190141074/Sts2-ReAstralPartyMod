@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AstralPartyMod.AstralPartyCardCode.Powers;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -50,6 +51,6 @@ public class SkillChainReaction : AstralPartyCardModel
         }
 
         var bite = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillBite>(), Owner);
-        await CardPileCmd.AddGeneratedCardToCombat(bite, PileType.Hand, true);
+        await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(bite, true);
     }
 }

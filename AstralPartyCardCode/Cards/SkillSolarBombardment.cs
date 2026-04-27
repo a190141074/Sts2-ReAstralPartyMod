@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using AstralPartyMod.AstralPartyCardCode.Keywords;
+using AstralPartyMod.AstralPartyCardCode.Utils;
 using BaseLib.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -110,12 +111,11 @@ public class SkillSolarBombardment : AstralPartyCardModel
 
         for (var i = 0; i < hitCount; i++)
         {
-            var target = owner.RunState.Rng.CombatTargets.NextItem(
-                owner.Creature.CombatState.GetOpponentsOf(owner.Creature).Where(creature => creature.IsAlive)
-            );
-            if (target == null)
+            var targets = CombatTargetOrdering.GetLivingOpponentsStable(owner.Creature);
+            if (targets.Count == 0)
                 break;
 
+            var target = targets[owner.RunState.Rng.CombatTargets.NextInt(targets.Count)];
             if (sourceCard != null)
             {
                 await CommonActions.CardAttack(sourceCard, target, damage, 1).Execute(choiceContext);
