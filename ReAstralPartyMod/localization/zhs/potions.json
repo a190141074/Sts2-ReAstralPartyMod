@@ -1,0 +1,12 @@
+{
+  "RE_ASTRAL_PARTY_MOD_POTION_PERSON_CHEST_CHOOSE.title": "人格宝箱",
+  "RE_ASTRAL_PARTY_MOD_POTION_PERSON_CHEST_CHOOSE.description": "只能在战斗外使用。随机展示4个人格遗物，并从中选择1个获得。",
+  "RE_ASTRAL_PARTY_MOD_POTION_PERSON_CHEST_CHOOSE.selectionScreenHeader": "选择一个人格",
+  "RE_ASTRAL_PARTY_MOD_POTION_PERSON_CHEST_CHOOSE.selectionScreenPrompt": "选择一个要获得的人格遗物",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_SUPPORT_GUM.title": "糖果·支援口香糖",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_SUPPORT_GUM.description": "指定任意玩家使用。目标恢复[blue]6[/blue]点生命，获得{energyPrefix:energyIcons(1)}，并移除其身上的[gold]灾厄[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_ENERGY_SUPPLEMENT_BAR.title": "糖果·能量补充棒",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_ENERGY_SUPPLEMENT_BAR.description": "只能对拥有[gold]改造[/gold]的玩家使用。目标获得[blue]2[/blue]层[gold]改造[/gold]和[blue]2[/blue]层[gold]灾厄[/gold]，并获得[blue]3[/blue]点临时[red]力量[/red]与[blue]2[/blue]点临时[green]敏捷[/green]，持续[blue]2[/blue]回合。",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_BIG_BRAIN_GUMMY.title": "糖果·大聪明软糖",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_BIG_BRAIN_GUMMY.description": "指定任意玩家使用。目标抽[blue]3[/blue]张牌，并移除其身上的[gold]改造[/gold]和[gold]灾厄[/gold]。"
+}

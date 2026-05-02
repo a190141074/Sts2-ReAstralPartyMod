@@ -1,0 +1,4 @@
+interface:
+  display_name: "STS2 RitsuLib Modding"
+  short_description: "面向 RitsuLib 前置 STS2 Mod 开发与迁移排错"
+  default_prompt: "Use $sts2-ritsulib-modding to build or debug a RitsuLib-based Slay the Spire 2 mod."

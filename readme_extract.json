@@ -1,0 +1,1340 @@
+{
+  "cards": [
+    {
+      "class": "BaseAbilityOrbitalRailgun",
+      "title": "Orbital Railgun",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AnyEnemy",
+      "desc": "Deal {Damage:diff()} damage to the target. [gold]Unblockable[/gold].\nWhen used as [gold]Orbital Bombardment Material[/gold], this card counts as [blue]2[/blue] cards and its cost counts as {energyPrefix:energyIcons(3)}."
+    },
+    {
+      "class": "CollectorsCardIAmDragon",
+      "title": "I Am a Dragon!",
+      "cost": "1",
+      "type": "Attack",
+      "rarity": "Rare",
+      "target": "AllEnemies",
+      "desc": "Deal {Damage:diff()} damage to all enemies and temporarily reduce their [red]Strength[/red] by {StrengthLoss:diff()}.\nAfter being played, when you take damage, automatically play this card from your [gold]Exhaust Pile[/gold]. Then return it to your [gold]Exhaust Pile[/gold].\nIf you have lost HP this turn, deal {BonusDamage:diff()} extra damage."
+    },
+    {
+      "class": "CollectorsCardStagnantProtocol",
+      "title": "Stagnant Protocol",
+      "cost": "2",
+      "type": "Power",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Gain [blue]100[/blue] [gold]Stagnant Protocol[/gold]."
+    },
+    {
+      "class": "CuriousCandyMachine",
+      "title": "Curious Candy Machine",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "[exhaust]Exhaust[/exhaust], [retain]Retain[/retain], costs [blue]0[/blue].\nSpend [blue]12[/blue] Gold. Gain [blue]1[/blue] random candy potion."
+    },
+    {
+      "class": "EventAngelsDescent",
+      "title": "Angel's Descent",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Restore {Heal:diff()} HP to all creatures."
+    },
+    {
+      "class": "EventCrowdedPassage",
+      "title": "Crowded Passage",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Apply {Buffer:diff()} [buffer]Buffer[/buffer] and {Vulnerable:diff()} [vulnerable]Vulnerable[/vulnerable] to all allies."
+    },
+    {
+      "class": "EventDeusExMachina",
+      "title": "Deus Ex Machina",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Choose 1 event card other than [card]Deus Ex Machina[/card] and play it twice."
+    },
+    {
+      "class": "EventEquality",
+      "title": "Equality",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Set all allies' HP to 1 and gain {Block:diff()} [blue]Block[/blue]."
+    },
+    {
+      "class": "EventFightFun",
+      "title": "Fight, Fun!",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Give each ally a [card]Giant Rock[/card] card ([exhaust]Exhaust[/exhaust]+[ethereal]Ethereal[/ethereal])."
+    },
+    {
+      "class": "EventFoodSafety",
+      "title": "Food Safety",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Apply {Poison:diff()} [poison]Poison[/poison] to all creatures."
+    },
+    {
+      "class": "EventFoodSafetyDoom",
+      "title": "Food Safety",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Apply {DoomPower:diff()} Doom to all creatures."
+    },
+    {
+      "class": "EventGiftFromSky",
+      "title": "Gift from Sky",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Draw {Cards:diff()} card(s) for all allies and gain {StarLight:diff()} [gold]StarLight[/gold]."
+    },
+    {
+      "class": "EventHandErase",
+      "title": "Hand Erase",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Discard the rightmost card from all allies' hands."
+    },
+    {
+      "class": "EventPlayerRepresentative",
+      "title": "Player Representative",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Only you make a judgment. On 1-3, you take {SelfDamage:diff()} damage and teammates take {TeamDamage:diff()} damage; on 4-6, you gain {SelfStarLight:diff()} [gold]StarLight[/gold] and teammates gain {TeamStarLight:diff()} [gold]StarLight[/gold]."
+    },
+    {
+      "class": "EventRedHeatWarning",
+      "title": "Red Heat Warning",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "All players gain {VigorPower:diff()} [gold]Vigor[/gold]."
+    },
+    {
+      "class": "EventsConcealingInvestigationA",
+      "title": "Concealing Investigation - Phase 1",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Apply 1 [power]Mark[/power] to a random non-Boss, non-Elite enemy.\nBonnie and the event trigger gain [power]Concealing[/power]."
+    },
+    {
+      "class": "EventsConcealingInvestigationB",
+      "title": "Concealing Investigation - Phase 2",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Apply 1 [power]Mark[/power] to a random non-Boss enemy.\nBonnie and the event trigger each take 1 Attack card from their Draw pile first, otherwise from their Discard pile; if neither pile has an Attack, gain {energyPrefix:energyIcons(1)} instead.\nThen they gain [power]Concealing[/power]."
+    },
+    {
+      "class": "EventsConcealingInvestigationC",
+      "title": "Concealing Investigation - Phase 3",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Apply 1 [power]Mark[/power] to all units.\nBonnie and the event trigger each take 1 Attack card from their Draw pile first, otherwise from their Discard pile; if neither pile has an Attack, gain {energyPrefix:energyIcons(1)} instead.\nThen they gain [power]Concealing[/power]."
+    },
+    {
+      "class": "EventsConcealingInvestigationD",
+      "title": "Truth Unveiled",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Apply 2 [power]Mark[/power] to all units.\nAll allies each take 1 Attack card from their Draw pile first, otherwise from their Discard pile; if neither pile has an Attack, gain {energyPrefix:energyIcons(1)} instead.\nThen all allies gain [power]Concealing[/power]."
+    },
+    {
+      "class": "EventSprint",
+      "title": "Sprint",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Gain {Dexterity:diff()} [green]Dexterity[/green] for all allies."
+    },
+    {
+      "class": "EventThunderStrike",
+      "title": "Thunder Strike",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AllAllies",
+      "desc": "Deal {Damage:diff()} damage to all creatures."
+    },
+    {
+      "class": "SkillBite",
+      "title": "Bite",
+      "cost": "0",
+      "type": "Attack",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Gain 1 stack of [power]Dragon Awakening[/power]. Then gain temporary [red]Strength[/red] equal to your current [power]Dragon Awakening[/power], up to 4."
+    },
+    {
+      "class": "SkillChainReaction",
+      "title": "Chain Reaction",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Each other player draws 1 card. If that player's hand has fewer than 4 cards, they draw 2 instead. Then add 1 [card]Bite[/card] to your hand."
+    },
+    {
+      "class": "SkillConcealingOperation",
+      "title": "Concealing Operation",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AnyEnemy",
+      "desc": "Apply [power]Investigation Target[/power] and [blue]2[/blue] [power]Mark[/power] to the target.\nGain [gold]StarLight[/gold] equal to [blue]2[/blue] times that target's current [power]Mark[/power].\nSee [gold]Investigation Progress[/gold]."
+    },
+    {
+      "class": "SkillDragonsRoar",
+      "title": "Dragon's Roar",
+      "cost": "0",
+      "type": "Attack",
+      "rarity": "Rare",
+      "target": "AnyEnemy",
+      "desc": "Apply 1 [vulnerable]Vulnerable[/vulnerable] and 1 [weak]Weak[/weak]. Gain 3 temporary [red]Strength[/red], and until the enemy turn starts, ignore damage from enemy sources."
+    },
+    {
+      "class": "SkillFamousBlade",
+      "title": "Famous Blade",
+      "cost": "0",
+      "type": "Attack",
+      "rarity": "Rare",
+      "target": "AnyEnemy",
+      "desc": "Deal {Damage:diff()} damage. After playing this, consume up to 2 [power]Sword Aura[/power]. Then gain 1 [power]Sword Aura[/power]."
+    },
+    {
+      "class": "SkillFateGuidance",
+      "title": "Fate Guidance",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Advance your persona relic counters by 1 and gain {energyPrefix:energyIcons(1)}."
+    },
+    {
+      "class": "SkillFateWeakMprint",
+      "title": "Weak Imprint",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AnyEnemy",
+      "desc": "Apply [power]Weak Imprint[/power]."
+    },
+    {
+      "class": "SkillHealingSlime",
+      "title": "Healing Slime",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AnyAlly",
+      "desc": "Gain {HalfLifeHealPower:diff()} [power]Half Life Heal[/power]."
+    },
+    {
+      "class": "SkillIronVirgin",
+      "title": "Iron Virgin",
+      "cost": "1",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Gain [power]Iron Virgin Ward[/power] and ignore damage until your next turn starts. If your persona's [power]Boundary Reinforcement[/power] has not triggered this turn, also gain 3 temporary [red]Strength[/red]."
+    },
+    {
+      "class": "SkillMixedCocktails",
+      "title": "Mixed Cocktails",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AnyPlayer",
+      "desc": "In single-player, this affects you. In multiplayer, choose an ally.\nDiscard up to 3 cards from your hand. Apply effects to the target based on [gold]Mixed[/gold], then draw cards equal to the number discarded."
+    },
+    {
+      "class": "SkillMudTruckCrash",
+      "title": "Mud Truck Crash",
+      "cost": "0",
+      "type": "Attack",
+      "rarity": "Rare",
+      "target": "AnyEnemy",
+      "desc": "Deal {Damage:diff()} damage.\nDeal equal damage to all other enemies and apply [power]Fracture[/power]."
+    },
+    {
+      "class": "SkillNinjutsuCombo",
+      "title": "Ninjutsu Combo",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Gain {energyPrefix:energyIcons(1)}. Add [blue]1[/blue] random Base Ability card to your hand."
+    },
+    {
+      "class": "SkillPowerfulPity",
+      "title": "Powerful Pity",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AnyPlayer",
+      "desc": "Choose a player. Select up to [blue]3[/blue] cards from your hand and copy them into that player's hand.\nGain [gold]StarLight[/gold] equal to the number copied, discard the chosen cards, and gain [blue]1[/blue] stack of [gold]Eternal Starlight[/gold]."
+    },
+    {
+      "class": "SkillProductRestocking",
+      "title": "Product Restocking",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Discard all cards in your hand. Draw cards equal to your original hand size + 1."
+    },
+    {
+      "class": "SkillRemoteIntrusion",
+      "title": "Remote Intrusion",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Immediately gain [blue]1[/blue] Attack card to your hand; it costs [blue]0[/blue] this turn.\nThis turn, Attack cards you play do not trigger Cyber Kitty's passive firewall discard effect."
+    },
+    {
+      "class": "SkillRoyalPrerogative",
+      "title": "Royal Prerogative",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Draw 3 cards. The drawn cards gain [gold]Temporary[/gold] and are discarded at end of turn."
+    },
+    {
+      "class": "SkillSaveMeMousy",
+      "title": "Mousy Save Me",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AnyAlly",
+      "desc": "Target player draws 1 card and gains [power]Mouse Shield[/power] and [power]Counter[/power]. If that target is at 50% HP or less, you also gain [power]Mouse Shield[/power] and draw 1 card."
+    },
+    {
+      "class": "SkillShadowFusion",
+      "title": "Shadow Fusion",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Count all enemy [power]Twin Shadows[/power]. Gain 1 temporary [green]Strength[/green] this turn for each separate shadow, then remove all enemy [power]Twin Shadows[/power]."
+    },
+    {
+      "class": "SkillSolarBombardment",
+      "title": "Orbital Bombardment",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "RandomEnemy",
+      "desc": "Discard all cards in your hand. Deal {Damage:diff()} damage to a random enemy {Repeat:diff()} times. For every 2 discarded cards, deal damage 1 additional time. For every {energyPrefix:energyIcons(3)} total cost among the discarded cards, increase this damage by 1. Discarded 0-cost cards count as {energyPrefix:energyIcons(1)}. Discarded X-cost cards count as your current Energy."
+    },
+    {
+      "class": "SkillTransfer",
+      "title": "Transfer",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "AnyAlly",
+      "desc": "Spend 5 Gold. Target player gains 5 [gold]StarLight[/gold]. Your [relic]Persona Derivative: Wealth[/relic] counter +1."
+    },
+    {
+      "class": "SkillTroubleMaker",
+      "title": "Trouble Maker",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Show 2 random other event cards. Choose 1 to play immediately. Gain {StarLight:diff()} [gold]StarLight[/gold]."
+    },
+    {
+      "class": "SkillUnstoppable",
+      "title": "Unstoppable",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "Immediately gain [power]Ready to Strike[/power].\nDiscard all Attack cards in your hand.\nGain [blue]1[/blue] [card]Mud Truck Crash[/card].\nDraw [blue]12[/blue] cards."
+    },
+    {
+      "class": "SkillVampireBite",
+      "title": "One Little Sip",
+      "cost": "0",
+      "type": "Skill",
+      "rarity": "Rare",
+      "target": "Self",
+      "desc": "If your HP is above [blue]50[/blue]% of your current Max HP, take [blue]6[/blue] damage.\nGain [blue]1[/blue] [power]Bloodthirst[/power]."
+    }
+  ],
+  "powers": [
+    {
+      "class": "AmbushPower",
+      "title": "Ambush",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Gain temporary [red]Strength[/red] equal to this power's amount. Remove it at the end of your turn."
+    },
+    {
+      "class": "AstralPartyPowerModel",
+      "title": "AstralPartyPowerModel",
+      "type": "?",
+      "stack": "?",
+      "desc": ""
+    },
+    {
+      "class": "AstralTemporaryAppliedPowerBase",
+      "title": "AstralTemporaryAppliedPowerBase",
+      "type": "?",
+      "stack": "?",
+      "desc": ""
+    },
+    {
+      "class": "BloodthirstPower",
+      "title": "Bloodthirst",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "The next Attack card you play that deals damage heals you for [blue]50[/blue]% of that damage.\nThis turn, some effects that depend on low HP resolve as though you were below [blue]15[/blue]% HP."
+    },
+    {
+      "class": "BoundaryReinforcementPower",
+      "title": "Boundary Reinforcement",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Lasts 2 turns. It does nothing on the turn you gain it. If you take no damage from the time you gain it until your next turn starts, gain 3 temporary [red]Strength[/red] at the start of that turn. If you take damage during that window, remove this power."
+    },
+    {
+      "class": "BronzeGongPower",
+      "title": "Empowered Bronze Gong",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Each stack grants [blue]1[/blue] temporary [red]Strength[/red] and [blue]1[/blue] temporary stack of [gold]Phantom Reverse Scales[/gold]. Remove it at end of turn."
+    },
+    {
+      "class": "CandyEnergySupplementBarPower",
+      "title": "Candy: Energy Supplement Bar",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Each stack grants [blue]3[/blue] temporary [red]Strength[/red] and [blue]2[/blue] temporary [green]Dexterity[/green] this turn and again next turn."
+    },
+    {
+      "class": "ConcealingPower",
+      "title": "Concealing",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "Until your next turn starts, ignore damage from enemy sources.\nDuring that time, the first time you deal damage to an enemy, gain [power]Ambush[/power] equal to that enemy's [power]Mark[/power], then remove this power."
+    },
+    {
+      "class": "CopyQuotaPower",
+      "title": "Copy Quota",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Shows how many more Skill cards you can spend this turn before [relic]Persona: Ninja[/relic]'s copy effect shuts off. Resets to [blue]9[/blue] at the start of your turn."
+    },
+    {
+      "class": "CosmosFreezesPower",
+      "title": "Stagnation",
+      "type": "Debuff",
+      "stack": "Counter",
+      "desc": "This unit's damage is directly reduced using ([blue]1[/blue]-[blue]100[/blue]/([blue]100[/blue]+stacks)), and the icon number shows the current reduction.\nWhen stacks are above [blue]10[/blue], lose [blue]10[/blue]% of the current stacks at end of turn, with a minimum loss of [blue]1[/blue]."
+    },
+    {
+      "class": "CounterPower",
+      "title": "Counter",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "When you take unblocked damage, lose [blue]1[/blue] stack and deal damage back to the attacker equal to that damage plus your current [red]Strength[/red]."
+    },
+    {
+      "class": "CrossedTwinCarpPower",
+      "title": "Empowered Crossed Twin Carp",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "Gain [blue]6[/blue] [gold]Vigor[/gold]. The next time you deal damage, add back the portion blocked by Block as unblockable damage, then remove this power."
+    },
+    {
+      "class": "CuteIsJusticePower",
+      "title": "Cute Is Justice",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Each stack grants [blue]1[/blue] [red]Strength[/red]."
+    },
+    {
+      "class": "CyberKittyFirewallBypassPower",
+      "title": "Passive Firewall Disabled",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "This turn, Attack cards you play do not trigger Cyber Kitty's passive firewall discard effect."
+    },
+    {
+      "class": "CyberKittyNodePower",
+      "title": "Node",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "At the start of your turn, reroll this value to a random number from [blue]1[/blue] to [blue]10[/blue]. Lower values move you farther right; higher values move you farther left. This visual offset is disabled in Boss rooms."
+    },
+    {
+      "class": "DragonAwakeningPower",
+      "title": "Dragon Awakening",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "At the end of combat, [relic]Dragon Gate[/relic] reduces its Thunder counter by this amount."
+    },
+    {
+      "class": "DragonRoarWardPower",
+      "title": "Dragon Roar Ward",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "Until the enemy turn starts, ignore damage from enemy sources."
+    },
+    {
+      "class": "ElegantFeatherPower",
+      "title": "Elegant Feather",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Each stack gives [blue]1[/blue] temporary [red]Strength[/red]. Whenever you take unblocked damage, lose [blue]1[/blue] stack."
+    },
+    {
+      "class": "EsotericEmpowerPower",
+      "title": "Esoteric Empower",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Whenever your Skill card deals damage to an enemy, it deals additional damage equal to this power's amount."
+    },
+    {
+      "class": "ExposurePower",
+      "title": "Exposure",
+      "type": "Debuff",
+      "stack": "Counter",
+      "desc": "If this enemy is killed by a player who owns a Flashlight relic, that killer gains [blue]1[/blue] stack of [gold]Eternal Starlight[/gold]."
+    },
+    {
+      "class": "FateWeakImprintPower",
+      "title": "Weak Imprint",
+      "type": "Debuff",
+      "stack": "None",
+      "desc": "Take 1 extra damage from all hits, including hits fully absorbed by Block. Does not stack. Refreshes to 2 turns when applied again. If killed while marked, the killer gains 1 [card]Fate Guidance[/card]."
+    },
+    {
+      "class": "FracturePower",
+      "title": "Fracture",
+      "type": "Debuff",
+      "stack": "Counter",
+      "desc": "Take [blue]50[/blue]% more attack damage and deal [blue]30[/blue]% less attack damage.\nLasts [blue]1[/blue] turn."
+    },
+    {
+      "class": "GiantAnchorPower",
+      "title": "Giant Anchor",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Each stack gives you [blue]1[/blue] temporary [red]Strength[/red]. Lose [blue]1[/blue] stack at the end of your turn."
+    },
+    {
+      "class": "HalfLifeHealPower",
+      "title": "Half Life Heal",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "At the start of your turn, heal for the amount shown. The healing is halved each turn."
+    },
+    {
+      "class": "HuntersFeastPower",
+      "title": "Hunter's Feast",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "At the end of this combat, permanently increase your [power]Shadow Quota[/power] limit by this amount."
+    },
+    {
+      "class": "IAmDragonTemporaryStrengthLossPower",
+      "title": "Dragon Suppression",
+      "type": "Debuff",
+      "stack": "Counter",
+      "desc": "Lose [blue]{Amount}[/blue] [red]Strength[/red] this turn. Restore it at end of turn."
+    },
+    {
+      "class": "InvestigationTargetPower",
+      "title": "Investigation Target",
+      "type": "Debuff",
+      "stack": "None",
+      "desc": "Does not stack or duplicate.\nWhen a unit with this power is killed, the killer immediately triggers 1 [gold]Concealing Investigation[/gold] event card, and the holder of [relic]Persona: Bonnie[/relic] gains [blue]5[/blue] [gold]StarLight[/gold]."
+    },
+    {
+      "class": "IronVirginWardPower",
+      "title": "Iron Virgin Ward",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "Ignore all damage until your next turn starts."
+    },
+    {
+      "class": "LingHunLianJiePower",
+      "title": "Soul Link",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Soul Link power description."
+    },
+    {
+      "class": "LittleCarpDollPower",
+      "title": "Empowered Little Carp Doll",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Each stack grants [blue]1[/blue] [red]Strength[/red] and [blue]1[/blue] [green]Dexterity[/green]."
+    },
+    {
+      "class": "MarkLockPower",
+      "title": "Mark",
+      "type": "Debuff",
+      "stack": "Counter",
+      "desc": "This power can stack, but regardless of its amount, all hits only deal [blue]1[/blue] extra damage, including hits fully absorbed by Block. Loses [blue]1[/blue] stack at the end of each enemy turn."
+    },
+    {
+      "class": "MixedCocktailsPower",
+      "title": "Mixed Cocktails",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "This [card]Mixed Cocktails[/card] granted:\nTemporary Strength: {TemporaryStrength}\nTemporary Dexterity: {TemporaryDexterity}\nExtra Dexterity: {Dexterity}\nHealing: {Heal}\nEnergy: {Energy:energyIcons()}\nCard Draw: {Draw}\nBlock: {Block}"
+    },
+    {
+      "class": "ModificationPower",
+      "title": "Modification",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "This power has no direct effect. Lose [blue]1[/blue] stack at the end of your turn."
+    },
+    {
+      "class": "MouseShieldPower",
+      "title": "Mouse Shield",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "Reduce all HP loss you take by 9. This power does not stack or expire on its own."
+    },
+    {
+      "class": "ProblemStudentPower",
+      "title": "Problem Student",
+      "type": "Debuff",
+      "stack": "None",
+      "desc": "Does not stack. Gain [blue]4[/blue] [green]Dexterity[/green], take [blue]2[/blue] extra damage, and remove this power after being hit by an enemy in a Boss room."
+    },
+    {
+      "class": "ReadyToStrikePower",
+      "title": "Ready to Strike",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "Gain [blue]2[/blue] temporary [red]Strength[/red].\nThis turn, damage from your Attack cards is [gold]Unblockable[/gold].\nThis turn, each card you draw is judged: non-Attack cards gain [blue]1[/blue] [gold]Vigor[/gold] and return to your Draw pile; Attack cards grant [blue]1[/blue] temporary [red]Strength[/red] and are discarded.\nWhenever your temporary [red]Strength[/red] or [gold]Vigor[/gold] reaches a multiple of [blue]6[/blue], add [card]Mud Truck, Crash Them Dead![/card] to your hand."
+    },
+    {
+      "class": "ReversedScalesHolographicPower",
+      "title": "Phantom Reverse Scales",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Each stack reduces HP loss you take by [blue]1[/blue]."
+    },
+    {
+      "class": "ReversedScalesPower",
+      "title": "Phantom Reverse Scales",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Each stack reduces HP loss you take by [blue]2[/blue]. Whenever you gain [blue]1[/blue] stack, gain [blue]2[/blue] temporary [red]Strength[/red]. Remove this power at end of turn."
+    },
+    {
+      "class": "ShadowsLimitPower",
+      "title": "Shadow Quota",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Shows how many more times this turn your Attack cards can apply [power]Twin Shadows[/power]."
+    },
+    {
+      "class": "StagnantCosmosPower",
+      "title": "Stagnant Protocol",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Whenever you play an Attack or Skill that actually spends at least [blue]1[/blue] Energy and it deals damage, spend [blue]1[/blue] [gold]Stagnant Protocol[/gold] to apply [gold]Stagnation[/gold] to the target equal to that card's cost."
+    },
+    {
+      "class": "StarLightPower",
+      "title": "StarLight",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "At the end of this combat, gain Gold equal to this power's amount."
+    },
+    {
+      "class": "SwordAuraPower",
+      "title": "Sword Aura",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks."
+    },
+    {
+      "class": "TokenRelicBridgePower",
+      "title": "TokenRelicBridgePower",
+      "type": "Buff",
+      "stack": "None",
+      "desc": ""
+    },
+    {
+      "class": "TridentEmpowerPower",
+      "title": "Empowered Trident",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "Does not stack. Gain [blue]1[/blue] [red]Strength[/red] and [blue]1[/blue] [green]Dexterity[/green]."
+    },
+    {
+      "class": "TrueDragonFormPower",
+      "title": "True Dragon Form",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "Damage +4. Gain 2 [red]Strength[/red], 1 [green]Dexterity[/green], and permanently gain 2 Max HP. Does not stack."
+    },
+    {
+      "class": "TwinShadowsPower",
+      "title": "Twin Shadows",
+      "type": "Debuff",
+      "stack": "Counter",
+      "desc": "This shadow makes its owner lose 1 HP at the start of its turn. Lasts 2 turns. Multiple Twin Shadows track separately."
+    },
+    {
+      "class": "VoidCrystalPower",
+      "title": "Void Protocol",
+      "type": "Buff",
+      "stack": "None",
+      "desc": "Does not stack or duplicate. After [blue]3[/blue] turns, gain [blue]1[/blue] Max Energy."
+    },
+    {
+      "class": "ZuoTeaCakePower",
+      "title": "Zuo Tea Cake",
+      "type": "Buff",
+      "stack": "Counter",
+      "desc": "Each stack grants [blue]1[/blue] temporary [red]Strength[/red] and [blue]1[/blue] temporary [green]Dexterity[/green]. Remove this power at end of turn."
+    }
+  ],
+  "relics": [
+    {
+      "class": "PersonalityDerivativeMascotGirlMimiTokenMemory",
+      "title": "[Persona Derivative: Token Memory]",
+      "rarity": "Ancient",
+      "desc": "Record the temporary token relic abilities you have gained through [card]Product Restocking[/card] this run. When the same temporary token ability has been gained [blue]3[/blue] times, add its matching token relic to the combat reward screen after battle."
+    },
+    {
+      "class": "PersonalityDerivativeNinjaGarrote",
+      "title": "[Persona Derivative: Garrote]",
+      "rarity": "Ancient",
+      "desc": "Starts with [blue]1[/blue] stack. At combat start, gain [power]Esoteric Empower[/power] equal to this relic's stacks. Every [blue]3[/blue] Skill cards you play in combat reduce [relic]Persona: Ninja[/relic]'s cooldown by [blue]1[/blue]. Every [blue]9[/blue] Skill cards you play in combat permanently increase this relic's stacks by [blue]1[/blue]."
+    },
+    {
+      "class": "PersonalityDerivativeProprietressWealthism",
+      "title": "[Persona Derivative: Wealth]",
+      "rarity": "Ancient",
+      "desc": "Every [blue]2[/blue] rooms, gain Gold equal to this relic's counter. [card]Transfer[/card] increases that counter by [blue]1[/blue]. This counter has no cap."
+    },
+    {
+      "class": "PersonalityDerivativeSwordIntent",
+      "title": "[Persona Derivative: Sword Intent]",
+      "rarity": "Ancient",
+      "desc": "Starts at [blue]0[/blue] and does not grow on its own. Every [blue]2[/blue] total [power]Sword Aura[/power] consumed by [card]Famous Blade[/card] increases this relic's counter by [blue]1[/blue]. Each time you play [card]Famous Blade[/card], deal bonus damage to the target equal to this relic's counter."
+    },
+    {
+      "class": "PersonalityDerivativeXiaoLeiDragonGate",
+      "title": "[Persona Derivative: Dragon Gate]",
+      "rarity": "Ancient",
+      "desc": "At the end of combat, reduce Seventy-Two Heavenly Thunders by your [power]Dragon Awakening[/power]. Whenever you take damage, reduce Thirty-Six Heavenly Fires by [blue]1[/blue]. Once both trials reach [blue]0[/blue], at the start of each combat gain [power]True Dragon Form[/power] and add [blue]1[/blue] [card]Dragon's Roar[/card] to your hand."
+    },
+    {
+      "class": "PersonBionicJasmine",
+      "title": "[Persona: Bionic Jasmine]",
+      "rarity": "Ancient",
+      "desc": "Gain [gold]Steps[/gold] when entering rooms. At combat start, lose [blue]1[/blue] Strength and [blue]1[/blue] Dexterity. Every [blue]13[/blue] steps gained grants [blue]1[/blue] Strength/Dexterity (alternating). Lose combat-gained Strength/Dexterity after combat ends."
+    },
+    {
+      "class": "PersonBlueWhale",
+      "title": "[Persona: Blue Whale]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Weak Imprint[/card] to your hand. Defeating an enemy with [power]Weak Imprint[/power] gives you [blue]3[/blue] Gold. If combat ends exactly on turn [blue]6[/blue], gain [blue]6[/blue] Gold. Each later repeat adds [blue]2[/blue] more Gold to that reward. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn."
+    },
+    {
+      "class": "PersonCyberKitty",
+      "title": "[Persona: Cyber Kitty]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Remote Intrusion[/card] to your hand.\nAt the start of your turn, if your [power]Node[/power] is above [blue]3[/blue], gain [blue]1[/blue] temporary [red]Strength[/red] and [blue]1[/blue] temporary [green]Dexterity[/green], then move [blue]1[/blue] Attack card from your draw pile to your hand and make it free this turn. If none is in the draw pile, take one from the discard pile instead.\nAfter the first Attack card you play each turn, discard the leftmost Attack card in your hand and upgrade it for this combat. If you have no Attack card in hand, instead upgrade a random Attack card for this combat. If no upgradable Attack remains, upgrade a random upgradable card instead."
+    },
+    {
+      "class": "PersonInkShadowHunter",
+      "title": "[Persona: Little Hunter]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Shadow Fusion[/card] to your hand. At the start of your turn, apply [blue]1[/blue] [power]Twin Shadows[/power] to a random enemy. Whenever you play an Attack card that costs {energyPrefix:energyIcons(1)} to {energyPrefix:energyIcons(3)} targeting an enemy, apply [blue]1[/blue] [power]Twin Shadows[/power] to that target, up to your current [power]Shadow Quota[/power] limit each turn. Entering an Elite room gives you [blue]1[/blue] [power]Hunter's Feast[/power]. Entering a Boss room gives you [blue]3[/blue] [power]Hunter's Feast[/power]. At the end of that combat, each stack of [power]Hunter's Feast[/power] permanently increases your [power]Shadow Quota[/power] limit by [blue]1[/blue]. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn."
+    },
+    {
+      "class": "PersonJillSteinle",
+      "title": "[Persona: Bartender]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Mixed Cocktails[/card] to your hand. If [card]Mixed Cocktails[/card] discards exactly [blue]3[/blue] cards with all different types, gain [blue]3[/blue] [gold]StarLight[/gold]. If it discards exactly [blue]3[/blue] cards of the same type, the target gains [blue]3[/blue] extra [green]Dexterity[/green]."
+    },
+    {
+      "class": "PersonMascotGirlMimi",
+      "title": "[Persona: Mimi]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Product Restocking[/card] to your hand. Whenever [card]Product Restocking[/card] discards a card, gain [blue]1[/blue] [gold]StarLight[/gold]. Every time [card]Product Restocking[/card] has drawn a cumulative total of [blue]25[/blue] cards, choose [blue]1[/blue] of [blue]3[/blue] token relics you do not currently own, gain that relic's temporary combat ability, and record it in [relic]Token Memory[/relic]. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn."
+    },
+    {
+      "class": "PersonMidnightFlash",
+      "title": "[Persona: Midnight Flash]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Unstoppable[/card] to your hand.\nWhenever you kill an enemy while you have [power]Ready to Strike[/power], reduce this relic's cooldown by [blue]2[/blue]."
+    },
+    {
+      "class": "PersonMousyLian",
+      "title": "[Persona: Mousy Lian]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Mousy Save Me[/card] to your hand. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn."
+    },
+    {
+      "class": "PersonNinja",
+      "title": "[Persona: Ninja]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Ninjutsu Combo[/card] to your hand. At the start of combat and at the start of each of your turns, set [power]Copy Quota[/power] to [blue]9[/blue]. Whenever you play your [blue]3[/blue]rd, [blue]6[/blue]th, [blue]9[/blue]th, and later Skill card each turn, if [power]Copy Quota[/power] remains, copy the most recently played non-persona Skill card into your hand and give it [exhaust]Exhaust[/exhaust]."
+    },
+    {
+      "class": "PersonOasisQueen",
+      "title": "[Persona: Oasis Queen]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Royal Prerogative[/card] to your hand. Deal [blue]1[/blue] extra damage for each [gold]Temporary[/gold] card in your hand, up to [blue]3[/blue]. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn."
+    },
+    {
+      "class": "PersonPoisonedApple",
+      "title": "[Persona: Bonnie]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Concealing Operation[/card] to your hand.\n[card]Trouble Maker[/card] temporarily includes the [gold]Concealing Investigation[/gold] event series in its pool, but [card]Deus Ex Machina[/card] never offers them.\nYour Attack cards deal [blue]3[/blue] extra damage to enemies that already have [power]Mark[/power].\nWhen a target with [power]Investigation Target[/power] is killed, it advances [gold]Investigation Progress[/gold] and triggers the matching-stage [gold]Concealing Investigation[/gold] event."
+    },
+    {
+      "class": "PersonProprietress",
+      "title": "[Persona: Proprietress]",
+      "rarity": "Ancient",
+      "desc": "When entering a shop, gain gold equal to [blue]10[/blue] times the number of shops you have entered this run. While any player has this relic, every player's shop cards, potions, relics, and card removal service each have a [blue]3[/blue]% chance to cost only [blue]30[/blue]% of their normal price. This chance increases by [blue]3[/blue]% each time you pass through a shop. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn. At the start of every [blue]3[/blue]rd turn, trigger this relic's combat effect."
+    },
+    {
+      "class": "PersonSamuraiPrawn",
+      "title": "[Persona: Samurai Prawn]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Famous Blade[/card] to your hand. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn. The first time each turn you attack an enemy, gain [blue]1[/blue] stack of [power]Sword Aura[/power]. The first [blue]2[/blue] stacks each make your attacks deal [blue]1[/blue] extra damage. The [blue]3[/blue]rd stack makes your attacks deal [blue]2[/blue] extra damage. Maximum [blue]3[/blue] stacks."
+    },
+    {
+      "class": "PersonShadowScion",
+      "title": "[Persona: Al]",
+      "rarity": "Ancient",
+      "desc": "At the start of the next [blue]1[/blue] combat, all players gain [blue]1[/blue] [card]Royalties[/card].\nAt the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Powerful Pity[/card] to your hand.\nWhenever you cause any player to gain or draw a card, you and that player each gain [blue]1[/blue] [gold]StarLight[/gold].\nAt combat start, for every [blue]12[/blue] stacks of [gold]Eternal Starlight[/gold] you have, gain [blue]1[/blue] [red]Strength[/red] and [blue]1[/blue] [green]Dexterity[/green]."
+    },
+    {
+      "class": "PersonSlimeLulu",
+      "title": "[Persona: Slime Lulu]",
+      "rarity": "Ancient",
+      "desc": "Lose [blue]10[/blue] Max HP. When taking damage, gain [blue]1[/blue] stack of [power]Half Life Heal[/power] and reduce this effect's cooldown by [blue]1[/blue] turn. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn. At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Healing Slime[/card] to your hand."
+    },
+    {
+      "class": "PersonSocialFearNun",
+      "title": "[Persona: Social Fear Nun]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Iron Virgin[/card] to your hand. At the start of each turn, apply [blue]1[/blue] [power]Boundary Reinforcement[/power]."
+    },
+    {
+      "class": "PersonSupermanMegas",
+      "title": "[Persona: Superman Megas]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Orbital Bombardment[/card] to your hand. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn. At turn end, if you have fewer than [blue]5[/blue] cards in hand, draw [blue]1[/blue] extra card next turn. After playing [card]Orbital Bombardment[/card], draw [blue]1[/blue] card."
+    },
+    {
+      "class": "PersonVampire",
+      "title": "[Persona: Vampire]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]One Little Sip[/card] to your hand.\nWhen your HP is below [blue]50[/blue]%, gain [blue]1[/blue] stack of [power]Cute Is Justice[/power]; below [blue]25[/blue]%, gain [blue]1[/blue] more; below [blue]15[/blue]%, gain [blue]1[/blue] more."
+    },
+    {
+      "class": "PersonWeirdEgg",
+      "title": "[Persona: Steamed Egg]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Trouble Maker[/card] to your hand. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn."
+    },
+    {
+      "class": "PersonXiaoLei",
+      "title": "[Persona: Xiao Lei]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Chain Reaction[/card] to your hand. Whenever you cause another player to gain a card, gain [blue]1[/blue] [power]Dragon Awakening[/power]. After enduring Seventy-Two Heavenly Thunders and Thirty-Six Heavenly Fires, unlock [power]True Dragon Form[/power]."
+    },
+    {
+      "class": "TokenBlueAtm",
+      "title": "ATM",
+      "rarity": "Common",
+      "desc": "Whenever you cause another player to gain [gold]StarLight[/gold], that target gains [blue]1[/blue] extra [gold]StarLight[/gold], and you gain [blue]1[/blue] [gold]StarLight[/gold]."
+    },
+    {
+      "class": "TokenBlueBankCardGeneral",
+      "title": "Bank Card: Low Balance",
+      "rarity": "Common",
+      "desc": "Gain [blue]14[/blue] stacks of [gold]Eternal Starlight[/gold]. If you do not have [gold]Eternal Starlight[/gold], obtain it first, then add the stacks."
+    },
+    {
+      "class": "TokenBlueBoxingGloveGeneral",
+      "title": "Boxing Glove: Basic",
+      "rarity": "Common",
+      "desc": "At the start of each turn, gain [blue]1[/blue] [power]Vigor[/power].\nThis relic also grants the [gold]Boxing Gloves Set[/gold] effect."
+    },
+    {
+      "class": "TokenBlueDie10",
+      "title": "Blue d[blue]10[/blue]",
+      "rarity": "?",
+      "desc": "If you end combat exactly on turn [blue]10[/blue], gain [blue]10[/blue] [gold]StarLight[/gold] and [blue]7[/blue] Block at the start of your next combat.\nAfter this relic triggers [blue]3[/blue] times, obtain [blue]1[/blue] die relic you do not have."
+    },
+    {
+      "class": "TokenBlueDie12",
+      "title": "Blue d[blue]12[/blue]",
+      "rarity": "?",
+      "desc": "If you end combat exactly on turn [blue]12[/blue], gain [blue]12[/blue] [gold]StarLight[/gold] and heal [blue]9[/blue] HP at the start of your next combat.\nAfter this relic triggers [blue]3[/blue] times, obtain [blue]1[/blue] die relic you do not have."
+    },
+    {
+      "class": "TokenBlueDie20",
+      "title": "Blue d[blue]20[/blue]",
+      "rarity": "?",
+      "desc": "If you end combat exactly on turn [blue]20[/blue], gain [blue]20[/blue] [gold]StarLight[/gold] and all start-of-next-combat effects from the other dice at the start of your next combat.\nAfter this relic triggers [blue]3[/blue] times, obtain [blue]1[/blue] die relic you do not have."
+    },
+    {
+      "class": "TokenBlueDie4",
+      "title": "Blue d[blue]4[/blue]",
+      "rarity": "?",
+      "desc": "If you end combat exactly on turn [blue]4[/blue], gain [blue]4[/blue] [gold]StarLight[/gold] and {energyPrefix:energyIcons(2)} at the start of your next combat.\nAfter this relic triggers [blue]3[/blue] times, obtain [blue]1[/blue] die relic you do not have."
+    },
+    {
+      "class": "TokenBlueDie6",
+      "title": "Blue d[blue]6[/blue]",
+      "rarity": "?",
+      "desc": "If you end combat exactly on turn [blue]6[/blue], gain [blue]6[/blue] [gold]StarLight[/gold] and draw [blue]3[/blue] extra cards at the start of your next combat.\nAfter this relic triggers [blue]3[/blue] times, obtain [blue]1[/blue] die relic you do not have."
+    },
+    {
+      "class": "TokenBlueDie8",
+      "title": "Blue d[blue]8[/blue]",
+      "rarity": "?",
+      "desc": "If you end combat exactly on turn [blue]8[/blue], gain [blue]8[/blue] [gold]StarLight[/gold] and deal [blue]5[/blue] damage to all enemies at the start of your next combat.\nAfter this relic triggers [blue]3[/blue] times, obtain [blue]1[/blue] die relic you do not have."
+    },
+    {
+      "class": "TokenBlueElegantFeather",
+      "title": "Elegant Feather",
+      "rarity": "Common",
+      "desc": "Whenever damage you take is fully blocked, gain [blue]1[/blue] stack of [gold]Elegant Feather[/gold], up to [blue]3[/blue]."
+    },
+    {
+      "class": "TokenBlueFlashlightGeneral",
+      "title": "Flashlight: Basic",
+      "rarity": "Common",
+      "desc": "Whenever you kill an enemy, heal [blue]4[/blue] HP.\nThis relic also grants the [gold]Flashlight Set[/gold] effect."
+    },
+    {
+      "class": "TokenBlueGiantAnchor",
+      "title": "Giant Anchor",
+      "rarity": "Common",
+      "desc": "Whenever you take unblocked damage, gain [blue]1[/blue] stack of [gold]Giant Anchor[/gold].\nThis relic also grants the [gold]Series: Dreamship[/gold] note."
+    },
+    {
+      "class": "TokenBlueHandheldFanSmall",
+      "title": "Handheld Fan: Small",
+      "rarity": "Common",
+      "desc": "After you play a Persona Skill card, apply [blue]1[/blue] stack of [gold]Mark[/gold] to a random enemy."
+    },
+    {
+      "class": "TokenBlueMarkSprayCan",
+      "title": "Mark Spray Can",
+      "rarity": "Common",
+      "desc": "After your Skill cards deal damage to an enemy, apply [blue]1[/blue] stack of [gold]Mark[/gold] to that target."
+    },
+    {
+      "class": "TokenBlueMedicalKitEmergencyTreatment",
+      "title": "Medical Kit: Emergency Treatment",
+      "rarity": "Common",
+      "desc": "At the start of each turn, gain [blue]1[/blue] stack of [gold]Half Life Heal[/gold]."
+    },
+    {
+      "class": "TokenBlueMembersReferenceStandard",
+      "title": "Member Referral Letter",
+      "rarity": "Common",
+      "desc": "At the start of your [blue]3[/blue]rd, [blue]6[/blue]th, [blue]9[/blue]th, and later turns, draw [blue]1[/blue] extra card."
+    },
+    {
+      "class": "TokenBlueMotorcycleHelmetGeneral",
+      "title": "Blue Motorcycle Helmet",
+      "rarity": "Common",
+      "desc": "At combat start, gain [blue]1[/blue] stack of [gold]Phantom Reverse Scales[/gold].\nAt the start of each turn, gain [blue]1[/blue] Block."
+    },
+    {
+      "class": "TokenBluePiggyBank",
+      "title": "Blue Piggy Bank",
+      "rarity": "Common",
+      "desc": "Whenever you spend {energyPrefix:energyIcons(6)}, gain [blue]3[/blue] [gold]StarLight[/gold]."
+    },
+    {
+      "class": "TokenBlueSandwichBiscuitGeneral",
+      "title": "Blue Sandwich Biscuit",
+      "rarity": "Common",
+      "desc": "Gain [blue]8[/blue] Max HP."
+    },
+    {
+      "class": "TokenBlueSpeedRollerGeneral",
+      "title": "Speed Roller: Basic",
+      "rarity": "Common",
+      "desc": "At combat start, gain [blue]1[/blue] [green]Dexterity[/green]."
+    },
+    {
+      "class": "TokenBlueTargetBoard",
+      "title": "Target Board",
+      "rarity": "Common",
+      "desc": "Your Attack cards deal [blue]1[/blue] extra damage.\nAt the start of each turn, apply [blue]1[/blue] stack of [gold]Mark[/gold] to a random enemy."
+    },
+    {
+      "class": "TokenEternalStarlight",
+      "title": "Eternal Starlight",
+      "rarity": "Uncommon",
+      "desc": "Every [blue]3[/blue] floors climbed, gain Gold equal to its stacks.\nSet: Eternal Starlight\n{CurrentSetLine}"
+    },
+    {
+      "class": "TokenExclusiveAncientWand",
+      "title": "Ancient Wand",
+      "rarity": "Uncommon",
+      "desc": "All Skill cards deal [blue]+3[/blue] damage.\nAt combat start, Max Energy +{energyPrefix:energyIcons(1)}.\nThis relic also grants the [gold]Series: Magic Academy[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveBoutiqueSwordShield",
+      "title": "Boutique Sword and Shield",
+      "rarity": "Rare",
+      "desc": "At combat start, gain [blue]2[/blue] [red]Strength[/red].\nAt the start of each turn, gain [blue]2[/blue] [gold]Vigor[/gold].\nIn Boss rooms, gain [blue]1[/blue] [gold]Problem Student[/gold] each turn.\nWhile you have [gold]Problem Student[/gold], gain [blue]4[/blue] [green]Dexterity[/green].\nThis relic also grants the [gold]Series: Magic Academy[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveBronzeGong",
+      "title": "Bronze Gong",
+      "rarity": "Common",
+      "desc": "After you play a Persona Skill card, all players gain [blue]1[/blue] stack of [gold]Empowered Bronze Gong[/gold].\nThis relic also grants the [gold]Series: Water Town[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveCandyMembershipCard",
+      "title": "Candy Membership Card",
+      "rarity": "Rare",
+      "desc": "At the start of each turn, if your hand does not contain [gold]Curious Candy Machine[/gold], add [blue]1[/blue] [gold]Curious Candy Machine[/gold] to your hand.\nThis relic also grants the [gold]Ghost Alley Series[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveCrossedTwinCarp",
+      "title": "Crossed Twin Carp",
+      "rarity": "Rare",
+      "desc": "At the start of each turn, gain [gold]Empowered Crossed Twin Carp[/gold].\nWhenever you gain [gold]Vigor[/gold], if you do not already have [gold]Empowered Crossed Twin Carp[/gold], gain it.\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveCursedSword",
+      "title": "Cursed Sword",
+      "rarity": "Common",
+      "desc": "At combat start, gain [blue]99[/blue] [gold]Frail[/gold].\nAt the start of turn [blue]1[/blue] and every multiple of [blue]3[/blue], gain [gold]Vigor[/gold] equal to this relic's counter.\nWhenever you kill [blue]1[/blue] monster, this relic's counter +[blue]1[/blue].\nThis relic also grants the [gold]Series: Spirit Festival[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveDreamshipModel",
+      "title": "Dreamship Model",
+      "rarity": "Rare",
+      "desc": "At combat start, gain [blue]2[/blue] [green]Dexterity[/green].\nEvery [blue]15[/blue] cards you play, reduce Persona relic cooldown by [blue]1[/blue].\nThis relic also grants the [gold]Series: Dreamship[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveInfiniteSnake",
+      "title": "Infinite Snake",
+      "rarity": "Rare",
+      "desc": "At combat start, Max Energy +{energyPrefix:energyIcons(1)}.\nAt the start of each turn, if you have fewer than [blue]8[/blue] cards in hand, draw until you have [blue]8[/blue].\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveLittleCarpDoll",
+      "title": "Little Carp Doll",
+      "rarity": "Uncommon",
+      "desc": "After you play a Persona Skill card, gain [blue]1[/blue] [gold]Counter[/gold].\nWhenever any [gold]Counter[/gold] effect triggers, gain [blue]1[/blue] stack of [gold]Empowered Little Carp Doll[/gold], once each turn.\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveLittleSnakeDoll",
+      "title": "Little Snake Doll",
+      "rarity": "Uncommon",
+      "desc": "Whenever you take damage, gain [blue]1[/blue] [gold]Reverse Scales[/gold].\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note."
+    },
+    {
+      "class": "TokenExclusivePiercingGun",
+      "title": "Piercing Gun",
+      "rarity": "Rare",
+      "desc": "Whenever your Skill cards deal damage, they also resolve the portion blocked by Block as extra damage, effectively stripping Block first.\nThis relic also grants the [gold]Series: Spirit Festival[/gold] note."
+    },
+    {
+      "class": "TokenExclusivePsychedelicSeafoodSoup",
+      "title": "Psychedelic Seafood Soup",
+      "rarity": "Common",
+      "desc": "At the start of each turn, randomly gain either [blue]1[/blue] or [blue]6[/blue] [gold]Vigor[/gold].\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveStormTalisman",
+      "title": "Storm Talisman",
+      "rarity": "Common",
+      "desc": "Whenever you play a Skill card, gain [blue]1[/blue] [gold]Doom[/gold].\nWhenever you draw [blue]1[/blue] card, gain [blue]1[/blue] [gold]Half Life Heal[/gold].\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveTimer",
+      "title": "Timer",
+      "rarity": "Common",
+      "desc": "Whenever you gain [gold]Modification[/gold], gain [blue]1[/blue] extra stack. For every [blue]2[/blue] stacks of [gold]Modification[/gold] you have, gain [blue]1[/blue] [red]Strength[/red].\nThis relic also grants the [gold]Ghost Alley Series[/gold] effect."
+    },
+    {
+      "class": "TokenExclusiveTrident",
+      "title": "Trident",
+      "rarity": "Uncommon",
+      "desc": "After you play a Persona Skill card, make [blue]1[/blue] player who does not already have [gold]Empowered Trident[/gold] gain it.\nThis relic also grants the [gold]Series: Dreamship[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveVengeanceHalberd",
+      "title": "Vengeance Halberd",
+      "rarity": "Uncommon",
+      "desc": "If you have defense-loss debuffs, gain [blue]5[/blue] temporary [red]Strength[/red].\nIf you have HP-loss debuffs, gain [blue]5[/blue] temporary [green]Dexterity[/green].\nThis relic also grants the [gold]Series: Spirit Festival[/gold] note."
+    },
+    {
+      "class": "TokenExclusiveZuoTeaCake",
+      "title": "Zuo Tea Cake",
+      "rarity": "Common",
+      "desc": "At combat start, gain [blue]1[/blue] [red]Strength[/red].\nAfter being obtained, during the current act, whenever your Attack card damages a non-Elite, non-Boss enemy, gain [blue]1[/blue] stack of [gold]Zuo Tea Cake[/gold].\nIt expires next act.\nThis relic also grants the [gold]Series: Magic Academy[/gold] note."
+    },
+    {
+      "class": "TokenGoldAdrenalineEfficient",
+      "title": "Adrenaline: Efficient",
+      "rarity": "Rare",
+      "desc": "When your HP is below [blue]50[/blue]%, gain [blue]3[/blue] temporary [red]Strength[/red]. When it is below [blue]25[/blue]%, gain [blue]8[/blue] temporary [red]Strength[/red] instead."
+    },
+    {
+      "class": "TokenGoldArtKnifeEnchanted",
+      "title": "Art Knife: Enchanted",
+      "rarity": "Rare",
+      "desc": "While you are at full HP, gain [blue]4[/blue] temporary [red]Strength[/red]. Your Skill cards deal extra damage equal to half your [gold]Half Life Heal[/gold] stacks."
+    },
+    {
+      "class": "TokenGoldArtKnifeSharp",
+      "title": "Art Knife: Sharp",
+      "rarity": "Rare",
+      "desc": "While you are at full HP, gain [blue]4[/blue] temporary [red]Strength[/red]. Your Attack cards deal extra damage equal to your [gold]Half Life Heal[/gold] stacks."
+    },
+    {
+      "class": "TokenGoldBankCardPremium",
+      "title": "Bank Card: Endless Limit",
+      "rarity": "Rare",
+      "desc": "Gain [blue]14[/blue] stacks of [gold]Eternal Starlight[/gold]. At combat start, all players gain [blue]3[/blue] [gold]StarLight[/gold]."
+    },
+    {
+      "class": "TokenGoldBigStewBowl",
+      "title": "Big Stew Bowl",
+      "rarity": "Rare",
+      "desc": "At the end of your turn, all players gain [blue]1[/blue] stack of [gold]Half Life Heal[/gold] and heal [blue]1[/blue] HP."
+    },
+    {
+      "class": "TokenGoldBoxingGlovePremium",
+      "title": "Boxing Glove: Premium",
+      "rarity": "Rare",
+      "desc": "At combat start, gain [blue]2[/blue] [red]Strength[/red]. At the start of each turn, gain [blue]3[/blue] [power]Vigor[/power].\nThis relic also grants the [gold]Boxing Gloves Set[/gold] effect."
+    },
+    {
+      "class": "TokenGoldBufferShield",
+      "title": "Buffer Shield",
+      "rarity": "Rare",
+      "desc": "Whenever an enemy attacks you with an attack intent, gain [blue]1[/blue] stack of [gold]Half Life Heal[/gold] and gain [blue]3[/blue] [gold]StarLight[/gold]."
+    },
+    {
+      "class": "TokenGoldEagleEyeScope",
+      "title": "Eagle Eye Scope",
+      "rarity": "Rare",
+      "desc": "When your Attack cards deal damage, first apply [blue]1[/blue] stack of [gold]Mark[/gold] to the target. That hit then deals extra damage equal to the target's [gold]Mark[/gold] stacks × [blue]2[/blue]."
+    },
+    {
+      "class": "TokenGoldExplorationSatellite",
+      "title": "Exploration Satellite",
+      "rarity": "Rare",
+      "desc": "Whenever you play a Star Engine effect card, which means any custom Skill card from this mod, add [blue]1[/blue] extra base-damage [gold]Orbital Bombardment[/gold]. This [gold]Orbital Bombardment[/gold] does not discard your hand.\nAt end of turn, if you have fewer than [blue]6[/blue] cards in hand, gain [blue]1[/blue] [gold]Orbital Railgun[/gold] next turn."
+    },
+    {
+      "class": "TokenGoldExtraBattery",
+      "title": "Extra Battery",
+      "rarity": "Rare",
+      "desc": "Cooldown-type Persona relics have their cooldown cap reduced by [blue]1[/blue].\n[relic]Bionic Jasmine[/relic]'s step conversion requirement is reduced by [blue]1[/blue]/[blue]4[/blue]."
+    },
+    {
+      "class": "TokenGoldFlashlightFlashburst",
+      "title": "Flashlight: Flashburst",
+      "rarity": "Rare",
+      "desc": "Every [blue]3[/blue] Attack cards you play that cost at least [blue]1[/blue], gain [blue]1[/blue] [gold]StarLight[/gold].\nFor every [blue]10[/blue] stacks of [gold]Eternal Starlight[/gold], your Attack cards deal [blue]1[/blue] extra damage.\nThis relic also grants the [gold]Flashlight Set[/gold] effect."
+    },
+    {
+      "class": "TokenGoldHandheldFanLarge",
+      "title": "Handheld Fan: Large",
+      "rarity": "Rare",
+      "desc": "After you play a Persona Skill card, draw [blue]1[/blue] card and apply [blue]1[/blue] stack of [gold]Mark[/gold] to a random enemy."
+    },
+    {
+      "class": "TokenGoldInitialPoint",
+      "title": "Initial Point",
+      "rarity": "Rare",
+      "desc": "At rest sites, you can spend Gold to [gold]Ascend[/gold]: the first [blue]3[/blue] uses cost [gold]60[/gold]/[gold]90[/gold]/[gold]120[/gold] Gold and grant a random token relic (excluding special relics) plus [blue]15[/blue]% Max HP healing. After all [blue]3[/blue] ascensions are complete, the option only heals [blue]15[/blue]% Max HP."
+    },
+    {
+      "class": "TokenGoldMagicQuiver",
+      "title": "Magic Quiver",
+      "rarity": "Rare",
+      "desc": "Once each turn, when a Skill card deals damage to a monster that already has [gold]Mark[/gold], apply [blue]1[/blue] more [gold]Mark[/gold] and return a copy of that Skill card to your hand."
+    },
+    {
+      "class": "TokenGoldMedicalKitCompleteTreatment",
+      "title": "Medical Kit: Complete Treatment",
+      "rarity": "Rare",
+      "desc": "At the start of each turn, gain [blue]3[/blue] stacks of [gold]Half Life Heal[/gold]."
+    },
+    {
+      "class": "TokenGoldMembersReferenceUltimate",
+      "title": "Ultimate Black Gold Referral Letter",
+      "rarity": "Rare",
+      "desc": "At the start of your [blue]3[/blue]rd, [blue]6[/blue]th, [blue]9[/blue]th, and later turns, draw [blue]2[/blue] extra cards and gain {energyPrefix:energyIcons(2)}."
+    },
+    {
+      "class": "TokenGoldMotorcycleHelmetPremium",
+      "title": "Gold Motorcycle Helmet",
+      "rarity": "Rare",
+      "desc": "At combat start, gain [blue]2[/blue] stacks of [gold]Phantom Reverse Scales[/gold] and [blue]1[/blue] [green]Dexterity[/green].\nAt the start of each turn, gain [blue]3[/blue] Block."
+    },
+    {
+      "class": "TokenGoldNinjaShuriken",
+      "title": "Ninja Shuriken",
+      "rarity": "Rare",
+      "desc": "At combat start, your Max Energy is increased by {energyPrefix:energyIcons(1)}.\nWhenever your Skill cards deal damage to an enemy, that target takes extra damage equal to its [gold]Mark[/gold] stacks."
+    },
+    {
+      "class": "TokenGoldSandwichBiscuitPremium",
+      "title": "Gold Sandwich Biscuit",
+      "rarity": "Uncommon",
+      "desc": "Gain [blue]11[/blue] Max HP."
+    },
+    {
+      "class": "TokenGoldSpeedRollerPremium",
+      "title": "Speed Roller: Premium",
+      "rarity": "Rare",
+      "desc": "At combat start, gain [blue]4[/blue] [green]Dexterity[/green]."
+    },
+    {
+      "class": "TokenGoldStarCoinHammer",
+      "title": "Star Coin Hammer",
+      "rarity": "Rare",
+      "desc": "Gain [blue]15[/blue] stacks of [gold]Eternal Starlight[/gold]. If you have at least [blue]40[/blue] stacks of [gold]Eternal Starlight[/gold] and at least [blue]100[/blue] Gold, the first time each turn you deal damage, spend [blue]15[/blue] Gold and deal bonus damage to that target equal to [blue]10[/blue]% of your current Gold. If that bonus damage kills the target, gain [blue]6[/blue] [gold]StarLight[/gold]."
+    },
+    {
+      "class": "TokenGoldVitamin",
+      "title": "Vitamin",
+      "rarity": "Rare",
+      "desc": "Whenever you draw [blue]1[/blue] card, gain [blue]1[/blue] stack of [gold]Half Life Heal[/gold]. This can trigger at most [blue]9[/blue] times each turn."
+    },
+    {
+      "class": "TokenPurpleAdrenalineGeneral",
+      "title": "Adrenaline: Basic",
+      "rarity": "Uncommon",
+      "desc": "When your HP is below [blue]50[/blue]%, gain [blue]1[/blue] temporary [red]Strength[/red]. When it is below [blue]25[/blue]%, gain [blue]3[/blue] temporary [red]Strength[/red] instead."
+    },
+    {
+      "class": "TokenPurpleArtKnifeBeginner",
+      "title": "Art Knife: Beginner",
+      "rarity": "Uncommon",
+      "desc": "While you are at full HP, gain [blue]2[/blue] temporary [red]Strength[/red]. Your Attack cards deal extra damage equal to your [gold]Half Life Heal[/gold] stacks."
+    },
+    {
+      "class": "TokenPurpleBankCardIntermediate",
+      "title": "Bank Card: High Balance",
+      "rarity": "Uncommon",
+      "desc": "Gain [blue]28[/blue] stacks of [gold]Eternal Starlight[/gold]. If you do not have [gold]Eternal Starlight[/gold], obtain it first, then add the stacks."
+    },
+    {
+      "class": "TokenPurpleBasicScope",
+      "title": "Basic Scope",
+      "rarity": "Uncommon",
+      "desc": "Your Attack cards deal [blue]2[/blue] extra damage and apply [blue]1[/blue] stack of [gold]Mark[/gold] after dealing damage."
+    },
+    {
+      "class": "TokenPurpleBigBackpack",
+      "title": "Big Backpack",
+      "rarity": "Uncommon",
+      "desc": "At combat start, your Max Energy is increased by {energyPrefix:energyIcons(1)}."
+    },
+    {
+      "class": "TokenPurpleBoxingGloveIntermediate",
+      "title": "Boxing Glove: Intermediate",
+      "rarity": "Uncommon",
+      "desc": "At combat start, gain [blue]1[/blue] [red]Strength[/red]. At the start of each turn, gain [blue]1[/blue] [power]Vigor[/power].\nThis relic also grants the [gold]Boxing Gloves Set[/gold] effect."
+    },
+    {
+      "class": "TokenPurpleFlashlightStronglight",
+      "title": "Flashlight: Strong Beam",
+      "rarity": "Uncommon",
+      "desc": "Every [blue]3[/blue] Attack cards you play that cost at least [blue]1[/blue], gain [blue]1[/blue] [gold]StarLight[/gold].\nThis relic also grants the [gold]Flashlight Set[/gold] effect."
+    },
+    {
+      "class": "TokenPurpleFriendshipBadge",
+      "title": "Friendship Badge",
+      "rarity": "Uncommon",
+      "desc": "Whenever you cause a teammate to gain [gold]StarLight[/gold] or [gold]Half Life Heal[/gold], both you and that target gain [blue]1[/blue] stack of [gold]Half Life Heal[/gold]."
+    },
+    {
+      "class": "TokenPurpleMembersReferencePremium",
+      "title": "Premium Member Referral Letter",
+      "rarity": "Uncommon",
+      "desc": "At the start of your [blue]3[/blue]rd, [blue]6[/blue]th, [blue]9[/blue]th, and later turns, draw [blue]2[/blue] extra cards."
+    },
+    {
+      "class": "TokenPurpleMotorcycleHelmetIntermediate",
+      "title": "Purple Motorcycle Helmet",
+      "rarity": "Uncommon",
+      "desc": "At combat start, gain [blue]2[/blue] stacks of [gold]Phantom Reverse Scales[/gold].\nAt the start of each turn, gain [blue]2[/blue] Block."
+    },
+    {
+      "class": "TokenPurpleSandwichBiscuitIntermediate",
+      "title": "Purple Sandwich Biscuit",
+      "rarity": "Rare",
+      "desc": "Gain [blue]15[/blue] Max HP. At the start of each turn, if your current HP is below [blue]50[/blue]% of your Max HP, gain [blue]1[/blue] [gold]Counter[/gold]."
+    },
+    {
+      "class": "TokenPurpleSmartWatch",
+      "title": "Smart Watch",
+      "rarity": "Uncommon",
+      "desc": "At the end of your turn, if you have fewer than [blue]5[/blue] cards in hand, draw [blue]1[/blue] extra card next turn."
+    },
+    {
+      "class": "TokenPurpleSpeedRollerIntermediate",
+      "title": "Speed Roller: Intermediate",
+      "rarity": "Uncommon",
+      "desc": "At combat start, gain [blue]2[/blue] [green]Dexterity[/green]."
+    },
+    {
+      "class": "TokenPurpleTastyCandy",
+      "title": "Tasty Candy",
+      "rarity": "Uncommon",
+      "desc": "Whenever you play a card that costs at least [blue]1[/blue], gain [blue]1[/blue] stack of [gold]Half Life Heal[/gold].\nIf your HP is full, spend [blue]4[/blue] stacks of [gold]Half Life Heal[/gold] and gain {energyPrefix:energyIcons(1)}."
+    }
+  ]
+}

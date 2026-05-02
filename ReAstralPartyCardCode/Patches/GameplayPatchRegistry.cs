@@ -1,0 +1,196 @@
+using HarmonyLib;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Nodes;
+using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
+using MegaCrit.Sts2.Core.Nodes.Screens;
+using MegaCrit.Sts2.Core.Nodes.Screens.RelicCollection;
+using MegaCrit.Sts2.Core.Rewards;
+using MegaCrit.Sts2.Core.Runs;
+using STS2RitsuLib;
+using STS2RitsuLib.Patching.Builders;
+using STS2RitsuLib.Patching.Core;
+using STS2RitsuLib.Patching.Models;
+
+namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+
+public static class GameplayPatchRegistry
+{
+    public static void RegisterAndApply()
+    {
+        var patcher = RitsuLibFramework.CreatePatcher(MainFile.ModId, "gameplay-patches", "gameplay patches");
+        patcher.RegisterPatches<GameplayStaticPatches>();
+        patcher.ApplyDynamic(GameplayDynamicPatches.CreateBuilder(), rollbackOnCriticalFailure: true);
+
+        if (!patcher.PatchAll())
+            throw new InvalidOperationException($"Failed to apply required gameplay patches for {MainFile.ModId}.");
+    }
+}
+
+public sealed class GameplayStaticPatches : IModPatches
+{
+    public static void AddTo(ModPatcher patcher)
+    {
+        GameplayStaticPatchCatalog.RegisterAll(patcher);
+    }
+}
+
+public static class GameplayDynamicPatches
+{
+    public static DynamicPatchBuilder CreateBuilder()
+    {
+        return GameplayDynamicPatchCatalog.CreateBuilder();
+    }
+}
+
+internal static class GameplayStaticPatchCatalog
+{
+    public static void RegisterAll(ModPatcher patcher)
+    {
+        RegisterUiPatches(patcher);
+        RegisterGameplayPatches(patcher);
+        RegisterFragileGameplayPatches(patcher);
+    }
+
+    private static void RegisterUiPatches(ModPatcher patcher)
+    {
+        patcher.RegisterPatches(
+        [
+            new ModPatchInfo(
+                "choose_relic_header_patch",
+                typeof(NChooseARelicSelection),
+                "_Ready",
+                typeof(ChooseRelicHeaderPatch),
+                isCritical: false,
+                description: "UI patch: replace the shared relic-selection header text"),
+            new ModPatchInfo(
+                "persona_relic_collection_patch",
+                typeof(NRelicCollectionCategory),
+                "LoadRelics",
+                typeof(PersonaRelicCollectionPatch),
+                isCritical: false,
+                description: "UI patch: inject persona relic subsection into the compendium"),
+            new ModPatchInfo(
+                "skill_famous_blade_title_patch",
+                typeof(CardModel),
+                nameof(CardModel.Title),
+                typeof(SkillFamousBladeTitlePatch),
+                isCritical: false,
+                description: "UI patch: override Famous Blade title getter",
+                harmonyMethodType: MethodType.Getter)
+        ]);
+    }
+
+    private static void RegisterGameplayPatches(ModPatcher patcher)
+    {
+        patcher.RegisterPatches(
+        [
+            new ModPatchInfo(
+                "star_engine_combat_relic_reward_patch",
+                typeof(RelicReward),
+                nameof(RelicReward.Populate),
+                typeof(StarEngineCombatRelicRewardPatch),
+                description:
+                "Gameplay patch: swap combat and event relic rewards for token relics when Star Engine is active")
+        ]);
+    }
+
+    private static void RegisterFragileGameplayPatches(ModPatcher patcher)
+    {
+        patcher.RegisterPatches(
+        [
+            new ModPatchInfo(
+                "star_engine_treasure_room_relic_patch",
+                typeof(TreasureRoomRelicSynchronizer),
+                nameof(TreasureRoomRelicSynchronizer.BeginRelicPicking),
+                typeof(StarEngineTreasureRoomRelicPatch),
+                description:
+                "Version-fragile gameplay patch: replace treasure-room relic voting setup for Star Engine token relics"),
+            new ModPatchInfo(
+                "starting_persona_relic_selection_patch",
+                typeof(NGame),
+                "StartRun",
+                typeof(StartingPersonaRelicSelectionPatch),
+                description:
+                "Version-fragile gameplay patch: open the starting persona relic selection after run start",
+                parameterTypes: [typeof(RunState)])
+        ]);
+    }
+}
+
+internal static class GameplayDynamicPatchCatalog
+{
+    public static DynamicPatchBuilder CreateBuilder()
+    {
+        var builder = new DynamicPatchBuilder($"{MainFile.ModId}_dynamic");
+        RegisterUiPatches(builder);
+        RegisterCompatibilityBridgePatches(builder);
+        return builder;
+    }
+
+    private static void RegisterUiPatches(DynamicPatchBuilder builder)
+    {
+        builder.AddMethod(
+            typeof(NHandCardHolder),
+            nameof(NHandCardHolder.UpdateCard),
+            Type.EmptyTypes,
+            postfix: DynamicPatchBuilder.FromMethod(
+                typeof(TemporaryCardHighlightPatch),
+                nameof(TemporaryCardHighlightPatch.UpdateCardPostfix)),
+            isCritical: false,
+            description: "UI patch: highlight temporary cards when hand cards refresh",
+            patchId: "temporary_card_highlight_update");
+        builder.AddMethod(
+            typeof(NHandCardHolder),
+            nameof(NHandCardHolder.Flash),
+            Type.EmptyTypes,
+            postfix: DynamicPatchBuilder.FromMethod(
+                typeof(TemporaryCardHighlightPatch),
+                nameof(TemporaryCardHighlightPatch.FlashPostfix)),
+            isCritical: false,
+            description: "UI patch: re-apply temporary card highlight after flash",
+            patchId: "temporary_card_highlight_flash");
+    }
+
+    private static void RegisterCompatibilityBridgePatches(DynamicPatchBuilder builder)
+    {
+        var cooldownPrefix = DynamicPatchBuilder.FromMethod(
+            typeof(CooldownEnchantmentGrantPatch),
+            nameof(CooldownEnchantmentGrantPatch.Prefix));
+
+        TryRegisterCooldownBridgePatch(
+            builder,
+            "cooldown_enchantment_grant_4arg",
+            [typeof(CardModel), typeof(PileType), typeof(bool), typeof(CardPilePosition)],
+            cooldownPrefix);
+
+        TryRegisterCooldownBridgePatch(
+            builder,
+            "cooldown_enchantment_grant_3arg",
+            [typeof(CardModel), typeof(PileType), typeof(bool)],
+            cooldownPrefix);
+    }
+
+    private static void TryRegisterCooldownBridgePatch(
+        DynamicPatchBuilder builder,
+        string patchId,
+        Type[] parameterTypes,
+        HarmonyMethod cooldownPrefix)
+    {
+        var target = AccessTools.DeclaredMethod(
+            typeof(CardPileCmd),
+            nameof(CardPileCmd.AddGeneratedCardToCombat),
+            parameterTypes);
+        if (target == null)
+            return;
+
+        builder.Add(
+            target,
+            prefix: cooldownPrefix,
+            description: "Compatibility patch: auto-apply cooldown enchantment to generated persona skills",
+            patchId: patchId);
+    }
+}

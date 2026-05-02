@@ -1,0 +1,16 @@
+using MegaCrit.Sts2.Core.Entities.Relics;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.RelicPools;
+using MegaCrit.Sts2.Core.Saves.Runs;
+
+namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+
+[RegisterRelic(typeof(SharedRelicPool))]
+public class TokenPurpleBoxingGloveIntermediate : BoxingGloveRelicBase
+{
+    protected override decimal CombatStartStrengthBonus => 1m;
+
+    protected override decimal TurnStartVigorBonus => 1m;
+
+    public override RelicRarity Rarity => RelicRarity.Uncommon;
+}

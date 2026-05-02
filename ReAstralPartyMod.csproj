@@ -1,0 +1,523 @@
+﻿<Project Sdk="Godot.NET.Sdk/4.5.1">
+  <PropertyGroup>
+    <!-- 濡傛灉浣犲畨瑁呬簡10.0骞堕亣鍒伴棶棰橈紝鏀逛笅杩欓噷 -->
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>true</ImplicitUsings>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+
+    <!-- 鏀规垚浣犵殑鏉€鎴皷濉?鐩綍 -->
+    <Sts2Dir>D:\Steam\steamapps\common\Slay the Spire 2</Sts2Dir>
+    <Sts2DataDir>$(Sts2Dir)\data_sts2_windows_x86_64</Sts2DataDir>
+    <SecondarySts2Dir Condition="'$(SecondarySts2Dir)' == '' and Exists('D:\SteamLibrary\steamapps\common\Slay the Spire 2')">D:\SteamLibrary\steamapps\common\Slay the Spire 2</SecondarySts2Dir>
+    <GodotExportPreset>Windows Desktop</GodotExportPreset>
+    <ModOutputDir>$(Sts2Dir)\mods\$(MSBuildProjectName)\</ModOutputDir>
+    <SecondaryModOutputDir Condition="'$(SecondarySts2Dir)' != ''">$(SecondarySts2Dir)\mods\$(MSBuildProjectName)\</SecondaryModOutputDir>
+    <PckOutputPath>$(ModOutputDir)$(MSBuildProjectName).pck</PckOutputPath>
+    <GodotEditorPath Condition="'$(GodotEditorPath)' == '' and Exists('D:\MOD\杀戮尖塔2mod制作\megadot-4.5.1-m.8-windows-x86_64-llvm-editor-csharp\MegaDot_v4.5.1-stable_mono_win64.exe')">D:\MOD\杀戮尖塔2mod制作\megadot-4.5.1-m.8-windows-x86_64-llvm-editor-csharp\MegaDot_v4.5.1-stable_mono_win64.exe</GodotEditorPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RunPckExport Condition="'$(RunPckExport)' == '' and '$(DesignTimeBuild)' != 'true'">true</RunPckExport>
+    <RunPckExport Condition="'$(RunPckExport)' == ''">false</RunPckExport>
+  </PropertyGroup>
+
+  <Target Name="ValidateChineseLocalization" BeforeTargets="BeforeBuild">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\ValidateLocalization.ps1&quot; -LocalizationDir &quot;$(MSBuildProjectDirectory)\ReAstralPartyMod\localization\zhs&quot;" />
+  </Target>
+
+  <ItemGroup>
+    <Reference Include="sts2">
+      <HintPath>$(Sts2DataDir)\sts2.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <Reference Include="0Harmony">
+      <HintPath>$(Sts2DataDir)\0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- 鏈湴寮曠敤锛屾敞鎰忚矾寰勬槸鍚︽纭?-->
+    <Reference Include="STS2-RitsuLib">
+      <HintPath>$(Sts2Dir)/mods/RitsuLib/STS2-RitsuLib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+
+    <!-- NuGet鑾峰彇锛屾敞鎰忕増鏈槸鍚︿竴鑷达紝涓嶄竴鑷存墜鍔ㄦ洿鏀筕ersion -->
+    <!-- <PackageReference Include="STS2.RitsuLib" Version="*" /> -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ReAstralPartyMod\**\*">
+      <Visible>true</Visible>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="ReAstralPartyMod\images\astral_token.png" />
+    <Content Include="ReAstralPartyMod\images\astral_token.png.import" />
+    <Content Include="ReAstralPartyMod\images\background\starting_persona_pelic_selection_screen.png" />
+    <Content Include="ReAstralPartyMod\images\background\starting_persona_pelic_selection_screen.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\base_ability_orbital_railgun.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\base_ability_orbital_railgun.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\collectors_card_iam_dragon.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\collectors_card_iam_dragon.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\collectors_card_i_am_dragon.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\collectors_card_i_am_dragon.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\collectors_card_stagnant_protocol.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\collectors_card_stagnant_protocol.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\curious_candy_machine.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\curious_candy_machine.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\events_concealing_investigation_a.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\events_concealing_investigation_a.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\events_concealing_investigation_b.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\events_concealing_investigation_b.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\events_concealing_investigation_c.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\events_concealing_investigation_c.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\events_concealing_investigation_d.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\events_concealing_investigation_d.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_angels_descent.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_angels_descent.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_crowded_passage.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_crowded_passage.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_deus_ex_machina.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_deus_ex_machina.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_equality.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_equality.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_fight_fun.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_fight_fun.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_food_safety.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_food_safety.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_food_safety_doom.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_food_safety_doom.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_gift_from_sky.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_gift_from_sky.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_hand_erase.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_hand_erase.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_player_representative.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_player_representative.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_red_heat_warning.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_red_heat_warning.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_sprint.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_sprint.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_thunder_strike.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_thunder_strike.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_extra_large.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_extra_large.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_gawu_cutter.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_gawu_cutter.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_large.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_large.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_medium.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_medium.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_bite.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_bite.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_chain_reaction.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_chain_reaction.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_channel_energy.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_channel_energy.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_concealing_operation.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_concealing_operation.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_dragons_roar.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_dragons_roar.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_guidance.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_guidance.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_weak_mprint.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_weak_mprint.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_healing_slime.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_healing_slime.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_iron_virgin.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_iron_virgin.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_mixed_cocktails.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_mixed_cocktails.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_powerful_pity.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_powerful_pity.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_product_restocking.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_product_restocking.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_royal_prerogative.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_royal_prerogative.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_save_me_mousy.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_save_me_mousy.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_shadow_fusion.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_shadow_fusion.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_solar_bombardment.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_solar_bombardment.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_transfer.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_transfer.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_trouble_maker.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_trouble_maker.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_unstoppable.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_unstoppable.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_vampire_bite.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_vampire_bite.png.import" />
+    <Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png" />
+    <Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png.import" />
+    <Content Include="ReAstralPartyMod\images\events\astral_relic_store.png" />
+    <Content Include="ReAstralPartyMod\images\events\astral_relic_store.png.import" />
+    <Content Include="ReAstralPartyMod\images\potion\candy_big_brain_gummy.png" />
+    <Content Include="ReAstralPartyMod\images\potion\candy_big_brain_gummy.png.import" />
+    <Content Include="ReAstralPartyMod\images\potion\candy_energy_supplement_bar.png" />
+    <Content Include="ReAstralPartyMod\images\potion\candy_energy_supplement_bar.png.import" />
+    <Content Include="ReAstralPartyMod\images\potion\candy_support_gum.png" />
+    <Content Include="ReAstralPartyMod\images\potion\candy_support_gum.png.import" />
+    <Content Include="ReAstralPartyMod\images\potion\person_chest_choose.png" />
+    <Content Include="ReAstralPartyMod\images\potion\person_chest_choose.png.import" />
+    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_blue.png" />
+    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_blue.png.import" />
+    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_gold.png" />
+    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_gold.png.import" />
+    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_purple.png" />
+    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_purple.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\ambush_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\ambush_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\bloodthirst_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\bloodthirst_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\boundary_reinforcement_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\boundary_reinforcement_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\bronze_gong_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\bronze_gong_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\candy_energy_supplement_bar_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\candy_energy_supplement_bar_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\concealing_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\concealing_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\conserve_energy_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\conserve_energy_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\cosmos_freezes_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\cosmos_freezes_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\counter_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\counter_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\crossed_twin_carp_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\crossed_twin_carp_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\cute_is_justice_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\cute_is_justice_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\dragon_awakening_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\dragon_awakening_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\dragon_roar_ward_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\dragon_roar_ward_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\elegant_feather_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\elegant_feather_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\exposure_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\exposure_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\fate_weak_imprint_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\fate_weak_imprint_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\half_life_heal_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\half_life_heal_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\hunters_feast_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\hunters_feast_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\investigation_target_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\investigation_target_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\iron_virgin_ward_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\iron_virgin_ward_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\ling_hun_lian_jie_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\ling_hun_lian_jie_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\little_carp_doll_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\little_carp_doll_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\mark_lock_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\mark_lock_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\mixed_cocktails_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\mixed_cocktails_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\modification_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\modification_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\mouse_shield_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\mouse_shield_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\problem_student_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\problem_student_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\ready_to_strike_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\ready_to_strike_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\reversed_scales_holographic_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\reversed_scales_holographic_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\reversed_scales_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\reversed_scales_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\shadows_limit_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\shadows_limit_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\somatic_remodeling_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\somatic_remodeling_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\stagnant_cosmos_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\stagnant_cosmos_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\star_fragment_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\star_fragment_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\star_light_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\star_light_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\sword_aura_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\sword_aura_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\trident_empower_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\trident_empower_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\true_dragon_form_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\true_dragon_form_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\twin_shadows_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\twin_shadows_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\fracture_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_masters_chips.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_intent.png" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_intent.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_xiao_lei_dragon_gate.png" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_xiao_lei_dragon_gate.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_land_center.png" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_land_center.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_bionic_jasmine.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_bionic_jasmine.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_blue_whale.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_blue_whale.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_cheongsam_lady.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_cheongsam_lady.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_gunsmith_moses.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_gunsmith_moses.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_ink_shadow_hunter.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_ink_shadow_hunter.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_jill_steinle.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_jill_steinle.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_mascot_girl_mimi.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_mascot_girl_mimi.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_midnight_flash.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_midnight_flash.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_mousy_lian.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_mousy_lian.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_oasis_queen.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_oasis_queen.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_poisoned_apple.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_poisoned_apple.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_proprietress.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_proprietress.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_samurai_prawn.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_samurai_prawn.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_shadow_scion.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_shadow_scion.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_slime_lulu.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_slime_lulu.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_social_fear_nun.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_social_fear_nun.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_superman_megas.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_superman_megas.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_vampire.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_vampire.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_weird_egg.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_weird_egg.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_xiao_lei.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_xiao_lei.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_atm.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_atm.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_bank_card_general.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_bank_card_general.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_boxing_glove_general.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_boxing_glove_general.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die10.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die10.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die12.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die12.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die20.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die20.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die4.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die4.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die6.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die6.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die8.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_die8.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_elegant_feather.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_elegant_feather.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_flashlight_general.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_flashlight_general.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_giant_anchor.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_giant_anchor.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_handheld_fan_small.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_handheld_fan_small.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_mark_spray_can.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_mark_spray_can.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_medical_kit_emergency_treatment.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_medical_kit_emergency_treatment.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_members_reference_standard.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_members_reference_standard.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_motorcycle_helmet_general.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_motorcycle_helmet_general.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_piggy_bank.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_piggy_bank.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_sandwich_biscuit_general.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_sandwich_biscuit_general.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_speed_roller_general.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_speed_roller_general.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_target_board.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_target_board.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_trident.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_blue_trident.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_Eternal_Starlight.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_Eternal_Starlight.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_ancient_wand.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_ancient_wand.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_boutique_sword_shield.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_boutique_sword_shield.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_bronze_gong.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_bronze_gong.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_candy_membership_card.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_candy_membership_card.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_crossed_twin_carp.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_crossed_twin_carp.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_cursed_sword.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_cursed_sword.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_dreamship_model.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_dreamship_model.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_infinite_snake.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_infinite_snake.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_little_carp_doll.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_little_carp_doll.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_little_snake_doll.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_little_snake_doll.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_piercing_gun.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_piercing_gun.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_psychedelic_seafood_soup.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_psychedelic_seafood_soup.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_storm_talisman.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_storm_talisman.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_timer.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_timer.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_trident.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_trident.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_vengeance_halberd.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_vengeance_halberd.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_zuo_tea_cake.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_exclusive_zuo_tea_cake.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_adrenaline_efficient.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_adrenaline_efficient.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_art_knife_enchanted.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_art_knife_enchanted.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_art_knife_sharp.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_art_knife_sharp.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_bank_card_premium.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_bank_card_premium.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_big_stew_bowl.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_big_stew_bowl.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_boxing_glove_premium.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_boxing_glove_premium.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_buffer_shield.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_buffer_shield.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_eagle_eye_scope.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_eagle_eye_scope.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_exploration_satellite.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_exploration_satellite.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_extra_battery.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_extra_battery.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_flashlight_flashburst.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_flashlight_flashburst.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_handheld_fan_large.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_handheld_fan_large.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_magic_quiver.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_magic_quiver.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_medical_kit_complete_treatment.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_medical_kit_complete_treatment.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_members_reference_ultimate.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_members_reference_ultimate.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_motorcycle_helmet_premium.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_motorcycle_helmet_premium.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_ninja_shuriken.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_ninja_shuriken.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_sandwich_biscuit_premium.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_sandwich_biscuit_premium.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_speed_roller_premium.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_speed_roller_premium.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_star_coin_hammer.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_star_coin_hammer.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_vitamin.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_vitamin.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_adrenaline_general.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_adrenaline_general.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_art_knife_beginner.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_art_knife_beginner.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_bank_card_intermediate.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_bank_card_intermediate.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_basic_scope.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_basic_scope.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_big_backpack.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_big_backpack.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_boxing_glove_intermediate.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_boxing_glove_intermediate.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_flashlight_stronglight.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_flashlight_stronglight.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_friendship_badge.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_friendship_badge.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_members_reference_premium.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_members_reference_premium.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_motorcycle_helmet_intermediate.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_motorcycle_helmet_intermediate.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_sandwich_biscuit_intermediate.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_sandwich_biscuit_intermediate.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_smart_watch.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_smart_watch.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_speed_roller_intermediate.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_speed_roller_intermediate.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_tasty_candy.png" />
+    <Content Include="ReAstralPartyMod\images\relic\token_purple_tasty_candy.png.import" />
+    <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png" />
+    <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png.import" />
+    <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_big.png" />
+    <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_big.png.import" />
+    <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png" />
+    <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png.import" />
+    <Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png" />
+    <Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png.import" />
+    <Content Include="ReAstralPartyMod\localization\eng\cards.json" />
+    <Content Include="ReAstralPartyMod\localization\eng\card_keywords.json" />
+    <Content Include="ReAstralPartyMod\localization\eng\enchantments.json" />
+    <Content Include="ReAstralPartyMod\localization\eng\modifiers.json" />
+    <Content Include="ReAstralPartyMod\localization\eng\modifiers.json.block" />
+    <Content Include="ReAstralPartyMod\localization\eng\potions.json" />
+    <Content Include="ReAstralPartyMod\localization\eng\powers.json" />
+    <Content Include="ReAstralPartyMod\localization\eng\relics.json" />
+    <Content Include="ReAstralPartyMod\localization\eng\relic_collection.json" />
+    <Content Include="ReAstralPartyMod\localization\eng\rest_site_ui.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\cards.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\card_keywords.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\enchantments.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\modifiers.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\potions.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\powers.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\relics.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\relic_collection.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\rest_site_ui.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="**\*.import" />
+    <None Remove="**\*.import" />
+  </ItemGroup>
+
+  <Target Name="ExportModPck" AfterTargets="Build" Condition="'$(RunPckExport)' == 'true' and '$(STS2_SKIP_PCK_EXPORT)' != '1' and Exists('$(GodotEditorPath)')">
+    <Message Text="Exporting mod pck to $(PckOutputPath)..." Importance="high" />
+    <MakeDir Directories="$(ModOutputDir)" />
+    <Exec
+      WorkingDirectory="$(MSBuildProjectDirectory)"
+      Command="&quot;$(GodotEditorPath)&quot; --headless --path &quot;$(MSBuildProjectDirectory)&quot; --export-pack &quot;$(GodotExportPreset)&quot; &quot;$(PckOutputPath)&quot;"
+      EnvironmentVariables="STS2_SKIP_PCK_EXPORT=1"
+      IgnoreExitCode="true"
+      IgnoreStandardErrorWarningFormat="true" />
+    <Error Condition="!Exists('$(PckOutputPath)')" Text="Godot export did not produce $(PckOutputPath)." />
+  </Target>
+
+  <Target Name="WarnMissingGodot" AfterTargets="Build" Condition="'$(RunPckExport)' == 'true' and '$(STS2_SKIP_PCK_EXPORT)' != '1' and !Exists('$(GodotEditorPath)')">
+    <Warning Text="Godot executable not found at $(GodotEditorPath). Skipped PCK export." />
+  </Target>
+
+  <!-- 鑷姩澶嶅埗dll鍜宩son -->
+  <Target Name="CopyModArtifacts" AfterTargets="Build" DependsOnTargets="ExportModPck">
+    <Message Text="Copying mod to Slay the Spire 2 mods folder..." Importance="high" />
+    <MakeDir Directories="$(ModOutputDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModOutputDir)\" />
+    <Copy SourceFiles="$(MSBuildProjectName).json" DestinationFolder="$(ModOutputDir)\" />
+    <Copy Condition="Exists('$(PckOutputPath)')" SourceFiles="$(PckOutputPath)" DestinationFolder="$(ModOutputDir)\" />
+
+    <Message Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)'" Text="Copying mod to secondary Slay the Spire 2 mods folder..." Importance="high" />
+    <MakeDir Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)'" Directories="$(SecondaryModOutputDir)" />
+    <Copy Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)'" SourceFiles="$(TargetPath)" DestinationFolder="$(SecondaryModOutputDir)\" />
+    <Copy Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)'" SourceFiles="$(MSBuildProjectName).json" DestinationFolder="$(SecondaryModOutputDir)\" />
+    <Copy Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)' and Exists('$(PckOutputPath)')" SourceFiles="$(PckOutputPath)" DestinationFolder="$(SecondaryModOutputDir)\" />
+  </Target>
+</Project>
