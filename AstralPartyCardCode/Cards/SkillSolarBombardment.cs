@@ -117,13 +117,11 @@ public class SkillSolarBombardment : AstralPartyCardModel
 
             var target = targets[owner.RunState.Rng.CombatTargets.NextInt(targets.Count)];
             if (sourceCard != null)
-            {
-                await CommonActions.CardAttack(sourceCard, target, damage, 1).Execute(choiceContext);
-                continue;
-            }
-
-            await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable,
-                owner.Creature);
+                await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable,
+                    owner.Creature, sourceCard);
+            else
+                await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable,
+                    owner.Creature);
         }
     }
 

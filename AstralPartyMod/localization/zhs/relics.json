@@ -252,7 +252,7 @@
   "ASTRALPARTYMOD-TOKEN_GOLD_HANDHELD_FAN_LARGE.description": "使用人格技能牌后，抽[blue]1[/blue]张牌，并对随机怪物施加[blue]1[/blue]层[gold]标记[/gold]。",
   "ASTRALPARTYMOD-TOKEN_GOLD_HANDHELD_FAN_LARGE.flavor": "风大一点，连节奏都能一起带起来。",
   "ASTRALPARTYMOD-TOKEN_GOLD_INITIAL_POINT.title": "【初始点】",
-  "ASTRALPARTYMOD-TOKEN_GOLD_INITIAL_POINT.description": "在休息处，你可以花费金币[gold]升星[/gold]：前[blue]3[/blue]次分别花费[gold]60[/gold]/[gold]90[/gold]/[gold]120[/gold]金币，获得随机筹码遗物（不包括特殊遗物）并恢复[blue]15[/blue]%最大生命值；完成[blue]3[/blue]次后，该选项仅恢复[blue]15[/blue]%最大生命值。",
+  "ASTRALPARTYMOD-TOKEN_GOLD_INITIAL_POINT.description": "在休息处，你可以花费金币[gold]升星[/gold]\n花费[gold]60/90/120[/gold]金币，获得随机筹码遗物，恢复[blue]15[/blue]%最大生命值；\n完成[blue]3[/blue]次后，该选项仅恢复[blue]15[/blue]%最大生命值。",
   "ASTRALPARTYMOD-TOKEN_GOLD_INITIAL_POINT.flavor": "起点看起来很小，但只要肯投进去，它就会把路越铺越宽。",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TRIDENT.title": "【三叉戟】",
   "ASTRALPARTYMOD-TOKEN_EXCLUSIVE_TRIDENT.description": "你使用人格技能牌后，使[blue]1[/blue]名没有[gold]强化·三叉戟[/gold]的玩家获得[gold]强化·三叉戟[/gold]。\n拥有[gold]【系列·梦想号】[/gold]效果。",

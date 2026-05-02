@@ -24,6 +24,11 @@ public static class MidnightFlashHelper
             return null;
 
         var omnislice = combatState.CreateCard(ModelDb.Card<Omnislice>(), owner);
+        if (!omnislice.Keywords.Contains(CardKeyword.Exhaust))
+            omnislice.AddKeyword(CardKeyword.Exhaust);
+        if (!omnislice.Keywords.Contains(CardKeyword.Ethereal))
+            omnislice.AddKeyword(CardKeyword.Ethereal);
+
         if (owner.RunState.Rng.Niche.NextInt(2) == 0)
             CardCmd.Upgrade(omnislice);
 
