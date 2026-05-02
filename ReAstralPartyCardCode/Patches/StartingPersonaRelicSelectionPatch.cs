@@ -63,7 +63,7 @@ public static class StartingPersonaRelicSelectionPatch
 
     private static IReadOnlyList<RelicModel> CreateStartingPersonaRelicOptions(RunState runState)
     {
-        var targetCount = runState.Players.Count + 3;
+        var targetCount = runState.Players.Count * 2 + 2;
         var allPersonaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics()
             .OrderBy(relic => relic.Id.Entry)
             .ToList();

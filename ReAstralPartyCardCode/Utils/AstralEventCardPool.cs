@@ -17,10 +17,12 @@ public static class AstralEventCardPool
         ModelDb.Card<EventEquality>(),
         ModelDb.Card<EventFightFun>(),
         ModelDb.Card<EventFoodSafety>(),
+        ModelDb.Card<EventFoodSafetyDoom>(),
         ModelDb.Card<EventGiftFromSky>(),
         ModelDb.Card<EventHandErase>(),
         ModelDb.Card<EventPlayerRepresentative>(),
         ModelDb.Card<EventRedHeatWarning>(),
+        ModelDb.Card<EventThunderApproaches>(),
         ModelDb.Card<EventSprint>(),
         ModelDb.Card<EventThunderStrike>()
     ];

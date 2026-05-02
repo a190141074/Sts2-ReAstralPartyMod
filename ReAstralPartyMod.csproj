@@ -56,6 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="ReAstralPartyMod.json" />
     <Content Include="ReAstralPartyMod\images\astral_token.png" />
     <Content Include="ReAstralPartyMod\images\astral_token.png.import" />
     <Content Include="ReAstralPartyMod\images\background\starting_persona_pelic_selection_screen.png" />
@@ -102,6 +103,7 @@
     <Content Include="ReAstralPartyMod\images\card_portraits\event_red_heat_warning.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\event_sprint.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\event_sprint.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_thunder_approaches.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\event_thunder_strike.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\event_thunder_strike.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_extra_large.png" />

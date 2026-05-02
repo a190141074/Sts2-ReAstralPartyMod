@@ -91,5 +91,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_MUD_TRUCK_CRASH.title": "泥头车，创死死！",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_MUD_TRUCK_CRASH.description": "造成{Damage:diff()}点伤害。\n对所有其他敌人造成等量的伤害，并施加[gold]骨折[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NINJUTSU_COMBO.title": "忍术连击",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NINJUTSU_COMBO.description": "获得{energyPrefix:energyIcons(1)}。将[blue]1[/blue]张随机基础技能牌加入手中。"
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NINJUTSU_COMBO.description": "获得{energyPrefix:energyIcons(1)}。将[blue]1[/blue]张随机基础技能牌加入手中。",
+  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_THUNDER_APPROACHES.title": "????",
+  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_THUNDER_APPROACHES.description": "???????????????[gold]Ringing[/gold]???{Cards:diff()}?????????{DrawCardsNextTurnPower:diff()}???"
 }

@@ -35,7 +35,6 @@ public static class TokenRelicRegistry
         typeof(TokenExclusiveAncientWand),
         typeof(TokenExclusiveBoutiqueSwordShield),
         typeof(TokenExclusiveBronzeGong),
-        typeof(TokenExclusiveCandyMembershipCard),
         typeof(TokenExclusiveCrossedTwinCarp),
         typeof(TokenExclusiveCursedSword),
         typeof(TokenExclusiveDreamshipModel),
