@@ -1,15 +1,22 @@
+using Godot;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Combat;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.TestSupport;
+using MegaCrit.Sts2.Core.Nodes.Vfx;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class ZhaoCombatHelper
 {
+    private const float ChaseVisualExtraOffset = 300f;
+
     public static async Task<CardModel?> AutoPlayRandomAttackForZhao(
         PlayerChoiceContext choiceContext,
         Player owner,
@@ -28,6 +35,7 @@ public static class ZhaoCombatHelper
         if (extraAttackPower == null)
             return null;
 
+        ApplyBygoneEffigyStyleChaseVisual(owner.Creature, target);
         extraAttackPower.BeginTriggeredAttack(attackCard, target, bonusDamage);
         try
         {
@@ -38,6 +46,27 @@ public static class ZhaoCombatHelper
         {
             extraAttackPower.EndTriggeredAttack(attackCard);
         }
+    }
+
+    private static void ApplyBygoneEffigyStyleChaseVisual(Creature? attacker, Creature target)
+    {
+        if (TestMode.IsOn || attacker == null || NCombatRoom.Instance == null)
+            return;
+
+        var attackerNode = NCombatRoom.Instance.GetCreatureNode(attacker);
+        var targetNode = NCombatRoom.Instance.GetCreatureNode(target);
+        if (attackerNode == null || targetNode == null)
+            return;
+
+        var specialNode = attackerNode.GetSpecialNode<Node2D>("Visuals/SpineBoneNode");
+        if (specialNode == null)
+            return;
+
+        NCombatRoom.Instance.RadialBlur(VfxPosition.Left);
+
+        // Mirror Bygone Effigy's setup for a player-side attacker: start from the left, then cut right.
+        specialNode.Position = Vector2.Left
+            * (targetNode.GlobalPosition.X - attackerNode.GlobalPosition.X + ChaseVisualExtraOffset);
     }
 
     private static CardModel? FindRandomAttackCard(Player owner)
