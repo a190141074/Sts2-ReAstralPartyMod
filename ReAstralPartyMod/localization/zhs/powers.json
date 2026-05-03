@@ -142,5 +142,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_INVOKE_SPIRITS_POWER.smartDescription": "攻击牌会消耗【人格：照】的[gold]狐火[/gold]来触发[gold]追击[/gold]。",
   "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.title": "追击",
   "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.description": "【人格：照】的固有能力。\n触发时，会对同一目标从照的抽牌堆自动打出[blue]1[/blue]张攻击牌；\n若抽牌堆中没有攻击牌，则改为从弃牌堆中打出。\n该攻击额外造成等同于消耗前[gold]狐火[/gold]层数的伤害。",
-  "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.smartDescription": "由[gold]降神[/gold]触发，自动打出攻击牌并附加基于[gold]狐火[/gold]的额外伤害。"
+  "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.smartDescription": "由[gold]降神[/gold]触发，自动打出攻击牌并附加基于[gold]狐火[/gold]的额外伤害。",
+  "RE_ASTRAL_PARTY_MOD_POWER_UNCLE_PEDERMAN_NODE_POWER.title": "节点",
+  "RE_ASTRAL_PARTY_MOD_POWER_UNCLE_PEDERMAN_NODE_POWER.description": "回合开始时，将此值刷新为[blue]1[/blue]到[blue]6[/blue]的随机数。若为[blue]6[/blue]，则本回合你的攻击牌[gold]无视格挡[/gold]。若为[blue]1[/blue]，则下回合必定刷新为[blue]6[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_POWER_UNCLE_PEDERMAN_NODE_POWER.smartDescription": "回合开始时刷新为[blue]1[/blue]到[blue]6[/blue]。结果为[blue]6[/blue]时，本回合攻击牌无视格挡；结果为[blue]1[/blue]时，下回合固定为[blue]6[/blue]。"
 }

@@ -142,5 +142,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_INVOKE_SPIRITS_POWER.smartDescription": "Attack cards consume Zhao's [power]Foxfire[/power] to trigger [power]Extra Attack[/power].",
   "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.title": "Extra Attack",
   "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.description": "Zhao's innate spirit-chase effect. When triggered, automatically play [blue]1[/blue] Attack card from Zhao's draw pile against the same target; if none exist, use the discard pile instead. That Attack deals extra damage equal to the consumed [power]Foxfire[/power] stacks before consumption.",
-  "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.smartDescription": "Triggered by [power]Invoke Spirits[/power] to auto-play an Attack card and add Foxfire-based bonus damage."
+  "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.smartDescription": "Triggered by [power]Invoke Spirits[/power] to auto-play an Attack card and add Foxfire-based bonus damage.",
+  "RE_ASTRAL_PARTY_MOD_POWER_UNCLE_PEDERMAN_NODE_POWER.title": "Node",
+  "RE_ASTRAL_PARTY_MOD_POWER_UNCLE_PEDERMAN_NODE_POWER.description": "At the start of your turn, refresh this value to a random number from 1 to 6. If it is 6, your Attack cards are Unblockable this turn. If it is 1, next turn it is forced to 6.",
+  "RE_ASTRAL_PARTY_MOD_POWER_UNCLE_PEDERMAN_NODE_POWER.smartDescription": "At turn start, reroll to 1-6. A 6 makes your Attack cards Unblockable this turn. A 1 forces next turn's result to 6."
 }

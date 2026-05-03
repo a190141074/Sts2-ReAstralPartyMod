@@ -140,6 +140,7 @@
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_powerful_pity.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_product_restocking.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_product_restocking.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_really_angry.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_royal_prerogative.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_royal_prerogative.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_save_me_mousy.png" />
@@ -258,6 +259,7 @@
     <Content Include="ReAstralPartyMod\images\powers\twin_shadows_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\fracture_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\extra_attack_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\uncle_pederman_node_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png" />
@@ -306,6 +308,7 @@
     <Content Include="ReAstralPartyMod\images\relic\person_social_fear_nun.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_superman_megas.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_superman_megas.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_uncle_pederman.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_vampire.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_vampire.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_weird_egg.png" />
