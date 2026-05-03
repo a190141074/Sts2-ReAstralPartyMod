@@ -99,11 +99,8 @@ public class SkillPowerfulPity : AstralPartyCardModel
         CardModel selectedCard,
         MegaCrit.Sts2.Core.Entities.Players.Player targetPlayer)
     {
-        var copiedCard =
-            ownerCreature.CombatState!.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, targetPlayer);
-        for (var i = 0; i < selectedCard.CurrentUpgradeLevel; i++)
-            CardCmd.Upgrade(copiedCard);
-
+        var copiedCard = selectedCard.CreateClone();
+        copiedCard.Owner = targetPlayer;
         return copiedCard;
     }
 
