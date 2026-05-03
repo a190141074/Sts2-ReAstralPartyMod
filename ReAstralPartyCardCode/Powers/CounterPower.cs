@@ -39,6 +39,9 @@ public class CounterPower : AstralPartyPowerModel
 
             await CreatureCmd.Damage(choiceContext, dealer, retaliateDamage,
                 ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.SkipHurtAnim, Owner, null);
+
+            if (Owner.HasPower<InvokeSpiritsPower>() && dealer.IsAlive)
+                await InvokeSpiritsPower.TryTriggerChase(choiceContext, Owner, dealer, null, this);
         }
         finally
         {

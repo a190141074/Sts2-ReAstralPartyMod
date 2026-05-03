@@ -15,7 +15,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 public class InvokeSpiritsPower : AstralPartyPowerModel
 {
     [SavedProperty] public ulong AstralParty_InvokeSpiritsZhaoPlayerNetId { get; set; }
-    [SavedProperty] public bool AstralParty_InvokeSpiritsHasReachedNextOwnerTurn { get; set; }
 
     public override PowerType Type => PowerType.Buff;
 
@@ -32,22 +31,7 @@ public class InvokeSpiritsPower : AstralPartyPowerModel
         if (Owner?.Player != player)
             return Task.CompletedTask;
 
-        if (!AstralParty_InvokeSpiritsHasReachedNextOwnerTurn)
-        {
-            AstralParty_InvokeSpiritsHasReachedNextOwnerTurn = true;
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
-    {
-        if (Owner == null || Owner.Side != side)
-            return;
-        if (!AstralParty_InvokeSpiritsHasReachedNextOwnerTurn)
-            return;
-
-        await PowerCmd.Remove(this);
+        return PowerCmd.Remove(this);
     }
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -59,34 +43,53 @@ public class InvokeSpiritsPower : AstralPartyPowerModel
         if (cardPlay.Card.Type != CardType.Attack)
             return;
 
-        var zhaoPlayer = ResolveZhaoPlayer();
-        var zhaoCreature = zhaoPlayer?.Creature;
-        var zhaoRelic = zhaoPlayer?.GetRelic<PersonZhao>();
-        if (zhaoPlayer == null || zhaoCreature == null || zhaoRelic == null)
-            return;
-
-        var foxfirePower = zhaoCreature.GetPower<FoxfirePower>();
-        var extraAttackPower = zhaoCreature.GetPower<ExtraAttackPower>();
-        if (foxfirePower == null || extraAttackPower == null)
-            return;
-        if (extraAttackPower.IsTriggeredAttack(cardPlay.Card))
-            return;
-        if (foxfirePower.Amount <= 0m)
-            return;
-
-        var bonusDamage = foxfirePower.Amount;
-        await PowerCmd.ModifyAmount(foxfirePower, -1m, zhaoCreature, cardPlay.Card, true);
-
         var target = cardPlay.Target;
-        if (target == null || !target.IsAlive || target.Side == zhaoCreature.Side)
+        if (target == null || !target.IsAlive)
             return;
-
-        zhaoRelic.Flash();
-        await ZhaoCombatHelper.AutoPlayRandomAttackForZhao(choiceContext, zhaoPlayer, target, bonusDamage, this);
+        await TryTriggerChase(choiceContext, Owner, target, cardPlay.Card, this);
     }
 
     private MegaCrit.Sts2.Core.Entities.Players.Player? ResolveZhaoPlayer()
     {
         return Owner?.CombatState?.Players.FirstOrDefault(player => player.NetId == AstralParty_InvokeSpiritsZhaoPlayerNetId);
+    }
+
+    public static async Task<bool> TryTriggerChase(
+        PlayerChoiceContext choiceContext,
+        Creature? invokeOwner,
+        Creature target,
+        CardModel? triggeringCard,
+        AbstractModel source)
+    {
+        if (invokeOwner?.Player == null || !target.IsAlive)
+            return false;
+
+        var invokePower = invokeOwner.GetPower<InvokeSpiritsPower>();
+        if (invokePower == null)
+            return false;
+
+        var zhaoPlayer = invokePower.ResolveZhaoPlayer();
+        var zhaoCreature = zhaoPlayer?.Creature;
+        var zhaoRelic = zhaoPlayer?.GetRelic<PersonZhao>();
+        if (zhaoPlayer == null || zhaoCreature == null || zhaoRelic == null)
+            return false;
+        if (target.Side == zhaoCreature.Side)
+            return false;
+
+        var foxfirePower = zhaoCreature.GetPower<FoxfirePower>();
+        var extraAttackPower = zhaoCreature.GetPower<ExtraAttackPower>();
+        if (foxfirePower == null || extraAttackPower == null)
+            return false;
+        if (triggeringCard != null && extraAttackPower.IsTriggeredAttack(triggeringCard))
+            return false;
+        if (foxfirePower.Amount <= 0m)
+            return false;
+
+        var bonusDamage = foxfirePower.Amount;
+        await PowerCmd.ModifyAmount(foxfirePower, -1m, zhaoCreature, triggeringCard, true);
+
+        zhaoRelic.Flash();
+        await ZhaoCombatHelper.AutoPlayRandomAttackForZhao(choiceContext, zhaoPlayer, target, bonusDamage, source);
+        return true;
     }
 }

@@ -109,7 +109,6 @@ public class PersonZhao : CooldownPersonaRelicBase
 
         var power = (InvokeSpiritsPower)ModelDb.Power<InvokeSpiritsPower>().ToMutable();
         power.AstralParty_InvokeSpiritsZhaoPlayerNetId = Owner.NetId;
-        power.AstralParty_InvokeSpiritsHasReachedNextOwnerTurn = false;
         await PowerCmd.Apply(power, targetPlayer.Creature!, 1m, Owner.Creature, sourceCard, false);
     }
 
