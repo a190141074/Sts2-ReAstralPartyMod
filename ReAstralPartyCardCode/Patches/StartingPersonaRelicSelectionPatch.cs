@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Extensions;
+using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
@@ -14,6 +15,9 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 [HarmonyPatch(typeof(NGame), "StartRun")]
 public static class StartingPersonaRelicSelectionPatch
 {
+    private const int VanillaSupportedPlayerCount = 4;
+    private const string RemoveMultiplayerPlayerLimitModId = "RemoveMultiplayerPlayerLimit";
+
     [HarmonyPostfix]
     public static void Postfix(RunState runState, ref Task __result)
     {
@@ -23,6 +27,9 @@ public static class StartingPersonaRelicSelectionPatch
     private static async Task RunAfterStartRun(Task originalTask, RunState runState)
     {
         await originalTask;
+
+        if (ShouldSkipSharedSelection(runState))
+            return;
 
         var overlayStack = NOverlayStack.Instance;
         if (overlayStack == null)
@@ -59,6 +66,22 @@ public static class StartingPersonaRelicSelectionPatch
             screen.Close();
             TreasureRoomRelicSessionHelper.EndSessionSafely(synchronizer);
         }
+    }
+
+    private static bool ShouldSkipSharedSelection(RunState runState)
+    {
+        if (runState.Players.Count <= VanillaSupportedPlayerCount)
+            return false;
+
+        var removeLimitLoaded = ModManager.GetLoadedMods()
+            .Any(mod => mod.manifest?.id == RemoveMultiplayerPlayerLimitModId);
+        if (!removeLimitLoaded)
+            return false;
+
+        MainFile.Logger.Warn(
+            $"Starting persona relic selection skipped because {RemoveMultiplayerPlayerLimitModId} is loaded and player count is {runState.Players.Count}. " +
+            "The shared treasure-room selection flow is only hardened for vanilla player counts and is known to conflict with expanded-player treasure-room UI patches.");
+        return true;
     }
 
     private static IReadOnlyList<RelicModel> CreateStartingPersonaRelicOptions(RunState runState)

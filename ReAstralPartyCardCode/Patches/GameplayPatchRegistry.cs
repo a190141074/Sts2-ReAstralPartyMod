@@ -86,29 +86,13 @@ internal static class GameplayStaticPatchCatalog
 
     private static void RegisterGameplayPatches(ModPatcher patcher)
     {
-        patcher.RegisterPatches(
-        [
-            new ModPatchInfo(
-                "star_engine_combat_relic_reward_patch",
-                typeof(RelicReward),
-                nameof(RelicReward.Populate),
-                typeof(StarEngineCombatRelicRewardPatch),
-                description:
-                "Gameplay patch: swap combat and event relic rewards for token relics when Star Engine is active")
-        ]);
+        patcher.RegisterPatches([]);
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)
     {
         patcher.RegisterPatches(
         [
-            new ModPatchInfo(
-                "star_engine_treasure_room_relic_patch",
-                typeof(TreasureRoomRelicSynchronizer),
-                nameof(TreasureRoomRelicSynchronizer.BeginRelicPicking),
-                typeof(StarEngineTreasureRoomRelicPatch),
-                description:
-                "Version-fragile gameplay patch: replace treasure-room relic voting setup for Star Engine token relics"),
             new ModPatchInfo(
                 "starting_persona_relic_selection_patch",
                 typeof(NGame),
