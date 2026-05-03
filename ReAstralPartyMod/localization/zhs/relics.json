@@ -317,9 +317,12 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_TIMER.flavor": "每走一格，代价就更近一格。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_MASCOT_GIRL_MIMI_TOKEN_MEMORY.empty_entries": "暂无记录",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_NINJA.title": "【人格：忍者】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_NINJA.description": "· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]忍术连击[/gold]加入手中。\n· 战斗开始时和你的每个回合开始时，将[gold]复制额度[/gold]重置为[blue]9[/blue]。\n· 你每回合打出的第[blue]3[/blue]/[blue]6[/blue]/[blue]9[/blue]张及之后每逗3的倍数的技能牌时，若[gold]复制额度[/gold]仍大于[blue]0[/blue]，则复制最近一次打出的非人格技能牌加入手中，并附加[gold]消耗[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_NINJA.description": "· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]忍术连击[/gold]加入手中。\n· 你每回合打出第[blue]3[/blue]/[blue]6[/blue]/[blue]9[/blue]张技能牌时，复制最后打出的非人格技能牌加入手中，并附加[gold]消耗[/gold]。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_NINJA.flavor": "每一道手势都在为下一次把戏腾位置。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_NINJA_GARROTE.title": "【人格衍生：绞毙】",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_NINJA_GARROTE.description": "· 初始层数为[blue]1[/blue]。\n· 战斗开始时，获得等同于本遗物层数的[gold]密宗强化[/gold]。\n· 你在一场战斗中每打出[blue]6[/blue]张不低于一费的技能牌，使[relic]人格：忍者[/relic]冷却-[blue]1[/blue]。\n· 你在一场战斗中每打出[blue]9[/blue]张不低于一费的技能牌，本遗物永久层数+[blue]1[/blue]。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_NINJA_GARROTE.flavor": "每完整走完一轮，绳结就会再紧一分。"
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_NINJA_GARROTE.flavor": "每完整走完一轮，绳结就会再紧一分。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ARCANE_CODEX.title": "【魔法秘典】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ARCANE_CODEX.description": "每回合一次，当你使用第[blue]3[/blue]张技能牌时，复制最后使用的那张技能牌，附加[gold]消耗[/gold]，加入手中并在本回合免费打出。此遗物的计数器会显示你本回合已为该效果使用了多少张技能牌。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ARCANE_CODEX.flavor": "第三次落笔时，法术就会自己续写下去。"
 }

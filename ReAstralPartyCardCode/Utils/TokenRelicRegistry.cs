@@ -61,6 +61,7 @@ public static class TokenRelicRegistry
         typeof(TokenGoldFlashlightFlashburst),
         typeof(TokenGoldHandheldFanLarge),
         typeof(TokenGoldInitialPoint),
+        typeof(TokenGoldArcaneCodex),
         typeof(TokenGoldMagicQuiver),
         typeof(TokenGoldMedicalKitCompleteTreatment),
         typeof(TokenGoldMembersReferenceUltimate),

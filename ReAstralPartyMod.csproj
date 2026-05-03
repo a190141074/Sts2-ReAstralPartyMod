@@ -391,6 +391,7 @@
     <Content Include="ReAstralPartyMod\images\relic\token_exclusive_zuo_tea_cake.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\token_gold_adrenaline_efficient.png" />
     <Content Include="ReAstralPartyMod\images\relic\token_gold_adrenaline_efficient.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\token_gold_arcane_codex.png" />
     <Content Include="ReAstralPartyMod\images\relic\token_gold_art_knife_enchanted.png" />
     <Content Include="ReAstralPartyMod\images\relic\token_gold_art_knife_enchanted.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\token_gold_art_knife_sharp.png" />
