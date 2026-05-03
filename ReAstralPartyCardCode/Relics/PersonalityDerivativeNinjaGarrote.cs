@@ -21,6 +21,7 @@ public class PersonalityDerivativeNinjaGarrote : AstralPartyRelicModel
 {
     [SavedProperty] public int AstralParty_PersonalityDerivativeNinjaGarroteStacks { get; set; } = 1;
     [SavedProperty] public int AstralParty_PersonalityDerivativeNinjaGarroteSkillCardsThisCombat { get; set; }
+    [SavedProperty] public int AstralParty_PersonalityDerivativeNinjaGarroteQualifiedSkillCardsThisCombat { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
@@ -43,6 +44,7 @@ public class PersonalityDerivativeNinjaGarrote : AstralPartyRelicModel
         if (AstralParty_PersonalityDerivativeNinjaGarroteStacks <= 0)
             AstralParty_PersonalityDerivativeNinjaGarroteStacks = 1;
         AstralParty_PersonalityDerivativeNinjaGarroteSkillCardsThisCombat = 0;
+        AstralParty_PersonalityDerivativeNinjaGarroteQualifiedSkillCardsThisCombat = 0;
         InvokeDisplayAmountChanged();
     }
 
@@ -52,6 +54,7 @@ public class PersonalityDerivativeNinjaGarrote : AstralPartyRelicModel
             return;
 
         AstralParty_PersonalityDerivativeNinjaGarroteSkillCardsThisCombat = 0;
+        AstralParty_PersonalityDerivativeNinjaGarroteQualifiedSkillCardsThisCombat = 0;
         if (AstralParty_PersonalityDerivativeNinjaGarroteStacks <= 0)
             AstralParty_PersonalityDerivativeNinjaGarroteStacks = 1;
 
@@ -75,25 +78,41 @@ public class PersonalityDerivativeNinjaGarrote : AstralPartyRelicModel
 
         AstralParty_PersonalityDerivativeNinjaGarroteSkillCardsThisCombat++;
 
-        if (AstralParty_PersonalityDerivativeNinjaGarroteSkillCardsThisCombat % 3 == 0
-            && Owner.GetRelic<PersonNinja>() is { } personNinja)
+        if (GetPlayedCost(cardPlay) >= 1)
         {
-            Flash();
-            personNinja.ReduceCooldown(1);
+            AstralParty_PersonalityDerivativeNinjaGarroteQualifiedSkillCardsThisCombat++;
+
+            if (AstralParty_PersonalityDerivativeNinjaGarroteQualifiedSkillCardsThisCombat % 6 == 0
+                && Owner.GetRelic<PersonNinja>() is { } personNinja)
+            {
+                Flash();
+                personNinja.ReduceCooldown(1);
+            }
         }
 
-        if (AstralParty_PersonalityDerivativeNinjaGarroteSkillCardsThisCombat % 9 != 0)
-            return Task.CompletedTask;
+        if (GetPlayedCost(cardPlay) >= 1
+            && AstralParty_PersonalityDerivativeNinjaGarroteQualifiedSkillCardsThisCombat % 9 == 0)
+        {
+            Flash();
+            AstralParty_PersonalityDerivativeNinjaGarroteStacks++;
+            InvokeDisplayAmountChanged();
+        }
 
-        Flash();
-        AstralParty_PersonalityDerivativeNinjaGarroteStacks++;
-        InvokeDisplayAmountChanged();
         return Task.CompletedTask;
     }
 
     public override Task AfterCombatEnd(CombatRoom room)
     {
         AstralParty_PersonalityDerivativeNinjaGarroteSkillCardsThisCombat = 0;
+        AstralParty_PersonalityDerivativeNinjaGarroteQualifiedSkillCardsThisCombat = 0;
         return Task.CompletedTask;
+    }
+
+    private static int GetPlayedCost(CardPlay cardPlay)
+    {
+        if (cardPlay.Card.EnergyCost.CostsX)
+            return Math.Max(1, cardPlay.Resources.EnergyValue);
+
+        return cardPlay.Card.EnergyCost.GetResolved();
     }
 }

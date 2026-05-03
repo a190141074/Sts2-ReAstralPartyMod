@@ -260,6 +260,7 @@
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_masters_chips.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_ninja_garrote.png" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_intent.png" />
