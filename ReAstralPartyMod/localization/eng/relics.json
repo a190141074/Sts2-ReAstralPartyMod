@@ -324,5 +324,8 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_NINJA_GARROTE.flavor": "The knot tightens a little more every time the sequence completes.",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ARCANE_CODEX.title": "Arcane Codex",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ARCANE_CODEX.description": "Once each turn, when you play your [blue]3[/blue]rd Skill card, copy that Skill card, give it [exhaust]Exhaust[/exhaust], add it to your hand, and make it free this turn. This relic shows how many Skill cards you have played toward that trigger this turn.",
-  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ARCANE_CODEX.flavor": "The third notation is where the spell starts repeating itself."
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ARCANE_CODEX.flavor": "The third notation is where the spell starts repeating itself.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_ZHAO.title": "[Persona: Zhao]",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_ZHAO.description": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Invoke Spirits[/card] to your hand. At combat start, gain [power]Extra Attack[/power]. Whenever you or the current [power]Invoke Spirits[/power] target play Attack cards, accumulate their actual cost; every [blue]2[/blue] total cost grants [blue]1[/blue] [power]Foxfire[/power].",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_ZHAO.flavor": "When the spirit descends, every strike echoes twice."
 }

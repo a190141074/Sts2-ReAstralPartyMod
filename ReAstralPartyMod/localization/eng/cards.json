@@ -1,4 +1,4 @@
-﻿{
+{
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.title": "Trouble Maker",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.description": "Show 2 random other event cards. Choose 1 to play immediately. Gain {StarLight:diff()} [gold]StarLight[/gold].",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.select_prompt": "Choose an event card to play",
@@ -93,5 +93,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NINJUTSU_COMBO.title": "Ninjutsu Combo",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NINJUTSU_COMBO.description": "Gain {energyPrefix:energyIcons(1)}. Add [blue]1[/blue] random Base Ability card to your hand.",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_THUNDER_APPROACHES.title": "Thunder Approaches",
-  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_THUNDER_APPROACHES.description": "Stun all enemy units. All players gain [power]Ringing[/power], draw {Cards:diff()} card, and gain {DrawCardsNextTurnPower:diff()} extra draw next turn."
+  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_THUNDER_APPROACHES.description": "Stun all enemy units. All players gain [power]Ringing[/power], draw {Cards:diff()} card, and gain {DrawCardsNextTurnPower:diff()} extra draw next turn.",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_INVOKE_SPIRITS.title": "Invoke Spirits",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_INVOKE_SPIRITS.description": "Choose another player. Apply [power]Invoke Spirits[/power] to them. This turn, gain temporary [red]Strength[/red] and [green]Dexterity[/green] equal to [blue]50[/blue]% of that target's current values, plus [blue]30[/blue]% of their current [gold]Vigor[/gold] and [blue]30[/blue]% of their current Block, all rounded up."
 }

@@ -29,7 +29,8 @@ public static class PersonaRelicRegistry
         ModelDb.Relic<PersonMidnightFlash>(),
         ModelDb.Relic<PersonVampire>(),
         ModelDb.Relic<PersonCyberKitty>(),
-        ModelDb.Relic<PersonNinja>()
+        ModelDb.Relic<PersonNinja>(),
+        ModelDb.Relic<PersonZhao>()
     ];
 
     public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelics()

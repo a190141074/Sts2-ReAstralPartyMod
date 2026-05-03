@@ -206,6 +206,7 @@
     <Content Include="ReAstralPartyMod\images\powers\exposure_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\fate_weak_imprint_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\fate_weak_imprint_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\foxfire_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\half_life_heal_power.png" />
@@ -228,6 +229,7 @@
     <Content Include="ReAstralPartyMod\images\powers\modification_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\mouse_shield_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\mouse_shield_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\powers\invoke_spirits_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\problem_student_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\problem_student_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\ready_to_strike_power.png" />
@@ -255,6 +257,7 @@
     <Content Include="ReAstralPartyMod\images\powers\twin_shadows_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\twin_shadows_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\fracture_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\extra_attack_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png" />
@@ -309,6 +312,7 @@
     <Content Include="ReAstralPartyMod\images\relic\person_weird_egg.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_xiao_lei.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_xiao_lei.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_zhao.png" />
     <Content Include="ReAstralPartyMod\images\relic\token_blue_atm.png" />
     <Content Include="ReAstralPartyMod\images\relic\token_blue_atm.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\token_blue_bank_card_general.png" />

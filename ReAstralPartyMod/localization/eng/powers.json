@@ -133,5 +133,14 @@
   "RE_ASTRAL_PARTY_MOD_POWER_COPY_QUOTA_POWER.smartDescription": "Remaining copy quota this turn.",
   "RE_ASTRAL_PARTY_MOD_POWER_ESOTERIC_EMPOWER_POWER.title": "Esoteric Empower",
   "RE_ASTRAL_PARTY_MOD_POWER_ESOTERIC_EMPOWER_POWER.description": "Whenever your Skill card deals damage to an enemy, it deals additional damage equal to this power's amount.",
-  "RE_ASTRAL_PARTY_MOD_POWER_ESOTERIC_EMPOWER_POWER.smartDescription": "Your Skill cards deal bonus damage equal to this amount."
+  "RE_ASTRAL_PARTY_MOD_POWER_ESOTERIC_EMPOWER_POWER.smartDescription": "Your Skill cards deal bonus damage equal to this amount.",
+  "RE_ASTRAL_PARTY_MOD_POWER_FOXFIRE_POWER.title": "Foxfire",
+  "RE_ASTRAL_PARTY_MOD_POWER_FOXFIRE_POWER.description": "Consumed by [power]Invoke Spirits[/power] to trigger [power]Extra Attack[/power].",
+  "RE_ASTRAL_PARTY_MOD_POWER_FOXFIRE_POWER.smartDescription": "Consumed to trigger [power]Extra Attack[/power].",
+  "RE_ASTRAL_PARTY_MOD_POWER_INVOKE_SPIRITS_POWER.title": "Invoke Spirits",
+  "RE_ASTRAL_PARTY_MOD_POWER_INVOKE_SPIRITS_POWER.description": "Lasts through your next full turn. Whenever you play an Attack card, if [relic]Persona: Zhao[/relic] has [power]Foxfire[/power], consume [blue]1[/blue] [power]Foxfire[/power] and trigger [power]Extra Attack[/power].",
+  "RE_ASTRAL_PARTY_MOD_POWER_INVOKE_SPIRITS_POWER.smartDescription": "Attack cards consume Zhao's [power]Foxfire[/power] to trigger [power]Extra Attack[/power].",
+  "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.title": "Extra Attack",
+  "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.description": "Zhao's innate spirit-chase effect. When triggered, automatically play [blue]1[/blue] Attack card from Zhao's draw pile against the same target; if none exist, use the discard pile instead. That Attack deals extra damage equal to the consumed [power]Foxfire[/power] stacks before consumption.",
+  "RE_ASTRAL_PARTY_MOD_POWER_EXTRA_ATTACK_POWER.smartDescription": "Triggered by [power]Invoke Spirits[/power] to auto-play an Attack card and add Foxfire-based bonus damage."
 }
