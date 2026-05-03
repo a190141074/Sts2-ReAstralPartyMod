@@ -14,8 +14,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(EventCardPool))]
 public class SkillHealingSlime : AstralPartyCardModel
 {
-    public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
-
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         new List<DynamicVar> { new PowerVar<HalfLifeHealPower>(3m) };
 
@@ -31,7 +29,7 @@ public class SkillHealingSlime : AstralPartyCardModel
         0,
         CardType.Skill,
         CardRarity.Rare,
-        TargetType.AnyAlly
+        TargetType.AnyPlayer
     )
     {
     }
@@ -45,7 +43,7 @@ public class SkillHealingSlime : AstralPartyCardModel
     {
         ArgumentNullException.ThrowIfNull(cardPlay.Target, nameof(cardPlay.Target));
 
-        var target = cardPlay.Target;
+        var target = cardPlay.Target ?? Owner.Creature;
         if (target == null || Owner?.Creature == null)
             return;
 

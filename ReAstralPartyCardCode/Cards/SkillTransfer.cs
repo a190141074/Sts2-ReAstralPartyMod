@@ -20,8 +20,6 @@ public class SkillTransfer : AstralPartyCardModel
     private const int TransferGoldCost = 5;
     private const int TransferStarLightAmount = 5;
 
-    public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
-
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [ReAstralPartyMod.ReAstralPartyCardCode.Keywords.AstralKeywords.AstralUnique];
 
@@ -30,7 +28,7 @@ public class SkillTransfer : AstralPartyCardModel
     protected override bool IsPlayable =>
         Owner != null
         && Owner.Gold >= TransferGoldCost
-        && HasOtherLivingPlayerTarget();
+        && HasAnyLivingPlayerTarget();
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
@@ -41,7 +39,7 @@ public class SkillTransfer : AstralPartyCardModel
         0,
         CardType.Skill,
         CardRarity.Rare,
-        TargetType.AnyAlly)
+        TargetType.AnyPlayer)
     {
     }
 
@@ -89,13 +87,13 @@ public class SkillTransfer : AstralPartyCardModel
         return (pileType, position);
     }
 
-    private bool HasOtherLivingPlayerTarget()
+    private bool HasAnyLivingPlayerTarget()
     {
         var combatState = Owner?.Creature?.CombatState;
-        if (Owner == null || combatState == null)
+        if (combatState == null)
             return false;
 
-        return combatState.PlayerCreatures.Any(creature => creature.IsAlive && creature.Player != Owner);
+        return combatState.PlayerCreatures.Any(creature => creature.IsAlive && creature.Player != null);
     }
 
     private bool MeetsTransferConditions(Creature? target)
@@ -104,8 +102,7 @@ public class SkillTransfer : AstralPartyCardModel
                && Owner.Creature != null
                && Owner.Gold >= TransferGoldCost
                && target?.Player != null
-               && target.Player != Owner
                && target.IsAlive
-               && HasOtherLivingPlayerTarget();
+               && HasAnyLivingPlayerTarget();
     }
 }

@@ -18,8 +18,6 @@ public class SkillSaveMeMousy : AstralPartyCardModel
     private const decimal CardsToDraw = 1m;
     private const decimal CounterAmount = 1m;
 
-    public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
-
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [ReAstralPartyMod.ReAstralPartyCardCode.Keywords.AstralKeywords.AstralUnique];
 
@@ -35,19 +33,17 @@ public class SkillSaveMeMousy : AstralPartyCardModel
         0,
         CardType.Skill,
         CardRarity.Rare,
-        TargetType.AnyAlly)
+        TargetType.AnyPlayer)
     {
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        ArgumentNullException.ThrowIfNull(cardPlay.Target, nameof(cardPlay.Target));
-
         var ownerCreature = Owner?.Creature;
         if (ownerCreature == null)
             return;
 
-        var target = cardPlay.Target;
+        var target = cardPlay.Target ?? ownerCreature;
         var targetPlayer = target.Player;
         if (targetPlayer == null)
             return;
