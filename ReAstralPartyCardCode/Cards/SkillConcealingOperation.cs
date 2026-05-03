@@ -67,6 +67,9 @@ public class SkillConcealingOperation : AstralPartyCardModel
 
     private string GetStagePortraitPath()
     {
+        if (ReferenceEquals(CanonicalInstance, this))
+            return Stage1PortraitPath;
+
         var stage = Owner?.GetRelic<PersonPoisonedApple>()?.GetCurrentInvestigationStage()
                     ?? ConcealingInvestigationHelper.InvestigationStage.Stage1;
 
