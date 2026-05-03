@@ -1,23 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using HarmonyLib;
-using MegaCrit.Sts2.Core.Extensions;
-using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
 [HarmonyPatch(typeof(NGame), "StartRun")]
 public static class StartingPersonaRelicSelectionPatch
 {
-    private const int VanillaSupportedPlayerCount = 4;
-    private const string RemoveMultiplayerPlayerLimitModId = "RemoveMultiplayerPlayerLimit";
-
     [HarmonyPostfix]
     public static void Postfix(RunState runState, ref Task __result)
     {
@@ -27,9 +22,6 @@ public static class StartingPersonaRelicSelectionPatch
     private static async Task RunAfterStartRun(Task originalTask, RunState runState)
     {
         await originalTask;
-
-        if (ShouldSkipSharedSelection(runState))
-            return;
 
         var overlayStack = NOverlayStack.Instance;
         if (overlayStack == null)
@@ -45,43 +37,18 @@ public static class StartingPersonaRelicSelectionPatch
             return;
         }
 
-        var synchronizer = RunManager.Instance.TreasureRoomRelicSynchronizer;
-        if (!TreasureRoomRelicSessionHelper.TryBeginSession(synchronizer, runState, relicOptions))
-        {
-            MainFile.Logger.Warn(
-                "Starting persona relic selection skipped because a relic picking session is already active.");
-            return;
-        }
-
         var screen = StartingPersonaRelicSelectionScreen.Create(runState, relicOptions);
         try
         {
             overlayStack.Push(screen);
             MainFile.Logger.Info(
-                $"Starting persona relic shared selection shown with {relicOptions.Count} persona relic options.");
+                $"Starting persona relic selection shown with {relicOptions.Count} persona relic options.");
             await screen.RelicPickingFinished();
         }
         finally
         {
             screen.Close();
-            TreasureRoomRelicSessionHelper.EndSessionSafely(synchronizer);
         }
-    }
-
-    private static bool ShouldSkipSharedSelection(RunState runState)
-    {
-        if (runState.Players.Count <= VanillaSupportedPlayerCount)
-            return false;
-
-        var removeLimitLoaded = ModManager.GetLoadedMods()
-            .Any(mod => mod.manifest?.id == RemoveMultiplayerPlayerLimitModId);
-        if (!removeLimitLoaded)
-            return false;
-
-        MainFile.Logger.Warn(
-            $"Starting persona relic selection skipped because {RemoveMultiplayerPlayerLimitModId} is loaded and player count is {runState.Players.Count}. " +
-            "The shared treasure-room selection flow is only hardened for vanilla player counts and is known to conflict with expanded-player treasure-room UI patches.");
-        return true;
     }
 
     private static IReadOnlyList<RelicModel> CreateStartingPersonaRelicOptions(RunState runState)
@@ -96,10 +63,15 @@ public static class StartingPersonaRelicSelectionPatch
             .Select(relic => relic.CanonicalInstance.Id)
             .ToHashSet();
 
-        var options = allPersonaRelics
-            .Where(relic => !ownedPersonaRelicIds.Contains(relic.Id))
-            .ToList()
-            .UnstableShuffle(runState.Rng.TreasureRoomRelics)
+        var options = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
+                allPersonaRelics
+                    .Where(relic => !ownedPersonaRelicIds.Contains(relic.Id))
+                    .ToList(),
+                relic => relic.Id.Entry,
+                MainFile.ModId,
+                "starting_persona_primary_pool",
+                runState.Rng.StringSeed,
+                runState.Players.Count)
             .Take(targetCount)
             .ToList();
 
@@ -107,10 +79,15 @@ public static class StartingPersonaRelicSelectionPatch
             return options;
 
         var selectedIds = options.Select(relic => relic.Id).ToHashSet();
-        var fallbackOptions = allPersonaRelics
-            .Where(relic => !selectedIds.Contains(relic.Id))
-            .ToList()
-            .UnstableShuffle(runState.Rng.TreasureRoomRelics);
+        var fallbackOptions = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
+            allPersonaRelics
+                .Where(relic => !selectedIds.Contains(relic.Id))
+                .ToList(),
+            relic => relic.Id.Entry,
+            MainFile.ModId,
+            "starting_persona_fallback_pool",
+            runState.Rng.StringSeed,
+            runState.Players.Count);
 
         options.AddRange(fallbackOptions.Take(targetCount - options.Count));
         return options;
