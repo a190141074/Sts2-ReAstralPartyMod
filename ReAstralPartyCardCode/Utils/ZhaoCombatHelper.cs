@@ -64,9 +64,12 @@ public static class ZhaoCombatHelper
 
         NCombatRoom.Instance.RadialBlur(VfxPosition.Left);
 
-        // Mirror Bygone Effigy's setup for a player-side attacker: start from the left, then cut right.
-        specialNode.Position = Vector2.Left
-            * (targetNode.GlobalPosition.X - attackerNode.GlobalPosition.X + ChaseVisualExtraOffset);
+        var horizontalDistance = Mathf.Abs(targetNode.GlobalPosition.X - attackerNode.GlobalPosition.X);
+        var offsetMagnitude = horizontalDistance + ChaseVisualExtraOffset;
+        var attackerIsLeftOfTarget = attackerNode.GlobalPosition.X <= targetNode.GlobalPosition.X;
+
+        // Reuse Bygone Effigy's pre-slash lunge, but mirror it based on battlefield side.
+        specialNode.Position = (attackerIsLeftOfTarget ? Vector2.Left : Vector2.Right) * offsetMagnitude;
     }
 
     private static CardModel? FindRandomAttackCard(Player owner)
