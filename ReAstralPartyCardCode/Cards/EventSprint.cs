@@ -5,7 +5,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
-using MegaCrit.Sts2.Core.Models.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -19,7 +19,7 @@ public class EventSprint : AstralPartyCardModel
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-        [HoverTipFactory.FromPower<DexterityPower>()];
+        [HoverTipFactory.FromPower<AstralTemporaryDexterityPower>()];
 
     public EventSprint() : base(
         0,
@@ -40,7 +40,7 @@ public class EventSprint : AstralPartyCardModel
 
         foreach (var player in CombatState.Players)
         {
-            await PowerCmd.Apply<DexterityPower>(player.Creature, DynamicVars["Dexterity"].BaseValue, null, null);
+            await AstralTemporaryDexterityPower.Apply(player.Creature, DynamicVars["Dexterity"].BaseValue, this, null, this);
 
             var bionicJasmine = player.GetRelic<PersonBionicJasmine>();
             if (bionicJasmine == null)

@@ -21,7 +21,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_HAND_ERASE.title": "手牌抹除",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_HAND_ERASE.description": "所有友方弃置手牌最右侧的1张牌。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_SPRINT.title": "疾跑",
-  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_SPRINT.description": "所有友方获得{Dexterity:diff()}点[green]敏捷[/green]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_SPRINT.description": "所有玩家获得{Dexterity:diff()}点临时[green]敏捷[/green]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_EQUALITY.title": "人人平等",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_EQUALITY.description": "将所有友方的生命值设为1，并获得{Block:diff()}点[blue]格挡[/blue]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_DEUS_EX_MACHINA.title": "天降神兵",

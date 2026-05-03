@@ -21,7 +21,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_HAND_ERASE.title": "Hand Erase",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_HAND_ERASE.description": "Discard the rightmost card from all allies' hands.",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_SPRINT.title": "Sprint",
-  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_SPRINT.description": "Gain {Dexterity:diff()} [green]Dexterity[/green] for all allies.",
+  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_SPRINT.description": "All players gain {Dexterity:diff()} temporary [green]Dexterity[/green].",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_EQUALITY.title": "Equality",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_EQUALITY.description": "Set all allies' HP to 1 and gain {Block:diff()} [blue]Block[/blue].",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_DEUS_EX_MACHINA.title": "Deus Ex Machina",
