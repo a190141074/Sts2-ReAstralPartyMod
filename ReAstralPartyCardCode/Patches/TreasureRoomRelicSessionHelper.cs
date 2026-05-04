@@ -8,6 +8,8 @@ using MegaCrit.Sts2.Core.Runs;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
+// Legacy reference helper for the old treasure-room-style shared relic flow.
+// The current starting persona selection no longer uses this as its main synchronization path.
 internal static class TreasureRoomRelicSessionHelper
 {
     private static readonly FieldInfo LocalPlayerIdField =
