@@ -236,7 +236,7 @@ internal static class NRestSiteRoomExpandedPlayerPatch
         while (containers.Count <= index)
             containers.Add(CreateCharacterContainer(containers));
 
-        RelayoutCharacterContainers(containers);
+        ApplyCharacterContainerVisibility(containers);
         return containers[index];
     }
 
@@ -256,44 +256,10 @@ internal static class NRestSiteRoomExpandedPlayerPatch
         return clone;
     }
 
-    private static void RelayoutCharacterContainers(List<Control> containers)
+    private static void ApplyCharacterContainerVisibility(List<Control> containers)
     {
-        if (containers.Count <= 4)
-            return;
-
-        var anchors = containers.Take(4).ToList();
-        var minX = anchors.Min(container => container.Position.X);
-        var maxX = anchors.Max(container => container.Position.X);
-        var centerX = (minX + maxX) * 0.5f;
-        var backRowY = anchors.Min(container => container.Position.Y);
-        var frontRowY = anchors.Max(container => container.Position.Y);
-        var spacing = Math.Max(180f, (maxX - minX) / 3f);
-        var frontCount = Math.Min(4, (int)Math.Ceiling(containers.Count / 2f));
-        var backCount = containers.Count - frontCount;
-
-        LayoutRow(containers, 0, frontCount, frontRowY, centerX, spacing);
-        if (backCount > 0)
-            LayoutRow(containers, frontCount, backCount, backRowY, centerX, spacing);
-    }
-
-    private static void LayoutRow(
-        IReadOnlyList<Control> containers,
-        int startIndex,
-        int count,
-        float y,
-        float centerX,
-        float spacing)
-    {
-        if (count <= 0)
-            return;
-
-        var totalWidth = (count - 1) * spacing;
-        var startX = centerX - totalWidth * 0.5f;
-
-        for (var i = 0; i < count; i++)
-        {
-            containers[startIndex + i].Position = new Vector2(startX + i * spacing, y);
-        }
+        for (var i = 0; i < containers.Count; i++)
+            containers[i].Visible = i < 4;
     }
 }
 

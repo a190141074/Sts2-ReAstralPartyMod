@@ -99,8 +99,11 @@ public class SkillPowerfulPity : AstralPartyCardModel
         CardModel selectedCard,
         MegaCrit.Sts2.Core.Entities.Players.Player targetPlayer)
     {
-        var copiedCard = selectedCard.CreateClone();
-        copiedCard.Owner = targetPlayer;
+        var copiedCard = CardModel.FromSerializable(selectedCard.ToSerializable());
+        var combatState = targetPlayer.Creature?.CombatState ?? ownerCreature.CombatState;
+        if (combatState == null)
+            throw new InvalidOperationException("Cannot copy a combat card for a player without an active combat state.");
+        combatState.AddCard(copiedCard, targetPlayer);
         return copiedCard;
     }
 
