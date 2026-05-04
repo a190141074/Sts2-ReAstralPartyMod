@@ -91,21 +91,30 @@ public class PersonalityDerivativeMascotGirlMimiTokenMemory : AstralPartyRelicMo
         InvokeDisplayAmountChanged();
     }
 
+    public void RefreshProgressDisplay()
+    {
+        InvokeDisplayAmountChanged();
+    }
+
     private IEnumerable<IHoverTip> BuildHoverTips()
     {
         yield return BuildSummaryHoverTip();
+
+        foreach (var entry in GetRecordedEntries())
+            yield return BuildEntryHoverTip(entry);
     }
 
     private HoverTip BuildSummaryHoverTip()
     {
         var bodyTemplate =
             new LocString("relics", $"{Id.Entry}.stats_description").GetRawText();
-        var recordedEntries = GetRecordedEntries().ToList();
         var body = string.Format(
             bodyTemplate,
             _temporaryTokenGainCounts.Count,
             GetReadyRewardCount(),
-            BuildRecordedEntriesText(recordedEntries));
+            _temporaryTokenGainCounts.Count == 0
+                ? new LocString("relics", $"{Id.Entry}.empty_entries").GetRawText()
+                : string.Empty).TrimEnd();
 
         return new HoverTip(
             new LocString("relics", $"{Id.Entry}.stats_title"),
@@ -113,30 +122,17 @@ public class PersonalityDerivativeMascotGirlMimiTokenMemory : AstralPartyRelicMo
             GD.Load<Texture2D>(PackedIconPath));
     }
 
-    private string BuildRecordedEntriesText(
-        IReadOnlyCollection<(RelicModel TokenRelic, int Count, bool IsReadyReward, bool IsOwned)> entries)
+    private HoverTip BuildEntryHoverTip(
+        (RelicModel TokenRelic, int Count, bool IsReadyReward, bool IsOwned) entry)
     {
-        if (entries.Count == 0)
-            return new LocString("relics", $"{Id.Entry}.empty_entries").GetRawText();
+        var bodyTemplate = new LocString("relics", $"{Id.Entry}.entry_description").GetRawText();
+        var body = $"记忆次数：{string.Format(bodyTemplate, entry.Count, RewardThreshold)}";
 
-        var builder = new StringBuilder();
-
-        foreach (var entry in entries)
+        return new HoverTip(entry.TokenRelic.Title, body, entry.TokenRelic.Icon)
         {
-            if (builder.Length > 0)
-                builder.Append('\n');
-
-            builder
-                .Append(entry.TokenRelic.Title.GetRawText())
-                .Append("[img]")
-                .Append(entry.TokenRelic.PackedIconPath)
-                .Append("[/img]-")
-                .Append(entry.Count)
-                .Append('/')
-                .Append(RewardThreshold);
-        }
-
-        return builder.ToString();
+            IsInstanced = true,
+            Id = $"{Id.Entry}:{entry.TokenRelic.Id}:{entry.Count}:{entry.IsReadyReward}"
+        };
     }
 
     private IEnumerable<(RelicModel TokenRelic, int Count, bool IsReadyReward, bool IsOwned)> GetRecordedEntries()

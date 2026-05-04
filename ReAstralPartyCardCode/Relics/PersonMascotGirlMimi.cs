@@ -73,6 +73,7 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
             return;
 
         AstralParty_PersonMascotGirlMimiProductRestockingDrawProgress += cardsDrawn;
+        memoryRelic.RefreshProgressDisplay();
 
         while (AstralParty_PersonMascotGirlMimiProductRestockingDrawProgress >= DrawsPerTokenMemoryChoice)
         {
@@ -81,6 +82,7 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
                 break;
 
             AstralParty_PersonMascotGirlMimiProductRestockingDrawProgress -= DrawsPerTokenMemoryChoice;
+            memoryRelic.RefreshProgressDisplay();
         }
     }
 
