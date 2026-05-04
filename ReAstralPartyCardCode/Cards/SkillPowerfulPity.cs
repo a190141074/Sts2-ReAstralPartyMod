@@ -12,7 +12,9 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using MegaCrit.Sts2.Core.Models.Events;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -62,8 +64,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
         foreach (var selectedCard in selectedCards)
         {
             var copiedCard = CreateCopiedCardForTarget(ownerCreature, selectedCard, targetPlayer);
-            if (!selectedCard.Keywords.Contains(CardKeyword.Exhaust)
-                && !copiedCard.Keywords.Contains(CardKeyword.Exhaust))
+            if (!copiedCard.Keywords.Contains(CardKeyword.Exhaust))
             {
                 CardCmd.ApplyKeyword(copiedCard, CardKeyword.Exhaust);
             }
@@ -99,12 +100,33 @@ public class SkillPowerfulPity : AstralPartyCardModel
         CardModel selectedCard,
         MegaCrit.Sts2.Core.Entities.Players.Player targetPlayer)
     {
-        var copiedCard = CardModel.FromSerializable(selectedCard.ToSerializable());
         var combatState = targetPlayer.Creature?.CombatState ?? ownerCreature.CombatState;
         if (combatState == null)
             throw new InvalidOperationException("Cannot copy a combat card for a player without an active combat state.");
-        combatState.AddCard(copiedCard, targetPlayer);
+
+        var copiedCard = combatState.CreateCard(selectedCard.CanonicalInstance, targetPlayer);
+        CopySupportedCombatState(selectedCard, copiedCard);
         return copiedCard;
+    }
+
+    private static void CopySupportedCombatState(CardModel sourceCard, CardModel copiedCard)
+    {
+        CopyUpgradeLevel(sourceCard, copiedCard);
+
+        if (sourceCard is MadScience sourceMadScience && copiedCard is MadScience copiedMadScience)
+        {
+            copiedMadScience.TinkerTimeType = sourceMadScience.TinkerTimeType;
+            copiedMadScience.TinkerTimeRider = sourceMadScience.TinkerTimeRider;
+        }
+    }
+
+    private static void CopyUpgradeLevel(CardModel sourceCard, CardModel copiedCard)
+    {
+        while (copiedCard.CurrentUpgradeLevel < sourceCard.CurrentUpgradeLevel)
+        {
+            copiedCard.UpgradeInternal();
+            copiedCard.FinalizeUpgradeInternal();
+        }
     }
 
     private async Task<List<CardModel>> SelectCards(PlayerChoiceContext choiceContext, List<CardModel> handCards)
