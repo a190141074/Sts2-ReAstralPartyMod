@@ -574,6 +574,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private async Task AwardRelicsAsync(List<RelicPickingResult> results)
     {
+        var awardedResults = new List<(Player Player, RelicModel Relic)>();
+
         foreach (var result in results)
         {
             if (result.player == null)
@@ -581,10 +583,33 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
             var relic = result.relic.ToMutable();
             SaveManager.Instance.MarkRelicAsSeen(relic);
+            MainFile.Logger.Info(
+                $"Starting persona selection awarding relic '{relic.Id.Entry}' to player {result.player.NetId}.");
             await RelicCmd.Obtain(relic, result.player);
+            awardedResults.Add((result.player, relic));
         }
 
+        await PersistStartingPersonaSelectionAsync(awardedResults);
         await Cmd.Wait(0.2f);
+    }
+
+    private async Task PersistStartingPersonaSelectionAsync(IReadOnlyCollection<(Player Player, RelicModel Relic)> awardedResults)
+    {
+        if (awardedResults.Count == 0)
+        {
+            MainFile.Logger.Warn("Starting persona selection finished without awarding any relics; skipping run save.");
+            return;
+        }
+
+        MainFile.Logger.Info(
+            "Starting persona selection awarded relics: "
+            + string.Join(
+                ", ",
+                awardedResults.Select(static entry => $"player={entry.Player.NetId}:{entry.Relic.Id.Entry}")));
+
+        MainFile.Logger.Info("Starting persona selection forcing current run save.");
+        await SaveManager.Instance.SaveRun(preFinishedRoom: null);
+        MainFile.Logger.Info("Starting persona selection current run save completed.");
     }
 
     private void OnHolderSelected(NTreasureRoomRelicHolder holder)
