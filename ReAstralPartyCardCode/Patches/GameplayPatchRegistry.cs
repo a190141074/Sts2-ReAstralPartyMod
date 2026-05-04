@@ -1,13 +1,21 @@
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Daily;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Multiplayer;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Multiplayer.Game.Lobby;
+using MegaCrit.Sts2.Core.Multiplayer.Messages.Lobby;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Nodes.Screens;
 using MegaCrit.Sts2.Core.Nodes.Screens.RelicCollection;
+using MegaCrit.Sts2.Core.Nodes.Screens.TreasureRoomRelic;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
 using STS2RitsuLib;
@@ -86,7 +94,97 @@ internal static class GameplayStaticPatchCatalog
 
     private static void RegisterGameplayPatches(ModPatcher patcher)
     {
-        patcher.RegisterPatches([]);
+        patcher.RegisterPatches(
+        [
+            new ModPatchInfo(
+                "lobby_player_serialize_expanded_bit_width_patch",
+                typeof(LobbyPlayer),
+                nameof(LobbyPlayer.Serialize),
+                typeof(LobbyPlayerSerializeExpandedBitWidthPatch),
+                isCritical: false,
+                description: "Multiplayer patch: expand serialized lobby player slot width for 8-player support"),
+            new ModPatchInfo(
+                "lobby_player_deserialize_expanded_bit_width_patch",
+                typeof(LobbyPlayer),
+                nameof(LobbyPlayer.Deserialize),
+                typeof(LobbyPlayerDeserializeExpandedBitWidthPatch),
+                isCritical: false,
+                description: "Multiplayer patch: expand deserialized lobby player slot width for 8-player support"),
+            new ModPatchInfo(
+                "client_lobby_join_response_serialize_expanded_bit_width_patch",
+                typeof(ClientLobbyJoinResponseMessage),
+                nameof(ClientLobbyJoinResponseMessage.Serialize),
+                typeof(ClientLobbyJoinResponseSerializeExpandedBitWidthPatch),
+                isCritical: false,
+                description: "Multiplayer patch: expand lobby join player-list width for 8-player support"),
+            new ModPatchInfo(
+                "client_lobby_join_response_deserialize_expanded_bit_width_patch",
+                typeof(ClientLobbyJoinResponseMessage),
+                nameof(ClientLobbyJoinResponseMessage.Deserialize),
+                typeof(ClientLobbyJoinResponseDeserializeExpandedBitWidthPatch),
+                isCritical: false,
+                description: "Multiplayer patch: expand lobby join player-list width for 8-player support"),
+            new ModPatchInfo(
+                "lobby_begin_run_serialize_expanded_bit_width_patch",
+                typeof(LobbyBeginRunMessage),
+                nameof(LobbyBeginRunMessage.Serialize),
+                typeof(LobbyBeginRunSerializeExpandedBitWidthPatch),
+                isCritical: false,
+                description: "Multiplayer patch: expand begin-run player-list width for 8-player support"),
+            new ModPatchInfo(
+                "lobby_begin_run_deserialize_expanded_bit_width_patch",
+                typeof(LobbyBeginRunMessage),
+                nameof(LobbyBeginRunMessage.Deserialize),
+                typeof(LobbyBeginRunDeserializeExpandedBitWidthPatch),
+                isCritical: false,
+                description: "Multiplayer patch: expand begin-run player-list width for 8-player support"),
+            new ModPatchInfo(
+                "rest_site_expanded_player_ready_patch",
+                typeof(NRestSiteRoom),
+                "_Ready",
+                typeof(NRestSiteRoomExpandedPlayerPatch),
+                isCritical: false,
+                description: "Multiplayer patch: allow rest site character containers to scale past 4 players"),
+            new ModPatchInfo(
+                "rest_site_hover_expanded_player_patch",
+                typeof(NRestSiteRoom),
+                "OnPlayerChangedHoveredRestSiteOption",
+                typeof(NRestSiteRoomHoverExpandedPlayerPatch),
+                isCritical: false,
+                description: "Multiplayer patch: make rest site hover updates resilient for expanded player counts",
+                parameterTypes: [typeof(ulong)]),
+            new ModPatchInfo(
+                "rest_site_before_select_expanded_player_patch",
+                typeof(NRestSiteRoom),
+                "OnBeforePlayerSelectedRestSiteOption",
+                typeof(NRestSiteRoomBeforeSelectExpandedPlayerPatch),
+                isCritical: false,
+                description: "Multiplayer patch: make rest site pre-select updates resilient for expanded player counts",
+                parameterTypes: [typeof(RestSiteOption), typeof(ulong)]),
+            new ModPatchInfo(
+                "rest_site_after_select_expanded_player_patch",
+                typeof(NRestSiteRoom),
+                "OnAfterPlayerSelectedRestSiteOption",
+                typeof(NRestSiteRoomAfterSelectExpandedPlayerPatch),
+                isCritical: false,
+                description: "Multiplayer patch: make rest site select-result updates resilient for expanded player counts",
+                parameterTypes: [typeof(RestSiteOption), typeof(bool), typeof(ulong)]),
+            new ModPatchInfo(
+                "treasure_room_initialize_relics_expanded_player_patch",
+                typeof(NTreasureRoomRelicCollection),
+                nameof(NTreasureRoomRelicCollection.InitializeRelics),
+                typeof(NTreasureRoomRelicCollectionExpandedPlayerPatch),
+                isCritical: false,
+                description: "Multiplayer patch: duplicate and relayout treasure-room relic holders for expanded player counts"),
+            new ModPatchInfo(
+                "treasure_room_default_focus_expanded_player_patch",
+                typeof(NTreasureRoomRelicCollection),
+                nameof(NTreasureRoomRelicCollection.DefaultFocusedControl),
+                typeof(NTreasureRoomRelicCollectionDefaultFocusExpandedPlayerPatch),
+                isCritical: false,
+                description: "Multiplayer patch: clamp treasure-room default focus for expanded player counts",
+                harmonyMethodType: MethodType.Getter)
+        ]);
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)
@@ -111,6 +209,7 @@ internal static class GameplayDynamicPatchCatalog
     {
         var builder = new DynamicPatchBuilder($"{MainFile.ModId}_dynamic");
         RegisterUiPatches(builder);
+        RegisterMultiplayerPatches(builder);
         RegisterCompatibilityBridgePatches(builder);
         return builder;
     }
@@ -176,5 +275,51 @@ internal static class GameplayDynamicPatchCatalog
             prefix: cooldownPrefix,
             description: "Compatibility patch: auto-apply cooldown enchantment to generated persona skills",
             patchId: patchId);
+    }
+
+    private static void RegisterMultiplayerPatches(DynamicPatchBuilder builder)
+    {
+        var clampLobbySizePrefix = DynamicPatchBuilder.FromMethod(
+            typeof(MultiplayerPlayerLimitPatch),
+            nameof(MultiplayerPlayerLimitPatch.ClampLobbySize));
+        var clampHostClientLimitPrefix = DynamicPatchBuilder.FromMethod(
+            typeof(MultiplayerPlayerLimitPatch),
+            nameof(MultiplayerPlayerLimitPatch.ClampHostClientLimit));
+
+        builder.Add(
+            AccessTools.Constructor(
+                typeof(StartRunLobby),
+                [typeof(GameMode), typeof(INetGameService), typeof(IStartRunLobbyListener), typeof(int)]),
+            prefix: clampLobbySizePrefix,
+            isCritical: false,
+            description: "Multiplayer patch: expand StartRunLobby player limit for standard/custom hosts",
+            patchId: "expand_start_run_lobby_limit");
+
+        builder.Add(
+            AccessTools.Constructor(
+                typeof(StartRunLobby),
+                [typeof(GameMode), typeof(INetGameService), typeof(IStartRunLobbyListener), typeof(TimeServerResult), typeof(int)]),
+            prefix: clampLobbySizePrefix,
+            isCritical: false,
+            description: "Multiplayer patch: expand StartRunLobby player limit for daily hosts",
+            patchId: "expand_start_run_lobby_limit_daily");
+
+        builder.AddMethod(
+            typeof(NetHostGameService),
+            nameof(NetHostGameService.StartENetHost),
+            [typeof(ushort), typeof(int)],
+            prefix: clampHostClientLimitPrefix,
+            isCritical: false,
+            description: "Multiplayer patch: expand ENet host client limit",
+            patchId: "expand_enet_host_limit");
+
+        builder.AddMethod(
+            typeof(NetHostGameService),
+            nameof(NetHostGameService.StartSteamHost),
+            [typeof(int)],
+            prefix: clampHostClientLimitPrefix,
+            isCritical: false,
+            description: "Multiplayer patch: expand Steam host client limit",
+            patchId: "expand_steam_host_limit");
     }
 }
