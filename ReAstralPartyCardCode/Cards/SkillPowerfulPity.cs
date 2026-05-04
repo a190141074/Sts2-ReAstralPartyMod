@@ -93,6 +93,10 @@ public class SkillPowerfulPity : AstralPartyCardModel
         }
 
         await TokenEternalStarlight.GrantStacks(owner, 1);
+        if (selectedCards.Count == MaxSelectedCards)
+        {
+            await TokenEternalStarlight.GrantStacks(owner, 1);
+        }
     }
 
     private static CardModel CreateCopiedCardForTarget(
