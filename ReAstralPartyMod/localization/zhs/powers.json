@@ -150,6 +150,9 @@
   "RE_ASTRAL_PARTY_MOD_POWER_GATHERING_STRENGTH_POWER.description": "最多[blue]5[/blue]层。只要层数大于[blue]0[/blue]，就固定获得[blue]2[/blue]点临时[red]力量[/red]和[blue]2[/blue]点临时[green]敏捷[/green]。",
   "RE_ASTRAL_PARTY_MOD_POWER_GATHERING_STRENGTH_POWER.smartDescription": "层数大于[blue]0[/blue]时，固定获得[blue]2[/blue]点临时[red]力量[/red]和[blue]2[/blue]点临时[green]敏捷[/green]。",
   "RE_ASTRAL_PARTY_MOD_POWER_CHANNEL_ENERGY_ATTACK_BOOST_POWER.title": "运功·强化",
-  "RE_ASTRAL_PARTY_MOD_POWER_CHANNEL_ENERGY_ATTACK_BOOST_POWER.description": "本回合你打出的攻击牌伤害+[blue]{Amount}[/blue]。",
-  "RE_ASTRAL_PARTY_MOD_POWER_CHANNEL_ENERGY_ATTACK_BOOST_POWER.smartDescription": "本回合攻击牌伤害+[blue]{Amount}[/blue]。"
+  "RE_ASTRAL_PARTY_MOD_POWER_CHANNEL_ENERGY_ATTACK_BOOST_POWER.description": "本回合你打出的攻击牌伤害+[blue]4[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_POWER_CHANNEL_ENERGY_ATTACK_BOOST_POWER.smartDescription": "本回合攻击牌伤害+[blue]4[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_POWER_SURVEY_FINDS_POWER.title": "调查发现",
+  "RE_ASTRAL_PARTY_MOD_POWER_SURVEY_FINDS_POWER.description": "获得时使[gold]人格衍生：活体书页[/gold]层数+[blue]1[/blue]。\n本回合你的技能牌对敌方单位造成伤害时，额外造成[blue]3[/blue]点伤害。",
+  "RE_ASTRAL_PARTY_MOD_POWER_SURVEY_FINDS_POWER.smartDescription": "本回合你的技能牌额外造成[blue]3[/blue]点伤害，并在获得时使[gold]人格衍生：活体书页[/gold]层数+[blue]1[/blue]。"
 }

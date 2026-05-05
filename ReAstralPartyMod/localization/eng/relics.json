@@ -333,5 +333,10 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_UNCLE_PEDERMAN.flavor": "He never has a small reaction.",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_FENG.title": "[Persona: Feng]",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_FENG.description": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Channel Energy[/card] to your hand. At combat start, gain [blue]1[/blue] [power]Gathering Strength[/power]. If you played no Attack cards this turn, gain [blue]1[/blue] [power]Gathering Strength[/power] at end of turn, or [blue]2[/blue] in Elite and Boss rooms. Whenever you play an Attack card, lose [blue]1[/blue] [power]Gathering Strength[/power]; if you had exactly [blue]5[/blue] beforehand, lose [blue]2[/blue] additional stacks and deal the same actual damage to all other enemies.",
-  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_FENG.flavor": "The calmer the preparation, the harder the release lands."
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_FENG.flavor": "The calmer the preparation, the harder the release lands.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_DEITY_LIN.title": "[Persona: Lin]",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_DEITY_LIN.description": "At the start of every [blue]3[/blue]rd turn, gain [blue]1[/blue] [power]Survey Finds[/power]. At combat start, add [blue]1[/blue] [card]Living Folio[/card] to your hand. Every [blue]3[/blue] stacks consumed from [relic]Persona Derivative: Living Folio[/relic] permanently increase [card]Living Folio[/card]'s base damage by [blue]1[/blue].",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_DEITY_LIN.flavor": "Every page turned leaves the next clue sharper than the last.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LIVING_FOLIO.title": "[Persona Derivative: Living Folio]",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LIVING_FOLIO.description": "Starts with [blue]1[/blue] stack and caps at [blue]9[/blue]. Whenever you enter an Event room, gain [blue]1[/blue] stack. Whenever you play an Event card, gain [blue]1[/blue] stack; [card]Trouble Maker[/card] does not count."
 }

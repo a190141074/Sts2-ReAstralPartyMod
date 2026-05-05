@@ -15,7 +15,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FIGHT_FUN.title": "战斗，爽！",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FIGHT_FUN.description": "每名队友获得1张[gold]巨石[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_CROWDED_PASSAGE.title": "拥挤通道",
-  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_CROWDED_PASSAGE.description": "所有友方获得{Buffer:diff()}层[gold]缓冲[/gold]和{Vulnerable:diff()}层[vulnerable]易伤[/vulnerable]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_CROWDED_PASSAGE.description": "所有友方获得{Buffer:diff()}层[gold]缓冲[/gold]和{gold:diff()}层[gold]易伤[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_GIFT_FROM_SKY.title": "天降之物",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_GIFT_FROM_SKY.description": "所有友方抽{Cards:diff()}张牌，并获得{StarLight:diff()}点[gold]星光[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_HAND_ERASE.title": "手牌抹除",
@@ -99,5 +99,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_REALLY_ANGRY.title": "真的生气了！",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_REALLY_ANGRY.description": "你的下一次【人格：叔叔】被动结算时，五项随机结果全部改为最大值。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CHANNEL_ENERGY.title": "运功",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CHANNEL_ENERGY.description": "回复{Heal:diff()}点生命。若当前拥有[gold]养精蓄锐[/gold]，则本回合你打出的攻击牌伤害+[blue]4[/blue]。"
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CHANNEL_ENERGY.description": "回复{Heal:diff()}点生命。若当前拥有[gold]养精蓄锐[/gold]，则本回合你打出的攻击牌伤害+[blue]4[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_LIVING_FOLIO.title": "活体书页",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_LIVING_FOLIO.description": "对目标造成{Damage:diff()}点伤害，并施加[blue]1[/blue]层[gold]标记[/gold]。\n此牌返回你的手牌。"
 }

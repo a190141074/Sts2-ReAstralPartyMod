@@ -35,6 +35,12 @@ public static class AstralEventCardPool
         ModelDb.Card<EventsConcealingInvestigationD>()
     ];
 
+    private static readonly HashSet<ModelId> EventCardIds =
+    [
+        .. EventCards.Select(card => card.CanonicalInstance?.Id ?? card.Id),
+        .. InvestigationCards.Select(card => card.CanonicalInstance?.Id ?? card.Id)
+    ];
+
     public static List<CardModel> CreateMutableEventCardsForPlayer(Player owner, params Type[] excludedTypes)
     {
         HashSet<Type> excludedTypeSet = excludedTypes.Length == 0 ? [] : [..excludedTypes];
@@ -122,5 +128,14 @@ public static class AstralEventCardPool
                 return mutableCard;
             })
             .ToList();
+    }
+
+    public static bool IsEventCard(CardModel? card)
+    {
+        if (card == null)
+            return false;
+
+        var id = card.CanonicalInstance?.Id ?? card.Id;
+        return EventCardIds.Contains(id);
     }
 }

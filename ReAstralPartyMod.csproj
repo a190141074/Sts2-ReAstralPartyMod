@@ -157,6 +157,7 @@
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_unstoppable.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_vampire_bite.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_vampire_bite.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_living_folio.png" />
     <Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png" />
     <Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png.import" />
     <Content Include="ReAstralPartyMod\images\events\astral_relic_store.png" />
@@ -261,6 +262,7 @@
     <Content Include="ReAstralPartyMod\images\powers\fracture_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\extra_attack_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\uncle_pederman_node_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\survey_finds_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png" />
@@ -276,6 +278,7 @@
     <Content Include="ReAstralPartyMod\images\relic\personality_land_center.png" />
     <Content Include="ReAstralPartyMod\images\relic\personality_land_center.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_bionic_jasmine.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_deity_lin.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_feng.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_bionic_jasmine.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_blue_whale.png" />
@@ -469,6 +472,7 @@
     <Content Include="ReAstralPartyMod\images\relic\token_purple_speed_roller_intermediate.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\token_purple_tasty_candy.png" />
     <Content Include="ReAstralPartyMod\images\relic\token_purple_tasty_candy.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_living_folio.png" />
     <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png" />
     <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png.import" />
     <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_big.png" />

@@ -767,6 +767,12 @@
       "desc": "At the end of combat, reduce Seventy-Two Heavenly Thunders by your [power]Dragon Awakening[/power]. Whenever you take damage, reduce Thirty-Six Heavenly Fires by [blue]1[/blue]. Once both trials reach [blue]0[/blue], at the start of each combat gain [power]True Dragon Form[/power] and add [blue]1[/blue] [card]Dragon's Roar[/card] to your hand."
     },
     {
+      "class": "PersonalityDerivativeLivingFolio",
+      "title": "[Persona Derivative: Living Folio]",
+      "rarity": "Ancient",
+      "desc": "Represents your [gold]Living Folio[/gold] stacks and related progression."
+    },
+    {
       "class": "PersonBionicJasmine",
       "title": "[Persona: Bionic Jasmine]",
       "rarity": "Ancient",
@@ -783,6 +789,18 @@
       "title": "[Persona: Cyber Kitty]",
       "rarity": "Ancient",
       "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Remote Intrusion[/card] to your hand.\nAt the start of your turn, if your [power]Node[/power] is above [blue]3[/blue], gain [blue]1[/blue] temporary [red]Strength[/red] and [blue]1[/blue] temporary [green]Dexterity[/green], then move [blue]1[/blue] Attack card from your draw pile to your hand and make it free this turn. If none is in the draw pile, take one from the discard pile instead.\nAfter the first Attack card you play each turn, discard the leftmost Attack card in your hand and upgrade it for this combat. If you have no Attack card in hand, instead upgrade a random Attack card for this combat. If no upgradable Attack remains, upgrade a random upgradable card instead."
+    },
+    {
+      "class": "PersonDeityLin",
+      "title": "[Persona: Lin]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, gain [blue]1[/blue] [power]Survey Finds[/power]. At combat start, add [blue]1[/blue] [card]Living Folio[/card] to your hand. Every [blue]3[/blue] stacks consumed from [relic]Persona Derivative: Living Folio[/relic] permanently increase [card]Living Folio[/card]'s base damage by [blue]1[/blue]."
+    },
+    {
+      "class": "PersonFeng",
+      "title": "[Persona: Feng]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Channel Energy[/card] to your hand. At combat start, gain [blue]1[/blue] [power]Gathering Strength[/power]. If you did not play an Attack card this turn, gain [blue]1[/blue] stack of [power]Gathering Strength[/power] at end of turn, doubled in Elite and Boss rooms, up to [blue]5[/blue]. When you play an Attack card, lose [blue]1[/blue] stack. If you had [blue]5[/blue] stacks before playing that Attack, lose [blue]2[/blue] extra stacks and deal the same damage to all other enemies."
     },
     {
       "class": "PersonInkShadowHunter",
@@ -869,6 +887,12 @@
       "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Orbital Bombardment[/card] to your hand. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn. At turn end, if you have fewer than [blue]5[/blue] cards in hand, draw [blue]1[/blue] extra card next turn. After playing [card]Orbital Bombardment[/card], draw [blue]1[/blue] card."
     },
     {
+      "class": "PersonUnclePederman",
+      "title": "[Persona: Uncle Pederman]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Really Angry![/card] to your hand. At the start of your turn, roll [gold]Node[/gold] from [blue]1[/blue] to [blue]6[/blue], then randomly gain temporary Strength, temporary Dexterity, Vigor, Block, and Energy in the range of [blue]-2[/blue] to [blue]+2[/blue]. If [gold]Node[/gold] is [blue]6[/blue], your Attack cards ignore Block this turn. If [gold]Node[/gold] is [blue]1[/blue], next turn's [gold]Node[/gold] is forced to [blue]6[/blue]."
+    },
+    {
       "class": "PersonVampire",
       "title": "[Persona: Vampire]",
       "rarity": "Ancient",
@@ -885,6 +909,12 @@
       "title": "[Persona: Xiao Lei]",
       "rarity": "Ancient",
       "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Chain Reaction[/card] to your hand. Whenever you cause another player to gain a card, gain [blue]1[/blue] [power]Dragon Awakening[/power]. After enduring Seventy-Two Heavenly Thunders and Thirty-Six Heavenly Fires, unlock [power]True Dragon Form[/power]."
+    },
+    {
+      "class": "PersonZhao",
+      "title": "[Persona: Zhao]",
+      "rarity": "Ancient",
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Invoke Spirits[/card] to your hand. At combat start, gain [power]Extra Attack[/power]. Whenever you or the current [gold]Invoke Spirits[/gold] target play Attack cards, every [blue]2[/blue] total actual Energy spent grants [blue]1[/blue] [power]Foxfire[/power]. When the allied target under [gold]Invoke Spirits[/gold] attacks or counters, consume [blue]1[/blue] [power]Foxfire[/power] to trigger [gold]Extra Attack[/gold]."
     },
     {
       "class": "TokenBlueAtm",
