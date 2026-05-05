@@ -46,7 +46,8 @@ public class SkillChainReaction : AstralPartyCardModel
                 continue;
 
             var cardsToDraw = PileType.Hand.GetPile(player).Cards.Count < 4 ? 2m : 1m;
-            await PersonaMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, cardsToDraw, player, this);
+            var drawnCards = await PersonaMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, cardsToDraw, player, this);
+            await XiaoLeiAwakeningHelper.TryGrantAwakeningForGrantedCard(Owner, player, drawnCards.Count());
         }
 
         var bite = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillBite>(), Owner);
