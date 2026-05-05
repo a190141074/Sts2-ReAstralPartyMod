@@ -121,6 +121,20 @@ public static class PersonaRelicHelper
                     );
                     RefreshRelicDisplayAmount(midnightFlash);
                     break;
+                case PersonShadowScion shadowScion:
+                    shadowScion.AstralParty_PersonShadowScionCounter = Math.Min(
+                        shadowScion.AstralParty_PersonShadowScionCounter + amount,
+                        ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(owner, 4)
+                    );
+                    RefreshRelicDisplayAmount(shadowScion);
+                    break;
+                case PersonPoisonedApple poisonedApple:
+                    poisonedApple.AstralParty_PersonPoisonedAppleCounter = Math.Min(
+                        poisonedApple.AstralParty_PersonPoisonedAppleCounter + amount,
+                        ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(owner, 4)
+                    );
+                    RefreshRelicDisplayAmount(poisonedApple);
+                    break;
                 case PersonCyberKitty cyberKitty:
                     cyberKitty.AstralParty_PersonCyberKittyCounter = Math.Min(
                         cyberKitty.AstralParty_PersonCyberKittyCounter + amount,
@@ -134,6 +148,27 @@ public static class PersonaRelicHelper
                         ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(owner, 4)
                     );
                     RefreshRelicDisplayAmount(vampire);
+                    break;
+                case PersonNinja ninja:
+                    ninja.AstralParty_PersonNinjaCounter = Math.Min(
+                        ninja.AstralParty_PersonNinjaCounter + amount,
+                        ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(owner, 4)
+                    );
+                    RefreshRelicDisplayAmount(ninja);
+                    break;
+                case PersonZhao zhao:
+                    zhao.AstralParty_PersonZhaoCounter = Math.Min(
+                        zhao.AstralParty_PersonZhaoCounter + amount,
+                        ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(owner, 4)
+                    );
+                    RefreshRelicDisplayAmount(zhao);
+                    break;
+                case PersonUnclePederman unclePederman:
+                    unclePederman.AstralParty_PersonUnclePedermanCounter = Math.Min(
+                        unclePederman.AstralParty_PersonUnclePedermanCounter + amount,
+                        ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(owner, 4)
+                    );
+                    RefreshRelicDisplayAmount(unclePederman);
                     break;
                 case PersonBionicJasmine bionicJasmine:
                     bionicJasmine.AddSteps(amount);

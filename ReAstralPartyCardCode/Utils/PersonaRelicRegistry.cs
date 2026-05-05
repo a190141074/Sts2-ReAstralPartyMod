@@ -30,7 +30,8 @@ public static class PersonaRelicRegistry
         ModelDb.Relic<PersonVampire>(),
         ModelDb.Relic<PersonCyberKitty>(),
         ModelDb.Relic<PersonNinja>(),
-        ModelDb.Relic<PersonZhao>()
+        ModelDb.Relic<PersonZhao>(),
+        ModelDb.Relic<PersonUnclePederman>()
     ];
 
     public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelics()
