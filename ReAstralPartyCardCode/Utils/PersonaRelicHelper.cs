@@ -170,6 +170,13 @@ public static class PersonaRelicHelper
                     );
                     RefreshRelicDisplayAmount(unclePederman);
                     break;
+                case PersonFeng feng:
+                    feng.AstralParty_PersonFengCounter = Math.Min(
+                        feng.AstralParty_PersonFengCounter + amount,
+                        ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(owner, 4)
+                    );
+                    RefreshRelicDisplayAmount(feng);
+                    break;
                 case PersonBionicJasmine bionicJasmine:
                     bionicJasmine.AddSteps(amount);
                     break;

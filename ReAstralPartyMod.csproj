@@ -208,6 +208,7 @@
     <Content Include="ReAstralPartyMod\images\powers\fate_weak_imprint_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\fate_weak_imprint_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\foxfire_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\gathering_strength_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\half_life_heal_power.png" />
@@ -275,6 +276,7 @@
     <Content Include="ReAstralPartyMod\images\relic\personality_land_center.png" />
     <Content Include="ReAstralPartyMod\images\relic\personality_land_center.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_bionic_jasmine.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_feng.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_bionic_jasmine.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_blue_whale.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_blue_whale.png.import" />
