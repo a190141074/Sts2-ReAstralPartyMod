@@ -113,15 +113,24 @@ public class PersonBionicJasmine : AstralPartyRelicModel
 
         var stepsToAdd = room.RoomType switch
         {
+            // 未分配/默认房间类型：增加 2 步
             RoomType.Unassigned => 2,
+            // 休息站点：增加 2 步
             RoomType.RestSite => 2,
+            // 商店：增加 2 步
             RoomType.Shop => 2,
+            // 宝藏房：增加 2 步
             RoomType.Treasure => 2,
-            RoomType.Monster => 2,
+            // 普通怪物房：增加 5 步
+            RoomType.Monster => 5,
+            // 事件房：增加 3 步
             RoomType.Event => 3,
-            RoomType.Elite => 6,
-            RoomType.Boss => 10,
-            RoomType.Map => 2,
+            // 精英怪房：增加 8 步
+            RoomType.Elite => 8,
+            // Boss 房：增加 12 步
+            RoomType.Boss => 12,
+            // 地图节点：增加 10 步
+            RoomType.Map => 10,
             _ => 2
         };
 
