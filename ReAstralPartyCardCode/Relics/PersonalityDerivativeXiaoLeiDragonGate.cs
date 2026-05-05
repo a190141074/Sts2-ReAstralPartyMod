@@ -73,17 +73,11 @@ public class PersonalityDerivativeXiaoLeiDragonGate : AstralPartyRelicModel
         await PowerCmd.Apply<TrueDragonFormPower>(Owner.Creature, 1m, Owner.Creature, null, false);
     }
 
-    public override Task AfterDamageReceived(
-        PlayerChoiceContext choiceContext,
-        Creature target,
-        DamageResult result,
-        ValueProp props,
-        Creature? dealer,
-        CardModel? cardSource)
+    public override Task AfterCurrentHpChanged(Creature creature, decimal delta)
     {
-        if (Owner?.Creature == null || target != Owner.Creature)
+        if (Owner?.Creature == null || creature != Owner.Creature)
             return Task.CompletedTask;
-        if (result.UnblockedDamage <= 0)
+        if (delta >= 0m)
             return Task.CompletedTask;
         if (AstralParty_PersonalityDerivativeXiaoLeiDragonGateFireCounter <= 0)
             return Task.CompletedTask;
