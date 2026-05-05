@@ -26,6 +26,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class PersonMascotGirlMimi : CooldownPersonaRelicBase
 {
     private const int DrawsPerTokenMemoryChoice = 25;
+    private const int PreferredBankCardWeight = 3;
 
     [SavedProperty] public int AstralParty_PersonMascotGirlMimiCounter { get; set; } = 1;
 
@@ -126,9 +127,10 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
         if (availableTokenRelics.Count == 0)
             return false;
 
-        var selectionOptions = PersonaMultiplayerEffectHelper.CreateDeterministicRelicChoiceOptions(
+        var selectionOptions = PersonaMultiplayerEffectHelper.CreateWeightedDeterministicRelicChoiceOptions(
             availableTokenRelics,
             3,
+            relic => TokenRelicRegistry.IsBankCardTokenRelic(relic) ? PreferredBankCardWeight : 1,
             MainFile.ModId,
             Id.Entry,
             Owner.RunState.Rng.StringSeed,

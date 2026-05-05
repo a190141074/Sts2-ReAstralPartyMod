@@ -148,6 +148,17 @@ public static class TokenRelicRegistry
         return DiceSeriesHelper.IsDiceSeriesRelic(relic);
     }
 
+    public static bool IsBankCardTokenRelic(RelicModel relic)
+    {
+        var id = relic.CanonicalInstance?.Id ?? relic.Id;
+        return id == ModelDb.GetId<TokenBlueBankCardGeneral>()
+               || id == ModelDb.GetId<TokenPurpleBankCardIntermediate>()
+               || id == ModelDb.GetId<TokenGoldBankCardPremium>()
+               || id == ModelDb.GetId<TokenPurpleFlashlightStronglight>()
+               || id == ModelDb.GetId<TokenGoldFlashlightFlashburst>()
+               || id == ModelDb.GetId<TokenGoldStarCoinHammer>();
+    }
+
     public static RelicModel? GetRandomTokenRelicForTreasure(RelicRarity rolledRarity, Rng rng)
     {
         var candidates = GetFallbackCandidates(rolledRarity);

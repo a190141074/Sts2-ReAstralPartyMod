@@ -130,6 +130,27 @@ public static class PersonaMultiplayerEffectHelper
         return ordered.Take(Math.Min(maxCount, ordered.Count)).ToList();
     }
 
+    public static IReadOnlyList<RelicModel> CreateWeightedDeterministicRelicChoiceOptions(
+        IEnumerable<RelicModel> candidates,
+        int maxCount,
+        Func<RelicModel, int> weightSelector,
+        params object?[] contextParts)
+    {
+        var ordered = candidates
+            .Select(relic => new
+            {
+                Relic = relic,
+                Score = GetBestWeightedDeterministicScore(relic, Math.Max(1, weightSelector(relic)), contextParts),
+                Id = (relic.CanonicalInstance?.Id ?? relic.Id).Entry
+            })
+            .OrderBy(entry => entry.Score)
+            .ThenBy(entry => entry.Id, StringComparer.Ordinal)
+            .Select(entry => entry.Relic)
+            .ToList();
+
+        return ordered.Take(Math.Min(maxCount, ordered.Count)).ToList();
+    }
+
     public static CardModel? SelectRandomUpgradeableCombatCard(
         Player owner,
         Func<CardModel, bool> predicate,
@@ -163,5 +184,25 @@ public static class PersonaMultiplayerEffectHelper
     {
         if (!RunManager.Instance.IsSinglePlayerOrFakeMultiplayer && CombatManager.Instance.IsInProgress)
             throw new InvalidOperationException($"Tried to sync {operation} during combat. Use deterministic combat actions instead.");
+    }
+
+    private static uint GetBestWeightedDeterministicScore(
+        RelicModel relic,
+        int weight,
+        IReadOnlyList<object?> contextParts)
+    {
+        var relicId = (relic.CanonicalInstance?.Id ?? relic.Id).Entry;
+        var bestScore = uint.MaxValue;
+        for (var i = 0; i < weight; i++)
+        {
+            var score = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+                0,
+                int.MaxValue,
+                contextParts.Concat([relicId, "weight", i]).ToArray());
+            if ((uint)score < bestScore)
+                bestScore = (uint)score;
+        }
+
+        return bestScore;
     }
 }
