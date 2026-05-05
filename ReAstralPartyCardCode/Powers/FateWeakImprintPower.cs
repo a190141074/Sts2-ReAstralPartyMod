@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -83,15 +84,15 @@ public class FateWeakImprintPower : AstralPartyPowerModel
             return;
 
         var rewardPlayer = dealer.Player ?? dealer.PetOwner;
-        var combatState = rewardPlayer?.Creature?.CombatState;
-        if (rewardPlayer == null || combatState == null)
+        var sourceBlueWhale = Applier?.Player?.GetRelic<PersonBlueWhale>();
+        if (rewardPlayer == null || sourceBlueWhale == null)
             return;
 
         Flash();
-
-        // Reward the creature that dealt the killing blow, not necessarily the one that applied the imprint.
-        var card = combatState.CreateCard(ModelDb.Card<SkillFateGuidance>(), rewardPlayer);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
-        await XiaoLeiAwakeningHelper.TryGrantAwakeningForGrantedCard(Applier?.Player, rewardPlayer);
+        await FateGuidanceCompatibilityHelper.GrantFateGuidanceAsync(
+            sourceBlueWhale,
+            rewardPlayer,
+            1,
+            allowStoreForNextCombat: true);
     }
 }

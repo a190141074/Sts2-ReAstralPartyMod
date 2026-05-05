@@ -7,12 +7,15 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using MegaCrit.Sts2.Core.Saves.Runs;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
 public class SkillFateGuidance : AstralPartyCardModel
 {
+    [SavedProperty] public ulong AstralParty_FateGuidanceSourceBlueWhalePlayerNetId { get; set; }
+
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>

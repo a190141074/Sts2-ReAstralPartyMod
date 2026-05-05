@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
@@ -33,6 +35,19 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
 
     [SavedProperty] public int AstralParty_PersonBlueWhaleExactRound6RewardCount { get; set; }
 
+    private Dictionary<ulong, int> _pendingFateGuidanceByRecipientNetId = new();
+
+    [SavedProperty]
+    private string AstralParty_PersonBlueWhalePendingFateGuidanceByRecipientNetIdJson
+    {
+        get => JsonSerializer.Serialize(
+            _pendingFateGuidanceByRecipientNetId.ToDictionary(
+                entry => entry.Key.ToString(),
+                entry => entry.Value,
+                StringComparer.Ordinal));
+        set => _pendingFateGuidanceByRecipientNetId = DeserializePendingFateGuidanceCounts(value);
+    }
+
     protected override int CounterValue
     {
         get => AstralParty_PersonBlueWhaleCounter;
@@ -57,6 +72,7 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
     {
         await base.AfterObtained();
         AstralParty_PersonBlueWhaleExactRound6RewardCount = 0;
+        _pendingFateGuidanceByRecipientNetId.Clear();
     }
 
     public override async Task AfterDeath(
@@ -83,6 +99,8 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
         if (Owner == null)
             return;
 
+        RecordPendingFateGuidanceFromHand(room.CombatState);
+
         if (room.CombatState.RoundNumber == ExactRoundTarget)
         {
             // Each exact-turn clear increases future payouts by 2 gold.
@@ -103,5 +121,91 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFateWeakMprint>(), Owner);
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+    }
+
+    public override async Task BeforeCombatStart()
+    {
+        await base.BeforeCombatStart();
+
+        if (Owner?.Creature?.CombatState == null || _pendingFateGuidanceByRecipientNetId.Count == 0)
+            return;
+
+        var pendingEntries = _pendingFateGuidanceByRecipientNetId
+            .Where(entry => entry.Value > 0)
+            .OrderBy(entry => entry.Key)
+            .ToList();
+        if (pendingEntries.Count == 0)
+            return;
+
+        foreach (var entry in pendingEntries)
+        {
+            var recipient = Owner.Creature.CombatState.Players.FirstOrDefault(player => player.NetId == entry.Key);
+            if (recipient == null)
+                continue;
+
+            await FateGuidanceCompatibilityHelper.GrantFateGuidanceAsync(
+                this,
+                recipient,
+                entry.Value,
+                allowStoreForNextCombat: false);
+            _pendingFateGuidanceByRecipientNetId[entry.Key] = 0;
+        }
+
+        RemoveZeroPendingFateGuidanceEntries();
+    }
+
+    internal void AddPendingFateGuidanceForRecipient(Player recipient, int amount)
+    {
+        if (recipient == null || amount <= 0)
+            return;
+
+        _pendingFateGuidanceByRecipientNetId.TryGetValue(recipient.NetId, out var existingAmount);
+        _pendingFateGuidanceByRecipientNetId[recipient.NetId] = existingAmount + amount;
+    }
+
+    private void RecordPendingFateGuidanceFromHand(CombatState combatState)
+    {
+        if (Owner == null)
+            return;
+
+        foreach (var player in combatState.Players)
+        {
+            var count = player.PlayerCombatState?.Hand?.Cards
+                .OfType<SkillFateGuidance>()
+                .Count(card => card.AstralParty_FateGuidanceSourceBlueWhalePlayerNetId == Owner.NetId)
+                ?? 0;
+            if (count <= 0)
+                continue;
+
+            AddPendingFateGuidanceForRecipient(player, count);
+        }
+
+        RemoveZeroPendingFateGuidanceEntries();
+    }
+
+    private void RemoveZeroPendingFateGuidanceEntries()
+    {
+        foreach (var key in _pendingFateGuidanceByRecipientNetId
+                     .Where(entry => entry.Value <= 0)
+                     .Select(entry => entry.Key)
+                     .ToList())
+            _pendingFateGuidanceByRecipientNetId.Remove(key);
+    }
+
+    private static Dictionary<ulong, int> DeserializePendingFateGuidanceCounts(string value)
+    {
+        try
+        {
+            var raw = JsonSerializer.Deserialize<Dictionary<string, int>>(value)
+                      ?? new Dictionary<string, int>(StringComparer.Ordinal);
+            return raw
+                .Select(entry => (Success: ulong.TryParse(entry.Key, out var netId), NetId: netId, entry.Value))
+                .Where(entry => entry.Success && entry.Value > 0)
+                .ToDictionary(entry => entry.NetId, entry => entry.Value);
+        }
+        catch
+        {
+            return new Dictionary<ulong, int>();
+        }
     }
 }
