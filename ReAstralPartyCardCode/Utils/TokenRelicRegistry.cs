@@ -123,6 +123,15 @@ public static class TokenRelicRegistry
             .ToList();
     }
 
+    public static IReadOnlyList<RelicModel> GetNonDiceTokenRelicsByRarity(RelicRarity rarity)
+    {
+        return GetCanonicalTokenRelics()
+            .Where(relic => relic.Rarity == rarity)
+            .Where(relic => !DiceSeriesHelper.IsDiceSeriesRelic(relic))
+            .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
+            .ToList();
+    }
+
     public static bool IsTokenRelic(RelicModel relic)
     {
         return TokenRelicTypes.Any(type => ModelDb.GetId(type) == relic.CanonicalInstance.Id);
@@ -132,6 +141,11 @@ public static class TokenRelicRegistry
     {
         var id = relic.CanonicalInstance?.Id ?? relic.Id;
         return SeriesTokenRelicTypes.Any(type => ModelDb.GetId(type) == id);
+    }
+
+    public static bool IsDiceSeriesRelic(RelicModel relic)
+    {
+        return DiceSeriesHelper.IsDiceSeriesRelic(relic);
     }
 
     public static RelicModel? GetRandomTokenRelicForTreasure(RelicRarity rolledRarity, Rng rng)

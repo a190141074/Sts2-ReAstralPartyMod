@@ -167,7 +167,7 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
 
     private List<RelicModel> GetCandidates(RelicRarity rarity, bool excludeOwned)
     {
-        return TokenRelicRegistry.GetTokenRelicsByRarity(rarity)
+        return TokenRelicRegistry.GetNonDiceTokenRelicsByRarity(rarity)
             .Where(relic => IsValidRewardCandidate(relic, excludeOwned))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();

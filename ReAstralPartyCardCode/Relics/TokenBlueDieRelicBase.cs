@@ -47,7 +47,7 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
 
     public override bool ShouldReceiveCombatHooks => true;
 
-    public override bool ShowCounter => true;
+    public override bool ShowCounter => !DiceSeriesHelper.OwnsFullDiceSet(Owner);
 
     public override int DisplayAmount => AstralParty_BlueDieTriggerProgress;
 
@@ -75,15 +75,19 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
             return;
 
         AstralParty_PendingBlueDieStarLight += StarLightRewardAmount;
-        AstralParty_BlueDieTriggerProgress = Math.Min(
-            AstralParty_BlueDieTriggerProgress + 1,
-            GetRequiredTriggerCountForNewDieRelic()
-        );
         Flash();
 
-        if (AstralParty_BlueDieTriggerProgress >= GetRequiredTriggerCountForNewDieRelic()
-            && await TryObtainMissingDieRelic())
-            AstralParty_BlueDieTriggerProgress = 0;
+        if (!DiceSeriesHelper.OwnsFullDiceSet(Owner))
+        {
+            AstralParty_BlueDieTriggerProgress = Math.Min(
+                AstralParty_BlueDieTriggerProgress + 1,
+                GetRequiredTriggerCountForNewDieRelic()
+            );
+
+            if (AstralParty_BlueDieTriggerProgress >= GetRequiredTriggerCountForNewDieRelic()
+                && await TryObtainMissingDieRelic())
+                AstralParty_BlueDieTriggerProgress = 0;
+        }
 
         InvokeDisplayAmountChanged();
     }
@@ -185,38 +189,20 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
 
     private async Task<bool> TryObtainMissingDieRelic()
     {
-        if (Owner == null)
+        if (Owner == null || DiceSeriesHelper.OwnsFullDiceSet(Owner))
             return false;
 
-        if (await TryObtainMissingDieRelic<TokenBlueDie4>())
-            return true;
-        if (await TryObtainMissingDieRelic<TokenBlueDie6>())
-            return true;
-        if (await TryObtainMissingDieRelic<TokenBlueDie8>())
-            return true;
-        if (await TryObtainMissingDieRelic<TokenBlueDie10>())
-            return true;
-        if (await TryObtainMissingDieRelic<TokenBlueDie12>())
-            return true;
-        if (await TryObtainMissingDieRelic<TokenBlueDie20>())
-            return true;
-
-        return false;
-    }
-
-    private async Task<bool> TryObtainMissingDieRelic<T>()
-        where T : AstralPartyRelicModel
-    {
-        if (Owner == null || Owner.GetRelic<T>() != null)
+        var nextMissingDieRelic = DiceSeriesHelper.GetNextMissingDiceRelic(Owner);
+        if (nextMissingDieRelic == null)
             return false;
 
-        await RewardSyncHelper.ObtainRelicAsReward(Owner, ModelDb.Relic<T>());
+        await RewardSyncHelper.ObtainRelicAsReward(Owner, nextMissingDieRelic);
         return true;
     }
 
     private int GetRequiredTriggerCountForNewDieRelic()
     {
-        var ownedDiceCount = CountOwnedDieRelics();
+        var ownedDiceCount = DiceSeriesHelper.CountOwnedDiceRelics(Owner);
         var reduction = ownedDiceCount >= FiveDieSetCount
             ? FiveDieSetReduction
             : ownedDiceCount >= TwoDieSetCount
@@ -224,27 +210,5 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
                 : 0;
 
         return Math.Max(1, BaseTriggerCountForNewDieRelic - reduction);
-    }
-
-    private int CountOwnedDieRelics()
-    {
-        if (Owner == null)
-            return 0;
-
-        var count = 0;
-        if (Owner.GetRelic<TokenBlueDie4>() != null)
-            count++;
-        if (Owner.GetRelic<TokenBlueDie6>() != null)
-            count++;
-        if (Owner.GetRelic<TokenBlueDie8>() != null)
-            count++;
-        if (Owner.GetRelic<TokenBlueDie10>() != null)
-            count++;
-        if (Owner.GetRelic<TokenBlueDie12>() != null)
-            count++;
-        if (Owner.GetRelic<TokenBlueDie20>() != null)
-            count++;
-
-        return count;
     }
 }
