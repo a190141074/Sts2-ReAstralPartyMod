@@ -26,6 +26,8 @@ public class SkillLivingFolio : AstralPartyCardModel
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [CardKeyword.Eternal, CardKeyword.Retain, AstralKeywords.AstralUnique];
 
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
+
     protected override bool IsPlayable =>
         Owner != null
         && HasLivingEnemyTarget()
