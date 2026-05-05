@@ -119,15 +119,9 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
         if (Owner?.Creature == null)
             return false;
 
-        var availableNonSeriesTokenRelics = MascotGirlMimiTokenMemoryHelper
+        var availableTokenRelics = MascotGirlMimiTokenMemoryHelper
             .GetBridgeableUnownedTokenRelics(Owner, Owner.Creature, includeSeriesRelics: false)
             .ToList();
-
-        var availableTokenRelics = availableNonSeriesTokenRelics.Count > 0
-            ? availableNonSeriesTokenRelics
-            : MascotGirlMimiTokenMemoryHelper
-                .GetBridgeableUnownedTokenRelics(Owner, Owner.Creature)
-                .ToList();
 
         if (availableTokenRelics.Count == 0)
             return false;
