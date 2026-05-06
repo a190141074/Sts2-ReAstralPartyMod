@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
@@ -41,8 +40,6 @@ public class SkillHealingSlime : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        ArgumentNullException.ThrowIfNull(cardPlay.Target, nameof(cardPlay.Target));
-
         var target = cardPlay.Target ?? Owner.Creature;
         if (target == null || Owner?.Creature == null)
             return;
