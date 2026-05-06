@@ -20,8 +20,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public class PersonDeityLin : CooldownPersonaRelicBase
 {
-    private const int LivingFolioGrowthThreshold = 3;
-
     [SavedProperty] public int AstralParty_PersonDeityLinCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonDeityLinPendingCombatStartCard { get; set; }
     [SavedProperty] public int AstralParty_PersonDeityLinConsumedLivingFolioStacksProgress { get; set; }
@@ -100,14 +98,12 @@ public class PersonDeityLin : CooldownPersonaRelicBase
             return;
 
         AstralParty_PersonDeityLinConsumedLivingFolioStacksProgress += amount;
-        var growthCount = AstralParty_PersonDeityLinConsumedLivingFolioStacksProgress / LivingFolioGrowthThreshold;
-        AstralParty_PersonDeityLinConsumedLivingFolioStacksProgress %= LivingFolioGrowthThreshold;
+        var grew = false;
+        while (TryAdvanceLivingFolioGrowth())
+            grew = true;
 
-        if (growthCount <= 0)
-            return;
-
-        AstralParty_PersonDeityLinPermanentLivingFolioDamageBonus += growthCount;
-        Flash();
+        if (grew)
+            Flash();
     }
 
     public bool TryRefundLivingFolioEnergy()
@@ -134,5 +130,26 @@ public class PersonDeityLin : CooldownPersonaRelicBase
     private async Task EnsureLivingFolioRelic()
     {
         await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeLivingFolio>(Owner);
+    }
+
+    private bool TryAdvanceLivingFolioGrowth()
+    {
+        var currentBonus = GetLivingFolioPermanentDamageBonus();
+        var requiredStacks = GetRequiredConsumptionForNextGrowth(currentBonus);
+        if (AstralParty_PersonDeityLinConsumedLivingFolioStacksProgress < requiredStacks)
+            return false;
+
+        AstralParty_PersonDeityLinConsumedLivingFolioStacksProgress -= requiredStacks;
+        AstralParty_PersonDeityLinPermanentLivingFolioDamageBonus++;
+        return true;
+    }
+
+    private static int GetRequiredConsumptionForNextGrowth(int currentBonus)
+    {
+        if (currentBonus <= 11)
+            return 1;
+        if (currentBonus <= 22)
+            return 2;
+        return 3;
     }
 }

@@ -71,6 +71,18 @@ public class SkillLivingFolio : AstralPartyCardModel
             : (pileType, position);
     }
 
+    public override bool TryModifyEnergyCostInCombat(CardModel card, decimal originalCost, out decimal modifiedCost)
+    {
+        if (card != this)
+        {
+            modifiedCost = originalCost;
+            return false;
+        }
+
+        modifiedCost = GetCombatEnergyCost(originalCost);
+        return modifiedCost != originalCost;
+    }
+
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         var owner = Owner;
@@ -119,6 +131,14 @@ public class SkillLivingFolio : AstralPartyCardModel
     private decimal GetCurrentDamageAmount()
     {
         return BaseDamage + GetPermanentDamageBonus();
+    }
+
+    private decimal GetCombatEnergyCost(decimal originalCost)
+    {
+        if (GetPermanentDamageBonus() > 11m)
+            return originalCost;
+
+        return System.Math.Max(0m, originalCost - 1m);
     }
 
     private decimal GetPermanentDamageBonus()
