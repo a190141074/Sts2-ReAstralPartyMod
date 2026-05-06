@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Relics;
 using MegaCrit.Sts2.Core.Random;
+using MegaCrit.Sts2.Core.Runs;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -93,6 +94,7 @@ public static class TokenRelicRegistry
         typeof(TokenExclusiveAncientWand),
         typeof(TokenExclusiveBoutiqueSwordShield),
         typeof(TokenExclusiveBronzeGong),
+        typeof(TokenExclusiveCandyMembershipCard),
         typeof(TokenExclusiveCrossedTwinCarp),
         typeof(TokenExclusiveCursedSword),
         typeof(TokenExclusiveDreamshipModel),
@@ -102,6 +104,7 @@ public static class TokenRelicRegistry
         typeof(TokenExclusivePiercingGun),
         typeof(TokenExclusivePsychedelicSeafoodSoup),
         typeof(TokenExclusiveStormTalisman),
+        typeof(TokenExclusiveTimer),
         typeof(TokenExclusiveTrident),
         typeof(TokenExclusiveVengeanceHalberd),
         typeof(TokenExclusiveZuoTeaCake)
@@ -123,6 +126,19 @@ public static class TokenRelicRegistry
             .ToList();
     }
 
+    public static IReadOnlyList<RelicModel> GetAvailableTokenRelicsByRarity(
+        IRunState? runState,
+        RelicRarity rarity,
+        bool excludeDice = false)
+    {
+        return GetCanonicalTokenRelics()
+            .Where(relic => relic.Rarity == rarity)
+            .Where(relic => !excludeDice || !DiceSeriesHelper.IsDiceSeriesRelic(relic))
+            .Where(relic => TokenSeriesAvailabilityHelper.IsRelicAvailableForRun(runState, relic))
+            .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
+            .ToList();
+    }
+
     public static IReadOnlyList<RelicModel> GetNonDiceTokenRelicsByRarity(RelicRarity rarity)
     {
         return GetCanonicalTokenRelics()
@@ -130,6 +146,11 @@ public static class TokenRelicRegistry
             .Where(relic => !DiceSeriesHelper.IsDiceSeriesRelic(relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
+    }
+
+    public static IReadOnlyList<RelicModel> GetAvailableNonDiceTokenRelicsByRarity(IRunState? runState, RelicRarity rarity)
+    {
+        return GetAvailableTokenRelicsByRarity(runState, rarity, excludeDice: true);
     }
 
     public static bool IsTokenRelic(RelicModel relic)
@@ -159,22 +180,27 @@ public static class TokenRelicRegistry
                || id == ModelDb.GetId<TokenGoldStarCoinHammer>();
     }
 
-    public static RelicModel? GetRandomTokenRelicForTreasure(RelicRarity rolledRarity, Rng rng)
+    public static RelicModel? GetRandomTokenRelicForTreasure(IRunState? runState, RelicRarity rolledRarity, Rng rng)
     {
-        var candidates = GetFallbackCandidates(rolledRarity);
+        var candidates = GetFallbackCandidates(runState, rolledRarity);
         return candidates.Count == 0 ? null : candidates[rng.NextInt(candidates.Count)];
     }
 
-    private static IReadOnlyList<RelicModel> GetFallbackCandidates(RelicRarity rolledRarity)
+    public static bool IsRelicAvailableForRun(IRunState? runState, RelicModel relic)
+    {
+        return TokenSeriesAvailabilityHelper.IsRelicAvailableForRun(runState, relic);
+    }
+
+    private static IReadOnlyList<RelicModel> GetFallbackCandidates(IRunState? runState, RelicRarity rolledRarity)
     {
         foreach (var rarity in GetRarityFallbackOrder(rolledRarity))
         {
-            var candidates = GetTokenRelicsByRarity(rarity);
+            var candidates = GetAvailableTokenRelicsByRarity(runState, rarity);
             if (candidates.Count > 0)
                 return candidates;
         }
 
-        return GetCanonicalTokenRelics();
+        return TokenSeriesAvailabilityHelper.FilterAvailableForRun(runState, GetCanonicalTokenRelics());
     }
 
     private static IEnumerable<RelicRarity> GetRarityFallbackOrder(RelicRarity rolledRarity)

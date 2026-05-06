@@ -88,7 +88,15 @@ internal static class GameplayStaticPatchCatalog
                 typeof(SkillFamousBladeTitlePatch),
                 isCritical: false,
                 description: "UI patch: override Famous Blade title getter",
-                harmonyMethodType: MethodType.Getter)
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
+                "top_bar_open_token_series_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.CommonUi.NTopBar),
+                nameof(MegaCrit.Sts2.Core.Nodes.CommonUi.NTopBar.Initialize),
+                typeof(NTopBarOpenTokenSeriesPatch),
+                isCritical: false,
+                description: "UI patch: append current open token series icon to the normal-mode top bar",
+                parameterTypes: [typeof(IRunState)])
         ]);
     }
 
@@ -183,7 +191,15 @@ internal static class GameplayStaticPatchCatalog
                 typeof(NTreasureRoomRelicCollectionDefaultFocusExpandedPlayerPatch),
                 isCritical: false,
                 description: "Multiplayer patch: clamp treasure-room default focus for expanded player counts",
-                harmonyMethodType: MethodType.Getter)
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
+                "relic_grab_bag_populate_series_filter_patch",
+                typeof(MegaCrit.Sts2.Core.Runs.RelicGrabBag),
+                nameof(MegaCrit.Sts2.Core.Runs.RelicGrabBag.Populate),
+                typeof(RelicGrabBagPopulateSeriesFilterPatch),
+                isCritical: false,
+                description: "Gameplay patch: remove unopened special token series relics from random relic grab bags at run setup",
+                parameterTypes: [typeof(Player), typeof(MegaCrit.Sts2.Core.Random.Rng)])
         ]);
     }
 

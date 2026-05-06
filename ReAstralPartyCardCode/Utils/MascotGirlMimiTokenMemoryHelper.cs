@@ -26,6 +26,7 @@ public static class MascotGirlMimiTokenMemoryHelper
             .Where(relic => TokenRelicBridgeHelper.CanBridgeTokenRelic(relic, out _))
             .Where(relic => !TokenRelicRegistry.IsDiceSeriesRelic(relic))
             .Where(relic => includeSeriesRelics || !TokenRelicRegistry.IsSeriesTokenRelic(relic))
+            .Where(relic => TokenRelicRegistry.IsRelicAvailableForRun(owner.RunState, relic))
             .ToList();
     }
 

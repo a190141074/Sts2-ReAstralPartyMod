@@ -344,5 +344,10 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_NEEDY_GIRL.description": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Emotional Overdose[/card] to your hand. At combat start, gain [blue]2[/blue] [power]Love[/power]. Whenever you or [relic]Persona: KAngel[/relic] take unblocked damage, gain [blue]1[/blue] [power]Love[/power].",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_NEEDY_GIRL.flavor": "The more attention it gets, the more desperately it wants to be needed.",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LIVING_FOLIO.title": "[Persona Derivative: Living Folio]",
-  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LIVING_FOLIO.description": "Starts with [blue]1[/blue] stack and caps at [blue]9[/blue]. Whenever you enter an Event room, gain [blue]1[/blue] stack. Whenever you play an Event card, gain [blue]1[/blue] stack; [card]Trouble Maker[/card] does not count."
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LIVING_FOLIO.description": "Starts with [blue]1[/blue] stack and caps at [blue]9[/blue]. Whenever you enter an Event room, gain [blue]1[/blue] stack. Whenever you play an Event card, gain [blue]1[/blue] stack; [card]Trouble Maker[/card] does not count.",
+  "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.title": "Current Open Token Series",
+  "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.description": "Special token series open for this run:\n{SeriesA}\n{SeriesB}\nOnly these two special series can appear from random acquisition sources.",
+  "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.description_uninitialized": "Open token series have not been initialized for this run yet.",
+  "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.extension1_title": "[Extension 1: {SeriesName}]",
+  "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.extension2_title": "[Extension 2: {SeriesName}]"
 }
