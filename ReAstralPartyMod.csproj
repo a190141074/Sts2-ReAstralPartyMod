@@ -122,8 +122,10 @@
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_channel_energy.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_concealing_operation.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_concealing_operation.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_cyber_angel.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_dragons_roar.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_dragons_roar.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_emotional_overdose.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_guidance.png" />
@@ -263,6 +265,8 @@
     <Content Include="ReAstralPartyMod\images\powers\extra_attack_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\uncle_pederman_node_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\survey_finds_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\fan_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\love_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png" />
@@ -291,12 +295,14 @@
     <Content Include="ReAstralPartyMod\images\relic\person_ink_shadow_hunter.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_jill_steinle.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_jill_steinle.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_kawaii_angel.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_mascot_girl_mimi.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_mascot_girl_mimi.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_midnight_flash.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_midnight_flash.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_mousy_lian.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_mousy_lian.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_needy_girl.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_oasis_queen.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_oasis_queen.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_poisoned_apple.png" />

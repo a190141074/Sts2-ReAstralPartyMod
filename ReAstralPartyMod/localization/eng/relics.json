@@ -337,6 +337,12 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_DEITY_LIN.title": "[Persona: Lin]",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_DEITY_LIN.description": "At the start of every [blue]3[/blue]rd turn, gain [blue]1[/blue] [power]Survey Finds[/power]. At combat start, add [blue]1[/blue] [card]Living Folio[/card] to your hand. While [card]Living Folio[/card]'s permanent damage bonus is [blue]0-11[/blue], each consumed stack of [relic]Persona Derivative: Living Folio[/relic] permanently increases its base damage by [blue]1[/blue] and reduces its Energy cost by [blue]1[/blue]. While its permanent damage bonus is [blue]12-22[/blue], it gains [blue]1[/blue] permanent base damage for every [blue]2[/blue] stacks consumed. While its permanent damage bonus is [blue]23+[/blue], it gains [blue]1[/blue] permanent base damage for every [blue]3[/blue] stacks consumed.",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_DEITY_LIN.flavor": "Every page turned leaves the next clue sharper than the last.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_KAWAII_ANGEL.title": "[Persona: KAngel]",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_KAWAII_ANGEL.description": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Cyber Angel[/card] to your hand. When an enemy attacks you and deals unblocked damage, it gains [blue]1[/blue] [power]Fan[/power]. When an enemy takes unblocked damage from you or [relic]Persona: Needy Girl[/relic], it gains [blue]1[/blue] [power]Fan[/power].",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_KAWAII_ANGEL.flavor": "Attention from the far side of the screen can still become force in the real fight.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_NEEDY_GIRL.title": "[Persona: Needy Girl]",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_NEEDY_GIRL.description": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Emotional Overdose[/card] to your hand. At combat start, gain [blue]2[/blue] [power]Love[/power]. Whenever you or [relic]Persona: KAngel[/relic] take unblocked damage, gain [blue]1[/blue] [power]Love[/power].",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_NEEDY_GIRL.flavor": "The more attention it gets, the more desperately it wants to be needed.",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LIVING_FOLIO.title": "[Persona Derivative: Living Folio]",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LIVING_FOLIO.description": "Starts with [blue]1[/blue] stack and caps at [blue]9[/blue]. Whenever you enter an Event room, gain [blue]1[/blue] stack. Whenever you play an Event card, gain [blue]1[/blue] stack; [card]Trouble Maker[/card] does not count."
 }

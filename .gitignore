@@ -20,6 +20,8 @@ Thumbs.db
 bin/
 obj/
 objtmp/
+_build_out/
+_deploy_test/
 __pycache__/
 *.py[cod]
 

@@ -33,7 +33,9 @@ public static class PersonaRelicRegistry
         ModelDb.Relic<PersonZhao>(),
         ModelDb.Relic<PersonUnclePederman>(),
         ModelDb.Relic<PersonFeng>(),
-        ModelDb.Relic<PersonDeityLin>()
+        ModelDb.Relic<PersonDeityLin>(),
+        ModelDb.Relic<PersonKawaiiAngel>(),
+        ModelDb.Relic<PersonNeedyGirl>()
     ];
 
     public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelics()
