@@ -33,6 +33,9 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
     public bool AstralParty_RunRelicAfterObtainedOnFirstApply { get; set; }
 
     [SavedProperty]
+    public int AstralParty_BridgeInitializationModeValue { get; set; }
+
+    [SavedProperty]
     private string AstralParty_BridgedTokenRelicStateJson
     {
         get => SerializeBridgedRelicState();
@@ -71,10 +74,14 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
         GetBridgedRelic()?.HoverTipsExcludingRelic ?? [];
 
-    public void Configure(ModelId relicId, bool runAfterObtainedOnFirstApply = false)
+    public void Configure(
+        ModelId relicId,
+        TokenRelicBridgeInitializationMode initializationMode = TokenRelicBridgeInitializationMode.None)
     {
         AstralParty_BridgedTokenRelicId = relicId;
-        AstralParty_RunRelicAfterObtainedOnFirstApply = runAfterObtainedOnFirstApply;
+        AstralParty_RunRelicAfterObtainedOnFirstApply =
+            initializationMode != TokenRelicBridgeInitializationMode.None;
+        AstralParty_BridgeInitializationModeValue = (int)initializationMode;
         _bridgedRelic = null;
         _pendingRelicStateJson = null;
         InvokeDisplayAmountChanged();
@@ -114,8 +121,14 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         if (relic == null)
             return;
 
-        if (AstralParty_RunRelicAfterObtainedOnFirstApply)
+        var initializationMode = GetInitializationMode();
+        if (initializationMode != TokenRelicBridgeInitializationMode.None)
+        {
+            using var _ = TokenRelicBridgeInitializationContext.Push(
+                initializationMode,
+                AstralParty_BridgedTokenRelicId);
             await relic.AfterObtained();
+        }
 
         await ReplayCurrentTurnStartHooksIfNeeded(relic);
         InvokeDisplayAmountChanged();
@@ -327,6 +340,16 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
 
         await relic.BeforeSideTurnStart(choiceContext, combatState.CurrentSide, combatState);
         await relic.AfterPlayerTurnStart(choiceContext, ownerPlayer);
+    }
+
+    private TokenRelicBridgeInitializationMode GetInitializationMode()
+    {
+        if (Enum.IsDefined(typeof(TokenRelicBridgeInitializationMode), AstralParty_BridgeInitializationModeValue))
+            return (TokenRelicBridgeInitializationMode)AstralParty_BridgeInitializationModeValue;
+
+        return AstralParty_RunRelicAfterObtainedOnFirstApply
+            ? TokenRelicBridgeInitializationMode.RunAfterObtained
+            : TokenRelicBridgeInitializationMode.None;
     }
 
     private PlayerChoiceContext CreateImmediateHookContext()

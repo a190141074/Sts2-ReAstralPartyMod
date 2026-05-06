@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.RelicPools;
@@ -25,6 +26,8 @@ public class TokenPurpleBankCardIntermediate : AstralPartyRelicModel
     {
         await base.AfterObtained();
         if (Owner == null)
+            return;
+        if (TokenRelicBridgeInitializationContext.ShouldSkipOneTimeObtainRewards)
             return;
 
         await TokenEternalStarlight.GrantStacks(Owner, EternalStarlightToGrant);

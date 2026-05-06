@@ -57,7 +57,7 @@ public static class TokenRelicBridgeHelper
         Creature? applier = null,
         CardModel? cardSource = null,
         bool removeExisting = true,
-        bool runAfterObtainedOnFirstApply = false)
+        TokenRelicBridgeInitializationMode initializationMode = TokenRelicBridgeInitializationMode.None)
         where TTokenRelic : RelicModel
     {
         return await ApplyTokenRelicPower(
@@ -66,7 +66,7 @@ public static class TokenRelicBridgeHelper
             applier,
             cardSource,
             removeExisting,
-            runAfterObtainedOnFirstApply);
+            initializationMode);
     }
 
     public static async Task<TokenRelicBridgePower?> ApplyTokenRelicPower(
@@ -75,7 +75,7 @@ public static class TokenRelicBridgeHelper
         Creature? applier = null,
         CardModel? cardSource = null,
         bool removeExisting = true,
-        bool runAfterObtainedOnFirstApply = false)
+        TokenRelicBridgeInitializationMode initializationMode = TokenRelicBridgeInitializationMode.None)
     {
         if (!CanBridgeTokenRelic(tokenRelicId, out var reason))
         {
@@ -102,7 +102,7 @@ public static class TokenRelicBridgeHelper
         if (power == null)
             throw new InvalidOperationException("Failed to create mutable TokenRelicBridgePower instance.");
 
-        power.Configure(tokenRelicId, runAfterObtainedOnFirstApply);
+        power.Configure(tokenRelicId, initializationMode);
         await PowerCmd.Apply(power, target, 1m, applier, cardSource, false);
         return power;
     }

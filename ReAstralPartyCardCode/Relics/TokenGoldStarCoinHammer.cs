@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -54,7 +55,14 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
         await base.AfterObtained();
         AstralParty_RelicGoldStarCoinHammerTriggeredThisTurn = false;
         if (Owner != null)
+        {
+            if (TokenRelicBridgeInitializationContext.ShouldSkipOneTimeObtainRewards)
+            {
+                InvokeDisplayAmountChanged();
+                return;
+            }
             await TokenEternalStarlight.GrantStacks(Owner, EternalStarlightToGrant);
+        }
         InvokeDisplayAmountChanged();
     }
 

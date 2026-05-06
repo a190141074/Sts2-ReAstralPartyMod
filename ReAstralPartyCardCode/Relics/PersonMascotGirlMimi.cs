@@ -155,7 +155,7 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
             Owner.Creature,
             sourceCard,
             removeExisting: false,
-            runAfterObtainedOnFirstApply: true);
+            initializationMode: TokenRelicBridgeInitializationMode.RunAfterObtainedSkipOneTimeRewards);
 
         if (bridgePower == null)
             return false;
