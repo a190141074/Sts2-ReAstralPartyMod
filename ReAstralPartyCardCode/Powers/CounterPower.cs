@@ -6,6 +6,8 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -33,7 +35,9 @@ public class CounterPower : AstralPartyPowerModel
         {
             // Retaliation damage should not recursively trigger other retaliation-style effects.
             _activeRetaliations++;
-            var retaliateDamage = result.UnblockedDamage + Owner.GetPowerAmount<StrengthPower>();
+            decimal retaliateDamage = result.UnblockedDamage + Owner.GetPowerAmount<StrengthPower>();
+            if (Owner.Player?.GetRelic<PersonalityDerivativePandaMeng>() != null)
+                retaliateDamage += PandaPersonaHelper.GetEnemyAttackIntentSum(Owner);
             if (retaliateDamage <= 0m)
                 return;
 

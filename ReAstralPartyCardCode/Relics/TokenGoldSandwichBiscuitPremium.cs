@@ -21,6 +21,6 @@ public class TokenGoldSandwichBiscuitPremium : AstralPartyRelicModel
             return;
 
         Flash();
-        await CreatureCmd.GainMaxHp(Owner.Creature, MaxHpBonus);
+        await PandaMaxHpHelper.GainMaxHpFromRelic(Owner.Creature, MaxHpBonus, false);
     }
 }

@@ -114,6 +114,7 @@
     <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_large.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_medium.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\famous_blade_medium.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_big_eater.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_bite.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_bite.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_chain_reaction.png" />
@@ -160,6 +161,8 @@
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_vampire_bite.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_vampire_bite.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_living_folio.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\base_ability_chocolate_cake.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\base_ability_hamburger.png" />
     <Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png" />
     <Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png.import" />
     <Content Include="ReAstralPartyMod\images\events\astral_relic_store.png" />
@@ -273,6 +276,7 @@
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_masters_chips.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_ninja_garrote.png" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_panda_meng.png" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_intent.png" />
@@ -305,6 +309,7 @@
     <Content Include="ReAstralPartyMod\images\relic\person_needy_girl.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_oasis_queen.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_oasis_queen.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_panda_meng.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_poisoned_apple.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_poisoned_apple.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_proprietress.png" />

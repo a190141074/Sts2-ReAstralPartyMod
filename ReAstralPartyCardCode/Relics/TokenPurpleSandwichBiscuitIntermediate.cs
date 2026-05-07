@@ -35,7 +35,7 @@ public class TokenPurpleSandwichBiscuitIntermediate : AstralPartyRelicModel
             return;
 
         Flash();
-        await CreatureCmd.GainMaxHp(Owner.Creature, MaxHpBonus);
+        await PandaMaxHpHelper.GainMaxHpFromRelic(Owner.Creature, MaxHpBonus, false);
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
