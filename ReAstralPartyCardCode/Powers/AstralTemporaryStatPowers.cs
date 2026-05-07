@@ -27,7 +27,7 @@ public abstract class AstralTemporaryAppliedPowerBase : ModTemporaryPowerTemplat
 
     public abstract PowerAssetProfile BaseGameAssetProfile { get; }
 
-    protected override IEnumerable<DynamicVar> CanonicalVars =>
+    protected override IEnumerable<DynamicVar> AdditionalCanonicalVars =>
     [
         new RepeatVar(0)
     ];
