@@ -146,5 +146,14 @@ public abstract class CooldownPersonaRelicBase : AstralPartyRelicModel
         RefreshCooldownDisplay();
     }
 
+    internal void AdvanceCooldownProgressFromExternalEffect(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        CounterValue = Math.Min(GetClampedCounter() + amount, GetMaxCounter());
+        RefreshCooldownDisplay();
+    }
+
     protected abstract Task GrantCooldownCard();
 }
