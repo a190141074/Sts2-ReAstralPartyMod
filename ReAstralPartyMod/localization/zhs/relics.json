@@ -1,7 +1,7 @@
 {
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONA_gold_COLLECTION_SUBCATEGORY": "人格遗物",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_WEIRD_EGG.title": "【人格：蒸蛋】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_WEIRD_EGG.description": "· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]麻烦制造者[/gold]加入手中。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_WEIRD_EGG.description": "· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]麻烦制造者[/gold]加入手中。\n· 进入事件房间时，获得[gold]9[/gold]金币。连续进入事件房间时，金币收益连续翻倍。\n· 你触发任意事件卡时，获得[blue]3[/blue]层[gold]星光[/gold]。[gold]麻烦制造者[/gold]除外。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_WEIRD_EGG.flavor": "搜索，解析，确定。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_SAMURAI_PRAWN.title": "【人格：太刀虾】",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_SAMURAI_PRAWN.description": "· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]名刀[/gold]加入手中。\n· 每回合你首次攻击敌人时，获得[blue]1[/blue]层[gold]剑气[/gold]，最多[blue]3[/blue]层",

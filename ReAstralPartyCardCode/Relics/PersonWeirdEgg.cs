@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -20,6 +21,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class PersonWeirdEgg : LegacyCooldownPersonaRelicBase
 {
     private const int EventRoomBaseGoldGain = 9;
+    private const decimal StarLightPerTriggeredEventCard = 3m;
 
     [SavedProperty]
     public int AstralParty_PersonWeirdEggCounter
@@ -56,7 +58,8 @@ public class PersonWeirdEgg : LegacyCooldownPersonaRelicBase
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<SkillTroubleMaker>()
+        HoverTipFactory.FromCard<SkillTroubleMaker>(),
+        HoverTipFactory.FromPower<StarLightPower>()
     ];
 
     public override async Task AfterObtained()
@@ -82,6 +85,26 @@ public class PersonWeirdEgg : LegacyCooldownPersonaRelicBase
         var goldToGain = GetEventRoomGoldGain(AstralParty_PersonWeirdEggConsecutiveEventRooms);
         Flash();
         await PersonaMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
+    }
+
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        if (Owner?.Creature == null)
+            return;
+        if (cardPlay.Card.Owner != Owner)
+            return;
+        if (cardPlay.Card is SkillTroubleMaker)
+            return;
+        if (!AstralEventCardPool.IsEventCard(cardPlay.Card))
+            return;
+
+        Flash();
+        await PowerCmd.Apply<StarLightPower>(
+            Owner.Creature,
+            StarLightPerTriggeredEventCard,
+            Owner.Creature,
+            cardPlay.Card,
+            false);
     }
 
     // Keep the stored value aligned with the shown value so the cooldown is easy to reason about.

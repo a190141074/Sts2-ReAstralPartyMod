@@ -1,9 +1,7 @@
-using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 
@@ -20,8 +18,6 @@ public class SkillTroubleMaker : AstralPartyCardModel
         [ReAstralPartyMod.ReAstralPartyCardCode.Keywords.AstralKeywords.AstralUnique];
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
-
-    protected override IEnumerable<DynamicVar> CanonicalVars => [new IntVar("StarLight", 3)];
 
     public SkillTroubleMaker() : base(
         0,
@@ -51,9 +47,6 @@ public class SkillTroubleMaker : AstralPartyCardModel
             $"{Id.Entry}.play");
 
         if (selectedCard == null) return;
-
-        await PowerCmd.Apply(ModelDb.Power<StarLightPower>().ToMutable(), Owner.Creature,
-            DynamicVars["StarLight"].BaseValue, Owner.Creature, this, false);
 
         var cardToPlay = CombatState.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, Owner);
         await CardCmd.AutoPlay(choiceContext, cardToPlay, Owner.Creature, AutoPlayType.Default, false, true);
