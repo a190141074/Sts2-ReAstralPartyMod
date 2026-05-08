@@ -266,6 +266,26 @@ internal static class GameplayDynamicPatchCatalog
             isCritical: false,
             description: "UI patch: re-apply temporary card highlight after flash",
             patchId: "temporary_card_highlight_flash");
+        builder.AddMethod(
+            typeof(MegaCrit.Sts2.Core.Nodes.Screens.Map.NNormalMapPoint),
+            "_Ready",
+            Type.EmptyTypes,
+            postfix: DynamicPatchBuilder.FromMethod(
+                typeof(JunkBotQuestIconMapPatch),
+                nameof(JunkBotQuestIconMapPatch.Postfix)),
+            isCritical: false,
+            description: "UI patch: replace Junk Bot quest markers with the custom map icon",
+            patchId: "junk_bot_quest_icon_map");
+        builder.AddMethod(
+            typeof(MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen.NMapPointHistoryEntry),
+            nameof(MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen.NMapPointHistoryEntry.SetPlayer),
+            [typeof(MegaCrit.Sts2.Core.Runs.RunHistoryPlayer)],
+            postfix: DynamicPatchBuilder.FromMethod(
+                typeof(JunkBotQuestIconHistoryPatch),
+                nameof(JunkBotQuestIconHistoryPatch.Postfix)),
+            isCritical: false,
+            description: "UI patch: replace Junk Bot completed quest markers in run history",
+            patchId: "junk_bot_quest_icon_history");
     }
 
     private static void RegisterCompatibilityBridgePatches(DynamicPatchBuilder builder)

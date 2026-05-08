@@ -106,6 +106,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_EMOTIONAL_OVERDOSE.description": "获得等同于当前[gold]爱[/gold]层数的[gold]治愈[/gold]和临时[green]敏捷[/green]，持续一回合。\n然后移除所有[gold]爱[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_LIVING_FOLIO.title": "活体书页",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_LIVING_FOLIO.description": "对目标造成{Damage:diff()}点伤害，并施加[blue]1[/blue]层[gold]标记[/gold]。\n此牌返回你的手牌。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_COME_HERE_YOU.title": "过来吧你",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_COME_HERE_YOU.description": "对目标造成[blue]5[/blue]点伤害。\n施加[blue]1[/blue]层[gold]脆弱[/gold]、[blue]1[/blue]层[gold]摧残[/gold]，并使其[red]敏捷[/red]-[blue]7[/blue]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_BIG_EATER.title": "大吃特吃",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_BIG_EATER.description": "随机获得[gold]巧克力蛋糕[/gold]或[gold]汉堡[/gold]中的[blue]1[/blue]张到手中。",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_CHOCOLATE_CAKE.title": "巧克力蛋糕",

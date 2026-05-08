@@ -122,6 +122,7 @@
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_chain_reaction.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_channel_energy.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_channel_energy.png.import" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\skill_come_here_you.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_concealing_operation.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_concealing_operation.png.import" />
     <Content Include="ReAstralPartyMod\images\card_portraits\skill_cyber_angel.png" />
@@ -299,6 +300,7 @@
     <Content Include="ReAstralPartyMod\images\relic\person_ink_shadow_hunter.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_jill_steinle.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_jill_steinle.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\person_junk_bot.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_kawaii_angel.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_mascot_girl_mimi.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_mascot_girl_mimi.png.import" />
@@ -485,6 +487,7 @@
     <Content Include="ReAstralPartyMod\images\relic\token_purple_tasty_candy.png" />
     <Content Include="ReAstralPartyMod\images\relic\token_purple_tasty_candy.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_living_folio.png" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_z3000_weapon_frame.png" />
     <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png" />
     <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png.import" />
     <Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_big.png" />
