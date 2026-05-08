@@ -32,8 +32,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private const string TreasureRelicHolderScenePath = "ui/treasure_relic_holder";
     private const float HolderWidth = 136f;
     private const float HolderHeight = 136f;
-    private const float HandPanelWidth = 180f;
-    private const float HandPanelHeight = 126f;
+    private const int MaxFightTieRounds = 4;
 
     private readonly TaskCompletionSource _completionSource = new();
     private readonly TaskCompletionSource<int> _localChoiceSource = new();
@@ -42,10 +41,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private readonly List<Player> _orderedPlayers;
     private readonly Dictionary<ulong, PlayerSelectionState> _selectionStates = new();
     private readonly Dictionary<ModelId, NTreasureRoomRelicHolder> _holdersById = new();
-    private readonly Dictionary<ulong, PlayerHandPanel> _handPanels = new();
 
     private Control _holderContainer = null!;
-    private Control _handPanelContainer = null!;
     private Label _titleLabel = null!;
     private Label _subtitleLabel = null!;
     private ColorRect _fightBackstop = null!;
@@ -179,14 +176,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _holderContainer.OffsetBottom = -170f;
         AddChild(_holderContainer);
 
-        _handPanelContainer = new Control
-        {
-            Name = "HandPanelContainer",
-            MouseFilter = MouseFilterEnum.Ignore
-        };
-        _handPanelContainer.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-        AddChild(_handPanelContainer);
-
         _fightBackstop = new ColorRect
         {
             Name = "FightBackstop",
@@ -243,41 +232,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
 
         ApplyHolderLayout(_holdersById.Values.OrderBy(holder => holder.Index).ToList(), _relicOptions.Count);
-        BuildHandPanels();
         ConfigureHolderFocusNeighbors();
         RefreshVotes(animate: false);
-        RefreshHandPanels();
-    }
-
-    private void BuildHandPanels()
-    {
-        foreach (var player in _orderedPlayers)
-        {
-            var panel = new PlayerHandPanel(player, LocalContext.IsMe(player));
-            _handPanels[player.NetId] = panel;
-            _handPanelContainer.AddChild(panel.Root);
-        }
-
-        LayoutHandPanels();
-    }
-
-    private void LayoutHandPanels()
-    {
-        var viewport = GetViewportRect().Size;
-        var count = Math.Max(1, _orderedPlayers.Count);
-        var spacing = Math.Max(110f, Math.Min(240f, viewport.X / (count + 1)));
-        var startX = viewport.X * 0.5f - spacing * (count - 1) * 0.5f;
-        var y = viewport.Y - HandPanelHeight - 28f;
-
-        for (var index = 0; index < _orderedPlayers.Count; index++)
-        {
-            var player = _orderedPlayers[index];
-            if (!_handPanels.TryGetValue(player.NetId, out var panel))
-                continue;
-
-            var x = startX + spacing * index - HandPanelWidth * 0.5f;
-            panel.Root.Position = new Vector2(x, y);
-        }
     }
 
     private void AnimateIn()
@@ -299,19 +255,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 holder.MouseFilter = MouseFilterEnum.Stop;
                 holder.Enable();
             })).SetDelay(delay + 0.5f);
-        }
-
-        foreach (var panel in _handPanels.Values)
-        {
-            var originalPosition = panel.Root.Position;
-            panel.Root.Modulate = new Color(1f, 1f, 1f, 0f);
-            panel.Root.Position = originalPosition + new Vector2(0f, 36f);
-
-            var tween = panel.Root.CreateTween().SetParallel();
-            tween.TweenProperty(panel.Root, "modulate", Colors.White, 0.28f).SetDelay(0.12f);
-            tween.TweenProperty(panel.Root, "position", originalPosition, 0.35f).SetDelay(0.12f)
-                .SetTrans(Tween.TransitionType.Cubic)
-                .SetEase(Tween.EaseType.Out);
         }
     }
 
@@ -391,7 +334,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         state.SelectedRelic = selectedRelic;
         state.SelectionResolved = true;
         RefreshVotes();
-        RefreshHandPanels();
     }
 
     private void SaveAllOptionsAsSeen()
@@ -493,6 +435,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         var contenders = players.ToHashSet();
         var roundIndex = 0;
+        var tieRounds = 0;
         while (contenders.Count > 1)
         {
             var round = new RelicPickingFightRound();
@@ -520,11 +463,24 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             var distinctMoves = round.moves.OfType<RelicPickingFightMove>().Distinct().ToList();
             if (distinctMoves.Count == 2)
             {
+                tieRounds = 0;
                 var losingMove = GetLosingMove(distinctMoves[0], distinctMoves[1]);
                 for (var i = 0; i < players.Count; i++)
                 {
                     if (round.moves[i] == losingMove)
                         contenders.Remove(players[i]);
+                }
+            }
+            else
+            {
+                tieRounds++;
+                if (tieRounds >= MaxFightTieRounds)
+                {
+                    var resolvedWinner = BreakFightTieDeterministically(contenders, relic, roundIndex);
+                    contenders.Clear();
+                    contenders.Add(resolvedWinner);
+                    MainFile.Logger.Info(
+                        $"Starting persona selection fight tie-break resolved for relic '{relic.Id.Entry}' after {tieRounds} tied rounds: player {resolvedWinner.NetId}.");
                 }
             }
 
@@ -540,6 +496,19 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         };
     }
 
+    private Player BreakFightTieDeterministically(IReadOnlyCollection<Player> contenders, RelicModel relic, int roundIndex)
+    {
+        return DeterministicMultiplayerChoiceHelper.OrderDeterministically(
+                contenders.ToList(),
+                player => player.NetId.ToString(),
+                MainFile.ModId,
+                "starting_persona_fight_tiebreak",
+                _runState.Rng.StringSeed,
+                relic.Id.Entry,
+                roundIndex)
+            .First();
+    }
+
     private static RelicPickingFightMove GetLosingMove(RelicPickingFightMove move1, RelicPickingFightMove move2)
     {
         return (int)(move1 + 1) % 3 == (int)move2 ? move1 : move2;
@@ -553,16 +522,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             holder.Disable();
             holder.SetFocusMode(FocusModeEnum.None);
-        }
-
-        foreach (var state in _selectionStates.Values)
-        {
-            if (!_handPanels.TryGetValue(state.Player.NetId, out var panel))
-                continue;
-
-            panel.SetLockedState(state.SelectedRelic == null
-                ? "已跳过"
-                : $"锁定：{state.SelectedRelic.Title.GetFormattedText()}");
         }
 
         RelicPickingResultType? previousType = null;
@@ -589,7 +548,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 await ToSignal(tween, Tween.SignalName.Finished);
 
                 if (result.fight != null)
-                    await AnimateFightRoundsAsync(result.fight);
+                    await AnimateFightSummaryAsync(result.fight);
 
                 await AnimateAwardResultAsync(holder, result.player, "猜拳胜出");
 
@@ -613,64 +572,34 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             await Cmd.Wait(0.7f);
     }
 
-    private async Task AnimateFightRoundsAsync(RelicPickingFight fight)
+    private async Task AnimateFightSummaryAsync(RelicPickingFight fight)
     {
-        foreach (var panel in _handPanels.Values)
-            panel.ClearMove();
-
         for (var roundIndex = 0; roundIndex < fight.rounds.Count; roundIndex++)
         {
             var round = fight.rounds[roundIndex];
-            _fightLabel.Text = $"猜拳第 {roundIndex + 1} 轮";
-
-            for (var i = 0; i < fight.playersInvolved.Count; i++)
-            {
-                var player = fight.playersInvolved[i];
-                if (!_handPanels.TryGetValue(player.NetId, out var panel))
-                    continue;
-
-                var move = i < round.moves.Count ? round.moves[i] : null;
-                panel.SetFightMove(move);
-            }
-
-            await Cmd.Wait(0.9f);
+            _fightLabel.Text = BuildFightRoundText(roundIndex, fight.playersInvolved, round);
+            await Cmd.Wait(1.2f);
 
             var activeMoves = round.moves.OfType<RelicPickingFightMove>().Distinct().ToList();
             if (activeMoves.Count == 2)
             {
                 var losingMove = GetLosingMove(activeMoves[0], activeMoves[1]);
-                for (var i = 0; i < fight.playersInvolved.Count; i++)
-                {
-                    var player = fight.playersInvolved[i];
-                    if (!_handPanels.TryGetValue(player.NetId, out var panel))
-                        continue;
-
-                    if (i >= round.moves.Count || round.moves[i] == null)
-                        continue;
-
-                    panel.SetEliminated(round.moves[i] == losingMove);
-                }
+                _fightLabel.Text = $"第 {roundIndex + 1} 轮结束：{FormatMove(losingMove)} 落败";
             }
             else
             {
-                foreach (var player in fight.playersInvolved)
-                {
-                    if (_handPanels.TryGetValue(player.NetId, out var panel))
-                        panel.SetRoundDraw();
-                }
+                _fightLabel.Text = roundIndex + 1 >= MaxFightTieRounds
+                    ? $"第 {roundIndex + 1} 轮结束：平局过多，改为稳定判定归属"
+                    : $"第 {roundIndex + 1} 轮结束：平局，继续";
             }
 
             await Cmd.Wait(0.7f);
         }
-
-        foreach (var panel in _handPanels.Values)
-            panel.ClearMove();
     }
 
     private async Task AnimateAwardResultAsync(NTreasureRoomRelicHolder holder, Player player, string reason)
     {
-        if (_handPanels.TryGetValue(player.NetId, out var panel))
-            panel.SetLockedState(reason);
+        _fightLabel.Text = $"玩家 {player.NetId} {reason}";
 
         var targetPosition = ResolvePlayerAnchorPosition(player, holder.Size);
         var tween = CreateTween().SetParallel();
@@ -691,13 +620,16 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private Vector2 ResolvePlayerAnchorPosition(Player player, Vector2 holderSize)
     {
-        if (!_handPanels.TryGetValue(player.NetId, out var panel))
-            return new Vector2(0f, 0f);
+        var playerIndex = _orderedPlayers.FindIndex(entry => entry.NetId == player.NetId);
+        if (playerIndex < 0)
+            playerIndex = 0;
 
-        var anchor = panel.Root.GlobalPosition + new Vector2(
-            (HandPanelWidth - holderSize.X) * 0.5f,
-            -holderSize.Y * 0.2f);
-        return anchor;
+        var viewport = GetViewportRect().Size;
+        var spacing = Math.Max(220f, viewport.X / Math.Max(2, _orderedPlayers.Count + 1));
+        var startX = viewport.X * 0.5f - spacing * (_orderedPlayers.Count - 1) * 0.5f;
+        var x = startX + spacing * playerIndex - holderSize.X * 0.5f;
+        var y = viewport.Y - holderSize.Y - 72f;
+        return new Vector2(x, y);
     }
 
     private async Task AwardRelicsAsync(List<RelicPickingResult> results)
@@ -715,9 +647,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 $"Starting persona selection awarding relic '{relic.Id.Entry}' to player {result.player.NetId}.");
             await RelicCmd.Obtain(relic, result.player);
             awardedResults.Add((result.player, relic));
-
-            if (_handPanels.TryGetValue(result.player.NetId, out var panel))
-                panel.SetLockedState($"已获得：{relic.Title.GetFormattedText()}");
         }
 
         await PersistStartingPersonaSelectionAsync(awardedResults);
@@ -767,29 +696,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         foreach (var holder in _holdersById.Values)
             holder.VoteContainer.RefreshPlayerVotes(animate);
-    }
-
-    private void RefreshHandPanels()
-    {
-        foreach (var state in _selectionStates.Values.OrderBy(entry => entry.Player.NetId))
-        {
-            if (!_handPanels.TryGetValue(state.Player.NetId, out var panel))
-                continue;
-
-            if (!state.SelectionResolved)
-            {
-                panel.SetWaitingState();
-                continue;
-            }
-
-            if (state.SelectedRelic == null)
-            {
-                panel.SetSkippedState();
-                continue;
-            }
-
-            panel.SetSelectedState(state.SelectedRelic.Title.GetFormattedText());
-        }
     }
 
     private bool PlayerSelectedHolder(Player player, int holderIndex)
@@ -862,147 +768,27 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         public bool SelectionResolved { get; set; }
     }
 
-    private sealed class PlayerHandPanel
+    private string BuildFightRoundText(int roundIndex, IReadOnlyList<Player> players, RelicPickingFightRound round)
     {
-        private readonly Color _localColor = new(0.92f, 0.86f, 0.58f, 0.95f);
-        private readonly Color _remoteColor = new(0.26f, 0.22f, 0.16f, 0.88f);
-        private readonly Color _eliminatedColor = new(0.28f, 0.12f, 0.12f, 0.9f);
-
-        public PlayerHandPanel(Player player, bool isLocal)
+        var parts = new List<string>(players.Count);
+        for (var index = 0; index < players.Count; index++)
         {
-            Root = new PanelContainer
-            {
-                Name = $"PlayerHandPanel_{player.NetId}",
-                MouseFilter = MouseFilterEnum.Ignore,
-                Visible = true,
-                CustomMinimumSize = new Vector2(HandPanelWidth, HandPanelHeight)
-            };
-            Root.SetAnchorsAndOffsetsPreset(LayoutPreset.TopLeft);
-            Root.Modulate = Colors.White;
-
-            var background = new ColorRect
-            {
-                Name = "PanelBackground",
-                Color = isLocal ? _localColor : _remoteColor,
-                MouseFilter = MouseFilterEnum.Ignore
-            };
-            background.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-            Root.AddChild(background);
-            Root.MoveChild(background, 0);
-            Background = background;
-
-            var layout = new VBoxContainer
-            {
-                Name = "Layout",
-                MouseFilter = MouseFilterEnum.Ignore,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                SizeFlagsVertical = SizeFlags.ExpandFill
-            };
-            layout.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-            layout.OffsetLeft = 12f;
-            layout.OffsetTop = 10f;
-            layout.OffsetRight = -12f;
-            layout.OffsetBottom = -10f;
-            layout.AddThemeConstantOverride("separation", 4);
-            Root.AddChild(layout);
-
-            NameLabel = new Label
-            {
-                Text = isLocal ? $"你 ({player.NetId})" : $"玩家 {player.NetId}",
-                ThemeTypeVariation = "HeaderSmall"
-            };
-            layout.AddChild(NameLabel);
-
-            HandLabel = new Label
-            {
-                Text = "手势：待命",
-                ThemeTypeVariation = "HeaderMedium",
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-            layout.AddChild(HandLabel);
-
-            StatusLabel = new Label
-            {
-                Text = "等待选择",
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                SizeFlagsVertical = SizeFlags.ExpandFill
-            };
-            layout.AddChild(StatusLabel);
+            var move = index < round.moves.Count ? round.moves[index] : null;
+            var moveText = move == null ? "离场" : FormatMove(move.Value);
+            parts.Add($"{players[index].NetId}:{moveText}");
         }
 
-        public PanelContainer Root { get; }
+        return $"猜拳第 {roundIndex + 1} 轮\n{string.Join("  ", parts)}";
+    }
 
-        private ColorRect Background { get; }
-
-        private Label NameLabel { get; }
-
-        private Label HandLabel { get; }
-
-        private Label StatusLabel { get; }
-
-        public void SetWaitingState()
+    private static string FormatMove(RelicPickingFightMove move)
+    {
+        return move switch
         {
-            Background.Color = NameLabel.Text.StartsWith("你", StringComparison.Ordinal) ? _localColor : _remoteColor;
-            HandLabel.Text = "手势：待命";
-            StatusLabel.Text = "等待选择";
-        }
-
-        public void SetSelectedState(string relicTitle)
-        {
-            Background.Color = NameLabel.Text.StartsWith("你", StringComparison.Ordinal) ? _localColor : _remoteColor;
-            HandLabel.Text = "手势：伸手";
-            StatusLabel.Text = $"已选择\n{relicTitle}";
-        }
-
-        public void SetSkippedState()
-        {
-            Background.Color = NameLabel.Text.StartsWith("你", StringComparison.Ordinal) ? _localColor : _remoteColor;
-            HandLabel.Text = "手势：收回";
-            StatusLabel.Text = "已跳过";
-        }
-
-        public void SetLockedState(string text)
-        {
-            Background.Color = NameLabel.Text.StartsWith("你", StringComparison.Ordinal) ? _localColor : _remoteColor;
-            StatusLabel.Text = text;
-        }
-
-        public void SetFightMove(RelicPickingFightMove? move)
-        {
-            Background.Color = NameLabel.Text.StartsWith("你", StringComparison.Ordinal) ? _localColor : _remoteColor;
-            HandLabel.Text = move == null
-                ? "手势：离场"
-                : $"手势：{FormatMove(move.Value)}";
-            StatusLabel.Text = move == null ? "未参与" : "猜拳中";
-        }
-
-        public void SetEliminated(bool eliminated)
-        {
-            Background.Color = eliminated ? _eliminatedColor : (NameLabel.Text.StartsWith("你", StringComparison.Ordinal) ? _localColor : _remoteColor);
-            StatusLabel.Text = eliminated ? "本轮落败" : "继续争夺";
-        }
-
-        public void SetRoundDraw()
-        {
-            StatusLabel.Text = "平局，继续";
-        }
-
-        public void ClearMove()
-        {
-            HandLabel.Text = "手势：待命";
-        }
-
-        private static string FormatMove(RelicPickingFightMove move)
-        {
-            return move switch
-            {
-                RelicPickingFightMove.Rock => "石头",
-                RelicPickingFightMove.Paper => "布",
-                RelicPickingFightMove.Scissors => "剪刀",
-                _ => move.ToString()
-            };
-        }
+            RelicPickingFightMove.Rock => "石头",
+            RelicPickingFightMove.Paper => "布",
+            RelicPickingFightMove.Scissors => "剪刀",
+            _ => move.ToString()
+        };
     }
 }
