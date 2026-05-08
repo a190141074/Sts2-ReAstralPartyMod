@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
@@ -16,6 +17,9 @@ public class SkillChannelEnergy : AstralPartyCardModel
     private const decimal BaseHealAmount = 2m;
     private const decimal HealPerGatheringStrengthStack = 2m;
     private const decimal AttackDamageBonusThisTurn = 4m;
+
+    protected override IEnumerable<DynamicVar> CanonicalVars =>
+        [new HealVar(BaseHealAmount)];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [AstralKeywords.AstralUnique];

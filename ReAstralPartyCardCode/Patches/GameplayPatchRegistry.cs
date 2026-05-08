@@ -295,6 +295,17 @@ internal static class GameplayDynamicPatchCatalog
 
     private static void RegisterMultiplayerPatches(DynamicPatchBuilder builder)
     {
+        builder.AddMethod(
+            typeof(MegaCrit.Sts2.Core.Models.ActModel),
+            "PullNextEvent",
+            [typeof(RunState)],
+            postfix: DynamicPatchBuilder.FromMethod(
+                typeof(AstralRelicStoreEventOverridePatch),
+                nameof(AstralRelicStoreEventOverridePatch.PullNextEventPostfix)),
+            isCritical: false,
+            description: "Gameplay patch: override the first second-act event pull to Astral Relic Store",
+            patchId: "astral_relic_store_pull_next_event_override");
+
         var clampLobbySizePrefix = DynamicPatchBuilder.FromMethod(
             typeof(MultiplayerPlayerLimitPatch),
             nameof(MultiplayerPlayerLimitPatch.ClampLobbySize));

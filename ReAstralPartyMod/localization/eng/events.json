@@ -1,0 +1,16 @@
+{
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.title": "Token Shop",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.description": "A makeshift stall blocks the roadside, its shelves lined with polished token packs.\n\nThe shopkeeper barely lifts a hand, as if they already expected you.\n\n\"Buy fast. No haggling here. Just show me how much gold you're willing to spend.\"",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.BLUE_PACK.title": "[Blue Rare]",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.BLUE_PACK.description": "Pay [gold]50[/gold] Gold. Obtain [◈ Token Pack].",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.GOLD_PACK.title": "[Purple Epic]",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.GOLD_PACK.description": "Pay [gold]75[/gold] Gold. Obtain [◈◈ Token Pack].",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.PURPLE_PACK.title": "[Golden Legend]",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.PURPLE_PACK.description": "Pay [gold]100[/gold] Gold. Obtain [◈◈◈ Token Pack].",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.INITIAL_POINT.title": "[Fine, take this instead]",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.INITIAL_POINT.description": "Pay [gold]1[/gold] Gold. Obtain [Initial Point].",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.BLUE_PACK_FINISH.description": "You slap the gold onto the counter and trade it for a [◈ Token Pack].\n\nThe shopkeeper nods. \"You know what you're buying. Bring more gold next time if you want bigger odds.\"",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.GOLD_PACK_FINISH.description": "You take the heavier [◈◈ Token Pack].\n\nThe shopkeeper weighs the coins in hand. \"That one was worth the price.\"",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.PURPLE_PACK_FINISH.description": "You buy the most expensive [◈◈◈ Token Pack] without hesitation.\n\nThe shopkeeper smiles. \"Now that's someone willing to spend properly.\"",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL_POINT_FINISH.description": "The shopkeeper stares at your single coin for a moment, then shoves [Initial Point] into your hands.\n\n\"A bargain's a bargain. Take it and move along.\""
+}
