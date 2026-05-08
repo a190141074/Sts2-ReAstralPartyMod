@@ -44,23 +44,28 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         if (Owner == null || player != Owner)
             return false;
 
-        options.Add(new InitialPointRestSiteOption(player, this));
+        options.Add(new InitialPointRestSiteOption(player));
         return true;
     }
 
-    public bool IsRestSiteOptionEnabled()
+    public bool IsRestSiteOptionEnabled(Player player)
     {
-        return Owner != null && (IsMaxedAscension() || Owner.Gold >= GetCurrentAscensionCost());
+        return Owner != null
+               && player == Owner
+               && (IsMaxedAscension() || player.Gold >= GetCurrentAscensionCost());
     }
 
-    public LocString BuildRestSiteDescription()
+    public LocString BuildRestSiteDescription(Player player)
     {
+        if (Owner == null || player != Owner)
+            return new LocString("rest_site_ui", $"OPTION_{InitialPointRestSiteOption.OptionKey}.description_stage1");
+
         return new LocString("rest_site_ui", GetDescriptionKey());
     }
 
-    public async Task<bool> ResolveRestSiteOptionSelection()
+    public async Task<bool> ResolveRestSiteOptionSelection(Player player)
     {
-        if (Owner?.Creature == null)
+        if (Owner?.Creature == null || player != Owner)
             return false;
 
         Flash();
@@ -68,20 +73,20 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         if (!IsMaxedAscension())
         {
             var goldCost = GetCurrentAscensionCost();
-            if (Owner.Gold < goldCost)
+            if (player.Gold < goldCost)
                 return false;
 
-            var reward = GetRandomAscensionReward();
+            var reward = GetRandomAscensionReward(player);
             if (reward == null)
                 return false;
 
-            await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, Owner, GoldLossType.Spent);
-            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, reward);
+            await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, player, GoldLossType.Spent);
+            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(player, reward);
             AstralParty_TokenGoldInitialPointAscensionCount =
                 Math.Min(MaxAscensions, AstralParty_TokenGoldInitialPointAscensionCount + 1);
         }
 
-        await HealOwner();
+        await HealPlayer(player);
         return true;
     }
 
@@ -113,30 +118,33 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         };
     }
 
-    private async Task HealOwner()
+    private async Task HealPlayer(Player player)
     {
-        var healAmount = Math.Max(1m, Math.Ceiling(Owner!.Creature.MaxHp * HealPercent));
-        await CreatureCmd.Heal(Owner.Creature, healAmount, true);
+        if (player.Creature == null)
+            return;
+
+        var healAmount = Math.Max(1m, Math.Ceiling(player.Creature.MaxHp * HealPercent));
+        await CreatureCmd.Heal(player.Creature, healAmount, true);
     }
 
-    private RelicModel? GetRandomAscensionReward()
+    private RelicModel? GetRandomAscensionReward(Player player)
     {
-        if (Owner == null)
+        if (Owner == null || player != Owner)
             return null;
 
-        var rng = Owner.PlayerRng.Rewards;
+        var rng = player.PlayerRng.Rewards;
         var rolledRarity = RollAscensionRewardRarity(rng);
 
         foreach (var rarity in GetRaritySelectionOrder(rolledRarity))
         {
-            var unownedCandidates = GetCandidates(rarity, true);
+            var unownedCandidates = GetCandidates(player, rarity, true);
             if (unownedCandidates.Count > 0)
                 return unownedCandidates[rng.NextInt(unownedCandidates.Count)];
         }
 
         foreach (var rarity in GetRaritySelectionOrder(rolledRarity))
         {
-            var anyCandidates = GetCandidates(rarity, false);
+            var anyCandidates = GetCandidates(player, rarity, false);
             if (anyCandidates.Count > 0)
                 return anyCandidates[rng.NextInt(anyCandidates.Count)];
         }
@@ -165,23 +173,23 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
                 yield return fallback;
     }
 
-    private List<RelicModel> GetCandidates(RelicRarity rarity, bool excludeOwned)
+    private List<RelicModel> GetCandidates(Player player, RelicRarity rarity, bool excludeOwned)
     {
-        return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(Owner?.RunState, rarity)
-            .Where(relic => IsValidRewardCandidate(relic, excludeOwned))
+        return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(player.RunState, rarity)
+            .Where(relic => IsValidRewardCandidate(player, relic, excludeOwned))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
     }
 
-    private bool IsValidRewardCandidate(RelicModel relic, bool excludeOwned)
+    private bool IsValidRewardCandidate(Player player, RelicModel relic, bool excludeOwned)
     {
-        if (Owner == null)
+        if (Owner == null || player != Owner)
             return false;
         if (relic.Rarity is not (RelicRarity.Common or RelicRarity.Uncommon or RelicRarity.Rare))
             return false;
         if (relic.CanonicalInstance.Id == CanonicalInstance.Id)
             return false;
 
-        return !excludeOwned || Owner.Relics.All(owned => owned.CanonicalInstance.Id != relic.CanonicalInstance.Id);
+        return !excludeOwned || player.Relics.All(owned => owned.CanonicalInstance.Id != relic.CanonicalInstance.Id);
     }
 }
