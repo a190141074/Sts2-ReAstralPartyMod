@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -35,6 +36,12 @@ public class TokenPurpleSandwichBiscuitIntermediate : AstralPartyRelicModel
             return;
 
         Flash();
+        if (TokenRelicBridgeInitializationContext.ShouldSkipOneTimeObtainRewards)
+        {
+            await CreatureCmd.GainBlock(Owner.Creature, MaxHpBonus, ValueProp.Move, null);
+            return;
+        }
+
         await PandaMaxHpHelper.GainMaxHpFromRelic(Owner.Creature, MaxHpBonus, false);
     }
 
