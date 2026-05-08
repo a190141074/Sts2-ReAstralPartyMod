@@ -19,6 +19,9 @@ public static class PersonaRelicRegistry
         .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
         .OrderBy(relic => (relic.CanonicalInstance?.Id ?? relic.Id).Entry, StringComparer.Ordinal)
         .ToList();
+    private static readonly HashSet<ModelId> PersonaRelicIds = PersonaRelics
+        .Select(relic => relic.CanonicalInstance?.Id ?? relic.Id)
+        .ToHashSet();
 
     public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelics()
     {
@@ -31,17 +34,17 @@ public static class PersonaRelicRegistry
             return false;
 
         var id = relic.CanonicalInstance?.Id ?? relic.Id;
-        return PersonaRelics.Any(candidate => (candidate.CanonicalInstance?.Id ?? candidate.Id) == id);
+        return PersonaRelicIds.Contains(id);
     }
 
     public static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(Player owner)
     {
         var ownedRelicIds = owner.Relics
-            .Select(relic => relic.CanonicalInstance.Id)
+            .Select(relic => relic.CanonicalInstance?.Id ?? relic.Id)
             .ToHashSet();
 
         return GetCanonicalPersonaRelics()
-            .Where(relic => !ownedRelicIds.Contains(relic.Id))
+            .Where(relic => !ownedRelicIds.Contains(relic.CanonicalInstance?.Id ?? relic.Id))
             .ToList();
     }
 }

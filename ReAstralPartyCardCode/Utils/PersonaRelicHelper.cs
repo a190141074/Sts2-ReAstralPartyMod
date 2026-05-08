@@ -1,5 +1,3 @@
-using System;
-using System.Reflection;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -30,21 +28,5 @@ public static class PersonaRelicHelper
                     bionicJasmine.AddSteps(amount);
                     break;
             }
-    }
-
-    public static void RefreshRelicDisplayAmount(object relic)
-    {
-        for (var currentType = relic.GetType(); currentType != null; currentType = currentType.BaseType)
-        {
-            var refreshMethod = currentType.GetMethod(
-                "InvokeDisplayAmountChanged",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            );
-            if (refreshMethod == null)
-                continue;
-
-            refreshMethod.Invoke(relic, null);
-            return;
-        }
     }
 }

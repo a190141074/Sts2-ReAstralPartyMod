@@ -109,13 +109,20 @@ public static class TokenRelicRegistry
         typeof(TokenExclusiveVengeanceHalberd),
         typeof(TokenExclusiveZuoTeaCake)
     ];
+    private static readonly IReadOnlyList<RelicModel> CanonicalTokenRelics = TokenRelicTypes
+        .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
+        .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
+        .ToList();
+    private static readonly HashSet<ModelId> TokenRelicIds = CanonicalTokenRelics
+        .Select(relic => relic.CanonicalInstance?.Id ?? relic.Id)
+        .ToHashSet();
+    private static readonly HashSet<ModelId> SeriesTokenRelicIds = SeriesTokenRelicTypes
+        .Select(ModelDb.GetId)
+        .ToHashSet();
 
     public static IReadOnlyList<RelicModel> GetCanonicalTokenRelics()
     {
-        return TokenRelicTypes
-            .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
-            .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
-            .ToList();
+        return CanonicalTokenRelics;
     }
 
     public static IReadOnlyList<RelicModel> GetTokenRelicsByRarity(RelicRarity rarity)
@@ -155,13 +162,14 @@ public static class TokenRelicRegistry
 
     public static bool IsTokenRelic(RelicModel relic)
     {
-        return TokenRelicTypes.Any(type => ModelDb.GetId(type) == relic.CanonicalInstance.Id);
+        var id = relic.CanonicalInstance?.Id ?? relic.Id;
+        return TokenRelicIds.Contains(id);
     }
 
     public static bool IsSeriesTokenRelic(RelicModel relic)
     {
         var id = relic.CanonicalInstance?.Id ?? relic.Id;
-        return SeriesTokenRelicTypes.Any(type => ModelDb.GetId(type) == id);
+        return SeriesTokenRelicIds.Contains(id);
     }
 
     public static bool IsDiceSeriesRelic(RelicModel relic)
