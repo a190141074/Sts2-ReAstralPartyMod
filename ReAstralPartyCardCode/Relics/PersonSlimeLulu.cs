@@ -83,12 +83,12 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         );
     }
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    public override async Task BeforeSideTurnStart(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        CombatState combatState)
     {
-        if (player != Owner)
-            return;
-
-        if (Owner?.Creature?.CombatState == null)
+        if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
             return;
 
         if (AstralParty_PersonSlimeLuluPendingCombatStartCard)

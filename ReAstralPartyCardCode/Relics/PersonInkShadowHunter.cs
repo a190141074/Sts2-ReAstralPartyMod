@@ -81,15 +81,13 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
         await PowerCmd.Apply<HuntersFeastPower>(Owner.Creature, feastAmount, Owner.Creature, null);
     }
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    public override async Task BeforeSideTurnStart(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        CombatState combatState)
     {
-        if (player != Owner || Owner?.Creature?.CombatState == null || Owner.Creature == null)
+        if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
             return;
-
-        // Reset the attack-triggered shadow quota at the start of this player's turn.
-        AstralParty_PersonInkShadowHunterAttackTriggerCountThisTurn = 0;
-        await SyncAttackLimitPower();
-        await ApplyTwinShadowToRandomEnemy();
 
         if (AstralParty_PersonInkShadowHunterPendingCombatStartCard)
         {
@@ -106,6 +104,17 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
         AstralParty_PersonInkShadowHunterCounter = 1;
         AstralParty_PersonInkShadowHunterPendingCombatStartCard = false;
         InvokeDisplayAmountChanged();
+    }
+
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    {
+        if (player != Owner || Owner?.Creature?.CombatState == null || Owner.Creature == null)
+            return;
+
+        // Keep non-card turn-start effects after the normal draw.
+        AstralParty_PersonInkShadowHunterAttackTriggerCountThisTurn = 0;
+        await SyncAttackLimitPower();
+        await ApplyTwinShadowToRandomEnemy();
     }
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)

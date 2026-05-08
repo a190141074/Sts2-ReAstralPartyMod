@@ -22,6 +22,7 @@ using STS2RitsuLib;
 using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Models;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 

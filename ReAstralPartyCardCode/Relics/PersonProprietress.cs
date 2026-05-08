@@ -142,9 +142,12 @@ public class PersonProprietress : AstralPartyRelicModel
         await PersonaMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
     }
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    public override async Task BeforeSideTurnStart(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        CombatState combatState)
     {
-        if (player != Owner || Owner?.Creature?.CombatState == null)
+        if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
             return;
 
         if (AstralParty_PersonProprietressPendingCombatStartTrigger)

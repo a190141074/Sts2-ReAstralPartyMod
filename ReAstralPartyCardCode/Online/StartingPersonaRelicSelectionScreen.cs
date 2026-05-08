@@ -22,7 +22,7 @@ using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
-namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOverlayScreen, IScreenContext
 {

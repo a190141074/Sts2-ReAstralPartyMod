@@ -26,12 +26,16 @@ public abstract class CooldownPersonaRelicBase : AstralPartyRelicModel
         RefreshCooldownDisplay();
     }
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    public override async Task BeforeSideTurnStart(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        CombatState combatState)
     {
-        if (player != Owner || Owner?.Creature?.CombatState == null)
+        var owner = Owner;
+        if (owner?.Creature?.CombatState == null || side != owner.Creature.Side)
             return;
 
-        await BeforeCooldownCardCheck(choiceContext, player);
+        await BeforeCooldownCardCheck(choiceContext, owner);
 
         if (PendingCombatStartCard)
         {

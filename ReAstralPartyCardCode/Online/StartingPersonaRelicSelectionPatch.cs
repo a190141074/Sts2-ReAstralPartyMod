@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
+using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
-namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 [HarmonyPatch(typeof(NGame), "StartRun")]
 public static class StartingPersonaRelicSelectionPatch
@@ -22,6 +23,11 @@ public static class StartingPersonaRelicSelectionPatch
     private static async Task RunAfterStartRun(Task originalTask, RunState runState)
     {
         await originalTask;
+        if (!ShouldOpenStartingPersonaRelicSelection(runState, out var skipReason))
+        {
+            MainFile.Logger.Info($"Starting persona relic selection skipped: {skipReason}.");
+            return;
+        }
 
         var overlayStack = NOverlayStack.Instance;
         if (overlayStack == null)
@@ -49,6 +55,27 @@ public static class StartingPersonaRelicSelectionPatch
         {
             screen.Close();
         }
+    }
+
+    private static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)
+    {
+        var existingPersonaOwners = runState.Players
+            .Where(player => player.Relics.Any(IsOwnedPersonaRelic))
+            .Select(player => player.NetId)
+            .ToList();
+        if (existingPersonaOwners.Count > 0)
+        {
+            reason = $"players already own persona relics ({string.Join(", ", existingPersonaOwners)})";
+            return false;
+        }
+
+        reason = "fresh run without persona relics detected";
+        return true;
+    }
+
+    private static bool IsOwnedPersonaRelic(RelicModel relic)
+    {
+        return PersonaRelicRegistry.IsPersonaRelic(relic.CanonicalInstance ?? relic);
     }
 
     private static IReadOnlyList<RelicModel> CreateStartingPersonaRelicOptions(RunState runState)

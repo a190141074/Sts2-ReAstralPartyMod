@@ -6,7 +6,7 @@ using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
 
-namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 // Legacy reference helper for the old treasure-room-style shared relic flow.
 // The current starting persona selection no longer uses this as its main synchronization path.
