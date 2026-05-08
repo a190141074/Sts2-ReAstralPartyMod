@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Gold;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Runs;
@@ -47,9 +48,13 @@ public sealed class AstralRelicStore : AstralPartyEventModel
     private EventOption CreatePurchaseOption<TRelic>(decimal cost, Func<Task> onChosen, string optionKey)
         where TRelic : RelicModel
     {
+        var hoverTips = HoverTipFactory.FromRelic(ModelDb.Relic<TRelic>()).ToArray();
+        var canAfford = Owner != null && Owner.Gold >= cost;
+
         MainFile.Logger.Info(
-            $"AstralRelicStore CreatePurchaseOption | impl={ImplementationVersion} | relic={typeof(TRelic).Name} | cost={cost} | option={optionKey}");
-        return new EventOption(this, onChosen, InitialOptionKey(optionKey));
+            $"AstralRelicStore CreatePurchaseOption | impl={ImplementationVersion} | relic={typeof(TRelic).Name} | cost={cost} | option={optionKey} | can_afford={canAfford}");
+
+        return new EventOption(this, canAfford ? onChosen : null, InitialOptionKey(optionKey), hoverTips);
     }
 
     private Task BuyBluePack()

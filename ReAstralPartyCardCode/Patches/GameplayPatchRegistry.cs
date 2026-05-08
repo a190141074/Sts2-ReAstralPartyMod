@@ -96,7 +96,21 @@ internal static class GameplayStaticPatchCatalog
                 typeof(NTopBarOpenTokenSeriesPatch),
                 isCritical: false,
                 description: "UI patch: append current open token series icon to the normal-mode top bar",
-                parameterTypes: [typeof(IRunState)])
+                parameterTypes: [typeof(IRunState)]),
+            new ModPatchInfo(
+                "event_option_locked_hover_focus_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
+                "OnFocus",
+                typeof(EventOptionLockedHoverFocusPatch),
+                isCritical: false,
+                description: "UI patch: allow locked event options with hover data to still show hover tips"),
+            new ModPatchInfo(
+                "event_option_locked_hover_unfocus_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
+                "OnUnfocus",
+                typeof(EventOptionLockedHoverUnfocusPatch),
+                isCritical: false,
+                description: "UI patch: clean up hover tips for locked event options")
         ]);
     }
 
