@@ -23,9 +23,9 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonProprietress : AstralPartyRelicModel
+public class PersonProprietress : CooldownPersonaRelicBase
 {
-    private const int BaseMaxCounter = 3;
+    private const int ProprietressBaseMaxCounter = 3;
     private const int ShopGoldGainStep = 10;
     private const int DiscountChancePerShopPercent = 3;
     private const decimal DiscountedPriceMultiplier = 0.3m;
@@ -104,28 +104,31 @@ public class PersonProprietress : AstralPartyRelicModel
         }
     }
 
+    protected override int CounterValue
+    {
+        get => AstralParty_PersonProprietressCounter;
+        set => AstralParty_PersonProprietressCounter = value;
+    }
+
+    protected override bool PendingCombatStartCard
+    {
+        get => AstralParty_PersonProprietressPendingCombatStartTrigger;
+        set => AstralParty_PersonProprietressPendingCombatStartTrigger = value;
+    }
+
     public override RelicRarity Rarity => RelicRarity.Ancient;
-
-    public override bool ShowCounter => Owner?.Creature?.CombatState != null;
-
-    public override bool ShouldReceiveCombatHooks => true;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillTransfer>()
     ];
 
-    // Keep the combat display aligned with the actual cooldown progress.
-    public override int DisplayAmount => GetClampedCounter();
+    protected override int BaseMaxCounter => ProprietressBaseMaxCounter;
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonProprietressCounter = 1;
-        // Newly obtained cooldown relics should grant their first card on the next player turn start.
-        AstralParty_PersonProprietressPendingCombatStartTrigger = true;
         AstralParty_PersonProprietressVisitedShops = 0;
-        InvokeDisplayAmountChanged();
 
         await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeProprietressWealthism>(
             Owner);
@@ -140,48 +143,6 @@ public class PersonProprietress : AstralPartyRelicModel
         var goldToGain = ShopGoldGainStep;
         Flash();
         await PersonaMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
-    }
-
-    public override async Task BeforeSideTurnStart(
-        PlayerChoiceContext choiceContext,
-        CombatSide side,
-        CombatState combatState)
-    {
-        if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
-            return;
-
-        if (AstralParty_PersonProprietressPendingCombatStartTrigger)
-        {
-            await GrantTransfer();
-            AstralParty_PersonProprietressPendingCombatStartTrigger = false;
-            InvokeDisplayAmountChanged();
-            return;
-        }
-
-        if (GetClampedCounter() < GetMaxCounter())
-            return;
-
-        await GrantTransfer();
-        AstralParty_PersonProprietressCounter = 1;
-        AstralParty_PersonProprietressPendingCombatStartTrigger = false;
-        InvokeDisplayAmountChanged();
-    }
-
-    public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
-    {
-        if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
-            return Task.CompletedTask;
-
-        AdvanceCounter();
-        InvokeDisplayAmountChanged();
-        return Task.CompletedTask;
-    }
-
-    public override Task AfterCombatEnd(CombatRoom room)
-    {
-        AdvanceCounterAfterCombatEnd();
-        InvokeDisplayAmountChanged();
-        return Task.CompletedTask;
     }
 
     public override decimal ModifyMerchantPrice(Player player, MerchantEntry entry, decimal originalPrice)
@@ -201,36 +162,6 @@ public class PersonProprietress : AstralPartyRelicModel
             return originalPrice;
 
         return originalPrice * DiscountedPriceMultiplier;
-    }
-
-    private int GetClampedCounter()
-    {
-        return Math.Clamp(AstralParty_PersonProprietressCounter, 1, GetMaxCounter());
-    }
-
-    private int GetMaxCounter()
-    {
-        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
-    }
-
-    private void AdvanceCounter()
-    {
-        AstralParty_PersonProprietressCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
-    }
-
-    private void AdvanceCounterAfterCombatEnd()
-    {
-        if (AstralParty_PersonProprietressPendingCombatStartTrigger)
-            return;
-
-        if (GetClampedCounter() >= GetMaxCounter() - 1)
-        {
-            AstralParty_PersonProprietressCounter = 1;
-            AstralParty_PersonProprietressPendingCombatStartTrigger = true;
-            return;
-        }
-
-        AdvanceCounter();
     }
 
     private static int GetDiscountChancePercent(PersonProprietress? controller)
@@ -298,7 +229,7 @@ public class PersonProprietress : AstralPartyRelicModel
         };
     }
 
-    private async Task GrantTransfer()
+    protected override async Task GrantCooldownCard()
     {
         if (Owner?.Creature?.CombatState == null)
             return;

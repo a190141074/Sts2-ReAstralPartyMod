@@ -20,9 +20,9 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonSlimeLulu : AstralPartyRelicModel
+public class PersonSlimeLulu : CooldownPersonaRelicBase
 {
-    private const int BaseMaxCounter = 4;
+    private const int SlimeLuluBaseMaxCounter = 4;
 
     [SavedProperty] public int AstralParty_PersonSlimeLuluCounter { get; set; } = 1;
 
@@ -49,9 +49,19 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         set => AstralParty_PersonSlimeLuluPendingCombatStartCard = value;
     }
 
-    public override RelicRarity Rarity => RelicRarity.Ancient;
+    protected override int CounterValue
+    {
+        get => AstralParty_PersonSlimeLuluCounter;
+        set => AstralParty_PersonSlimeLuluCounter = value;
+    }
 
-    public override bool ShowCounter => Owner?.Creature?.CombatState != null;
+    protected override bool PendingCombatStartCard
+    {
+        get => AstralParty_PersonSlimeLuluPendingCombatStartCard;
+        set => AstralParty_PersonSlimeLuluPendingCombatStartCard = value;
+    }
+
+    public override RelicRarity Rarity => RelicRarity.Ancient;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
@@ -59,9 +69,7 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         HoverTipFactory.FromPower<HalfLifeHealPower>()
     ];
 
-    public override int DisplayAmount => GetClampedCounter();
-
-    public override bool ShouldReceiveCombatHooks => true;
+    protected override int BaseMaxCounter => SlimeLuluBaseMaxCounter;
 
     public override async Task AfterObtained()
     {
@@ -69,11 +77,7 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         if (Owner?.Creature == null)
             return;
 
-        AstralParty_PersonSlimeLuluCounter = 1;
-        // Newly obtained cooldown relics should grant their first card on the next player turn start.
-        AstralParty_PersonSlimeLuluPendingCombatStartCard = true;
         AstralParty_PersonSlimeLuluHealingSlimeUses = 0;
-        RefreshCounterDisplay();
 
         await CreatureCmd.LoseMaxHp(
             new ThrowingPlayerChoiceContext(),
@@ -81,51 +85,6 @@ public class PersonSlimeLulu : AstralPartyRelicModel
             10m,
             false
         );
-    }
-
-    public override async Task BeforeSideTurnStart(
-        PlayerChoiceContext choiceContext,
-        CombatSide side,
-        CombatState combatState)
-    {
-        if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
-            return;
-
-        if (AstralParty_PersonSlimeLuluPendingCombatStartCard)
-        {
-            await GrantHealingSlime();
-            AstralParty_PersonSlimeLuluPendingCombatStartCard = false;
-            RefreshCounterDisplay();
-            return;
-        }
-
-        if (GetClampedCounter() >= GetMaxCounter())
-        {
-            await GrantHealingSlime();
-            AstralParty_PersonSlimeLuluCounter = 1;
-            AstralParty_PersonSlimeLuluPendingCombatStartCard = false;
-            RefreshCounterDisplay();
-        }
-    }
-
-    public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
-    {
-        if (Owner?.Creature?.CombatState == null)
-            return Task.CompletedTask;
-
-        if (side != Owner.Creature.Side)
-            return Task.CompletedTask;
-
-        AdvanceCounter();
-        RefreshCounterDisplay();
-        return Task.CompletedTask;
-    }
-
-    public override Task AfterCombatEnd(CombatRoom room)
-    {
-        AdvanceCounterAfterCombatEnd();
-        RefreshCounterDisplay();
-        return Task.CompletedTask;
     }
 
     public override async Task AfterDamageReceived(
@@ -154,40 +113,10 @@ public class PersonSlimeLulu : AstralPartyRelicModel
         );
 
         AdvanceCounter();
-        RefreshCounterDisplay();
+        RefreshCooldownDisplay();
     }
 
-    private int GetClampedCounter()
-    {
-        return Math.Clamp(AstralParty_PersonSlimeLuluCounter, 1, GetMaxCounter());
-    }
-
-    private int GetMaxCounter()
-    {
-        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
-    }
-
-    private void AdvanceCounter()
-    {
-        AstralParty_PersonSlimeLuluCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
-    }
-
-    private void AdvanceCounterAfterCombatEnd()
-    {
-        if (AstralParty_PersonSlimeLuluPendingCombatStartCard)
-            return;
-
-        if (GetClampedCounter() >= GetMaxCounter() - 1)
-        {
-            AstralParty_PersonSlimeLuluCounter = 1;
-            AstralParty_PersonSlimeLuluPendingCombatStartCard = true;
-            return;
-        }
-
-        AdvanceCounter();
-    }
-
-    private async Task GrantHealingSlime()
+    protected override async Task GrantCooldownCard()
     {
         if (Owner?.Creature?.CombatState == null)
             return;
@@ -196,10 +125,5 @@ public class PersonSlimeLulu : AstralPartyRelicModel
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillHealingSlime>(), Owner);
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
-    }
-
-    private void RefreshCounterDisplay()
-    {
-        InvokeDisplayAmountChanged();
     }
 }

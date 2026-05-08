@@ -21,9 +21,9 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonInkShadowHunter : AstralPartyRelicModel
+public class PersonInkShadowHunter : CooldownPersonaRelicBase
 {
-    private const int BaseMaxCounter = 4;
+    private const int InkShadowHunterBaseMaxCounter = 4;
     private const int TwinShadowDuration = 2;
     private const int MinTrackedAttackCost = 1;
     private const int MaxTrackedAttackCost = 3;
@@ -36,11 +36,19 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
 
     [SavedProperty] public int AstralParty_PersonInkShadowHunterPermanentAttackQuotaBonus { get; set; }
 
+    protected override int CounterValue
+    {
+        get => AstralParty_PersonInkShadowHunterCounter;
+        set => AstralParty_PersonInkShadowHunterCounter = value;
+    }
+
+    protected override bool PendingCombatStartCard
+    {
+        get => AstralParty_PersonInkShadowHunterPendingCombatStartCard;
+        set => AstralParty_PersonInkShadowHunterPendingCombatStartCard = value;
+    }
+
     public override RelicRarity Rarity => RelicRarity.Ancient;
-
-    public override bool ShouldReceiveCombatHooks => true;
-
-    public override bool ShowCounter => Owner?.Creature?.CombatState != null;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
@@ -50,17 +58,13 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
         HoverTipFactory.FromPower<HuntersFeastPower>()
     ];
 
-    public override int DisplayAmount => GetClampedCounter();
+    protected override int BaseMaxCounter => InkShadowHunterBaseMaxCounter;
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonInkShadowHunterCounter = 1;
         AstralParty_PersonInkShadowHunterAttackTriggerCountThisTurn = 0;
         AstralParty_PersonInkShadowHunterPermanentAttackQuotaBonus = 0;
-        // Newly obtained cooldown relics should grant their first card on the next player turn start.
-        AstralParty_PersonInkShadowHunterPendingCombatStartCard = true;
-        InvokeDisplayAmountChanged();
     }
 
     public override async Task AfterRoomEntered(AbstractRoom room)
@@ -81,31 +85,6 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
         await PowerCmd.Apply<HuntersFeastPower>(Owner.Creature, feastAmount, Owner.Creature, null);
     }
 
-    public override async Task BeforeSideTurnStart(
-        PlayerChoiceContext choiceContext,
-        CombatSide side,
-        CombatState combatState)
-    {
-        if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
-            return;
-
-        if (AstralParty_PersonInkShadowHunterPendingCombatStartCard)
-        {
-            await GrantShadowFusion();
-            AstralParty_PersonInkShadowHunterPendingCombatStartCard = false;
-            InvokeDisplayAmountChanged();
-            return;
-        }
-
-        if (GetClampedCounter() < GetMaxCounter())
-            return;
-
-        await GrantShadowFusion();
-        AstralParty_PersonInkShadowHunterCounter = 1;
-        AstralParty_PersonInkShadowHunterPendingCombatStartCard = false;
-        InvokeDisplayAmountChanged();
-    }
-
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
         if (player != Owner || Owner?.Creature?.CombatState == null || Owner.Creature == null)
@@ -117,14 +96,9 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
         await ApplyTwinShadowToRandomEnemy();
     }
 
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    protected override Task AfterAdvanceCounterOnTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
-        if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
-            return;
-
-        AdvanceCounter();
-        await SetAttackLimitPowerRemaining(0);
-        InvokeDisplayAmountChanged();
+        return SetAttackLimitPowerRemaining(0);
     }
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -150,7 +124,7 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
         await SyncAttackLimitPower();
     }
 
-    public override async Task AfterCombatEnd(CombatRoom room)
+    protected override Task BeforeAdvanceCounterAfterCombatEnd(CombatRoom room)
     {
         if (Owner?.Creature != null)
         {
@@ -162,44 +136,16 @@ public class PersonInkShadowHunter : AstralPartyRelicModel
             }
         }
 
-        AdvanceCounterAfterCombatEnd();
-        await RemoveAttackLimitPower();
-        InvokeDisplayAmountChanged();
-    }
-
-    private int GetClampedCounter()
-    {
-        return Math.Clamp(AstralParty_PersonInkShadowHunterCounter, 1, GetMaxCounter());
-    }
-
-    private int GetMaxCounter()
-    {
-        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
-    }
-
-    private void AdvanceCounter()
-    {
-        AstralParty_PersonInkShadowHunterCounter = Math.Min(GetClampedCounter() + 1, GetMaxCounter());
-    }
-
-    private void AdvanceCounterAfterCombatEnd()
-    {
         AstralParty_PersonInkShadowHunterAttackTriggerCountThisTurn = 0;
-
-        if (AstralParty_PersonInkShadowHunterPendingCombatStartCard)
-            return;
-
-        if (GetClampedCounter() >= GetMaxCounter() - 1)
-        {
-            AstralParty_PersonInkShadowHunterCounter = 1;
-            AstralParty_PersonInkShadowHunterPendingCombatStartCard = true;
-            return;
-        }
-
-        AdvanceCounter();
+        return Task.CompletedTask;
     }
 
-    private async Task GrantShadowFusion()
+    protected override Task AfterAdvanceCounterAfterCombatEnd(CombatRoom room)
+    {
+        return RemoveAttackLimitPower();
+    }
+
+    protected override async Task GrantCooldownCard()
     {
         if (Owner?.Creature?.CombatState == null)
             return;
