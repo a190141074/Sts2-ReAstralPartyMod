@@ -66,7 +66,8 @@ public class PersonSlimeLulu : CooldownPersonaRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillHealingSlime>(),
-        HoverTipFactory.FromPower<HalfLifeHealPower>()
+        HoverTipFactory.FromPower<HalfLifeHealPower>(),
+        HoverTipFactory.FromPower<AdherentMucusPower>()
     ];
 
     protected override int BaseMaxCounter => SlimeLuluBaseMaxCounter;
@@ -112,8 +113,41 @@ public class PersonSlimeLulu : CooldownPersonaRelicBase
             false
         );
 
+        if (dealer != null && dealer.Side != Owner.Creature.Side && dealer.IsAlive)
+        {
+            await AdherentMucusPower.Apply(
+                dealer,
+                Owner,
+                Owner.Creature,
+                cardSource
+            );
+        }
+
         AdvanceCounter();
         RefreshCooldownDisplay();
+    }
+
+    public override async Task BeforeSideTurnStart(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        CombatState combatState)
+    {
+        await base.BeforeSideTurnStart(choiceContext, side, combatState);
+
+        if (Owner?.Creature?.CombatState == null || side == Owner.Creature.Side)
+            return;
+
+        await AdherentMucusPower.ResetRoundHitFlagForBoundSlime(Owner.Creature.CombatState, Owner.NetId);
+    }
+
+    protected override async Task AfterAdvanceCounterOnTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    {
+        await base.AfterAdvanceCounterOnTurnEnd(choiceContext, side);
+
+        if (Owner?.Creature?.CombatState == null || side == Owner.Creature.Side)
+            return;
+
+        await AdherentMucusPower.DecayAllForBoundSlimeIfMissed(Owner.Creature.CombatState, Owner.NetId);
     }
 
     protected override async Task GrantCooldownCard()

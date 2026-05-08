@@ -266,6 +266,7 @@
     <Content Include="ReAstralPartyMod\images\powers\survey_finds_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\fan_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\love_power.png" />
+    <Content Include="ReAstralPartyMod\images\powers\adherent_mucus_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png" />
