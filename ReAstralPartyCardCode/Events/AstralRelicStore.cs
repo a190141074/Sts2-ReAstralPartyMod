@@ -10,21 +10,18 @@ using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Interop.AutoRegistration;
-using STS2RitsuLib.Scaffolding.Content;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Events;
 
 [RegisterActEvent(typeof(Hive))]
 [RegisterActEvent(typeof(Underdocks))]
-public sealed class AstralRelicStore : ModEventTemplate
+public sealed class AstralRelicStore : AstralPartyEventModel
 {
+    private const string ImplementationVersion = "2026-05-08-safe-2";
     private const decimal BluePackCost = 50m;
     private const decimal GoldPackCost = 75m;
     private const decimal PurplePackCost = 100m;
     private const decimal InitialPointCost = 1m;
-
-    public override EventAssetProfile AssetProfile => new(
-        InitialPortraitPath: "res://ReAstralPartyMod/images/events/astral_relic_store.png");
 
     public override bool IsAllowed(IRunState runState)
     {
@@ -35,6 +32,9 @@ public sealed class AstralRelicStore : ModEventTemplate
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions()
     {
+        MainFile.Logger.Info(
+            $"AstralRelicStore GenerateInitialOptions | impl={ImplementationVersion} | owner={Owner?.NetId.ToString() ?? "null"} | gold={Owner?.Gold.ToString() ?? "null"}");
+
         return
         [
             CreatePurchaseOption<PackRandomTokenBlue>(BluePackCost, BuyBluePack, "BLUE_PACK"),
@@ -47,9 +47,9 @@ public sealed class AstralRelicStore : ModEventTemplate
     private EventOption CreatePurchaseOption<TRelic>(decimal cost, Func<Task> onChosen, string optionKey)
         where TRelic : RelicModel
     {
-        var canAfford = Owner?.Gold >= cost;
-        return new EventOption(this, canAfford ? onChosen : null, InitialOptionKey(optionKey))
-            .WithRelic<TRelic>(Owner);
+        MainFile.Logger.Info(
+            $"AstralRelicStore CreatePurchaseOption | impl={ImplementationVersion} | relic={typeof(TRelic).Name} | cost={cost} | option={optionKey}");
+        return new EventOption(this, onChosen, InitialOptionKey(optionKey));
     }
 
     private Task BuyBluePack()
@@ -76,15 +76,23 @@ public sealed class AstralRelicStore : ModEventTemplate
         where TRelic : RelicModel
     {
         ArgumentNullException.ThrowIfNull(Owner);
+        var owner = Owner;
 
-        if (Owner.Gold < goldCost)
+        MainFile.Logger.Info(
+            $"AstralRelicStore CompletePurchase begin | impl={ImplementationVersion} | owner={owner.NetId} | relic={typeof(TRelic).Name} | gold_before={owner.Gold} | cost={goldCost}");
+
+        if (owner.Gold < goldCost)
         {
+            MainFile.Logger.Warn(
+                $"AstralRelicStore CompletePurchase insufficient gold | impl={ImplementationVersion} | owner={owner.NetId} | relic={typeof(TRelic).Name} | gold_before={owner.Gold} | cost={goldCost}");
             SetEventState(PageDescription("INITIAL"), GenerateInitialOptions());
             return;
         }
 
-        await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, Owner, GoldLossType.Spent);
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, ModelDb.Relic<TRelic>());
+        await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, owner, GoldLossType.Spent);
+        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<TRelic>());
+        MainFile.Logger.Info(
+            $"AstralRelicStore CompletePurchase success | impl={ImplementationVersion} | owner={owner.NetId} | relic={typeof(TRelic).Name} | gold_after={owner.Gold}");
         SetEventFinished(PageDescription(finishPageName));
     }
 }

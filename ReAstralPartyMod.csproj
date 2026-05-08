@@ -31,18 +31,18 @@
   <ItemGroup>
     <Reference Include="sts2">
       <HintPath>$(Sts2DataDir)\sts2.dll</HintPath>
-      <Private>false</Private>
+      <Private>true</Private>
     </Reference>
 
     <Reference Include="0Harmony">
       <HintPath>$(Sts2DataDir)\0Harmony.dll</HintPath>
-      <Private>false</Private>
+      <Private>true</Private>
     </Reference>
 
     <!-- 鏈湴寮曠敤锛屾敞鎰忚矾寰勬槸鍚︽纭?-->
     <Reference Include="STS2-RitsuLib">
       <HintPath>$(Sts2Dir)/mods/RitsuLib/STS2-RitsuLib.dll</HintPath>
-      <Private>false</Private>
+      <Private>true</Private>
     </Reference>
 
     <!-- NuGet鑾峰彇锛屾敞鎰忕増鏈槸鍚︿竴鑷达紝涓嶄竴鑷存墜鍔ㄦ洿鏀筕ersion -->
@@ -56,6 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="README.md" />
     <Content Include="ReAstralPartyMod.json" />
     <Content Include="ReAstralPartyMod\images\astral_token.png" />
     <Content Include="ReAstralPartyMod\images\astral_token.png.import" />
@@ -175,11 +176,8 @@
     <Content Include="ReAstralPartyMod\images\potion\candy_support_gum.png.import" />
     <Content Include="ReAstralPartyMod\images\potion\person_chest_choose.png" />
     <Content Include="ReAstralPartyMod\images\potion\person_chest_choose.png.import" />
-    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_blue.png" />
     <Content Include="ReAstralPartyMod\images\potion\token_random_pack_blue.png.import" />
-    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_gold.png" />
     <Content Include="ReAstralPartyMod\images\potion\token_random_pack_gold.png.import" />
-    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_purple.png" />
     <Content Include="ReAstralPartyMod\images\potion\token_random_pack_purple.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\ambush_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\ambush_power.png.import" />
@@ -274,6 +272,10 @@
     <Content Include="ReAstralPartyMod\images\powers\void_crystal_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\zuo_tea_cake_power.png.import" />
+    <Content Include="ReAstralPartyMod\images\relic\pack_random_token_blue.png" />
+    <Content Include="ReAstralPartyMod\images\relic\pack_random_token_gold.png" />
+    <Content Include="ReAstralPartyMod\images\relic\pack_random_token_purple.png" />
+    <Content Include="ReAstralPartyMod\images\relic\personality_derivative_mascot_girl_mimi_token_memory.png" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_masters_chips.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_ninja_garrote.png" />
     <Content Include="ReAstralPartyMod\images\relic\personality_derivative_panda_meng.png" />
@@ -286,6 +288,7 @@
     <Content Include="ReAstralPartyMod\images\relic\personality_land_center.png" />
     <Content Include="ReAstralPartyMod\images\relic\personality_land_center.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_bionic_jasmine.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_cyber_kitty.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_deity_lin.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_feng.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_bionic_jasmine.png.import" />
@@ -307,6 +310,7 @@
     <Content Include="ReAstralPartyMod\images\relic\person_mousy_lian.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_mousy_lian.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_needy_girl.png" />
+    <Content Include="ReAstralPartyMod\images\relic\person_ninja.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_oasis_queen.png" />
     <Content Include="ReAstralPartyMod\images\relic\person_oasis_queen.png.import" />
     <Content Include="ReAstralPartyMod\images\relic\person_panda_meng.png" />
@@ -495,6 +499,7 @@
     <Content Include="ReAstralPartyMod\localization\eng\cards.json" />
     <Content Include="ReAstralPartyMod\localization\eng\card_keywords.json" />
     <Content Include="ReAstralPartyMod\localization\eng\enchantments.json" />
+    <Content Include="ReAstralPartyMod\localization\eng\events.json" />
     <Content Include="ReAstralPartyMod\localization\eng\modifiers.json" />
     <Content Include="ReAstralPartyMod\localization\eng\modifiers.json.block" />
     <Content Include="ReAstralPartyMod\localization\eng\potions.json" />
@@ -505,6 +510,7 @@
     <Content Include="ReAstralPartyMod\localization\zhs\cards.json" />
     <Content Include="ReAstralPartyMod\localization\zhs\card_keywords.json" />
     <Content Include="ReAstralPartyMod\localization\zhs\enchantments.json" />
+    <Content Include="ReAstralPartyMod\localization\zhs\events.json" />
     <Content Include="ReAstralPartyMod\localization\zhs\modifiers.json" />
     <Content Include="ReAstralPartyMod\localization\zhs\potions.json" />
     <Content Include="ReAstralPartyMod\localization\zhs\powers.json" />

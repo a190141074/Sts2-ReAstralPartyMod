@@ -13,6 +13,5 @@ public class PackRandomTokenPurple : RandomTokenPackRelicBase
     protected override int RareWeight => 30;
 
     public override RelicRarity Rarity => RelicRarity.Rare;
-
-    protected override string IconBasePath => "res://ReAstralPartyMod/images/potion/pack_random_token_purple";
+    
 }

@@ -44,7 +44,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private Label _subtitleLabel = null!;
     private ColorRect _fightBackstop = null!;
     private Label _fightLabel = null!;
-    private NHandImageCollection _hands = null!;
     private bool _opened;
     private bool _closed;
     private bool _holdersBuilt;
@@ -107,7 +106,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             throw new InvalidOperationException("Run screen state tracker was not ready for starting persona selection.");
 
         NRun.Instance.ScreenStateTracker.SetIsInSharedRelicPickingScreen(isInSharedRelicPicking: true);
-        _hands.Initialize(_runState);
         AnimateIn();
         _openedTicks = Time.GetTicksMsec();
         _ = RunSelectionFlow();
@@ -141,14 +139,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         };
         background.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         AddChild(background);
-
-        _hands = new NHandImageCollection
-        {
-            Name = "HandsContainer",
-            MouseFilter = MouseFilterEnum.Ignore
-        };
-        _hands.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-        AddChild(_hands);
 
         var titlePanel = new VBoxContainer
         {
@@ -269,7 +259,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             })).SetDelay(delay + 0.5f);
         }
 
-        _hands.AnimateHandsIn();
     }
 
     private async Task RunSelectionFlow()
@@ -514,11 +503,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         foreach (var state in _selectionStates.Values)
         {
             if (state.SelectedRelic == null)
-                _hands.GetHand(state.Player.NetId)?.SetSkipped();
+                MainFile.Logger.Info($"Starting persona selection player {state.Player.NetId} skipped pick.");
         }
 
-        _hands.BeforeRelicsAwarded();
-        var tasksToWait = new List<Task>();
         RelicPickingResultType? previousType = null;
 
         foreach (var result in results.OrderBy(result => result.type))
@@ -543,9 +530,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     .SetEase(Tween.EaseType.In);
                 await ToSignal(tween, Tween.SignalName.Finished);
 
-                _hands.BeforeFightStarted(result.fight!.playersInvolved);
                 await Cmd.Wait(1f);
-                await _hands.DoFight(result, holder);
+                await AnimateFightResolutionAsync(result, holder);
 
                 var fadeTween = CreateTween();
                 fadeTween.TweenProperty(_fightBackstop, "modulate:a", 0f, 0.25f);
@@ -555,21 +541,57 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             }
             else if (result.type != RelicPickingResultType.Skipped && result.player != null)
             {
-                var hand = _hands.GetHand(result.player.NetId);
-                if (hand != null)
-                {
-                    tasksToWait.Add(TaskHelper.RunSafely(hand.GrabRelic(holder)));
-                    await Cmd.Wait(0.25f);
-                }
+                await AnimateAwardedHolderAsync(holder, result.player);
             }
 
             previousType = result.type;
         }
 
-        if (tasksToWait.Count > 0)
-            await Task.WhenAll(tasksToWait);
-        else if (_runState.Players.Count > 1)
+        if (_runState.Players.Count > 1)
             await Cmd.Wait(0.7f);
+    }
+
+    private async Task AnimateFightResolutionAsync(RelicPickingResult result, NTreasureRoomRelicHolder holder)
+    {
+        if (result.player == null)
+            return;
+
+        _fightLabel.Text = $"【{result.relic.Title.GetFormattedText()}】归属玩家 {result.player.NetId}";
+        await Cmd.Wait(0.9f);
+        await AnimateAwardedHolderAsync(holder, result.player);
+    }
+
+    private async Task AnimateAwardedHolderAsync(NTreasureRoomRelicHolder holder, Player player)
+    {
+        var targetPosition = ResolvePlayerAnchorPosition(player, holder.Size);
+        var tween = CreateTween().SetParallel();
+        tween.TweenProperty(holder, "global_position", targetPosition, 0.35f)
+            .SetEase(Tween.EaseType.Out)
+            .SetTrans(Tween.TransitionType.Cubic);
+        tween.TweenProperty(holder, "scale", new Vector2(0.85f, 0.85f), 0.35f);
+        await ToSignal(tween, Tween.SignalName.Finished);
+
+        var flashTween = CreateTween().SetParallel();
+        flashTween.TweenProperty(holder, "modulate", new Color(1f, 1f, 1f, 0.35f), 0.12f);
+        flashTween.TweenProperty(holder, "modulate", Colors.White, 0.18f).SetDelay(0.12f);
+        await ToSignal(flashTween, Tween.SignalName.Finished);
+
+        holder.Visible = false;
+        holder.Scale = Vector2.One;
+    }
+
+    private Vector2 ResolvePlayerAnchorPosition(Player player, Vector2 holderSize)
+    {
+        var playerIndex = _orderedPlayers.FindIndex(entry => entry.NetId == player.NetId);
+        if (playerIndex < 0)
+            playerIndex = 0;
+
+        var viewport = GetViewportRect().Size;
+        var spacing = Math.Max(220f, viewport.X / Math.Max(2, _orderedPlayers.Count + 1));
+        var startX = viewport.X * 0.5f - spacing * (_orderedPlayers.Count - 1) * 0.5f;
+        var x = startX + spacing * playerIndex - holderSize.X * 0.5f;
+        var y = viewport.Y - holderSize.Y - 72f;
+        return new Vector2(x, y);
     }
 
     private async Task AwardRelicsAsync(List<RelicPickingResult> results)

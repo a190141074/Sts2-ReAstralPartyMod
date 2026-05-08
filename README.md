@@ -11,7 +11,6 @@
 </div>
 <div><b>简体中文</b></div>
 </div>
-
 `ReAstralPartyMod` 是一个以 **STS2-RitsuLib** 为前置的《杀戮尖塔 2》模组。当前版本围绕“人格遗物 + 筹码遗物 + 事件卡”三条主线构建玩法，把原先散落在旧工程里的角色和系统整合进同一个可运行项目中。
 
 这个 README 以当前仓库代码和 `zhs` 本地化为准生成，面向中文版玩家阅读。文档中的颜色标签、关键字标签和游戏内富文本标记已被移除，避免 Markdown 中混入游戏内专用标签。
@@ -480,5 +479,12 @@ dotnet build /p:RunPckExport=false
 
 ## 致谢
 
-- [STS2-RitsuLib](https://github.com/BAKAOLC/STS2-RitsuLib)
-- 《杀戮尖塔 2》mod 社区中的案例工程、迁移文档和联机调试经验
+- 前置：[STS2-RitsuLib](https://github.com/BAKAOLC/STS2-RitsuLib)
+- 借鉴：[酒狐MOD](https://github.com/LuoTianOrange/STS2_WineFox)
+- 借鉴：[基石符文&海克斯符文](https://github.com/s1f102500012/sts2mod/tree/main)
+- 教程参考：[GlitchedReme](https://github.com/GlitchedReme/)
+- 代码参考：[YuWan886](https://github.com/YuWan886/)
+- 代码协助：猫妖の舞
+- 其他协作：codex
+- 交流群：[1095510315](https://qm.qq.com/q/rCLGFhecKI)
+- 小黑盒平台支持
