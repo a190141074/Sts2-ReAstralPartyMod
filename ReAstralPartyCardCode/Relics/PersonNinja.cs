@@ -21,7 +21,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public class PersonNinja : CooldownPersonaRelicBase
 {
-    private const int CopyQuotaPerTurn = 10;
+    private const int CopyQuotaPerTurn = CopyQuotaPower.MaxTrackedSkillsPerTurn;
 
     [SavedProperty] public int AstralParty_PersonNinjaCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonNinjaPendingCombatStartCard { get; set; }
