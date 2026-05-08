@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -8,42 +9,20 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class PersonaRelicRegistry
 {
-    private static readonly IReadOnlyList<RelicModel> PersonaRelics =
-    [
-        ModelDb.Relic<PersonWeirdEgg>(),
-        ModelDb.Relic<PersonSamuraiPrawn>(),
-        ModelDb.Relic<PersonSlimeLulu>(),
-        ModelDb.Relic<PersonBionicJasmine>(),
-        ModelDb.Relic<PersonProprietress>(),
-        ModelDb.Relic<PersonMousyLian>(),
-        ModelDb.Relic<PersonBlueWhale>(),
-        ModelDb.Relic<PersonOasisQueen>(),
-        ModelDb.Relic<PersonInkShadowHunter>(),
-        ModelDb.Relic<PersonMascotGirlMimi>(),
-        ModelDb.Relic<PersonSupermanMegas>(),
-        ModelDb.Relic<PersonXiaoLei>(),
-        ModelDb.Relic<PersonSocialFearNun>(),
-        ModelDb.Relic<PersonJillSteinle>(),
-        ModelDb.Relic<PersonShadowScion>(),
-        ModelDb.Relic<PersonPoisonedApple>(),
-        ModelDb.Relic<PersonMidnightFlash>(),
-        ModelDb.Relic<PersonVampire>(),
-        ModelDb.Relic<PersonCyberKitty>(),
-        ModelDb.Relic<PersonNinja>(),
-        ModelDb.Relic<PersonZhao>(),
-        ModelDb.Relic<PersonUnclePederman>(),
-        ModelDb.Relic<PersonFeng>(),
-        ModelDb.Relic<PersonDeityLin>(),
-        ModelDb.Relic<PersonKawaiiAngel>(),
-        ModelDb.Relic<PersonNeedyGirl>(),
-        ModelDb.Relic<PersonPandaMeng>()
-    ];
+    private static readonly IReadOnlyList<RelicModel> PersonaRelics = typeof(PersonaRelicBase)
+        .Assembly
+        .GetTypes()
+        .Where(type =>
+            type is { IsAbstract: false, IsClass: true }
+            && typeof(PersonaRelicBase).IsAssignableFrom(type))
+        .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
+        .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
+        .OrderBy(relic => (relic.CanonicalInstance?.Id ?? relic.Id).Entry, StringComparer.Ordinal)
+        .ToList();
 
     public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelics()
     {
-        return PersonaRelics
-            .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
-            .ToList();
+        return PersonaRelics;
     }
 
     public static bool IsPersonaRelic(RelicModel? relic)
