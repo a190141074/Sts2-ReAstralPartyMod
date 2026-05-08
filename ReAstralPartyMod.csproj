@@ -176,9 +176,6 @@
     <Content Include="ReAstralPartyMod\images\potion\candy_support_gum.png.import" />
     <Content Include="ReAstralPartyMod\images\potion\person_chest_choose.png" />
     <Content Include="ReAstralPartyMod\images\potion\person_chest_choose.png.import" />
-    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_blue.png.import" />
-    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_gold.png.import" />
-    <Content Include="ReAstralPartyMod\images\potion\token_random_pack_purple.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\ambush_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\ambush_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\bloodthirst_power.png" />
