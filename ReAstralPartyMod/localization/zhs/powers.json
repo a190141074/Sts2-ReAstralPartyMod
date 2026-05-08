@@ -129,7 +129,7 @@
   "RE_ASTRAL_PARTY_MOD_POWER_FRACTURE_POWER.description": "施加[gold]易伤[/gold][blue]1[/blue]层和[gold]缩小[/gold][blue]1[/blue]层。\n持续[blue]1[/blue]回合。",
   "RE_ASTRAL_PARTY_MOD_POWER_FRACTURE_POWER.smartDescription": "施加[gold]易伤[/gold][blue]1[/blue]层和[gold]缩小[/gold][blue]1[/blue]层，持续[blue]1[/blue]回合。",
   "RE_ASTRAL_PARTY_MOD_POWER_COPY_QUOTA_POWER.title": "复制额度",
-  "RE_ASTRAL_PARTY_MOD_POWER_COPY_QUOTA_POWER.description": "显示你本回合还能消耗多少次技能牌，才会让【人格：忍者】的复制效果失效。你的回合开始时重置为[blue]9[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_POWER_COPY_QUOTA_POWER.description": "显示你本回合还能消耗多少次技能牌，才会让【人格：忍者】的复制效果失效。你的回合开始时重置为[blue]10[/blue]。",
   "RE_ASTRAL_PARTY_MOD_POWER_COPY_QUOTA_POWER.smartDescription": "本回合剩余复制额度。",
   "RE_ASTRAL_PARTY_MOD_POWER_ESOTERIC_EMPOWER_POWER.title": "密宗强化",
   "RE_ASTRAL_PARTY_MOD_POWER_ESOTERIC_EMPOWER_POWER.description": "当你的技能牌对敌方单位造成伤害时，额外造成等同于本能力层数的伤害。",

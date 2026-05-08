@@ -129,7 +129,7 @@
   "RE_ASTRAL_PARTY_MOD_POWER_FRACTURE_POWER.description": "Apply [gold]Vulnerable[/gold] [blue]1[/blue] and [gold]Shrink[/gold] [blue]1[/blue].\nLasts [blue]1[/blue] turn.",
   "RE_ASTRAL_PARTY_MOD_POWER_FRACTURE_POWER.smartDescription": "Apply [gold]Vulnerable[/gold] [blue]1[/blue] and [gold]Shrink[/gold] [blue]1[/blue] for [blue]1[/blue] turn.",
   "RE_ASTRAL_PARTY_MOD_POWER_COPY_QUOTA_POWER.title": "Copy Quota",
-  "RE_ASTRAL_PARTY_MOD_POWER_COPY_QUOTA_POWER.description": "Shows how many more Skill cards you can spend this turn before [relic]Persona: Ninja[/relic]'s copy effect shuts off. Resets to [blue]9[/blue] at the start of your turn.",
+  "RE_ASTRAL_PARTY_MOD_POWER_COPY_QUOTA_POWER.description": "Shows how many more Skill cards you can spend this turn before [relic]Persona: Ninja[/relic]'s copy effect shuts off. Resets to [blue]10[/blue] at the start of your turn.",
   "RE_ASTRAL_PARTY_MOD_POWER_COPY_QUOTA_POWER.smartDescription": "Remaining copy quota this turn.",
   "RE_ASTRAL_PARTY_MOD_POWER_ESOTERIC_EMPOWER_POWER.title": "Esoteric Empower",
   "RE_ASTRAL_PARTY_MOD_POWER_ESOTERIC_EMPOWER_POWER.description": "Whenever your Skill card deals damage to an enemy, it deals additional damage equal to this power's amount.",
