@@ -7,7 +7,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
 internal static class MultiplayerPlayerLimitPatch
 {
-    public const int ExpandedPlayerLimit = 8;
+    public const int ExpandedPlayerLimit = 12;
 
     public static void ClampLobbySize(ref int maxPlayers)
     {

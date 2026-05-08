@@ -23,7 +23,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
 internal static class ExpandedMultiplayerCompatibilityPatch
 {
-    public const int ExpandedPlayerSlotBitCount = 3;
+    public const int ExpandedPlayerSlotBitCount = 4;
     public const int ExpandedLobbyPlayerListBitCount = 4;
 
     public static IEnumerable<CodeInstruction> ReplaceIntConstant(
@@ -380,12 +380,19 @@ internal static class NTreasureRoomRelicCollectionExpandedPlayerPatch
         var spacing = holdersInUse.Count >= 8
             ? Math.Max(180f, (maxX - minX) / 3f)
             : Math.Max(220f, (maxX - minX) / 2f);
-        var topCount = Math.Min(4, (int)Math.Ceiling(holdersInUse.Count / 2f));
-        var bottomCount = holdersInUse.Count - topCount;
+        var rowCounts = GetBalancedRowCounts(holdersInUse.Count);
+        var consumed = 0;
 
-        LayoutHolderRow(holdersInUse, 0, topCount, topY, centerX, spacing);
-        if (bottomCount > 0)
-            LayoutHolderRow(holdersInUse, topCount, bottomCount, bottomY, centerX, spacing);
+        for (var rowIndex = 0; rowIndex < rowCounts.Count; rowIndex++)
+        {
+            var rowCount = rowCounts[rowIndex];
+            if (rowCount <= 0)
+                continue;
+
+            var y = GetRowY(topY, bottomY, rowCounts.Count, rowIndex);
+            LayoutHolderRow(holdersInUse, consumed, rowCount, y, centerX, spacing);
+            consumed += rowCount;
+        }
     }
 
     private static void LayoutHolderRow(
@@ -403,6 +410,41 @@ internal static class NTreasureRoomRelicCollectionExpandedPlayerPatch
         var startX = centerX - totalWidth * 0.5f;
         for (var index = 0; index < count; index++)
             holders[startIndex + index].Position = new Vector2(startX + index * spacing, y);
+    }
+
+    private static List<int> GetBalancedRowCounts(int totalCount)
+    {
+        if (totalCount <= 0)
+            return [];
+
+        if (totalCount <= 4)
+            return [totalCount];
+
+        if (totalCount <= 8)
+        {
+            var topCount = (int)Math.Ceiling(totalCount / 2f);
+            return [topCount, totalCount - topCount];
+        }
+
+        var rowCount = (int)Math.Ceiling(totalCount / 4f);
+        var baseCount = totalCount / rowCount;
+        var extra = totalCount % rowCount;
+        var counts = new List<int>(rowCount);
+        for (var i = 0; i < rowCount; i++)
+            counts.Add(baseCount + (i < extra ? 1 : 0));
+
+        return counts;
+    }
+
+    private static float GetRowY(float topY, float bottomY, int rowCount, int rowIndex)
+    {
+        if (rowCount <= 1)
+            return (topY + bottomY) * 0.5f;
+        if (rowCount == 2)
+            return rowIndex == 0 ? topY : bottomY;
+
+        var progress = rowIndex / (float)(rowCount - 1);
+        return Mathf.Lerp(topY, bottomY, progress);
     }
 }
 
