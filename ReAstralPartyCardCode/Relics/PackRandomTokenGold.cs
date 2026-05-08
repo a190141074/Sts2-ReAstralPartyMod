@@ -12,6 +12,6 @@ public class PackRandomTokenGold : RandomTokenPackRelicBase
     protected override int UncommonWeight => 40;
     protected override int RareWeight => 20;
 
-    public override RelicRarity Rarity => RelicRarity.Uncommon;
+    public override RelicRarity Rarity => RelicRarity.Rare;
     
 }

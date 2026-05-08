@@ -20,8 +20,8 @@ public sealed class AstralRelicStore : AstralPartyEventModel
 {
     private const string ImplementationVersion = "2026-05-08-safe-2";
     private const decimal BluePackCost = 50m;
-    private const decimal GoldPackCost = 75m;
-    private const decimal PurplePackCost = 100m;
+    private const decimal PurplePackCost = 75m;
+    private const decimal GoldPackCost = 100m;
     private const decimal InitialPointCost = 1m;
 
     public override bool IsAllowed(IRunState runState)
@@ -39,8 +39,8 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         return
         [
             CreatePurchaseOption<PackRandomTokenBlue>(BluePackCost, BuyBluePack, "BLUE_PACK"),
-            CreatePurchaseOption<PackRandomTokenPurple>(GoldPackCost, BuyGoldPack, "GOLD_PACK"),
-            CreatePurchaseOption<PackRandomTokenGold>(PurplePackCost, BuyPurplePack, "PURPLE_PACK"),
+            CreatePurchaseOption<PackRandomTokenPurple>(PurplePackCost, BuyPurplePack, "PURPLE_PACK"),
+            CreatePurchaseOption<PackRandomTokenGold>(GoldPackCost, BuyGoldPack, "GOLD_PACK"),
             CreatePurchaseOption<TokenGoldInitialPoint>(InitialPointCost, BuyInitialPoint, "INITIAL_POINT")
         ];
     }
@@ -64,12 +64,12 @@ public sealed class AstralRelicStore : AstralPartyEventModel
 
     private Task BuyGoldPack()
     {
-        return CompletePurchase<PackRandomTokenPurple>(GoldPackCost, "GOLD_PACK_FINISH");
+        return CompletePurchase<PackRandomTokenGold>(GoldPackCost, "GOLD_PACK_FINISH");
     }
 
     private Task BuyPurplePack()
     {
-        return CompletePurchase<PackRandomTokenGold>(PurplePackCost, "PURPLE_PACK_FINISH");
+        return CompletePurchase<PackRandomTokenPurple>(PurplePackCost, "PURPLE_PACK_FINISH");
     }
 
     private Task BuyInitialPoint()

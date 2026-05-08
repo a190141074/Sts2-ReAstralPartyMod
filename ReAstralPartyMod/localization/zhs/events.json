@@ -1,16 +1,16 @@
 {
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.title": "筹码商店",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.description": "想要在我这里找好东西？行，不过可不便宜……好吧好吧，看在来自同一个世界的份上给你们便宜点。",
-  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.BLUE_PACK.title": "【蓝色稀有】",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.BLUE_PACK.title": "【蓝色普通】",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.BLUE_PACK.description": "花费[gold]50[/gold]金币，获得[blue]【◈筹码卡包】[/blue]。",
-  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.GOLD_PACK.title": "【紫色史诗】",
-  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.GOLD_PACK.description": "花费[gold]75[/gold]金币，获得[purple]【◈◈筹码卡包】[/purple]。",
-  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.PURPLE_PACK.title": "【金色传说】",
-  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.PURPLE_PACK.description": "花费[gold]100[/gold]金币，获得[gold]【◈◈◈筹码卡包】[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.GOLD_PACK.title": "【金色稀有】",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.GOLD_PACK.description": "花费[gold]100[/gold]金币，获得[gold]【◈◈◈筹码卡包】[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.PURPLE_PACK.title": "【紫色罕见】",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.PURPLE_PACK.description": "花费[gold]75[/gold]金币，获得[purple]【◈◈筹码卡包】[/purple]。",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.INITIAL_POINT.title": "【算了，这个给你吧】",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL.options.INITIAL_POINT.description": "花费[gold]1[/gold]金币，获得【初始点】。",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.BLUE_PACK_FINISH.description": "你把金币拍在柜台上，换来一包[blue]【◈筹码卡包】[/blue]。",
-  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.GOLD_PACK_FINISH.description": "你挑走了更厚实的那包[purple]【◈◈筹码卡包】[/purple]。",
-  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.PURPLE_PACK_FINISH.description": "最贵的[gold]【◈◈◈筹码卡包】[/gold]被你直接拿下。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.GOLD_PACK_FINISH.description": "最贵的[gold]【◈◈◈筹码卡包】[/gold]被你直接拿下。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.PURPLE_PACK_FINISH.description": "你挑走了更厚实的那包[purple]【◈◈筹码卡包】[/purple]。",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL_POINT_FINISH.description": "店主盯着你手里的那一枚金币看了两秒，最后还是把【初始点】塞了过来。\n\n“算你捡漏。拿了就走，别耽误我做生意。”"
 }
