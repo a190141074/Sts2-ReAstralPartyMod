@@ -7,9 +7,9 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Entities.TreasureRelicPicking;
 using MegaCrit.Sts2.Core.GameActions;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
@@ -35,7 +35,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private const int MaxFightTieRounds = 4;
 
     private readonly TaskCompletionSource _completionSource = new();
-    private readonly TaskCompletionSource<int> _localChoiceSource = new();
     private readonly RunState _runState;
     private readonly IReadOnlyList<RelicModel> _relicOptions;
     private readonly List<Player> _orderedPlayers;
@@ -50,6 +49,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private bool _opened;
     private bool _closed;
     private bool _holdersBuilt;
+    private bool _selectionFinalized;
     private ulong _openedTicks;
 
     public NetScreenType ScreenType => NetScreenType.None;
@@ -279,49 +279,36 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         SaveAllOptionsAsSeen();
 
-        if (RunManager.Instance.NetService.Type is NetGameType.Singleplayer or NetGameType.None)
+        var relicSynchronizer = RunManager.Instance.TreasureRoomRelicSynchronizer
+            ?? throw new InvalidOperationException("TreasureRoomRelicSynchronizer was not ready for starting persona selection.");
+
+        if (!TreasureRoomRelicSessionHelper.TryBeginSession(relicSynchronizer, _runState, _relicOptions))
+            throw new InvalidOperationException("Treasure-room relic session was already active for starting persona selection.");
+
+        try
         {
-            var selectedIndex = await _localChoiceSource.Task;
-            ApplySelection(_orderedPlayers[0], selectedIndex);
-            return;
+            for (var frame = 0; frame < 60 * 60 * 5; frame++)
+            {
+                SyncSelectionStatesFromVotes(relicSynchronizer);
+                if (AreAllSelectionsSubmitted())
+                {
+                    _selectionFinalized = true;
+                    foreach (var holder in _holdersById.Values)
+                        holder.Disable();
+
+                    _subtitleLabel.Text = "所有玩家已锁定选择，开始结算……";
+                    return;
+                }
+
+                await Task.Yield();
+            }
+
+            throw new TimeoutException("Starting persona relic selection timed out while waiting for votes.");
         }
-
-        var synchronizer = await WaitForPlayerChoiceSynchronizerAsync();
-        if (synchronizer == null)
-            throw new InvalidOperationException("PlayerChoiceSynchronizer was not ready for starting persona selection.");
-
-        var choiceIds = _orderedPlayers.ToDictionary(player => player.NetId, player => synchronizer.ReserveChoiceId(player));
-        var selectionTasks = _orderedPlayers
-            .Select(player => CollectSelectionForPlayer(player, synchronizer, choiceIds[player.NetId]))
-            .ToList();
-        await Task.WhenAll(selectionTasks);
-    }
-
-    private async Task CollectSelectionForPlayer(Player player, PlayerChoiceSynchronizer synchronizer, uint choiceId)
-    {
-        if (LocalContext.IsMe(player))
+        finally
         {
-            var selectedIndex = await _localChoiceSource.Task;
-            synchronizer.SyncLocalChoice(player, choiceId, PlayerChoiceResult.FromIndex(selectedIndex));
-            ApplySelection(player, selectedIndex);
-            return;
+            TreasureRoomRelicSessionHelper.EndSessionSafely(relicSynchronizer);
         }
-
-        var selectedIndexRemote = (await synchronizer.WaitForRemoteChoice(player, choiceId)).AsIndex();
-        ApplySelection(player, selectedIndexRemote);
-    }
-
-    private async Task<PlayerChoiceSynchronizer?> WaitForPlayerChoiceSynchronizerAsync()
-    {
-        for (var frame = 0; frame < 60; frame++)
-        {
-            if (RunManager.Instance.PlayerChoiceSynchronizer != null)
-                return RunManager.Instance.PlayerChoiceSynchronizer;
-
-            await Task.Yield();
-        }
-
-        return RunManager.Instance.PlayerChoiceSynchronizer;
     }
 
     private void ApplySelection(Player player, int selectedIndex)
@@ -343,6 +330,37 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         foreach (var relic in _relicOptions)
             SaveManager.Instance.MarkRelicAsSeen(relic);
+    }
+
+    private void SyncSelectionStatesFromVotes(TreasureRoomRelicSynchronizer synchronizer)
+    {
+        foreach (var player in _orderedPlayers)
+        {
+            var vote = synchronizer.GetPlayerVote(player);
+            var selectedRelic = vote.voteReceived
+                && vote.index.HasValue
+                && vote.index.Value >= 0
+                && vote.index.Value < _relicOptions.Count
+                ? _relicOptions[vote.index.Value]
+                : null;
+
+            var state = _selectionStates[player.NetId];
+            if (state.SelectionResolved == vote.voteReceived
+                && state.SelectedRelic?.Id == selectedRelic?.Id)
+            {
+                continue;
+            }
+
+            state.SelectionResolved = vote.voteReceived;
+            state.SelectedRelic = selectedRelic;
+        }
+
+        RefreshVotes();
+    }
+
+    private bool AreAllSelectionsSubmitted()
+    {
+        return _selectionStates.Values.All(static state => state.SelectionResolved);
     }
 
     private List<RelicPickingResult> ResolveSelectionResults()
@@ -548,7 +566,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 await ToSignal(tween, Tween.SignalName.Finished);
 
                 if (result.fight != null)
-                    await AnimateFightSummaryAsync(result.fight);
+                    await AnimateFightSummaryAsync(result.fight, result.relic);
 
                 await AnimateAwardResultAsync(holder, result.player, "猜拳胜出");
 
@@ -572,19 +590,19 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             await Cmd.Wait(0.7f);
     }
 
-    private async Task AnimateFightSummaryAsync(RelicPickingFight fight)
+    private async Task AnimateFightSummaryAsync(RelicPickingFight fight, RelicModel relic)
     {
+        _fightLabel.Text = $"【{relic.Title.GetFormattedText()}】发生冲突，正在稳定判定归属";
+        await Cmd.Wait(0.8f);
+
         for (var roundIndex = 0; roundIndex < fight.rounds.Count; roundIndex++)
         {
             var round = fight.rounds[roundIndex];
-            _fightLabel.Text = BuildFightRoundText(roundIndex, fight.playersInvolved, round);
-            await Cmd.Wait(1.2f);
-
             var activeMoves = round.moves.OfType<RelicPickingFightMove>().Distinct().ToList();
             if (activeMoves.Count == 2)
             {
                 var losingMove = GetLosingMove(activeMoves[0], activeMoves[1]);
-                _fightLabel.Text = $"第 {roundIndex + 1} 轮结束：{FormatMove(losingMove)} 落败";
+                _fightLabel.Text = $"第 {roundIndex + 1} 轮结束：{FormatMove(losingMove)} 方落败";
             }
             else
             {
@@ -593,7 +611,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     : $"第 {roundIndex + 1} 轮结束：平局，继续";
             }
 
-            await Cmd.Wait(0.7f);
+            await Cmd.Wait(0.55f);
         }
     }
 
@@ -674,22 +692,19 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private void OnHolderSelected(NTreasureRoomRelicHolder holder)
     {
-        if (_localChoiceSource.Task.IsCompleted)
+        if (_selectionFinalized)
             return;
 
         if (Time.GetTicksMsec() - _openedTicks <= 200uL)
             return;
 
-        var localPlayer = LocalContext.GetMe(_runState.Players);
-        if (localPlayer == null)
+        var relicSynchronizer = RunManager.Instance.TreasureRoomRelicSynchronizer;
+        if (relicSynchronizer == null)
             return;
 
-        foreach (var relicHolder in _holdersById.Values)
-            relicHolder.Disable();
-
-        ApplySelection(localPlayer, holder.Index);
-        _subtitleLabel.Text = "已提交你的选择，等待其他玩家……";
-        _localChoiceSource.TrySetResult(holder.Index);
+        relicSynchronizer.PickRelicLocally(holder.Index);
+        SyncSelectionStatesFromVotes(relicSynchronizer);
+        _subtitleLabel.Text = "已更新你的选择，等待其他玩家锁定……";
     }
 
     private void RefreshVotes(bool animate = true)
@@ -766,19 +781,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         public RelicModel? SelectedRelic { get; set; }
 
         public bool SelectionResolved { get; set; }
-    }
-
-    private string BuildFightRoundText(int roundIndex, IReadOnlyList<Player> players, RelicPickingFightRound round)
-    {
-        var parts = new List<string>(players.Count);
-        for (var index = 0; index < players.Count; index++)
-        {
-            var move = index < round.moves.Count ? round.moves[index] : null;
-            var moveText = move == null ? "离场" : FormatMove(move.Value);
-            parts.Add($"{players[index].NetId}:{moveText}");
-        }
-
-        return $"猜拳第 {roundIndex + 1} 轮\n{string.Join("  ", parts)}";
     }
 
     private static string FormatMove(RelicPickingFightMove move)
