@@ -14,6 +14,10 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 [HarmonyPatch(typeof(NGame), "StartRun")]
 public static class StartingPersonaRelicSelectionPatch
 {
+    private static readonly object SelectionLifecycleLock = new();
+    private static readonly HashSet<string> ActiveRunKeys = [];
+    private static readonly HashSet<string> CompletedRunKeys = [];
+
     [HarmonyPostfix]
     public static void Postfix(RunState runState, ref Task __result)
     {
@@ -29,9 +33,17 @@ public static class StartingPersonaRelicSelectionPatch
             return;
         }
 
+        var runKey = GetRunKey(runState);
+        if (!TryBeginSelection(runKey))
+        {
+            MainFile.Logger.Info($"Starting persona relic selection skipped because run '{runKey}' is already processing.");
+            return;
+        }
+
         var overlayStack = NOverlayStack.Instance;
         if (overlayStack == null)
         {
+            EndSelection(runKey, completed: false);
             MainFile.Logger.Warn("Starting persona relic selection skipped because overlay stack is not ready.");
             return;
         }
@@ -39,6 +51,7 @@ public static class StartingPersonaRelicSelectionPatch
         var relicOptions = CreateStartingPersonaRelicOptions(runState);
         if (relicOptions.Count == 0)
         {
+            EndSelection(runKey, completed: false);
             MainFile.Logger.Warn("Starting persona relic selection skipped because no persona relics are registered.");
             return;
         }
@@ -50,6 +63,12 @@ public static class StartingPersonaRelicSelectionPatch
             MainFile.Logger.Info(
                 $"Starting persona relic selection shown with {relicOptions.Count} persona relic options.");
             await screen.RelicPickingFinished();
+            EndSelection(runKey, completed: true);
+        }
+        catch
+        {
+            EndSelection(runKey, completed: false);
+            throw;
         }
         finally
         {
@@ -118,5 +137,35 @@ public static class StartingPersonaRelicSelectionPatch
 
         options.AddRange(fallbackOptions.Take(targetCount - options.Count));
         return options;
+    }
+
+    private static string GetRunKey(RunState runState)
+    {
+        var orderedPlayers = runState.Players
+            .Select(player => player.NetId.ToString())
+            .OrderBy(static netId => netId, StringComparer.Ordinal);
+        return $"{runState.Rng.StringSeed}|{string.Join(",", orderedPlayers)}";
+    }
+
+    private static bool TryBeginSelection(string runKey)
+    {
+        lock (SelectionLifecycleLock)
+        {
+            if (CompletedRunKeys.Contains(runKey) || ActiveRunKeys.Contains(runKey))
+                return false;
+
+            ActiveRunKeys.Add(runKey);
+            return true;
+        }
+    }
+
+    private static void EndSelection(string runKey, bool completed)
+    {
+        lock (SelectionLifecycleLock)
+        {
+            ActiveRunKeys.Remove(runKey);
+            if (completed)
+                CompletedRunKeys.Add(runKey);
+        }
     }
 }
