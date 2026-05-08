@@ -40,6 +40,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private readonly Dictionary<ModelId, NTreasureRoomRelicHolder> _holdersById = new();
 
     private Control _holderContainer = null!;
+    private NHandImageCollection _hands = null!;
     private Label _titleLabel = null!;
     private Label _subtitleLabel = null!;
     private ColorRect _fightBackstop = null!;
@@ -49,7 +50,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private bool _holdersBuilt;
     private ulong _openedTicks;
 
-    public NetScreenType ScreenType => NetScreenType.None;
+    public NetScreenType ScreenType => NetScreenType.SharedRelicPicking;
 
     public bool UseSharedBackstop => true;
 
@@ -105,6 +106,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (NRun.Instance?.ScreenStateTracker == null)
             throw new InvalidOperationException("Run screen state tracker was not ready for starting persona selection.");
 
+        _hands.Initialize(_runState);
         NRun.Instance.ScreenStateTracker.SetIsInSharedRelicPickingScreen(isInSharedRelicPicking: true);
         AnimateIn();
         _openedTicks = Time.GetTicksMsec();
@@ -178,6 +180,14 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _holderContainer.OffsetTop = 140f;
         _holderContainer.OffsetBottom = -60f;
         AddChild(_holderContainer);
+
+        _hands = new NHandImageCollection
+        {
+            Name = "HandsContainer",
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        _hands.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        AddChild(_hands);
 
         _fightBackstop = new ColorRect
         {
@@ -259,6 +269,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             })).SetDelay(delay + 0.5f);
         }
 
+        _hands.AnimateHandsIn();
     }
 
     private async Task RunSelectionFlow()
@@ -503,8 +514,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         foreach (var state in _selectionStates.Values)
         {
             if (state.SelectedRelic == null)
+            {
+                _hands.GetHand(state.Player.NetId)?.SetSkipped();
                 MainFile.Logger.Info($"Starting persona selection player {state.Player.NetId} skipped pick.");
+            }
         }
+
+        _hands.BeforeRelicsAwarded();
 
         RelicPickingResultType? previousType = null;
 
@@ -531,6 +547,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 await ToSignal(tween, Tween.SignalName.Finished);
 
                 await Cmd.Wait(1f);
+                if (result.fight != null)
+                    _hands.BeforeFightStarted(result.fight.playersInvolved);
                 await AnimateFightResolutionAsync(result, holder);
 
                 var fadeTween = CreateTween();
@@ -556,6 +574,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (result.player == null)
             return;
 
+        if (result.fight != null)
+        {
+            await _hands.DoFight(result, holder);
+            return;
+        }
+
         _fightLabel.Text = $"【{result.relic.Title.GetFormattedText()}】归属玩家 {result.player.NetId}";
         await Cmd.Wait(0.9f);
         await AnimateAwardedHolderAsync(holder, result.player);
@@ -563,6 +587,15 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private async Task AnimateAwardedHolderAsync(NTreasureRoomRelicHolder holder, Player player)
     {
+        var hand = _hands.GetHand(player.NetId);
+        if (hand != null)
+        {
+            await hand.GrabRelic(holder);
+            holder.Visible = false;
+            holder.Scale = Vector2.One;
+            return;
+        }
+
         var targetPosition = ResolvePlayerAnchorPosition(player, holder.Size);
         var tween = CreateTween().SetParallel();
         tween.TweenProperty(holder, "global_position", targetPosition, 0.35f)
