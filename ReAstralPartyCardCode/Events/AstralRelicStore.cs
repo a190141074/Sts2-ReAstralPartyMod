@@ -39,8 +39,8 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         return
         [
             CreatePurchaseOption<PackRandomTokenBlue>(BluePackCost, BuyBluePack, "BLUE_PACK"),
-            CreatePurchaseOption<PackRandomTokenGold>(GoldPackCost, BuyGoldPack, "GOLD_PACK"),
-            CreatePurchaseOption<PackRandomTokenPurple>(PurplePackCost, BuyPurplePack, "PURPLE_PACK"),
+            CreatePurchaseOption<PackRandomTokenPurple>(GoldPackCost, BuyGoldPack, "GOLD_PACK"),
+            CreatePurchaseOption<PackRandomTokenGold>(PurplePackCost, BuyPurplePack, "PURPLE_PACK"),
             CreatePurchaseOption<TokenGoldInitialPoint>(InitialPointCost, BuyInitialPoint, "INITIAL_POINT")
         ];
     }
@@ -64,12 +64,12 @@ public sealed class AstralRelicStore : AstralPartyEventModel
 
     private Task BuyGoldPack()
     {
-        return CompletePurchase<PackRandomTokenGold>(GoldPackCost, "GOLD_PACK_FINISH");
+        return CompletePurchase<PackRandomTokenPurple>(GoldPackCost, "GOLD_PACK_FINISH");
     }
 
     private Task BuyPurplePack()
     {
-        return CompletePurchase<PackRandomTokenPurple>(PurplePackCost, "PURPLE_PACK_FINISH");
+        return CompletePurchase<PackRandomTokenGold>(PurplePackCost, "PURPLE_PACK_FINISH");
     }
 
     private Task BuyInitialPoint()
