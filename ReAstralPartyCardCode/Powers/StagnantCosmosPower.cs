@@ -16,10 +16,18 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 public class StagnantCosmosPower : AstralPartyPowerModel
 {
     private const decimal ProtocolCostPerTrigger = 1m;
+    private const decimal BonusStagnationAmount = 1m;
+
+    private sealed class PendingTrigger
+    {
+        public required CardModel Card { get; init; }
+        public required decimal PaidEnergy { get; init; }
+        public bool Consumed { get; set; }
+    }
 
     private sealed class Data
     {
-        public Dictionary<CardModel, decimal> EligibleCards { get; } = [];
+        public List<PendingTrigger> PendingTriggers { get; } = [];
     }
 
     public override PowerType Type => PowerType.Buff;
@@ -40,7 +48,7 @@ public class StagnantCosmosPower : AstralPartyPowerModel
         HoverTipFactory.FromPower<CosmosFreezesPower>()
     ];
 
-    public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    public override Task BeforeCardPlayed(CardPlay cardPlay)
     {
         if (Owner == null)
             return Task.CompletedTask;
@@ -53,7 +61,11 @@ public class StagnantCosmosPower : AstralPartyPowerModel
         if (paidEnergy < 1m)
             return Task.CompletedTask;
 
-        GetInternalData<Data>().EligibleCards[cardPlay.Card] = paidEnergy;
+        GetInternalData<Data>().PendingTriggers.Add(new PendingTrigger
+        {
+            Card = cardPlay.Card,
+            PaidEnergy = paidEnergy
+        });
         return Task.CompletedTask;
     }
 
@@ -81,7 +93,22 @@ public class StagnantCosmosPower : AstralPartyPowerModel
     public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
         if (Owner != null && side == Owner.Side)
-            GetInternalData<Data>().EligibleCards.Clear();
+            GetInternalData<Data>().PendingTriggers.Clear();
+
+        return Task.CompletedTask;
+    }
+
+    public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        var pendingTriggers = GetInternalData<Data>().PendingTriggers;
+        for (var i = pendingTriggers.Count - 1; i >= 0; i--)
+        {
+            if (!ReferenceEquals(pendingTriggers[i].Card, cardPlay.Card))
+                continue;
+
+            pendingTriggers.RemoveAt(i);
+            break;
+        }
 
         return Task.CompletedTask;
     }
@@ -108,10 +135,24 @@ public class StagnantCosmosPower : AstralPartyPowerModel
         if (Amount < ProtocolCostPerTrigger)
             return false;
 
-        if (!GetInternalData<Data>().EligibleCards.TryGetValue(cardSource, out var cardCost))
+        var pendingTrigger = FindPendingTrigger(cardSource);
+        if (pendingTrigger == null || pendingTrigger.Consumed)
             return false;
 
-        stagnationAmount = cardCost;
+        pendingTrigger.Consumed = true;
+        stagnationAmount = pendingTrigger.PaidEnergy + BonusStagnationAmount;
         return stagnationAmount > 0m;
+    }
+
+    private PendingTrigger? FindPendingTrigger(CardModel cardSource)
+    {
+        var pendingTriggers = GetInternalData<Data>().PendingTriggers;
+        for (var i = pendingTriggers.Count - 1; i >= 0; i--)
+        {
+            if (ReferenceEquals(pendingTriggers[i].Card, cardSource))
+                return pendingTriggers[i];
+        }
+
+        return null;
     }
 }

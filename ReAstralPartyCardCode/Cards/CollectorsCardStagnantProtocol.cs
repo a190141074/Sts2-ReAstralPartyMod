@@ -24,13 +24,13 @@ public class CollectorsCardStagnantProtocol : AstralPartyCardModel
         HoverTipFactory.FromPower<CosmosFreezesPower>()
     ];
 
-    public CollectorsCardStagnantProtocol() : base(2, CardType.Power, CardRarity.Rare, TargetType.Self)
+    public CollectorsCardStagnantProtocol() : base(1, CardType.Power, CardRarity.Rare, TargetType.Self)
     {
     }
 
     protected override void OnUpgrade()
     {
-        EnergyCost.UpgradeBy(-1);
+        CardCmd.ApplyKeyword(this, CardKeyword.Innate);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

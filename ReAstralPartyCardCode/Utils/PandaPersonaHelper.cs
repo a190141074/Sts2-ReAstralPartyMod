@@ -82,6 +82,12 @@ internal static class PandaPersonaHelper
         return total;
     }
 
+    public static bool HasAttackIntent(Creature creature)
+    {
+        var intent = TryReadIntentObject(creature);
+        return intent != null && intent.GetType().Name.Contains("Attack", StringComparison.OrdinalIgnoreCase);
+    }
+
     private static decimal TryReadAttackIntentDamage(Creature creature)
     {
         var intent = TryReadIntentObject(creature);
