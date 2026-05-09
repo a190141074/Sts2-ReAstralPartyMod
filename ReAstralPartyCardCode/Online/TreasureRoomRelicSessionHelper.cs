@@ -1,5 +1,6 @@
 using System.Reflection;
 using HarmonyLib;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
@@ -40,6 +41,10 @@ internal static class TreasureRoomRelicSessionHelper
         AccessTools.Method(typeof(TreasureRoomRelicSynchronizer), "EndRelicVoting")
         ?? throw new MissingMethodException(typeof(TreasureRoomRelicSynchronizer).FullName, "EndRelicVoting");
 
+    private static readonly MethodInfo BeginRelicPickingMethod =
+        AccessTools.Method(typeof(TreasureRoomRelicSynchronizer), "BeginRelicPicking")
+        ?? throw new MissingMethodException(typeof(TreasureRoomRelicSynchronizer).FullName, "BeginRelicPicking");
+
     public static bool TryBeginSession(
         TreasureRoomRelicSynchronizer synchronizer,
         IRunState runState,
@@ -57,12 +62,23 @@ internal static class TreasureRoomRelicSessionHelper
         foreach (var player in runState.Players)
             votes.Add(CreateInitialVote(runState, player, relicOptions.Count));
 
+        BeginRelicPickingMethod.Invoke(synchronizer, null);
+
         if (relicOptions.Count == 0)
             EndRelicVotingMethod.Invoke(synchronizer, null);
         else
             InvokeVotesChanged(synchronizer);
 
         return true;
+    }
+
+    public static void SubmitLocalPick(TreasureRoomRelicSynchronizer synchronizer, IRunState runState, int index)
+    {
+        var localPlayer = LocalContext.GetMe(runState.Players);
+        if (localPlayer == null)
+            throw new InvalidOperationException("Local player was not found for starting persona selection.");
+
+        synchronizer.OnPicked(localPlayer, index);
     }
 
     public static void EndSessionSafely(TreasureRoomRelicSynchronizer synchronizer)
