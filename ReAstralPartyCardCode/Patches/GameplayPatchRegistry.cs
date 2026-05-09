@@ -259,7 +259,7 @@ internal static class GameplayDynamicPatchCatalog
                 typeof(AstralRelicStoreEventOverridePatch),
                 nameof(AstralRelicStoreEventOverridePatch.PullNextEventPostfix)),
             isCritical: false,
-            description: "Gameplay patch: override the first second-act event pull to Astral Relic Store",
+            description: "Gameplay patch: keep Astral Relic Store pending until the first actual event pull in act 2",
             patchId: "astral_relic_store_pull_next_event_override");
     }
 }

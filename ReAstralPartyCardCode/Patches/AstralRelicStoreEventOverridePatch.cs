@@ -9,16 +9,18 @@ public static class AstralRelicStoreEventOverridePatch
 {
     public static void PullNextEventPostfix(ActModel __instance, RunState runState, ref EventModel __result)
     {
+        var storeId = ModelDb.Event<AstralRelicStore>().Id;
+        var storeVisited = runState.VisitedEventIds.Contains(storeId);
         if (!ShouldForceStoreEvent(__instance, runState, __result))
         {
             MainFile.Logger.Info(
-                $"AstralRelicStore skipped | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count}");
+                $"AstralRelicStore skipped | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeVisited={storeVisited}");
             return;
         }
 
         __result = ModelDb.Event<AstralRelicStore>();
         MainFile.Logger.Info(
-            $"AstralRelicStore override applied | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count}");
+            $"AstralRelicStore override applied | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | pendingUntilFirstActualEventPull=true");
     }
 
     private static bool ShouldForceStoreEvent(ActModel act, RunState? runState, EventModel? currentEvent)
@@ -27,9 +29,6 @@ public static class AstralRelicStoreEventOverridePatch
             return false;
 
         if (!IsSecondAct(runState, act))
-            return false;
-
-        if (runState.VisitedEventIds.Count != 1)
             return false;
 
         var storeId = ModelDb.Event<AstralRelicStore>().Id;
