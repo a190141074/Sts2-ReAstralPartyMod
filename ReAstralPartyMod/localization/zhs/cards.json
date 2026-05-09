@@ -1,6 +1,6 @@
 {
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.title": "麻烦制造者",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.description": "展示3张随机事件牌，选择1张立即发动。\n获得{StarLight:diff()}点[gold]星光[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.description": "展示3张随机事件牌，选择1张立即发动。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.select_prompt": "选择1张事件牌发动",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_ANGELS_DESCENT.title": "天使降临",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_ANGELS_DESCENT.description": "所有单位回复{Heal:diff()}点生命。",
@@ -15,7 +15,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FIGHT_FUN.title": "战斗，爽！",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FIGHT_FUN.description": "每名队友获得1张[gold]巨石[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_CROWDED_PASSAGE.title": "拥挤通道",
-  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_CROWDED_PASSAGE.description": "所有友方获得{Buffer:diff()}层[gold]缓冲[/gold]和{gold:diff()}层[gold]易伤[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_CROWDED_PASSAGE.description": "所有友方获得{Buffer:diff()}层[gold]缓冲[/gold]和{Vulnerable:diff()}层[gold]易伤[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_GIFT_FROM_SKY.title": "天降之物",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_GIFT_FROM_SKY.description": "所有友方抽{Cards:diff()}张牌，并获得{StarLight:diff()}点[gold]星光[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_HAND_ERASE.title": "手牌抹除",

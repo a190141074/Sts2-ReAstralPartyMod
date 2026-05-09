@@ -1,6 +1,6 @@
 {
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.title": "Trouble Maker",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.description": "Show 2 random other event cards. Choose 1 to play immediately. Gain {StarLight:diff()} [gold]StarLight[/gold].",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.description": "Show 3 random other event cards. Choose 1 to play immediately.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.select_prompt": "Choose an event card to play",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_ANGELS_DESCENT.title": "Angel's Descent",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_ANGELS_DESCENT.description": "Restore {Heal:diff()} HP to all creatures.",
