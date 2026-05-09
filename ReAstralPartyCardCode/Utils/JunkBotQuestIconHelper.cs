@@ -2,6 +2,7 @@ using Godot;
 using MegaCrit.Sts2.Core.Assets;
 using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Screens.Map;
 using MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Runs.History;
@@ -37,6 +38,28 @@ public static class JunkBotQuestIconHelper
     public static bool HasJunkBotQuest(MapPoint? point)
     {
         return point?.Quests.Any(IsJunkBotQuestModel) == true;
+    }
+
+    public static bool TryApplyMapQuestIcon(NNormalMapPoint mapPointNode, bool logSkipped = true)
+    {
+        if (!HasJunkBotQuest(mapPointNode.Point))
+            return false;
+
+        var questIcon = mapPointNode.GetNodeOrNull<TextureRect>("%QuestIcon");
+        var texture = LoadTexture();
+        if (questIcon == null || texture == null)
+        {
+            if (logSkipped)
+            {
+                MainFile.Logger.Warn(
+                    $"Junk Bot map quest icon patch skipped | questIconFound={questIcon != null} | textureLoaded={texture != null} | path={IconPath}");
+            }
+
+            return false;
+        }
+
+        questIcon.Texture = texture;
+        return true;
     }
 
     public static bool HasJunkBotCompletedQuest(NMapPointHistoryEntry entry)

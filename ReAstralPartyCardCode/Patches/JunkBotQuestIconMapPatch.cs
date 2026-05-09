@@ -11,20 +11,9 @@ public static class JunkBotQuestIconMapPatch
     [HarmonyPostfix]
     public static void Postfix(NNormalMapPoint __instance)
     {
-        if (!JunkBotQuestIconHelper.HasJunkBotQuest(__instance.Point))
+        if (!JunkBotQuestIconHelper.TryApplyMapQuestIcon(__instance))
             return;
 
-        var questIcon = __instance.GetNodeOrNull<TextureRect>("%QuestIcon");
-        var texture = JunkBotQuestIconHelper.LoadTexture();
-        if (questIcon == null || texture == null)
-        {
-            MainFile.Logger.Warn(
-                $"Junk Bot map quest icon patch skipped | questIconFound={questIcon != null} | textureLoaded={texture != null} | path={JunkBotQuestIconHelper.IconPath}");
-            return;
-        }
-
-        questIcon.Texture = texture;
-        MainFile.Logger.Info(
-            $"Junk Bot map quest icon replaced | path={JunkBotQuestIconHelper.IconPath}");
+        MainFile.Logger.Info($"Junk Bot map quest icon replaced | path={JunkBotQuestIconHelper.IconPath}");
     }
 }

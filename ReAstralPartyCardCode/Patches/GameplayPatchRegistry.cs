@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Cards.Holders;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Nodes.Screens;
+using MegaCrit.Sts2.Core.Nodes.Screens.Map;
 using MegaCrit.Sts2.Core.Nodes.Screens.RelicCollection;
 using MegaCrit.Sts2.Core.Nodes.Screens.TreasureRoomRelic;
 using MegaCrit.Sts2.Core.Rewards;
@@ -198,6 +199,7 @@ internal static class GameplayDynamicPatchCatalog
             isCritical: false,
             description: "UI patch: replace Junk Bot quest markers with the custom map icon",
             patchId: "junk_bot_quest_icon_map");
+        TryRegisterJunkBotMapScreenPatch(builder);
         builder.AddMethod(
             typeof(MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen.NMapPointHistoryEntry),
             nameof(MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen.NMapPointHistoryEntry.SetPlayer),
@@ -208,6 +210,27 @@ internal static class GameplayDynamicPatchCatalog
             isCritical: false,
             description: "UI patch: replace Junk Bot completed quest markers in run history",
             patchId: "junk_bot_quest_icon_history");
+    }
+
+    private static void TryRegisterJunkBotMapScreenPatch(DynamicPatchBuilder builder)
+    {
+        var postfix = DynamicPatchBuilder.FromMethod(
+            typeof(JunkBotQuestIconMapScreenPatch),
+            nameof(JunkBotQuestIconMapScreenPatch.Postfix));
+
+        var target = AccessTools.DeclaredMethod(
+            typeof(NMapScreen),
+            "SetMap",
+            [typeof(MegaCrit.Sts2.Core.Map.ActMap), typeof(uint), typeof(bool)]);
+        if (target != null)
+        {
+            builder.Add(
+                target,
+                postfix: postfix,
+                isCritical: false,
+                description: "UI patch: re-apply Junk Bot quest markers after map screen refresh",
+                patchId: "junk_bot_quest_icon_map_screen_refresh");
+        }
     }
 
     private static void RegisterCompatibilityBridgePatches(DynamicPatchBuilder builder)
