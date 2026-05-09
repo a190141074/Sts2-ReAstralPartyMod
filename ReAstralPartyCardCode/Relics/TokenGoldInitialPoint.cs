@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 using ReAstralPartyMod.ReAstralPartyCardCode.RestSite;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
@@ -22,6 +23,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class TokenGoldInitialPoint : AstralPartyRelicModel
 {
     private const int MaxAscensions = 3;
+    private const int AscensionChoiceCount = 3;
     private const int FirstAscensionCost = 60;
     private const int SecondAscensionCost = 90;
     private const int ThirdAscensionCost = 120;
@@ -76,7 +78,17 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
             if (player.Gold < goldCost)
                 return false;
 
-            var reward = GetRandomAscensionReward(player);
+            var rewardOptions = BuildAscensionRewardOptions(player);
+            if (rewardOptions.Count == 0)
+                return false;
+
+            using var _ = RelicSelectionHeaderContext.Push(
+                new LocString("relics", $"{Id.Entry}.selectionScreenHeader").GetRawText());
+
+            var reward = await DeterministicMultiplayerChoiceHelper.SelectRelicForPlayer(
+                player,
+                rewardOptions,
+                $"{Id.Entry}.ascension-choice");
             if (reward == null)
                 return false;
 
@@ -127,24 +139,42 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         await CreatureCmd.Heal(player.Creature, healAmount, true);
     }
 
-    private RelicModel? GetRandomAscensionReward(Player player)
+    private List<RelicModel> BuildAscensionRewardOptions(Player player)
     {
         if (Owner == null || player != Owner)
-            return null;
+            return [];
 
         var rng = player.PlayerRng.Rewards;
+        var selectedIds = new HashSet<ModelId>();
+        var selectedRelics = new List<RelicModel>(AscensionChoiceCount);
+
+        for (var slotIndex = 0; slotIndex < AscensionChoiceCount; slotIndex++)
+        {
+            var reward = GetAscensionRewardCandidate(player, rng, selectedIds);
+            if (reward == null)
+                break;
+
+            selectedRelics.Add(reward);
+            selectedIds.Add(GetCanonicalId(reward));
+        }
+
+        return selectedRelics;
+    }
+
+    private RelicModel? GetAscensionRewardCandidate(Player player, Rng rng, IReadOnlySet<ModelId> selectedIds)
+    {
         var rolledRarity = RollAscensionRewardRarity(rng);
 
         foreach (var rarity in GetRaritySelectionOrder(rolledRarity))
         {
-            var unownedCandidates = GetCandidates(player, rarity, true);
+            var unownedCandidates = GetCandidates(player, rarity, true, selectedIds);
             if (unownedCandidates.Count > 0)
                 return unownedCandidates[rng.NextInt(unownedCandidates.Count)];
         }
 
         foreach (var rarity in GetRaritySelectionOrder(rolledRarity))
         {
-            var anyCandidates = GetCandidates(player, rarity, false);
+            var anyCandidates = GetCandidates(player, rarity, false, selectedIds);
             if (anyCandidates.Count > 0)
                 return anyCandidates[rng.NextInt(anyCandidates.Count)];
         }
@@ -173,9 +203,10 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
                 yield return fallback;
     }
 
-    private List<RelicModel> GetCandidates(Player player, RelicRarity rarity, bool excludeOwned)
+    private List<RelicModel> GetCandidates(Player player, RelicRarity rarity, bool excludeOwned, IReadOnlySet<ModelId> selectedIds)
     {
         return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(player.RunState, rarity)
+            .Where(relic => !selectedIds.Contains(GetCanonicalId(relic)))
             .Where(relic => IsValidRewardCandidate(player, relic, excludeOwned))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
@@ -191,5 +222,10 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
             return false;
 
         return !excludeOwned || player.Relics.All(owned => owned.CanonicalInstance.Id != relic.CanonicalInstance.Id);
+    }
+
+    private static ModelId GetCanonicalId(RelicModel relic)
+    {
+        return relic.CanonicalInstance?.Id ?? relic.Id;
     }
 }

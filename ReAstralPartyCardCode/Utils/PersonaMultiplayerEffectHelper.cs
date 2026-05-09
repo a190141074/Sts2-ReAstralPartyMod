@@ -76,7 +76,8 @@ public static class PersonaMultiplayerEffectHelper
 
     public static Task<RelicModel> ObtainRelicDeterministic(Player owner, RelicModel relic)
     {
-        return RelicCmd.Obtain(relic.ToMutable(), owner);
+        var canonicalRelic = relic.CanonicalInstance ?? relic;
+        return RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
     }
 
     public static Task<RelicModel> ObtainRelicAsReward(Player owner, RelicModel relic)
