@@ -15,11 +15,14 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Helpers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class PersonaMultiplayerEffectHelper
 {
+    private const int DuplicateInitialPointFallbackEternalStarlightStacks = 3;
+
     public static Task AddGeneratedCardToHandAndNotify(
         CardModel card,
         bool animate = true,
@@ -77,6 +80,9 @@ public static class PersonaMultiplayerEffectHelper
     public static Task<RelicModel> ObtainRelicDeterministic(Player owner, RelicModel relic)
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
+        if (canonicalRelic.Id == ModelDb.GetId<TokenGoldInitialPoint>() && owner.GetRelic<TokenGoldInitialPoint>() != null)
+            return ObtainDuplicateInitialPointFallback(owner);
+
         return RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
     }
 
@@ -179,6 +185,18 @@ public static class PersonaMultiplayerEffectHelper
 
         var index = pile.Cards.IndexOf(card);
         return $"{pile.Type}:{index:D4}";
+    }
+
+    private static async Task<RelicModel> ObtainDuplicateInitialPointFallback(Player owner)
+    {
+        var eternalStarlight = await TokenEternalStarlight.GrantStacks(
+            owner,
+            DuplicateInitialPointFallbackEternalStarlightStacks);
+
+        if (eternalStarlight != null)
+            return eternalStarlight;
+
+        return owner.GetRelic<TokenGoldInitialPoint>()!;
     }
 
     private static void GuardRewardSyncAllowed(string operation)
