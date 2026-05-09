@@ -65,6 +65,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private Player? _localPlayer;
     private Player? _authorityPlayer;
     private bool _multiplayerCommitSent;
+    private bool _closeQueued;
 
     public NetScreenType ScreenType => NetScreenType.None;
 
@@ -107,11 +108,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     public void Close()
     {
-        if (_closed)
+        if (_closed || _closeQueued)
             return;
 
-        _closed = true;
-        NOverlayStack.Instance?.Remove(this);
+        _closeQueued = true;
+        _ = TaskHelper.RunSafely(CloseAfterInputReleasedAsync());
     }
 
     public void AfterOverlayOpened()
@@ -130,6 +131,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     public void AfterOverlayClosed()
     {
+        _closed = true;
         QueueFree();
     }
 
@@ -1015,6 +1017,46 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             else
                 await Task.Yield();
         }
+    }
+
+    private async Task CloseAfterInputReleasedAsync()
+    {
+        try
+        {
+            await WaitForMouseReleaseAsync();
+        }
+        finally
+        {
+            if (!_closed)
+                NOverlayStack.Instance?.Remove(this);
+        }
+    }
+
+    private async Task WaitForMouseReleaseAsync()
+    {
+        if (!await AwaitProcessFrameIfInsideTreeAsync())
+            return;
+
+        while (Input.IsMouseButtonPressed(MouseButton.Left))
+        {
+            if (!await AwaitProcessFrameIfInsideTreeAsync())
+                return;
+        }
+
+        await AwaitProcessFrameIfInsideTreeAsync();
+    }
+
+    private async Task<bool> AwaitProcessFrameIfInsideTreeAsync()
+    {
+        if (!IsInsideTree())
+            return false;
+
+        var tree = GetTree();
+        if (tree == null)
+            return false;
+
+        await ToSignal(tree, SceneTree.SignalName.ProcessFrame);
+        return IsInsideTree();
     }
 
     private static PlayerChoiceResult CreateSelectionUpdateChoiceResult(int sequence, int selectedIndex)

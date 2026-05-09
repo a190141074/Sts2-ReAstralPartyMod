@@ -112,6 +112,15 @@ internal static class GameplayStaticPatchCatalog
                 typeof(EventOptionLockedHoverUnfocusPatch),
                 isCritical: false,
                 description: "UI patch: clean up hover tips for locked event options")
+            ,
+            new ModPatchInfo(
+                "multiplayer_relic_animation_safety_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Relics.NRelicInventoryHolder),
+                nameof(MegaCrit.Sts2.Core.Nodes.Relics.NRelicInventoryHolder.PlayNewlyAcquiredAnimation),
+                typeof(MultiplayerRelicAnimationSafetyPatch),
+                isCritical: false,
+                description: "UI patch: skip newly acquired relic animations when the inventory holder is no longer usable",
+                parameterTypes: [typeof(Godot.Vector2?), typeof(Godot.Vector2?)])
         ]);
     }
 
