@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Saves.Runs;
 
@@ -14,14 +16,10 @@ internal static class SavedPropertyCacheBootstrap
         var discoveredTypeCount = 0;
         var discoveredPropertyCount = 0;
 
-        var modelTypes = assembly
-            .GetTypes()
-            .Where(static type =>
-                !type.IsAbstract &&
-                typeof(AbstractModel).IsAssignableFrom(type) &&
-                HasSavedProperties(type))
-            .OrderBy(static type => type.FullName, StringComparer.Ordinal)
+        var modelTypes = DeterministicTypeCatalog
+            .GetAssignableTypes<AbstractModel>(assembly, HasSavedProperties)
             .ToArray();
+        var fingerprint = ComputeFingerprint(modelTypes);
 
         foreach (var modelType in modelTypes)
         {
@@ -41,7 +39,8 @@ internal static class SavedPropertyCacheBootstrap
             injectedTypeCount,
             discoveredPropertyCount,
             totalPropertyNameCount,
-            SavedPropertiesTypeCache.NetIdBitSize);
+            SavedPropertiesTypeCache.NetIdBitSize,
+            fingerprint);
     }
 
     private static bool HasSavedProperties(Type modelType)
@@ -77,6 +76,40 @@ internal static class SavedPropertyCacheBootstrap
 
         return count;
     }
+
+    private static string ComputeFingerprint(IEnumerable<Type> modelTypes)
+    {
+        var builder = new StringBuilder();
+
+        foreach (var modelType in modelTypes)
+        {
+            builder.Append(modelType.FullName);
+            builder.Append('|');
+
+            foreach (var property in GetSavedProperties(modelType))
+            {
+                builder.Append(property.Name);
+                builder.Append(':');
+                builder.Append(property.PropertyType.FullName);
+                builder.Append(';');
+            }
+
+            builder.AppendLine();
+        }
+
+        var bytes = Encoding.UTF8.GetBytes(builder.ToString());
+        var hash = SHA256.HashData(bytes);
+        return Convert.ToHexString(hash);
+    }
+
+    private static IReadOnlyList<PropertyInfo> GetSavedProperties(Type modelType)
+    {
+        return modelType
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            .Where(static property => property.GetCustomAttribute<SavedPropertyAttribute>() != null)
+            .OrderBy(static property => property.Name, StringComparer.Ordinal)
+            .ToArray();
+    }
 }
 
 internal sealed record SavedPropertyBootstrapResult(
@@ -84,4 +117,5 @@ internal sealed record SavedPropertyBootstrapResult(
     int InjectedTypeCount,
     int DiscoveredPropertyCount,
     int TotalPropertyNameCount,
-    int NetIdBitSize);
+    int NetIdBitSize,
+    string Fingerprint);

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using MegaCrit.Sts2.Core.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -32,8 +31,8 @@ public static class BaseAbilityCardRegistry
 
     private static IReadOnlyList<Type> DiscoverBaseAbilityTypes()
     {
-        return Assembly.GetExecutingAssembly()
-            .GetTypes()
+        return DeterministicTypeCatalog
+            .GetSortedTypes(typeof(AstralPartyCardModel).Assembly)
             .Where(type =>
                 !type.IsAbstract
                 && typeof(AstralPartyCardModel).IsAssignableFrom(type)

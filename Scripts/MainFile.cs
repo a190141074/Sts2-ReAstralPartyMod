@@ -28,8 +28,8 @@ public class MainFile
         // Current content still references minted CardKeyword values while models materialize,
         // so keywords must be registered before assembly auto-discovery runs.
         AstralKeywords.RegisterAll();
-        ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
         PreloadSavedPropertyCache(assembly);
+        ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
         GameplayPatchRegistry.RegisterAndApply();
 
         var buildMarker = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
@@ -47,7 +47,7 @@ public class MainFile
         {
             var result = SavedPropertyCacheBootstrap.PreloadFromAssembly(assembly);
             Logger.Info(
-                $"{ModId} saved properties | discovered_types={result.DiscoveredTypeCount} | injected_types={result.InjectedTypeCount} | discovered_properties={result.DiscoveredPropertyCount} | total_property_names={result.TotalPropertyNameCount} | net_id_bits={result.NetIdBitSize}");
+                $"{ModId} saved properties | discovered_types={result.DiscoveredTypeCount} | injected_types={result.InjectedTypeCount} | discovered_properties={result.DiscoveredPropertyCount} | total_property_names={result.TotalPropertyNameCount} | net_id_bits={result.NetIdBitSize} | fingerprint={result.Fingerprint}");
         }
         catch (Exception ex)
         {

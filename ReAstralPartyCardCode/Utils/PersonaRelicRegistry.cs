@@ -9,12 +9,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class PersonaRelicRegistry
 {
-    private static readonly IReadOnlyList<RelicModel> PersonaRelics = typeof(PersonaRelicBase)
-        .Assembly
-        .GetTypes()
-        .Where(type =>
-            type is { IsAbstract: false, IsClass: true }
-            && typeof(PersonaRelicBase).IsAssignableFrom(type))
+    private static readonly IReadOnlyList<RelicModel> PersonaRelics = DeterministicTypeCatalog
+        .GetAssignableTypes<PersonaRelicBase>(typeof(PersonaRelicBase).Assembly)
         .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
         .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
         .OrderBy(relic => (relic.CanonicalInstance?.Id ?? relic.Id).Entry, StringComparer.Ordinal)
