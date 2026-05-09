@@ -69,6 +69,15 @@ public class PersonSupermanMegas : LegacyCooldownPersonaRelicBase
         HoverTipFactory.FromPower<DrawCardsNextTurnPower>()
     ];
 
+    public override int ModifyMaxHandSize(Player player, int currentMaxHandSize)
+    {
+        var modifiedHandSize = base.ModifyMaxHandSize(player, currentMaxHandSize);
+        if (player != Owner)
+            return modifiedHandSize;
+
+        return modifiedHandSize + 3;
+    }
+
     protected override async Task BeforeAdvanceCounterOnTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
         if (PileType.Hand.GetPile(Owner).Cards.Count < NextTurnDrawThreshold)

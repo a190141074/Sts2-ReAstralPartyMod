@@ -7,7 +7,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 // Marker base for relics that should participate in persona-specific systems.
 public abstract class PersonaRelicBase : AstralPartyRelicModel, IMaxHandSizeModifier
 {
-    public int ModifyMaxHandSize(Player player, int currentMaxHandSize)
+    public virtual int ModifyMaxHandSize(Player player, int currentMaxHandSize)
     {
         if (player != Owner)
             return currentMaxHandSize;
