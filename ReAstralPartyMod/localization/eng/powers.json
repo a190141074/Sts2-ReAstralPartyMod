@@ -159,8 +159,11 @@
   "RE_ASTRAL_PARTY_MOD_POWER_SURVEY_FINDS_POWER.description": "When gained, [relic]Persona Derivative: Living Folio[/relic] gains [blue]1[/blue] stack. This turn, whenever your Skill cards deal damage to an enemy, they deal [blue]3[/blue] extra damage.",
   "RE_ASTRAL_PARTY_MOD_POWER_SURVEY_FINDS_POWER.smartDescription": "When gained, [relic]Persona Derivative: Living Folio[/relic] gains [blue]1[/blue] stack. This turn, your Skill cards deal [blue]3[/blue] extra damage.",
   "RE_ASTRAL_PARTY_MOD_POWER_FAN_POWER.title": "Fan",
-  "RE_ASTRAL_PARTY_MOD_POWER_FAN_POWER.description": "Deal [blue]1[/blue] less hostile damage. If the target is [relic]Persona: KAngel[/relic] or [relic]Persona: Needy Girl[/relic], deal [blue]1[/blue] less again.",
-  "RE_ASTRAL_PARTY_MOD_POWER_FAN_POWER.smartDescription": "Deal [blue]1[/blue] less hostile damage. Deal [blue]1[/blue] less again when targeting KAngel or Needy Girl.",
+  "RE_ASTRAL_PARTY_MOD_POWER_FAN_POWER.description": "Lose [blue]1[/blue] [red]Strength[/red]. If you deal damage to [relic]Persona: KAngel[/relic] or [relic]Persona: Needy Girl[/relic], that damage is reduced by [blue]1[/blue] more.",
+  "RE_ASTRAL_PARTY_MOD_POWER_FAN_POWER.smartDescription": "Lose [blue]1[/blue] [red]Strength[/red]. Deal [blue]1[/blue] less damage to KAngel or Needy Girl.",
+  "RE_ASTRAL_PARTY_MOD_POWER_MONEY_POWER.title": "Money Power",
+  "RE_ASTRAL_PARTY_MOD_POWER_MONEY_POWER.description": "Does not stack or duplicate. This turn, gain [blue]2[/blue] temporary [red]Strength[/red] and [blue]1[/blue] temporary [green]Dexterity[/green].",
+  "RE_ASTRAL_PARTY_MOD_POWER_MONEY_POWER.smartDescription": "Does not stack or duplicate. This turn, gain [blue]2[/blue] temporary [red]Strength[/red] and [blue]1[/blue] temporary [green]Dexterity[/green].",
   "RE_ASTRAL_PARTY_MOD_POWER_LOVE_POWER.title": "Love",
   "RE_ASTRAL_PARTY_MOD_POWER_LOVE_POWER.description": "Each stack grants [blue]1[/blue] [red]Strength[/red]. Every [blue]2[/blue] stacks also give [blue]-1[/blue] [green]Dexterity[/green]. Maximum [blue]4[/blue] stacks.",
   "RE_ASTRAL_PARTY_MOD_POWER_LOVE_POWER.smartDescription": "Each stack grants [blue]1[/blue] [red]Strength[/red]. Every [blue]2[/blue] stacks also give [blue]-1[/blue] [green]Dexterity[/green], up to [blue]4[/blue] stacks."

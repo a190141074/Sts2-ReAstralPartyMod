@@ -7,6 +7,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -23,8 +24,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public class PersonShadowScion : CooldownPersonaRelicBase
 {
-    private const int RoyalPrerogativeCombatsOnObtain = 1;
-    private const int EternalStarlightPerCombatBonus = 12;
+    private const int RoyalPrerogativeCombatCountPerAct = 1;
+    private const int EternalStarlightPerCombatBonus = 13;
     private const decimal CombatBonusPerThreshold = 1m;
 
     [SavedProperty] public int AstralParty_PersonShadowScionCounter { get; set; } = 1;
@@ -32,6 +33,8 @@ public class PersonShadowScion : CooldownPersonaRelicBase
     [SavedProperty] public bool AstralParty_PersonShadowScionPendingCombatStartCard { get; set; }
 
     [SavedProperty] public int AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats { get; set; }
+
+    [SavedProperty] public int AstralParty_PersonShadowScionPendingRoyalPrerogativeActIndex { get; set; } = -1;
 
     protected override int CounterValue
     {
@@ -60,13 +63,15 @@ public class PersonShadowScion : CooldownPersonaRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats = RoyalPrerogativeCombatsOnObtain;
+        RefreshPendingRoyalPrerogativeForCurrentAct();
     }
 
     public override async Task BeforeCombatStart()
     {
         if (Owner?.Creature?.CombatState == null)
             return;
+
+        RefreshPendingRoyalPrerogativeForCurrentAct();
 
         if (AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats > 0)
         {
@@ -133,6 +138,23 @@ public class PersonShadowScion : CooldownPersonaRelicBase
         );
     }
 
+    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier,
+        CardModel? cardSource)
+    {
+        if (Owner?.Creature == null || power.Owner != Owner.Creature)
+            return;
+        if (power is not StarLightPower)
+            return;
+        if (amount <= 0m)
+            return;
+
+        if (Owner.Creature.HasPower<MoneyPower>())
+            return;
+
+        Flash();
+        await PowerCmd.Apply<MoneyPower>(Owner.Creature, 1m, applier, cardSource, false);
+    }
+
     protected override async Task GrantCooldownCard()
     {
         if (Owner?.Creature?.CombatState == null)
@@ -141,5 +163,18 @@ public class PersonShadowScion : CooldownPersonaRelicBase
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillPowerfulPity>(), Owner);
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+    }
+
+    private void RefreshPendingRoyalPrerogativeForCurrentAct()
+    {
+        if (Owner?.RunState == null)
+            return;
+
+        var currentActIndex = Owner.RunState.CurrentActIndex;
+        if (AstralParty_PersonShadowScionPendingRoyalPrerogativeActIndex == currentActIndex)
+            return;
+
+        AstralParty_PersonShadowScionPendingRoyalPrerogativeActIndex = currentActIndex;
+        AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats = RoyalPrerogativeCombatCountPerAct;
     }
 }
