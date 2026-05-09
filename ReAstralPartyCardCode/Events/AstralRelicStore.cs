@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Gold;
-using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Events;
-using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Runs;
@@ -18,7 +16,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Events;
 [RegisterActEvent(typeof(Underdocks))]
 public sealed class AstralRelicStore : AstralPartyEventModel
 {
-    private const string ImplementationVersion = "2026-05-08-safe-2";
+    private const string ImplementationVersion = "2026-05-09-safe-preface-gold";
     private const decimal BluePackCost = 50m;
     private const decimal PurplePackCost = 75m;
     private const decimal GoldPackCost = 100m;
@@ -36,6 +34,27 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         MainFile.Logger.Info(
             $"AstralRelicStore GenerateInitialOptions | impl={ImplementationVersion} | owner={Owner?.NetId.ToString() ?? "null"} | gold={Owner?.Gold.ToString() ?? "null"}");
 
+        return [new EventOption(this, OpenStorefront, InitialOptionKey("FOUND_ONE_GOLD"))];
+    }
+
+    private async Task OpenStorefront()
+    {
+        ArgumentNullException.ThrowIfNull(Owner);
+        var owner = Owner;
+
+        MainFile.Logger.Info(
+            $"AstralRelicStore OpenStorefront begin | impl={ImplementationVersion} | owner={owner.NetId} | gold_before={owner.Gold}");
+
+        await PersonaMultiplayerEffectHelper.GainGoldDeterministic(1m, owner);
+
+        MainFile.Logger.Info(
+            $"AstralRelicStore OpenStorefront success | impl={ImplementationVersion} | owner={owner.NetId} | gold_after={owner.Gold}");
+
+        SetEventState(PageDescription("STOREFRONT"), CreateStorefrontOptions());
+    }
+
+    private IReadOnlyList<EventOption> CreateStorefrontOptions()
+    {
         return
         [
             CreatePurchaseOption<PackRandomTokenBlue>(BluePackCost, BuyBluePack, "BLUE_PACK"),
@@ -48,13 +67,12 @@ public sealed class AstralRelicStore : AstralPartyEventModel
     private EventOption CreatePurchaseOption<TRelic>(decimal cost, Func<Task> onChosen, string optionKey)
         where TRelic : RelicModel
     {
-        var hoverTips = HoverTipFactory.FromRelic(ModelDb.Relic<TRelic>()).ToArray();
         var canAfford = Owner != null && Owner.Gold >= cost;
 
         MainFile.Logger.Info(
             $"AstralRelicStore CreatePurchaseOption | impl={ImplementationVersion} | relic={typeof(TRelic).Name} | cost={cost} | option={optionKey} | can_afford={canAfford}");
 
-        return new EventOption(this, canAfford ? onChosen : null, InitialOptionKey(optionKey), hoverTips);
+        return new EventOption(this, canAfford ? onChosen : null, ModOptionKey("STOREFRONT", optionKey));
     }
 
     private Task BuyBluePack()
@@ -90,7 +108,7 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         {
             MainFile.Logger.Warn(
                 $"AstralRelicStore CompletePurchase insufficient gold | impl={ImplementationVersion} | owner={owner.NetId} | relic={typeof(TRelic).Name} | gold_before={owner.Gold} | cost={goldCost}");
-            SetEventState(PageDescription("INITIAL"), GenerateInitialOptions());
+            SetEventState(PageDescription("STOREFRONT"), CreateStorefrontOptions());
             return;
         }
 
