@@ -21,15 +21,18 @@ public sealed class AstralRelicStore : AstralPartyEventModel
     private const decimal PurplePackCost = 75m;
     private const decimal GoldPackCost = 100m;
     private const decimal InitialPointCost = 1m;
+    private static readonly HashSet<string> ConsumedActs = [];
 
     public override bool IsAllowed(IRunState runState)
     {
         return runState.CurrentActIndex == 1
+               && !HasBeenConsumedThisAct(runState)
                && runState.Players.All(player => player.Gold >= MinimumGoldRequiredPerPlayer);
     }
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions()
     {
+        MarkConsumedForCurrentAct();
         MainFile.Logger.Info(
             $"AstralRelicStore GenerateInitialOptions | owner={Owner?.NetId.ToString() ?? "null"} | gold={Owner?.Gold.ToString() ?? "null"}");
 
@@ -116,5 +119,31 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         MainFile.Logger.Info(
             $"AstralRelicStore CompletePurchase success | owner={owner.NetId} | relic={typeof(TRelic).Name} | gold_after={owner.Gold}");
         SetEventFinished(PageDescription(finishPageName));
+    }
+
+    internal static bool HasBeenConsumedThisAct(IRunState? runState)
+    {
+        if (runState == null)
+            return false;
+
+        return ConsumedActs.Contains(GetCurrentActConsumptionKey(runState));
+    }
+
+    internal static void MarkConsumedForCurrentAct(IRunState? runState)
+    {
+        if (runState == null)
+            return;
+
+        ConsumedActs.Add(GetCurrentActConsumptionKey(runState));
+    }
+
+    private void MarkConsumedForCurrentAct()
+    {
+        MarkConsumedForCurrentAct(Owner?.RunState);
+    }
+
+    private static string GetCurrentActConsumptionKey(IRunState runState)
+    {
+        return $"{runState.Rng.StringSeed}|act:{runState.CurrentActIndex}";
     }
 }

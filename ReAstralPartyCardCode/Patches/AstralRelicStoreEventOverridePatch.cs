@@ -12,16 +12,18 @@ public static class AstralRelicStoreEventOverridePatch
         var storeEvent = ModelDb.Event<AstralRelicStore>();
         var storeId = storeEvent.Id;
         var storeVisited = runState.VisitedEventIds.Contains(storeId);
+        var storeConsumedThisAct = AstralRelicStore.HasBeenConsumedThisAct(runState);
         if (!ShouldForceStoreEvent(__instance, runState, __result))
         {
             MainFile.Logger.Info(
-                $"AstralRelicStore skipped | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeVisited={storeVisited}");
+                $"AstralRelicStore skipped | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeVisited={storeVisited} | storeConsumedThisAct={storeConsumedThisAct}");
             return;
         }
 
+        AstralRelicStore.MarkConsumedForCurrentAct(runState);
         __result = storeEvent;
         MainFile.Logger.Info(
-            $"AstralRelicStore override applied | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | pendingUntilFirstActualEventPull=true");
+            $"AstralRelicStore override applied | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeConsumedThisAct=true | pendingUntilFirstActualEventPull=false");
     }
 
     private static bool ShouldForceStoreEvent(ActModel act, RunState? runState, EventModel? currentEvent)
@@ -34,7 +36,9 @@ public static class AstralRelicStoreEventOverridePatch
 
         var storeEvent = ModelDb.Event<AstralRelicStore>();
         var storeId = storeEvent.Id;
-        if (currentEvent.Id == storeId || runState.VisitedEventIds.Contains(storeId))
+        if (currentEvent.Id == storeId
+            || runState.VisitedEventIds.Contains(storeId)
+            || AstralRelicStore.HasBeenConsumedThisAct(runState))
             return false;
 
         return true;
