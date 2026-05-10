@@ -70,23 +70,6 @@ public class SkillTransfer : AstralPartyCardModel
         Owner.GetRelic<PersonalityDerivativeProprietressWealthism>()?.IncreaseWealthCounter(1);
     }
 
-    public override (PileType, CardPilePosition) ModifyCardPlayResultPileTypeAndPosition(
-        CardModel card,
-        bool isAutoPlay,
-        ResourceInfo resources,
-        PileType pileType,
-        CardPilePosition position)
-    {
-        if (card != this)
-            return (pileType, position);
-
-        // Safety net: if runtime conditions are no longer valid, keep the card in hand.
-        if (!MeetsTransferConditions(CurrentTarget))
-            return (PileType.Hand, CardPilePosition.Top);
-
-        return (pileType, position);
-    }
-
     private bool HasAnyLivingPlayerTarget()
     {
         var combatState = Owner?.Creature?.CombatState;

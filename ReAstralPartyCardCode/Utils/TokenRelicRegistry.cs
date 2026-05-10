@@ -116,6 +116,10 @@ public static class TokenRelicRegistry
     private static readonly HashSet<ModelId> TokenRelicIds = CanonicalTokenRelics
         .Select(relic => relic.CanonicalInstance?.Id ?? relic.Id)
         .ToHashSet();
+    private static readonly HashSet<ModelId> ExcludedFromRandomTokenPools =
+    [
+        ModelDb.GetId<TokenEternalStarlight>()
+    ];
     private static readonly HashSet<ModelId> SeriesTokenRelicIds = SeriesTokenRelicTypes
         .Select(ModelDb.GetId)
         .ToHashSet();
@@ -129,6 +133,7 @@ public static class TokenRelicRegistry
     {
         return GetCanonicalTokenRelics()
             .Where(relic => relic.Rarity == rarity)
+            .Where(IsTokenRelicPoolCandidate)
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
     }
@@ -140,6 +145,7 @@ public static class TokenRelicRegistry
     {
         return GetCanonicalTokenRelics()
             .Where(relic => relic.Rarity == rarity)
+            .Where(IsTokenRelicPoolCandidate)
             .Where(relic => !excludeDice || !DiceSeriesHelper.IsDiceSeriesRelic(relic))
             .Where(relic => TokenSeriesAvailabilityHelper.IsRelicAvailableForRun(runState, relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
@@ -150,6 +156,7 @@ public static class TokenRelicRegistry
     {
         return GetCanonicalTokenRelics()
             .Where(relic => relic.Rarity == rarity)
+            .Where(IsTokenRelicPoolCandidate)
             .Where(relic => !DiceSeriesHelper.IsDiceSeriesRelic(relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
@@ -164,6 +171,12 @@ public static class TokenRelicRegistry
     {
         var id = relic.CanonicalInstance?.Id ?? relic.Id;
         return TokenRelicIds.Contains(id);
+    }
+
+    public static bool IsTokenRelicPoolCandidate(RelicModel relic)
+    {
+        var id = relic.CanonicalInstance?.Id ?? relic.Id;
+        return !ExcludedFromRandomTokenPools.Contains(id);
     }
 
     public static bool IsSeriesTokenRelic(RelicModel relic)
@@ -208,7 +221,9 @@ public static class TokenRelicRegistry
                 return candidates;
         }
 
-        return TokenSeriesAvailabilityHelper.FilterAvailableForRun(runState, GetCanonicalTokenRelics());
+        return TokenSeriesAvailabilityHelper.FilterAvailableForRun(runState, GetCanonicalTokenRelics())
+            .Where(IsTokenRelicPoolCandidate)
+            .ToList();
     }
 
     private static IEnumerable<RelicRarity> GetRarityFallbackOrder(RelicRarity rolledRarity)
