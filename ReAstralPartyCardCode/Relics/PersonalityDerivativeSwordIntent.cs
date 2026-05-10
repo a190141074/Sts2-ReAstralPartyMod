@@ -48,7 +48,7 @@ public class PersonalityDerivativeSwordIntent : AstralPartyRelicModel
         int consumedAura,
         CardModel sourceCard)
     {
-        if (Owner?.Creature == null || target == null || !target.IsAlive || target.Side == Owner.Creature.Side)
+        if (Owner?.Creature == null)
             return;
 
         if (consumedAura > 0)
@@ -63,6 +63,9 @@ public class PersonalityDerivativeSwordIntent : AstralPartyRelicModel
                 InvokeDisplayAmountChanged();
             }
         }
+
+        if (target == null || !target.IsAlive || target.Side == Owner.Creature.Side)
+            return;
 
         var pursuitDamage = AstralParty_PersonalityDerivativeSwordIntentCounter;
         if (pursuitDamage <= 0)

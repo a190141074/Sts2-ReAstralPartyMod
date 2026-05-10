@@ -39,6 +39,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_EVENTS_CONCEALING_INVESTIGATION_D.description": "Apply 2 [power]Mark[/power] to all units.\nAll allies each take 1 Attack card from their Draw pile first, otherwise from their Discard pile; if neither pile has an Attack, gain {energyPrefix:energyIcons(1)} instead.\nThen all allies gain [power]Concealing[/power].",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.title": "Famous Blade",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.description": "Deal {Damage:diff()} damage. After playing this, consume up to 2 [power]Sword Aura[/power]. Then gain 1 [power]Sword Aura[/power].",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.description_gawu_cutter": "Deal {Damage:diff()} damage. After playing this, consume up to 2 [power]Sword Aura[/power]. Then gain 1 [power]Sword Aura[/power]. After playing this, deal an additional [blue]1-20[/blue] random damage.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.title": "Healing Slime",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.description": "Gain {HalfLifeHealPower:diff()} [power]Half Life Heal[/power].",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.smartDescription": "Gain {HalfLifeHealPower:diff()} [power]Half Life Heal[/power].",

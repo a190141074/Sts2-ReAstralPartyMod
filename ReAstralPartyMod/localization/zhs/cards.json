@@ -39,6 +39,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_EVENTS_CONCEALING_INVESTIGATION_D.description": "所有单位获得2层[gold]标记[/gold]。\n所有队友各获得1张攻击牌；若其抽牌堆与弃牌堆都没有攻击牌，则改为获得{energyPrefix:energyIcons(1)}。\n然后所有队友获得[gold]隐匿[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.title": "名刀",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.description": "造成{Damage:diff()}点伤害。\n打出后，至多消耗2层[gold]剑气[/gold],用于增强剑意。\n获得1层[gold]剑气[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.description_gawu_cutter": "造成{Damage:diff()}点伤害。\n打出后，至多消耗2层[gold]剑气[/gold],用于增强剑意。\n获得1层[gold]剑气[/gold]。\n打出后，追加[blue]1-20[/blue]点随机伤害。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.title": "治愈黏液",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.description": "获得{HalfLifeHealPower:diff()}层[gold]治愈[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.smartDescription": "获得{HalfLifeHealPower:diff()}层[gold]治愈[/gold]。",

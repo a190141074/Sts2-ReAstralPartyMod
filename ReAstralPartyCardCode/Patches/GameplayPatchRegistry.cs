@@ -92,6 +92,14 @@ internal static class GameplayStaticPatchCatalog
                 description: "UI patch: override Famous Blade title getter",
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
+                "skill_famous_blade_description_patch",
+                typeof(CardModel),
+                nameof(CardModel.Description),
+                typeof(SkillFamousBladeDescriptionPatch),
+                isCritical: false,
+                description: "UI patch: override Famous Blade description getter",
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
                 "top_bar_open_token_series_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.CommonUi.NTopBar),
                 nameof(MegaCrit.Sts2.Core.Nodes.CommonUi.NTopBar.Initialize),
