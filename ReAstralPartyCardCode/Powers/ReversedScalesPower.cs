@@ -96,6 +96,8 @@ public class ReversedScalesPower : AstralPartyPowerModel
             return amount;
         if (amount <= 0m || Amount <= 0m)
             return amount;
+        if (dealer == null || dealer.Side == Owner?.Side)
+            return amount;
 
         return Math.Max(amount - Amount * DamageReductionPerStack, 0m);
     }

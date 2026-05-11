@@ -41,8 +41,20 @@ public class EventAnomalyLoveCatTv : AstralPartyCardModel
 
         foreach (var player in CombatState.Players)
         {
-            await PowerCmd.Apply<StrengthPower>(player.Creature, -TemporaryStrengthLoss, Owner.Creature, this, true);
-            await PowerCmd.Apply<DexterityPower>(player.Creature, -TemporaryDexterityLoss, Owner.Creature, this, true);
+            await AstralTemporaryStrengthPower.Apply(
+                player.Creature,
+                -TemporaryStrengthLoss,
+                this,
+                Owner.Creature,
+                this,
+                true);
+            await AstralTemporaryDexterityPower.Apply(
+                player.Creature,
+                -TemporaryDexterityLoss,
+                this,
+                Owner.Creature,
+                this,
+                true);
         }
 
         foreach (var enemy in CombatState.Creatures.Where(creature => creature.IsAlive && creature.Side != Owner.Creature.Side))
