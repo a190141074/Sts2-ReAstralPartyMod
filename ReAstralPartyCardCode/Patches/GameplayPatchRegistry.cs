@@ -198,6 +198,16 @@ internal static class GameplayDynamicPatchCatalog
             description: "UI patch: re-apply temporary card highlight after flash",
             patchId: "temporary_card_highlight_flash");
         builder.AddMethod(
+            typeof(NMapScreen),
+            "RecalculateTravelability",
+            Type.EmptyTypes,
+            postfix: DynamicPatchBuilder.FromMethod(
+                typeof(SpeedRollerFlightTravelabilityPatch),
+                nameof(SpeedRollerFlightTravelabilityPatch.Postfix)),
+            isCritical: false,
+            description: "UI patch: allow single-use Speed Roller flight to open the next row's map points",
+            patchId: "speed_roller_flight_travelability");
+        builder.AddMethod(
             typeof(MegaCrit.Sts2.Core.Nodes.Screens.Map.NNormalMapPoint),
             "_Ready",
             Type.EmptyTypes,
@@ -282,6 +292,21 @@ internal static class GameplayDynamicPatchCatalog
 
     private static void RegisterMultiplayerPatches(DynamicPatchBuilder builder)
     {
+        var speedRollerConsumeTarget = AccessTools.DeclaredMethod(
+            typeof(MegaCrit.Sts2.Core.GameActions.MoveToMapCoordAction),
+            "ExecuteAction",
+            Type.EmptyTypes);
+        if (speedRollerConsumeTarget != null)
+        {
+            builder.Add(
+                speedRollerConsumeTarget,
+                prefix: DynamicPatchBuilder.FromMethod(
+                    typeof(SpeedRollerFlightConsumePatch),
+                    nameof(SpeedRollerFlightConsumePatch.Prefix)),
+                isCritical: false,
+                description: "Gameplay patch: consume one Speed Roller flight charge when moving to an otherwise unreachable next-row map point",
+                patchId: "speed_roller_flight_consume");
+        }
         builder.AddMethod(
             typeof(MegaCrit.Sts2.Core.Models.ActModel),
             "PullNextEvent",

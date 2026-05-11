@@ -19,7 +19,7 @@ public class TokenGoldMotorcycleHelmetPremium : AstralPartyRelicModel
 {
     private const decimal CombatStartReversedScales = 2m;
     private const decimal CombatStartDexterity = 1m;
-    private const decimal BlockPerTurn = 3m;
+    private const decimal BlockPerTurn = 2m;
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 

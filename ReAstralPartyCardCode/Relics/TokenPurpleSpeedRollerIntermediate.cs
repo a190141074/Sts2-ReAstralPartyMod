@@ -8,7 +8,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenPurpleSpeedRollerIntermediate : SpeedRollerRelicBase
 {
-    protected override decimal CombatStartDexterityBonus => 2m;
+    protected override decimal CombatStartDexterityBonus => 1m;
+    protected override int FloorsPerFlight => 9;
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 }

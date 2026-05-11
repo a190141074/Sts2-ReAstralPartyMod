@@ -16,7 +16,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class TokenPurpleMotorcycleHelmetIntermediate : AstralPartyRelicModel
 {
     private const decimal CombatStartReversedScales = 2m;
-    private const decimal BlockPerTurn = 2m;
+    private const decimal BlockPerTurn = 1m;
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
