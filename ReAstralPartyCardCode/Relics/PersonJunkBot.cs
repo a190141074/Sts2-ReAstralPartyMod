@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -33,10 +34,37 @@ public class PersonJunkBot : CooldownPersonaRelicBase
     [SavedProperty] public int AstralParty_PersonJunkBotCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonJunkBotPendingCombatStartCard { get; set; }
     [SavedProperty] public int AstralParty_PersonJunkBotMarkedActIndex { get; set; } = -1;
-    [SavedProperty] public int[] AstralParty_PersonJunkBotMarkedCoordCols { get; set; } = [];
-    [SavedProperty] public int[] AstralParty_PersonJunkBotMarkedCoordRows { get; set; } = [];
     [SavedProperty] public bool AstralParty_PersonJunkBotMarkedCoordsSet { get; set; }
     [SavedProperty] public int AstralParty_PersonJunkBotMarkedKillProgress { get; set; }
+
+    private int[] _markedCoordCols = [];
+    private int[] _markedCoordRows = [];
+
+    [SavedProperty]
+    private string AstralParty_PersonJunkBotMarkedCoordColsJson
+    {
+        get => JsonSerializer.Serialize(_markedCoordCols);
+        set => _markedCoordCols = DeserializeIntArray(value);
+    }
+
+    [SavedProperty]
+    private string AstralParty_PersonJunkBotMarkedCoordRowsJson
+    {
+        get => JsonSerializer.Serialize(_markedCoordRows);
+        set => _markedCoordRows = DeserializeIntArray(value);
+    }
+
+    public int[] AstralParty_PersonJunkBotMarkedCoordCols
+    {
+        get => _markedCoordCols;
+        set => _markedCoordCols = value ?? [];
+    }
+
+    public int[] AstralParty_PersonJunkBotMarkedCoordRows
+    {
+        get => _markedCoordRows;
+        set => _markedCoordRows = value ?? [];
+    }
 
     protected override int CounterValue
     {
@@ -229,5 +257,20 @@ public class PersonJunkBot : CooldownPersonaRelicBase
             return;
 
         playerEntry.CompletedQuests.Add(Id);
+    }
+
+    private static int[] DeserializeIntArray(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return [];
+
+        try
+        {
+            return JsonSerializer.Deserialize<int[]>(value) ?? [];
+        }
+        catch
+        {
+            return [];
+        }
     }
 }

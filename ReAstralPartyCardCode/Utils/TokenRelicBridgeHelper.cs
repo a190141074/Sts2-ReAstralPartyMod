@@ -111,14 +111,14 @@ public static class TokenRelicBridgeHelper
     {
         return target
             .GetPowerInstances<TokenRelicBridgePower>()
-            .FirstOrDefault(power => power.AstralParty_BridgedTokenRelicId == tokenRelicId);
+            .FirstOrDefault(power => power.BridgedTokenRelicId == tokenRelicId);
     }
 
     public static async Task RemoveAllBridgePowersForToken(Creature target, ModelId tokenRelicId)
     {
         var existingPowers = target
             .GetPowerInstances<TokenRelicBridgePower>()
-            .Where(power => power.AstralParty_BridgedTokenRelicId == tokenRelicId)
+            .Where(power => power.BridgedTokenRelicId == tokenRelicId)
             .ToList();
 
         foreach (var power in existingPowers)

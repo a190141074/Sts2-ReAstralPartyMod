@@ -25,9 +25,14 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
 {
     private RelicModel? _bridgedRelic;
     private string? _pendingRelicStateJson;
+    private ModelId _bridgedTokenRelicId = ModelId.none;
 
     [SavedProperty]
-    public ModelId AstralParty_BridgedTokenRelicId { get; set; } = ModelId.none;
+    private string AstralParty_BridgedTokenRelicId
+    {
+        get => _bridgedTokenRelicId == ModelId.none ? string.Empty : _bridgedTokenRelicId.ToString();
+        set => _bridgedTokenRelicId = DeserializeModelIdOrNone(value);
+    }
 
     [SavedProperty]
     public bool AstralParty_RunRelicAfterObtainedOnFirstApply { get; set; }
@@ -74,11 +79,17 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
         GetBridgedRelic()?.HoverTipsExcludingRelic ?? [];
 
+    public ModelId BridgedTokenRelicId
+    {
+        get => _bridgedTokenRelicId;
+        set => _bridgedTokenRelicId = value;
+    }
+
     public void Configure(
         ModelId relicId,
         TokenRelicBridgeInitializationMode initializationMode = TokenRelicBridgeInitializationMode.None)
     {
-        AstralParty_BridgedTokenRelicId = relicId;
+        BridgedTokenRelicId = relicId;
         AstralParty_RunRelicAfterObtainedOnFirstApply =
             initializationMode != TokenRelicBridgeInitializationMode.None;
         AstralParty_BridgeInitializationModeValue = (int)initializationMode;
@@ -92,13 +103,13 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         if (_bridgedRelic != null)
             return _bridgedRelic;
 
-        if (AstralParty_BridgedTokenRelicId == ModelId.none)
+        if (BridgedTokenRelicId == ModelId.none)
             return null;
 
-        if (!TokenRelicBridgeHelper.CanBridgeTokenRelic(AstralParty_BridgedTokenRelicId, out var reason))
+        if (!TokenRelicBridgeHelper.CanBridgeTokenRelic(BridgedTokenRelicId, out var reason))
         {
             MainFile.Logger.Warn(
-                $"[TokenRelicBridgePower] Refused to initialize bridge for {AstralParty_BridgedTokenRelicId}: {reason}");
+                $"[TokenRelicBridgePower] Refused to initialize bridge for {BridgedTokenRelicId}: {reason}");
             return null;
         }
 
@@ -106,7 +117,7 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         if (ownerPlayer == null)
             return null;
 
-        var relic = ModelDb.GetById<RelicModel>(AstralParty_BridgedTokenRelicId).ToMutable();
+        var relic = ModelDb.GetById<RelicModel>(BridgedTokenRelicId).ToMutable();
         relic.Owner = ownerPlayer;
         RestoreBridgedRelicState(relic);
         relic.Flashed += HandleRelicFlashed;
@@ -126,7 +137,7 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         {
             using var _ = TokenRelicBridgeInitializationContext.Push(
                 initializationMode,
-                AstralParty_BridgedTokenRelicId);
+                BridgedTokenRelicId);
             await relic.AfterObtained();
         }
 
@@ -311,7 +322,7 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         catch (Exception ex)
         {
             MainFile.Logger.Error(
-                $"[TokenRelicBridgePower] Failed to restore bridge state for {AstralParty_BridgedTokenRelicId}: {ex}");
+                $"[TokenRelicBridgePower] Failed to restore bridge state for {BridgedTokenRelicId}: {ex}");
         }
     }
 
@@ -350,6 +361,21 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         return AstralParty_RunRelicAfterObtainedOnFirstApply
             ? TokenRelicBridgeInitializationMode.RunAfterObtained
             : TokenRelicBridgeInitializationMode.None;
+    }
+
+    private static ModelId DeserializeModelIdOrNone(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return ModelId.none;
+
+        try
+        {
+            return ModelId.Deserialize(value);
+        }
+        catch
+        {
+            return ModelId.none;
+        }
     }
 
     private PlayerChoiceContext CreateImmediateHookContext()
