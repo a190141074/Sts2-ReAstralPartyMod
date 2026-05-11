@@ -14,7 +14,13 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(EventCardPool))]
 public class SkillFateGuidance : AstralPartyCardModel
 {
-    [SavedProperty] public ulong AstralParty_FateGuidanceSourceBlueWhalePlayerNetId { get; set; }
+    [SavedProperty] public string AstralParty_FateGuidanceSourceBlueWhalePlayerNetIdRaw { get; set; } = string.Empty;
+
+    public ulong AstralParty_FateGuidanceSourceBlueWhalePlayerNetId
+    {
+        get => ulong.TryParse(AstralParty_FateGuidanceSourceBlueWhalePlayerNetIdRaw, out var value) ? value : 0UL;
+        set => AstralParty_FateGuidanceSourceBlueWhalePlayerNetIdRaw = value.ToString();
+    }
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 

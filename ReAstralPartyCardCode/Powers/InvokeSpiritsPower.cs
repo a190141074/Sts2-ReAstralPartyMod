@@ -14,7 +14,13 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 public class InvokeSpiritsPower : AstralPartyPowerModel
 {
-    [SavedProperty] public ulong AstralParty_InvokeSpiritsZhaoPlayerNetId { get; set; }
+    [SavedProperty] public string AstralParty_InvokeSpiritsZhaoPlayerNetIdRaw { get; set; } = string.Empty;
+
+    public ulong AstralParty_InvokeSpiritsZhaoPlayerNetId
+    {
+        get => ulong.TryParse(AstralParty_InvokeSpiritsZhaoPlayerNetIdRaw, out var value) ? value : 0UL;
+        set => AstralParty_InvokeSpiritsZhaoPlayerNetIdRaw = value.ToString();
+    }
 
     public override PowerType Type => PowerType.Buff;
 

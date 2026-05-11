@@ -27,7 +27,13 @@ public class AdherentMucusPower : AstralPartyPowerModel
         public bool DealtUnblockedDamageToBoundSlimeThisTurn;
     }
 
-    [SavedProperty] public ulong AstralParty_AdherentMucusBoundSlimePlayerNetId { get; set; }
+    [SavedProperty] public string AstralParty_AdherentMucusBoundSlimePlayerNetIdRaw { get; set; } = string.Empty;
+
+    public ulong AstralParty_AdherentMucusBoundSlimePlayerNetId
+    {
+        get => ulong.TryParse(AstralParty_AdherentMucusBoundSlimePlayerNetIdRaw, out var value) ? value : 0UL;
+        set => AstralParty_AdherentMucusBoundSlimePlayerNetIdRaw = value.ToString();
+    }
 
     public override PowerType Type => PowerType.Debuff;
 

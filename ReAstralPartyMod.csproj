@@ -1,4 +1,4 @@
-﻿<Project Sdk="Godot.NET.Sdk/4.5.1">
+<Project Sdk="Godot.NET.Sdk/4.5.1">
   <PropertyGroup>
     <!-- 濡傛灉浣犲畨瑁呬簡10.0骞堕亣鍒伴棶棰橈紝鏀逛笅杩欓噷 -->
     <TargetFramework>net9.0</TargetFramework>
@@ -89,7 +89,7 @@
     <Content Include="ReAstralPartyMod\images\card_portraits\event_anomaly_bug_again.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\event_anomaly_demon_lord_protection.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\event_anomaly_its_over.png" />
-    <Content Include="ReAstralPartyMod\images\card_portraits\event_anomaly_just_a_mob.png" />
+    <Content Include="ReAstralPartyMod\images\card_portraits\event_anomaly_just_amob.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\event_anomaly_love_cat_tv.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\event_anomaly_mystic_dodge.png" />
     <Content Include="ReAstralPartyMod\images\card_portraits\event_anomaly_no_retreat_shrimp.png" />
