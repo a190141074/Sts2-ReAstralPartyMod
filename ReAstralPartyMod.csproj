@@ -1,6 +1,6 @@
 <Project Sdk="Godot.NET.Sdk/4.5.1">
   <PropertyGroup>
-    <!-- 濡傛灉浣犲畨瑁呬簡10.0骞堕亣鍒伴棶棰橈紝鏀逛笅杩欓噷 -->
+    <!-- 如果你安装了 10.0 并遇到问题，改这里 -->
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>true</ImplicitUsings>
     <LangVersion>12.0</LangVersion>
@@ -8,7 +8,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <EnableDynamicLoading>true</EnableDynamicLoading>
 
-    <!-- 鏀规垚浣犵殑鏉€鎴皷濉?鐩綍 -->
+    <!-- 改成你的杀戮尖塔 2 目录 -->
     <Sts2Dir>D:\Steam\steamapps\common\Slay the Spire 2</Sts2Dir>
     <Sts2DataDir>$(Sts2Dir)\data_sts2_windows_x86_64</Sts2DataDir>
     <SecondarySts2Dir Condition="'$(SecondarySts2Dir)' == '' and Exists('D:\SteamLibrary\steamapps\common\Slay the Spire 2')">D:\SteamLibrary\steamapps\common\Slay the Spire 2</SecondarySts2Dir>
@@ -39,13 +39,13 @@
       <Private>true</Private>
     </Reference>
 
-    <!-- 鏈湴寮曠敤锛屾敞鎰忚矾寰勬槸鍚︽纭?-->
+    <!-- 本地引用，注意路径是否正确 -->
     <Reference Include="STS2-RitsuLib">
       <HintPath>$(Sts2Dir)/mods/RitsuLib/STS2-RitsuLib.dll</HintPath>
       <Private>true</Private>
     </Reference>
 
-    <!-- NuGet鑾峰彇锛屾敞鎰忕増鏈槸鍚︿竴鑷达紝涓嶄竴鑷存墜鍔ㄦ洿鏀筕ersion -->
+    <!-- NuGet 获取，注意版本是否一致，不一致手动更改 Version -->
     <!-- <PackageReference Include="STS2.RitsuLib" Version="*" /> -->
   </ItemGroup>
 
@@ -562,7 +562,7 @@
     <Warning Text="Godot executable not found at $(GodotEditorPath). Skipped PCK export." />
   </Target>
 
-  <!-- 鑷姩澶嶅埗dll鍜宩son -->
+  <!-- 自动复制 dll 和 json -->
   <Target Name="CopyModArtifacts" AfterTargets="Build" DependsOnTargets="ExportModPck">
     <Message Text="Copying mod to Slay the Spire 2 mods folder..." Importance="high" />
     <MakeDir Directories="$(ModOutputDir)" />
