@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Powers;
@@ -19,6 +20,9 @@ public class SkillComeHereYou : AstralPartyCardModel
     private const decimal DexterityLoss = -7m;
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        [AstralKeywords.AstralUnique];
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
