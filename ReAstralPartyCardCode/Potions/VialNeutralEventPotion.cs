@@ -24,16 +24,7 @@ public class VialNeutralEventPotion : AstralPartyPotionModel
         if (Owner == null)
             return;
 
-        var options = VialEpisodeEventHelper.CreateNeutralEventOptions(Owner);
-        var selected = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayer(
-            choiceContext,
-            Owner,
-            options,
-            false,
-            $"{Id.Entry}.use");
-        if (selected == null)
-            return;
-
-        await VialEpisodeEventHelper.AutoPlayCanonicalCardForOwner(Owner, selected);
+        var options = VialEpisodeEventHelper.CreateNeutralEventOptions(Owner, $"{Id.Entry}.use");
+        await VialEpisodeEventHelper.PlaySelectedCanonicalCardForOwner(choiceContext, Owner, options, $"{Id.Entry}.use");
     }
 }

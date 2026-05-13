@@ -227,15 +227,29 @@ public static class DeterministicMultiplayerChoiceHelper
         bool canSkip)
     {
         NPlayerHand.Instance?.CancelAllCardPlay();
-        var screen = NChooseACardSelectionScreen.ShowScreen(options, canSkip);
+        var displayOptions = CreateDisplayCardOptions(player, options);
+        var screen = NChooseACardSelectionScreen.ShowScreen(displayOptions, canSkip);
         if (LocalContext.IsMe(player))
         {
             foreach (var card in options)
-                SaveManager.Instance.MarkCardAsSeen(card);
+                SaveManager.Instance.MarkCardAsSeen(card.CanonicalInstance ?? card);
         }
 
         var selectedCard = (await screen.CardsSelected()).FirstOrDefault();
         return selectedCard?.CanonicalInstance ?? selectedCard;
+    }
+
+    private static IReadOnlyList<CardModel> CreateDisplayCardOptions(Player player, IReadOnlyList<CardModel> options)
+    {
+        var displayOptions = new List<CardModel>(options.Count);
+        foreach (var option in options)
+        {
+            var displayCard = option.CanonicalInstance == null ? option.ToMutable() : option;
+            displayCard.Owner ??= player;
+            displayOptions.Add(displayCard);
+        }
+
+        return displayOptions;
     }
 
     private static int IndexOfRelic(IReadOnlyList<RelicModel> relics, RelicModel relic)

@@ -1,7 +1,9 @@
+using STS2RitsuLib.Interop.AutoRegistration;
 using STS2RitsuLib.Scaffolding.Content;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Potions;
 
+[RegisterSharedPotionPool]
 public class CandyPotionPool : TypeListPotionPoolModel
 {
     public override string EnergyColorName => "colorless";

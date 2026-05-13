@@ -26,6 +26,6 @@ public class VialAnomalyEventPotion : AstralPartyPotionModel
         if (Owner == null)
             return;
 
-        await VialEpisodeEventHelper.AutoPlayCanonicalCardForOwner(Owner, ModelDb.Card<EventAnomalyTransferRequest>());
+        await VialEpisodeEventHelper.AutoPlayCanonicalCardForOwner(choiceContext, Owner, ModelDb.Card<EventAnomalyTransferRequest>());
     }
 }

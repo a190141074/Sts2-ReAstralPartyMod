@@ -26,6 +26,6 @@ public class VialDeusExMachinaPotion : AstralPartyPotionModel
         if (Owner == null)
             return;
 
-        await VialEpisodeEventHelper.AutoPlayCanonicalCardForOwner(Owner, ModelDb.Card<EventDeusExMachina>());
+        await VialEpisodeEventHelper.AutoPlayCanonicalCardForOwner(choiceContext, Owner, ModelDb.Card<EventDeusExMachina>());
     }
 }

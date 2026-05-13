@@ -12,9 +12,9 @@
   "RE_ASTRAL_PARTY_MOD_POTION_VIAL_ANOMALY_EVENT_POTION.title": "Vial: Anomaly Event",
   "RE_ASTRAL_PARTY_MOD_POTION_VIAL_ANOMALY_EVENT_POTION.description": "Use only in combat. Automatically plays [card]Transfer Request[/card].",
   "RE_ASTRAL_PARTY_MOD_POTION_VIAL_NEUTRAL_EVENT_POTION.title": "Vial: Neutral Event",
-  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_NEUTRAL_EVENT_POTION.description": "Use only in combat. Choose and play [card]Crowded Passage[/card], [card]Equality[/card], [card]Player Representative[/card], or [card]Thunder Approaches[/card].",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_NEUTRAL_EVENT_POTION.description": "Use only in combat. Randomly draw 3 from [card]Crowded Passage[/card], [card]Equality[/card], [card]Player Representative[/card], and [card]Thunder Approaches[/card], then choose 1 to play.",
   "RE_ASTRAL_PARTY_MOD_POTION_VIAL_GOOD_EVENT_POTION.title": "Vial: Good Event",
-  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_GOOD_EVENT_POTION.description": "Use only in combat. Choose and play [card]Fight, Fun![/card], [card]Gift from Sky[/card], [card]Red Heat Warning[/card], or [card]Sprint[/card].",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_GOOD_EVENT_POTION.description": "Use only in combat. Randomly draw 3 from [card]Fight, Fun![/card], [card]Gift from Sky[/card], [card]Red Heat Warning[/card], and [card]Sprint[/card], then choose 1 to play.",
   "RE_ASTRAL_PARTY_MOD_POTION_VIAL_DEUS_EX_MACHINA_POTION.title": "Vial: Deus Ex Machina",
   "RE_ASTRAL_PARTY_MOD_POTION_VIAL_DEUS_EX_MACHINA_POTION.description": "Use only in combat. Automatically plays [card]Deus Ex Machina[/card]."
 }

@@ -9,27 +9,48 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class VialEpisodeEventHelper
 {
-    public static IReadOnlyList<CardModel> CreateNeutralEventOptions(Player owner)
+    public static IReadOnlyList<CardModel> CreateNeutralEventOptions(Player owner, string context)
     {
-        return CreateCanonicalOptions(
+        return CreateRandomChoiceOptions(
             owner,
-            ModelDb.Card<EventCrowdedPassage>(),
-            ModelDb.Card<EventEquality>(),
-            ModelDb.Card<EventPlayerRepresentative>(),
-            ModelDb.Card<EventThunderApproaches>());
+            context,
+            typeof(EventCrowdedPassage),
+            typeof(EventEquality),
+            typeof(EventPlayerRepresentative),
+            typeof(EventThunderApproaches));
     }
 
-    public static IReadOnlyList<CardModel> CreateGoodEventOptions(Player owner)
+    public static IReadOnlyList<CardModel> CreateGoodEventOptions(Player owner, string context)
     {
-        return CreateCanonicalOptions(
+        return CreateRandomChoiceOptions(
             owner,
-            ModelDb.Card<EventFightFun>(),
-            ModelDb.Card<EventGiftFromSky>(),
-            ModelDb.Card<EventRedHeatWarning>(),
-            ModelDb.Card<EventSprint>());
+            context,
+            typeof(EventFightFun),
+            typeof(EventGiftFromSky),
+            typeof(EventRedHeatWarning),
+            typeof(EventSprint));
+    }
+
+    public static async Task PlaySelectedCanonicalCardForOwner(
+        PlayerChoiceContext choiceContext,
+        Player owner,
+        IReadOnlyList<CardModel> options,
+        string context)
+    {
+        var selected = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayer(
+            choiceContext,
+            owner,
+            options,
+            false,
+            context);
+        if (selected == null)
+            return;
+
+        await AutoPlayCanonicalCardForOwner(choiceContext, owner, selected);
     }
 
     public static async Task AutoPlayCanonicalCardForOwner(
+        PlayerChoiceContext choiceContext,
         Player owner,
         CardModel canonicalCard)
     {
@@ -37,19 +58,30 @@ public static class VialEpisodeEventHelper
             return;
 
         var cardToPlay = owner.Creature.CombatState.CreateCard(canonicalCard.CanonicalInstance ?? canonicalCard, owner);
-        await CardCmd.AutoPlay(new ThrowingPlayerChoiceContext(), cardToPlay, owner.Creature, AutoPlayType.Default, false, true);
+        await CardCmd.AutoPlay(choiceContext, cardToPlay, owner.Creature, AutoPlayType.Default, false, true);
     }
 
-    private static IReadOnlyList<CardModel> CreateCanonicalOptions(Player owner, params CardModel[] cards)
+    private static IReadOnlyList<CardModel> CreateRandomChoiceOptions(Player owner, string context, params Type[] cardTypes)
     {
-        return cards
+        var orderedCanonicals = DeterministicMultiplayerChoiceHelper
+            .OrderDeterministically(
+                cardTypes.Select(type => ModelDb.GetById<CardModel>(ModelDb.GetId(type))),
+                card => card.Id.Entry,
+                MainFile.ModId,
+                context,
+                owner.RunState.Rng.StringSeed,
+                owner.RunState.CurrentActIndex,
+                owner.RunState.ActFloor,
+                owner.NetId)
+            .Take(3);
+
+        return orderedCanonicals
             .Select(card =>
             {
                 var mutable = card.ToMutable();
                 mutable.Owner = owner;
-                return mutable.CanonicalInstance ?? mutable;
+                return mutable;
             })
-            .OrderBy(card => card.Id.Entry, StringComparer.Ordinal)
             .ToList();
     }
 }
