@@ -50,6 +50,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private readonly Dictionary<ModelId, NTreasureRoomRelicHolder> _holdersById = new();
     private readonly Dictionary<ulong, uint> _nextChoiceIdsByPlayer = new();
     private readonly Dictionary<ulong, int> _selectionSequencesByPlayer = new();
+    private readonly Dictionary<ulong, int> _pendingLocalSelectionIndexes = new();
 
     private Control _holderContainer = null!;
     private Label _titleLabel = null!;
@@ -85,6 +86,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             _selectionStates[player.NetId] = new PlayerSelectionState(player);
             _selectionSequencesByPlayer[player.NetId] = 0;
+            _pendingLocalSelectionIndexes[player.NetId] = -1;
         }
 
         Name = nameof(StartingPersonaRelicSelectionScreen);
@@ -311,6 +313,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _multiplayerSynchronizer = await WaitForPlayerChoiceSynchronizerAsync()
             ?? throw new InvalidOperationException("PlayerChoiceSynchronizer was not ready for starting persona selection.");
         InitializeMultiplayerChoiceStreams(_multiplayerSynchronizer);
+        FlushPendingLocalSelectionIfNeeded();
         UpdatePendingSubtitle();
 
         foreach (var player in _orderedPlayers)
@@ -332,6 +335,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private void ApplySelection(Player player, int selectedIndex)
     {
+        if (selectedIndex < 0 || selectedIndex >= _relicOptions.Count)
+        {
+            MainFile.Logger.Warn(
+                $"Starting persona selection ignored invalid selection index: player={player.NetId} index={selectedIndex} options={_relicOptions.Count}.");
+            return;
+        }
+
         RelicModel? selectedRelic = selectedIndex >= 0 && selectedIndex < _relicOptions.Count
             ? _relicOptions[selectedIndex]
             : null;
@@ -709,6 +719,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         if (_localPlayer == null || _multiplayerSynchronizer == null || !_nextChoiceIdsByPlayer.ContainsKey(_localPlayer.NetId))
         {
+            if (_localPlayer != null)
+            {
+                _pendingLocalSelectionIndexes[_localPlayer.NetId] = holder.Index;
+                ApplySelection(_localPlayer, holder.Index);
+                UpdatePendingSubtitle();
+            }
+
             _subtitleLabel.Text = "联机同步尚未就绪，请稍候再试。";
             return;
         }
@@ -728,7 +745,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private void RefreshVotes(bool animate = true)
     {
         foreach (var holder in _holdersById.Values)
+        {
+            if (!GodotObject.IsInstanceValid(holder) || !GodotObject.IsInstanceValid(holder.VoteContainer))
+                continue;
+
             holder.VoteContainer.RefreshPlayerVotes(animate);
+        }
     }
 
     private bool PlayerSelectedHolder(Player player, int holderIndex)
@@ -878,10 +900,16 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 _nextChoiceIdsByPlayer[player.NetId] = synchronizer.ReserveChoiceId(player);
             }
         }
+        catch (ObjectDisposedException ex)
+        {
+            MainFile.Logger.Warn(
+                $"Starting persona selection remote observer disposed for player {player.NetId}; ignoring late UI update. {ex.Message}");
+        }
         catch (Exception ex)
         {
             MainFile.Logger.Error($"Starting persona selection remote observer failed for player {player.NetId}: {ex}");
-            _multiplayerCommitSource.TrySetException(ex);
+            if (!_closed && !_selectionFinalized)
+                _multiplayerCommitSource.TrySetException(ex);
         }
     }
 
@@ -894,6 +922,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             MainFile.Logger.Warn(
                 $"Starting persona selection ignored stale remote update: player={player.NetId} sequence={sequence} current={currentSequence}.");
+            return;
+        }
+
+        if (selectedIndex < 0 || selectedIndex >= _relicOptions.Count)
+        {
+            MainFile.Logger.Warn(
+                $"Starting persona selection ignored out-of-range remote update: player={player.NetId} sequence={sequence} index={selectedIndex} options={_relicOptions.Count}.");
             return;
         }
 
@@ -916,6 +951,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
 
         var selectedIndexes = BuildCommittedSelectionIndexes();
+        if (selectedIndexes.Any(index => index < 0 || index >= _relicOptions.Count))
+        {
+            MainFile.Logger.Warn(
+                $"Starting persona selection deferred final commit because some indexes were invalid: {string.Join(',', selectedIndexes)}.");
+            return;
+        }
+
         var choiceId = _nextChoiceIdsByPlayer[_authorityPlayer.NetId];
         _multiplayerSynchronizer.SyncLocalChoice(
             _authorityPlayer,
@@ -954,7 +996,15 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
 
         for (var i = 0; i < _orderedPlayers.Count; i++)
+        {
+            if (snapshot.SelectedIndexes[i] < 0 || snapshot.SelectedIndexes[i] >= _relicOptions.Count)
+            {
+                throw new InvalidOperationException(
+                    $"Starting persona selection commit index out of range for player {_orderedPlayers[i].NetId}: {snapshot.SelectedIndexes[i]} / {_relicOptions.Count}.");
+            }
+
             ApplySelection(_orderedPlayers[i], snapshot.SelectedIndexes[i]);
+        }
 
         FinalizeSelectionDisplay("所有玩家已锁定选择，开始结算……");
     }
@@ -1141,6 +1191,22 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
 
         return -1;
+    }
+
+    private void FlushPendingLocalSelectionIfNeeded()
+    {
+        if (_localPlayer == null || _multiplayerSynchronizer == null)
+            return;
+        if (!_pendingLocalSelectionIndexes.TryGetValue(_localPlayer.NetId, out var pendingIndex))
+            return;
+        if (pendingIndex < 0 || pendingIndex >= _relicOptions.Count)
+            return;
+
+        if (_selectionStates[_localPlayer.NetId].SelectedRelic?.Id != _relicOptions[pendingIndex].Id)
+            ApplySelection(_localPlayer, pendingIndex);
+
+        SendLocalSelectionUpdate(pendingIndex);
+        _pendingLocalSelectionIndexes[_localPlayer.NetId] = -1;
     }
 
     private static void ObserveTaskFault(Task task)

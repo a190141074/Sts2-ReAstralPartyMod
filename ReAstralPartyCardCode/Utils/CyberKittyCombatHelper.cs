@@ -15,6 +15,10 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class CyberKittyCombatHelper
 {
+    private const decimal StandardNodeDiscountAmount = 1m;
+    private const decimal HighCostNodeDiscountAmount = 2m;
+    private const int HighCostThreshold = 3;
+
     public static async Task<CardModel?> GainRandomAttackCardFreeThisTurn(
         PlayerChoiceContext choiceContext,
         Player owner,
@@ -29,6 +33,30 @@ public static class CyberKittyCombatHelper
 
         await CardPileCmd.Add(attackCard, PileType.Hand, CardPilePosition.Bottom, source);
         attackCard.SetToFreeThisTurn();
+        return attackCard;
+    }
+
+    public static async Task<CardModel?> GainRandomAttackCardDiscounted(
+        PlayerChoiceContext choiceContext,
+        Player owner,
+        AbstractModel source)
+    {
+        if (owner.Creature?.CombatState == null)
+            return null;
+
+        var attackCard = FindPreferredAttackCard(owner);
+        if (attackCard == null)
+            return null;
+
+        await CardPileCmd.Add(attackCard, PileType.Hand, CardPilePosition.Bottom, source);
+
+        var discountAmount = GetNodeDiscountAmount(attackCard);
+        if (discountAmount <= 0m)
+            return attackCard;
+
+        var discountPower = owner.Creature.GetPower<CyberKittyDiscountedAttackPower>()
+                            ?? await CreateDiscountPower(owner, source as CardModel);
+        discountPower?.TrackCard(attackCard, discountAmount);
         return attackCard;
     }
 
@@ -83,5 +111,26 @@ public static class CyberKittyCombatHelper
             .GetPile(owner)
             .Cards
             .FirstOrDefault(card => card.Type == CardType.Attack);
+    }
+
+    private static decimal GetNodeDiscountAmount(CardModel card)
+    {
+        if (card.EnergyCost.CostsX)
+            return 0m;
+
+        var resolvedCost = card.EnergyCost.GetResolved();
+        return resolvedCost > HighCostThreshold
+            ? HighCostNodeDiscountAmount
+            : StandardNodeDiscountAmount;
+    }
+
+    private static async Task<CyberKittyDiscountedAttackPower?> CreateDiscountPower(Player owner, CardModel? source)
+    {
+        var power = ModelDb.Power<CyberKittyDiscountedAttackPower>().ToMutable() as CyberKittyDiscountedAttackPower;
+        if (power == null)
+            return null;
+
+        await PowerCmd.Apply(power, owner.Creature, 1m, owner.Creature, source, false);
+        return owner.Creature.GetPower<CyberKittyDiscountedAttackPower>();
     }
 }

@@ -98,7 +98,7 @@ public class PersonCyberKitty : CooldownPersonaRelicBase
         Flash();
         await AstralTemporaryStrengthPower.Apply(Owner.Creature, PassiveTemporaryStatAmount, this, Owner.Creature, null, true);
         await AstralTemporaryDexterityPower.Apply(Owner.Creature, PassiveTemporaryStatAmount, this, Owner.Creature, null, true);
-        await CyberKittyCombatHelper.GainRandomAttackCardFreeThisTurn(choiceContext, Owner, this);
+        await CyberKittyCombatHelper.GainRandomAttackCardDiscounted(choiceContext, Owner, this);
     }
 
     protected override Task BeforeAdvanceCounterOnTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)

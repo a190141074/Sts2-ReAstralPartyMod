@@ -35,7 +35,7 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
-    public override string PortraitPath => GetPortraitPath();
+    public override string PortraitPath => "res://ReAstralPartyMod/images/card_portraits/skill_famous_blade.png";
 
     public SkillFamousBlade() : base(
         0,
@@ -100,6 +100,15 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     public string GetDisplayTitle(string language)
     {
+        if (!CanUseDynamicDisplay())
+        {
+            return language switch
+            {
+                "zhs" => "名刀",
+                _ => "Famous Blade"
+            };
+        }
+
         return GetDisplayTier() switch
         {
             FamousBladeDisplayTier.Medium => language switch
@@ -132,7 +141,7 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     public string GetDisplayDescriptionKey()
     {
-        return IsGawuCutterTier() ? GawuCutterDescriptionKey : BaseDescriptionKey;
+        return CanUseDynamicDisplay() && IsGawuCutterTier() ? GawuCutterDescriptionKey : BaseDescriptionKey;
     }
 
     private int GetSwordIntentCounter()
@@ -198,18 +207,9 @@ public class SkillFamousBlade : AstralPartyCardModel
         return $"{target.Side}:{target.LogName}";
     }
 
-    private string GetPortraitPath()
+    private bool CanUseDynamicDisplay()
     {
-        return GetDisplayTier() switch
-        {
-            FamousBladeDisplayTier.Medium => "res://ReAstralPartyMod/images/card_portraits/famous_blade_medium.png",
-            FamousBladeDisplayTier.Large => "res://ReAstralPartyMod/images/card_portraits/famous_blade_large.png",
-            FamousBladeDisplayTier.ExtraLarge =>
-                "res://ReAstralPartyMod/images/card_portraits/famous_blade_extra_large.png",
-            FamousBladeDisplayTier.GawuCutter =>
-                "res://ReAstralPartyMod/images/card_portraits/famous_blade_gawu_cutter.png",
-            _ => "res://ReAstralPartyMod/images/card_portraits/skill_famous_blade.png"
-        };
+        return !ReferenceEquals(CanonicalInstance, this) && Owner != null;
     }
 
     private enum FamousBladeDisplayTier

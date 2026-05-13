@@ -15,6 +15,10 @@ public static class SkillFamousBladeDescriptionPatch
         if (__instance is not SkillFamousBlade famousBlade)
             return;
 
-        __result = new LocString("cards", famousBlade.GetDisplayDescriptionKey());
+        var key = famousBlade.GetDisplayDescriptionKey();
+        if (string.IsNullOrWhiteSpace(key))
+            return;
+
+        __result = new LocString("cards", key);
     }
 }

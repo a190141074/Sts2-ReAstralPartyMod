@@ -41,6 +41,15 @@ public static class AstralEventCardPool
         .. InvestigationCards.Select(card => card.CanonicalInstance?.Id ?? card.Id)
     ];
 
+    private static readonly HashSet<ModelId> TroubleMakerUnsafeEventCardIds =
+    [
+        ModelDb.GetId<EventDeusExMachina>(),
+        ModelDb.GetId<EventsConcealingInvestigationA>(),
+        ModelDb.GetId<EventsConcealingInvestigationB>(),
+        ModelDb.GetId<EventsConcealingInvestigationC>(),
+        ModelDb.GetId<EventsConcealingInvestigationD>()
+    ];
+
     public static List<CardModel> CreateMutableEventCardsForPlayer(Player owner, params Type[] excludedTypes)
     {
         HashSet<Type> excludedTypeSet = excludedTypes.Length == 0 ? [] : [..excludedTypes];
@@ -76,6 +85,19 @@ public static class AstralEventCardPool
         return cards
             .OrderBy(card => GetTroubleMakerSortKey(owner, sourceCard, card))
             .ThenBy(card => card.Id.Entry)
+            .Take(count)
+            .ToList();
+    }
+
+    public static List<CardModel> CreateStableBossBurnedOutSafeCardsForPlayer(Player owner, CardModel sourceCard, int count)
+    {
+        var cards = CreateMutableEventCardsForPlayer(owner)
+            .Where(IsBossBurnedOutSafeCard)
+            .ToList();
+
+        return cards
+            .OrderBy(card => GetTroubleMakerSortKey(owner, sourceCard, card))
+            .ThenBy(card => card.Id.Entry, StringComparer.Ordinal)
             .Take(count)
             .ToList();
     }
@@ -137,5 +159,11 @@ public static class AstralEventCardPool
 
         var id = card.CanonicalInstance?.Id ?? card.Id;
         return EventCardIds.Contains(id);
+    }
+
+    private static bool IsBossBurnedOutSafeCard(CardModel card)
+    {
+        var id = card.CanonicalInstance?.Id ?? card.Id;
+        return !TroubleMakerUnsafeEventCardIds.Contains(id);
     }
 }

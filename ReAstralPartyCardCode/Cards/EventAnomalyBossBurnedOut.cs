@@ -28,9 +28,7 @@ public class EventAnomalyBossBurnedOut : AstralPartyCardModel
         if (Owner?.Creature?.CombatState == null)
             return;
 
-        var offeredCards = AstralEventCardPool.CreateStableTroubleMakerCardsForPlayer(Owner, this, 3)
-            .Where(card => card is not EventDeusExMachina)
-            .ToList();
+        var offeredCards = AstralEventCardPool.CreateStableBossBurnedOutSafeCardsForPlayer(Owner, this, 3);
         if (offeredCards.Count > 0)
         {
             var selectedCard = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayer(

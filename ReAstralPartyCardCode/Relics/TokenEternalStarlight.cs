@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using Godot;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -100,7 +101,10 @@ public class TokenEternalStarlight : AstralPartyRelicModel
         await PlayerCmd.GainGold(goldReward, Owner);
 
         if (grantMembership && Owner.GetRelic<MembershipCard>() == null)
+        {
             await RelicCmd.Obtain(ModelDb.Relic<MembershipCard>().ToMutable(), Owner);
+            MerchantUiRefreshHelper.TryRefreshCurrentMerchantUi(Owner.RunState);
+        }
     }
 
     public int GetStacks()
