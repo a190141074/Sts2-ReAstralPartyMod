@@ -16,6 +16,7 @@ using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Helpers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -30,6 +31,32 @@ public static class PersonaMultiplayerEffectHelper
         AbstractModel? source = null)
     {
         return GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, animate, position, source);
+    }
+
+    public static async Task<bool> TryRedirectLivingFolioCopyToDerivativeStacks(
+        Player? owner,
+        CardModel? sourceCard,
+        AbstractModel? source)
+    {
+        if (owner == null || sourceCard == null)
+            return false;
+
+        var canonicalCard = sourceCard.CanonicalInstance ?? sourceCard;
+        if (canonicalCard.Id != ModelDb.GetId<SkillLivingFolio>())
+            return false;
+
+        var livingFolioRelic = owner.GetRelic<PersonalityDerivativeLivingFolio>()
+                               ?? await ObtainDerivativeRelicIfMissing<PersonalityDerivativeLivingFolio>(owner)
+                               as PersonalityDerivativeLivingFolio;
+        if (livingFolioRelic == null)
+            return false;
+
+        await CardGainAttribution.RunWithSource(source, () =>
+        {
+            livingFolioRelic.AddStacksCapped(1);
+            return Task.CompletedTask;
+        });
+        return true;
     }
 
     public static Task<IEnumerable<CardModel>> DrawCardsForPlayer(

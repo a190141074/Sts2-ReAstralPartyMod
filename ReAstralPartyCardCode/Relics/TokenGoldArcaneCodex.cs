@@ -80,6 +80,13 @@ public class TokenGoldArcaneCodex : AstralPartyRelicModel
         if (AstralParty_TokenGoldArcaneCodexSkillCountThisTurn < SkillsRequiredPerTrigger)
             return;
 
+        AstralParty_TokenGoldArcaneCodexTriggeredThisTurn = true;
+        InvokeDisplayAmountChanged();
+
+        Flash();
+        if (await PersonaMultiplayerEffectHelper.TryRedirectLivingFolioCopyToDerivativeStacks(Owner, cardPlay.Card, this))
+            return;
+
         var copiedCard = cardPlay.Card.CreateClone();
         if (!cardPlay.Card.Keywords.Contains(CardKeyword.Exhaust)
             && !copiedCard.Keywords.Contains(CardKeyword.Exhaust))
@@ -88,10 +95,6 @@ public class TokenGoldArcaneCodex : AstralPartyRelicModel
         }
 
         copiedCard.SetToFreeThisTurn();
-        AstralParty_TokenGoldArcaneCodexTriggeredThisTurn = true;
-        InvokeDisplayAmountChanged();
-
-        Flash();
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
             copiedCard,
             true,

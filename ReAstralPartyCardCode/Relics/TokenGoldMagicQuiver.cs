@@ -128,6 +128,12 @@ public class TokenGoldMagicQuiver : AstralPartyRelicModel
             if (!_shouldCopyTrackedSkillCard)
                 return;
 
+            if (await PersonaMultiplayerEffectHelper.TryRedirectLivingFolioCopyToDerivativeStacks(
+                Owner,
+                cardPlay.Card,
+                this))
+                return;
+
             var copiedCard = cardPlay.Card.CreateClone();
             if (!cardPlay.Card.Keywords.Contains(CardKeyword.Exhaust)
                 && !copiedCard.Keywords.Contains(CardKeyword.Exhaust))
