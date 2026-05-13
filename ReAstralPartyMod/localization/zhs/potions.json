@@ -8,5 +8,13 @@
   "RE_ASTRAL_PARTY_MOD_POTION_CANDY_ENERGY_SUPPLEMENT_BAR.title": "糖果·能量补充棒",
   "RE_ASTRAL_PARTY_MOD_POTION_CANDY_ENERGY_SUPPLEMENT_BAR.description": "只能对拥有[gold]改造[/gold]的玩家使用。目标获得[blue]2[/blue]层[gold]改造[/gold]和[blue]2[/blue]层[gold]灾厄[/gold]，并获得[blue]3[/blue]点临时[red]力量[/red]与[blue]2[/blue]点临时[green]敏捷[/green]，持续[blue]2[/blue]回合。",
   "RE_ASTRAL_PARTY_MOD_POTION_CANDY_BIG_BRAIN_GUMMY.title": "糖果·大聪明软糖",
-  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_BIG_BRAIN_GUMMY.description": "指定任意玩家使用。目标抽[blue]3[/blue]张牌，并移除其身上的[gold]改造[/gold]和[gold]灾厄[/gold]。"
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_BIG_BRAIN_GUMMY.description": "指定任意玩家使用。目标抽[blue]3[/blue]张牌，并移除其身上的[gold]改造[/gold]和[gold]灾厄[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_ANOMALY_EVENT_POTION.title": "瓶装·异常事件",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_ANOMALY_EVENT_POTION.description": "只能在战斗中使用。使用后自动打出【请求转账】。",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_NEUTRAL_EVENT_POTION.title": "瓶装·中性事件",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_NEUTRAL_EVENT_POTION.description": "只能在战斗中使用。可选择打出【拥挤通道】、【人人平等】、【玩家代表】或【雷暴将至】。",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_GOOD_EVENT_POTION.title": "瓶装·好事件",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_GOOD_EVENT_POTION.description": "只能在战斗中使用。可选择打出【战斗，爽！】、【天降之物】、【红温警告】或【疾跑】。",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_DEUS_EX_MACHINA_POTION.title": "瓶装·天降神兵",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_DEUS_EX_MACHINA_POTION.description": "只能在战斗中使用。使用后自动打出【天降神兵】。"
 }

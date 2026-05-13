@@ -16,4 +16,22 @@
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.GOLD_PACK_FINISH.description": "You buy the most expensive [◈◈◈ Token Pack] without hesitation.\n\nThe shopkeeper smiles. \"Now that's someone willing to spend properly.\"",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.PURPLE_PACK_FINISH.description": "You take the heavier [◈◈ Token Pack].\n\nThe shopkeeper weighs the coins in hand. \"That one was worth the price.\"",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL_POINT_FINISH.description": "The shopkeeper stares at your single coin for a moment, then shoves [Initial Point] into your hands.\n\n\"A bargain's a bargain. Take it and move along.\""
+  ,
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.title": "Vial Episode",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.INITIAL.description": "Before you reach the shelf, you notice a lone coin rolling on the floor.\n\nNo one stops you from taking it.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.INITIAL.options.FOUND_ONE_GOLD.title": "[Pick up the coin]",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.INITIAL.options.FOUND_ONE_GOLD.description": "Gain [gold]1[/gold] Gold.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.STOREFRONT.description": "A row of sealed vials sways in front of you. Inside each one, a compressed event fragment keeps flashing on repeat.\n\n\"Expensive ones are stable. Cheap ones are exciting. Pick your poison.\"",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.STOREFRONT.options.ANOMALY.title": "[Vial: Anomaly Event]",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.STOREFRONT.options.ANOMALY.description": "Pay [gold]1[/gold] Gold. Obtain [Vial: Anomaly Event]. Automatically plays [card]Transfer Request[/card] when used.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.STOREFRONT.options.NEUTRAL.title": "[Vial: Neutral Event]",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.STOREFRONT.options.NEUTRAL.description": "Pay [gold]15[/gold] Gold. Obtain [Vial: Neutral Event]. Choose and play [card]Crowded Passage[/card], [card]Equality[/card], [card]Player Representative[/card], or [card]Thunder Approaches[/card] when used.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.STOREFRONT.options.GOOD.title": "[Vial: Good Event]",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.STOREFRONT.options.GOOD.description": "Pay [gold]37[/gold] Gold. Obtain [Vial: Good Event]. Choose and play [card]Fight, Fun![/card], [card]Gift from Sky[/card], [card]Red Heat Warning[/card], or [card]Sprint[/card] when used.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.STOREFRONT.options.DEUS_EX_MACHINA.title": "[Vial: Deus Ex Machina]",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.STOREFRONT.options.DEUS_EX_MACHINA.description": "Pay [gold]89[/gold] Gold. Obtain [Vial: Deus Ex Machina]. Automatically plays [card]Deus Ex Machina[/card] when used.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.ANOMALY_FINISH.description": "You pick up the cheapest vial. Static crackles inside like it might burst open at any moment.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.NEUTRAL_FINISH.description": "This one feels balanced enough to be suspiciously ordinary.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.GOOD_FINISH.description": "A warm glow leaks from the glass. At least this one does not look immediately dangerous.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.DEUS_EX_MACHINA_FINISH.description": "The most expensive vial is heavier than it looks, as if someone compressed a whole miracle into the bottle."
 }

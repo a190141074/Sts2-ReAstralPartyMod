@@ -188,6 +188,7 @@
     <Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png.import" />
     <Content Include="ReAstralPartyMod\images\events\astral_relic_store.png" />
     <Content Include="ReAstralPartyMod\images\events\astral_relic_store.png.import" />
+    <Content Include="ReAstralPartyMod\images\events\vial_episode_store.png" />
     <Content Include="ReAstralPartyMod\images\potion\candy_big_brain_gummy.png" />
     <Content Include="ReAstralPartyMod\images\potion\candy_big_brain_gummy.png.import" />
     <Content Include="ReAstralPartyMod\images\potion\candy_energy_supplement_bar.png" />
@@ -196,6 +197,10 @@
     <Content Include="ReAstralPartyMod\images\potion\candy_support_gum.png.import" />
     <Content Include="ReAstralPartyMod\images\potion\person_chest_choose.png" />
     <Content Include="ReAstralPartyMod\images\potion\person_chest_choose.png.import" />
+    <Content Include="ReAstralPartyMod\images\potion\vial_anomaly_event_potion.png" />
+    <Content Include="ReAstralPartyMod\images\potion\vial_deus_ex_machina_potion.png" />
+    <Content Include="ReAstralPartyMod\images\potion\vial_good_event_potion.png" />
+    <Content Include="ReAstralPartyMod\images\potion\vial_neutral_event_potion.png" />
     <Content Include="ReAstralPartyMod\images\powers\ambush_power.png" />
     <Content Include="ReAstralPartyMod\images\powers\ambush_power.png.import" />
     <Content Include="ReAstralPartyMod\images\powers\bloodthirst_power.png" />
