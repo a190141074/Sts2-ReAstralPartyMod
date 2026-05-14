@@ -15,6 +15,7 @@ using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
 using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -24,6 +25,7 @@ public static class DeterministicMultiplayerChoiceHelper
     private const int ChoiceMagic = unchecked((int)0x5241504D);
     private const int ChoiceKindRelicSelection = 1;
     private const int ChoiceKindCanonicalCardSelection = 2;
+    private const int ChoiceKindRefreshableRelicSelection = 3;
 
     public static async Task<RelicModel?> SelectRelicForPlayer(
         Player player,
@@ -105,6 +107,73 @@ public static class DeterministicMultiplayerChoiceHelper
         {
             await choiceContext.SignalPlayerChoiceEnded();
         }
+    }
+
+    public static async Task<RefreshableTokenRelicSelectionResult> SelectRefreshableRelicForPlayer(
+        Player player,
+        IReadOnlyList<RelicModel> options,
+        int rerollCount,
+        string title,
+        string subtitle,
+        string context,
+        Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc,
+        Func<IReadOnlyList<int>, IReadOnlyList<RelicModel>> rebuildFromHistory)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(options);
+
+        var runManager = RunManager.Instance;
+        var gameType = runManager.NetService.Type;
+        if (gameType is NetGameType.Singleplayer or NetGameType.None)
+        {
+            return await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitle, rerollFunc);
+        }
+
+        var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
+        if (synchronizer == null)
+        {
+            return await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitle, rerollFunc);
+        }
+
+        var choiceId = synchronizer.ReserveChoiceId(player);
+        if (IsLocalPlayer(runManager, player))
+        {
+            var result = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitle, rerollFunc);
+            synchronizer.SyncLocalChoice(player, choiceId, CreateRefreshableRelicChoiceResult(result));
+            Log.Info(
+                $"[{MainFile.ModId}] Synced local refreshable relic choice: context={context} player={player.NetId} choiceId={choiceId} index={result.SelectedIndex} rerolls={result.RerollHistory.Count}");
+            return result;
+        }
+
+        var remoteChoice = await WaitForRemoteChoice(synchronizer, player, choiceId, context);
+        if (!TryDecodeRefreshableRelicChoice(remoteChoice, out var selectedIndex, out var rerollHistory))
+        {
+            Log.Warn(
+                $"[{MainFile.ModId}] Failed to decode refreshable relic choice: context={context} player={player.NetId} choiceId={choiceId}");
+            return new RefreshableTokenRelicSelectionResult
+            {
+                SelectedRelic = null,
+                SelectedIndex = -1,
+                StartingRerolls = rerollCount,
+                RemainingRerolls = rerollCount,
+                RerollHistory = [],
+                FinalOptions = options.ToList()
+            };
+        }
+
+        var finalOptions = rebuildFromHistory(rerollHistory);
+        var selectedRelic = selectedIndex >= 0 && selectedIndex < finalOptions.Count ? finalOptions[selectedIndex] : null;
+        Log.Info(
+            $"[{MainFile.ModId}] Received remote refreshable relic choice: context={context} player={player.NetId} choiceId={choiceId} index={selectedIndex} rerolls={rerollHistory.Count}");
+        return new RefreshableTokenRelicSelectionResult
+        {
+            SelectedRelic = selectedRelic,
+            SelectedIndex = selectedIndex,
+            StartingRerolls = rerollCount,
+            RemainingRerolls = Math.Max(0, rerollCount - rerollHistory.Count),
+            RerollHistory = rerollHistory,
+            FinalOptions = finalOptions.ToList()
+        };
     }
 
     public static IReadOnlyList<T> OrderDeterministically<T>(
@@ -204,6 +273,48 @@ public static class DeterministicMultiplayerChoiceHelper
         }
     }
 
+    private static PlayerChoiceResult CreateRefreshableRelicChoiceResult(RefreshableTokenRelicSelectionResult result)
+    {
+        var payload = new List<int>(4 + result.RerollHistory.Count)
+        {
+            ChoiceMagic,
+            ChoiceKindRefreshableRelicSelection,
+            result.SelectedIndex,
+            result.RerollHistory.Count
+        };
+        payload.AddRange(result.RerollHistory);
+        return PlayerChoiceResult.FromIndexes(payload);
+    }
+
+    private static bool TryDecodeRefreshableRelicChoice(
+        PlayerChoiceResult result,
+        out int selectedIndex,
+        out IReadOnlyList<int> rerollHistory)
+    {
+        selectedIndex = -1;
+        rerollHistory = [];
+        try
+        {
+            var payload = result.AsIndexes();
+            if (payload == null || payload.Count < 4)
+                return false;
+            if (payload[0] != ChoiceMagic || payload[1] != ChoiceKindRefreshableRelicSelection)
+                return false;
+
+            selectedIndex = payload[2];
+            var rerollCount = Math.Max(0, payload[3]);
+            if (payload.Count < rerollCount + 4)
+                return false;
+
+            rerollHistory = payload.Skip(4).Take(rerollCount).ToArray();
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+    }
+
     private static bool IsLocalPlayer(RunManager runManager, Player player)
     {
         return player.NetId != 0UL && player.NetId == runManager.NetService.NetId;
@@ -219,6 +330,39 @@ public static class DeterministicMultiplayerChoiceHelper
         }
 
         return (await screen.RelicsSelected()).FirstOrDefault();
+    }
+
+    private static async Task<RefreshableTokenRelicSelectionResult> ShowLocalRefreshableRelicSelection(
+        Player player,
+        IReadOnlyList<RelicModel> options,
+        int rerollCount,
+        string title,
+        string subtitle,
+        Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc)
+    {
+        var overlayStack = NOverlayStack.Instance;
+        if (overlayStack == null)
+        {
+            return new RefreshableTokenRelicSelectionResult
+            {
+                SelectedRelic = null,
+                SelectedIndex = -1,
+                StartingRerolls = rerollCount,
+                RemainingRerolls = rerollCount,
+                RerollHistory = [],
+                FinalOptions = options.ToList()
+            };
+        }
+
+        if (LocalContext.IsMe(player))
+        {
+            foreach (var relic in options)
+                SaveManager.Instance.MarkRelicAsSeen(relic);
+        }
+
+        var screen = RefreshableTokenRelicSelectionScreen.Create(player, options, rerollCount, title, subtitle, rerollFunc);
+        overlayStack.Push(screen);
+        return await screen.WaitForResult();
     }
 
     private static async Task<CardModel?> ShowLocalCanonicalCardSelection(

@@ -14,7 +14,6 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Models.Relics;
-using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Saves.Runs;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -22,6 +21,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenGoldInitialPoint : AstralPartyRelicModel
 {
+    private const int InitialRefreshPool = 3;
     private const int MaxAscensions = 3;
     private const int AscensionChoiceCount = 3;
     private const int FirstAscensionCost = 60;
@@ -30,6 +30,7 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
     private const decimal HealPercent = 0.15m;
 
     [SavedProperty] public int AstralParty_TokenGoldInitialPointAscensionCount { get; set; }
+    [SavedProperty] public int AstralParty_TokenGoldInitialPointRemainingRerolls { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -39,6 +40,7 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_TokenGoldInitialPointAscensionCount = 0;
+        AstralParty_TokenGoldInitialPointRemainingRerolls = InitialRefreshPool;
     }
 
     public override bool TryModifyRestSiteOptions(Player player, ICollection<RestSiteOption> options)
@@ -82,20 +84,25 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
             if (rewardOptions.Count == 0)
                 return false;
 
-            using var _ = RelicSelectionHeaderContext.Push(
-                new LocString("relics", $"{Id.Entry}.selectionScreenHeader").GetRawText());
-
-            var reward = await DeterministicMultiplayerChoiceHelper.SelectRelicForPlayer(
+            var selectionTitle = new LocString("relics", $"{Id.Entry}.selectionScreenHeader").GetRawText();
+            var selectionResult = await DeterministicMultiplayerChoiceHelper.SelectRefreshableRelicForPlayer(
                 player,
                 rewardOptions,
-                $"{Id.Entry}.ascension-choice");
-            if (reward == null)
+                AstralParty_TokenGoldInitialPointRemainingRerolls,
+                selectionTitle,
+                $"剩余刷新次数：{AstralParty_TokenGoldInitialPointRemainingRerolls}",
+                $"{Id.Entry}.ascension-choice",
+                RerollAscensionRewardOptions,
+                RebuildAscensionRewardOptionsFromHistory);
+            if (selectionResult.SelectedRelic == null)
                 return false;
 
             await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, player, GoldLossType.Spent);
-            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(player, reward);
+            AstralParty_TokenGoldInitialPointRemainingRerolls = selectionResult.RemainingRerolls;
+            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(player, selectionResult.SelectedRelic);
             AstralParty_TokenGoldInitialPointAscensionCount =
                 Math.Min(MaxAscensions, AstralParty_TokenGoldInitialPointAscensionCount + 1);
+            AstralParty_TokenGoldInitialPointRemainingRerolls++;
         }
 
         await HealPlayer(player);
@@ -144,18 +151,54 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         if (Owner == null || player != Owner)
             return [];
 
-        return TokenRewardSelectionHelper.BuildRewardOptions(
+        return TokenRewardRerollHelper.BuildInitialOptions(
             player,
             AscensionChoiceCount,
-            player.PlayerRng.Rewards,
             RollAscensionRewardRarity,
             TokenRewardSelectionHelper.GetDefaultRaritySelectionOrder,
             GetCandidates);
     }
 
-    private RelicRarity RollAscensionRewardRarity(Rng rng)
+    private IReadOnlyList<RelicModel> RerollAscensionRewardOptions(
+        IReadOnlyList<RelicModel> currentOptions,
+        int rerollOrdinal,
+        IReadOnlySet<ModelId> historicalIds)
     {
-        var roll = rng.NextInt(100);
+        return TokenRewardRerollHelper.RerollOptions(
+            Owner!,
+            currentOptions,
+            rerollOrdinal + 1,
+            historicalIds,
+            RollAscensionRewardRarity,
+            TokenRewardSelectionHelper.GetDefaultRaritySelectionOrder,
+            GetCandidates);
+    }
+
+    private IReadOnlyList<RelicModel> RebuildAscensionRewardOptionsFromHistory(IReadOnlyList<int> rerollHistory)
+    {
+        return TokenRewardRerollHelper.RebuildOptionsFromHistory(
+            Owner!,
+            AscensionChoiceCount,
+            rerollHistory,
+            RollAscensionRewardRarity,
+            TokenRewardSelectionHelper.GetDefaultRaritySelectionOrder,
+            GetCandidates);
+    }
+
+    private RelicRarity RollAscensionRewardRarity(Player owner, int slotIndex, int rerollOrdinal)
+    {
+        var roll = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+            0,
+            100,
+            MainFile.ModId,
+            Id.Entry,
+            "initial_point_rarity",
+            owner.RunState.Rng.StringSeed,
+            owner.RunState.CurrentActIndex,
+            owner.NetId,
+            AstralParty_TokenGoldInitialPointAscensionCount,
+            slotIndex,
+            rerollOrdinal);
         return AstralParty_TokenGoldInitialPointAscensionCount switch
         {
             0 => roll < 65 ? RelicRarity.Common : roll < 95 ? RelicRarity.Uncommon : RelicRarity.Rare,
