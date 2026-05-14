@@ -48,42 +48,13 @@ public abstract class RandomTokenPackRelicBase : AstralPartyRelicModel
 
     private List<RelicModel> BuildRewardOptions(Player owner)
     {
-        var selectedIds = new HashSet<ModelId>();
-        var selectedRelics = new List<RelicModel>(RewardChoiceCount);
-        var rng = owner.PlayerRng.Rewards;
-
-        for (var slotIndex = 0; slotIndex < RewardChoiceCount; slotIndex++)
-        {
-            var reward = GetRewardCandidate(owner, rng, selectedIds);
-            if (reward == null)
-                break;
-
-            selectedRelics.Add(reward);
-            selectedIds.Add(GetCanonicalId(reward));
-        }
-
-        return selectedRelics;
-    }
-
-    private RelicModel? GetRewardCandidate(Player owner, Rng rng, IReadOnlySet<ModelId> selectedIds)
-    {
-        var rolledRarity = RollRewardRarity(rng);
-
-        foreach (var rarity in GetRaritySelectionOrder(rolledRarity))
-        {
-            var unownedCandidates = GetCandidates(owner, rarity, excludeOwned: true, selectedIds);
-            if (unownedCandidates.Count > 0)
-                return unownedCandidates[rng.NextInt(unownedCandidates.Count)];
-        }
-
-        foreach (var rarity in GetRaritySelectionOrder(rolledRarity))
-        {
-            var anyCandidates = GetCandidates(owner, rarity, excludeOwned: false, selectedIds);
-            if (anyCandidates.Count > 0)
-                return anyCandidates[rng.NextInt(anyCandidates.Count)];
-        }
-
-        return null;
+        return TokenRewardSelectionHelper.BuildRewardOptions(
+            owner,
+            RewardChoiceCount,
+            owner.PlayerRng.Rewards,
+            RollRewardRarity,
+            TokenRewardSelectionHelper.GetDefaultRaritySelectionOrder,
+            GetCandidates);
     }
 
     private RelicRarity RollRewardRarity(Rng rng)
@@ -101,15 +72,6 @@ public abstract class RandomTokenPackRelicBase : AstralPartyRelicModel
         return RelicRarity.Rare;
     }
 
-    private static IEnumerable<RelicRarity> GetRaritySelectionOrder(RelicRarity rolledRarity)
-    {
-        yield return rolledRarity;
-
-        foreach (var fallback in new[] { RelicRarity.Common, RelicRarity.Uncommon, RelicRarity.Rare })
-            if (fallback != rolledRarity)
-                yield return fallback;
-    }
-
     private static List<RelicModel> GetCandidates(
         Player owner,
         RelicRarity rarity,
@@ -118,14 +80,9 @@ public abstract class RandomTokenPackRelicBase : AstralPartyRelicModel
     {
         return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(owner.RunState, rarity)
             .Where(relic => !TokenRelicRegistry.IsSeriesTokenRelic(relic))
-            .Where(relic => !selectedIds.Contains(GetCanonicalId(relic)))
+            .Where(relic => !selectedIds.Contains(TokenRewardSelectionHelper.GetCanonicalId(relic)))
             .Where(relic => !excludeOwned || owner.Relics.All(owned => owned.CanonicalInstance.Id != relic.CanonicalInstance.Id))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
-    }
-
-    private static ModelId GetCanonicalId(RelicModel relic)
-    {
-        return relic.CanonicalInstance?.Id ?? relic.Id;
     }
 }

@@ -144,42 +144,13 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         if (Owner == null || player != Owner)
             return [];
 
-        var rng = player.PlayerRng.Rewards;
-        var selectedIds = new HashSet<ModelId>();
-        var selectedRelics = new List<RelicModel>(AscensionChoiceCount);
-
-        for (var slotIndex = 0; slotIndex < AscensionChoiceCount; slotIndex++)
-        {
-            var reward = GetAscensionRewardCandidate(player, rng, selectedIds);
-            if (reward == null)
-                break;
-
-            selectedRelics.Add(reward);
-            selectedIds.Add(GetCanonicalId(reward));
-        }
-
-        return selectedRelics;
-    }
-
-    private RelicModel? GetAscensionRewardCandidate(Player player, Rng rng, IReadOnlySet<ModelId> selectedIds)
-    {
-        var rolledRarity = RollAscensionRewardRarity(rng);
-
-        foreach (var rarity in GetRaritySelectionOrder(rolledRarity))
-        {
-            var unownedCandidates = GetCandidates(player, rarity, true, selectedIds);
-            if (unownedCandidates.Count > 0)
-                return unownedCandidates[rng.NextInt(unownedCandidates.Count)];
-        }
-
-        foreach (var rarity in GetRaritySelectionOrder(rolledRarity))
-        {
-            var anyCandidates = GetCandidates(player, rarity, false, selectedIds);
-            if (anyCandidates.Count > 0)
-                return anyCandidates[rng.NextInt(anyCandidates.Count)];
-        }
-
-        return null;
+        return TokenRewardSelectionHelper.BuildRewardOptions(
+            player,
+            AscensionChoiceCount,
+            player.PlayerRng.Rewards,
+            RollAscensionRewardRarity,
+            TokenRewardSelectionHelper.GetDefaultRaritySelectionOrder,
+            GetCandidates);
     }
 
     private RelicRarity RollAscensionRewardRarity(Rng rng)
@@ -194,19 +165,10 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         };
     }
 
-    private static IEnumerable<RelicRarity> GetRaritySelectionOrder(RelicRarity rolledRarity)
-    {
-        yield return rolledRarity;
-
-        foreach (var fallback in new[] { RelicRarity.Common, RelicRarity.Uncommon, RelicRarity.Rare })
-            if (fallback != rolledRarity)
-                yield return fallback;
-    }
-
     private List<RelicModel> GetCandidates(Player player, RelicRarity rarity, bool excludeOwned, IReadOnlySet<ModelId> selectedIds)
     {
         return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(player.RunState, rarity)
-            .Where(relic => !selectedIds.Contains(GetCanonicalId(relic)))
+            .Where(relic => !selectedIds.Contains(TokenRewardSelectionHelper.GetCanonicalId(relic)))
             .Where(relic => IsValidRewardCandidate(player, relic, excludeOwned))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
@@ -222,10 +184,5 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
             return false;
 
         return !excludeOwned || player.Relics.All(owned => owned.CanonicalInstance.Id != relic.CanonicalInstance.Id);
-    }
-
-    private static ModelId GetCanonicalId(RelicModel relic)
-    {
-        return relic.CanonicalInstance?.Id ?? relic.Id;
     }
 }
