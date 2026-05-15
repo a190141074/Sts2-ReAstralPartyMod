@@ -306,6 +306,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             var selectedIndex = await _singlePlayerChoiceSource.Task;
             ApplySelection(_localPlayer ?? _orderedPlayers[0], selectedIndex);
+            AstralTelemetry.RecordPersonaChoice(
+                _runState,
+                _relicOptions,
+                new Dictionary<ulong, int>
+                {
+                    [(_localPlayer ?? _orderedPlayers[0]).NetId] = selectedIndex
+                });
             FinalizeSelectionDisplay("选择已锁定，开始结算……");
             return;
         }
@@ -1005,6 +1012,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
             ApplySelection(_orderedPlayers[i], snapshot.SelectedIndexes[i]);
         }
+
+        AstralTelemetry.RecordPersonaChoice(
+            _runState,
+            _relicOptions,
+            _orderedPlayers
+                .Select((player, index) => new KeyValuePair<ulong, int>(player.NetId, snapshot.SelectedIndexes[index]))
+                .ToDictionary());
 
         FinalizeSelectionDisplay("所有玩家已锁定选择，开始结算……");
     }

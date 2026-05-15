@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.Enchantments;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using STS2RitsuLib.Content;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -89,6 +90,12 @@ public abstract partial class AstralPartyCardModel : ModCardTemplate
     internal static bool ShouldAutoApplyCooldown(CardModel card)
     {
         return card is AstralPartyCardModel astralCard && astralCard.ShouldAutoApplyCooldownEnchantment;
+    }
+
+    protected void RecordTelemetryOnPlay()
+    {
+        if (ShouldAutoApplyCooldownEnchantment)
+            AstralTelemetry.RecordPersonaSkillUseIfTracked(this);
     }
 
     [GeneratedRegex(@"([a-z])([A-Z])", RegexOptions.Compiled)]

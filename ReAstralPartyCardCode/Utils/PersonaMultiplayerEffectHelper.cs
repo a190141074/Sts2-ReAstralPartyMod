@@ -17,6 +17,7 @@ using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Helpers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -110,7 +111,7 @@ public static class PersonaMultiplayerEffectHelper
         if (canonicalRelic.Id == ModelDb.GetId<TokenGoldInitialPoint>() && owner.GetRelic<TokenGoldInitialPoint>() != null)
             return ObtainDuplicateInitialPointFallback(owner);
 
-        return RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
+        return ObtainRelicDeterministicTracked(owner, canonicalRelic);
     }
 
     public static Task<RelicModel> ObtainRelicAsReward(Player owner, RelicModel relic)
@@ -224,6 +225,13 @@ public static class PersonaMultiplayerEffectHelper
             return eternalStarlight;
 
         return owner.GetRelic<TokenGoldInitialPoint>()!;
+    }
+
+    private static async Task<RelicModel> ObtainRelicDeterministicTracked(Player owner, RelicModel canonicalRelic)
+    {
+        var obtained = await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
+        AstralTelemetry.RecordObtainedToken(owner, canonicalRelic);
+        return obtained;
     }
 
     private static void GuardRewardSyncAllowed(string operation)

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using Godot;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -194,7 +195,7 @@ public class TokenEternalStarlight : AstralPartyRelicModel
         var relic = owner.GetRelic<TokenEternalStarlight>();
         if (relic == null)
         {
-            await RelicCmd.Obtain(ModelDb.Relic<TokenEternalStarlight>().ToMutable(), owner);
+            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<TokenEternalStarlight>());
             relic = owner.GetRelic<TokenEternalStarlight>();
         }
 

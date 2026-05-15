@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 using STS2RitsuLib;
 using STS2RitsuLib.Interop;
@@ -31,6 +32,7 @@ public class MainFile
         PreloadSavedPropertyCache(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
         GameplayPatchRegistry.RegisterAndApply();
+        AstralTelemetry.Initialize();
 
         var buildMarker = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                           ?? assembly.GetName().Version?.ToString()

@@ -2,11 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Entities.Multiplayer;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
@@ -27,6 +31,8 @@ public static class StartingPersonaRelicSelectionPatch
     private static async Task RunAfterStartRun(Task originalTask, RunState runState)
     {
         await originalTask;
+        var gameType = RunManager.Instance.NetService.Type;
+        MainFile.Logger.Info($"Starting persona relic selection run gate: netMode={gameType} players={runState.Players.Count}.");
         if (!ShouldOpenStartingPersonaRelicSelection(runState, out var skipReason))
         {
             MainFile.Logger.Info($"Starting persona relic selection skipped: {skipReason}.");

@@ -551,6 +551,10 @@
     <None Remove="**\*.import" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ReAstralPartyCardCode\Server\" />
+  </ItemGroup>
+
   <Target Name="ExportModPck" AfterTargets="Build" Condition="'$(RunPckExport)' == 'true' and '$(STS2_SKIP_PCK_EXPORT)' != '1' and Exists('$(GodotEditorPath)')">
     <Message Text="Exporting mod pck to $(PckOutputPath)..." Importance="high" />
     <MakeDir Directories="$(ModOutputDir)" />

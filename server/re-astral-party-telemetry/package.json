@@ -1,0 +1,13 @@
+{
+  "name": "re-astral-party-telemetry",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Anonymous balance telemetry receiver for ReAstralPartyMod.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

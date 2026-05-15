@@ -65,9 +65,7 @@ public static class TokenRewardRerollHelper
             if (options.Count == 0)
                 break;
 
-            seenIds = options
-                .Select(TokenRewardSelectionHelper.GetCanonicalId)
-                .ToHashSet();
+            seenIds.UnionWith(options.Select(TokenRewardSelectionHelper.GetCanonicalId));
         }
 
         return options;
@@ -127,10 +125,7 @@ public static class TokenRewardRerollHelper
             if (options.Count == 0)
                 break;
 
-            seenIds = options
-                .Select(TokenRewardSelectionHelper.GetCanonicalId)
-                .ToHashSet();
-            seenIds.UnionWith(initialSeenIds);
+            seenIds.UnionWith(options.Select(TokenRewardSelectionHelper.GetCanonicalId));
         }
 
         return options;

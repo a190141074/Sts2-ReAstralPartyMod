@@ -1,0 +1,8 @@
+{
+  "netModes": {
+    "Singleplayer": "单人",
+    "Host": "联机房主",
+    "Client": "联机客机",
+    "Replay": "回放"
+  }
+}

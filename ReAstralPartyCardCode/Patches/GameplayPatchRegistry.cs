@@ -160,6 +160,23 @@ internal static class GameplayStaticPatchCatalog
                 description:
                 "Version-fragile gameplay patch: open the starting persona relic selection after run start",
                 parameterTypes: [typeof(RunState)])
+            ,
+            new ModPatchInfo(
+                "astral_telemetry_start_run_patch",
+                typeof(NGame),
+                "StartRun",
+                typeof(AstralTelemetryStartRunPatch),
+                isCritical: false,
+                description: "Lifecycle patch: reset Astral telemetry state after run start",
+                parameterTypes: [typeof(RunState)]),
+            new ModPatchInfo(
+                "astral_telemetry_run_ended_patch",
+                typeof(RunManager),
+                nameof(RunManager.OnEnded),
+                typeof(AstralTelemetryRunEndedPatch),
+                isCritical: false,
+                description: "Lifecycle patch: submit Astral telemetry when a run ends",
+                parameterTypes: [typeof(bool)])
         ]);
     }
 }
