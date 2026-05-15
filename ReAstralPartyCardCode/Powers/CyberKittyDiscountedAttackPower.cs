@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -13,6 +14,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 public class CyberKittyDiscountedAttackPower : AstralPartyPowerModel
 {
+    private static readonly string CyberKittyRelicIconPath = new PersonCyberKitty().PackedIconPath;
+
     private sealed class DiscountedCardEntry
     {
         public required CardModel Card { get; init; }
@@ -33,6 +36,14 @@ public class CyberKittyDiscountedAttackPower : AstralPartyPowerModel
     protected override object InitInternalData()
     {
         return new Data();
+    }
+
+    protected override IEnumerable<string> GetCandidateIconPaths()
+    {
+        yield return CyberKittyRelicIconPath;
+
+        foreach (var path in base.GetCandidateIconPaths())
+            yield return path;
     }
 
     public void TrackCard(CardModel card, decimal discountAmount)
