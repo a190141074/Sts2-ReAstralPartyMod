@@ -1,3 +1,4 @@
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -47,6 +48,8 @@ public class SkillTroubleMaker : AstralPartyCardModel
             $"{Id.Entry}.play");
 
         if (selectedCard == null) return;
+
+        await TroubleMakerTransformPreviewHelper.PlayTroubleMakerTransformAsync(Owner, this, selectedCard);
 
         var cardToPlay = CombatState.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, Owner);
         await CardCmd.AutoPlay(choiceContext, cardToPlay, Owner.Creature, AutoPlayType.Default, false, true);
