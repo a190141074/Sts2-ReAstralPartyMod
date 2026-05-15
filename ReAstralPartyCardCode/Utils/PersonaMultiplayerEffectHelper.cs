@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Saves;
 using MegaCrit.Sts2.Core.Helpers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
@@ -231,6 +232,7 @@ public static class PersonaMultiplayerEffectHelper
 
     private static async Task<RelicModel> ObtainRelicDeterministicTracked(Player owner, RelicModel canonicalRelic)
     {
+        MarkRelicAsSeenIfPossible(canonicalRelic);
         var obtained = await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
         AstralTelemetry.RecordObtainedToken(owner, canonicalRelic);
         return obtained;
@@ -238,6 +240,7 @@ public static class PersonaMultiplayerEffectHelper
 
     private static async Task<RelicModel> ObtainRelicAsRewardTracked(Player owner, RelicModel canonicalRelic)
     {
+        MarkRelicAsSeenIfPossible(canonicalRelic);
         var obtained = await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
         AstralTelemetry.RecordObtainedToken(owner, canonicalRelic);
         return obtained;
@@ -268,5 +271,10 @@ public static class PersonaMultiplayerEffectHelper
         }
 
         return bestScore;
+    }
+
+    private static void MarkRelicAsSeenIfPossible(RelicModel relic)
+    {
+        SaveManager.Instance?.MarkRelicAsSeen(relic.CanonicalInstance ?? relic);
     }
 }
