@@ -33,12 +33,15 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private readonly HashSet<ModelId> _seenOptionIds = [];
     private IReadOnlyList<RelicModel> _options;
     private readonly int _startingRerolls;
+    private readonly string _subtitlePrefix;
+    private readonly string _probabilityText;
     private int _remainingRerolls;
 
     private VBoxContainer _rootContainer = null!;
     private HBoxContainer _holderContainer = null!;
     private Label _titleLabel = null!;
     private Label _infoLabel = null!;
+    private Label _probabilityLabel = null!;
     private Label _bottomPromptLabel = null!;
     private Button _rerollButton = null!;
     private bool _closed;
@@ -54,7 +57,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         IReadOnlyList<RelicModel> options,
         int rerollCount,
         string title,
-        string subtitle,
+        string subtitlePrefix,
+        string probabilityText,
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc)
     {
         _owner = owner;
@@ -62,6 +66,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _options = options;
         _startingRerolls = Math.Max(0, rerollCount);
         _remainingRerolls = _startingRerolls;
+        _subtitlePrefix = subtitlePrefix;
+        _probabilityText = probabilityText;
         _rerollFunc = rerollFunc;
 
         Name = nameof(RefreshableTokenRelicSelectionScreen);
@@ -69,7 +75,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         MouseFilter = MouseFilterEnum.Stop;
         FocusMode = FocusModeEnum.All;
 
-        BuildUi(title, subtitle);
+        BuildUi(title);
         UpdateSubtitle();
     }
 
@@ -78,10 +84,11 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         IReadOnlyList<RelicModel> options,
         int rerollCount,
         string title,
-        string subtitle,
+        string subtitlePrefix,
+        string probabilityText,
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc)
     {
-        return new RefreshableTokenRelicSelectionScreen(owner, options, rerollCount, title, subtitle, rerollFunc);
+        return new RefreshableTokenRelicSelectionScreen(owner, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
     }
 
     public Task<RefreshableTokenRelicSelectionResult> WaitForResult()
@@ -120,7 +127,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         Visible = false;
     }
 
-    private void BuildUi(string title, string subtitle)
+    private void BuildUi(string title)
     {
         var backstop = new ColorRect
         {
@@ -148,7 +155,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _infoLabel = new Label
         {
             Name = "Info",
-            Text = subtitle,
+            Text = $"{_subtitlePrefix}{_remainingRerolls}",
             HorizontalAlignment = HorizontalAlignment.Right,
             ThemeTypeVariation = "HeaderSmall",
             MouseFilter = MouseFilterEnum.Ignore
@@ -157,8 +164,21 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _infoLabel.OffsetTop = 28f;
         _infoLabel.OffsetLeft = -540f;
         _infoLabel.OffsetRight = -40f;
-        _infoLabel.OffsetBottom = 76f;
         AddChild(_infoLabel);
+
+        _probabilityLabel = new Label
+        {
+            Name = "Probability",
+            Text = _probabilityText,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            ThemeTypeVariation = "HeaderSmall",
+            MouseFilter = MouseFilterEnum.Ignore
+        };
+        _probabilityLabel.SetAnchorsAndOffsetsPreset(LayoutPreset.TopRight);
+        _probabilityLabel.OffsetTop = 56f;
+        _probabilityLabel.OffsetLeft = -540f;
+        _probabilityLabel.OffsetRight = -40f;
+        AddChild(_probabilityLabel);
 
         _rootContainer = new VBoxContainer
         {
@@ -218,7 +238,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _rerollButton = new Button
         {
             Text = "刷新",
-            CustomMinimumSize = new Vector2(122f, 118f)
+            CustomMinimumSize = new Vector2(134f, 126f)
         };
         _rerollButton.Pressed += OnRerollPressed;
         _rerollButton.AddThemeStyleboxOverride("normal", CreateRerollButtonStyle(new Color(0.98f, 0.82f, 0.16f), new Color(1f, 0.9f, 0.4f)));
@@ -226,6 +246,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _rerollButton.AddThemeStyleboxOverride("pressed", CreateRerollButtonStyle(new Color(0.92f, 0.76f, 0.1f), new Color(1f, 0.88f, 0.36f)));
         _rerollButton.AddThemeStyleboxOverride("focus", CreateRerollButtonStyle(new Color(1f, 0.86f, 0.22f), new Color(1f, 0.94f, 0.5f)));
         _rerollButton.AddThemeStyleboxOverride("disabled", CreateRerollButtonStyle(new Color(0.56f, 0.5f, 0.34f, 0.86f), new Color(0.72f, 0.66f, 0.48f, 0.92f)));
+        _rerollButton.AddThemeFontSizeOverride("font_size", 34);
         _rerollButton.AddThemeColorOverride("font_color", new Color(0.08f, 0.08f, 0.08f));
         _rerollButton.AddThemeColorOverride("font_hover_color", new Color(0.08f, 0.08f, 0.08f));
         _rerollButton.AddThemeColorOverride("font_pressed_color", new Color(0.08f, 0.08f, 0.08f));
@@ -430,6 +451,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private void UpdateSubtitle()
     {
         _rerollButton.Text = $"刷新\nx{_remainingRerolls}";
+        _infoLabel.Text = $"{_subtitlePrefix}{_remainingRerolls}";
         _rerollButton.Disabled = _choiceLocked || _remainingRerolls <= 0;
     }
 

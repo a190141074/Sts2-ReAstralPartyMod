@@ -114,7 +114,8 @@ public static class DeterministicMultiplayerChoiceHelper
         IReadOnlyList<RelicModel> options,
         int rerollCount,
         string title,
-        string subtitle,
+        string subtitlePrefix,
+        string probabilityText,
         string context,
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc,
         Func<IReadOnlyList<int>, IReadOnlyList<RelicModel>> rebuildFromHistory)
@@ -126,19 +127,19 @@ public static class DeterministicMultiplayerChoiceHelper
         var gameType = runManager.NetService.Type;
         if (gameType is NetGameType.Singleplayer or NetGameType.None)
         {
-            return await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitle, rerollFunc);
+            return await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
         }
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
         {
-            return await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitle, rerollFunc);
+            return await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
         }
 
         var choiceId = synchronizer.ReserveChoiceId(player);
         if (IsLocalPlayer(runManager, player))
         {
-            var result = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitle, rerollFunc);
+            var result = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
             synchronizer.SyncLocalChoice(player, choiceId, CreateRefreshableRelicChoiceResult(result));
             Log.Info(
                 $"[{MainFile.ModId}] Synced local refreshable relic choice: context={context} player={player.NetId} choiceId={choiceId} index={result.SelectedIndex} rerolls={result.RerollHistory.Count}");
@@ -337,7 +338,8 @@ public static class DeterministicMultiplayerChoiceHelper
         IReadOnlyList<RelicModel> options,
         int rerollCount,
         string title,
-        string subtitle,
+        string subtitlePrefix,
+        string probabilityText,
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc)
     {
         var overlayStack = NOverlayStack.Instance;
@@ -360,7 +362,7 @@ public static class DeterministicMultiplayerChoiceHelper
                 SaveManager.Instance.MarkRelicAsSeen(relic);
         }
 
-        var screen = RefreshableTokenRelicSelectionScreen.Create(player, options, rerollCount, title, subtitle, rerollFunc);
+        var screen = RefreshableTokenRelicSelectionScreen.Create(player, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
         overlayStack.Push(screen);
         return await screen.WaitForResult();
     }

@@ -40,7 +40,8 @@ public abstract class RandomTokenPackRelicBase : AstralPartyRelicModel
             rewardOptions,
             DefaultRerolls,
             selectionTitle,
-            "剩余刷新次数：1",
+            "剩余刷新次数：",
+            "筹码概率：蓝 60% / 紫 30% / 金 10%",
             $"{Id.Entry}.pack-choice",
             RerollRewardOptions,
             RebuildRewardOptionsFromHistory);

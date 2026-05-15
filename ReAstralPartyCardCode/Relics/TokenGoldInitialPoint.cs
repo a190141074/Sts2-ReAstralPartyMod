@@ -90,7 +90,8 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
                 rewardOptions,
                 AstralParty_TokenGoldInitialPointRemainingRerolls,
                 selectionTitle,
-                $"剩余刷新次数：{AstralParty_TokenGoldInitialPointRemainingRerolls}",
+                "剩余刷新次数：",
+                "筹码概率：按当前升星阶段",
                 $"{Id.Entry}.ascension-choice",
                 RerollAscensionRewardOptions,
                 RebuildAscensionRewardOptionsFromHistory);
