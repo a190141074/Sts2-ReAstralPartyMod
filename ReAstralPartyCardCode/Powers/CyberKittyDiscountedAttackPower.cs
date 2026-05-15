@@ -14,8 +14,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 public class CyberKittyDiscountedAttackPower : AstralPartyPowerModel
 {
-    private static readonly string CyberKittyRelicIconPath = new PersonCyberKitty().PackedIconPath;
-
     private sealed class DiscountedCardEntry
     {
         public required CardModel Card { get; init; }
@@ -40,7 +38,7 @@ public class CyberKittyDiscountedAttackPower : AstralPartyPowerModel
 
     protected override IEnumerable<string> GetCandidateIconPaths()
     {
-        yield return CyberKittyRelicIconPath;
+        yield return ModelDb.Relic<PersonCyberKitty>().PackedIconPath;
 
         foreach (var path in base.GetCandidateIconPaths())
             yield return path;

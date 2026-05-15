@@ -29,20 +29,6 @@ public sealed class VialEpisodeStore : AstralPartyEventModel
         return runState.Players.All(player => player.Gold >= MinimumGoldRequiredPerPlayer);
     }
 
-    protected override Task BeforeEventStarted(bool isPreFinished)
-    {
-        if (Owner != null)
-            Owner.CanRemovePotions = false;
-
-        return Task.CompletedTask;
-    }
-
-    protected override void OnEventFinished()
-    {
-        if (Owner != null)
-            Owner.CanRemovePotions = true;
-    }
-
     protected override IReadOnlyList<EventOption> GenerateInitialOptions()
     {
         return [new EventOption(this, OpenStorefront, InitialOptionKey("FOUND_ONE_GOLD"))];
