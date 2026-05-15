@@ -25,6 +25,7 @@ public class VialNeutralEventPotion : AstralPartyPotionModel
             return;
 
         var options = VialEpisodeEventHelper.CreateNeutralEventOptions(Owner, $"{Id.Entry}.use");
-        await VialEpisodeEventHelper.PlaySelectedCanonicalCardForOwner(choiceContext, Owner, options, $"{Id.Entry}.use");
+        await VialEpisodeEventHelper.PlaySelectedCanonicalCardForOwner(choiceContext, Owner, options,
+            $"{Id.Entry}.use");
     }
 }

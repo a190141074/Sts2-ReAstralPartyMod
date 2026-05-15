@@ -31,7 +31,8 @@ public static class DeterministicSelectionHelper
 
     private static int ComputeDeterministicIndex(int upperExclusive, params object[] contextParts)
     {
-        var bytes = Encoding.UTF8.GetBytes(string.Join("|", contextParts.Select(part => part?.ToString() ?? string.Empty)));
+        var bytes = Encoding.UTF8.GetBytes(string.Join("|",
+            contextParts.Select(part => part?.ToString() ?? string.Empty)));
         var hash = SHA256.HashData(bytes);
         var value = BitConverter.ToUInt32(hash, 0);
         return (int)(value % upperExclusive);

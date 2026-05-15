@@ -37,8 +37,7 @@ public class PersonWeirdEgg : LegacyCooldownPersonaRelicBase
         set => SetCanonicalPendingCombatStartCard(value);
     }
 
-    [SavedProperty]
-    public int AstralParty_PersonWeirdEggConsecutiveEventRooms { get; set; }
+    [SavedProperty] public int AstralParty_PersonWeirdEggConsecutiveEventRooms { get; set; }
 
     // Read the old save field without writing it back into newly saved runs.
     public int FurCoatCoordsSet

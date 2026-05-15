@@ -18,7 +18,7 @@ public static class EventOptionLockedHoverFocusPatch
         NHoverTipSet.CreateAndShow(
             __instance,
             __instance.Option.HoverTips,
-            (__instance.Event.LayoutType != MegaCrit.Sts2.Core.Events.EventLayoutType.Combat)
+            __instance.Event.LayoutType != MegaCrit.Sts2.Core.Events.EventLayoutType.Combat
                 ? HoverTipAlignment.Left
                 : HoverTipAlignment.Right);
         return false;

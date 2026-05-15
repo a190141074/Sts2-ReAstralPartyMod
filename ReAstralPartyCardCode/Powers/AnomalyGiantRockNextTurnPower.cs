@@ -15,9 +15,11 @@ public class AnomalyGiantRockNextTurnPower : AstralPartyPowerModel
 
     public override PowerStackType StackType => PowerStackType.None;
 
-    public override LocString Title => new("powers", "RE_ASTRAL_PARTY_MOD_POWER_ANOMALY_GIANT_ROCK_NEXT_TURN_POWER.title");
+    public override LocString Title =>
+        new("powers", "RE_ASTRAL_PARTY_MOD_POWER_ANOMALY_GIANT_ROCK_NEXT_TURN_POWER.title");
 
-    public override LocString Description => new("powers", "RE_ASTRAL_PARTY_MOD_POWER_ANOMALY_GIANT_ROCK_NEXT_TURN_POWER.description");
+    public override LocString Description =>
+        new("powers", "RE_ASTRAL_PARTY_MOD_POWER_ANOMALY_GIANT_ROCK_NEXT_TURN_POWER.description");
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
@@ -27,7 +29,8 @@ public class AnomalyGiantRockNextTurnPower : AstralPartyPowerModel
         var card = player.Creature.CombatState.CreateCard(ModelDb.Card<GiantRock>(), player);
         card.AddKeyword(CardKeyword.Exhaust);
         card.AddKeyword(CardKeyword.Ethereal);
-        await CardGainAttribution.RunWithSource(this, () => CardPileCmd.Add(card, PileType.Hand, CardPilePosition.Top, this));
+        await CardGainAttribution.RunWithSource(this,
+            () => CardPileCmd.Add(card, PileType.Hand, CardPilePosition.Top, this));
         await GeneratedCardObserver.NotifyCardAddedToHand(card, this);
         await PowerCmd.Remove(this);
     }

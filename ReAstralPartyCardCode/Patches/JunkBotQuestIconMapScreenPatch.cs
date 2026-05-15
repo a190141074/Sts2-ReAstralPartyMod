@@ -14,14 +14,12 @@ public static class JunkBotQuestIconMapScreenPatch
             if (child is not NNormalMapPoint mapPointNode)
                 continue;
 
-            if (JunkBotQuestIconHelper.TryApplyMapQuestIcon(mapPointNode, logSkipped: false))
+            if (JunkBotQuestIconHelper.TryApplyMapQuestIcon(mapPointNode, false))
                 appliedCount++;
         }
 
         if (appliedCount > 0)
-        {
             MainFile.Logger.Info(
                 $"Junk Bot map screen refresh reapplied quest icons | count={appliedCount} | path={JunkBotQuestIconHelper.IconPath}");
-        }
     }
 }

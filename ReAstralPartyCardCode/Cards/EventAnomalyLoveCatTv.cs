@@ -57,7 +57,8 @@ public class EventAnomalyLoveCatTv : AstralPartyCardModel
                 true);
         }
 
-        foreach (var enemy in CombatState.Creatures.Where(creature => creature.IsAlive && creature.Side != Owner.Creature.Side))
+        foreach (var enemy in CombatState.Creatures.Where(creature =>
+                     creature.IsAlive && creature.Side != Owner.Creature.Side))
             await PowerCmd.Apply<StrengthPower>(enemy, -EnemyStrengthLoss, Owner.Creature, this, false);
     }
 }

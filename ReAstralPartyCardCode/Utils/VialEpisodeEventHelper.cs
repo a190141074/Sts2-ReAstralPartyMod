@@ -61,7 +61,8 @@ public static class VialEpisodeEventHelper
         await CardCmd.AutoPlay(choiceContext, cardToPlay, owner.Creature, AutoPlayType.Default, false, true);
     }
 
-    private static IReadOnlyList<CardModel> CreateRandomChoiceOptions(Player owner, string context, params Type[] cardTypes)
+    private static IReadOnlyList<CardModel> CreateRandomChoiceOptions(Player owner, string context,
+        params Type[] cardTypes)
     {
         var orderedCanonicals = DeterministicMultiplayerChoiceHelper
             .OrderDeterministically(

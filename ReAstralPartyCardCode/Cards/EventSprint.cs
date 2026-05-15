@@ -40,7 +40,8 @@ public class EventSprint : AstralPartyCardModel
 
         foreach (var player in CombatState.Players)
         {
-            await AstralTemporaryDexterityPower.Apply(player.Creature, DynamicVars["Dexterity"].BaseValue, this, null, this);
+            await AstralTemporaryDexterityPower.Apply(player.Creature, DynamicVars["Dexterity"].BaseValue, this, null,
+                this);
 
             var bionicJasmine = player.GetRelic<PersonBionicJasmine>();
             if (bionicJasmine == null)

@@ -99,7 +99,7 @@ public class PersonNeedyGirl : CooldownPersonaRelicBase
         if (Owner?.Creature == null || amount <= 0)
             return;
 
-        var newAmount = System.Math.Min(GetLoveAmount() + amount, MaxLoveStacks);
+        var newAmount = Math.Min(GetLoveAmount() + amount, MaxLoveStacks);
         await SetLoveAmount(newAmount, source);
         Flash();
     }
@@ -109,7 +109,7 @@ public class PersonNeedyGirl : CooldownPersonaRelicBase
         if (Owner?.Creature == null)
             return;
 
-        var clampedAmount = System.Math.Clamp(amount, 0, MaxLoveStacks);
+        var clampedAmount = Math.Clamp(amount, 0, MaxLoveStacks);
         var existingPower = Owner.Creature.GetPower<LovePower>();
         if (clampedAmount <= 0)
         {
@@ -125,6 +125,6 @@ public class PersonNeedyGirl : CooldownPersonaRelicBase
     {
         return Owner?.Creature == null
             ? 0
-            : System.Math.Max((int)Owner.Creature.GetPowerAmount<LovePower>(), 0);
+            : Math.Max((int)Owner.Creature.GetPowerAmount<LovePower>(), 0);
     }
 }

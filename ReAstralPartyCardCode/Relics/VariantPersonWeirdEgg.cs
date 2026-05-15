@@ -35,8 +35,7 @@ public class VariantPersonWeirdEgg : LegacyCooldownPersonaRelicBase
         set => SetCanonicalPendingCombatStartCard(value);
     }
 
-    [SavedProperty]
-    public int AstralParty_VariantPersonWeirdEggConsecutiveEventRooms { get; set; }
+    [SavedProperty] public int AstralParty_VariantPersonWeirdEggConsecutiveEventRooms { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

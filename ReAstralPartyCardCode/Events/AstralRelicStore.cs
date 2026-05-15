@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Gold;
 using MegaCrit.Sts2.Core.Events;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
+using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -115,10 +119,47 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         }
 
         await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, owner, GoldLossType.Spent);
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<TRelic>());
+        await GrantStorePurchase(owner, ModelDb.Relic<TRelic>());
         MainFile.Logger.Info(
             $"AstralRelicStore CompletePurchase success | owner={owner.NetId} | relic={typeof(TRelic).Name} | gold_after={owner.Gold}");
         SetEventFinished(PageDescription(finishPageName));
+    }
+
+    private static async Task GrantStorePurchase(Player owner, RelicModel relic)
+    {
+        var canonicalRelic = relic.CanonicalInstance ?? relic;
+        if (canonicalRelic.Id == ModelDb.GetId<TokenGoldInitialPoint>())
+        {
+            if (owner.GetRelic<TokenGoldInitialPoint>() != null)
+                await ObtainDuplicateInitialPointFallbackAsReward(owner);
+            else
+                await RewardSyncHelper.ObtainRelicAsReward(owner, canonicalRelic);
+
+            return;
+        }
+
+        await RewardsCmd.OfferCustom(owner, [new RelicReward(canonicalRelic.ToMutable(), owner)]);
+    }
+
+    private static async Task<RelicModel> ObtainDuplicateInitialPointFallbackAsReward(Player owner)
+    {
+        var eternalStarlight = owner.GetRelic<TokenEternalStarlight>();
+        if (eternalStarlight == null)
+            eternalStarlight = await RewardSyncHelper.ObtainRelicAsReward(owner, ModelDb.Relic<TokenEternalStarlight>())
+                                   as TokenEternalStarlight
+                               ?? owner.GetRelic<TokenEternalStarlight>();
+
+        if (eternalStarlight != null)
+        {
+            await CardGainAttribution.RunWithSource(null, () =>
+            {
+                eternalStarlight.AddStacks(3);
+                return Task.CompletedTask;
+            });
+            return eternalStarlight;
+        }
+
+        return owner.GetRelic<TokenGoldInitialPoint>()!;
     }
 
     internal static bool HasBeenConsumedThisAct(IRunState? runState)

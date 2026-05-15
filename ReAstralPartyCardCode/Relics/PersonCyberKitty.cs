@@ -96,8 +96,10 @@ public class PersonCyberKitty : CooldownPersonaRelicBase
             return;
 
         Flash();
-        await AstralTemporaryStrengthPower.Apply(Owner.Creature, PassiveTemporaryStatAmount, this, Owner.Creature, null, true);
-        await AstralTemporaryDexterityPower.Apply(Owner.Creature, PassiveTemporaryStatAmount, this, Owner.Creature, null, true);
+        await AstralTemporaryStrengthPower.Apply(Owner.Creature, PassiveTemporaryStatAmount, this, Owner.Creature, null,
+            true);
+        await AstralTemporaryDexterityPower.Apply(Owner.Creature, PassiveTemporaryStatAmount, this, Owner.Creature,
+            null, true);
         await CyberKittyCombatHelper.GainRandomAttackCardDiscounted(choiceContext, Owner, this);
     }
 
@@ -123,7 +125,8 @@ public class PersonCyberKitty : CooldownPersonaRelicBase
         AstralParty_PersonCyberKittyTriggeredThisTurn = true;
         Flash();
 
-        var discardedAttack = await CyberKittyCombatHelper.DiscardLeftmostAttackAndUpgradeForCombat(choiceContext, Owner);
+        var discardedAttack =
+            await CyberKittyCombatHelper.DiscardLeftmostAttackAndUpgradeForCombat(choiceContext, Owner);
         if (discardedAttack != null)
             return;
 

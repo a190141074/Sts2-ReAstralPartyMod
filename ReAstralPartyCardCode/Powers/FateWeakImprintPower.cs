@@ -93,6 +93,6 @@ public class FateWeakImprintPower : AstralPartyPowerModel
             sourceBlueWhale,
             rewardPlayer,
             1,
-            allowStoreForNextCombat: true);
+            true);
     }
 }

@@ -147,7 +147,7 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
                 this,
                 recipient,
                 entry.Value,
-                allowStoreForNextCombat: false);
+                false);
             _pendingFateGuidanceByRecipientNetId[entry.Key] = 0;
         }
 
@@ -171,9 +171,9 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
         foreach (var player in combatState.Players)
         {
             var count = player.PlayerCombatState?.Hand?.Cards
-                .OfType<SkillFateGuidance>()
-                .Count(card => card.AstralParty_FateGuidanceSourceBlueWhalePlayerNetId == Owner.NetId)
-                ?? 0;
+                            .OfType<SkillFateGuidance>()
+                            .Count(card => card.AstralParty_FateGuidanceSourceBlueWhalePlayerNetId == Owner.NetId)
+                        ?? 0;
             if (count <= 0)
                 continue;
 

@@ -61,7 +61,7 @@ public static class FateGuidanceCompatibilityHelper
         if (!CombatManager.Instance.IsOverOrEnding && recipient.Creature?.CombatState != null)
         {
             if (card.Pile != null)
-                await CardPileCmd.RemoveFromCombat(card, skipVisuals: true);
+                await CardPileCmd.RemoveFromCombat(card, true);
 
             await CardCmd.AutoPlay(new ThrowingPlayerChoiceContext(), card, null, skipCardPileVisuals: true);
             return;

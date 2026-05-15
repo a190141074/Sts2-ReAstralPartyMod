@@ -108,7 +108,8 @@ internal static class TreasureRoomRelicSessionHelper
         List<TreasureRoomRelicSynchronizer.PlayerVote> votes,
         int relicCount)
     {
-        if (!RunManager.Instance.IsSinglePlayerOrFakeMultiplayer || playerCollection.Players.Count <= 1 || relicCount <= 0)
+        if (!RunManager.Instance.IsSinglePlayerOrFakeMultiplayer || playerCollection.Players.Count <= 1 ||
+            relicCount <= 0)
             return;
 
         var localPlayerId = (ulong)LocalPlayerIdField.GetValue(synchronizer)!;
@@ -138,13 +139,11 @@ internal static class TreasureRoomRelicSessionHelper
             && runState.Players.Count > 1
             && player.NetId != RunManager.Instance.NetService.NetId
             && optionCount > 0)
-        {
             return new TreasureRoomRelicSynchronizer.PlayerVote
             {
                 index = runState.Rng.TreasureRoomRelics.NextInt(optionCount),
                 voteReceived = true
             };
-        }
 
         return new TreasureRoomRelicSynchronizer.PlayerVote
         {

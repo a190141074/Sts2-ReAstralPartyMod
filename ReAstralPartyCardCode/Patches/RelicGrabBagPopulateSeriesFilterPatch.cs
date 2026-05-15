@@ -6,7 +6,8 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
-[HarmonyPatch(typeof(RelicGrabBag), nameof(RelicGrabBag.Populate), [typeof(Player), typeof(MegaCrit.Sts2.Core.Random.Rng)])]
+[HarmonyPatch(typeof(RelicGrabBag), nameof(RelicGrabBag.Populate),
+    [typeof(Player), typeof(MegaCrit.Sts2.Core.Random.Rng)])]
 internal static class RelicGrabBagPopulateSeriesFilterPatch
 {
     [HarmonyPostfix]

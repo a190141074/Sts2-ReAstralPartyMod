@@ -250,13 +250,14 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             holder.VoteContainer.Initialize(
                 player => PlayerSelectedHolder(player, holder.Index),
                 _runState.Players);
-            holder.Connect(NClickableControl.SignalName.Released, Callable.From<NTreasureRoomRelicHolder>(_ => OnHolderSelected(holder)));
+            holder.Connect(NClickableControl.SignalName.Released,
+                Callable.From<NTreasureRoomRelicHolder>(_ => OnHolderSelected(holder)));
             _holdersById[relic.Id] = holder;
         }
 
         ApplyHolderLayout(_holdersById.Values.OrderBy(holder => holder.Index).ToList(), _relicOptions.Count);
         ConfigureHolderFocusNeighbors();
-        RefreshVotes(animate: false);
+        RefreshVotes(false);
     }
 
     private void AnimateIn()
@@ -318,7 +319,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
 
         _multiplayerSynchronizer = await WaitForPlayerChoiceSynchronizerAsync()
-            ?? throw new InvalidOperationException("PlayerChoiceSynchronizer was not ready for starting persona selection.");
+                                   ?? throw new InvalidOperationException(
+                                       "PlayerChoiceSynchronizer was not ready for starting persona selection.");
         InitializeMultiplayerChoiceStreams(_multiplayerSynchronizer);
         FlushPendingLocalSelectionIfNeeded();
         UpdatePendingSubtitle();
@@ -334,7 +336,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         var timeoutTask = WaitForFramesAsync(SelectionCommitTimeoutFrames);
         var completedTask = await Task.WhenAny(_multiplayerCommitSource.Task, timeoutTask);
         if (completedTask != _multiplayerCommitSource.Task)
-            throw new TimeoutException("Starting persona relic selection timed out while waiting for the final synchronized lock.");
+            throw new TimeoutException(
+                "Starting persona relic selection timed out while waiting for the final synchronized lock.");
 
         var committedSnapshot = await _multiplayerCommitSource.Task;
         ApplyCommittedSelections(committedSnapshot);
@@ -349,7 +352,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
         }
 
-        RelicModel? selectedRelic = selectedIndex >= 0 && selectedIndex < _relicOptions.Count
+        var selectedRelic = selectedIndex >= 0 && selectedIndex < _relicOptions.Count
             ? _relicOptions[selectedIndex]
             : null;
 
@@ -371,9 +374,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private void InitializeMultiplayerChoiceStreams(PlayerChoiceSynchronizer synchronizer)
     {
         foreach (var player in _orderedPlayers)
-        {
             _nextChoiceIdsByPlayer[player.NetId] = synchronizer.ReserveChoiceId(player);
-        }
     }
 
     private bool AreAllSelectionsSubmitted()
@@ -423,7 +424,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             results.Add(GenerateDeterministicFight(voters, relic));
         }
 
-        var assignedPlayers = results.Where(result => result.player != null).Select(result => result.player!).ToHashSet();
+        var assignedPlayers =
+            results.Where(result => result.player != null).Select(result => result.player!).ToHashSet();
         var consolationPlayers = _orderedPlayers
             .Where(player => !assignedPlayers.Contains(player) && !skippedPlayers.Contains(player))
             .ToList();
@@ -439,23 +441,19 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             var relic = orderedUnclaimedRelics[i];
             if (i < consolationPlayers.Count)
-            {
                 results.Add(new RelicPickingResult
                 {
                     type = RelicPickingResultType.ConsolationPrize,
                     player = consolationPlayers[i],
                     relic = relic
                 });
-            }
             else
-            {
                 results.Add(new RelicPickingResult
                 {
                     type = RelicPickingResultType.Skipped,
                     player = null,
                     relic = relic
                 });
-            }
         }
 
         return results
@@ -502,10 +500,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 tieRounds = 0;
                 var losingMove = GetLosingMove(distinctMoves[0], distinctMoves[1]);
                 for (var i = 0; i < players.Count; i++)
-                {
                     if (round.moves[i] == losingMove)
                         contenders.Remove(players[i]);
-                }
             }
             else
             {
@@ -532,7 +528,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         };
     }
 
-    private Player BreakFightTieDeterministically(IReadOnlyCollection<Player> contenders, RelicModel relic, int roundIndex)
+    private Player BreakFightTieDeterministically(IReadOnlyCollection<Player> contenders, RelicModel relic,
+        int roundIndex)
     {
         return DeterministicMultiplayerChoiceHelper.OrderDeterministically(
                 contenders.ToList(),
@@ -596,9 +593,10 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             }
             else if (result.type != RelicPickingResultType.Skipped && result.player != null)
             {
-                await AnimateAwardResultAsync(holder, result.player, result.type == RelicPickingResultType.ConsolationPrize
-                    ? "补发获得"
-                    : "直接获得");
+                await AnimateAwardResultAsync(holder, result.player,
+                    result.type == RelicPickingResultType.ConsolationPrize
+                        ? "补发获得"
+                        : "直接获得");
             }
 
             previousType = result.type;
@@ -689,7 +687,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         await Cmd.Wait(0.2f);
     }
 
-    private async Task PersistStartingPersonaSelectionAsync(IReadOnlyCollection<(Player Player, RelicModel Relic)> awardedResults)
+    private async Task PersistStartingPersonaSelectionAsync(
+        IReadOnlyCollection<(Player Player, RelicModel Relic)> awardedResults)
     {
         if (awardedResults.Count == 0)
         {
@@ -704,7 +703,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 awardedResults.Select(static entry => $"player={entry.Player.NetId}:{entry.Relic.Id.Entry}")));
 
         MainFile.Logger.Info("Starting persona selection forcing current run save.");
-        await SaveManager.Instance.SaveRun(preFinishedRoom: null);
+        await SaveManager.Instance.SaveRun(null);
         MainFile.Logger.Info("Starting persona selection current run save completed.");
     }
 
@@ -724,7 +723,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
         }
 
-        if (_localPlayer == null || _multiplayerSynchronizer == null || !_nextChoiceIdsByPlayer.ContainsKey(_localPlayer.NetId))
+        if (_localPlayer == null || _multiplayerSynchronizer == null ||
+            !_nextChoiceIdsByPlayer.ContainsKey(_localPlayer.NetId))
         {
             if (_localPlayer != null)
             {
@@ -753,7 +753,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         foreach (var holder in _holdersById.Values)
         {
-            if (!GodotObject.IsInstanceValid(holder) || !GodotObject.IsInstanceValid(holder.VoteContainer))
+            if (!IsInstanceValid(holder) || !IsInstanceValid(holder.VoteContainer))
                 continue;
 
             holder.VoteContainer.RefreshPlayerVotes(animate);
@@ -948,7 +948,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private void MaybeCommitSelections()
     {
-        if (_selectionFinalized || _multiplayerCommitSent || _multiplayerSynchronizer == null || _authorityPlayer == null)
+        if (_selectionFinalized || _multiplayerCommitSent || _multiplayerSynchronizer == null ||
+            _authorityPlayer == null)
             return;
 
         if (_localPlayer == null || _localPlayer.NetId != _authorityPlayer.NetId)
@@ -997,18 +998,14 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private void ApplyCommittedSelections(CommittedSelectionSnapshot snapshot)
     {
         if (snapshot.SelectedIndexes.Count != _orderedPlayers.Count)
-        {
             throw new InvalidOperationException(
                 $"Starting persona selection commit player count mismatch: expected {_orderedPlayers.Count}, got {snapshot.SelectedIndexes.Count}.");
-        }
 
         for (var i = 0; i < _orderedPlayers.Count; i++)
         {
             if (snapshot.SelectedIndexes[i] < 0 || snapshot.SelectedIndexes[i] >= _relicOptions.Count)
-            {
                 throw new InvalidOperationException(
                     $"Starting persona selection commit index out of range for player {_orderedPlayers[i].NetId}: {snapshot.SelectedIndexes[i]} / {_relicOptions.Count}.");
-            }
 
             ApplySelection(_orderedPlayers[i], snapshot.SelectedIndexes[i]);
         }
@@ -1038,7 +1035,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
 
         var selectedCount = _selectionStates.Values.Count(static state => state.SelectedRelic != null);
-        if (_localPlayer == null || !_selectionStates.TryGetValue(_localPlayer.NetId, out var localState) || localState.SelectedRelic == null)
+        if (_localPlayer == null || !_selectionStates.TryGetValue(_localPlayer.NetId, out var localState) ||
+            localState.SelectedRelic == null)
         {
             _subtitleLabel.Text = "所有玩家共享同一批人格。全员完成前可以改选；若多人选中同一人格，则按稳定猜拳规则决定归属。";
             return;
@@ -1075,12 +1073,10 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private async Task WaitForFramesAsync(int frameCount)
     {
         for (var frame = 0; frame < frameCount && !_closed && !_multiplayerCommitSource.Task.IsCompleted; frame++)
-        {
             if (NGame.Instance?.IsInsideTree() == true)
                 await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
             else
                 await Task.Yield();
-        }
     }
 
     private async Task CloseAfterInputReleasedAsync()
@@ -1102,10 +1098,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
 
         while (Input.IsMouseButtonPressed(MouseButton.Left))
-        {
             if (!await AwaitProcessFrameIfInsideTreeAsync())
                 return;
-        }
 
         await AwaitProcessFrameIfInsideTreeAsync();
     }
@@ -1125,7 +1119,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private static PlayerChoiceResult CreateSelectionUpdateChoiceResult(int sequence, int selectedIndex)
     {
-        return PlayerChoiceResult.FromIndexes([MultiplayerChoiceMagic, ChoiceKindSelectionUpdate, sequence, selectedIndex]);
+        return PlayerChoiceResult.FromIndexes([
+            MultiplayerChoiceMagic, ChoiceKindSelectionUpdate, sequence, selectedIndex
+        ]);
     }
 
     private static PlayerChoiceResult CreateSelectionCommitChoiceResult(IReadOnlyList<int> selectedIndexes)
@@ -1148,9 +1144,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             || payload.Count < 4
             || payload[0] != MultiplayerChoiceMagic
             || payload[1] != ChoiceKindSelectionUpdate)
-        {
             return false;
-        }
 
         sequence = payload[2];
         selectedIndex = payload[3];
@@ -1164,9 +1158,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             || payload.Count < 3
             || payload[0] != MultiplayerChoiceMagic
             || payload[1] != ChoiceKindSelectionCommit)
-        {
             return false;
-        }
 
         var playerCount = payload[2];
         if (playerCount < 0 || payload.Count < playerCount + 3)
@@ -1226,10 +1218,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private static void ObserveTaskFault(Task task)
     {
         _ = task.ContinueWith(
-            static completedTask =>
-            {
-                _ = completedTask.Exception;
-            },
+            static completedTask => { _ = completedTask.Exception; },
             TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
     }
 }

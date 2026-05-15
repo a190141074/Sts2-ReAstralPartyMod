@@ -84,15 +84,14 @@ public class TokenGoldArcaneCodex : AstralPartyRelicModel
         InvokeDisplayAmountChanged();
 
         Flash();
-        if (await PersonaMultiplayerEffectHelper.TryRedirectLivingFolioCopyToDerivativeStacks(Owner, cardPlay.Card, this))
+        if (await PersonaMultiplayerEffectHelper.TryRedirectLivingFolioCopyToDerivativeStacks(Owner, cardPlay.Card,
+                this))
             return;
 
         var copiedCard = cardPlay.Card.CreateClone();
         if (!cardPlay.Card.Keywords.Contains(CardKeyword.Exhaust)
             && !copiedCard.Keywords.Contains(CardKeyword.Exhaust))
-        {
             CardCmd.ApplyKeyword(copiedCard, CardKeyword.Exhaust);
-        }
 
         copiedCard.SetToFreeThisTurn();
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(

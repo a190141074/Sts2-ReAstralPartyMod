@@ -85,7 +85,8 @@ public class PersonalityDerivativeMascotGirlMimiTokenMemory : AstralPartyRelicMo
         currentCount++;
         _temporaryTokenGainCounts[tokenKey] = currentCount;
 
-        if (currentCount >= RewardThreshold && !MascotGirlMimiTokenMemoryHelper.PlayerOwnsTokenRelic(Owner, tokenRelicId))
+        if (currentCount >= RewardThreshold &&
+            !MascotGirlMimiTokenMemoryHelper.PlayerOwnsTokenRelic(Owner, tokenRelicId))
             _readyRewardTokenIds.Add(tokenKey);
 
         InvokeDisplayAmountChanged();

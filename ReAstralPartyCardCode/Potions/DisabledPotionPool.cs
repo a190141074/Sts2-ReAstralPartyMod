@@ -9,7 +9,6 @@ public sealed class DisabledPotionPool : TypeListPotionPoolModel
     public override string EnergyColorName => "colorless";
 
 #pragma warning disable CS0618
-    [Obsolete]
-    protected override IEnumerable<Type> PotionTypes => [];
+    [Obsolete] protected override IEnumerable<Type> PotionTypes => [];
 #pragma warning restore CS0618
 }

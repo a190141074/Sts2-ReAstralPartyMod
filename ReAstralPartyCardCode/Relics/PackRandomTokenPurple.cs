@@ -13,5 +13,4 @@ public class PackRandomTokenPurple : RandomTokenPackRelicBase
     protected override int RareWeight => 20;
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
-    
 }

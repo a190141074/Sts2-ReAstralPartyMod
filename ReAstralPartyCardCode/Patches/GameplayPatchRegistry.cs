@@ -19,6 +19,8 @@ using MegaCrit.Sts2.Core.Nodes.Screens.RelicCollection;
 using MegaCrit.Sts2.Core.Nodes.Screens.TreasureRoomRelic;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.Saves.Runs;
 using STS2RitsuLib;
 using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Core;
@@ -33,7 +35,7 @@ public static class GameplayPatchRegistry
     {
         var patcher = RitsuLibFramework.CreatePatcher(MainFile.ModId, "gameplay-patches", "gameplay patches");
         patcher.RegisterPatches<GameplayStaticPatches>();
-        patcher.ApplyDynamic(GameplayDynamicPatches.CreateBuilder(), rollbackOnCriticalFailure: true);
+        patcher.ApplyDynamic(GameplayDynamicPatches.CreateBuilder(), true);
 
         if (!patcher.PatchAll())
             throw new InvalidOperationException($"Failed to apply required gameplay patches for {MainFile.ModId}.");
@@ -74,62 +76,61 @@ internal static class GameplayStaticPatchCatalog
                 typeof(NChooseARelicSelection),
                 "_Ready",
                 typeof(ChooseRelicHeaderPatch),
-                isCritical: false,
-                description: "UI patch: replace the shared relic-selection header text"),
+                false,
+                "UI patch: replace the shared relic-selection header text"),
             new ModPatchInfo(
                 "persona_relic_collection_patch",
                 typeof(NRelicCollectionCategory),
                 "LoadRelics",
                 typeof(PersonaRelicCollectionPatch),
-                isCritical: false,
-                description: "UI patch: inject persona relic subsection into the compendium"),
+                false,
+                "UI patch: inject persona relic subsection into the compendium"),
             new ModPatchInfo(
                 "skill_famous_blade_title_patch",
                 typeof(CardModel),
                 nameof(CardModel.Title),
                 typeof(SkillFamousBladeTitlePatch),
-                isCritical: false,
-                description: "UI patch: override Famous Blade title getter",
+                false,
+                "UI patch: override Famous Blade title getter",
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
                 "skill_famous_blade_description_patch",
                 typeof(CardModel),
                 nameof(CardModel.Description),
                 typeof(SkillFamousBladeDescriptionPatch),
-                isCritical: false,
-                description: "UI patch: override Famous Blade description getter",
+                false,
+                "UI patch: override Famous Blade description getter",
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
                 "top_bar_open_token_series_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.CommonUi.NTopBar),
                 nameof(MegaCrit.Sts2.Core.Nodes.CommonUi.NTopBar.Initialize),
                 typeof(NTopBarOpenTokenSeriesPatch),
-                isCritical: false,
-                description: "UI patch: append current open token series icon to the normal-mode top bar",
-                parameterTypes: [typeof(IRunState)]),
+                false,
+                "UI patch: append current open token series icon to the normal-mode top bar",
+                [typeof(IRunState)]),
             new ModPatchInfo(
                 "event_option_locked_hover_focus_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
                 "OnFocus",
                 typeof(EventOptionLockedHoverFocusPatch),
-                isCritical: false,
-                description: "UI patch: allow locked event options with hover data to still show hover tips"),
+                false,
+                "UI patch: allow locked event options with hover data to still show hover tips"),
             new ModPatchInfo(
                 "event_option_locked_hover_unfocus_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
                 "OnUnfocus",
                 typeof(EventOptionLockedHoverUnfocusPatch),
-                isCritical: false,
-                description: "UI patch: clean up hover tips for locked event options")
-            ,
+                false,
+                "UI patch: clean up hover tips for locked event options"),
             new ModPatchInfo(
                 "multiplayer_relic_animation_safety_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Relics.NRelicInventoryHolder),
                 nameof(MegaCrit.Sts2.Core.Nodes.Relics.NRelicInventoryHolder.PlayNewlyAcquiredAnimation),
                 typeof(MultiplayerRelicAnimationSafetyPatch),
-                isCritical: false,
-                description: "UI patch: skip newly acquired relic animations when the inventory holder is no longer usable",
-                parameterTypes: [typeof(Godot.Vector2?), typeof(Godot.Vector2?)])
+                false,
+                "UI patch: skip newly acquired relic animations when the inventory holder is no longer usable",
+                [typeof(Godot.Vector2?), typeof(Godot.Vector2?)])
         ]);
     }
 
@@ -139,12 +140,12 @@ internal static class GameplayStaticPatchCatalog
         [
             new ModPatchInfo(
                 "relic_grab_bag_populate_series_filter_patch",
-                typeof(MegaCrit.Sts2.Core.Runs.RelicGrabBag),
-                nameof(MegaCrit.Sts2.Core.Runs.RelicGrabBag.Populate),
+                typeof(RelicGrabBag),
+                nameof(RelicGrabBag.Populate),
                 typeof(RelicGrabBagPopulateSeriesFilterPatch),
-                isCritical: false,
-                description: "Gameplay patch: remove unopened special token series relics from random relic grab bags at run setup",
-                parameterTypes: [typeof(Player), typeof(MegaCrit.Sts2.Core.Random.Rng)])
+                false,
+                "Gameplay patch: remove unopened special token series relics from random relic grab bags at run setup",
+                [typeof(Player), typeof(MegaCrit.Sts2.Core.Random.Rng)])
         ]);
     }
 
@@ -159,24 +160,45 @@ internal static class GameplayStaticPatchCatalog
                 typeof(StartingPersonaRelicSelectionPatch),
                 description:
                 "Version-fragile gameplay patch: open the starting persona relic selection after run start",
-                parameterTypes: [typeof(RunState)])
-            ,
+                parameterTypes: [typeof(RunState)]),
             new ModPatchInfo(
                 "astral_telemetry_start_run_patch",
                 typeof(NGame),
                 "StartRun",
                 typeof(AstralTelemetryStartRunPatch),
-                isCritical: false,
-                description: "Lifecycle patch: reset Astral telemetry state after run start",
-                parameterTypes: [typeof(RunState)]),
+                false,
+                "Lifecycle patch: reset Astral telemetry state after run start",
+                [typeof(RunState)]),
+            new ModPatchInfo(
+                "astral_telemetry_load_run_patch",
+                typeof(NGame),
+                "LoadRun",
+                typeof(AstralTelemetryLoadRunPatch),
+                false,
+                "Lifecycle patch: restore Astral telemetry state after loading a run",
+                [typeof(RunState), typeof(SerializableRoom)]),
             new ModPatchInfo(
                 "astral_telemetry_run_ended_patch",
                 typeof(RunManager),
                 nameof(RunManager.OnEnded),
                 typeof(AstralTelemetryRunEndedPatch),
-                isCritical: false,
-                description: "Lifecycle patch: submit Astral telemetry when a run ends",
-                parameterTypes: [typeof(bool)])
+                false,
+                "Lifecycle patch: submit Astral telemetry when a run ends",
+                [typeof(bool)]),
+            new ModPatchInfo(
+                "astral_telemetry_abandon_patch",
+                typeof(RunManager),
+                nameof(RunManager.Abandon),
+                typeof(AstralTelemetryAbandonPatch),
+                false,
+                "Lifecycle patch: discard Astral telemetry snapshot when the active run is abandoned"),
+            new ModPatchInfo(
+                "astral_telemetry_delete_current_run_patch",
+                typeof(SaveManager),
+                nameof(SaveManager.DeleteCurrentRun),
+                typeof(AstralTelemetryDeleteCurrentRunPatch),
+                false,
+                "Lifecycle patch: discard Astral telemetry snapshot after deleting the saved current run")
         ]);
     }
 }
@@ -225,7 +247,7 @@ internal static class GameplayDynamicPatchCatalog
             description: "UI patch: allow single-use Speed Roller flight to open the next row's map points",
             patchId: "speed_roller_flight_travelability");
         builder.AddMethod(
-            typeof(MegaCrit.Sts2.Core.Nodes.Screens.Map.NNormalMapPoint),
+            typeof(NNormalMapPoint),
             "_Ready",
             Type.EmptyTypes,
             postfix: DynamicPatchBuilder.FromMethod(
@@ -238,7 +260,7 @@ internal static class GameplayDynamicPatchCatalog
         builder.AddMethod(
             typeof(MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen.NMapPointHistoryEntry),
             nameof(MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen.NMapPointHistoryEntry.SetPlayer),
-            [typeof(MegaCrit.Sts2.Core.Runs.RunHistoryPlayer)],
+            [typeof(RunHistoryPlayer)],
             postfix: DynamicPatchBuilder.FromMethod(
                 typeof(JunkBotQuestIconHistoryPatch),
                 nameof(JunkBotQuestIconHistoryPatch.Postfix)),
@@ -258,14 +280,12 @@ internal static class GameplayDynamicPatchCatalog
             "SetMap",
             [typeof(MegaCrit.Sts2.Core.Map.ActMap), typeof(uint), typeof(bool)]);
         if (target != null)
-        {
             builder.Add(
                 target,
                 postfix: postfix,
                 isCritical: false,
                 description: "UI patch: re-apply Junk Bot quest markers after map screen refresh",
                 patchId: "junk_bot_quest_icon_map_screen_refresh");
-        }
     }
 
     private static void RegisterCompatibilityBridgePatches(DynamicPatchBuilder builder)
@@ -302,7 +322,7 @@ internal static class GameplayDynamicPatchCatalog
 
         builder.Add(
             target,
-            prefix: cooldownPrefix,
+            cooldownPrefix,
             description: "Compatibility patch: auto-apply cooldown enchantment to generated persona skills",
             patchId: patchId);
     }
@@ -314,18 +334,17 @@ internal static class GameplayDynamicPatchCatalog
             "ExecuteAction",
             Type.EmptyTypes);
         if (speedRollerConsumeTarget != null)
-        {
             builder.Add(
                 speedRollerConsumeTarget,
-                prefix: DynamicPatchBuilder.FromMethod(
+                DynamicPatchBuilder.FromMethod(
                     typeof(SpeedRollerFlightConsumePatch),
                     nameof(SpeedRollerFlightConsumePatch.Prefix)),
                 isCritical: false,
-                description: "Gameplay patch: consume one Speed Roller flight charge when moving to an otherwise unreachable next-row map point",
+                description:
+                "Gameplay patch: consume one Speed Roller flight charge when moving to an otherwise unreachable next-row map point",
                 patchId: "speed_roller_flight_consume");
-        }
         builder.AddMethod(
-            typeof(MegaCrit.Sts2.Core.Models.ActModel),
+            typeof(ActModel),
             "PullNextEvent",
             [typeof(RunState)],
             postfix: DynamicPatchBuilder.FromMethod(

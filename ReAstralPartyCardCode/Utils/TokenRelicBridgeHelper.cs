@@ -164,7 +164,8 @@ public static class TokenRelicBridgeHelper
              current != null && current != typeof(AstralPartyRelicModel) && current != typeof(RelicModel);
              current = current.BaseType)
         {
-            foreach (var method in current.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic |
+            foreach (var method in current.GetMethods(BindingFlags.Instance | BindingFlags.Public |
+                                                      BindingFlags.NonPublic |
                                                       BindingFlags.DeclaredOnly))
             {
                 if (method.IsStatic)

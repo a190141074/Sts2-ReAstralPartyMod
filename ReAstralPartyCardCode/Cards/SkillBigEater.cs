@@ -39,6 +39,7 @@ public class SkillBigEater : AstralPartyCardModel
         var generatedCard = Owner.Creature.CombatState.CreateCard(
             PandaPersonaHelper.GetDeterministicFoodCardModel(Owner),
             Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(generatedCard, true, CardPilePosition.Top, this);
+        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(generatedCard, true, CardPilePosition.Top,
+            this);
     }
 }

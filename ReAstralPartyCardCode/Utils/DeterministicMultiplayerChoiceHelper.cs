@@ -51,7 +51,8 @@ public static class DeterministicMultiplayerChoiceHelper
             var selectedIndex = selectedRelic == null ? -1 : IndexOfRelic(options, selectedRelic);
             synchronizer.SyncLocalChoice(player, choiceId, CreateRelicChoiceResult(selectedIndex));
             AstralTelemetry.RecordTokenChoice(player, context, options, selectedRelic, 0);
-            Log.Info($"[{MainFile.ModId}] Synced local relic choice: context={context} player={player.NetId} choiceId={choiceId} index={selectedIndex}");
+            Log.Info(
+                $"[{MainFile.ModId}] Synced local relic choice: context={context} player={player.NetId} choiceId={choiceId} index={selectedIndex}");
             return selectedRelic;
         }
 
@@ -59,7 +60,8 @@ public static class DeterministicMultiplayerChoiceHelper
         var remoteIndex = DecodeRelicChoiceIndex(remoteChoice);
         var remoteRelic = remoteIndex >= 0 && remoteIndex < options.Count ? options[remoteIndex] : null;
         AstralTelemetry.RecordTokenChoice(player, context, options, remoteRelic, 0);
-        Log.Info($"[{MainFile.ModId}] Received remote relic choice: context={context} player={player.NetId} choiceId={choiceId} index={remoteIndex}");
+        Log.Info(
+            $"[{MainFile.ModId}] Received remote relic choice: context={context} player={player.NetId} choiceId={choiceId} index={remoteIndex}");
         return remoteRelic;
     }
 
@@ -130,25 +132,31 @@ public static class DeterministicMultiplayerChoiceHelper
         var gameType = runManager.NetService.Type;
         if (gameType is NetGameType.Singleplayer or NetGameType.None)
         {
-            var localResult = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
-            AstralTelemetry.RecordTokenChoice(player, context, localResult.FinalOptions, localResult.SelectedRelic, localResult.RerollHistory.Count);
+            var localResult = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title,
+                subtitlePrefix, probabilityText, rerollFunc);
+            AstralTelemetry.RecordTokenChoice(player, context, localResult.FinalOptions, localResult.SelectedRelic,
+                localResult.RerollHistory.Count);
             return localResult;
         }
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
         {
-            var localResult = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
-            AstralTelemetry.RecordTokenChoice(player, context, localResult.FinalOptions, localResult.SelectedRelic, localResult.RerollHistory.Count);
+            var localResult = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title,
+                subtitlePrefix, probabilityText, rerollFunc);
+            AstralTelemetry.RecordTokenChoice(player, context, localResult.FinalOptions, localResult.SelectedRelic,
+                localResult.RerollHistory.Count);
             return localResult;
         }
 
         var choiceId = synchronizer.ReserveChoiceId(player);
         if (IsLocalPlayer(runManager, player))
         {
-            var result = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
+            var result = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title, subtitlePrefix,
+                probabilityText, rerollFunc);
             synchronizer.SyncLocalChoice(player, choiceId, CreateRefreshableRelicChoiceResult(result));
-            AstralTelemetry.RecordTokenChoice(player, context, result.FinalOptions, result.SelectedRelic, result.RerollHistory.Count);
+            AstralTelemetry.RecordTokenChoice(player, context, result.FinalOptions, result.SelectedRelic,
+                result.RerollHistory.Count);
             Log.Info(
                 $"[{MainFile.ModId}] Synced local refreshable relic choice: context={context} player={player.NetId} choiceId={choiceId} index={result.SelectedIndex} rerolls={result.RerollHistory.Count}");
             return result;
@@ -171,7 +179,9 @@ public static class DeterministicMultiplayerChoiceHelper
         }
 
         var finalOptions = rebuildFromHistory(rerollHistory);
-        var selectedRelic = selectedIndex >= 0 && selectedIndex < finalOptions.Count ? finalOptions[selectedIndex] : null;
+        var selectedRelic = selectedIndex >= 0 && selectedIndex < finalOptions.Count
+            ? finalOptions[selectedIndex]
+            : null;
         AstralTelemetry.RecordTokenChoice(player, context, finalOptions, selectedRelic, rerollHistory.Count);
         Log.Info(
             $"[{MainFile.ModId}] Received remote refreshable relic choice: context={context} player={player.NetId} choiceId={choiceId} index={selectedIndex} rerolls={rerollHistory.Count}");
@@ -248,7 +258,8 @@ public static class DeterministicMultiplayerChoiceHelper
             if (TryDecodeRelicChoiceIndex(remoteChoice, out _))
                 return remoteChoice;
 
-            Log.Warn($"[{MainFile.ModId}] Skipped non-relic multiplayer choice: context={context} player={player.NetId} choiceId={choiceId} result={remoteChoice}");
+            Log.Warn(
+                $"[{MainFile.ModId}] Skipped non-relic multiplayer choice: context={context} player={player.NetId} choiceId={choiceId} result={remoteChoice}");
             choiceId = synchronizer.ReserveChoiceId(player);
         }
     }
@@ -266,7 +277,8 @@ public static class DeterministicMultiplayerChoiceHelper
             if (TryDecodeRefreshableRelicChoice(remoteChoice, out _, out _))
                 return remoteChoice;
 
-            Log.Warn($"[{MainFile.ModId}] Skipped non-refreshable relic multiplayer choice: context={context} player={player.NetId} choiceId={choiceId} result={remoteChoice}");
+            Log.Warn(
+                $"[{MainFile.ModId}] Skipped non-refreshable relic multiplayer choice: context={context} player={player.NetId} choiceId={choiceId} result={remoteChoice}");
             choiceId = synchronizer.ReserveChoiceId(player);
         }
     }
@@ -352,10 +364,8 @@ public static class DeterministicMultiplayerChoiceHelper
     {
         var screen = NChooseARelicSelection.ShowScreen(options);
         if (LocalContext.IsMe(player))
-        {
             foreach (var relic in options)
                 SaveManager.Instance.MarkRelicAsSeen(relic);
-        }
 
         return (await screen.RelicsSelected()).FirstOrDefault();
     }
@@ -371,7 +381,6 @@ public static class DeterministicMultiplayerChoiceHelper
     {
         var overlayStack = NOverlayStack.Instance;
         if (overlayStack == null)
-        {
             return new RefreshableTokenRelicSelectionResult
             {
                 SelectedRelic = null,
@@ -381,15 +390,13 @@ public static class DeterministicMultiplayerChoiceHelper
                 RerollHistory = [],
                 FinalOptions = options.ToList()
             };
-        }
 
         if (LocalContext.IsMe(player))
-        {
             foreach (var relic in options)
                 SaveManager.Instance.MarkRelicAsSeen(relic);
-        }
 
-        var screen = RefreshableTokenRelicSelectionScreen.Create(player, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
+        var screen = RefreshableTokenRelicSelectionScreen.Create(player, options, rerollCount, title, subtitlePrefix,
+            probabilityText, rerollFunc);
         overlayStack.Push(screen);
         return await screen.WaitForResult();
     }
@@ -403,10 +410,8 @@ public static class DeterministicMultiplayerChoiceHelper
         var displayOptions = CreateDisplayCardOptions(player, options);
         var screen = NChooseACardSelectionScreen.ShowScreen(displayOptions, canSkip);
         if (LocalContext.IsMe(player))
-        {
             foreach (var card in options)
                 SaveManager.Instance.MarkCardAsSeen(card.CanonicalInstance ?? card);
-        }
 
         var selectedCard = (await screen.CardsSelected()).FirstOrDefault();
         return selectedCard?.CanonicalInstance ?? selectedCard;

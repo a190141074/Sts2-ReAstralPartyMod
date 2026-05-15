@@ -48,10 +48,7 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonaRelicBase
     public bool AstralParty_PersonSamuraiPrawnOpenedThisCombat
     {
         get => default;
-        set
-        {
-            SetLegacyPendingAliasIfMissing(!value);
-        }
+        set => SetLegacyPendingAliasIfMissing(!value);
     }
 
     // Keep the removed legacy flag name so old saves can still deserialize without polluting SavedProperty sync.

@@ -89,7 +89,7 @@ public class PersonDeityLin : CooldownPersonaRelicBase
 
     public int GetLivingFolioPermanentDamageBonus()
     {
-        return System.Math.Max(AstralParty_PersonDeityLinPermanentLivingFolioDamageBonus, 0);
+        return Math.Max(AstralParty_PersonDeityLinPermanentLivingFolioDamageBonus, 0);
     }
 
     public void RecordLivingFolioConsumption(int amount)
@@ -124,7 +124,7 @@ public class PersonDeityLin : CooldownPersonaRelicBase
     private int GetLivingFolioRefundCapForCurrentTurn()
     {
         var currentMaxEnergy = (int)(Owner?.PlayerCombatState?.MaxEnergy ?? Owner?.MaxEnergy ?? 0m);
-        return System.Math.Max(0, 9 - currentMaxEnergy);
+        return Math.Max(0, 9 - currentMaxEnergy);
     }
 
     private async Task EnsureLivingFolioRelic()

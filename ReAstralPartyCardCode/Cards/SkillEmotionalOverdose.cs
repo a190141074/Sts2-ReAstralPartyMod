@@ -34,7 +34,7 @@ public class SkillEmotionalOverdose : AstralPartyCardModel
         if (Owner?.Creature == null)
             return;
 
-        var loveStacks = System.Math.Max((int)Owner.Creature.GetPowerAmount<LovePower>(), 0);
+        var loveStacks = Math.Max((int)Owner.Creature.GetPowerAmount<LovePower>(), 0);
         if (loveStacks > 0)
         {
             await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, loveStacks, Owner.Creature, this, false);

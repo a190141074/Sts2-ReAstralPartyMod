@@ -67,7 +67,8 @@ public class CyberKittyNodePower : AstralPartyPowerModel
         return Task.CompletedTask;
     }
 
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier,
+        CardModel? cardSource)
     {
         if (power != this)
             return;

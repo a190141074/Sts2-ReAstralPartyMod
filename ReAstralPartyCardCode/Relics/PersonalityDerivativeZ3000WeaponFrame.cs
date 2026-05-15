@@ -20,7 +20,8 @@ public class PersonalityDerivativeZ3000WeaponFrame : AstralPartyRelicModel
 {
     [SavedProperty] public int AstralParty_PersonalityDerivativeZ3000WeaponFrameStacks { get; set; }
 
-    protected override string IconBasePath => "res://ReAstralPartyMod/images/relic/personality_derivative_z3000_weapon_frame";
+    protected override string IconBasePath =>
+        "res://ReAstralPartyMod/images/relic/personality_derivative_z3000_weapon_frame";
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

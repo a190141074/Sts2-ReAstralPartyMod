@@ -65,9 +65,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
         {
             var copiedCard = CreateCopiedCardForTarget(ownerCreature, selectedCard, targetPlayer);
             if (!copiedCard.Keywords.Contains(CardKeyword.Exhaust))
-            {
                 CardCmd.ApplyKeyword(copiedCard, CardKeyword.Exhaust);
-            }
 
             await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
                 copiedCard,
@@ -93,10 +91,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
         }
 
         await TokenEternalStarlight.GrantStacks(owner, 1);
-        if (selectedCards.Count == MaxSelectedCards)
-        {
-            await TokenEternalStarlight.GrantStacks(owner, 1);
-        }
+        if (selectedCards.Count == MaxSelectedCards) await TokenEternalStarlight.GrantStacks(owner, 1);
     }
 
     private static CardModel CreateCopiedCardForTarget(
@@ -106,7 +101,8 @@ public class SkillPowerfulPity : AstralPartyCardModel
     {
         var combatState = targetPlayer.Creature?.CombatState ?? ownerCreature.CombatState;
         if (combatState == null)
-            throw new InvalidOperationException("Cannot copy a combat card for a player without an active combat state.");
+            throw new InvalidOperationException(
+                "Cannot copy a combat card for a player without an active combat state.");
 
         var copiedCard = combatState.CreateCard(selectedCard.CanonicalInstance, targetPlayer);
         CopySupportedCombatState(selectedCard, copiedCard);

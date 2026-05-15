@@ -60,6 +60,12 @@ public abstract class ArtKnifeRelicBase : AstralPartyRelicModel
             await SyncStrengthState();
     }
 
+    public override async Task AfterCurrentHpChanged(Creature creature, decimal delta)
+    {
+        if (creature == Owner?.Creature)
+            await SyncStrengthState();
+    }
+
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (cardPlay.Card.Owner == Owner)

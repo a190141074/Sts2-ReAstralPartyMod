@@ -50,14 +50,18 @@ internal static class AstralTelemetry
         long RunTime);
 
     private sealed record PostHogEnvelope(
-        [property: JsonPropertyName("api_key")] string ApiKey,
+        [property: JsonPropertyName("api_key")]
+        string ApiKey,
         [property: JsonPropertyName("batch")] IReadOnlyList<PostHogEvent> Batch);
 
     private sealed record PostHogEvent(
         [property: JsonPropertyName("event")] string Event,
-        [property: JsonPropertyName("distinct_id")] string DistinctId,
-        [property: JsonPropertyName("properties")] Dictionary<string, object?> Properties,
-        [property: JsonPropertyName("timestamp")] string Timestamp);
+        [property: JsonPropertyName("distinct_id")]
+        string DistinctId,
+        [property: JsonPropertyName("properties")]
+        Dictionary<string, object?> Properties,
+        [property: JsonPropertyName("timestamp")]
+        string Timestamp);
 
     internal sealed record PersonaChoiceRecord(
         int PlayerSlot,
@@ -94,6 +98,7 @@ internal static class AstralTelemetry
     private const string DefaultProjectToken = "phc_tUUfTxDRKbzBcq24G78yPUu3w6TYkmCySG4cRwp7bJwC";
     private const string ConfigFileName = "telemetry_config.json";
     private const string PendingFileName = "telemetry_pending.jsonl";
+    private const string ActiveRunFileName = "telemetry_active_run.json";
     private const string InstallSaltFileName = "telemetry_install_salt.txt";
     private const int MaxPendingLines = 64;
     private const long MinRunTimeForUploadSeconds = 180;
@@ -120,6 +125,22 @@ internal static class AstralTelemetry
         public List<TokenChoiceRecord> TokenChoices { get; } = [];
     }
 
+    private sealed record ActiveRunSnapshot(
+        string RunKey,
+        string Seed,
+        IReadOnlyList<PlayerTelemetrySnapshot> Players,
+        IReadOnlyList<PersonaChoiceRecord> PersonaChoices,
+        IReadOnlyList<TokenChoiceRecord> TokenChoices);
+
+    private sealed record PlayerTelemetrySnapshot(
+        ulong NetId,
+        int Slot,
+        string Character,
+        string? PersonaSelected,
+        string? PersonaSkillCardId,
+        int PersonaSkillUseCount,
+        IReadOnlyList<string> ObtainedTokens);
+
     public static void Initialize()
     {
         try
@@ -132,18 +153,77 @@ internal static class AstralTelemetry
         }
     }
 
-    public static void ResetRunState(RunState? runState)
+    public static void BeginNewRun(RunState? runState)
     {
         if (runState == null)
             return;
 
         lock (StateLock)
         {
-            ActiveRuns[GetRunKey(runState)] = CreateRunState(runState);
+            var state = CreateRunState(runState);
+            ActiveRuns.Clear();
+            ActiveRuns[state.RunKey] = state;
+            PersistRunStateLocked(state);
         }
     }
 
-    public static void RecordPersonaChoice(RunState runState, IReadOnlyList<RelicModel> options, IReadOnlyDictionary<ulong, int> selectedIndexes)
+    public static void RestoreLoadedRun(RunState? runState)
+    {
+        if (runState == null)
+            return;
+
+        lock (StateLock)
+        {
+            var runKey = GetRunKey(runState);
+            var state = CreateRunState(runState);
+            var snapshot = TryReadActiveSnapshotLocked();
+            if (snapshot != null && string.Equals(snapshot.RunKey, runKey, StringComparison.Ordinal))
+            {
+                ApplySnapshotToState(state, snapshot);
+                MainFile.Logger.Info(
+                    $"[{MainFile.ModId}][Telemetry] Restored active run snapshot runKey={runKey} personaChoices={state.PersonaChoices.Count} tokenChoices={state.TokenChoices.Count}.");
+            }
+            else
+            {
+                if (snapshot != null)
+                    MainFile.Logger.Info(
+                        $"[{MainFile.ModId}][Telemetry] Active run snapshot runKey mismatch; expected={runKey} actual={snapshot.RunKey}. Resetting snapshot.");
+
+                PersistRunStateLocked(state);
+            }
+
+            ActiveRuns.Clear();
+            ActiveRuns[runKey] = state;
+            PersistRunStateLocked(state);
+        }
+    }
+
+    public static void DiscardPersistedRunState(string reason)
+    {
+        lock (StateLock)
+        {
+            ActiveRuns.Clear();
+            DeleteActiveRunSnapshotLocked();
+            MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Discarded active run snapshot reason={reason}.");
+        }
+    }
+
+    public static void DiscardPersistedRunStateIfNoActiveRun(string reason)
+    {
+        lock (StateLock)
+        {
+            if (RunManager.Instance?.DebugOnlyGetState() != null)
+                return;
+
+            ActiveRuns.Clear();
+            DeleteActiveRunSnapshotLocked();
+            MainFile.Logger.Info(
+                $"[{MainFile.ModId}][Telemetry] Discarded active run snapshot without live run reason={reason}.");
+        }
+    }
+
+    public static void RecordPersonaChoice(RunState runState, IReadOnlyList<RelicModel> options,
+        IReadOnlyDictionary<ulong, int> selectedIndexes)
     {
         var state = GetOrCreateRunState(runState);
         lock (StateLock)
@@ -157,21 +237,25 @@ internal static class AstralTelemetry
                 if (selectedIndexes.TryGetValue(player.NetId, out var selectedIndex)
                     && selectedIndex >= 0
                     && selectedIndex < options.Count)
-                {
                     selected = GetRelicId(options[selectedIndex]);
-                }
 
                 state.PersonaChoices.Add(new PersonaChoiceRecord(slot, optionIds, selected));
                 if (state.PlayerStates.TryGetValue(player.NetId, out var playerState))
                 {
                     playerState.PersonaSelected = selected;
-                    playerState.PersonaSkillCardId = selected == null ? null : PersonaSkillRegistry.TryGetPersonaSkillCardId(selected);
+                    playerState.PersonaSkillCardId =
+                        selected == null ? null : PersonaSkillRegistry.TryGetPersonaSkillCardId(selected);
                 }
             }
+
+            MainFile.Logger.Info(
+                $"[{MainFile.ModId}][Telemetry] Recorded persona choices: players={state.PersonaChoices.Count} runKey={state.RunKey}");
+            PersistRunStateLocked(state);
         }
     }
 
-    public static void RecordTokenChoice(Player player, string source, IReadOnlyList<RelicModel> options, RelicModel? selectedRelic, int rerollCount)
+    public static void RecordTokenChoice(Player player, string source, IReadOnlyList<RelicModel> options,
+        RelicModel? selectedRelic, int rerollCount)
     {
         if (player.RunState is not RunState runState)
             return;
@@ -192,6 +276,7 @@ internal static class AstralTelemetry
                 canonicalOptions.Select(GetRelicId).ToArray(),
                 selectedRelic == null ? null : GetRelicId(selectedRelic),
                 Math.Max(0, rerollCount)));
+            PersistRunStateLocked(state);
         }
     }
 
@@ -208,7 +293,10 @@ internal static class AstralTelemetry
         lock (StateLock)
         {
             if (state.PlayerStates.TryGetValue(owner.NetId, out var playerState))
+            {
                 playerState.ObtainedTokenIds.Add(GetRelicId(canonicalRelic));
+                PersistRunStateLocked(state);
+            }
         }
     }
 
@@ -234,6 +322,7 @@ internal static class AstralTelemetry
                 return;
 
             playerState.PersonaSkillUseCount++;
+            PersistRunStateLocked(state);
         }
     }
 
@@ -255,7 +344,8 @@ internal static class AstralTelemetry
 
             if (serializableRun.RunTime <= MinRunTimeForUploadSeconds)
             {
-                MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Upload skipped for short run runTime={serializableRun.RunTime}s");
+                MainFile.Logger.Info(
+                    $"[{MainFile.ModId}][Telemetry] Upload skipped for short run runTime={serializableRun.RunTime}s");
                 return;
             }
 
@@ -283,16 +373,16 @@ internal static class AstralTelemetry
         finally
         {
             if (runState != null)
-            {
                 lock (StateLock)
                 {
                     ActiveRuns.Remove(GetRunKey(runState));
+                    DeleteActiveRunSnapshotLocked();
                 }
-            }
         }
     }
 
-    private static RunEndedPayload? BuildPayload(RunState? runState, SerializableRun serializableRun, bool isVictory, NetGameType gameType)
+    private static RunEndedPayload? BuildPayload(RunState? runState, SerializableRun serializableRun, bool isVictory,
+        NetGameType gameType)
     {
         if (runState == null)
         {
@@ -333,6 +423,9 @@ internal static class AstralTelemetry
             })
             .ToArray();
 
+        MainFile.Logger.Info(
+            $"[{MainFile.ModId}][Telemetry] Built payload: personaChoices={state.PersonaChoices.Count} tokenChoices={state.TokenChoices.Count} players={players.Length} runKey={state.RunKey}");
+
         return new RunEndedPayload(
             1,
             MainFile.ModId,
@@ -362,6 +455,7 @@ internal static class AstralTelemetry
 
         var created = CreateRunState(runState);
         ActiveRuns[runKey] = created;
+        PersistRunStateLocked(created);
         return created;
     }
 
@@ -374,15 +468,109 @@ internal static class AstralTelemetry
         };
 
         foreach (var player in runState.Players.OrderBy(static player => player.NetId))
-        {
             state.PlayerStates[player.NetId] = new PlayerTelemetryState
             {
                 Slot = GetPlayerSlot(runState, player),
                 Character = player.Character.Id.Entry
             };
-        }
 
         return state;
+    }
+
+    private static void PersistRunStateLocked(RunTelemetryState state)
+    {
+        try
+        {
+            Directory.CreateDirectory(GetDataDirectory());
+            var snapshot = CreateSnapshot(state);
+            var json = JsonSerializer.Serialize(snapshot, JsonOptions);
+            var path = GetActiveRunPath();
+            var tempPath = path + ".tmp";
+            File.WriteAllText(tempPath, json, Encoding.UTF8);
+            File.Move(tempPath, path, true);
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Failed to persist active run snapshot: {ex.Message}");
+        }
+    }
+
+    private static ActiveRunSnapshot CreateSnapshot(RunTelemetryState state)
+    {
+        var players = state.PlayerStates
+            .OrderBy(static pair => pair.Key)
+            .Select(pair => new PlayerTelemetrySnapshot(
+                pair.Key,
+                pair.Value.Slot,
+                pair.Value.Character,
+                pair.Value.PersonaSelected,
+                pair.Value.PersonaSkillCardId,
+                pair.Value.PersonaSkillUseCount,
+                pair.Value.ObtainedTokenIds.OrderBy(static id => id, StringComparer.Ordinal).ToArray()))
+            .ToArray();
+
+        return new ActiveRunSnapshot(
+            state.RunKey,
+            state.Seed,
+            players,
+            state.PersonaChoices.ToArray(),
+            state.TokenChoices.ToArray());
+    }
+
+    private static ActiveRunSnapshot? TryReadActiveSnapshotLocked()
+    {
+        try
+        {
+            var path = GetActiveRunPath();
+            if (!File.Exists(path))
+                return null;
+
+            var json = File.ReadAllText(path, Encoding.UTF8);
+            return JsonSerializer.Deserialize<ActiveRunSnapshot>(json, JsonOptions);
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Failed to restore active run snapshot: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static void ApplySnapshotToState(RunTelemetryState state, ActiveRunSnapshot snapshot)
+    {
+        state.PersonaChoices.Clear();
+        state.PersonaChoices.AddRange(snapshot.PersonaChoices ?? []);
+        state.TokenChoices.Clear();
+        state.TokenChoices.AddRange(snapshot.TokenChoices ?? []);
+
+        foreach (var player in snapshot.Players ?? [])
+        {
+            if (!state.PlayerStates.TryGetValue(player.NetId, out var playerState))
+                continue;
+
+            playerState.PersonaSelected = player.PersonaSelected;
+            playerState.PersonaSkillCardId = player.PersonaSkillCardId;
+            playerState.PersonaSkillUseCount = Math.Max(0, player.PersonaSkillUseCount);
+            playerState.ObtainedTokenIds.Clear();
+            foreach (var tokenId in player.ObtainedTokens.Where(static id => !string.IsNullOrWhiteSpace(id)))
+                playerState.ObtainedTokenIds.Add(tokenId);
+        }
+    }
+
+    private static void DeleteActiveRunSnapshotLocked()
+    {
+        try
+        {
+            var path = GetActiveRunPath();
+            var tempPath = path + ".tmp";
+            if (File.Exists(path))
+                File.Delete(path);
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Failed to delete active run snapshot: {ex.Message}");
+        }
     }
 
     private static async Task UploadPendingThenCurrentAsync(TelemetryConfig config, string currentJson, string runId)
@@ -433,9 +621,7 @@ internal static class AstralTelemetry
             if (document.RootElement.TryGetProperty("run", out var run)
                 && run.TryGetProperty("runTime", out var runTimeElement)
                 && runTimeElement.TryGetInt64(out var runTime))
-            {
                 return runTime <= MinRunTimeForUploadSeconds;
-            }
         }
         catch
         {
@@ -465,7 +651,8 @@ internal static class AstralTelemetry
                     DefaultProjectToken,
                     PendingFileName);
                 WriteConfigFile(migrated);
-                MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Migrated legacy telemetry config to PostHog format.");
+                MainFile.Logger.Info(
+                    $"[{MainFile.ModId}][Telemetry] Migrated legacy telemetry config to PostHog format.");
                 return migrated;
             }
         }
@@ -549,23 +736,29 @@ internal static class AstralTelemetry
         return Path.Combine(GetDataDirectory(), string.IsNullOrWhiteSpace(pendingFile) ? PendingFileName : pendingFile);
     }
 
+    private static string GetActiveRunPath()
+    {
+        return Path.Combine(GetDataDirectory(), ActiveRunFileName);
+    }
+
     private static int GetPlayerSlot(RunState runState, Player player)
     {
         for (var i = 0; i < runState.Players.Count; i++)
-        {
             if (ReferenceEquals(runState.Players[i], player))
                 return i;
-        }
 
         return Math.Max(0, runState.GetPlayerSlotIndex(player));
     }
 
     private static string GetRunKey(RunState runState)
     {
-        var orderedPlayers = runState.Players
-            .Select(player => player.NetId.ToString())
-            .OrderBy(static netId => netId, StringComparer.Ordinal);
-        return $"{runState.Rng.StringSeed}|{string.Join(",", orderedPlayers)}";
+        var seed = runState.Rng.StringSeed ?? string.Empty;
+        var ascension = runState.AscensionLevel;
+        var playerCount = runState.Players.Count;
+        var characters = string.Join(
+            ",",
+            runState.Players.Select(static player => player.Character.Id.Entry ?? "<unknown>"));
+        return $"{seed}|a{ascension}|p{playerCount}|{characters}";
     }
 
     private static string GetRelicId(RelicModel relic)
@@ -639,10 +832,10 @@ internal static class AstralTelemetry
         return new PostHogEnvelope(config.ProjectToken, events);
     }
 
-    private static IEnumerable<PostHogEvent> CreatePersonaOptionOfferedEvents(RunEndedPayload payload, PersonaChoiceRecord choice)
+    private static IEnumerable<PostHogEvent> CreatePersonaOptionOfferedEvents(RunEndedPayload payload,
+        PersonaChoiceRecord choice)
     {
         foreach (var optionId in choice.Options)
-        {
             yield return new PostHogEvent(
                 "astral_persona_option_offered",
                 CreateDistinctId(payload.Run.RunId, choice.PlayerSlot),
@@ -653,13 +846,12 @@ internal static class AstralTelemetry
                     .With("selected_label", GetRelicLabel(choice.Selected))
                     .With("is_selected", string.Equals(optionId, choice.Selected, StringComparison.Ordinal)),
                 payload.UploadedAtUtc);
-        }
     }
 
-    private static IEnumerable<PostHogEvent> CreateTokenOptionOfferedEvents(RunEndedPayload payload, TokenChoiceRecord choice)
+    private static IEnumerable<PostHogEvent> CreateTokenOptionOfferedEvents(RunEndedPayload payload,
+        TokenChoiceRecord choice)
     {
         foreach (var optionId in choice.Options)
-        {
             yield return new PostHogEvent(
                 "astral_token_option_offered",
                 CreateDistinctId(payload.Run.RunId, choice.PlayerSlot),
@@ -672,7 +864,6 @@ internal static class AstralTelemetry
                     .With("is_selected", string.Equals(optionId, choice.Selected, StringComparison.Ordinal))
                     .With("reroll_count", choice.RerollCount),
                 payload.UploadedAtUtc);
-        }
     }
 
     private static PostHogEvent CreatePersonaChoiceEvent(RunEndedPayload payload, PersonaChoiceRecord choice)
@@ -705,7 +896,8 @@ internal static class AstralTelemetry
             payload.UploadedAtUtc);
     }
 
-    private static PostHogEvent CreateTokenObtainedEvent(RunEndedPayload payload, PlayerRunTelemetry player, string tokenId)
+    private static PostHogEvent CreateTokenObtainedEvent(RunEndedPayload payload, PlayerRunTelemetry player,
+        string tokenId)
     {
         return new PostHogEvent(
             "astral_token_obtained",
@@ -826,7 +1018,8 @@ internal static class AstralTelemetry
 
 internal static class AstralTelemetryDictionaryExtensions
 {
-    public static Dictionary<string, object?> With(this Dictionary<string, object?> dictionary, string key, object? value)
+    public static Dictionary<string, object?> With(this Dictionary<string, object?> dictionary, string key,
+        object? value)
     {
         dictionary[key] = value;
         return dictionary;
@@ -867,7 +1060,8 @@ internal static class PersonaSkillRegistry
         ["RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_WEIRD_EGG"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ANOMALY_MAKER"
     };
 
-    private static readonly HashSet<string> TrackedPersonaSkillCardIds = PersonaToSkillCardId.Values.ToHashSet(StringComparer.Ordinal);
+    private static readonly HashSet<string> TrackedPersonaSkillCardIds =
+        PersonaToSkillCardId.Values.ToHashSet(StringComparer.Ordinal);
 
     public static string? TryGetPersonaSkillCardId(string personaRelicId)
     {

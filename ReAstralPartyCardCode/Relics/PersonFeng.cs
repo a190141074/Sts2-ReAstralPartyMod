@@ -151,7 +151,8 @@ public class PersonFeng : CooldownPersonaRelicBase
             if (currentStacks <= 0)
                 return;
 
-            var amountToConsume = BaseAttackConsumption + (_pendingAttackShouldSplash ? ExtraConsumptionAtFiveStacks : 0);
+            var amountToConsume =
+                BaseAttackConsumption + (_pendingAttackShouldSplash ? ExtraConsumptionAtFiveStacks : 0);
             await SetGatheringStrengthAmount(currentStacks - amountToConsume, cardPlay.Card);
         }
         finally
@@ -202,7 +203,7 @@ public class PersonFeng : CooldownPersonaRelicBase
         if (Owner?.Creature == null)
             return;
 
-        var clampedAmount = System.Math.Clamp(amount, 0, MaxGatheringStrengthStacks);
+        var clampedAmount = Math.Clamp(amount, 0, MaxGatheringStrengthStacks);
         var existingPower = Owner.Creature.GetPower<GatheringStrengthPower>();
 
         if (clampedAmount <= 0)
@@ -219,7 +220,7 @@ public class PersonFeng : CooldownPersonaRelicBase
     {
         return Owner?.Creature == null
             ? 0
-            : System.Math.Max((int)Owner.Creature.GetPowerAmount<GatheringStrengthPower>(), 0);
+            : Math.Max((int)Owner.Creature.GetPowerAmount<GatheringStrengthPower>(), 0);
     }
 
     private int GetTurnEndGainAmount()

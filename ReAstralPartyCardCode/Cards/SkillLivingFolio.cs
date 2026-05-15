@@ -88,7 +88,8 @@ public class SkillLivingFolio : AstralPartyCardModel
         var owner = Owner;
         var ownerCreature = owner?.Creature;
         var target = cardPlay.Target;
-        if (owner == null || ownerCreature == null || target == null || target.Side == ownerCreature.Side || !target.IsAlive)
+        if (owner == null || ownerCreature == null || target == null || target.Side == ownerCreature.Side ||
+            !target.IsAlive)
             return;
         if (owner.GetRelic<PersonalityDerivativeLivingFolio>() is not { } livingFolioRelic)
             return;
@@ -138,7 +139,7 @@ public class SkillLivingFolio : AstralPartyCardModel
         if (GetPermanentDamageBonus() > 11m)
             return originalCost;
 
-        return System.Math.Max(0m, originalCost - 1m);
+        return Math.Max(0m, originalCost - 1m);
     }
 
     private decimal GetPermanentDamageBonus()

@@ -15,10 +15,12 @@ public static class DiceSeriesHelper
         typeof(TokenBlueDie12),
         typeof(TokenBlueDie20)
     ];
+
     private static readonly IReadOnlyList<RelicModel> CanonicalDiceRelics = DiceRelicTypes
         .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
         .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
         .ToList();
+
     private static readonly HashSet<ModelId> DiceRelicIds = CanonicalDiceRelics
         .Select(relic => relic.CanonicalInstance?.Id ?? relic.Id)
         .ToHashSet();

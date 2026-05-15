@@ -17,7 +17,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 public static class TroubleMakerTransformPreviewHelper
 {
-    public static async Task PlayTroubleMakerTransformAsync(Player owner, CardModel sourceCard, CardModel selectedEventCard)
+    public static async Task PlayTroubleMakerTransformAsync(Player owner, CardModel sourceCard,
+        CardModel selectedEventCard)
     {
         await PlayTransformPreviewAsync(owner, sourceCard, selectedEventCard);
     }
@@ -54,7 +55,8 @@ public static class TroubleMakerTransformPreviewHelper
         }
         catch (Exception ex)
         {
-            Log.Warn($"[{MainFile.ModId}] Failed to play Trouble Maker transform preview. Falling back to normal autoplay.\n{ex}");
+            Log.Warn(
+                $"[{MainFile.ModId}] Failed to play Trouble Maker transform preview. Falling back to normal autoplay.\n{ex}");
         }
     }
 }
@@ -173,7 +175,8 @@ internal sealed partial class TroubleMakerTransformPreviewVfx : Control
             await WaitSecondsAsync(0.16f);
 
             var charge = CreateTween().SetParallel();
-            charge.TweenProperty(_cardNode!, "scale", new Vector2(CardScale * 1.12f, CardScale * 0.9f), ScaleDuration(0.16f))
+            charge.TweenProperty(_cardNode!, "scale", new Vector2(CardScale * 1.12f, CardScale * 0.9f),
+                    ScaleDuration(0.16f))
                 .SetEase(Tween.EaseType.Out)
                 .SetTrans(Tween.TransitionType.Quad);
             charge.TweenProperty(_cardNode!, "rotation_degrees", 2f, ScaleDuration(0.12f))
@@ -187,7 +190,8 @@ internal sealed partial class TroubleMakerTransformPreviewVfx : Control
             PlayBurst();
 
             var swap = CreateTween().SetParallel();
-            swap.TweenProperty(_cardNode!, "scale", new Vector2(CardScale * 0.96f, CardScale * 1.08f), ScaleDuration(0.12f))
+            swap.TweenProperty(_cardNode!, "scale", new Vector2(CardScale * 0.96f, CardScale * 1.08f),
+                    ScaleDuration(0.12f))
                 .SetEase(Tween.EaseType.Out)
                 .SetTrans(Tween.TransitionType.Back);
             swap.TweenProperty(_cardNode!, "rotation_degrees", -1.5f, ScaleDuration(0.12f))
@@ -245,10 +249,7 @@ internal sealed partial class TroubleMakerTransformPreviewVfx : Control
     private void UpdateBurstLayout(Vector2 cardTopLeft)
     {
         var burstCenter = cardTopLeft + new Vector2(PreviewWidth * 0.5f, PreviewHeight * 0.46f);
-        foreach (var streak in _burstStreaks)
-        {
-            streak.Position = new Vector2(burstCenter.X - 7f, burstCenter.Y - 128f);
-        }
+        foreach (var streak in _burstStreaks) streak.Position = new Vector2(burstCenter.X - 7f, burstCenter.Y - 128f);
     }
 
     private async Task WaitSecondsAsync(float seconds)

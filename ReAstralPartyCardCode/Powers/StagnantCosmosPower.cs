@@ -148,10 +148,8 @@ public class StagnantCosmosPower : AstralPartyPowerModel
     {
         var pendingTriggers = GetInternalData<Data>().PendingTriggers;
         for (var i = pendingTriggers.Count - 1; i >= 0; i--)
-        {
             if (ReferenceEquals(pendingTriggers[i].Card, cardSource))
                 return pendingTriggers[i];
-        }
 
         return null;
     }

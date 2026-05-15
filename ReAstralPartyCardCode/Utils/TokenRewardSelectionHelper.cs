@@ -24,7 +24,8 @@ public static class TokenRewardSelectionHelper
 
         for (var slotIndex = 0; slotIndex < optionCount; slotIndex++)
         {
-            var reward = GetRewardCandidate(owner, rng, selectedIds, rollRarity, getRaritySelectionOrder, getCandidates);
+            var reward = GetRewardCandidate(owner, rng, selectedIds, rollRarity, getRaritySelectionOrder,
+                getCandidates);
             if (reward == null)
                 break;
 

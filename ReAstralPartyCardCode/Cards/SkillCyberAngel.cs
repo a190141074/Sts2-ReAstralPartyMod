@@ -42,10 +42,10 @@ public class SkillCyberAngel : AstralPartyCardModel
             return;
 
         var target = cardPlay.Target;
-        var fanStacksBeforeApply = System.Math.Max((int)target.GetPowerAmount<FanPower>(), 0);
+        var fanStacksBeforeApply = Math.Max((int)target.GetPowerAmount<FanPower>(), 0);
         await PowerCmd.Apply<FanPower>(target, 1m, Owner.Creature, this, false);
 
-        var starLightToGain = System.Math.Min(BaseStarLightGain + fanStacksBeforeApply, MaxStarLightGain);
+        var starLightToGain = Math.Min(BaseStarLightGain + fanStacksBeforeApply, MaxStarLightGain);
         await PowerCmd.Apply(
             ModelDb.Power<StarLightPower>().ToMutable(),
             Owner.Creature,

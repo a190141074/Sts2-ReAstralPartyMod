@@ -48,7 +48,7 @@ public class InitialPointRestSiteOption : ModRestSiteOptionTemplate
         HealRestSiteOption.PlayRestSiteHealSfx();
         NRestSiteRoom.Instance?.AddChildSafely(NRestSmokeVfx.Create());
         NRestSiteRoom.Instance?.AddChildSafely(NDesaturateTransitionVfx.Create());
-        await Cmd.CustomScaledWait(1.5f, 2.5f, ignoreCombatEnd: false, ct);
+        await Cmd.CustomScaledWait(1.5f, 2.5f, false, ct);
     }
 
     public override Task DoRemotePostSelectVfx()

@@ -15,7 +15,8 @@ public static class TokenRewardRerollHelper
         Func<RelicRarity, IEnumerable<RelicRarity>> getRaritySelectionOrder,
         Func<Player, RelicRarity, bool, IReadOnlySet<ModelId>, List<RelicModel>> getCandidates)
     {
-        return BuildOptions(owner, optionCount, 0, new HashSet<ModelId>(), rollRarity, getRaritySelectionOrder, getCandidates);
+        return BuildOptions(owner, optionCount, 0, new HashSet<ModelId>(), rollRarity, getRaritySelectionOrder,
+            getCandidates);
     }
 
     public static List<RelicModel> RerollOptions(
@@ -45,7 +46,8 @@ public static class TokenRewardRerollHelper
         Func<RelicRarity, IEnumerable<RelicRarity>> getRaritySelectionOrder,
         Func<Player, RelicRarity, bool, IReadOnlySet<ModelId>, List<RelicModel>> getCandidates)
     {
-        var options = BuildOptions(owner, optionCount, 0, new HashSet<ModelId>(), rollRarity, getRaritySelectionOrder, getCandidates);
+        var options = BuildOptions(owner, optionCount, 0, new HashSet<ModelId>(), rollRarity, getRaritySelectionOrder,
+            getCandidates);
         var seenIds = options
             .Select(TokenRewardSelectionHelper.GetCanonicalId)
             .ToHashSet();
@@ -104,7 +106,8 @@ public static class TokenRewardRerollHelper
         Func<Player, RelicRarity, bool, IReadOnlySet<ModelId>, List<RelicModel>> getCandidates,
         IReadOnlySet<ModelId> initialSeenIds)
     {
-        var options = BuildOptions(owner, optionCount, 0, initialSeenIds, rollRarity, getRaritySelectionOrder, getCandidates);
+        var options = BuildOptions(owner, optionCount, 0, initialSeenIds, rollRarity, getRaritySelectionOrder,
+            getCandidates);
         var seenIds = options
             .Select(TokenRewardSelectionHelper.GetCanonicalId)
             .ToHashSet();

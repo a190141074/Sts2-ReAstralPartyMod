@@ -32,16 +32,10 @@ internal static class ExpandedMultiplayerCompatibilityPatch
         int to)
     {
         foreach (var instruction in instructions)
-        {
             if (TryGetLdcI4Value(instruction, out var value) && value == from)
-            {
                 yield return new CodeInstruction(OpCodes.Ldc_I4, to);
-            }
             else
-            {
                 yield return instruction;
-            }
-        }
     }
 
     private static bool TryGetLdcI4Value(CodeInstruction instruction, out int value)
@@ -131,8 +125,8 @@ internal static class LobbyPlayerSerializeExpandedBitWidthPatch
     {
         return ExpandedMultiplayerCompatibilityPatch.ReplaceIntConstant(
             instructions,
-            from: 2,
-            to: ExpandedMultiplayerCompatibilityPatch.ExpandedPlayerSlotBitCount);
+            2,
+            ExpandedMultiplayerCompatibilityPatch.ExpandedPlayerSlotBitCount);
     }
 }
 
@@ -144,8 +138,8 @@ internal static class LobbyPlayerDeserializeExpandedBitWidthPatch
     {
         return ExpandedMultiplayerCompatibilityPatch.ReplaceIntConstant(
             instructions,
-            from: 2,
-            to: ExpandedMultiplayerCompatibilityPatch.ExpandedPlayerSlotBitCount);
+            2,
+            ExpandedMultiplayerCompatibilityPatch.ExpandedPlayerSlotBitCount);
     }
 }
 
@@ -157,8 +151,8 @@ internal static class ClientLobbyJoinResponseSerializeExpandedBitWidthPatch
     {
         return ExpandedMultiplayerCompatibilityPatch.ReplaceIntConstant(
             instructions,
-            from: 3,
-            to: ExpandedMultiplayerCompatibilityPatch.ExpandedLobbyPlayerListBitCount);
+            3,
+            ExpandedMultiplayerCompatibilityPatch.ExpandedLobbyPlayerListBitCount);
     }
 }
 
@@ -170,8 +164,8 @@ internal static class ClientLobbyJoinResponseDeserializeExpandedBitWidthPatch
     {
         return ExpandedMultiplayerCompatibilityPatch.ReplaceIntConstant(
             instructions,
-            from: 3,
-            to: ExpandedMultiplayerCompatibilityPatch.ExpandedLobbyPlayerListBitCount);
+            3,
+            ExpandedMultiplayerCompatibilityPatch.ExpandedLobbyPlayerListBitCount);
     }
 }
 
@@ -183,8 +177,8 @@ internal static class LobbyBeginRunSerializeExpandedBitWidthPatch
     {
         return ExpandedMultiplayerCompatibilityPatch.ReplaceIntConstant(
             instructions,
-            from: 3,
-            to: ExpandedMultiplayerCompatibilityPatch.ExpandedLobbyPlayerListBitCount);
+            3,
+            ExpandedMultiplayerCompatibilityPatch.ExpandedLobbyPlayerListBitCount);
     }
 }
 
@@ -196,8 +190,8 @@ internal static class LobbyBeginRunDeserializeExpandedBitWidthPatch
     {
         return ExpandedMultiplayerCompatibilityPatch.ReplaceIntConstant(
             instructions,
-            from: 3,
-            to: ExpandedMultiplayerCompatibilityPatch.ExpandedLobbyPlayerListBitCount);
+            3,
+            ExpandedMultiplayerCompatibilityPatch.ExpandedLobbyPlayerListBitCount);
     }
 }
 
@@ -214,18 +208,12 @@ internal static class NRestSiteRoomExpandedPlayerPatch
     public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
     {
         foreach (var instruction in instructions)
-        {
             if (CharacterContainerGetter != null
                 && SafeContainerGetter != null
                 && instruction.Calls(CharacterContainerGetter))
-            {
                 yield return new CodeInstruction(OpCodes.Call, SafeContainerGetter);
-            }
             else
-            {
                 yield return instruction;
-            }
-        }
     }
 
     public static Control GetOrCreateCharacterContainer(List<Control> containers, int index)
@@ -244,7 +232,7 @@ internal static class NRestSiteRoomExpandedPlayerPatch
     {
         var template = containers[^1];
         var parent = template.GetParent<Control>()
-            ?? throw new InvalidOperationException("Rest site character container parent is missing.");
+                     ?? throw new InvalidOperationException("Rest site character container parent is missing.");
         var clone = template.Duplicate(15) as Control ?? new Control();
 
         clone.Name = $"Character_{containers.Count + 1}";
@@ -341,9 +329,7 @@ internal static class NTreasureRoomRelicCollectionExpandedPlayerPatch
             || holders.Count == 0
             || currentRelics == null
             || currentRelics.Count <= holders.Count)
-        {
             return;
-        }
 
         var template = holders[^1];
         var parent = template.GetParent();
@@ -448,7 +434,8 @@ internal static class NTreasureRoomRelicCollectionExpandedPlayerPatch
     }
 }
 
-[HarmonyPatch(typeof(NTreasureRoomRelicCollection), nameof(NTreasureRoomRelicCollection.DefaultFocusedControl), MethodType.Getter)]
+[HarmonyPatch(typeof(NTreasureRoomRelicCollection), nameof(NTreasureRoomRelicCollection.DefaultFocusedControl),
+    MethodType.Getter)]
 internal static class NTreasureRoomRelicCollectionDefaultFocusExpandedPlayerPatch
 {
     [HarmonyPrefix]

@@ -32,7 +32,8 @@ public class InvokeSpiritsPower : AstralPartyPowerModel
         HoverTipFactory.FromPower<ExtraAttackPower>()
     ];
 
-    public override Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, MegaCrit.Sts2.Core.Entities.Players.Player player)
+    public override Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext,
+        MegaCrit.Sts2.Core.Entities.Players.Player player)
     {
         if (Owner?.Player != player)
             return Task.CompletedTask;
@@ -57,7 +58,8 @@ public class InvokeSpiritsPower : AstralPartyPowerModel
 
     private MegaCrit.Sts2.Core.Entities.Players.Player? ResolveZhaoPlayer()
     {
-        return Owner?.CombatState?.Players.FirstOrDefault(player => player.NetId == AstralParty_InvokeSpiritsZhaoPlayerNetId);
+        return Owner?.CombatState?.Players.FirstOrDefault(player =>
+            player.NetId == AstralParty_InvokeSpiritsZhaoPlayerNetId);
     }
 
     public static async Task<bool> TryTriggerChase(

@@ -114,14 +114,12 @@ public class PersonSlimeLulu : CooldownPersonaRelicBase
         );
 
         if (dealer != null && dealer.Side != Owner.Creature.Side && dealer.IsAlive)
-        {
             await AdherentMucusPower.Apply(
                 dealer,
                 Owner,
                 Owner.Creature,
                 cardSource
             );
-        }
 
         AdvanceCounter();
         RefreshCooldownDisplay();

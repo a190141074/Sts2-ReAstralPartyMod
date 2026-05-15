@@ -152,8 +152,9 @@ public class PersonPandaMeng : CooldownPersonaRelicBase
 
         foreach (var teammate in PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner!)
                      .Where(player => player != Owner)
-                     .Where(player => player.Creature != null && player.Creature.Side == Owner!.Creature!.Side && player.Creature.IsAlive))
-        {
+                     .Where(player =>
+                         player.Creature != null && player.Creature.Side == Owner!.Creature!.Side &&
+                         player.Creature.IsAlive))
             await PowerCmd.Apply(
                 ModelDb.Power<TPower>().ToMutable(),
                 teammate.Creature!,
@@ -161,13 +162,14 @@ public class PersonPandaMeng : CooldownPersonaRelicBase
                 Owner!.Creature!,
                 null,
                 false);
-        }
     }
 
     private void ResetObservedSupportPowerAmounts()
     {
-        AstralParty_PersonPandaMengObservedRegenerationAmount = GetObservedPowerAmount(Owner?.Creature?.GetPowerAmount<RegenPower>() ?? 0m);
-        AstralParty_PersonPandaMengObservedHalfLifeHealAmount = GetObservedPowerAmount(Owner?.Creature?.GetPowerAmount<HalfLifeHealPower>() ?? 0m);
+        AstralParty_PersonPandaMengObservedRegenerationAmount =
+            GetObservedPowerAmount(Owner?.Creature?.GetPowerAmount<RegenPower>() ?? 0m);
+        AstralParty_PersonPandaMengObservedHalfLifeHealAmount =
+            GetObservedPowerAmount(Owner?.Creature?.GetPowerAmount<HalfLifeHealPower>() ?? 0m);
     }
 
     private static int GetObservedPowerAmount(decimal amount)

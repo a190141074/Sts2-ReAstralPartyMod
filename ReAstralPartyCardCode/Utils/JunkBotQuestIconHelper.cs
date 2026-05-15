@@ -14,10 +14,13 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 public static class JunkBotQuestIconHelper
 {
     private const string QuestIconPath = "res://ReAstralPartyMod/images/quest/quest_z3000.png";
+
     private static readonly AccessTools.FieldRef<NMapPointHistoryEntry, MapPointHistoryEntry> EntryField =
         AccessTools.FieldRefAccess<NMapPointHistoryEntry, MapPointHistoryEntry>("_entry");
+
     private static readonly AccessTools.FieldRef<NMapPointHistoryEntry, RunHistoryPlayer?> PlayerField =
         AccessTools.FieldRefAccess<NMapPointHistoryEntry, RunHistoryPlayer?>("_player");
+
     private static bool _loadLogged;
 
     public static string IconPath => QuestIconPath;
@@ -50,10 +53,8 @@ public static class JunkBotQuestIconHelper
         if (questIcon == null || texture == null)
         {
             if (logSkipped)
-            {
                 MainFile.Logger.Warn(
                     $"Junk Bot map quest icon patch skipped | questIconFound={questIcon != null} | textureLoaded={texture != null} | path={IconPath}");
-            }
 
             return false;
         }

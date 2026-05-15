@@ -89,7 +89,8 @@ public static class AstralEventCardPool
             .ToList();
     }
 
-    public static List<CardModel> CreateStableBossBurnedOutSafeCardsForPlayer(Player owner, CardModel sourceCard, int count)
+    public static List<CardModel> CreateStableBossBurnedOutSafeCardsForPlayer(Player owner, CardModel sourceCard,
+        int count)
     {
         var cards = CreateMutableEventCardsForPlayer(owner)
             .Where(IsBossBurnedOutSafeCard)

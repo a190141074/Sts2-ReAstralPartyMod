@@ -209,7 +209,8 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         };
     }
 
-    private List<RelicModel> GetCandidates(Player player, RelicRarity rarity, bool excludeOwned, IReadOnlySet<ModelId> selectedIds)
+    private List<RelicModel> GetCandidates(Player player, RelicRarity rarity, bool excludeOwned,
+        IReadOnlySet<ModelId> selectedIds)
     {
         return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(player.RunState, rarity)
             .Where(relic => !selectedIds.Contains(TokenRewardSelectionHelper.GetCanonicalId(relic)))

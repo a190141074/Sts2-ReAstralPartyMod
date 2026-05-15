@@ -121,7 +121,8 @@ public abstract class RandomTokenPackRelicBase : AstralPartyRelicModel
         return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(owner.RunState, rarity)
             .Where(relic => !TokenRelicRegistry.IsSeriesTokenRelic(relic))
             .Where(relic => !selectedIds.Contains(TokenRewardSelectionHelper.GetCanonicalId(relic)))
-            .Where(relic => !excludeOwned || owner.Relics.All(owned => owned.CanonicalInstance.Id != relic.CanonicalInstance.Id))
+            .Where(relic =>
+                !excludeOwned || owner.Relics.All(owned => owned.CanonicalInstance.Id != relic.CanonicalInstance.Id))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
     }

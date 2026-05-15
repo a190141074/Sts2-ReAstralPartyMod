@@ -32,7 +32,8 @@ public static class StartingPersonaRelicSelectionPatch
     {
         await originalTask;
         var gameType = RunManager.Instance.NetService.Type;
-        MainFile.Logger.Info($"Starting persona relic selection run gate: netMode={gameType} players={runState.Players.Count}.");
+        MainFile.Logger.Info(
+            $"Starting persona relic selection run gate: netMode={gameType} players={runState.Players.Count}.");
         if (!ShouldOpenStartingPersonaRelicSelection(runState, out var skipReason))
         {
             MainFile.Logger.Info($"Starting persona relic selection skipped: {skipReason}.");
@@ -42,14 +43,15 @@ public static class StartingPersonaRelicSelectionPatch
         var runKey = GetRunKey(runState);
         if (!TryBeginSelection(runKey))
         {
-            MainFile.Logger.Info($"Starting persona relic selection skipped because run '{runKey}' is already processing.");
+            MainFile.Logger.Info(
+                $"Starting persona relic selection skipped because run '{runKey}' is already processing.");
             return;
         }
 
         var overlayStack = NOverlayStack.Instance;
         if (overlayStack == null)
         {
-            EndSelection(runKey, completed: false);
+            EndSelection(runKey, false);
             MainFile.Logger.Warn("Starting persona relic selection skipped because overlay stack is not ready.");
             return;
         }
@@ -57,7 +59,7 @@ public static class StartingPersonaRelicSelectionPatch
         var relicOptions = CreateStartingPersonaRelicOptions(runState);
         if (relicOptions.Count == 0)
         {
-            EndSelection(runKey, completed: false);
+            EndSelection(runKey, false);
             MainFile.Logger.Warn("Starting persona relic selection skipped because no persona relics are registered.");
             return;
         }
@@ -69,11 +71,11 @@ public static class StartingPersonaRelicSelectionPatch
             MainFile.Logger.Info(
                 $"Starting persona relic selection shown with {relicOptions.Count} persona relic options.");
             await screen.RelicPickingFinished();
-            EndSelection(runKey, completed: true);
+            EndSelection(runKey, true);
         }
         catch
         {
-            EndSelection(runKey, completed: false);
+            EndSelection(runKey, false);
             throw;
         }
         finally

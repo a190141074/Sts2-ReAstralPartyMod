@@ -109,17 +109,21 @@ public static class TokenRelicRegistry
         typeof(TokenExclusiveVengeanceHalberd),
         typeof(TokenExclusiveZuoTeaCake)
     ];
+
     private static readonly IReadOnlyList<RelicModel> CanonicalTokenRelics = TokenRelicTypes
         .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
         .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
         .ToList();
+
     private static readonly HashSet<ModelId> TokenRelicIds = CanonicalTokenRelics
         .Select(relic => relic.CanonicalInstance?.Id ?? relic.Id)
         .ToHashSet();
+
     private static readonly HashSet<ModelId> ExcludedFromRandomTokenPools =
     [
         ModelDb.GetId<TokenEternalStarlight>()
     ];
+
     private static readonly HashSet<ModelId> SeriesTokenRelicIds = SeriesTokenRelicTypes
         .Select(ModelDb.GetId)
         .ToHashSet();
@@ -162,9 +166,10 @@ public static class TokenRelicRegistry
             .ToList();
     }
 
-    public static IReadOnlyList<RelicModel> GetAvailableNonDiceTokenRelicsByRarity(IRunState? runState, RelicRarity rarity)
+    public static IReadOnlyList<RelicModel> GetAvailableNonDiceTokenRelicsByRarity(IRunState? runState,
+        RelicRarity rarity)
     {
-        return GetAvailableTokenRelicsByRarity(runState, rarity, excludeDice: true);
+        return GetAvailableTokenRelicsByRarity(runState, rarity, true);
     }
 
     public static bool IsTokenRelic(RelicModel relic)

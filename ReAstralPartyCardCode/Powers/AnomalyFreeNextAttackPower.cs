@@ -18,7 +18,8 @@ public class AnomalyFreeNextAttackPower : AstralPartyPowerModel
 
     public override LocString Title => new("powers", "RE_ASTRAL_PARTY_MOD_POWER_ANOMALY_FREE_NEXT_ATTACK_POWER.title");
 
-    public override LocString Description => new("powers", "RE_ASTRAL_PARTY_MOD_POWER_ANOMALY_FREE_NEXT_ATTACK_POWER.description");
+    public override LocString Description =>
+        new("powers", "RE_ASTRAL_PARTY_MOD_POWER_ANOMALY_FREE_NEXT_ATTACK_POWER.description");
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [

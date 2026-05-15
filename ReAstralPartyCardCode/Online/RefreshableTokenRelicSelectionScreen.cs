@@ -88,7 +88,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         string probabilityText,
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc)
     {
-        return new RefreshableTokenRelicSelectionScreen(owner, options, rerollCount, title, subtitlePrefix, probabilityText, rerollFunc);
+        return new RefreshableTokenRelicSelectionScreen(owner, options, rerollCount, title, subtitlePrefix,
+            probabilityText, rerollFunc);
     }
 
     public Task<RefreshableTokenRelicSelectionResult> WaitForResult()
@@ -241,11 +242,16 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             CustomMinimumSize = new Vector2(134f, 126f)
         };
         _rerollButton.Pressed += OnRerollPressed;
-        _rerollButton.AddThemeStyleboxOverride("normal", CreateRerollButtonStyle(new Color(0.98f, 0.82f, 0.16f), new Color(1f, 0.9f, 0.4f)));
-        _rerollButton.AddThemeStyleboxOverride("hover", CreateRerollButtonStyle(new Color(1f, 0.86f, 0.22f), new Color(1f, 0.94f, 0.5f)));
-        _rerollButton.AddThemeStyleboxOverride("pressed", CreateRerollButtonStyle(new Color(0.92f, 0.76f, 0.1f), new Color(1f, 0.88f, 0.36f)));
-        _rerollButton.AddThemeStyleboxOverride("focus", CreateRerollButtonStyle(new Color(1f, 0.86f, 0.22f), new Color(1f, 0.94f, 0.5f)));
-        _rerollButton.AddThemeStyleboxOverride("disabled", CreateRerollButtonStyle(new Color(0.56f, 0.5f, 0.34f, 0.86f), new Color(0.72f, 0.66f, 0.48f, 0.92f)));
+        _rerollButton.AddThemeStyleboxOverride("normal",
+            CreateRerollButtonStyle(new Color(0.98f, 0.82f, 0.16f), new Color(1f, 0.9f, 0.4f)));
+        _rerollButton.AddThemeStyleboxOverride("hover",
+            CreateRerollButtonStyle(new Color(1f, 0.86f, 0.22f), new Color(1f, 0.94f, 0.5f)));
+        _rerollButton.AddThemeStyleboxOverride("pressed",
+            CreateRerollButtonStyle(new Color(0.92f, 0.76f, 0.1f), new Color(1f, 0.88f, 0.36f)));
+        _rerollButton.AddThemeStyleboxOverride("focus",
+            CreateRerollButtonStyle(new Color(1f, 0.86f, 0.22f), new Color(1f, 0.94f, 0.5f)));
+        _rerollButton.AddThemeStyleboxOverride("disabled",
+            CreateRerollButtonStyle(new Color(0.56f, 0.5f, 0.34f, 0.86f), new Color(0.72f, 0.66f, 0.48f, 0.92f)));
         _rerollButton.AddThemeFontSizeOverride("font_size", 34);
         _rerollButton.AddThemeColorOverride("font_color", new Color(0.08f, 0.08f, 0.08f));
         _rerollButton.AddThemeColorOverride("font_hover_color", new Color(0.08f, 0.08f, 0.08f));
@@ -267,9 +273,11 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             SizeFlagsVertical = SizeFlags.ShrinkCenter
         };
         rerollCenter.AddChild(_rerollButton);
-        rerollColumn.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore });
+        rerollColumn.AddChild(new Control
+            { SizeFlagsVertical = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore });
         rerollColumn.AddChild(rerollCenter);
-        rerollColumn.AddChild(new Control { SizeFlagsVertical = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore });
+        rerollColumn.AddChild(new Control
+            { SizeFlagsVertical = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore });
         selectionRow.AddChild(rerollColumn);
 
         var bottomPromptPanel = new PanelContainer

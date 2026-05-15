@@ -42,10 +42,7 @@ public class CyberKittyDiscountedAttackPower : AstralPartyPowerModel
 
         var data = GetInternalData<Data>();
         var existing = data.DiscountedCards.FirstOrDefault(entry => ReferenceEquals(entry.Card, card));
-        if (existing != null)
-        {
-            data.DiscountedCards.Remove(existing);
-        }
+        if (existing != null) data.DiscountedCards.Remove(existing);
 
         data.DiscountedCards.Add(new DiscountedCardEntry
         {

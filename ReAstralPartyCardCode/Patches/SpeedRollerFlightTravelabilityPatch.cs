@@ -30,25 +30,19 @@ public static class SpeedRollerFlightTravelabilityPatch
             return;
 
         foreach (var point in runState.Map.GetPointsInRow(nextRow))
-        {
             if (mapPointDictionary.TryGetValue(point.coord, out var mapPoint))
                 mapPoint.State = MapPointState.Travelable;
-        }
     }
 
     internal static bool TryGetAnyFlightCharges(RunState runState, out SpeedRollerRelicBase? relic)
     {
         foreach (var player in runState.Players)
-        {
-            foreach (var candidate in player.Relics)
+        foreach (var candidate in player.Relics)
+            if (candidate is SpeedRollerRelicBase speedRoller && speedRoller.HasFlightCharge())
             {
-                if (candidate is SpeedRollerRelicBase speedRoller && speedRoller.HasFlightCharge())
-                {
-                    relic = speedRoller;
-                    return true;
-                }
+                relic = speedRoller;
+                return true;
             }
-        }
 
         relic = null;
         return false;

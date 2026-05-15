@@ -57,9 +57,7 @@ public class PersonZhao : CooldownPersonaRelicBase
         AstralParty_PersonZhaoAccumulatedAttackCostThisCombat = 0;
 
         if (Owner.Creature.GetPower<ExtraAttackPower>() == null)
-        {
             await PowerCmd.Apply<ExtraAttackPower>(Owner.Creature, 1m, Owner.Creature, null, false);
-        }
     }
 
     protected override Task BeforeAdvanceCounterAfterCombatEnd(CombatRoom room)

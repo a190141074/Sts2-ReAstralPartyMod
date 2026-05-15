@@ -28,6 +28,7 @@ public class ReadyToStrikePower : AstralPartyPowerModel
     private const decimal InitialTemporaryStrengthAmount = 2m;
     private const decimal DrawnAttackTemporaryStrengthAmount = 1m;
     private const decimal DrawnNonAttackVigorAmount = 1m;
+
     private sealed class Data
     {
         public bool IsResolvingDraw;

@@ -15,8 +15,7 @@
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.BLUE_PACK_FINISH.description": "You slap the gold onto the counter and trade it for a [◈ Token Pack].\n\nThe shopkeeper nods. \"You know what you're buying. Bring more gold next time if you want bigger odds.\"",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.GOLD_PACK_FINISH.description": "You buy the most expensive [◈◈◈ Token Pack] without hesitation.\n\nThe shopkeeper smiles. \"Now that's someone willing to spend properly.\"",
   "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.PURPLE_PACK_FINISH.description": "You take the heavier [◈◈ Token Pack].\n\nThe shopkeeper weighs the coins in hand. \"That one was worth the price.\"",
-  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL_POINT_FINISH.description": "The shopkeeper stares at your single coin for a moment, then shoves [Initial Point] into your hands.\n\n\"A bargain's a bargain. Take it and move along.\""
-  ,
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_RELIC_STORE.pages.INITIAL_POINT_FINISH.description": "The shopkeeper stares at your single coin for a moment, then shoves [Initial Point] into your hands.\n\n\"A bargain's a bargain. Take it and move along.\"",
   "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.title": "Vial Episode",
   "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.INITIAL.description": "Before you reach the shelf, you notice a lone coin rolling on the floor.\n\nNo one stops you from taking it.",
   "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.INITIAL.options.FOUND_ONE_GOLD.title": "[Pick up the coin]",

@@ -48,7 +48,7 @@ public static class PersonaMultiplayerEffectHelper
 
         var livingFolioRelic = owner.GetRelic<PersonalityDerivativeLivingFolio>()
                                ?? await ObtainDerivativeRelicIfMissing<PersonalityDerivativeLivingFolio>(owner)
-                               as PersonalityDerivativeLivingFolio;
+                                   as PersonalityDerivativeLivingFolio;
         if (livingFolioRelic == null)
             return false;
 
@@ -108,7 +108,8 @@ public static class PersonaMultiplayerEffectHelper
     public static Task<RelicModel> ObtainRelicDeterministic(Player owner, RelicModel relic)
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
-        if (canonicalRelic.Id == ModelDb.GetId<TokenGoldInitialPoint>() && owner.GetRelic<TokenGoldInitialPoint>() != null)
+        if (canonicalRelic.Id == ModelDb.GetId<TokenGoldInitialPoint>() &&
+            owner.GetRelic<TokenGoldInitialPoint>() != null)
             return ObtainDuplicateInitialPointFallback(owner);
 
         return ObtainRelicDeterministicTracked(owner, canonicalRelic);
@@ -118,10 +119,11 @@ public static class PersonaMultiplayerEffectHelper
     {
         GuardRewardSyncAllowed("relic reward");
 
+        var canonicalRelic = relic.CanonicalInstance ?? relic;
         if (LocalContext.IsMe(owner))
-            RunManager.Instance?.RewardSynchronizer?.SyncLocalObtainedRelic(relic);
+            RunManager.Instance?.RewardSynchronizer?.SyncLocalObtainedRelic(canonicalRelic);
 
-        return RelicCmd.Obtain(relic.ToMutable(), owner);
+        return ObtainRelicAsRewardTracked(owner, canonicalRelic);
     }
 
     public static void SyncGoldLostAsReward(Player owner, int goldLost)
@@ -234,10 +236,18 @@ public static class PersonaMultiplayerEffectHelper
         return obtained;
     }
 
+    private static async Task<RelicModel> ObtainRelicAsRewardTracked(Player owner, RelicModel canonicalRelic)
+    {
+        var obtained = await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
+        AstralTelemetry.RecordObtainedToken(owner, canonicalRelic);
+        return obtained;
+    }
+
     private static void GuardRewardSyncAllowed(string operation)
     {
         if (!RunManager.Instance.IsSinglePlayerOrFakeMultiplayer && CombatManager.Instance.IsInProgress)
-            throw new InvalidOperationException($"Tried to sync {operation} during combat. Use deterministic combat actions instead.");
+            throw new InvalidOperationException(
+                $"Tried to sync {operation} during combat. Use deterministic combat actions instead.");
     }
 
     private static uint GetBestWeightedDeterministicScore(

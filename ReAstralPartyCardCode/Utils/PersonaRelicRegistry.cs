@@ -15,6 +15,7 @@ public static class PersonaRelicRegistry
         .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
         .OrderBy(relic => (relic.CanonicalInstance?.Id ?? relic.Id).Entry, StringComparer.Ordinal)
         .ToList();
+
     private static readonly HashSet<ModelId> PersonaRelicIds = PersonaRelics
         .Select(relic => relic.CanonicalInstance?.Id ?? relic.Id)
         .ToHashSet();

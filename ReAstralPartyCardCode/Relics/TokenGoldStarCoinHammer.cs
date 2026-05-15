@@ -61,8 +61,10 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
                 InvokeDisplayAmountChanged();
                 return;
             }
+
             await TokenEternalStarlight.GrantStacks(Owner, EternalStarlightToGrant);
         }
+
         InvokeDisplayAmountChanged();
     }
 

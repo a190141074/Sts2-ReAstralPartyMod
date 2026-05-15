@@ -92,13 +92,13 @@ public class PersonJunkBot : CooldownPersonaRelicBase
     {
         await base.AfterObtained();
         await EnsureWeaponFrameRelic();
-        InitializeMarkedCombatsForCurrentAct(forceRefresh: true);
+        InitializeMarkedCombatsForCurrentAct(true);
     }
 
     public override async Task AfterActEntered()
     {
         await base.AfterActEntered();
-        InitializeMarkedCombatsForCurrentAct(forceRefresh: true);
+        InitializeMarkedCombatsForCurrentAct(true);
     }
 
     public override ActMap ModifyGeneratedMapLate(IRunState runState, ActMap map, int actIndex)
@@ -152,7 +152,8 @@ public class PersonJunkBot : CooldownPersonaRelicBase
 
     private async Task EnsureWeaponFrameRelic()
     {
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeZ3000WeaponFrame>(Owner);
+        await PersonaMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeZ3000WeaponFrame>(Owner);
     }
 
     private void InitializeMarkedCombatsForCurrentAct(bool forceRefresh = false)
@@ -180,10 +181,11 @@ public class PersonJunkBot : CooldownPersonaRelicBase
             .Where(p => !p.Quests.Any(q => q is PersonJunkBot))
             .ToList();
 
-        var rng = new Rng((uint)((int)runState.Rng.Seed + (int)Owner!.NetId + StringHelper.GetDeterministicHashCode(JunkBotMapSalt)));
+        var rng = new Rng((uint)((int)runState.Rng.Seed + (int)Owner!.NetId +
+                                 StringHelper.GetDeterministicHashCode(JunkBotMapSalt)));
         candidates.UnstableShuffle(rng);
 
-        var selected = candidates.Take(System.Math.Min(MarkedCombatCount, candidates.Count)).ToList();
+        var selected = candidates.Take(Math.Min(MarkedCombatCount, candidates.Count)).ToList();
         AstralParty_PersonJunkBotMarkedCoordCols = selected.Select(p => p.coord.col).ToArray();
         AstralParty_PersonJunkBotMarkedCoordRows = selected.Select(p => p.coord.row).ToArray();
         AstralParty_PersonJunkBotMarkedCoordsSet = true;
@@ -205,7 +207,7 @@ public class PersonJunkBot : CooldownPersonaRelicBase
             || map.GetPoint(coord).PointType is not (MapPointType.Monster or MapPointType.Elite));
         if (invalidCoords)
         {
-            InitializeMarkedCombatsForCurrentAct(forceRefresh: true);
+            InitializeMarkedCombatsForCurrentAct(true);
             markedCoords = GetMarkedCoords() ?? [];
         }
 
@@ -236,13 +238,11 @@ public class PersonJunkBot : CooldownPersonaRelicBase
 
         var result = new List<MapCoord>(AstralParty_PersonJunkBotMarkedCoordCols.Length);
         for (var i = 0; i < AstralParty_PersonJunkBotMarkedCoordCols.Length; i++)
-        {
             result.Add(new MapCoord
             {
                 col = AstralParty_PersonJunkBotMarkedCoordCols[i],
                 row = AstralParty_PersonJunkBotMarkedCoordRows[i]
             });
-        }
 
         return result;
     }

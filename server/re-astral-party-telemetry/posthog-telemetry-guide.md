@@ -20,6 +20,7 @@ ReAstralPartyMod PostHog 遥测说明
 
 - `telemetry_config.json`
 - `telemetry_pending.jsonl`
+- `telemetry_active_run.json`
 - `telemetry_install_salt.txt`
 
 当前配置格式：
@@ -268,23 +269,8 @@ GROUP BY "筹码ID", "筹码名称"
 ORDER BY "出现次数" DESC
 ```
 
-## 验证步骤
-
-1. 打一局单人局，确保总时长大于 180 秒
-2. 结算后查看 PostHog 是否出现：
-   - `astral_persona_choice`
-   - `astral_token_choice`
-   - `astral_token_obtained`
-   - `astral_run_finished`
-3. 检查事件属性中是否出现：
-   - `selected_label`
-   - `token_label`
-   - `persona_selected_label`
-   - `persona_skill_card_label`
-
-## 口径说明
+## 统计口径
 
 - 胜率统一按整局胜败统计
 - 人格统计按开局人格选择口径
 - 筹码统计同时保留选择口径与实际获得口径
-- 人格技能牌平均使用次数按所有合格样本平均，未使用记 0

@@ -34,11 +34,9 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         set => _bridgedTokenRelicId = DeserializeModelIdOrNone(value);
     }
 
-    [SavedProperty]
-    public bool AstralParty_RunRelicAfterObtainedOnFirstApply { get; set; }
+    [SavedProperty] public bool AstralParty_RunRelicAfterObtainedOnFirstApply { get; set; }
 
-    [SavedProperty]
-    public int AstralParty_BridgeInitializationModeValue { get; set; }
+    [SavedProperty] public int AstralParty_BridgeInitializationModeValue { get; set; }
 
     [SavedProperty]
     private string AstralParty_BridgedTokenRelicStateJson
@@ -381,7 +379,8 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
     private PlayerChoiceContext CreateImmediateHookContext()
     {
         if (Owner?.CombatState != null && LocalContext.NetId.HasValue)
-            return new HookPlayerChoiceContext(this, LocalContext.NetId.Value, Owner.CombatState, GameActionType.Combat);
+            return new HookPlayerChoiceContext(this, LocalContext.NetId.Value, Owner.CombatState,
+                GameActionType.Combat);
 
         return NoChoicePlayerChoiceContext.Instance;
     }

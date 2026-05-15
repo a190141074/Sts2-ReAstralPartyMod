@@ -9,7 +9,9 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 public static class SpeedRollerFlightConsumePatch
 {
     private static readonly FieldInfo? PlayerField = AccessTools.Field(typeof(MoveToMapCoordAction), "_player");
-    private static readonly FieldInfo? DestinationField = AccessTools.Field(typeof(MoveToMapCoordAction), "_destination");
+
+    private static readonly FieldInfo? DestinationField =
+        AccessTools.Field(typeof(MoveToMapCoordAction), "_destination");
 
     public static void Prefix(MoveToMapCoordAction __instance)
     {

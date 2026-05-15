@@ -34,6 +34,7 @@ public class EventAnomalyNoRetreatShrimp : AstralPartyCardModel
             return;
 
         foreach (var player in CombatState.Players)
-            await AstralTemporaryStrengthPower.Apply(player.Creature, TemporaryStrengthAmount, this, Owner?.Creature, this, true);
+            await AstralTemporaryStrengthPower.Apply(player.Creature, TemporaryStrengthAmount, this, Owner?.Creature,
+                this, true);
     }
 }

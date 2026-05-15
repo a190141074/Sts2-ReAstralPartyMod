@@ -20,7 +20,8 @@ public static partial class NTopBarOpenTokenSeriesPatch
         if (!TokenSeriesAvailabilityHelper.TryGetState(runState, out _))
             return;
 
-        MainFile.Logger.Info($"Top bar open token series patch active | {TokenSeriesAvailabilityHelper.BuildDebugSummary(runState)}");
+        MainFile.Logger.Info(
+            $"Top bar open token series patch active | {TokenSeriesAvailabilityHelper.BuildDebugSummary(runState)}");
 
         var existing = __instance.GetNodeOrNull<Control>(NodeName);
         existing?.QueueFree();

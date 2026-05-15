@@ -74,7 +74,7 @@ public class LovePower : AstralPartyPowerModel
 
         var data = GetInternalData<Data>();
         var desiredStrength = Amount;
-        var desiredDexterityPenalty = -System.Math.Floor(Amount / 2m);
+        var desiredDexterityPenalty = -Math.Floor(Amount / 2m);
 
         var strengthDelta = desiredStrength - data.AppliedStrengthBonus;
         var dexterityDelta = desiredDexterityPenalty - data.AppliedDexterityPenalty;

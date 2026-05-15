@@ -34,6 +34,7 @@ public class EventAnomalyJustAMob : AstralPartyCardModel
             return;
 
         foreach (var player in CombatState.Players)
-            await AstralTemporaryDexterityPower.Apply(player.Creature, TemporaryDexterityAmount, this, Owner?.Creature, this, true);
+            await AstralTemporaryDexterityPower.Apply(player.Creature, TemporaryDexterityAmount, this, Owner?.Creature,
+                this, true);
     }
 }

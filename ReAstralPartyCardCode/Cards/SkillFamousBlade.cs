@@ -20,7 +20,10 @@ public class SkillFamousBlade : AstralPartyCardModel
     private const int GawuCutterBonusDamageMin = 1;
     private const int GawuCutterBonusDamageMaxExclusive = 21;
     private const string BaseDescriptionKey = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.description";
-    private const string GawuCutterDescriptionKey = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.description_gawu_cutter";
+
+    private const string GawuCutterDescriptionKey =
+        "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.description_gawu_cutter";
+
     private const string GawuCutterBonusDamageSalt = "gawu_cutter_bonus_damage";
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
@@ -101,13 +104,11 @@ public class SkillFamousBlade : AstralPartyCardModel
     public string GetDisplayTitle(string language)
     {
         if (!CanUseDynamicDisplay())
-        {
             return language switch
             {
                 "zhs" => "名刀",
                 _ => "Famous Blade"
             };
-        }
 
         return GetDisplayTier() switch
         {

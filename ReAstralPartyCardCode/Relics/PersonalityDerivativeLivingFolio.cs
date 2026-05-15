@@ -35,7 +35,8 @@ public class PersonalityDerivativeLivingFolio : AstralPartyRelicModel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonalityDerivativeLivingFolioStacks = ClampStacks(AstralParty_PersonalityDerivativeLivingFolioStacks);
+        AstralParty_PersonalityDerivativeLivingFolioStacks =
+            ClampStacks(AstralParty_PersonalityDerivativeLivingFolioStacks);
         InvokeDisplayAmountChanged();
     }
 
@@ -90,6 +91,6 @@ public class PersonalityDerivativeLivingFolio : AstralPartyRelicModel
 
     private static int ClampStacks(int amount)
     {
-        return System.Math.Clamp(amount, 0, MaxStacks);
+        return Math.Clamp(amount, 0, MaxStacks);
     }
 }

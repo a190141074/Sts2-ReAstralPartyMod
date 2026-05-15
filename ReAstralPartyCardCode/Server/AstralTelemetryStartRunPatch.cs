@@ -10,6 +10,6 @@ public static class AstralTelemetryStartRunPatch
     [HarmonyPrefix]
     public static void Prefix(RunState runState)
     {
-        AstralTelemetry.ResetRunState(runState);
+        AstralTelemetry.BeginNewRun(runState);
     }
 }

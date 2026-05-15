@@ -51,7 +51,8 @@ public class EventThunderApproaches : AstralPartyCardModel
         foreach (var player in CombatState.Players)
         {
             await PowerCmd.Apply<RingingPower>(player.Creature, 1m, Owner.Creature, this);
-            await PowerCmd.Apply<DrawCardsNextTurnPower>(player.Creature, DynamicVars["DrawCardsNextTurnPower"].BaseValue,
+            await PowerCmd.Apply<DrawCardsNextTurnPower>(player.Creature,
+                DynamicVars["DrawCardsNextTurnPower"].BaseValue,
                 Owner.Creature, this);
             await CardGainAttribution.RunWithSource(this,
                 () => CardPileCmd.Draw(choiceContext, (int)DynamicVars["Cards"].BaseValue, player));

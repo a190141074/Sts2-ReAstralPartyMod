@@ -1,7 +1,7 @@
 {
-    "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.name":  "升星",
-    "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.description_stage1":  "消耗[gold]60[/gold]金币进行[gold]升格[/gold]。获得[blue]1[/blue]件随机筹码遗物（不包含特殊遗物），恢复[blue]15[/blue]%最大生命值。",
-    "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.description_stage2":  "消耗[gold]90[/gold]金币进行[gold]升格[/gold]。获得[blue]1[/blue]件随机筹码遗物（不包含特殊遗物），恢复[blue]15[/blue]%最大生命值。",
-    "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.description_stage3":  "消耗[gold]120[/gold]金币进行[gold]升格[/gold]。获得[blue]1[/blue]件随机筹码遗物（不包含特殊遗物），恢复[blue]15[/blue]%最大生命值。",
-    "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.description_maxed":  "已完成全部[blue]3[/blue]次升格。此选项现在只会恢复[blue]15[/blue]%最大生命值。"
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.name": "升星",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.description_stage1": "消耗[gold]60[/gold]金币进行[gold]升格[/gold]。获得[blue]1[/blue]件随机筹码遗物（不包含特殊遗物），恢复[blue]15[/blue]%最大生命值。",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.description_stage2": "消耗[gold]90[/gold]金币进行[gold]升格[/gold]。获得[blue]1[/blue]件随机筹码遗物（不包含特殊遗物），恢复[blue]15[/blue]%最大生命值。",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.description_stage3": "消耗[gold]120[/gold]金币进行[gold]升格[/gold]。获得[blue]1[/blue]件随机筹码遗物（不包含特殊遗物），恢复[blue]15[/blue]%最大生命值。",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_INITIAL_POINT.description_maxed": "已完成全部[blue]3[/blue]次升格。此选项现在只会恢复[blue]15[/blue]%最大生命值。"
 }

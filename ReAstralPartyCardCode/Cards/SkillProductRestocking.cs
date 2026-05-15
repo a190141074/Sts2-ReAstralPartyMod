@@ -56,7 +56,6 @@ public class SkillProductRestocking : AstralPartyCardModel
             return;
 
         if (discardedCardCount > 0)
-        {
             await PowerCmd.Apply(
                 ModelDb.Power<StarLightPower>().ToMutable(),
                 Owner.Creature,
@@ -65,7 +64,6 @@ public class SkillProductRestocking : AstralPartyCardModel
                 this,
                 false
             );
-        }
 
         await mascotGirlMimi.HandleProductRestockingDraw(choiceContext, this, cardsToDraw);
     }

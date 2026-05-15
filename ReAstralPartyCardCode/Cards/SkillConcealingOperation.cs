@@ -17,10 +17,18 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 public class SkillConcealingOperation : AstralPartyCardModel
 {
     private const decimal MarkAmount = 2m;
-    private const string Stage1PortraitPath = "res://ReAstralPartyMod/images/card_portraits/events_concealing_investigation_a.png";
-    private const string Stage2PortraitPath = "res://ReAstralPartyMod/images/card_portraits/events_concealing_investigation_b.png";
-    private const string Stage3PortraitPath = "res://ReAstralPartyMod/images/card_portraits/events_concealing_investigation_c.png";
-    private const string TruthPortraitPath = "res://ReAstralPartyMod/images/card_portraits/events_concealing_investigation_d.png";
+
+    private const string Stage1PortraitPath =
+        "res://ReAstralPartyMod/images/card_portraits/events_concealing_investigation_a.png";
+
+    private const string Stage2PortraitPath =
+        "res://ReAstralPartyMod/images/card_portraits/events_concealing_investigation_b.png";
+
+    private const string Stage3PortraitPath =
+        "res://ReAstralPartyMod/images/card_portraits/events_concealing_investigation_c.png";
+
+    private const string TruthPortraitPath =
+        "res://ReAstralPartyMod/images/card_portraits/events_concealing_investigation_d.png";
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 

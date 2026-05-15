@@ -41,7 +41,8 @@ public class EventAnomalyDemonLordProtection : AstralPartyCardModel
         if (CombatState == null || Owner?.Creature == null)
             return;
 
-        foreach (var enemy in CombatState.Creatures.Where(creature => creature.IsAlive && creature.Side != Owner.Creature.Side))
+        foreach (var enemy in CombatState.Creatures.Where(creature =>
+                     creature.IsAlive && creature.Side != Owner.Creature.Side))
         {
             await PowerCmd.Apply<MarkLockPower>(enemy, MarkAmount, Owner.Creature, this, false);
             await PowerCmd.Apply<VulnerablePower>(enemy, VulnerableAmount, Owner.Creature, this, false);

@@ -51,13 +51,11 @@ public class SkillChannelEnergy : AstralPartyCardModel
             await CreatureCmd.Heal(Owner.Creature, healAmount, true);
 
         if (gatheringStrengthStacks > 0m)
-        {
             await PowerCmd.Apply<ChannelEnergyAttackBoostPower>(
                 Owner.Creature,
                 AttackDamageBonusThisTurn,
                 Owner.Creature,
                 this,
                 false);
-        }
     }
 }

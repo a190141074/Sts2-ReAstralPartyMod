@@ -104,10 +104,8 @@ public static class ZhaoCombatHelper
             return -1;
 
         for (var i = 0; i < cards.Count; i++)
-        {
             if (ReferenceEquals(cards[i], target))
                 return i;
-        }
 
         return -1;
     }

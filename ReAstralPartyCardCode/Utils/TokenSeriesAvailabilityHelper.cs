@@ -186,7 +186,8 @@ public static class TokenSeriesAvailabilityHelper
     {
         if (!TryGetState(runState, out var state))
         {
-            MainFile.Logger.Warn($"Open token series hover tips fell back to uninitialized text. {BuildDebugSummary(runState)}");
+            MainFile.Logger.Warn(
+                $"Open token series hover tips fell back to uninitialized text. {BuildDebugSummary(runState)}");
             return
             [
                 new HoverTip(
@@ -204,7 +205,8 @@ public static class TokenSeriesAvailabilityHelper
 
     private static string GetQualifiedKeywordId(TokenSeries series)
     {
-        return STS2RitsuLib.Content.ModContentRegistry.GetQualifiedKeywordId(MainFile.ModId, SeriesKeywordStemBySeries[series]);
+        return STS2RitsuLib.Content.ModContentRegistry.GetQualifiedKeywordId(MainFile.ModId,
+            SeriesKeywordStemBySeries[series]);
     }
 
     private static string ResolveSeriesTitle(TokenSeries series)
@@ -240,7 +242,8 @@ public static class TokenSeriesAvailabilityHelper
             ? "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.extension1_title"
             : "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.extension2_title";
         var seriesTitle = ResolveSeriesTitle(series);
-        var title = LocString.GetIfExists("relics", titleKey) ?? new LocString("relics", "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.title");
+        var title = LocString.GetIfExists("relics", titleKey) ??
+                    new LocString("relics", "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.title");
         title.Add("SeriesName", seriesTitle);
 
         var descriptionLines = GetSeriesRelicTitles(series).Select(relicTitle => $"-{relicTitle}");

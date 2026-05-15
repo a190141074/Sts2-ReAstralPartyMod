@@ -106,8 +106,9 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
         if (memoryRelic != null)
             return memoryRelic;
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeMascotGirlMimiTokenMemory>(
-            Owner);
+        await PersonaMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeMascotGirlMimiTokenMemory>(
+                Owner);
 
         return MascotGirlMimiTokenMemoryHelper.GetMemoryRelic(Owner);
     }
@@ -121,7 +122,7 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
             return false;
 
         var availableTokenRelics = MascotGirlMimiTokenMemoryHelper
-            .GetBridgeableUnownedTokenRelics(Owner, Owner.Creature, includeSeriesRelics: false)
+            .GetBridgeableUnownedTokenRelics(Owner, Owner.Creature, false)
             .ToList();
 
         if (availableTokenRelics.Count == 0)
@@ -154,8 +155,8 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
             selectedRelic.Id,
             Owner.Creature,
             sourceCard,
-            removeExisting: false,
-            initializationMode: TokenRelicBridgeInitializationMode.RunAfterObtainedSkipOneTimeRewards);
+            false,
+            TokenRelicBridgeInitializationMode.RunAfterObtainedSkipOneTimeRewards);
 
         if (bridgePower == null)
             return false;

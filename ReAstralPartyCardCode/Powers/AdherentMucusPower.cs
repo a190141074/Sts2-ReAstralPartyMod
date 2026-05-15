@@ -201,7 +201,8 @@ public class AdherentMucusPower : AstralPartyPowerModel
             await PowerCmd.ModifyAmount(this, -1m, Owner, null, true);
     }
 
-    private static IEnumerable<AdherentMucusPower> GetPowersBoundToSlime(CombatState combatState, ulong slimePlayerNetId)
+    private static IEnumerable<AdherentMucusPower> GetPowersBoundToSlime(CombatState combatState,
+        ulong slimePlayerNetId)
     {
         return combatState.Creatures
             .Select(creature => creature.GetPower<AdherentMucusPower>())

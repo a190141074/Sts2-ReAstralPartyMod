@@ -57,14 +57,14 @@ internal static class PandaPersonaHelper
     public static CardModel GetDeterministicFoodCardModel(Player owner)
     {
         var selectedIndex = DeterministicSelectionHelper.PickDistinctIndices(
-            1,
-            FoodCards.Count,
-            MainFile.ModId,
-            nameof(PersonPandaMeng),
-            owner.NetId,
-            PileType.Hand.GetPile(owner).Cards.Count,
-            PileType.Draw.GetPile(owner).Cards.Count,
-            PileType.Discard.GetPile(owner).Cards.Count)
+                1,
+                FoodCards.Count,
+                MainFile.ModId,
+                nameof(PersonPandaMeng),
+                owner.NetId,
+                PileType.Hand.GetPile(owner).Cards.Count,
+                PileType.Draw.GetPile(owner).Cards.Count,
+                PileType.Discard.GetPile(owner).Cards.Count)
             .FirstOrDefault();
         return FoodCards[selectedIndex];
     }
@@ -75,7 +75,7 @@ internal static class PandaPersonaHelper
         if (combatState == null)
             return 0m;
 
-        decimal total = 0m;
+        var total = 0m;
         foreach (var enemy in combatState.GetOpponentsOf(ownerCreature).Where(creature => creature.IsAlive))
             total += TryReadAttackIntentDamage(enemy);
 
