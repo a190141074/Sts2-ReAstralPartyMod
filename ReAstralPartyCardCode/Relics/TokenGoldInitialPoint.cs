@@ -34,6 +34,10 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
+    public override bool ShowCounter => true;
+
+    public override int DisplayAmount => AstralParty_TokenGoldInitialPointAscensionCount;
+
     protected override string IconBasePath => "res://ReAstralPartyMod/images/relic/personality_land_center";
 
     public override async Task AfterObtained()
@@ -41,6 +45,7 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         await base.AfterObtained();
         AstralParty_TokenGoldInitialPointAscensionCount = 0;
         AstralParty_TokenGoldInitialPointRemainingRerolls = InitialRefreshPool;
+        InvokeDisplayAmountChanged();
     }
 
     public override bool TryModifyRestSiteOptions(Player player, ICollection<RestSiteOption> options)
@@ -103,6 +108,7 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
             await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(player, selectionResult.SelectedRelic);
             AstralParty_TokenGoldInitialPointAscensionCount =
                 Math.Min(MaxAscensions, AstralParty_TokenGoldInitialPointAscensionCount + 1);
+            InvokeDisplayAmountChanged();
             AstralParty_TokenGoldInitialPointRemainingRerolls++;
         }
 
