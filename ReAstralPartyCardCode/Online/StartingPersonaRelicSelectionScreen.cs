@@ -38,7 +38,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private const int ChoiceKindSelectionUpdate = 1;
     private const int ChoiceKindSelectionCommit = 2;
     private const int MaxSynchronizerWaitFrames = 600;
-    private const int SelectionCommitTimeoutFrames = 60 * 60 * 10;
+    private const int SelectionCommitTimeoutMilliseconds = 10 * 60 * 1000;
+    private const int SelectionCommitGraceMilliseconds = 5 * 1000;
 
     private readonly TaskCompletionSource _completionSource = new();
     private readonly TaskCompletionSource<int> _singlePlayerChoiceSource = new();
@@ -333,11 +334,16 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             _ = ObserveRemoteSelectionsAsync(player, _multiplayerSynchronizer);
         }
 
-        var timeoutTask = WaitForFramesAsync(SelectionCommitTimeoutFrames);
+        var timeoutTask = WaitForTimeoutAsync(SelectionCommitTimeoutMilliseconds);
         var completedTask = await Task.WhenAny(_multiplayerCommitSource.Task, timeoutTask);
         if (completedTask != _multiplayerCommitSource.Task)
-            throw new TimeoutException(
-                "Starting persona relic selection timed out while waiting for the final synchronized lock.");
+        {
+            MainFile.Logger.Warn(
+                "Starting persona relic selection timed out while waiting for the final synchronized lock; applying deterministic timeout fallback.");
+            var timeoutSnapshot = await ResolveTimeoutFallbackAsync();
+            ApplyCommittedSelections(timeoutSnapshot);
+            return;
+        }
 
         var committedSnapshot = await _multiplayerCommitSource.Task;
         ApplyCommittedSelections(committedSnapshot);
@@ -982,6 +988,120 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         });
     }
 
+    private async Task<CommittedSelectionSnapshot> ResolveTimeoutFallbackAsync()
+    {
+        if (_multiplayerCommitSource.Task.IsCompleted)
+            return await _multiplayerCommitSource.Task;
+
+        var fallbackSnapshot = BuildTimeoutFallbackSnapshot();
+
+        if (_localPlayer != null
+            && _authorityPlayer != null
+            && _localPlayer.NetId == _authorityPlayer.NetId
+            && _multiplayerSynchronizer != null
+            && !_multiplayerCommitSent)
+        {
+            TryBroadcastTimeoutFallbackCommit(fallbackSnapshot.SelectedIndexes);
+            _multiplayerCommitSource.TrySetResult(fallbackSnapshot);
+            return fallbackSnapshot;
+        }
+
+        var graceTask = WaitForTimeoutAsync(SelectionCommitGraceMilliseconds);
+        var completedTask = await Task.WhenAny(_multiplayerCommitSource.Task, graceTask);
+        if (completedTask == _multiplayerCommitSource.Task)
+            return await _multiplayerCommitSource.Task;
+
+        MainFile.Logger.Warn(
+            "Starting persona relic selection did not receive an authority final commit during grace period; applying local deterministic timeout fallback.");
+        _multiplayerCommitSource.TrySetResult(fallbackSnapshot);
+        return fallbackSnapshot;
+    }
+
+    private CommittedSelectionSnapshot BuildTimeoutFallbackSnapshot()
+    {
+        var selectedIndexes = new List<int>(_orderedPlayers.Count);
+        var reservedIndexes = new HashSet<int>();
+
+        for (var i = 0; i < _orderedPlayers.Count; i++)
+        {
+            var player = _orderedPlayers[i];
+            if (_selectionStates.TryGetValue(player.NetId, out var state) && state.SelectedRelic != null)
+            {
+                var selectedIndex = IndexOfRelic(_relicOptions, state.SelectedRelic);
+                if (selectedIndex >= 0 && selectedIndex < _relicOptions.Count)
+                {
+                    selectedIndexes.Add(selectedIndex);
+                    continue;
+                }
+            }
+
+            var fallbackIndex = SelectDeterministicTimeoutFallbackIndex(player, reservedIndexes);
+            selectedIndexes.Add(fallbackIndex);
+            reservedIndexes.Add(fallbackIndex);
+
+            MainFile.Logger.Warn(
+                $"Starting persona selection timeout fallback assigned index {fallbackIndex} ({_relicOptions[fallbackIndex].Id.Entry}) to player {player.NetId}.");
+        }
+
+        MainFile.Logger.Warn(
+            $"Starting persona selection timeout fallback snapshot: {string.Join(",", selectedIndexes)}.");
+
+        return new CommittedSelectionSnapshot
+        {
+            SelectedIndexes = selectedIndexes
+        };
+    }
+
+    private int SelectDeterministicTimeoutFallbackIndex(Player player, IReadOnlySet<int> reservedIndexes)
+    {
+        var orderedIndexes = Enumerable.Range(0, _relicOptions.Count)
+            .OrderBy(index => DeterministicMultiplayerChoiceHelper.RollDeterministically(
+                0,
+                int.MaxValue,
+                MainFile.ModId,
+                nameof(StartingPersonaRelicSelectionScreen),
+                "timeout_fallback",
+                _runState.Rng.StringSeed,
+                _orderedPlayers.Count,
+                player.NetId,
+                index))
+            .ThenBy(index => _relicOptions[index].Id.Entry, StringComparer.Ordinal)
+            .ToList();
+
+        foreach (var index in orderedIndexes)
+        {
+            if (reservedIndexes.Contains(index))
+                continue;
+
+            return index;
+        }
+
+        return 0;
+    }
+
+    private void TryBroadcastTimeoutFallbackCommit(IReadOnlyList<int> selectedIndexes)
+    {
+        if (_authorityPlayer == null || _multiplayerSynchronizer == null || _multiplayerCommitSent)
+            return;
+
+        try
+        {
+            var choiceId = _nextChoiceIdsByPlayer[_authorityPlayer.NetId];
+            _multiplayerSynchronizer.SyncLocalChoice(
+                _authorityPlayer,
+                choiceId,
+                CreateSelectionCommitChoiceResult(selectedIndexes));
+            _multiplayerCommitSent = true;
+
+            MainFile.Logger.Warn(
+                $"Starting persona selection sent timeout fallback final commit: player={_authorityPlayer.NetId} choiceId={choiceId} indexes={string.Join(",", selectedIndexes)}.");
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Error($"Starting persona selection failed to broadcast timeout fallback final commit: {ex}");
+        }
+    }
+
     private List<int> BuildCommittedSelectionIndexes()
     {
         return _orderedPlayers
@@ -1077,6 +1197,21 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
             else
                 await Task.Yield();
+    }
+
+    private async Task WaitForTimeoutAsync(int timeoutMilliseconds)
+    {
+        var startedAt = Time.GetTicksMsec();
+        while (!_closed && !_multiplayerCommitSource.Task.IsCompleted)
+        {
+            if (Time.GetTicksMsec() - startedAt >= (ulong)timeoutMilliseconds)
+                return;
+
+            if (NGame.Instance?.IsInsideTree() == true)
+                await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
+            else
+                await Task.Yield();
+        }
     }
 
     private async Task CloseAfterInputReleasedAsync()

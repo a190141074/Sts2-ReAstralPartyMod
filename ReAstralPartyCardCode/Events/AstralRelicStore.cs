@@ -133,7 +133,7 @@ public sealed class AstralRelicStore : AstralPartyEventModel
             if (owner.GetRelic<TokenGoldInitialPoint>() != null)
                 await ObtainDuplicateInitialPointFallbackAsReward(owner);
             else
-                await RewardSyncHelper.ObtainRelicAsRewardMultiplayerSafe(owner, canonicalRelic);
+                await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, canonicalRelic);
 
             return;
         }
@@ -145,7 +145,7 @@ public sealed class AstralRelicStore : AstralPartyEventModel
     {
         var eternalStarlight = owner.GetRelic<TokenEternalStarlight>();
         if (eternalStarlight == null)
-            eternalStarlight = await RewardSyncHelper.ObtainRelicAsRewardMultiplayerSafe(owner, ModelDb.Relic<TokenEternalStarlight>())
+            eternalStarlight = await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<TokenEternalStarlight>())
                                    as TokenEternalStarlight
                                ?? owner.GetRelic<TokenEternalStarlight>();
 

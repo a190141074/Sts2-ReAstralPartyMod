@@ -30,10 +30,29 @@ public static class DiceSeriesHelper
         return CanonicalDiceRelics;
     }
 
+    public static void ExpandSeenAndUnlockedDiceRelics(
+        HashSet<RelicModel> seenRelics,
+        HashSet<RelicModel> unlockedRelics)
+    {
+        if (!ContainsAnyDiceRelic(seenRelics) && !ContainsAnyDiceRelic(unlockedRelics))
+            return;
+
+        foreach (var relic in CanonicalDiceRelics)
+        {
+            seenRelics.Add(relic);
+            unlockedRelics.Add(relic);
+        }
+    }
+
     public static bool IsDiceSeriesRelic(RelicModel relic)
     {
         var id = relic.CanonicalInstance?.Id ?? relic.Id;
         return DiceRelicIds.Contains(id);
+    }
+
+    private static bool ContainsAnyDiceRelic(IEnumerable<RelicModel> relics)
+    {
+        return relics.Any(IsDiceSeriesRelic);
     }
 
     public static bool OwnsFullDiceSet(Player? owner)
