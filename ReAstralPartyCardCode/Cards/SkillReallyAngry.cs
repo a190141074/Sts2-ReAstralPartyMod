@@ -26,6 +26,7 @@ public class SkillReallyAngry : AstralPartyCardModel
 
     protected override Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        RecordTelemetryOnPlay();
         Owner?.GetRelic<PersonUnclePederman>()?.QueueMaxRollOverride();
         return Task.CompletedTask;
     }

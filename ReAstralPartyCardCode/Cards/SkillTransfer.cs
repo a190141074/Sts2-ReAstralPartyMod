@@ -49,6 +49,7 @@ public class SkillTransfer : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        RecordTelemetryOnPlay();
         var target = cardPlay.Target ?? Owner?.Creature;
         if (!MeetsTransferConditions(target))
             return;

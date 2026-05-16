@@ -91,6 +91,7 @@ public class SkillShadowFusion : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        RecordTelemetryOnPlay();
         var ownerCreature = Owner?.Creature;
         var combatState = ownerCreature?.CombatState;
         if (ownerCreature == null || combatState == null)

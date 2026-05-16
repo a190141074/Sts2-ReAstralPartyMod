@@ -39,6 +39,7 @@ public class SkillSaveMeMousy : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        RecordTelemetryOnPlay();
         var ownerCreature = Owner?.Creature;
         if (ownerCreature == null)
             return;

@@ -31,6 +31,7 @@ public class SkillEmotionalOverdose : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        RecordTelemetryOnPlay();
         if (Owner?.Creature == null)
             return;
 

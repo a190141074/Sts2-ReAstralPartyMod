@@ -40,6 +40,7 @@ public class SkillHealingSlime : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        RecordTelemetryOnPlay();
         var target = cardPlay.Target ?? Owner.Creature;
         if (target == null || Owner?.Creature == null)
             return;

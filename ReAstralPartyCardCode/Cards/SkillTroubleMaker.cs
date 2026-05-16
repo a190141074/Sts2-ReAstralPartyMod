@@ -34,6 +34,7 @@ public class SkillTroubleMaker : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        RecordTelemetryOnPlay();
         if (CombatState == null || Owner == null) return;
 
         var offeredCards = AstralEventCardPool.CreateStableTroubleMakerCardsForPlayer(Owner, this, _cardsToShow);

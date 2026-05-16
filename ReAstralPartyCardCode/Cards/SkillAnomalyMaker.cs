@@ -34,6 +34,7 @@ public class SkillAnomalyMaker : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        RecordTelemetryOnPlay();
         if (CombatState == null || Owner == null)
             return;
 

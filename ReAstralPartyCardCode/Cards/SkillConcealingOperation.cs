@@ -57,6 +57,7 @@ public class SkillConcealingOperation : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
+        RecordTelemetryOnPlay();
         var owner = Owner;
         var ownerCreature = owner?.Creature;
         var target = cardPlay.Target;
