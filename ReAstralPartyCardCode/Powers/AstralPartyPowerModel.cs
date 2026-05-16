@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Godot;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Scaffolding.Content;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
@@ -29,7 +30,7 @@ public abstract partial class AstralPartyPowerModel : ModPowerTemplate
 
     public static string GenerateIconPath<T>() where T : class
     {
-        return $"res://ReAstralPartyMod/images/powers/{GeneratePowerId<T>()}.png";
+        return AstralPartyAssetPaths.PowerIcon(GeneratePowerId<T>());
     }
 
     protected virtual string ResolveIconPath()
@@ -58,6 +59,11 @@ public abstract partial class AstralPartyPowerModel : ModPowerTemplate
             idEntry = idEntry[(prefixSeparator + 1)..];
 
         return idEntry.ToLowerInvariant();
+    }
+
+    protected static PowerAssetProfile Icons(string iconPath, string? bigIconPath = null)
+    {
+        return new(iconPath, bigIconPath ?? iconPath);
     }
 
     [GeneratedRegex(@"([a-z])([A-Z])", RegexOptions.Compiled)]
