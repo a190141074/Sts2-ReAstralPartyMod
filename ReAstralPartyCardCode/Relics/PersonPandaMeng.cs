@@ -150,18 +150,21 @@ public class PersonPandaMeng : CooldownPersonaRelicBase
         setObservedAmount(normalizedAmount);
         Flash();
 
-        foreach (var teammate in PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner!)
-                     .Where(player => player != Owner)
-                     .Where(player =>
-                         player.Creature != null && player.Creature.Side == Owner!.Creature!.Side &&
-                         player.Creature.IsAlive))
-            await PowerCmd.Apply(
-                ModelDb.Power<TPower>().ToMutable(),
-                teammate.Creature!,
-                SharedSupportAmount,
-                Owner!.Creature!,
-                null,
-                false);
+        await PersonaMultiplayerEffectHelper.RunAsDerivedSupportPower(async () =>
+        {
+            foreach (var teammate in PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner!)
+                         .Where(player => player != Owner)
+                         .Where(player =>
+                             player.Creature != null && player.Creature.Side == Owner!.Creature!.Side &&
+                             player.Creature.IsAlive))
+                await PowerCmd.Apply(
+                    ModelDb.Power<TPower>().ToMutable(),
+                    teammate.Creature!,
+                    SharedSupportAmount,
+                    Owner!.Creature!,
+                    null,
+                    false);
+        });
     }
 
     private void ResetObservedSupportPowerAmounts()

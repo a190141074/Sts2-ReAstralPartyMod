@@ -17,7 +17,6 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
     private readonly HashSet<Creature> _pendingHealTargets = [];
     private bool _pendingOwnerHeal;
     private bool _flushScheduled;
-    private bool _isResolvingFriendshipBadge;
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
@@ -57,7 +56,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
 
     private bool ShouldTrigger(PowerModel canonicalPower, Creature target, decimal amount, Creature? applier)
     {
-        if (_isResolvingFriendshipBadge)
+        if (PersonaMultiplayerEffectHelper.IsResolvingDerivedSupportPower)
             return false;
         if (Owner?.Creature == null || Owner.Creature.CombatState == null)
             return false;
@@ -94,8 +93,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
         var shouldHealOwner = _pendingOwnerHeal;
         ResetPendingState();
 
-        _isResolvingFriendshipBadge = true;
-        try
+        await PersonaMultiplayerEffectHelper.RunAsDerivedSupportPower(async () =>
         {
             foreach (var target in pendingTargets)
                 if (target.IsAlive)
@@ -103,11 +101,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
 
             if (shouldHealOwner && Owner.Creature.IsAlive)
                 await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, 1m, Owner.Creature, null, false);
-        }
-        finally
-        {
-            _isResolvingFriendshipBadge = false;
-        }
+        });
     }
 
     private void ResetPendingState()

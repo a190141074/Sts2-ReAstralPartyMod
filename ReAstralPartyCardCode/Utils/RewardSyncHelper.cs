@@ -12,4 +12,9 @@ public static class RewardSyncHelper
     {
         return PersonaMultiplayerEffectHelper.ObtainRelicAsReward(owner, relic);
     }
+
+    public static Task<RelicModel> ObtainRelicAsRewardMultiplayerSafe(Player owner, RelicModel relic)
+    {
+        return PersonaMultiplayerEffectHelper.ObtainRelicForMultiplayerSafeReward(owner, relic);
+    }
 }

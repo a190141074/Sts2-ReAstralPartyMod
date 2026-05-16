@@ -196,7 +196,7 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
         if (nextMissingDieRelic == null)
             return false;
 
-        await RewardSyncHelper.ObtainRelicAsReward(Owner, nextMissingDieRelic);
+        await RewardSyncHelper.ObtainRelicAsRewardMultiplayerSafe(Owner, nextMissingDieRelic);
         return true;
     }
 
