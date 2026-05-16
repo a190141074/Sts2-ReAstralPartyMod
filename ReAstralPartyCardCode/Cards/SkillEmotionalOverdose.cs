@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -36,6 +37,10 @@ public class SkillEmotionalOverdose : AstralPartyCardModel
             return;
 
         var loveStacks = Math.Max((int)Owner.Creature.GetPowerAmount<LovePower>(), 0);
+        var needyDerivative = Owner.GetRelic<PersonalityDerivativeNeedyGirl>();
+        if (loveStacks >= PersonalityDerivativeNeedyGirl.BaseLoveCap && needyDerivative != null)
+            await needyDerivative.GainPermanentGrowth(Owner.Creature);
+
         if (loveStacks > 0)
         {
             await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, loveStacks, Owner.Creature, this, false);

@@ -21,8 +21,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class PersonNeedyGirl : CooldownPersonaRelicBase
 {
     private const int StartingLoveStacks = 2;
-    private const int MaxLoveStacks = 4;
-
     [SavedProperty] public int AstralParty_PersonNeedyGirlCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonNeedyGirlPendingCombatStartCard { get; set; }
 
@@ -46,6 +44,12 @@ public class PersonNeedyGirl : CooldownPersonaRelicBase
         HoverTipFactory.FromPower<LovePower>(),
         HoverTipFactory.FromPower<HalfLifeHealPower>()
     ];
+
+    public override async Task AfterObtained()
+    {
+        await base.AfterObtained();
+        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeNeedyGirl>(Owner);
+    }
 
     public override async Task BeforeCombatStart()
     {
@@ -99,7 +103,7 @@ public class PersonNeedyGirl : CooldownPersonaRelicBase
         if (Owner?.Creature == null || amount <= 0)
             return;
 
-        var newAmount = Math.Min(GetLoveAmount() + amount, MaxLoveStacks);
+        var newAmount = Math.Min(GetLoveAmount() + amount, GetLoveCap());
         await SetLoveAmount(newAmount, source);
         Flash();
     }
@@ -109,7 +113,7 @@ public class PersonNeedyGirl : CooldownPersonaRelicBase
         if (Owner?.Creature == null)
             return;
 
-        var clampedAmount = Math.Clamp(amount, 0, MaxLoveStacks);
+        var clampedAmount = Math.Clamp(amount, 0, GetLoveCap());
         var existingPower = Owner.Creature.GetPower<LovePower>();
         if (clampedAmount <= 0)
         {
@@ -126,5 +130,11 @@ public class PersonNeedyGirl : CooldownPersonaRelicBase
         return Owner?.Creature == null
             ? 0
             : Math.Max((int)Owner.Creature.GetPowerAmount<LovePower>(), 0);
+    }
+
+    private int GetLoveCap()
+    {
+        return Owner?.GetRelic<PersonalityDerivativeNeedyGirl>()?.GetLoveCap()
+               ?? PersonalityDerivativeNeedyGirl.BaseLoveCap;
     }
 }

@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -17,8 +18,9 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 public class SkillCyberAngel : AstralPartyCardModel
 {
     private const decimal BaseStarLightGain = 1m;
-    private const decimal MaxStarLightGain = 7m;
+    private const decimal MaxStarLightGain = 10m;
     private const decimal RegenerationAmount = 2m;
+    private const decimal ExtraTeamStarLightGain = 3m;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [AstralKeywords.AstralUnique];
@@ -61,6 +63,21 @@ public class SkillCyberAngel : AstralPartyCardModel
             .ToList();
         if (enemiesWithFans == null || enemiesWithFans.Count == 0)
             return;
+
+        var kawaiiDerivative = Owner.GetRelic<PersonalityDerivativeKawaiiAngel>();
+        if (kawaiiDerivative != null
+            && enemiesWithFans.Sum(enemy => enemy.GetPowerAmount<FanPower>()) > 9m
+            && kawaiiDerivative.TryConsumeTrigger())
+        {
+            foreach (var enemy in Owner.Creature.CombatState!.Enemies.Where(enemy => enemy.IsAlive))
+                await PowerCmd.Apply<CyberAngelStrengthLossPower>(enemy, 1m, Owner.Creature, this, false);
+
+            foreach (var player in Owner.Creature.CombatState.Players
+                         .Where(player => player != Owner)
+                         .OrderBy(player => player.NetId))
+                await PowerCmd.Apply<StarLightPower>(player.Creature, ExtraTeamStarLightGain, Owner.Creature, this,
+                    false);
+        }
 
         if (enemiesWithFans.All(enemy => enemy.GetPowerAmount<FanPower>() > 3m))
             await PowerCmd.Apply<RegenPower>(Owner.Creature, RegenerationAmount, Owner.Creature, this, false);

@@ -44,6 +44,12 @@ public class PersonKawaiiAngel : CooldownPersonaRelicBase
         HoverTipFactory.FromPower<FanPower>()
     ];
 
+    public override async Task AfterObtained()
+    {
+        await base.AfterObtained();
+        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeKawaiiAngel>(Owner);
+    }
+
     public override async Task AfterDamageReceived(
         PlayerChoiceContext choiceContext,
         Creature target,
