@@ -64,8 +64,7 @@ public class SkillMixedCocktails : AstralPartyCardModel
         if (owner == null || ownerCreature == null || target == null || targetPlayer == null)
             return;
 
-        var handCards = PileType.Hand.GetPile(owner).Cards.ToList();
-        var cardsToDiscard = await SelectCardsToDiscard(choiceContext, handCards);
+        var cardsToDiscard = await SelectCardsToDiscard(choiceContext);
         if (cardsToDiscard.Count > 0)
             await CardCmd.Discard(choiceContext, cardsToDiscard);
 
@@ -148,17 +147,25 @@ public class SkillMixedCocktails : AstralPartyCardModel
         }
     }
 
-    private async Task<List<CardModel>> SelectCardsToDiscard(PlayerChoiceContext choiceContext,
-        List<CardModel> handCards)
+    private async Task<List<CardModel>> SelectCardsToDiscard(PlayerChoiceContext choiceContext)
     {
-        if (Owner == null || handCards.Count == 0)
+        if (Owner == null)
             return [];
 
-        var prefs = new CardSelectorPrefs(SelectionPrompt, 0, Math.Min(MaxDiscardCount, handCards.Count))
+        var handCount = PileType.Hand.GetPile(Owner).Cards.Count;
+        if (handCount == 0)
+            return [];
+
+        var prefs = new CardSelectorPrefs(SelectionPrompt, 0, Math.Min(MaxDiscardCount, handCount))
         {
             Cancelable = true
         };
 
-        return (await CardSelectCmd.FromSimpleGrid(choiceContext, handCards, Owner, prefs)).ToList();
+        var selectedCards = await DeterministicMultiplayerChoiceHelper.SelectHandCardsForPlayer(
+            choiceContext,
+            Owner,
+            prefs,
+            selectionSource: null);
+        return selectedCards.ToList();
     }
 }

@@ -56,6 +56,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Remove="doc\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Include="README.md"/>
 		<Content Include="ReAstralPartyMod.json"/>
 		<Content Include="ReAstralPartyMod\images\astral_token.png"/>

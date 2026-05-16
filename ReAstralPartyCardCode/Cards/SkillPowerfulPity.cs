@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -59,8 +58,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
         if (owner == null || ownerCreature == null || targetPlayer == null)
             return;
 
-        var handCards = PileType.Hand.GetPile(owner).Cards.ToList();
-        var selectedCards = await SelectCards(choiceContext, handCards);
+        var selectedCards = await SelectCards(choiceContext);
 
         foreach (var selectedCard in selectedCards)
         {
@@ -130,16 +128,25 @@ public class SkillPowerfulPity : AstralPartyCardModel
         }
     }
 
-    private async Task<List<CardModel>> SelectCards(PlayerChoiceContext choiceContext, List<CardModel> handCards)
+    private async Task<List<CardModel>> SelectCards(PlayerChoiceContext choiceContext)
     {
-        if (Owner == null || handCards.Count == 0)
+        if (Owner == null)
             return [];
 
-        var prefs = new CardSelectorPrefs(SelectionPrompt, Math.Min(MaxSelectedCards, handCards.Count))
+        var handCount = PileType.Hand.GetPile(Owner).Cards.Count;
+        if (handCount == 0)
+            return [];
+
+        var prefs = new CardSelectorPrefs(SelectionPrompt, 0, Math.Min(MaxSelectedCards, handCount))
         {
             Cancelable = true
         };
 
-        return (await CardSelectCmd.FromSimpleGrid(choiceContext, handCards, Owner, prefs)).ToList();
+        var selectedCards = await DeterministicMultiplayerChoiceHelper.SelectHandCardsForPlayer(
+            choiceContext,
+            Owner,
+            prefs,
+            selectionSource: null);
+        return selectedCards.ToList();
     }
 }

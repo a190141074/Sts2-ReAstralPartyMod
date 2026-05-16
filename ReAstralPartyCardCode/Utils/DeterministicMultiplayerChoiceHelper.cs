@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.Screens;
 using MegaCrit.Sts2.Core.Nodes.Screens.CardSelection;
@@ -112,6 +113,30 @@ public static class DeterministicMultiplayerChoiceHelper
         {
             await choiceContext.SignalPlayerChoiceEnded();
         }
+    }
+
+    public static async Task<IReadOnlyList<CardModel>> SelectHandCardsForPlayer(
+        PlayerChoiceContext choiceContext,
+        Player player,
+        CardSelectorPrefs prefs,
+        Func<CardModel, bool>? predicate = null,
+        AbstractModel? selectionSource = null)
+    {
+        ArgumentNullException.ThrowIfNull(choiceContext);
+        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(prefs);
+
+        if (player.Creature?.CombatState == null)
+            return [];
+
+        var selectedCards = await CardSelectCmd.FromHand(
+            choiceContext,
+            player,
+            prefs,
+            predicate,
+            selectionSource);
+
+        return selectedCards.ToList();
     }
 
     public static async Task<RefreshableTokenRelicSelectionResult> SelectRefreshableRelicForPlayer(
