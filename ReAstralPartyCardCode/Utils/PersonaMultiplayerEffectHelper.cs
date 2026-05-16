@@ -137,7 +137,7 @@ public static class PersonaMultiplayerEffectHelper
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
         if (CanUseRewardSynchronizer(owner, "relic reward"))
-            RunManager.Instance?.RewardSynchronizer?.SyncLocalObtainedRelic(canonicalRelic);
+            RunManager.Instance?.RewardSynchronizer?.SyncLocalObtainedRelic(canonicalRelic.ToMutable());
 
         return ObtainRelicAsRewardTracked(owner, canonicalRelic);
     }
