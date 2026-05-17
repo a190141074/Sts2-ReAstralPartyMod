@@ -37,7 +37,7 @@ public class SkillInvokeSpirits : AstralPartyCardModel
         HoverTipFactory.FromPower<ExtraAttackPower>()
     ];
 
-    public SkillInvokeSpirits() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AnyAlly)
+    public SkillInvokeSpirits() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.AnyAlly)
     {
     }
 

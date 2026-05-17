@@ -27,7 +27,7 @@ public class SkillFateWeakMprint : AstralPartyCardModel
     public SkillFateWeakMprint() : base(
         0,
         CardType.Skill,
-        CardRarity.Rare,
+        CardRarity.Ancient,
         TargetType.AnyEnemy
     )
     {

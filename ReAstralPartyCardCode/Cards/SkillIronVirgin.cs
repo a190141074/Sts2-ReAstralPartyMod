@@ -26,7 +26,7 @@ public class SkillIronVirgin : AstralPartyCardModel
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
-    public SkillIronVirgin() : base(1, CardType.Skill, CardRarity.Rare, TargetType.Self)
+    public SkillIronVirgin() : base(1, CardType.Skill, CardRarity.Ancient, TargetType.Self)
     {
     }
 

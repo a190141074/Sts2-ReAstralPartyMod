@@ -32,7 +32,7 @@ public class SkillChannelEnergy : AstralPartyCardModel
         HoverTipFactory.FromPower<ChannelEnergyAttackBoostPower>()
     ];
 
-    public SkillChannelEnergy() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
+    public SkillChannelEnergy() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
     {
     }
 

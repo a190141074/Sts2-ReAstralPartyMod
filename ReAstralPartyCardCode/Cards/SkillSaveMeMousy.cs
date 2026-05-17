@@ -32,7 +32,7 @@ public class SkillSaveMeMousy : AstralPartyCardModel
     public SkillSaveMeMousy() : base(
         0,
         CardType.Skill,
-        CardRarity.Rare,
+        CardRarity.Ancient,
         TargetType.AnyPlayer)
     {
     }

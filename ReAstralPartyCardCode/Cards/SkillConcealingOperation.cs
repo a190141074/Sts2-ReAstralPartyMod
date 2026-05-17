@@ -45,7 +45,7 @@ public class SkillConcealingOperation : AstralPartyCardModel
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralInvestigationProgressId)
     ];
 
-    public override string PortraitPath => GetStagePortraitPath();
+    protected override string DefaultPortraitPath => GetStagePortraitPath();
 
     public SkillConcealingOperation() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AnyEnemy)
     {

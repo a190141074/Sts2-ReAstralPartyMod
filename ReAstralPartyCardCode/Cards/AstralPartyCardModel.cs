@@ -21,20 +21,20 @@ public abstract partial class AstralPartyCardModel : ModCardTemplate
     protected virtual string CardId => CamelCaseRegex.Replace(GetType().Name, "$1_$2").ToLowerInvariant();
     protected virtual string PortraitBasePath => $"res://ReAstralPartyMod/images/card_portraits/{CardId}";
     protected virtual string FrameBasePath => $"res://ReAstralPartyMod/images/card_portraits/{CardId}";
+    protected virtual string DefaultPortraitPath => $"{PortraitBasePath}.png";
     protected new virtual IEnumerable<IHoverTip> ExtraHoverTips => [];
 
     protected override IEnumerable<IHoverTip> AdditionalHoverTips => ExtraHoverTips;
 
     public override CardAssetProfile AssetProfile => new()
     {
-        PortraitPath = PortraitPath,
+        PortraitPath = ResolveActivePortraitPath(),
         BetaPortraitPath = ResolveBetaPortraitPath()
     };
 
-    public override string PortraitPath => $"{PortraitBasePath}.png";
+    public override string PortraitPath => ResolveActivePortraitPath();
 
-    public override string? CustomPortraitPath =>
-        ShouldForceBetaPortrait() ? ResolvePreferredPortraitPath() : base.CustomPortraitPath;
+    public override string? CustomPortraitPath => ResolveActivePortraitPath();
 
     public override string? CustomBetaPortraitPath =>
         ResolveBetaPortraitPath();
@@ -102,7 +102,7 @@ public abstract partial class AstralPartyCardModel : ModCardTemplate
 
     protected virtual string? ResolveBetaPortraitPath()
     {
-        var portraitPath = PortraitPath;
+        var portraitPath = DefaultPortraitPath;
         if (string.IsNullOrWhiteSpace(portraitPath))
             return null;
 
@@ -120,7 +120,14 @@ public abstract partial class AstralPartyCardModel : ModCardTemplate
         if (!string.IsNullOrWhiteSpace(betaPortraitPath) && ResourceLoader.Exists(betaPortraitPath))
             return betaPortraitPath;
 
-        return PortraitPath;
+        return DefaultPortraitPath;
+    }
+
+    protected virtual string ResolveActivePortraitPath()
+    {
+        return ShouldForceBetaPortrait()
+            ? ResolvePreferredPortraitPath()
+            : DefaultPortraitPath;
     }
 
     protected virtual bool ShouldForceBetaPortrait()

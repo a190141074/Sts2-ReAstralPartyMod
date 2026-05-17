@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
@@ -27,7 +27,7 @@ public class SkillRemoteIntrusion : AstralPartyCardModel
         HoverTipFactory.FromPower<CyberKittyNodePower>()
     ];
 
-    public SkillRemoteIntrusion() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
+    public SkillRemoteIntrusion() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
     {
     }
 

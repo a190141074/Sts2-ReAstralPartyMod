@@ -27,7 +27,7 @@ public class SkillHealingSlime : AstralPartyCardModel
     public SkillHealingSlime() : base(
         0,
         CardType.Skill,
-        CardRarity.Rare,
+        CardRarity.Ancient,
         TargetType.AnyPlayer
     )
     {

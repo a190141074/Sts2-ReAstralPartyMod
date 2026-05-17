@@ -20,10 +20,17 @@ public static class TroubleMakerTransformPreviewHelper
     public static async Task PlayTroubleMakerTransformAsync(Player owner, CardModel sourceCard,
         CardModel selectedEventCard)
     {
-        await PlayTransformPreviewAsync(owner, sourceCard, selectedEventCard);
+        await PlayTransformPreviewAsync(owner, sourceCard, selectedEventCard, TroubleMakerPreviewMode.Transform);
     }
 
-    public static async Task PlayTransformPreviewAsync(Player owner, CardModel sourceCard, CardModel selectedEventCard)
+    public static async Task PlayResultCardPreviewAsync(Player owner, CardModel selectedEventCard)
+    {
+        await PlayTransformPreviewAsync(owner, selectedEventCard, selectedEventCard,
+            TroubleMakerPreviewMode.RevealResult);
+    }
+
+    public static async Task PlayTransformPreviewAsync(Player owner, CardModel sourceCard, CardModel selectedEventCard,
+        TroubleMakerPreviewMode mode = TroubleMakerPreviewMode.Transform)
     {
         ArgumentNullException.ThrowIfNull(owner);
         ArgumentNullException.ThrowIfNull(sourceCard);
@@ -49,7 +56,7 @@ public static class TroubleMakerTransformPreviewHelper
             var previewSource = combatState.CreateCard(sourceCanonical, owner);
             var previewTarget = combatState.CreateCard(selectedCanonical, owner);
 
-            var preview = TroubleMakerTransformPreviewVfx.Create(previewSource, previewTarget);
+            var preview = TroubleMakerTransformPreviewVfx.Create(previewSource, previewTarget, mode);
             previewContainer.AddChildSafely(preview);
             await preview.WaitForCompletionAsync();
         }
@@ -70,16 +77,18 @@ internal sealed partial class TroubleMakerTransformPreviewVfx : Control
     private readonly TaskCompletionSource _completionSource = new();
     private readonly CardModel _startCard;
     private readonly CardModel _endCard;
+    private readonly TroubleMakerPreviewMode _mode;
     private readonly ColorRect[] _burstStreaks = new ColorRect[8];
 
     private Control _cardStage = null!;
     private ColorRect _flashOverlay = null!;
     private NCard? _cardNode;
 
-    private TroubleMakerTransformPreviewVfx(CardModel startCard, CardModel endCard)
+    private TroubleMakerTransformPreviewVfx(CardModel startCard, CardModel endCard, TroubleMakerPreviewMode mode)
     {
         _startCard = startCard;
         _endCard = endCard;
+        _mode = mode;
 
         Name = nameof(TroubleMakerTransformPreviewVfx);
         MouseFilter = MouseFilterEnum.Ignore;
@@ -91,9 +100,10 @@ internal sealed partial class TroubleMakerTransformPreviewVfx : Control
         BuildUi();
     }
 
-    public static TroubleMakerTransformPreviewVfx Create(CardModel startCard, CardModel endCard)
+    public static TroubleMakerTransformPreviewVfx Create(CardModel startCard, CardModel endCard,
+        TroubleMakerPreviewMode mode)
     {
-        return new TroubleMakerTransformPreviewVfx(startCard, endCard);
+        return new TroubleMakerTransformPreviewVfx(startCard, endCard, mode);
     }
 
     public Task WaitForCompletionAsync()
@@ -154,7 +164,8 @@ internal sealed partial class TroubleMakerTransformPreviewVfx : Control
     {
         try
         {
-            _cardNode = NCard.Create(_startCard);
+            var initialCard = _mode == TroubleMakerPreviewMode.RevealResult ? _endCard : _startCard;
+            _cardNode = NCard.Create(initialCard);
             _cardStage.AddChildSafely(_cardNode);
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
             _cardNode.UpdateVisuals(PileType.None, CardPreviewMode.Normal);
@@ -173,6 +184,42 @@ internal sealed partial class TroubleMakerTransformPreviewVfx : Control
             await ToSignal(intro, Tween.SignalName.Finished);
 
             await WaitSecondsAsync(0.16f);
+
+            if (_mode == TroubleMakerPreviewMode.RevealResult)
+            {
+                PlayBurst();
+
+                var reveal = CreateTween().SetParallel();
+                reveal.TweenProperty(_cardNode!, "scale", new Vector2(CardScale * 0.96f, CardScale * 1.08f),
+                        ScaleDuration(0.12f))
+                    .SetEase(Tween.EaseType.Out)
+                    .SetTrans(Tween.TransitionType.Back);
+                reveal.TweenProperty(_cardNode!, "rotation_degrees", -1.5f, ScaleDuration(0.12f))
+                    .SetEase(Tween.EaseType.Out)
+                    .SetTrans(Tween.TransitionType.Quad);
+                await ToSignal(reveal, Tween.SignalName.Finished);
+
+                var revealSettle = CreateTween().SetParallel();
+                revealSettle.TweenProperty(_cardNode!, "scale", Vector2.One * CardScale, ScaleDuration(0.22f))
+                    .SetEase(Tween.EaseType.InOut)
+                    .SetTrans(Tween.TransitionType.Back);
+                revealSettle.TweenProperty(_cardNode!, "rotation_degrees", 0f, ScaleDuration(0.22f))
+                    .SetEase(Tween.EaseType.InOut)
+                    .SetTrans(Tween.TransitionType.Sine);
+                await ToSignal(revealSettle, Tween.SignalName.Finished);
+
+                await WaitSecondsAsync(0.34f);
+
+                var revealOutro = CreateTween().SetParallel();
+                revealOutro.TweenProperty(_cardNode!, "scale", Vector2.One * (CardScale * 0.9f),
+                        ScaleDuration(0.18f))
+                    .SetEase(Tween.EaseType.In)
+                    .SetTrans(Tween.TransitionType.Cubic);
+                revealOutro.TweenProperty(_cardNode!, "modulate:a", 0f, ScaleDuration(0.18f));
+                revealOutro.TweenProperty(this, "modulate:a", 0f, ScaleDuration(0.18f));
+                await ToSignal(revealOutro, Tween.SignalName.Finished);
+                return;
+            }
 
             var charge = CreateTween().SetParallel();
             charge.TweenProperty(_cardNode!, "scale", new Vector2(CardScale * 1.12f, CardScale * 0.9f),
@@ -256,4 +303,10 @@ internal sealed partial class TroubleMakerTransformPreviewVfx : Control
     {
         await ToSignal(GetTree().CreateTimer(ScaleDuration(seconds)), SceneTreeTimer.SignalName.Timeout);
     }
+}
+
+public enum TroubleMakerPreviewMode
+{
+    Transform,
+    RevealResult
 }

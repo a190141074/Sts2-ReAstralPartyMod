@@ -29,7 +29,7 @@ public class SkillVampireBite : AstralPartyCardModel
         HoverTipFactory.FromPower<CuteIsJusticePower>()
     ];
 
-    public SkillVampireBite() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
+    public SkillVampireBite() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
     {
     }
 

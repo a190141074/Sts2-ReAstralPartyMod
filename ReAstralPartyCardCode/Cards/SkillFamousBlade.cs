@@ -38,12 +38,22 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
-    public override string PortraitPath => "res://ReAstralPartyMod/images/card_portraits/skill_famous_blade.png";
+    protected override string DefaultPortraitPath => "res://ReAstralPartyMod/images/card_portraits/skill_famous_blade.png";
+
+    protected override string ResolveActivePortraitPath()
+    {
+        return DefaultPortraitPath;
+    }
+
+    protected override string? ResolveBetaPortraitPath()
+    {
+        return null;
+    }
 
     public SkillFamousBlade() : base(
         0,
         CardType.Attack,
-        CardRarity.Rare,
+        CardRarity.Ancient,
         TargetType.AnyEnemy,
         false)
     {

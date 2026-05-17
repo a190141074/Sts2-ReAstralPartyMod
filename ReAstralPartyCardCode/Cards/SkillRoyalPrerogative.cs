@@ -30,7 +30,7 @@ public class SkillRoyalPrerogative : AstralPartyCardModel
     public SkillRoyalPrerogative() : base(
         0,
         CardType.Skill,
-        CardRarity.Rare,
+        CardRarity.Ancient,
         TargetType.Self)
     {
     }

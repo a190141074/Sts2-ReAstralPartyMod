@@ -11,6 +11,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -44,7 +45,7 @@ public class SkillLivingFolio : AstralPartyCardModel
         HoverTipFactory.FromPower<SurveyFindsPower>()
     ];
 
-    public SkillLivingFolio() : base(1, CardType.Skill, CardRarity.Rare, TargetType.AnyEnemy)
+    public SkillLivingFolio() : base(1, CardType.Skill, CardRarity.Ancient, TargetType.AnyEnemy)
     {
     }
 
@@ -116,6 +117,8 @@ public class SkillLivingFolio : AstralPartyCardModel
 
         if (targetMarksBeforePlay >= 3m && personDeityLin.TryRefundLivingFolioEnergy())
             await PlayerCmd.GainEnergy(1m, owner);
+
+        await TroubleMakerTransformPreviewHelper.PlayResultCardPreviewAsync(owner, this);
     }
 
     private bool HasLivingEnemyTarget()
