@@ -1,0 +1,18 @@
+{
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.mod_display_name": "Astral Party",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.page_title": "Mod Settings",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.page_description": "Global switches for persona selection and token series availability.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.title": "Gameplay",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.description": "These options default to off and apply globally across all profiles.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label": "Enable All Personas",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.description": "Show every registered persona at run start instead of only a player-count-based subset.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.label": "Enable Duplicate Personas",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.description": "Multiple players can choose the same starting persona without entering a conflict resolution fight.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.label": "Expansion Mode",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.description": "Choose whether runs use two random expansions, all expansions, or no expansion series at all.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_random_two": "Two Random Expansions",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all": "All Expansions",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled": "Disable Expansions",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label": "Enable Pure Angel Mode",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description": "Reserved toggle. It currently has no gameplay effect."
+}

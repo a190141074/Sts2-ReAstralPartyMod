@@ -1,0 +1,18 @@
+{
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.mod_display_name": "星引擎派对",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.page_title": "模组设置",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.page_description": "控制人格选择与筹码拓展启用方式的全局开关。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.title": "玩法",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.description": "以下设置默认为关闭，并且对所有档位全局生效。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label": "开启全人格",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.description": "开局人格选择时，不再按人数只列出一部分人格，而是直接列出全部已注册人格。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.label": "开启人格重复",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.description": "多人可以选择同一个起始人格，不再因为撞人格而猜拳冲突。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.label": "拓展模式",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.description": "选择本局使用两个随机拓展、全拓展，或直接禁用所有拓展系列。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_random_two": "两个随机拓展",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all": "全拓展",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled": "禁用拓展",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label": "开启纯真天使模式",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description": "预留开关，当前版本暂时没有实际作用。"
+}

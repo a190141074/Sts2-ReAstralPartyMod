@@ -11,6 +11,7 @@ using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
@@ -107,7 +108,6 @@ public static class StartingPersonaRelicSelectionPatch
 
     private static IReadOnlyList<RelicModel> CreateStartingPersonaRelicOptions(RunState runState)
     {
-        var targetCount = runState.Players.Count * 2 + 2;
         var allPersonaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics()
             .OrderBy(relic => relic.Id.Entry)
             .ToList();
@@ -117,6 +117,16 @@ public static class StartingPersonaRelicSelectionPatch
             .Select(relic => relic.CanonicalInstance.Id)
             .ToHashSet();
 
+        if (ReAstralPartyModSettingsManager.EnableAllPersonas)
+        {
+            var allAvailableOptions = allPersonaRelics
+                .Where(relic => !ownedPersonaRelicIds.Contains(relic.Id))
+                .ToList();
+
+            return allAvailableOptions.Count > 0 ? allAvailableOptions : allPersonaRelics;
+        }
+
+        var targetCount = runState.Players.Count * 2 + 2;
         var options = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
                 allPersonaRelics
                     .Where(relic => !ownedPersonaRelicIds.Contains(relic.Id))

@@ -540,6 +540,7 @@
 		<Content Include="ReAstralPartyMod\localization\eng\relics.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\relic_collection.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\rest_site_ui.json"/>
+		<Content Include="ReAstralPartyMod\localization\eng\settings_ui.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\cards.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\card_keywords.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\enchantments.json"/>
@@ -550,6 +551,7 @@
 		<Content Include="ReAstralPartyMod\localization\zhs\relics.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\relic_collection.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\rest_site_ui.json"/>
+		<Content Include="ReAstralPartyMod\localization\zhs\settings_ui.json"/>
 	</ItemGroup>
 
 	<ItemGroup>

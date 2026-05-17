@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Modding;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using STS2RitsuLib;
 using STS2RitsuLib.Interop;
 
@@ -25,6 +26,7 @@ public class MainFile
         var assembly = Assembly.GetExecutingAssembly();
 
         RitsuLibFramework.EnsureGodotScriptsRegistered(assembly, Logger);
+        ReAstralPartyModSettingsManager.Register();
 
         // Current content still references minted CardKeyword values while models materialize,
         // so keywords must be registered before assembly auto-discovery runs.

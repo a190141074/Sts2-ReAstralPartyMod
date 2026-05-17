@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -112,6 +113,16 @@ public static class TokenSeriesAvailabilityHelper
         state = default;
         if (runState == null)
             return false;
+
+        switch (ReAstralPartyModSettingsManager.TokenSeriesMode)
+        {
+            case TokenSeriesMode.All:
+                state = new TokenSeriesAvailabilityState(AllSeries).Normalize();
+                return true;
+            case TokenSeriesMode.Disabled:
+                state = new TokenSeriesAvailabilityState([]);
+                return true;
+        }
 
         var seed = runState.Rng.StringSeed;
         if (string.IsNullOrWhiteSpace(seed))
@@ -238,16 +249,21 @@ public static class TokenSeriesAvailabilityHelper
 
     private static HoverTip BuildSeriesHoverTip(TokenSeries series, int extensionIndex, Texture2D? icon)
     {
-        var titleKey = extensionIndex == 1
-            ? "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.extension1_title"
-            : "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.extension2_title";
+        var titleKey = extensionIndex switch
+        {
+            1 => "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.extension1_title",
+            2 => "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.extension2_title",
+            _ => null
+        };
         var seriesTitle = ResolveSeriesTitle(series);
-        var title = LocString.GetIfExists("relics", titleKey) ??
-                    new LocString("relics", "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.title");
+        var title = !string.IsNullOrWhiteSpace(titleKey)
+            ? LocString.GetIfExists("relics", titleKey)
+              ?? new LocString("relics", "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.title")
+            : new LocString("relics", "RE_ASTRAL_PARTY_MOD_TOPBAR_OPEN_TOKEN_SERIES.title");
         title.Add("SeriesName", seriesTitle);
 
         var descriptionLines = GetSeriesRelicTitles(series).Select(relicTitle => $"-{relicTitle}");
-        var description = LocString.Exists("relics", titleKey)
+        var description = titleKey != null && LocString.Exists("relics", titleKey)
             ? string.Join("\n", descriptionLines)
             : $"【拓展{extensionIndex}：{seriesTitle}】\n{string.Join("\n", descriptionLines)}";
         return new HoverTip(title, description, icon)
@@ -281,7 +297,6 @@ public static class TokenSeriesAvailabilityHelper
             return new TokenSeriesAvailabilityState(OpenSeries
                 .Distinct()
                 .OrderBy(series => (int)series)
-                .Take(2)
                 .ToArray());
         }
     }

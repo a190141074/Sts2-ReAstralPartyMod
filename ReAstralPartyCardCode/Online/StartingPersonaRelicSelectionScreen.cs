@@ -21,6 +21,7 @@ using MegaCrit.Sts2.Core.Nodes.Screens.ScreenContext;
 using MegaCrit.Sts2.Core.Nodes.Screens.TreasureRoomRelic;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
@@ -184,7 +185,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         _subtitleLabel = new Label
         {
-            Text = "所有玩家共享同一批人格。选中后会显示选择状态；若多人选中同一人格，则按宝箱房规则猜拳决定归属。",
+            Text = BuildSelectionIntroSubtitle(),
             HorizontalAlignment = HorizontalAlignment.Center,
             AutowrapMode = TextServer.AutowrapMode.WordSmart
         };
@@ -390,6 +391,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private List<RelicPickingResult> ResolveSelectionResults()
     {
+        if (ReAstralPartyModSettingsManager.EnableDuplicatePersonas)
+            return ResolveSelectionResultsAllowingDuplicates();
+
         var votesByRelic = _relicOptions.ToDictionary(relic => relic.Id, _ => new List<Player>());
         var skippedPlayers = new List<Player>();
 
@@ -465,6 +469,22 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         return results
             .OrderBy(result => result.type)
             .ThenBy(result => result.relic.Id.Entry, StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private List<RelicPickingResult> ResolveSelectionResultsAllowingDuplicates()
+    {
+        return _orderedPlayers
+            .Select(player => _selectionStates[player.NetId])
+            .Where(state => state.SelectedRelic != null)
+            .Select(state => new RelicPickingResult
+            {
+                type = RelicPickingResultType.OnlyOnePlayerVoted,
+                relic = state.SelectedRelic!,
+                player = state.Player
+            })
+            .OrderBy(result => result.relic.Id.Entry, StringComparer.Ordinal)
+            .ThenBy(result => result.player?.NetId ?? 0)
             .ToList();
     }
 
@@ -556,6 +576,10 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private async Task AnimateSelectionResultsAsync(List<RelicPickingResult> results)
     {
         _subtitleLabel.Text = "选择已锁定，开始结算归属。";
+        var remainingAnimationsByRelicId = results
+            .Where(result => result.type != RelicPickingResultType.Skipped && result.player != null)
+            .GroupBy(result => result.relic.Id)
+            .ToDictionary(group => group.Key, group => group.Count());
 
         foreach (var holder in _holdersById.Values)
         {
@@ -589,7 +613,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 if (result.fight != null)
                     await AnimateFightSummaryAsync(result.fight, result.relic);
 
-                await AnimateAwardResultAsync(holder, result.player!, "猜拳胜出");
+                await AnimateAwardResultAsync(holder, result.player!, "猜拳胜出", true);
 
                 var fadeTween = CreateTween();
                 fadeTween.TweenProperty(_fightBackstop, "modulate:a", 0f, 0.25f);
@@ -599,10 +623,18 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             }
             else if (result.type != RelicPickingResultType.Skipped && result.player != null)
             {
+                var hideAfterAnimation = true;
+                if (remainingAnimationsByRelicId.TryGetValue(result.relic.Id, out var remainingCount))
+                {
+                    hideAfterAnimation = remainingCount <= 1;
+                    remainingAnimationsByRelicId[result.relic.Id] = Math.Max(0, remainingCount - 1);
+                }
+
                 await AnimateAwardResultAsync(holder, result.player,
                     result.type == RelicPickingResultType.ConsolationPrize
                         ? "补发获得"
-                        : "直接获得");
+                        : "直接获得",
+                    hideAfterAnimation);
             }
 
             previousType = result.type;
@@ -637,7 +669,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
     }
 
-    private async Task AnimateAwardResultAsync(NTreasureRoomRelicHolder holder, Player player, string reason)
+    private async Task AnimateAwardResultAsync(
+        NTreasureRoomRelicHolder holder,
+        Player player,
+        string reason,
+        bool hideAfterAnimation)
     {
         _fightLabel.Text = $"玩家 {player.NetId} {reason}";
 
@@ -654,8 +690,10 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         flashTween.TweenProperty(holder, "modulate", Colors.White, 0.18f).SetDelay(0.12f);
         await ToSignal(flashTween, Tween.SignalName.Finished);
 
-        holder.Visible = false;
         holder.Scale = Vector2.One;
+
+        if (hideAfterAnimation)
+            holder.Visible = false;
     }
 
     private Vector2 ResolvePlayerAnchorPosition(Player player, Vector2 holderSize)
@@ -1158,7 +1196,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (_localPlayer == null || !_selectionStates.TryGetValue(_localPlayer.NetId, out var localState) ||
             localState.SelectedRelic == null)
         {
-            _subtitleLabel.Text = "所有玩家共享同一批人格。全员完成前可以改选；若多人选中同一人格，则按稳定猜拳规则决定归属。";
+            _subtitleLabel.Text = BuildSelectionIntroSubtitle();
             return;
         }
 
@@ -1171,6 +1209,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _subtitleLabel.Text = _localPlayer.NetId == _authorityPlayer?.NetId
             ? "所有玩家已选择，正在锁定……"
             : "所有玩家已选择，等待同步锁定……";
+    }
+
+    private static string BuildSelectionIntroSubtitle()
+    {
+        return ReAstralPartyModSettingsManager.EnableDuplicatePersonas
+            ? "所有玩家共享同一批人格。全员完成前可以改选；多人选择同一人格时，都会直接获得。"
+            : "所有玩家共享同一批人格。全员完成前可以改选；若多人选中同一人格，则按稳定猜拳规则决定归属。";
     }
 
     private async Task<PlayerChoiceSynchronizer?> WaitForPlayerChoiceSynchronizerAsync()
