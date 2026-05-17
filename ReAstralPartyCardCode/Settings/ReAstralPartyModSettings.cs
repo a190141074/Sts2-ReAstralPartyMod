@@ -19,6 +19,14 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableDuplicatePersonas { get; set; }
 
+    public bool EnablePlayRecommendation { get; set; }
+
+    public bool EnableRouteRecommendation { get; set; }
+
+    public bool EnableTokenRecommendation { get; set; }
+
+    public bool EnableAutoPhrase { get; set; }
+
     public bool EnableTelemetry { get; set; } = true;
 
     // Legacy bool setting kept for backward compatibility with older settings.json files.
@@ -49,7 +57,22 @@ public static class ReAstralPartyModSettingsManager
 
     public static bool EnablePureAngelMode => ReadRuntime(settings => settings.EnablePureAngelMode);
 
+    public static bool EnablePlayRecommendation => ReadRuntime(settings => settings.EnablePlayRecommendation);
+
+    public static bool EnableRouteRecommendation => ReadRuntime(settings => settings.EnableRouteRecommendation);
+
+    public static bool EnableTokenRecommendation => ReadRuntime(settings => settings.EnableTokenRecommendation);
+
+    public static bool EnableAutoPhrase => ReadRuntime(settings => settings.EnableAutoPhrase);
+
     public static bool EnableTelemetry => ReadRuntime(settings => settings.EnableTelemetry);
+
+    public static bool EnableHiddenBetaCardPortraitMode => ReadRuntime(settings =>
+        settings.EnablePlayRecommendation
+        && settings.EnableRouteRecommendation
+        && settings.EnableTokenRecommendation
+        && settings.EnableAutoPhrase
+        && !settings.EnablePureAngelMode);
 
     public static ReAstralPartyModSettings ReadLocalSettings()
     {
@@ -195,6 +218,46 @@ public static class ReAstralPartyModSettingsManager
                 ApplyRuntimeSettings(settings, "enable_pure_angel_mode");
             });
 
+        var enablePlayRecommendation = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnablePlayRecommendation,
+            (settings, value) =>
+            {
+                settings.EnablePlayRecommendation = value;
+                ApplyRuntimeSettings(settings, "enable_play_recommendation");
+            });
+
+        var enableRouteRecommendation = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableRouteRecommendation,
+            (settings, value) =>
+            {
+                settings.EnableRouteRecommendation = value;
+                ApplyRuntimeSettings(settings, "enable_route_recommendation");
+            });
+
+        var enableTokenRecommendation = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableTokenRecommendation,
+            (settings, value) =>
+            {
+                settings.EnableTokenRecommendation = value;
+                ApplyRuntimeSettings(settings, "enable_token_recommendation");
+            });
+
+        var enableAutoPhrase = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableAutoPhrase,
+            (settings, value) =>
+            {
+                settings.EnableAutoPhrase = value;
+                ApplyRuntimeSettings(settings, "enable_auto_phrase");
+            });
+
         var enableTelemetry = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -252,6 +315,33 @@ public static class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label", "Enable Pure Angel Mode"),
                     enablePureAngelMode,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description",
+                        "Reserved toggle. It currently has no gameplay effect."))
+                .AddToggle(
+                    "enable_play_recommendation",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_play_recommendation.label",
+                        "Enable Play Recommendation"),
+                    enablePlayRecommendation,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_play_recommendation.description",
+                        "Reserved toggle. It currently has no gameplay effect."))
+                .AddToggle(
+                    "enable_route_recommendation",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_route_recommendation.label",
+                        "Enable Route Recommendation"),
+                    enableRouteRecommendation,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_route_recommendation.description",
+                        "Reserved toggle. It currently has no gameplay effect."))
+                .AddToggle(
+                    "enable_token_recommendation",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_recommendation.label",
+                        "Enable Token Recommendation"),
+                    enableTokenRecommendation,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_recommendation.description",
+                        "Reserved toggle. It currently has no gameplay effect."))
+                .AddToggle(
+                    "enable_auto_phrase",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_auto_phrase.label", "Enable Auto Phrase"),
+                    enableAutoPhrase,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_auto_phrase.description",
                         "Reserved toggle. It currently has no gameplay effect.")))
             .AddSection("telemetry", section => section
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.telemetry.title", "Telemetry"))
@@ -293,7 +383,7 @@ public static class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): all_personas={snapshot.EnableAllPersonas}, duplicate_personas={snapshot.EnableDuplicatePersonas}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): all_personas={snapshot.EnableAllPersonas}, duplicate_personas={snapshot.EnableDuplicatePersonas}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     private static TokenSeriesMode ResolveTokenSeriesModeCore(ReAstralPartyModSettings settings)
@@ -333,6 +423,14 @@ public static class ReAstralPartyModSettingsManager
 
         public bool EnableDuplicatePersonas { get; init; }
 
+        public bool EnablePlayRecommendation { get; init; }
+
+        public bool EnableRouteRecommendation { get; init; }
+
+        public bool EnableTokenRecommendation { get; init; }
+
+        public bool EnableAutoPhrase { get; init; }
+
         public bool EnableTelemetry { get; init; } = true;
 
         public TokenSeriesMode TokenSeriesMode { get; init; } = TokenSeriesMode.RandomTwo;
@@ -345,6 +443,10 @@ public static class ReAstralPartyModSettingsManager
             {
                 EnableAllPersonas = settings.EnableAllPersonas,
                 EnableDuplicatePersonas = settings.EnableDuplicatePersonas,
+                EnablePlayRecommendation = settings.EnablePlayRecommendation,
+                EnableRouteRecommendation = settings.EnableRouteRecommendation,
+                EnableTokenRecommendation = settings.EnableTokenRecommendation,
+                EnableAutoPhrase = settings.EnableAutoPhrase,
                 EnableTelemetry = settings.EnableTelemetry,
                 TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
                 EnablePureAngelMode = settings.EnablePureAngelMode

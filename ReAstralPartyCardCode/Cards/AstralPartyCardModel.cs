@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.Enchantments;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using STS2RitsuLib.Content;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -26,10 +27,17 @@ public abstract partial class AstralPartyCardModel : ModCardTemplate
 
     public override CardAssetProfile AssetProfile => new()
     {
-        PortraitPath = PortraitPath
+        PortraitPath = PortraitPath,
+        BetaPortraitPath = ResolveBetaPortraitPath()
     };
 
     public override string PortraitPath => $"{PortraitBasePath}.png";
+
+    public override string? CustomPortraitPath =>
+        ShouldForceBetaPortrait() ? ResolvePreferredPortraitPath() : base.CustomPortraitPath;
+
+    public override string? CustomBetaPortraitPath =>
+        ResolveBetaPortraitPath();
 
     public override bool HasTurnEndInHandEffect =>
         base.HasTurnEndInHandEffect || Keywords.Contains(AstralKeywords.AstralTemporary);
@@ -90,6 +98,34 @@ public abstract partial class AstralPartyCardModel : ModCardTemplate
     internal static bool ShouldAutoApplyCooldown(CardModel card)
     {
         return card is AstralPartyCardModel astralCard && astralCard.ShouldAutoApplyCooldownEnchantment;
+    }
+
+    protected virtual string? ResolveBetaPortraitPath()
+    {
+        var portraitPath = PortraitPath;
+        if (string.IsNullOrWhiteSpace(portraitPath))
+            return null;
+
+        var extensionIndex = portraitPath.LastIndexOf('.');
+        var preferredBetaPath = extensionIndex > 0
+            ? $"{portraitPath[..extensionIndex]}_beta{portraitPath[extensionIndex..]}"
+            : $"{portraitPath}_beta";
+
+        return ResourceLoader.Exists(preferredBetaPath) ? preferredBetaPath : null;
+    }
+
+    protected virtual string ResolvePreferredPortraitPath()
+    {
+        var betaPortraitPath = ResolveBetaPortraitPath();
+        if (!string.IsNullOrWhiteSpace(betaPortraitPath) && ResourceLoader.Exists(betaPortraitPath))
+            return betaPortraitPath;
+
+        return PortraitPath;
+    }
+
+    protected virtual bool ShouldForceBetaPortrait()
+    {
+        return ReAstralPartyModSettingsManager.EnableHiddenBetaCardPortraitMode;
     }
 
     protected void RecordTelemetryOnPlay()
