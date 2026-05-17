@@ -26,6 +26,7 @@ using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
@@ -176,6 +177,14 @@ internal static class GameplayStaticPatchCatalog
                 typeof(AstralTelemetryLoadRunPatch),
                 false,
                 "Lifecycle patch: restore Astral telemetry state after loading a run",
+                [typeof(RunState), typeof(SerializableRoom)]),
+            new ModPatchInfo(
+                "re_astral_party_run_settings_load_patch",
+                typeof(NGame),
+                "LoadRun",
+                typeof(ReAstralPartyRunSettingsLoadPatch),
+                false,
+                "Lifecycle patch: ensure run-scoped Astral Party settings are initialized after loading a run",
                 [typeof(RunState), typeof(SerializableRoom)]),
             new ModPatchInfo(
                 "astral_telemetry_run_ended_patch",

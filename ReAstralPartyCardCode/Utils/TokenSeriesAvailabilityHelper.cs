@@ -114,7 +114,9 @@ public static class TokenSeriesAvailabilityHelper
         if (runState == null)
             return false;
 
-        switch (ReAstralPartyModSettingsManager.TokenSeriesMode)
+        var tokenSeriesMode = ReAstralPartyModSettingsManager.GetTokenSeriesMode(runState);
+
+        switch (tokenSeriesMode)
         {
             case TokenSeriesMode.All:
                 state = new TokenSeriesAvailabilityState(AllSeries).Normalize();

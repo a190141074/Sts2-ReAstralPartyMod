@@ -32,6 +32,7 @@ public static class StartingPersonaRelicSelectionPatch
     private static async Task RunAfterStartRun(Task originalTask, RunState runState)
     {
         await originalTask;
+        await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         var gameType = RunManager.Instance.NetService.Type;
         MainFile.Logger.Info(
             $"Starting persona relic selection run gate: netMode={gameType} players={runState.Players.Count}.");
@@ -117,7 +118,7 @@ public static class StartingPersonaRelicSelectionPatch
             .Select(relic => relic.CanonicalInstance.Id)
             .ToHashSet();
 
-        if (ReAstralPartyModSettingsManager.EnableAllPersonas)
+        if (ReAstralPartyModSettingsManager.GetEnableAllPersonas(runState))
         {
             var allAvailableOptions = allPersonaRelics
                 .Where(relic => !ownedPersonaRelicIds.Contains(relic.Id))

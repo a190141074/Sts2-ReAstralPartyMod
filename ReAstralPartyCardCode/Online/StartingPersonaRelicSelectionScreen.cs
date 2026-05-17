@@ -391,7 +391,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private List<RelicPickingResult> ResolveSelectionResults()
     {
-        if (ReAstralPartyModSettingsManager.EnableDuplicatePersonas)
+        if (ReAstralPartyModSettingsManager.GetEnableDuplicatePersonas(_runState))
             return ResolveSelectionResultsAllowingDuplicates();
 
         var votesByRelic = _relicOptions.ToDictionary(relic => relic.Id, _ => new List<Player>());
@@ -1213,7 +1213,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private static string BuildSelectionIntroSubtitle()
     {
-        return ReAstralPartyModSettingsManager.EnableDuplicatePersonas
+        var runState = RunManager.Instance?.DebugOnlyGetState();
+        return ReAstralPartyModSettingsManager.GetEnableDuplicatePersonas(runState)
             ? "所有玩家共享同一批人格。全员完成前可以改选；多人选择同一人格时，都会直接获得。"
             : "所有玩家共享同一批人格。全员完成前可以改选；若多人选中同一人格，则按稳定猜拳规则决定归属。";
     }

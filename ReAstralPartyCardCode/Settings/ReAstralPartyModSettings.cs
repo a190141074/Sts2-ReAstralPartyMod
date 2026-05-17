@@ -1,6 +1,8 @@
 using STS2RitsuLib;
 using STS2RitsuLib.Settings;
 using STS2RitsuLib.Utils.Persistence;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Runs;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
@@ -30,6 +32,7 @@ public static class ReAstralPartyModSettingsManager
     public const string SettingsKey = "settings";
 
     private static bool _registered;
+    private static bool _loggedMultiplayerFallback;
 
     public static bool EnableAllPersonas => Read(settings => settings.EnableAllPersonas);
 
@@ -38,6 +41,53 @@ public static class ReAstralPartyModSettingsManager
     public static TokenSeriesMode TokenSeriesMode => ReadTokenSeriesMode();
 
     public static bool EnablePureAngelMode => Read(settings => settings.EnablePureAngelMode);
+
+    public static ReAstralPartyModSettings ReadLocalSettings()
+    {
+        return RitsuLibFramework.GetDataStore(MainFile.ModId).Get<ReAstralPartyModSettings>(SettingsKey);
+    }
+
+    public static TokenSeriesMode ResolveTokenSeriesMode(ReAstralPartyModSettings settings)
+    {
+        return GetTokenSeriesMode(settings);
+    }
+
+    public static bool TryGetRunSnapshot(IRunState? runState, out ReAstralPartyRunSettingsSnapshot snapshot)
+    {
+        return ReAstralPartyRunSettingsSync.TryGetSnapshot(runState, out snapshot);
+    }
+
+    public static bool GetEnableAllPersonas(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableAllPersonas;
+
+        return EnableAllPersonas;
+    }
+
+    public static bool GetEnableDuplicatePersonas(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableDuplicatePersonas;
+
+        return EnableDuplicatePersonas;
+    }
+
+    public static TokenSeriesMode GetTokenSeriesMode(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.TokenSeriesMode;
+
+        return TokenSeriesMode;
+    }
+
+    public static bool GetEnablePureAngelMode(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnablePureAngelMode;
+
+        return EnablePureAngelMode;
+    }
 
     public static void Register()
     {
@@ -62,6 +112,9 @@ public static class ReAstralPartyModSettingsManager
 
     private static bool Read(Func<ReAstralPartyModSettings, bool> selector)
     {
+        if (!ShouldUseLocalSettings())
+            return false;
+
         try
         {
             return selector(RitsuLibFramework.GetDataStore(MainFile.ModId).Get<ReAstralPartyModSettings>(SettingsKey));
@@ -158,6 +211,9 @@ public static class ReAstralPartyModSettingsManager
 
     private static TokenSeriesMode ReadTokenSeriesMode()
     {
+        if (!ShouldUseLocalSettings())
+            return TokenSeriesMode.RandomTwo;
+
         try
         {
             var settings = RitsuLibFramework.GetDataStore(MainFile.ModId).Get<ReAstralPartyModSettings>(SettingsKey);
@@ -175,5 +231,25 @@ public static class ReAstralPartyModSettingsManager
             return settings.EnableAllTokenSeries.Value ? TokenSeriesMode.All : TokenSeriesMode.RandomTwo;
 
         return settings.TokenSeriesMode;
+    }
+
+    private static bool ShouldUseLocalSettings()
+    {
+        var runManager = RunManager.Instance;
+        var netService = runManager?.NetService;
+        if (netService == null)
+            return true;
+
+        if (netService.Type is NetGameType.None or NetGameType.Singleplayer)
+            return true;
+
+        if (!_loggedMultiplayerFallback)
+        {
+            _loggedMultiplayerFallback = true;
+            MainFile.Logger.Warn(
+                $"{MainFile.ModId} mod settings fallback: multiplayer detected, using synchronized-safe defaults for persona/token-series options.");
+        }
+
+        return false;
     }
 }
