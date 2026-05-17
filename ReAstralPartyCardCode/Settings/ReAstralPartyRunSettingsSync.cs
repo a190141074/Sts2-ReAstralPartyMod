@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -137,18 +138,45 @@ internal static class ReAstralPartyRunSettingsSync
             return safeSnapshot;
         }
 
-        var authorityPlayer = GetAuthorityPlayer(runState, runManager);
-        if (authorityPlayer == null)
+        var authorityNetId = ResolveAuthorityNetId(netService);
+        if (authorityNetId == 0UL)
         {
             var safeSnapshot = CreateSafeSnapshot();
             MainFile.Logger.Warn(
-                $"{MainFile.ModId} settings sync skipped because no authority player was found; using safe multiplayer defaults.");
+                $"{MainFile.ModId} settings sync skipped because authority net id was unavailable; using safe multiplayer defaults.");
             state.SetSnapshot(safeSnapshot);
             return safeSnapshot;
         }
 
+        var authorityPlayer = runState.Players.FirstOrDefault(player => player.NetId == authorityNetId);
+        if (authorityPlayer == null)
+        {
+            var safeSnapshot = CreateSafeSnapshot();
+            MainFile.Logger.Warn(
+                $"{MainFile.ModId} settings sync skipped because authority player {authorityNetId} was unavailable; using safe multiplayer defaults.");
+            state.SetSnapshot(safeSnapshot);
+            return safeSnapshot;
+        }
+
+        var isHost = netService.Type == NetGameType.Host;
+        if (!isHost)
+        {
+            var remoteChoiceId = synchronizer.ReserveChoiceId(authorityPlayer);
+            var remoteChoice = await synchronizer.WaitForRemoteChoice(authorityPlayer, remoteChoiceId);
+            if (TryDecodeSnapshotChoiceResult(remoteChoice, out var remoteSnapshot))
+            {
+                state.SetSnapshot(remoteSnapshot);
+                MainFile.Logger.Info(
+                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: all_personas={remoteSnapshot.EnableAllPersonas}, duplicate_personas={remoteSnapshot.EnableDuplicatePersonas}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}");
+                return remoteSnapshot;
+            }
+        }
+
         var choiceId = synchronizer.ReserveChoiceId(authorityPlayer);
-        if (IsLocalPlayer(runManager, authorityPlayer))
+        MainFile.Logger.Info(
+            $"{MainFile.ModId} settings sync resolved netMode={netService.Type}, host={isHost}, authority={(authorityPlayer?.NetId.ToString() ?? "<null>")}.");
+
+        if (isHost && authorityPlayer != null)
         {
             var localSnapshot = CreateLocalSnapshot();
             state.SetSnapshot(localSnapshot);
@@ -158,25 +186,27 @@ internal static class ReAstralPartyRunSettingsSync
             return localSnapshot;
         }
 
-        var remoteChoice = await synchronizer.WaitForRemoteChoice(authorityPlayer, choiceId);
-        if (TryDecodeSnapshotChoiceResult(remoteChoice, out var remoteSnapshot))
-        {
-            state.SetSnapshot(remoteSnapshot);
-            MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync received from authority player {authorityPlayer.NetId}: all_personas={remoteSnapshot.EnableAllPersonas}, duplicate_personas={remoteSnapshot.EnableDuplicatePersonas}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}");
-            return remoteSnapshot;
-        }
-
         var fallbackSnapshot = CreateSafeSnapshot();
         MainFile.Logger.Warn(
-            $"{MainFile.ModId} settings sync received an invalid payload; using safe multiplayer defaults.");
+            $"{MainFile.ModId} settings sync did not have a host authority path; using safe multiplayer defaults.");
         state.SetSnapshot(fallbackSnapshot);
         return fallbackSnapshot;
     }
 
+    private static ulong ResolveAuthorityNetId(INetGameService netService)
+    {
+        if (netService.Type == NetGameType.Host)
+            return netService.NetId;
+
+        if (netService is INetClientGameService clientService)
+            return clientService.NetClient.HostNetId;
+
+        return 0UL;
+    }
+
     private static async Task<PlayerChoiceSynchronizer?> WaitForPlayerChoiceSynchronizerAsync(RunManager runManager)
     {
-        const int maxSynchronizerWaitFrames = 60;
+        const int maxSynchronizerWaitFrames = 600;
         for (var i = 0; i < maxSynchronizerWaitFrames; i++)
         {
             if (runManager.PlayerChoiceSynchronizer != null)
@@ -186,22 +216,6 @@ internal static class ReAstralPartyRunSettingsSync
         }
 
         return runManager.PlayerChoiceSynchronizer;
-    }
-
-    private static bool IsLocalPlayer(RunManager runManager, Player player)
-    {
-        return player.NetId != 0UL && player.NetId == runManager.NetService.NetId;
-    }
-
-    private static Player? GetAuthorityPlayer(RunState runState, RunManager runManager)
-    {
-        var localPlayer = runState.Players.FirstOrDefault(player => IsLocalPlayer(runManager, player));
-        if (localPlayer != null)
-            return localPlayer;
-
-        return runState.Players
-            .OrderBy(player => player.NetId)
-            .FirstOrDefault();
     }
 
     private sealed class RunSettingsSyncState

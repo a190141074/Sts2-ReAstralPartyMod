@@ -80,9 +80,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         _runState = runState;
         _relicOptions = relicOptions;
-        _orderedPlayers = runState.Players.OrderBy(player => player.NetId).ToList();
-        _localPlayer = _orderedPlayers.FirstOrDefault(LocalContext.IsMe) ?? _orderedPlayers.FirstOrDefault();
-        _authorityPlayer = _orderedPlayers.FirstOrDefault();
+        _orderedPlayers = runState.Players
+            .OrderBy(static player => player.NetId)
+            .ToList();
+        _localPlayer = LocalContext.GetMe(_orderedPlayers) ?? _orderedPlayers.FirstOrDefault();
+        _authorityPlayer = ResolveAuthorityPlayer(_orderedPlayers, _localPlayer);
 
         foreach (var player in _orderedPlayers)
         {
@@ -251,7 +253,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             holder.Initialize(relic, _runState);
             holder.VoteContainer.Initialize(
                 player => PlayerSelectedHolder(player, holder.Index),
-                _runState.Players);
+                _orderedPlayers);
             holder.Connect(NClickableControl.SignalName.Released,
                 Callable.From<NTreasureRoomRelicHolder>(_ => OnHolderSelected(holder)));
             _holdersById[relic.Id] = holder;
@@ -996,6 +998,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             _authorityPlayer == null)
             return;
 
+        if (RunManager.Instance.NetService.Type != NetGameType.Host)
+            return;
+
         if (_localPlayer == null || _localPlayer.NetId != _authorityPlayer.NetId)
             return;
 
@@ -1033,7 +1038,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         var fallbackSnapshot = BuildTimeoutFallbackSnapshot();
 
-        if (_localPlayer != null
+        if (RunManager.Instance.NetService.Type == NetGameType.Host
+            && _localPlayer != null
             && _authorityPlayer != null
             && _localPlayer.NetId == _authorityPlayer.NetId
             && _multiplayerSynchronizer != null
@@ -1206,7 +1212,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
         }
 
-        _subtitleLabel.Text = _localPlayer.NetId == _authorityPlayer?.NetId
+        _subtitleLabel.Text = RunManager.Instance.NetService.Type == NetGameType.Host
             ? "所有玩家已选择，正在锁定……"
             : "所有玩家已选择，等待同步锁定……";
     }
@@ -1378,6 +1384,29 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
 
         return -1;
+    }
+
+    private static Player? ResolveAuthorityPlayer(IReadOnlyList<Player> orderedPlayers, Player? localPlayer)
+    {
+        var runManager = RunManager.Instance;
+        var netService = runManager?.NetService;
+        if (netService == null)
+            return localPlayer ?? orderedPlayers.FirstOrDefault();
+
+        ulong authorityNetId = netService.Type == NetGameType.Host
+            ? netService.NetId
+            : netService is INetClientGameService clientService
+                ? clientService.NetClient.HostNetId
+                : 0UL;
+
+        if (authorityNetId != 0UL)
+        {
+            var authorityPlayer = orderedPlayers.FirstOrDefault(player => player.NetId == authorityNetId);
+            if (authorityPlayer != null)
+                return authorityPlayer;
+        }
+
+        return localPlayer ?? orderedPlayers.FirstOrDefault();
     }
 
     private void FlushPendingLocalSelectionIfNeeded()
