@@ -35,6 +35,7 @@ Markdown 中混入游戏内专用标签。
 ### 统计与服务端
 
 - 游戏内遥测采集与上传逻辑位于 `ReAstralPartyCardCode/Online/AstralTelemetry*.cs`
+- 客户端当前使用“首次主菜单询问 + 本地配置覆盖”的匿名遥测方案，说明见 `doc/posthog-telemetry-guide.md`
 - 服务端接收器、标签映射、PostHog/SQL
   统计说明统一位于 [server/re-astral-party-telemetry](B:\Documents\re-astral-party-mod\server\re-astral-party-telemetry)
 

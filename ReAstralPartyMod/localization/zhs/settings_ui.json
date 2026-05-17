@@ -14,5 +14,13 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all": "全拓展",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled": "禁用拓展",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label": "开启纯真天使模式",
-  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description": "预留开关，当前版本暂时没有实际作用。"
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description": "预留开关，当前版本暂时没有实际作用。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.telemetry.title": "遥测",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.telemetry.description": "随时管理匿名平衡统计。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.label": "开启匿名数据收集",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.description": "允许收集人格、筹码和技能牌的匿名使用统计。",
+  "RE_ASTRAL_PARTY_TELEMETRY_POPUP.title": "匿名数据收集说明",
+  "RE_ASTRAL_PARTY_TELEMETRY_POPUP.body": "本模组会收集匿名平衡统计，用于分析人格、筹码和技能牌的选择与胜率表现。不会上传 Steam ID、昵称、聊天内容等直接身份信息。选择关闭后将停止后续上报。",
+  "RE_ASTRAL_PARTY_TELEMETRY_POPUP.enable": "启用收集",
+  "RE_ASTRAL_PARTY_TELEMETRY_POPUP.disable": "关闭收集"
 }

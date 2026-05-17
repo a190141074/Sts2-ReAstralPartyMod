@@ -9,8 +9,14 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 public static class ReAstralPartyRunSettingsLoadPatch
 {
     [HarmonyPostfix]
-    public static void Postfix(RunState runState)
+    public static void Postfix(RunState runState, ref Task __result)
     {
-        _ = ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
+        __result = RunAfterLoadRun(__result, runState);
+    }
+
+    private static async Task RunAfterLoadRun(Task originalTask, RunState runState)
+    {
+        await originalTask;
+        await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
     }
 }

@@ -19,6 +19,8 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableDuplicatePersonas { get; set; }
 
+    public bool EnableTelemetry { get; set; } = true;
+
     // Legacy bool setting kept for backward compatibility with older settings.json files.
     public bool? EnableAllTokenSeries { get; set; }
 
@@ -41,6 +43,8 @@ public static class ReAstralPartyModSettingsManager
     public static TokenSeriesMode TokenSeriesMode => ReadTokenSeriesMode();
 
     public static bool EnablePureAngelMode => Read(settings => settings.EnablePureAngelMode);
+
+    public static bool EnableTelemetry => ReadTelemetry();
 
     public static ReAstralPartyModSettings ReadLocalSettings()
     {
@@ -110,6 +114,12 @@ public static class ReAstralPartyModSettingsManager
         MainFile.Logger.Info($"{MainFile.ModId} mod settings registered.");
     }
 
+    internal static void SetEnableTelemetry(bool enabled)
+    {
+        var settings = RitsuLibFramework.GetDataStore(MainFile.ModId).Get<ReAstralPartyModSettings>(SettingsKey);
+        settings.EnableTelemetry = enabled;
+    }
+
     private static bool Read(Func<ReAstralPartyModSettings, bool> selector)
     {
         if (!ShouldUseLocalSettings())
@@ -122,6 +132,19 @@ public static class ReAstralPartyModSettingsManager
         catch
         {
             return false;
+        }
+    }
+
+    private static bool ReadTelemetry()
+    {
+        try
+        {
+            return RitsuLibFramework.GetDataStore(MainFile.ModId).Get<ReAstralPartyModSettings>(SettingsKey)
+                .EnableTelemetry;
+        }
+        catch
+        {
+            return true;
         }
     }
 
@@ -154,6 +177,16 @@ public static class ReAstralPartyModSettingsManager
             SettingsKey,
             settings => settings.EnablePureAngelMode,
             (settings, value) => settings.EnablePureAngelMode = value);
+
+        var enableTelemetry = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableTelemetry,
+            (settings, value) =>
+            {
+                settings.EnableTelemetry = value;
+                ReAstralPartyCardCode.Online.AstralTelemetry.SetCollectionEnabledByConsent(value);
+            });
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
             .WithModDisplayName(T("RE_ASTRAL_PARTY_MOD_SETTINGS.mod_display_name", "Astral Party Mod"))
@@ -201,7 +234,17 @@ public static class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label", "Enable Pure Angel Mode"),
                     enablePureAngelMode,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description",
-                        "Reserved toggle. It currently has no gameplay effect."))));
+                        "Reserved toggle. It currently has no gameplay effect.")))
+            .AddSection("telemetry", section => section
+                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.telemetry.title", "Telemetry"))
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.telemetry.description",
+                    "Manage anonymous balance telemetry at any time."))
+                .AddToggle(
+                    "enable_telemetry",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.label", "Enable Anonymous Telemetry"),
+                    enableTelemetry,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.description",
+                        "Allow anonymous usage statistics for personas, tokens, and skill cards."))));
     }
 
     private static ModSettingsText T(string key, string fallback)

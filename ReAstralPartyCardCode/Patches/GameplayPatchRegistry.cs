@@ -163,6 +163,13 @@ internal static class GameplayStaticPatchCatalog
                 "Version-fragile gameplay patch: open the starting persona relic selection after run start",
                 parameterTypes: [typeof(RunState)]),
             new ModPatchInfo(
+                "astral_telemetry_consent_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu),
+                "_Ready",
+                typeof(AstralTelemetryConsentPatch),
+                false,
+                "Lifecycle patch: show Astral telemetry consent prompt on first main-menu entry"),
+            new ModPatchInfo(
                 "astral_telemetry_start_run_patch",
                 typeof(NGame),
                 "StartRun",

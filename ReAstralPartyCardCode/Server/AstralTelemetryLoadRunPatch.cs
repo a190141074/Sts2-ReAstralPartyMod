@@ -9,8 +9,14 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 public static class AstralTelemetryLoadRunPatch
 {
     [HarmonyPrefix]
-    public static void Prefix(RunState runState)
+    public static void Prefix(RunState runState, ref Task __result)
     {
+        __result = RunAfterLoadRun(__result, runState);
+    }
+
+    private static async Task RunAfterLoadRun(Task originalTask, RunState runState)
+    {
+        await originalTask;
         AstralTelemetry.RestoreLoadedRun(runState);
     }
 }

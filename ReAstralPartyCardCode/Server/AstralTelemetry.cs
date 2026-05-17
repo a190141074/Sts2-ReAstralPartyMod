@@ -13,17 +13,29 @@ using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 internal static class AstralTelemetry
 {
+    private enum TelemetryConsentState
+    {
+        Unknown = 0,
+        Accepted = 1,
+        Declined = 2
+    }
+
     private sealed record TelemetryConfig(
         bool Enabled,
         string Provider,
         string Host,
         string ProjectToken,
         string PendingFile);
+
+    private sealed record TelemetryState(
+        TelemetryConsentState ConsentState,
+        bool ConsentPromptShown);
 
     private sealed record LegacyTelemetryConfig(bool Enabled, string Endpoint);
 
@@ -97,6 +109,8 @@ internal static class AstralTelemetry
     private const string DefaultHost = "https://us.i.posthog.com";
     private const string DefaultProjectToken = "phc_tUUfTxDRKbzBcq24G78yPUu3w6TYkmCySG4cRwp7bJwC";
     private const string ConfigFileName = "telemetry_config.json";
+    private const string LocalConfigFileName = "telemetry_config.local.json";
+    private const string StateFileName = "telemetry_state.json";
     private const string PendingFileName = "telemetry_pending.jsonl";
     private const string ActiveRunFileName = "telemetry_active_run.json";
     private const string InstallSaltFileName = "telemetry_install_salt.txt";
@@ -113,8 +127,11 @@ internal static class AstralTelemetry
 
     private static readonly object QueueLock = new();
     private static readonly object StateLock = new();
+    private static readonly object ConfigLock = new();
     private static readonly HashSet<string> SubmittedRunIds = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, RunTelemetryState> ActiveRuns = new(StringComparer.Ordinal);
+    private static TelemetryConfig? _cachedConfig;
+    private static TelemetryState? _cachedState;
 
     private sealed class RunTelemetryState
     {
@@ -146,11 +163,68 @@ internal static class AstralTelemetry
         try
         {
             EnsureConfigFile();
+            EnsureStateFile();
+            SyncFromModSettings();
         }
         catch (Exception ex)
         {
             MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Config init failed: {ex.Message}");
         }
+    }
+
+    public static void SyncFromModSettings()
+    {
+        try
+        {
+            var enabled = ReAstralPartyModSettingsManager.EnableTelemetry;
+            lock (ConfigLock)
+            {
+                var state = LoadStateCore();
+                if (state.ConsentState == TelemetryConsentState.Unknown)
+                {
+                    SaveStateCore(state with
+                    {
+                        ConsentState = enabled ? TelemetryConsentState.Accepted : TelemetryConsentState.Declined,
+                        ConsentPromptShown = true
+                    });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Failed to sync telemetry setting from mod settings: {ex.Message}");
+        }
+    }
+
+    public static bool ShouldShowConsentPrompt()
+    {
+        var config = LoadConfig();
+        if (!config.Enabled)
+            return false;
+
+        var state = LoadState();
+        return state.ConsentState == TelemetryConsentState.Unknown;
+    }
+
+    public static void SetCollectionEnabledByConsent(bool enabled)
+    {
+        lock (ConfigLock)
+        {
+            var state = LoadStateCore();
+            SaveStateCore(state with
+            {
+                ConsentState = enabled ? TelemetryConsentState.Accepted : TelemetryConsentState.Declined,
+                ConsentPromptShown = true
+            });
+        }
+
+        MainFile.Logger.Info(
+            $"[{MainFile.ModId}][Telemetry] User consent updated: enabled={enabled}");
+    }
+
+    public static bool IsCollectionEnabled()
+    {
+        return IsTelemetryEnabled(LoadConfig(), LoadState());
     }
 
     public static void BeginNewRun(RunState? runState)
@@ -339,7 +413,8 @@ internal static class AstralTelemetry
         try
         {
             var config = LoadConfig();
-            if (!config.Enabled)
+            var state = LoadState();
+            if (!IsTelemetryEnabled(config, state))
                 return;
 
             if (serializableRun.RunTime <= MinRunTimeForUploadSeconds)
@@ -633,46 +708,32 @@ internal static class AstralTelemetry
 
     private static TelemetryConfig LoadConfig()
     {
-        EnsureConfigFile();
-        try
+        lock (ConfigLock)
         {
-            var json = File.ReadAllText(GetConfigPath());
-            var config = JsonSerializer.Deserialize<TelemetryConfig>(json, JsonOptions);
-            if (IsValidConfig(config))
-                return NormalizeConfig(config!);
-
-            var legacyConfig = JsonSerializer.Deserialize<LegacyTelemetryConfig>(json, JsonOptions);
-            if (legacyConfig != null)
-            {
-                var migrated = new TelemetryConfig(
-                    legacyConfig.Enabled,
-                    DefaultProvider,
-                    DefaultHost,
-                    DefaultProjectToken,
-                    PendingFileName);
-                WriteConfigFile(migrated);
-                MainFile.Logger.Info(
-                    $"[{MainFile.ModId}][Telemetry] Migrated legacy telemetry config to PostHog format.");
-                return migrated;
-            }
+            return LoadConfigCore();
         }
-        catch (Exception ex)
-        {
-            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Config read failed: {ex.Message}");
-        }
-
-        return new TelemetryConfig(true, DefaultProvider, DefaultHost, DefaultProjectToken, PendingFileName);
     }
 
     private static void EnsureConfigFile()
     {
         var configPath = GetConfigPath();
-        if (File.Exists(configPath))
+        Directory.CreateDirectory(GetDataDirectory());
+
+        if (!File.Exists(configPath))
+        {
+            var config = new TelemetryConfig(true, DefaultProvider, DefaultHost, DefaultProjectToken, PendingFileName);
+            WriteConfigFile(config);
+        }
+    }
+
+    private static void EnsureStateFile()
+    {
+        var statePath = GetStatePath();
+        Directory.CreateDirectory(GetDataDirectory());
+        if (File.Exists(statePath))
             return;
 
-        Directory.CreateDirectory(GetDataDirectory());
-        var config = new TelemetryConfig(true, DefaultProvider, DefaultHost, DefaultProjectToken, PendingFileName);
-        WriteConfigFile(config);
+        SaveStateCore(new TelemetryState(TelemetryConsentState.Unknown, false));
     }
 
     private static List<string> ReadPendingPayloads()
@@ -730,6 +791,16 @@ internal static class AstralTelemetry
         return Path.Combine(GetDataDirectory(), ConfigFileName);
     }
 
+    private static string GetLocalConfigPath()
+    {
+        return Path.Combine(GetDataDirectory(), LocalConfigFileName);
+    }
+
+    private static string GetStatePath()
+    {
+        return Path.Combine(GetDataDirectory(), StateFileName);
+    }
+
     private static string GetPendingPath()
     {
         var pendingFile = LoadConfig().PendingFile;
@@ -781,6 +852,108 @@ internal static class AstralTelemetry
         File.WriteAllText(
             GetConfigPath(),
             JsonSerializer.Serialize(config, new JsonSerializerOptions(JsonOptions) { WriteIndented = true }));
+    }
+
+    private static TelemetryConfig LoadConfigCore()
+    {
+        if (_cachedConfig != null)
+            return _cachedConfig;
+
+        EnsureConfigFile();
+
+        var localPath = GetLocalConfigPath();
+        var basePath = GetConfigPath();
+        try
+        {
+            if (File.Exists(localPath))
+            {
+                var localJson = File.ReadAllText(localPath);
+                var localConfig = JsonSerializer.Deserialize<TelemetryConfig>(localJson, JsonOptions);
+                if (IsValidConfig(localConfig))
+                {
+                    _cachedConfig = NormalizeConfig(localConfig!);
+                    return _cachedConfig;
+                }
+            }
+
+            var json = File.ReadAllText(basePath);
+            var config = JsonSerializer.Deserialize<TelemetryConfig>(json, JsonOptions);
+            if (IsValidConfig(config))
+            {
+                _cachedConfig = NormalizeConfig(config!);
+                return _cachedConfig;
+            }
+
+            var legacyConfig = JsonSerializer.Deserialize<LegacyTelemetryConfig>(json, JsonOptions);
+            if (legacyConfig != null)
+            {
+                var migrated = new TelemetryConfig(
+                    legacyConfig.Enabled,
+                    DefaultProvider,
+                    DefaultHost,
+                    DefaultProjectToken,
+                    PendingFileName);
+                WriteConfigFile(migrated);
+                MainFile.Logger.Info(
+                    $"[{MainFile.ModId}][Telemetry] Migrated legacy telemetry config to PostHog format.");
+                _cachedConfig = migrated;
+                return _cachedConfig;
+            }
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Config read failed: {ex.Message}");
+        }
+
+        _cachedConfig = new TelemetryConfig(true, DefaultProvider, DefaultHost, DefaultProjectToken, PendingFileName);
+        return _cachedConfig;
+    }
+
+    private static TelemetryState LoadState()
+    {
+        lock (ConfigLock)
+        {
+            return LoadStateCore();
+        }
+    }
+
+    private static TelemetryState LoadStateCore()
+    {
+        if (_cachedState != null)
+            return _cachedState;
+
+        EnsureStateFile();
+        try
+        {
+            var json = File.ReadAllText(GetStatePath());
+            var state = JsonSerializer.Deserialize<TelemetryState>(json, JsonOptions);
+            if (state != null)
+            {
+                _cachedState = state;
+                return state;
+            }
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] State read failed: {ex.Message}");
+        }
+
+        _cachedState = new TelemetryState(TelemetryConsentState.Unknown, false);
+        return _cachedState;
+    }
+
+    private static void SaveStateCore(TelemetryState state)
+    {
+        Directory.CreateDirectory(GetDataDirectory());
+        File.WriteAllText(
+            GetStatePath(),
+            JsonSerializer.Serialize(state, new JsonSerializerOptions(JsonOptions) { WriteIndented = true }));
+        _cachedState = state;
+    }
+
+    private static bool IsTelemetryEnabled(TelemetryConfig config, TelemetryState state)
+    {
+        return config.Enabled && state.ConsentState == TelemetryConsentState.Accepted;
     }
 
     private static bool IsValidConfig(TelemetryConfig? config)

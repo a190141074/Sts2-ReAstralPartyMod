@@ -14,5 +14,13 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all": "All Expansions",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled": "Disable Expansions",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label": "Enable Pure Angel Mode",
-  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description": "Reserved toggle. It currently has no gameplay effect."
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description": "Reserved toggle. It currently has no gameplay effect.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.telemetry.title": "Telemetry",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.telemetry.description": "Manage anonymous balance telemetry at any time.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.label": "Enable Anonymous Telemetry",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.description": "Allow anonymous usage statistics for personas, tokens, and skill cards.",
+  "RE_ASTRAL_PARTY_TELEMETRY_POPUP.title": "Anonymous Telemetry Notice",
+  "RE_ASTRAL_PARTY_TELEMETRY_POPUP.body": "This mod collects anonymous balance telemetry to analyze persona, token, and skill-card usage and win rates. It does not upload Steam IDs, player names, chat logs, or other direct identifiers. Choosing disable stops future uploads.",
+  "RE_ASTRAL_PARTY_TELEMETRY_POPUP.enable": "Enable Collection",
+  "RE_ASTRAL_PARTY_TELEMETRY_POPUP.disable": "Disable Collection"
 }

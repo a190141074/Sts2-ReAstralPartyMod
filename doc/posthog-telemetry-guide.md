@@ -4,6 +4,7 @@ ReAstralPartyMod PostHog 遥测说明
 
 当前客户端会在以下条件满足时上报匿名平衡统计：
 
+- 首次进入主菜单后会弹出一次匿名统计说明，玩家明确关闭后将停止后续上报
 - 仅统计单人局和联机房主局
 - `runTime > 180s`
 - 使用匿名 `distinct_id`
@@ -19,9 +20,17 @@ ReAstralPartyMod PostHog 遥测说明
 配置文件会自动创建在 mod 用户数据目录下：
 
 - `telemetry_config.json`
+- `telemetry_config.local.json`
+- `telemetry_state.json`
 - `telemetry_pending.jsonl`
 - `telemetry_active_run.json`
 - `telemetry_install_salt.txt`
+
+说明：
+
+- `telemetry_config.json`：基础公开配置模板
+- `telemetry_config.local.json`：本地覆盖配置，若存在则优先生效，适合放私有 token 或本地测试配置
+- `telemetry_state.json`：玩家同意/关闭状态，不参与上报字段
 
 当前配置格式：
 
@@ -34,6 +43,8 @@ ReAstralPartyMod PostHog 遥测说明
   "pendingFile": "telemetry_pending.jsonl"
 }
 ```
+
+如果存在 `telemetry_config.local.json`，会优先读取该文件。
 
 ## 当前事件
 
