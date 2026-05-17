@@ -1142,7 +1142,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
         catch (Exception ex)
         {
-            MainFile.Logger.Error($"Starting persona selection failed to broadcast timeout fallback final commit: {ex}");
+            MainFile.Logger.Error(
+                $"Starting persona selection failed to broadcast timeout fallback final commit: {ex}");
         }
     }
 
@@ -1393,7 +1394,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (netService == null)
             return localPlayer ?? orderedPlayers.FirstOrDefault();
 
-        ulong authorityNetId = netService.Type == NetGameType.Host
+        var authorityNetId = netService.Type == NetGameType.Host
             ? netService.NetId
             : netService is INetClientGameService clientService
                 ? clientService.NetClient.HostNetId

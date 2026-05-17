@@ -15,7 +15,8 @@ public class PersonalityDerivativeKawaiiAngel : AstralPartyRelicModel
 {
     public const int MaxTriggersPerCombat = 3;
 
-    [SavedProperty] public int AstralParty_PersonalityDerivativeKawaiiAngelRemainingTriggers { get; set; } =
+    [SavedProperty]
+    public int AstralParty_PersonalityDerivativeKawaiiAngelRemainingTriggers { get; set; } =
         MaxTriggersPerCombat;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;

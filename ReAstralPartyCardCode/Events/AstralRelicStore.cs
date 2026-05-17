@@ -145,9 +145,11 @@ public sealed class AstralRelicStore : AstralPartyEventModel
     {
         var eternalStarlight = owner.GetRelic<TokenEternalStarlight>();
         if (eternalStarlight == null)
-            eternalStarlight = await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<TokenEternalStarlight>())
-                                   as TokenEternalStarlight
-                               ?? owner.GetRelic<TokenEternalStarlight>();
+            eternalStarlight =
+                await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner,
+                        ModelDb.Relic<TokenEternalStarlight>())
+                    as TokenEternalStarlight
+                ?? owner.GetRelic<TokenEternalStarlight>();
 
         if (eternalStarlight != null)
         {

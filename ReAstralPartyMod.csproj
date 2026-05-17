@@ -56,7 +56,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Remove="doc\**\*.cs" />
+		<Compile Remove="doc\**\*.cs"/>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -518,8 +518,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_tasty_candy.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_living_folio.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_z3000_weapon_frame.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_kawaii_angel.png" />
-		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_needy_girl.png" />
+		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_kawaii_angel.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_needy_girl.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_weird_egg.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png.import"/>

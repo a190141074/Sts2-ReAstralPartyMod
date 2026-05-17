@@ -63,7 +63,7 @@ public abstract partial class AstralPartyPowerModel : ModPowerTemplate
 
     protected static PowerAssetProfile Icons(string iconPath, string? bigIconPath = null)
     {
-        return new(iconPath, bigIconPath ?? iconPath);
+        return new PowerAssetProfile(iconPath, bigIconPath ?? iconPath);
     }
 
     [GeneratedRegex(@"([a-z])([A-Z])", RegexOptions.Compiled)]

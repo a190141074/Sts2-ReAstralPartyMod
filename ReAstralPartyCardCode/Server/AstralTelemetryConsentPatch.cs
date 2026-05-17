@@ -31,7 +31,8 @@ public static class AstralTelemetryConsentPatch
 
         if (NModalContainer.Instance == null)
         {
-            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] NModalContainer unavailable; telemetry consent popup skipped.");
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}][Telemetry] NModalContainer unavailable; telemetry consent popup skipped.");
             return;
         }
 
@@ -39,7 +40,7 @@ public static class AstralTelemetryConsentPatch
         if (popup == null)
             return;
 
-        NModalContainer.Instance.Add(popup, showBackstop: true);
+        NModalContainer.Instance.Add(popup, true);
         MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Consent popup shown.");
     }
 }

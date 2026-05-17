@@ -34,6 +34,7 @@ public static class ReAstralPartyModSettingsManager
     public const string SettingsKey = "settings";
 
     private static readonly object RuntimeSettingsGate = new();
+
     private static LocalRuntimeSettings _runtimeSettings = LocalRuntimeSettings.FromPersistent(
         new ReAstralPartyModSettings());
 
@@ -125,11 +126,11 @@ public static class ReAstralPartyModSettingsManager
         {
             var store = RitsuLibFramework.GetDataStore(MainFile.ModId);
             store.Register<ReAstralPartyModSettings>(
-                key: SettingsKey,
-                fileName: "settings.json",
-                scope: SaveScope.Global,
-                defaultFactory: static () => new ReAstralPartyModSettings(),
-                autoCreateIfMissing: true);
+                SettingsKey,
+                "settings.json",
+                SaveScope.Global,
+                static () => new ReAstralPartyModSettings(),
+                true);
         }
 
         ApplyRuntimeSettings(ReadLocalSettings(), "register");
@@ -202,7 +203,7 @@ public static class ReAstralPartyModSettingsManager
             {
                 settings.EnableTelemetry = value;
                 ApplyRuntimeSettings(settings, "enable_telemetry");
-                ReAstralPartyCardCode.Online.AstralTelemetry.SetCollectionEnabledByConsent(value);
+                Online.AstralTelemetry.SetCollectionEnabledByConsent(value);
             });
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page

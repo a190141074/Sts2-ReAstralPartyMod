@@ -31,7 +31,8 @@ internal static class ReAstralPartyRunSettingsSync
     private const int SnapshotChoiceKind = 1;
     private const int SnapshotSchemaVersion = 1;
 
-    private static readonly AttachedState<RunState, RunSettingsSyncState> RunStates = new(() => new RunSettingsSyncState());
+    private static readonly AttachedState<RunState, RunSettingsSyncState> RunStates = new(() =>
+        new RunSettingsSyncState());
 
     public static Task EnsureSyncedAsync(RunState runState)
     {
@@ -88,7 +89,8 @@ internal static class ReAstralPartyRunSettingsSync
         ]);
     }
 
-    private static bool TryDecodeSnapshotChoiceResult(PlayerChoiceResult result, out ReAstralPartyRunSettingsSnapshot snapshot)
+    private static bool TryDecodeSnapshotChoiceResult(PlayerChoiceResult result,
+        out ReAstralPartyRunSettingsSnapshot snapshot)
     {
         snapshot = null!;
 
@@ -97,7 +99,8 @@ internal static class ReAstralPartyRunSettingsSync
             var payload = result.AsIndexes();
             if (payload == null || payload.Count < 7)
                 return false;
-            if (payload[0] != SnapshotChoiceMagic || payload[1] != SnapshotChoiceKind || payload[2] != SnapshotSchemaVersion)
+            if (payload[0] != SnapshotChoiceMagic || payload[1] != SnapshotChoiceKind ||
+                payload[2] != SnapshotSchemaVersion)
                 return false;
 
             snapshot = new ReAstralPartyRunSettingsSnapshot
@@ -174,7 +177,7 @@ internal static class ReAstralPartyRunSettingsSync
 
         var choiceId = synchronizer.ReserveChoiceId(authorityPlayer);
         MainFile.Logger.Info(
-            $"{MainFile.ModId} settings sync resolved netMode={netService.Type}, host={isHost}, authority={(authorityPlayer?.NetId.ToString() ?? "<null>")}.");
+            $"{MainFile.ModId} settings sync resolved netMode={netService.Type}, host={isHost}, authority={authorityPlayer?.NetId.ToString() ?? "<null>"}.");
 
         if (isHost && authorityPlayer != null)
         {

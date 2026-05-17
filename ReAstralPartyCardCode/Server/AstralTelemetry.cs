@@ -181,18 +181,17 @@ internal static class AstralTelemetry
             {
                 var state = LoadStateCore();
                 if (state.ConsentState == TelemetryConsentState.Unknown)
-                {
                     SaveStateCore(state with
                     {
                         ConsentState = enabled ? TelemetryConsentState.Accepted : TelemetryConsentState.Declined,
                         ConsentPromptShown = true
                     });
-                }
             }
         }
         catch (Exception ex)
         {
-            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Failed to sync telemetry setting from mod settings: {ex.Message}");
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}][Telemetry] Failed to sync telemetry setting from mod settings: {ex.Message}");
         }
     }
 
