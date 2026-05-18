@@ -27,7 +27,7 @@ public class SkillEmotionalOverdose : AstralPartyCardModel
         HoverTipFactory.FromPower<AstralTemporaryDexterityPower>()
     ];
 
-    public SkillEmotionalOverdose() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
+    public SkillEmotionalOverdose() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
     {
     }
 

@@ -27,7 +27,7 @@ public class SkillNinjutsuCombo : AstralPartyCardModel
         HoverTipFactory.FromPower<EsotericEmpowerPower>()
     ];
 
-    public SkillNinjutsuCombo() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
+    public SkillNinjutsuCombo() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
     {
     }
 

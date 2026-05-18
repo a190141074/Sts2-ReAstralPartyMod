@@ -40,7 +40,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
     public SkillPowerfulPity() : base(
         0,
         CardType.Skill,
-        CardRarity.Rare,
+        CardRarity.Ancient,
         TargetType.AnyPlayer)
     {
     }

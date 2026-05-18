@@ -35,7 +35,7 @@ public class SkillCyberAngel : AstralPartyCardModel
         HoverTipFactory.FromPower<RegenPower>()
     ];
 
-    public SkillCyberAngel() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AnyEnemy)
+    public SkillCyberAngel() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.AnyEnemy)
     {
     }
 

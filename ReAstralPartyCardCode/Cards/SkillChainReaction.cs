@@ -28,7 +28,7 @@ public class SkillChainReaction : AstralPartyCardModel
         HoverTipFactory.FromCard<SkillBite>()
     ];
 
-    public SkillChainReaction() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
+    public SkillChainReaction() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
     {
     }
 
