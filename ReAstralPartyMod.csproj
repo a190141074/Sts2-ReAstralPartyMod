@@ -7,6 +7,8 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<EnableDynamicLoading>true</EnableDynamicLoading>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
 
 		<!-- 改成你的杀戮尖塔 2 目录 -->
 		<Sts2Dir>D:\Steam\steamapps\common\Slay the Spire 2</Sts2Dir>
@@ -186,6 +188,11 @@
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_vampire_bite.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_vampire_bite.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_living_folio.png"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fortune_mischance.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\power_bai_ze_blessing.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\power_feng_shui_node.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\person_feng_shui.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_fortune_mischance.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\base_ability_chocolate_cake.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\base_ability_hamburger.png"/>
 		<Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png"/>
@@ -594,3 +601,4 @@
 		<Copy Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)' and Exists('$(PckOutputPath)')" SourceFiles="$(PckOutputPath)" DestinationFolder="$(SecondaryModOutputDir)\"/>
 	</Target>
 </Project>
+

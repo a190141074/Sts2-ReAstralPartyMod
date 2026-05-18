@@ -151,6 +151,13 @@ internal static class GameplayStaticPatchCatalog
         ]);
 
         patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
+        patcher.RegisterPatch<CardModelIsValidTargetMixedSinglePatch>();
+        patcher.RegisterPatch<NMouseCardPlayTargetSelectionMixedSinglePatch>();
+        patcher.RegisterPatch<NCardPlayTryPlayCardMixedSinglePatch>();
+        patcher.RegisterPatch<NControllerCardPlayStartMixedSinglePatch>();
+        patcher.RegisterPatch<NControllerCardPlaySingleTargetingMixedSinglePatch>();
+        patcher.RegisterPatch<CardCmdAutoPlayMixedSinglePatch>();
+        patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)
@@ -364,3 +371,4 @@ internal static class GameplayDynamicPatchCatalog
                 patchId: "speed_roller_flight_consume");
     }
 }
+

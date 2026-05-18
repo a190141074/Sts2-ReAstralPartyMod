@@ -46,7 +46,7 @@ public class SkillMixedCocktails : AstralPartyCardModel
     public SkillMixedCocktails() : base(
         0,
         CardType.Skill,
-        CardRarity.Rare,
+        CardRarity.Ancient,
         TargetType.AnyPlayer)
     {
     }

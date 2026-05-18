@@ -1,0 +1,54 @@
+using System.Reflection;
+using HarmonyLib;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Cards;
+using MegaCrit.Sts2.Core.Nodes.Combat;
+using STS2RitsuLib.Patching.Models;
+
+namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+
+public sealed class NMouseCardPlayTargetSelectionMixedSinglePatch : IPatchMethod
+{
+    private static readonly Func<NCardPlay, CardModel?> GetCard =
+        AccessTools.MethodDelegate<Func<NCardPlay, CardModel?>>(AccessTools.DeclaredPropertyGetter(typeof(NCardPlay), "Card"));
+
+    private static readonly Func<NCardPlay, NCard?> GetCardNode =
+        AccessTools.MethodDelegate<Func<NCardPlay, NCard?>>(AccessTools.DeclaredPropertyGetter(typeof(NCardPlay), "CardNode"));
+
+    private static readonly Action<NCardPlay> TryShowEvokingOrbs =
+        AccessTools.MethodDelegate<Action<NCardPlay>>(AccessTools.DeclaredMethod(typeof(NCardPlay), "TryShowEvokingOrbs"));
+
+    private static readonly MethodInfo SingleCreatureTargetingMethod =
+        AccessTools.DeclaredMethod(typeof(NMouseCardPlay), "SingleCreatureTargeting", [typeof(TargetMode), typeof(TargetType)]);
+
+    public static string PatchId => "card_mixed_single_mouse_target_selection";
+    public static string Description => "Route SkillFortuneMischance to single creature targeting UI";
+    public static bool IsCritical => true;
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(NMouseCardPlay), "TargetSelection", [typeof(TargetMode)])];
+    }
+
+    public static bool Prefix(NMouseCardPlay __instance, TargetMode targetMode, ref Task __result)
+    {
+        var card = GetCard(__instance);
+        if (!MixedSingleTargetingRuntime.IsMixedSingleTargetCard(card))
+            return true;
+
+        __result = RunTargeting(__instance, targetMode);
+        return false;
+    }
+
+    private static async Task RunTargeting(NMouseCardPlay instance, TargetMode targetMode)
+    {
+        var cardNode = GetCardNode(instance);
+        if (cardNode == null)
+            return;
+
+        TryShowEvokingOrbs(instance);
+        cardNode.CardHighlight.AnimFlash();
+        await (Task)SingleCreatureTargetingMethod.Invoke(instance, [targetMode, TargetType.AnyPlayer])!;
+    }
+}

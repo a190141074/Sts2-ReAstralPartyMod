@@ -142,5 +142,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_CHOCOLATE_CAKE.title": "巧克力蛋糕",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_CHOCOLATE_CAKE.description": "获得[blue]2[/blue]层[gold]再生[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_HAMBURGER.title": "汉堡",
-  "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_HAMBURGER.description": "获得[blue]4[/blue]层[gold]治愈[/gold]。"
+  "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_HAMBURGER.description": "获得[blue]4[/blue]层[gold]治愈[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FORTUNE_MISCHANCE.title": "福祸相依",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FORTUNE_MISCHANCE.description": "指定一名敌人或玩家。若目标是敌人，则造成[blue]2[/blue]点伤害。若目标是玩家，则回复[blue]2[/blue]点生命，并获得[gold]白泽赐福[/gold]。若目标是【人格：枫】，额外获得[blue]1[/blue]层[gold]养精蓄锐[/gold]。"
 }

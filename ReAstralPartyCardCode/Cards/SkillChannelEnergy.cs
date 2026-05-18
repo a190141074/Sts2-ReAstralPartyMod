@@ -8,9 +8,9 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
-
 
 [RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillChannelEnergy : AstralPartyCardModel
@@ -59,6 +59,8 @@ public class SkillChannelEnergy : AstralPartyCardModel
                 Owner.Creature,
                 this,
                 false);
+
+        foreach (var player in Owner.Creature.CombatState?.Players ?? [])
+            player.GetRelic<PersonalityDerivativeFortuneMischance>()?.AddStacksCapped(1);
     }
 }
-

@@ -142,5 +142,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_CHOCOLATE_CAKE.title": "Chocolate Cake",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_CHOCOLATE_CAKE.description": "Gain [blue]2[/blue] [power]Regeneration[/power].",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_HAMBURGER.title": "Hamburger",
-  "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_HAMBURGER.description": "Gain [blue]4[/blue] [power]Half Life Heal[/power]."
+  "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_HAMBURGER.description": "Gain [blue]4[/blue] [power]Half Life Heal[/power].",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FORTUNE_MISCHANCE.title": "Fortune and Mischance",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FORTUNE_MISCHANCE.description": "Target an enemy or a player. If the target is an enemy, deal [blue]2[/blue] damage. If the target is a player, heal [blue]2[/blue] HP and grant [power]Bai Ze Blessing[/power]. If the target is [relic]Persona: Feng[/relic], that target also gains [blue]1[/blue] [power]Gathering Strength[/power]."
 }
