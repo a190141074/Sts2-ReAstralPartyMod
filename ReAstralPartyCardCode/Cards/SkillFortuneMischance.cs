@@ -18,7 +18,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillFortuneMischance : AstralPartyCardModel
 {
-    private const decimal BaseDamage = 2m;
     private const decimal BaseHeal = 2m;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -64,12 +63,12 @@ public class SkillFortuneMischance : AstralPartyCardModel
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         RecordTelemetryOnPlay();
-        var owner = Owner;
-        var ownerCreature = owner?.Creature;
-        var target = cardPlay.Target;
-        if (owner == null || ownerCreature == null || target == null || !target.IsAlive)
+        var target = cardPlay.Target ?? Owner?.Creature;
+        var ownerCreature = Owner?.Creature;
+        var targetPlayer = target?.Player;
+        if (target == null || ownerCreature == null || targetPlayer == null || !target.IsAlive)
             return;
-        if (owner.GetRelic<PersonalityDerivativeFortuneMischance>() is not { } derivativeRelic)
+        if (Owner?.GetRelic<PersonalityDerivativeFortuneMischance>() is not { } derivativeRelic)
             return;
         if (!derivativeRelic.TryConsume(1))
             return;
@@ -77,7 +76,6 @@ public class SkillFortuneMischance : AstralPartyCardModel
         await CreatureCmd.Heal(target, BaseHeal, true);
         await PowerCmd.Apply<BaiZeBlessingPower>(target, 1m, ownerCreature, this, false);
 
-        var targetPlayer = target.Player;
         if (targetPlayer?.GetRelic<PersonFeng>() != null)
             await PowerCmd.Apply<GatheringStrengthPower>(target, 1m, ownerCreature, this, false);
     }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -61,6 +62,20 @@ public class PersonDeityLin : CooldownPersonaRelicBase
         AstralParty_PersonDeityLinLivingFolioRefundsThisTurn = 0;
         await EnsureLivingFolioRelic();
 
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillLivingFolio>(), Owner);
+        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+    }
+
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    {
+        if (player != Owner)
+            return;
+        if (Owner?.Creature?.CombatState == null)
+            return;
+        if (HasLivingFolioInPrimaryPiles())
+            return;
+
+        Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillLivingFolio>(), Owner);
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
@@ -130,6 +145,18 @@ public class PersonDeityLin : CooldownPersonaRelicBase
     private async Task EnsureLivingFolioRelic()
     {
         await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeLivingFolio>(Owner);
+    }
+
+    private bool HasLivingFolioInPrimaryPiles()
+    {
+        if (Owner == null)
+            return false;
+
+        var cardId = ModelDb.GetId<SkillLivingFolio>();
+        return PileType.Hand.GetPile(Owner).Cards
+            .Concat(PileType.Draw.GetPile(Owner).Cards)
+            .Concat(PileType.Discard.GetPile(Owner).Cards)
+            .Any(card => card.Owner == Owner && (card.CanonicalInstance?.Id ?? card.Id) == cardId);
     }
 
     private bool TryAdvanceLivingFolioGrowth()

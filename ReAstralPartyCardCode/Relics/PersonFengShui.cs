@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
@@ -49,5 +51,31 @@ public class PersonFengShui : PersonaRelicBase
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFortuneMischance>(), Owner);
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+    }
+
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    {
+        if (player != Owner)
+            return;
+        if (Owner?.Creature?.CombatState == null)
+            return;
+        if (HasFortuneMischanceInPrimaryPiles())
+            return;
+
+        Flash();
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFortuneMischance>(), Owner);
+        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+    }
+
+    private bool HasFortuneMischanceInPrimaryPiles()
+    {
+        if (Owner == null)
+            return false;
+
+        var cardId = ModelDb.GetId<SkillFortuneMischance>();
+        return PileType.Hand.GetPile(Owner).Cards
+            .Concat(PileType.Draw.GetPile(Owner).Cards)
+            .Concat(PileType.Discard.GetPile(Owner).Cards)
+            .Any(card => card.Owner == Owner && (card.CanonicalInstance?.Id ?? card.Id) == cardId);
     }
 }
