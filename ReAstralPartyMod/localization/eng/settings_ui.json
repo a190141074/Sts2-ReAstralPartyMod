@@ -2,6 +2,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.mod_display_name": "Astral Party",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.page_title": "Mod Settings",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.page_description": "Global switches for persona selection and token series availability.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied": "Setting applied.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.title": "Gameplay",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.description": "These options default to off and apply globally across all profiles.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label": "Enable All Personas",

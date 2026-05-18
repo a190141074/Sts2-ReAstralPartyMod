@@ -2,6 +2,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.mod_display_name": "星引擎派对",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.page_title": "模组设置",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.page_description": "控制人格选择与筹码拓展启用方式的全局开关。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied": "设置已应用。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.title": "玩法",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.description": "以下设置默认为关闭，并且对所有档位全局生效。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label": "开启全人格",
