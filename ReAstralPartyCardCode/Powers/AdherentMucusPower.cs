@@ -107,25 +107,6 @@ public class AdherentMucusPower : AstralPartyPowerModel
         return Task.CompletedTask;
     }
 
-    public override Task AfterDamageGiven(
-        PlayerChoiceContext choiceContext,
-        Creature? dealer,
-        DamageResult result,
-        ValueProp props,
-        Creature target,
-        CardModel? cardSource)
-    {
-        if (Owner == null || dealer != Owner)
-            return Task.CompletedTask;
-        if (result.UnblockedDamage <= 0m)
-            return Task.CompletedTask;
-        if (target != GetBoundSlimeCreature())
-            return Task.CompletedTask;
-
-        GetInternalData<Data>().DealtUnblockedDamageToBoundSlimeThisTurn = true;
-        return Task.CompletedTask;
-    }
-
     public static async Task Apply(Creature target, Player slimeOwner, Creature? applier, CardModel? cardSource)
     {
         if (target == null || slimeOwner == null)
@@ -147,6 +128,17 @@ public class AdherentMucusPower : AstralPartyPowerModel
         return Task.CompletedTask;
     }
 
+    public static Task MarkUnblockedHitForBoundSlime(CombatState combatState, ulong slimePlayerNetId)
+    {
+        if (combatState == null || slimePlayerNetId == 0)
+            return Task.CompletedTask;
+
+        foreach (var power in GetPowersBoundToSlime(combatState, slimePlayerNetId))
+            power.GetInternalData<Data>().DealtUnblockedDamageToBoundSlimeThisTurn = true;
+
+        return Task.CompletedTask;
+    }
+
     public static async Task DecayAllForBoundSlimeIfMissed(CombatState combatState, ulong slimePlayerNetId)
     {
         if (combatState == null || slimePlayerNetId == 0)
@@ -160,18 +152,6 @@ public class AdherentMucusPower : AstralPartyPowerModel
 
         foreach (var power in boundPowers)
             await power.TickDownOneStack();
-    }
-
-    private Creature? GetBoundSlimeCreature()
-    {
-        var owner = Owner;
-        var combatState = owner?.CombatState;
-        if (combatState == null || AstralParty_AdherentMucusBoundSlimePlayerNetId == 0)
-            return null;
-
-        return combatState.Players
-            .FirstOrDefault(player => player.NetId == AstralParty_AdherentMucusBoundSlimePlayerNetId)
-            ?.Creature;
     }
 
     private async Task SyncStrengthPenalty(Creature? applier, CardModel? cardSource)

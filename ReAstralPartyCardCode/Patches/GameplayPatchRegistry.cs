@@ -362,15 +362,5 @@ internal static class GameplayDynamicPatchCatalog
                 description:
                 "Gameplay patch: consume one Speed Roller flight charge when moving to an otherwise unreachable next-row map point",
                 patchId: "speed_roller_flight_consume");
-        builder.AddMethod(
-            typeof(ActModel),
-            "PullNextEvent",
-            [typeof(RunState)],
-            postfix: DynamicPatchBuilder.FromMethod(
-                typeof(AstralRelicStoreEventOverridePatch),
-                nameof(AstralRelicStoreEventOverridePatch.PullNextEventPostfix)),
-            isCritical: false,
-            description: "Gameplay patch: keep Astral Relic Store pending until the first actual event pull in act 2",
-            patchId: "astral_relic_store_pull_next_event_override");
     }
 }

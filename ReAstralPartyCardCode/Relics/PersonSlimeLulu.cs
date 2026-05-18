@@ -103,6 +103,9 @@ public class PersonSlimeLulu : CooldownPersonaRelicBase
         if (result.UnblockedDamage <= 0)
             return;
 
+        if (Owner.Creature.CombatState != null)
+            await AdherentMucusPower.MarkUnblockedHitForBoundSlime(Owner.Creature.CombatState, Owner.NetId);
+
         Flash();
 
         await PowerCmd.Apply<HalfLifeHealPower>(
