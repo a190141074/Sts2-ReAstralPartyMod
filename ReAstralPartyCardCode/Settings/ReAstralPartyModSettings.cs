@@ -188,7 +188,9 @@ public static class ReAstralPartyModSettingsManager
             {
                 settings.EnableAllPersonas = value;
                 ApplyRuntimeSettings(settings, "enable_all_personas");
-                ShowSettingAppliedToast("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label",
+                    value);
             });
 
         var enableDuplicatePersonas = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
@@ -199,7 +201,9 @@ public static class ReAstralPartyModSettingsManager
             {
                 settings.EnableDuplicatePersonas = value;
                 ApplyRuntimeSettings(settings, "enable_duplicate_personas");
-                ShowSettingAppliedToast("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.label");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.label",
+                    value);
             });
 
         var tokenSeriesMode = ModSettingsBindings.Global<ReAstralPartyModSettings, TokenSeriesMode>(
@@ -211,7 +215,7 @@ public static class ReAstralPartyModSettingsManager
                 settings.TokenSeriesMode = value;
                 settings.EnableAllTokenSeries = null;
                 ApplyRuntimeSettings(settings, "token_series_mode");
-                ShowSettingAppliedToast("RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.label");
+                ShowTokenSeriesModeToast(value);
             });
 
         var enablePureAngelMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
@@ -222,7 +226,9 @@ public static class ReAstralPartyModSettingsManager
             {
                 settings.EnablePureAngelMode = value;
                 ApplyRuntimeSettings(settings, "enable_pure_angel_mode");
-                ShowSettingAppliedToast("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label",
+                    value);
             });
 
         var enablePlayRecommendation = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
@@ -233,7 +239,9 @@ public static class ReAstralPartyModSettingsManager
             {
                 settings.EnablePlayRecommendation = value;
                 ApplyRuntimeSettings(settings, "enable_play_recommendation");
-                ShowSettingAppliedToast("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_play_recommendation.label");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_play_recommendation.label",
+                    value);
             });
 
         var enableRouteRecommendation = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
@@ -244,7 +252,9 @@ public static class ReAstralPartyModSettingsManager
             {
                 settings.EnableRouteRecommendation = value;
                 ApplyRuntimeSettings(settings, "enable_route_recommendation");
-                ShowSettingAppliedToast("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_route_recommendation.label");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_route_recommendation.label",
+                    value);
             });
 
         var enableTokenRecommendation = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
@@ -255,7 +265,9 @@ public static class ReAstralPartyModSettingsManager
             {
                 settings.EnableTokenRecommendation = value;
                 ApplyRuntimeSettings(settings, "enable_token_recommendation");
-                ShowSettingAppliedToast("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_recommendation.label");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_recommendation.label",
+                    value);
             });
 
         var enableAutoPhrase = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
@@ -266,7 +278,9 @@ public static class ReAstralPartyModSettingsManager
             {
                 settings.EnableAutoPhrase = value;
                 ApplyRuntimeSettings(settings, "enable_auto_phrase");
-                ShowSettingAppliedToast("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_auto_phrase.label");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_auto_phrase.label",
+                    value);
             });
 
         var enableTelemetry = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
@@ -278,7 +292,9 @@ public static class ReAstralPartyModSettingsManager
                 settings.EnableTelemetry = value;
                 ApplyRuntimeSettings(settings, "enable_telemetry");
                 Online.AstralTelemetry.SetCollectionEnabledByConsent(value);
-                ShowSettingAppliedToast("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.label");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.label",
+                    value);
             });
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
@@ -372,10 +388,28 @@ public static class ReAstralPartyModSettingsManager
         return ModSettingsText.LocString("settings_ui", key, fallback);
     }
 
-    private static void ShowSettingAppliedToast(string labelKey)
+    private static void ShowBoolSettingToast(string labelKey, bool enabled)
     {
         var title = new LocString("settings_ui", labelKey).GetRawText();
-        var body = new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied").GetRawText();
+        var body = new LocString(
+            "settings_ui",
+            enabled
+                ? "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_enabled"
+                : "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_disabled").GetRawText();
+        Callable.From(() => RitsuToastService.ShowInfo(title, body)).CallDeferred();
+    }
+
+    private static void ShowTokenSeriesModeToast(TokenSeriesMode mode)
+    {
+        var title = new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.label").GetRawText();
+        var bodyKey = mode switch
+        {
+            TokenSeriesMode.RandomTwo => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_random_two",
+            TokenSeriesMode.All => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all",
+            TokenSeriesMode.Disabled => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled",
+            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied"
+        };
+        var body = new LocString("settings_ui", bodyKey).GetRawText();
         Callable.From(() => RitsuToastService.ShowInfo(title, body)).CallDeferred();
     }
 
