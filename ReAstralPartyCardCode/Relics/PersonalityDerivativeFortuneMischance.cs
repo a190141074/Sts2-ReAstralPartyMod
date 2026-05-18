@@ -71,4 +71,16 @@ public class PersonalityDerivativeFortuneMischance : AstralPartyRelicModel
         Flash();
         InvokeDisplayAmountChanged();
     }
+
+    public bool TryConsume(int amount)
+    {
+        if (amount <= 0)
+            return true;
+        if (AstralParty_PersonalityDerivativeFortuneMischanceStacks < amount)
+            return false;
+
+        AstralParty_PersonalityDerivativeFortuneMischanceStacks -= amount;
+        InvokeDisplayAmountChanged();
+        return true;
+    }
 }

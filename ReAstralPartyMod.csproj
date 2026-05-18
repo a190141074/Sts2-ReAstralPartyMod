@@ -189,8 +189,10 @@
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_vampire_bite.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_living_folio.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fortune_mischance.png"/>
-		<Content Include="ReAstralPartyMod\images\powers\power_bai_ze_blessing.png"/>
-		<Content Include="ReAstralPartyMod\images\powers\power_feng_shui_node.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\bai_ze_blessing_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\bai_ze_blessing_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\feng_shui_node_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\feng_shui_node_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\person_feng_shui.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_fortune_mischance.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\base_ability_chocolate_cake.png"/>

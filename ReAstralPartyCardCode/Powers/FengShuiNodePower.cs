@@ -37,13 +37,14 @@ public class FengShuiNodePower : AstralPartyPowerModel
             if (combatState == null)
                 return;
 
-            var enemies = combatState.GetOpponentsOf(Owner).Where(creature => creature.IsAlive).ToList();
-            if (enemies.Count > 0)
+            var allCreatures = combatState.Creatures.Where(creature => creature.IsAlive).ToList();
+            if (allCreatures.Count > 0)
             {
                 Flash();
-                await CreatureCmd.Damage(choiceContext, enemies, 1m, ValueProp.Unpowered, Owner, null);
+                await CreatureCmd.Damage(choiceContext, allCreatures, 1m, ValueProp.Unpowered, Owner, null);
             }
 
+            player.GetRelic<PersonalityDerivativeFortuneMischance>()?.AddStacksCapped(1);
             return;
         }
 

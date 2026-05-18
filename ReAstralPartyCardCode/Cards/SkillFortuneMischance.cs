@@ -10,7 +10,6 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
-using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -27,9 +26,12 @@ public class SkillFortuneMischance : AstralPartyCardModel
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
+    protected override bool IsPlayable =>
+        Owner != null
+        && Owner.GetRelic<PersonalityDerivativeFortuneMischance>()?.AstralParty_PersonalityDerivativeFortuneMischanceStacks >= 1;
+
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(BaseDamage, ValueProp.Move),
         new HealVar(BaseHeal)
     ];
 
@@ -39,7 +41,7 @@ public class SkillFortuneMischance : AstralPartyCardModel
         HoverTipFactory.FromPower<GatheringStrengthPower>()
     ];
 
-    public SkillFortuneMischance() : base(1, CardType.Skill, CardRarity.Ancient, TargetType.AnyPlayer)
+    public SkillFortuneMischance() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.AnyPlayer)
     {
     }
 
@@ -67,25 +69,16 @@ public class SkillFortuneMischance : AstralPartyCardModel
         var target = cardPlay.Target;
         if (owner == null || ownerCreature == null || target == null || !target.IsAlive)
             return;
-
-        if (target.Side == ownerCreature.Side)
-        {
-            await CreatureCmd.Heal(target, BaseHeal, true);
-            await PowerCmd.Apply<BaiZeBlessingPower>(target, 1m, ownerCreature, this, false);
-
-            var targetPlayer = target.Player;
-            if (targetPlayer?.GetRelic<PersonFeng>() != null)
-                await PowerCmd.Apply<GatheringStrengthPower>(target, 1m, ownerCreature, this, false);
-
+        if (owner.GetRelic<PersonalityDerivativeFortuneMischance>() is not { } derivativeRelic)
             return;
-        }
+        if (!derivativeRelic.TryConsume(1))
+            return;
 
-        await CreatureCmd.Damage(choiceContext, target, BaseDamage, ValueProp.Move, ownerCreature, this);
-    }
+        await CreatureCmd.Heal(target, BaseHeal, true);
+        await PowerCmd.Apply<BaiZeBlessingPower>(target, 1m, ownerCreature, this, false);
 
-    protected override string ResolveActivePortraitPath()
-    {
-        MixedSingleTargetingRuntime.MarkCardForDualTargetUi(this);
-        return base.ResolveActivePortraitPath();
+        var targetPlayer = target.Player;
+        if (targetPlayer?.GetRelic<PersonFeng>() != null)
+            await PowerCmd.Apply<GatheringStrengthPower>(target, 1m, ownerCreature, this, false);
     }
 }
