@@ -11,7 +11,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(EventCardPool))]
+
 [RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillEmotionalOverdose : AstralPartyCardModel
 {

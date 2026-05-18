@@ -149,6 +149,8 @@ internal static class GameplayStaticPatchCatalog
                 "Gameplay patch: remove unopened special token series relics from random relic grab bags at run setup",
                 [typeof(Player), typeof(MegaCrit.Sts2.Core.Random.Rng)])
         ]);
+
+        patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)

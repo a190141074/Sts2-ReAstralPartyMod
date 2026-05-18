@@ -16,7 +16,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(EventCardPool))]
+
 [RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillMudTruckCrash : AstralPartyCardModel
 {

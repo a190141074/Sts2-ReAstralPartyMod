@@ -13,7 +13,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(EventCardPool))]
+
 [RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillDragonsRoar : AstralPartyCardModel
 {
