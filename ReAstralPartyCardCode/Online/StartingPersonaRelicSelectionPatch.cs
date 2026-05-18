@@ -13,17 +13,25 @@ using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
-[HarmonyPatch(typeof(NGame), "StartRun")]
-public static class StartingPersonaRelicSelectionPatch
+public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 {
+    public static string PatchId => "starting_persona_relic_selection_patch";
+    public static bool IsCritical => false;
+    public static string Description => "Open the starting persona relic selection after a run starts";
+
     private static readonly object SelectionLifecycleLock = new();
     private static readonly HashSet<string> ActiveRunKeys = [];
     private static readonly HashSet<string> CompletedRunKeys = [];
 
-    [HarmonyPostfix]
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(NGame), "StartRun", [typeof(RunState)])];
+    }
+
     public static void Postfix(RunState runState, ref Task __result)
     {
         __result = RunAfterStartRun(__result, runState);
@@ -31,7 +39,10 @@ public static class StartingPersonaRelicSelectionPatch
 
     private static async Task RunAfterStartRun(Task originalTask, RunState runState)
     {
+        MainFile.Logger.Info(
+            $"Starting persona relic selection patch entered: seed={runState.Rng.StringSeed} players={runState.Players.Count}.");
         await originalTask;
+        MainFile.Logger.Info("Starting persona relic selection patch resumed after StartRun task completed.");
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         var gameType = RunManager.Instance.NetService.Type;
         MainFile.Logger.Info(
@@ -50,7 +61,7 @@ public static class StartingPersonaRelicSelectionPatch
             return;
         }
 
-        var overlayStack = NOverlayStack.Instance;
+        var overlayStack = await WaitForOverlayStackAsync();
         if (overlayStack == null)
         {
             EndSelection(runKey, false);
@@ -66,6 +77,8 @@ public static class StartingPersonaRelicSelectionPatch
             return;
         }
 
+        MainFile.Logger.Info(
+            $"Starting persona relic selection options prepared: count={relicOptions.Count} runKey={runKey}.");
         var screen = StartingPersonaRelicSelectionScreen.Create(runState, relicOptions);
         try
         {
@@ -84,6 +97,20 @@ public static class StartingPersonaRelicSelectionPatch
         {
             screen.Close();
         }
+    }
+
+    private static async Task<NOverlayStack?> WaitForOverlayStackAsync()
+    {
+        for (var attempt = 0; attempt < 120; attempt++)
+        {
+            var overlayStack = NOverlayStack.Instance;
+            if (overlayStack != null && Godot.GodotObject.IsInstanceValid(overlayStack))
+                return overlayStack;
+
+            await Task.Yield();
+        }
+
+        return null;
     }
 
     private static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)
