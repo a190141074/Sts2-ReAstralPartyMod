@@ -13,8 +13,7 @@ public class GiantAnchorPower : AstralPartyPowerModel
 {
     private sealed class Data
     {
-        public decimal ProcessedAmount;
-        public decimal PendingAddedAmount;
+        public decimal AppliedStrengthBonus;
     }
 
     public override PowerType Type => PowerType.Buff;
@@ -26,43 +25,30 @@ public class GiantAnchorPower : AstralPartyPowerModel
         return new Data();
     }
 
-    public override bool TryModifyPowerAmountReceived(
-        PowerModel canonicalPower,
-        Creature target,
-        decimal amount,
-        Creature? applier,
-        out decimal modifiedAmount)
-    {
-        modifiedAmount = amount;
-
-        if (canonicalPower is not GiantAnchorPower)
-            return false;
-        if (target != Owner)
-            return false;
-        if (amount <= 0m)
-            return false;
-
-        GetInternalData<Data>().PendingAddedAmount += amount;
-        return false;
-    }
-
     public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
     {
-        if (Owner == null || Amount <= 0m)
+        await SyncStrengthBonus(applier, cardSource);
+    }
+
+    public override async Task AfterPowerAmountChanged(
+        PowerModel power,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource)
+    {
+        if (power != this)
             return;
 
+        await SyncStrengthBonus(applier, cardSource);
+    }
+
+    public override async Task AfterRemoved(Creature? oldOwner)
+    {
         var data = GetInternalData<Data>();
-        var addedAmount = data.PendingAddedAmount > 0m
-            ? data.PendingAddedAmount
-            : Math.Max(Amount - data.ProcessedAmount, 0m);
+        if (oldOwner != null && data.AppliedStrengthBonus != 0m)
+            await PowerCmd.Apply<StrengthPower>(oldOwner, -data.AppliedStrengthBonus, oldOwner, null, true);
 
-        data.PendingAddedAmount = 0m;
-        data.ProcessedAmount = Amount;
-
-        if (addedAmount <= 0m)
-            return;
-
-        await PowerCmd.Apply<StrengthPower>(Owner, addedAmount, applier, cardSource, true);
+        data.AppliedStrengthBonus = 0m;
     }
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
@@ -71,9 +57,20 @@ public class GiantAnchorPower : AstralPartyPowerModel
             return;
 
         await PowerCmd.TickDownDuration(this);
-        await PowerCmd.Apply<StrengthPower>(Owner, -1m, Owner, null, true);
+    }
+
+    private async Task SyncStrengthBonus(Creature? applier, CardModel? cardSource)
+    {
+        if (Owner == null)
+            return;
 
         var data = GetInternalData<Data>();
-        data.ProcessedAmount = Math.Max(0m, Amount - 1m);
+        var desiredStrengthBonus = Math.Max(Amount, 0m);
+        var delta = desiredStrengthBonus - data.AppliedStrengthBonus;
+        if (delta == 0m)
+            return;
+
+        data.AppliedStrengthBonus = desiredStrengthBonus;
+        await PowerCmd.Apply<StrengthPower>(Owner, delta, applier, cardSource, true);
     }
 }
