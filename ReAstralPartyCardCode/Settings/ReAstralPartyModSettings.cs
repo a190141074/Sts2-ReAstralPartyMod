@@ -104,6 +104,9 @@ public static class ReAstralPartyModSettingsManager
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableAllPersonas;
 
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableAllPersonas;
+
         if (ShouldUseSafeGameplayFallback(runState))
             return false;
 
@@ -114,6 +117,9 @@ public static class ReAstralPartyModSettingsManager
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableDuplicatePersonas;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableDuplicatePersonas;
 
         if (ShouldUseSafeGameplayFallback(runState))
             return false;
@@ -126,6 +132,9 @@ public static class ReAstralPartyModSettingsManager
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.TokenSeriesMode;
 
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.TokenSeriesMode;
+
         if (ShouldUseSafeGameplayFallback(runState))
             return TokenSeriesMode.RandomTwo;
 
@@ -136,6 +145,9 @@ public static class ReAstralPartyModSettingsManager
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnablePureAngelMode;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnablePureAngelMode;
 
         if (ShouldUseSafeGameplayFallback(runState))
             return false;
@@ -445,6 +457,26 @@ public static class ReAstralPartyModSettingsManager
             return settings.EnableAllTokenSeries.Value ? TokenSeriesMode.All : TokenSeriesMode.RandomTwo;
 
         return settings.TokenSeriesMode;
+    }
+
+    private static bool TryGetLocalAuthorityGameplayFallback(IRunState? runState, out LocalRuntimeSettings snapshot)
+    {
+        snapshot = default!;
+        if (runState is not RunState concreteRunState)
+            return false;
+
+        var runManager = RunManager.Instance;
+        var netService = runManager?.NetService;
+        if (netService == null)
+            return false;
+
+        ReAstralPartyRunSettingsSync.BeginSyncIfNeeded(concreteRunState);
+
+        if (netService.Type != NetGameType.Host)
+            return false;
+
+        snapshot = ReadRuntime(static runtime => runtime);
+        return true;
     }
 
     private static bool ShouldUseSafeGameplayFallback(IRunState? runState)

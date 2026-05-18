@@ -40,6 +40,26 @@ internal static class ReAstralPartyRunSettingsSync
         return RunStates.GetOrCreate(runState).EnsureSyncedAsync(runState);
     }
 
+    public static void BeginSyncIfNeeded(RunState runState)
+    {
+        ArgumentNullException.ThrowIfNull(runState);
+
+        var task = RunStates.GetOrCreate(runState).EnsureSyncedAsync(runState);
+        if (task.IsCompleted)
+            return;
+
+        _ = task.ContinueWith(
+            completedTask =>
+            {
+                if (completedTask.Exception == null)
+                    return;
+
+                MainFile.Logger.Warn(
+                    $"{MainFile.ModId} background settings sync failed: {completedTask.Exception.GetBaseException().Message}");
+            },
+            TaskContinuationOptions.OnlyOnFaulted);
+    }
+
     public static bool TryGetSnapshot(IRunState? runState, out ReAstralPartyRunSettingsSnapshot snapshot)
     {
         snapshot = null!;

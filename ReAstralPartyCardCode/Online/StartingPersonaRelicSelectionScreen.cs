@@ -838,7 +838,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         const float horizontalSpacing = 176f;
         const float verticalSpacing = 190f;
 
-        var columns = Math.Min(6, Math.Max(1, optionCount));
+        var columns = Math.Min(8, Math.Max(1, optionCount));
         var rows = (int)Math.Ceiling(optionCount / (double)columns);
 
         for (var index = 0; index < holders.Count; index++)
