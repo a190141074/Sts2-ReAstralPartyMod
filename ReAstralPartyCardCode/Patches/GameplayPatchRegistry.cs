@@ -25,6 +25,7 @@ using STS2RitsuLib;
 using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Models;
+using ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
@@ -166,6 +167,22 @@ internal static class GameplayStaticPatchCatalog
                 description:
                 "Version-fragile gameplay patch: open the starting persona relic selection after run start",
                 parameterTypes: [typeof(RunState)]),
+            new ModPatchInfo(
+                "astral_relic_store_modifier_start_run_patch",
+                typeof(NGame),
+                "StartRun",
+                typeof(AstralRelicStoreFirstEventModifierStartRunPatch),
+                false,
+                "Lifecycle patch: install the Astral Relic Store first-event modifier when a run starts",
+                [typeof(RunState)]),
+            new ModPatchInfo(
+                "astral_relic_store_modifier_load_run_patch",
+                typeof(NGame),
+                "LoadRun",
+                typeof(AstralRelicStoreFirstEventModifierLoadRunPatch),
+                false,
+                "Lifecycle patch: install the Astral Relic Store first-event modifier after loading a run",
+                [typeof(RunState), typeof(SerializableRoom)]),
             new ModPatchInfo(
                 "astral_telemetry_consent_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu),

@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Nodes.HoverTips;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -33,12 +34,35 @@ public static partial class NTopBarOpenTokenSeriesPatch
             return;
         }
 
+        HideAstralRelicStoreModifierIcons(modifiers, runState);
+
         var iconRoot = new TokenSeriesTopBarIcon(runState)
         {
             Name = NodeName
         };
         modifiers.AddChild(iconRoot);
         modifiers.Visible = true;
+    }
+
+    private static void HideAstralRelicStoreModifierIcons(Control modifiers, IRunState runState)
+    {
+        if (!runState.Modifiers.Any(static modifier => modifier is AstralRelicStoreFirstEventModifier))
+            return;
+
+        var hiddenCount = 0;
+        foreach (var child in modifiers.GetChildren())
+        {
+            if (child is not Control control)
+                continue;
+            if (control.Name == NodeName)
+                continue;
+
+            control.Visible = false;
+            hiddenCount++;
+        }
+
+        if (hiddenCount > 0)
+            MainFile.Logger.Info($"Top bar hid {hiddenCount} modifier icon node(s) for AstralRelicStoreFirstEventModifier.");
     }
 
     private sealed partial class TokenSeriesTopBarIcon : Control

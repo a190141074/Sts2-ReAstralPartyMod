@@ -50,9 +50,6 @@ public sealed class AstralRelicStoreFirstEventModifier : ModifierModel
             $"AstralRelicStore modify-next-event applied | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | original={currentEvent.Id.Entry} | replacement={storeId.Entry}");
         return storeEvent;
     }
-
-    protected override string IconPath => "res://images/powers/missing_power.png";
-
     private static bool IsSecondAct(RunState runState)
     {
         return runState.CurrentActIndex == 1
