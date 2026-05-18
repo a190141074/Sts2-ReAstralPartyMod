@@ -2,12 +2,25 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Events;
+using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
-public static class AstralRelicStoreEventOverridePatch
+public sealed class AstralRelicStoreEventOverridePatch : IPatchMethod
 {
-    public static void PullNextEventPostfix(ActModel __instance, RunState runState, ref EventModel __result)
+    public static string PatchId => "astral_relic_store_event_override_patch";
+
+    public static string Description =>
+        "Gameplay patch: force the first actual second-act event pull to become Astral Relic Store";
+
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(ActModel), nameof(ActModel.PullNextEvent), [typeof(RunState)])];
+    }
+
+    public static void Postfix(ActModel __instance, RunState runState, ref EventModel __result)
     {
         var storeEvent = ModelDb.Event<AstralRelicStore>();
         var storeId = storeEvent.Id;

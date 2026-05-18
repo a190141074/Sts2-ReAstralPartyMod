@@ -35,9 +35,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private const float HolderWidth = 136f;
     private const float HolderHeight = 136f;
     private const int MaxFightTieRounds = 4;
-    private const int MultiplayerChoiceMagic = unchecked((int)0x52415053);
-    private const int ChoiceKindSelectionUpdate = 1;
-    private const int ChoiceKindSelectionCommit = 2;
     private const int MaxSynchronizerWaitFrames = 600;
     private const int SelectionCommitTimeoutMilliseconds = 10 * 60 * 1000;
     private const int SelectionCommitGraceMilliseconds = 5 * 1000;
@@ -69,6 +66,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private Player? _authorityPlayer;
     private bool _multiplayerCommitSent;
     private bool _closeQueued;
+    private readonly string _choiceSessionKey;
 
     public NetScreenType ScreenType => NetScreenType.None;
 
@@ -85,6 +83,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             .ToList();
         _localPlayer = LocalContext.GetMe(_orderedPlayers) ?? _orderedPlayers.FirstOrDefault();
         _authorityPlayer = ResolveAuthorityPlayer(_orderedPlayers, _localPlayer);
+        _choiceSessionKey =
+            $"starting_persona_selection|{AstralChoiceProtocol.CreateRunScopeKey(runState)}|{_orderedPlayers.Count}";
 
         foreach (var player in _orderedPlayers)
         {
@@ -918,7 +918,16 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             while (!_multiplayerCommitSource.Task.IsCompleted && !_closed)
             {
                 var choiceId = _nextChoiceIdsByPlayer[player.NetId];
-                var waitTask = synchronizer.WaitForRemoteChoice(player, choiceId);
+                var waitTask = DeterministicMultiplayerChoiceHelper.WaitForRemoteIndexedEnvelopeAnyKind(
+                    synchronizer,
+                    player,
+                    choiceId,
+                    player.NetId == _authorityPlayer?.NetId
+                        ? [AstralChoiceKind.StartingPersonaSelectionUpdate, AstralChoiceKind.StartingPersonaSelectionCommit]
+                        : [AstralChoiceKind.StartingPersonaSelectionUpdate],
+                    _runState,
+                    _choiceSessionKey,
+                    "starting persona selection");
                 var completedTask = await Task.WhenAny(waitTask, _multiplayerCommitSource.Task);
                 if (completedTask != waitTask)
                 {
@@ -927,7 +936,15 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 }
 
                 var remoteChoice = await waitTask;
-                if (TryDecodeSelectionUpdate(remoteChoice, out var sequence, out var selectedIndex))
+                if (remoteChoice == null)
+                {
+                    MainFile.Logger.Error(
+                        $"Starting persona selection exhausted remote choice stream: player={player.NetId} choiceId={choiceId}.");
+                    return;
+                }
+
+                if (remoteChoice.Value.Kind == AstralChoiceKind.StartingPersonaSelectionUpdate &&
+                    TryDecodeSelectionUpdate(remoteChoice.Value.RawResult, out var sequence, out var selectedIndex))
                 {
                     _nextChoiceIdsByPlayer[player.NetId] = synchronizer.ReserveChoiceId(player);
                     ApplyRemoteSelectionUpdate(player, sequence, selectedIndex);
@@ -935,10 +952,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     continue;
                 }
 
-                if (_authorityPlayer != null
+                if (remoteChoice.Value.Kind == AstralChoiceKind.StartingPersonaSelectionCommit &&
+                    _authorityPlayer != null
                     && player.NetId == _authorityPlayer.NetId
-                    && TryDecodeSelectionCommit(remoteChoice, out var selectedIndexes))
+                    && TryDecodeSelectionCommit(remoteChoice.Value.RawResult, out var selectedIndexes))
                 {
+                    _nextChoiceIdsByPlayer[player.NetId] = synchronizer.ReserveChoiceId(player);
                     MainFile.Logger.Info(
                         $"Starting persona selection received final commit: player={player.NetId} choiceId={choiceId}.");
                     _multiplayerCommitSource.TrySetResult(new CommittedSelectionSnapshot
@@ -949,8 +968,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 }
 
                 MainFile.Logger.Warn(
-                    $"Starting persona selection skipped foreign multiplayer choice: player={player.NetId} choiceId={choiceId} result={remoteChoice}.");
-                _nextChoiceIdsByPlayer[player.NetId] = synchronizer.ReserveChoiceId(player);
+                    $"Starting persona selection ignored mismatched multiplayer choice after envelope wait: player={player.NetId} choiceId={choiceId}.");
             }
         }
         catch (ObjectDisposedException ex)
@@ -1020,6 +1038,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             _authorityPlayer,
             choiceId,
             CreateSelectionCommitChoiceResult(selectedIndexes));
+        _nextChoiceIdsByPlayer[_authorityPlayer.NetId] = _multiplayerSynchronizer.ReserveChoiceId(_authorityPlayer);
         _multiplayerCommitSent = true;
 
         MainFile.Logger.Info(
@@ -1135,6 +1154,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 _authorityPlayer,
                 choiceId,
                 CreateSelectionCommitChoiceResult(selectedIndexes));
+            _nextChoiceIdsByPlayer[_authorityPlayer.NetId] = _multiplayerSynchronizer.ReserveChoiceId(_authorityPlayer);
             _multiplayerCommitSent = true;
 
             MainFile.Logger.Warn(
@@ -1305,73 +1325,68 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         return IsInsideTree();
     }
 
-    private static PlayerChoiceResult CreateSelectionUpdateChoiceResult(int sequence, int selectedIndex)
+    private PlayerChoiceResult CreateSelectionUpdateChoiceResult(int sequence, int selectedIndex)
     {
-        return PlayerChoiceResult.FromIndexes([
-            MultiplayerChoiceMagic, ChoiceKindSelectionUpdate, sequence, selectedIndex
-        ]);
+        return AstralChoiceProtocol.CreateIndexedEnvelope(
+            AstralChoiceKind.StartingPersonaSelectionUpdate,
+            _runState,
+            _choiceSessionKey,
+            sequence,
+            [selectedIndex]);
     }
 
-    private static PlayerChoiceResult CreateSelectionCommitChoiceResult(IReadOnlyList<int> selectedIndexes)
+    private PlayerChoiceResult CreateSelectionCommitChoiceResult(IReadOnlyList<int> selectedIndexes)
     {
-        var payload = new List<int>(selectedIndexes.Count + 3)
+        var payload = new List<int>(selectedIndexes.Count + 1)
         {
-            MultiplayerChoiceMagic,
-            ChoiceKindSelectionCommit,
             selectedIndexes.Count
         };
         payload.AddRange(selectedIndexes);
-        return PlayerChoiceResult.FromIndexes(payload);
+        return AstralChoiceProtocol.CreateIndexedEnvelope(
+            AstralChoiceKind.StartingPersonaSelectionCommit,
+            _runState,
+            _choiceSessionKey,
+            0,
+            payload);
     }
 
-    private static bool TryDecodeSelectionUpdate(PlayerChoiceResult result, out int sequence, out int selectedIndex)
+    private bool TryDecodeSelectionUpdate(PlayerChoiceResult result, out int sequence, out int selectedIndex)
     {
         sequence = 0;
         selectedIndex = -1;
-        if (!TryGetIndexPayload(result, out var payload)
-            || payload.Count < 4
-            || payload[0] != MultiplayerChoiceMagic
-            || payload[1] != ChoiceKindSelectionUpdate)
+        if (!AstralChoiceProtocol.TryDecodeIndexedEnvelope(
+                result,
+                AstralChoiceKind.StartingPersonaSelectionUpdate,
+                _runState,
+                _choiceSessionKey,
+                out sequence,
+                out var payload)
+            || payload.Count < 1)
             return false;
 
-        sequence = payload[2];
-        selectedIndex = payload[3];
+        selectedIndex = payload[0];
         return true;
     }
 
-    private static bool TryDecodeSelectionCommit(PlayerChoiceResult result, out IReadOnlyList<int> selectedIndexes)
+    private bool TryDecodeSelectionCommit(PlayerChoiceResult result, out IReadOnlyList<int> selectedIndexes)
     {
         selectedIndexes = [];
-        if (!TryGetIndexPayload(result, out var payload)
-            || payload.Count < 3
-            || payload[0] != MultiplayerChoiceMagic
-            || payload[1] != ChoiceKindSelectionCommit)
+        if (!AstralChoiceProtocol.TryDecodeIndexedEnvelope(
+                result,
+                AstralChoiceKind.StartingPersonaSelectionCommit,
+                _runState,
+                _choiceSessionKey,
+                out _,
+                out var payload)
+            || payload.Count < 1)
             return false;
 
-        var playerCount = payload[2];
-        if (playerCount < 0 || payload.Count < playerCount + 3)
+        var playerCount = payload[0];
+        if (playerCount < 0 || payload.Count < playerCount + 1)
             return false;
 
-        selectedIndexes = payload.Skip(3).Take(playerCount).ToArray();
+        selectedIndexes = payload.Skip(1).Take(playerCount).ToArray();
         return true;
-    }
-
-    private static bool TryGetIndexPayload(PlayerChoiceResult result, out List<int> payload)
-    {
-        payload = [];
-        try
-        {
-            var indexes = result.AsIndexes();
-            if (indexes == null)
-                return false;
-
-            payload = indexes;
-            return true;
-        }
-        catch (InvalidOperationException)
-        {
-            return false;
-        }
     }
 
     private static int IndexOfRelic(IReadOnlyList<RelicModel> relics, RelicModel relic)
@@ -1397,7 +1412,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         var authorityNetId = netService.Type == NetGameType.Host
             ? netService.NetId
             : netService is INetClientGameService clientService
-                ? clientService.NetClient.HostNetId
+                ? clientService.NetClient?.HostNetId ?? 0UL
                 : 0UL;
 
         if (authorityNetId != 0UL)

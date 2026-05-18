@@ -204,12 +204,16 @@ public class PersonJunkBot : CooldownPersonaRelicBase
 
         var invalidCoords = markedCoords.Any(coord =>
             !map.HasPoint(coord)
-            || map.GetPoint(coord).PointType is not (MapPointType.Monster or MapPointType.Elite));
+            || map.GetPoint(coord) is not { } point
+            || point.PointType is not (MapPointType.Monster or MapPointType.Elite));
         if (invalidCoords)
         {
             InitializeMarkedCombatsForCurrentAct(true);
             markedCoords = GetMarkedCoords() ?? [];
         }
+
+        if (markedCoords.Count == 0)
+            return map;
 
         foreach (var coord in markedCoords)
         {

@@ -342,7 +342,11 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         if (ownerPlayer == null || combatState == null)
             return;
 
-        if (combatState.CurrentSide != owner.Side)
+        var ownerSide = owner?.Side;
+        if (ownerSide == null)
+            return;
+
+        if (combatState.CurrentSide != ownerSide)
             return;
 
         var choiceContext = CreateImmediateHookContext();

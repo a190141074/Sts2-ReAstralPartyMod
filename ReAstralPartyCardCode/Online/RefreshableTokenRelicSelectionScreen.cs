@@ -23,7 +23,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOverlayScreen, IScreenContext
 {
-    private readonly TaskCompletionSource<RefreshableTokenRelicSelectionResult> _completionSource = new();
+    private readonly TaskCompletionSource<RefreshableTokenRelicSelectionResult> _completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly RunState _runState;
     private readonly Player _owner;
     private readonly Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> _rerollFunc;
@@ -114,6 +114,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
 
     public void AfterOverlayClosed()
     {
+        EnsureCompletedOnForcedClose();
         _closed = true;
         QueueFree();
     }
@@ -454,6 +455,23 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             FinalOptions = _options.ToList()
         });
         Close();
+    }
+
+    private void EnsureCompletedOnForcedClose()
+    {
+        if (_completionSource.Task.IsCompleted)
+            return;
+
+        var fallbackRelic = _options.FirstOrDefault();
+        _completionSource.TrySetResult(new RefreshableTokenRelicSelectionResult
+        {
+            SelectedRelic = fallbackRelic,
+            SelectedIndex = fallbackRelic == null ? -1 : 0,
+            StartingRerolls = _startingRerolls,
+            RemainingRerolls = _remainingRerolls,
+            RerollHistory = _rerollHistory.ToList(),
+            FinalOptions = _options.ToList()
+        });
     }
 
     private void UpdateSubtitle()

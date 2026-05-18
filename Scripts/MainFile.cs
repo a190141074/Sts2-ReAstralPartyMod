@@ -32,12 +32,16 @@ public class MainFile
         // so keywords must be registered before assembly auto-discovery runs.
         AstralKeywords.RegisterAll();
         PreloadSavedPropertyCache(assembly);
+        SavedPropertyGovernance.LogGovernanceSummary(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
         RitsuLibFramework.GetContentRegistry(ModId).RegisterCardLibraryCompendiumSharedPoolFilter<PersonaSkillCardPool>(
             "persona_skill_pool",
             "res://ReAstralPartyMod/images/ui/persona_skill_pool.png");
         GameplayPatchRegistry.RegisterAndApply();
         AstralTelemetry.Initialize();
+        AstralChoiceProtocol.LogStartupDiagnostics();
+        AstralNetPhaseGuard.LogStartupDiagnostics();
+        RewardContextPolicy.LogStartupDiagnostics();
 
         var buildMarker = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                           ?? assembly.GetName().Version?.ToString()

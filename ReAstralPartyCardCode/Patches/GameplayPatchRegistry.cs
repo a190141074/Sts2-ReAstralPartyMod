@@ -165,70 +165,14 @@ internal static class GameplayStaticPatchCatalog
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)
     {
-        patcher.RegisterPatches(
-        [
-            new ModPatchInfo(
-                "starting_persona_relic_selection_patch",
-                typeof(NGame),
-                "StartRun",
-                typeof(StartingPersonaRelicSelectionPatch),
-                description:
-                "Version-fragile gameplay patch: open the starting persona relic selection after run start",
-                parameterTypes: [typeof(RunState)]),
-            new ModPatchInfo(
-                "astral_telemetry_consent_patch",
-                typeof(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu),
-                "_Ready",
-                typeof(AstralTelemetryConsentPatch),
-                false,
-                "Lifecycle patch: show Astral telemetry consent prompt on first main-menu entry"),
-            new ModPatchInfo(
-                "astral_telemetry_start_run_patch",
-                typeof(NGame),
-                "StartRun",
-                typeof(AstralTelemetryStartRunPatch),
-                false,
-                "Lifecycle patch: reset Astral telemetry state after run start",
-                [typeof(RunState)]),
-            new ModPatchInfo(
-                "astral_telemetry_load_run_patch",
-                typeof(NGame),
-                "LoadRun",
-                typeof(AstralTelemetryLoadRunPatch),
-                false,
-                "Lifecycle patch: restore Astral telemetry state after loading a run",
-                [typeof(RunState), typeof(SerializableRoom)]),
-            new ModPatchInfo(
-                "re_astral_party_run_settings_load_patch",
-                typeof(NGame),
-                "LoadRun",
-                typeof(ReAstralPartyRunSettingsLoadPatch),
-                false,
-                "Lifecycle patch: ensure run-scoped Astral Party settings are initialized after loading a run",
-                [typeof(RunState), typeof(SerializableRoom)]),
-            new ModPatchInfo(
-                "astral_telemetry_run_ended_patch",
-                typeof(RunManager),
-                nameof(RunManager.OnEnded),
-                typeof(AstralTelemetryRunEndedPatch),
-                false,
-                "Lifecycle patch: submit Astral telemetry when a run ends",
-                [typeof(bool)]),
-            new ModPatchInfo(
-                "astral_telemetry_abandon_patch",
-                typeof(RunManager),
-                nameof(RunManager.Abandon),
-                typeof(AstralTelemetryAbandonPatch),
-                false,
-                "Lifecycle patch: discard Astral telemetry snapshot when the active run is abandoned"),
-            new ModPatchInfo(
-                "astral_telemetry_delete_current_run_patch",
-                typeof(SaveManager),
-                nameof(SaveManager.DeleteCurrentRun),
-                typeof(AstralTelemetryDeleteCurrentRunPatch),
-                false,
-                "Lifecycle patch: discard Astral telemetry snapshot after deleting the saved current run")
-        ]);
+        patcher.RegisterPatch<StartingPersonaRelicSelectionPatch>();
+        patcher.RegisterPatch<AstralTelemetryConsentPatch>();
+        patcher.RegisterPatch<AstralTelemetryStartRunPatch>();
+        patcher.RegisterPatch<AstralTelemetryLoadRunPatch>();
+        patcher.RegisterPatch<AstralTelemetryRunEndedPatch>();
+        patcher.RegisterPatch<AstralTelemetryAbandonPatch>();
+        patcher.RegisterPatch<AstralTelemetryDeleteCurrentRunPatch>();
+        patcher.RegisterPatch<ReAstralPartyRunSettingsLoadPatch>();
     }
 }
 

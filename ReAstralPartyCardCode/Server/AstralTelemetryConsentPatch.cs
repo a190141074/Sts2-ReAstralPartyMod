@@ -1,18 +1,24 @@
 using Godot;
-using HarmonyLib;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Nodes.Screens.MainMenu;
+using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
-[HarmonyPatch(typeof(NMainMenu))]
-public static class AstralTelemetryConsentPatch
+public sealed class AstralTelemetryConsentPatch : IPatchMethod
 {
     private static bool _consentPromptTriggered;
 
-    [HarmonyPostfix]
-    [HarmonyPatch(nameof(NMainMenu._Ready))]
-    public static void AfterMainMenuReady()
+    public static string PatchId => "astral_telemetry_consent_patch";
+    public static bool IsCritical => false;
+    public static string Description => "Show Astral telemetry consent prompt on first main-menu entry";
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(NMainMenu), nameof(NMainMenu._Ready))];
+    }
+
+    public static void Postfix()
     {
         if (_consentPromptTriggered)
             return;

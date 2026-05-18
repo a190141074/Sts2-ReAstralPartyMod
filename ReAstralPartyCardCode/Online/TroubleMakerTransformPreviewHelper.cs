@@ -167,7 +167,14 @@ internal sealed partial class TroubleMakerTransformPreviewVfx : Control
             var initialCard = _mode == TroubleMakerPreviewMode.RevealResult ? _endCard : _startCard;
             _cardNode = NCard.Create(initialCard);
             _cardStage.AddChildSafely(_cardNode);
-            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+            var tree = GetTree();
+            if (tree == null)
+                return;
+
+            await ToSignal(tree, SceneTree.SignalName.ProcessFrame);
+            if (_cardNode == null)
+                return;
+
             _cardNode.UpdateVisuals(PileType.None, CardPreviewMode.Normal);
             _cardNode.Position = PileType.Play.GetTargetPosition(_cardNode);
             _cardNode.Scale = Vector2.One * 0.05f;

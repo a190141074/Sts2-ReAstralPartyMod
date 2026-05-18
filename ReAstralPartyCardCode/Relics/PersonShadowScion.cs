@@ -63,22 +63,29 @@ public class PersonShadowScion : CooldownPersonaRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        RefreshPendingRoyalPrerogativeForCurrentAct();
     }
 
     public override async Task BeforeCombatStart()
     {
-        if (Owner?.Creature?.CombatState == null)
+        if (Owner?.Creature?.CombatState == null || Owner.RunState == null)
             return;
 
         RefreshPendingRoyalPrerogativeForCurrentAct();
 
+        var combatState = Owner.Creature.CombatState;
+        var stablePlayers = PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner);
+        if (combatState == null || stablePlayers.Count == 0)
+            return;
+
         if (AstralParty_PersonShadowScionPendingRoyalPrerogativeCombats > 0)
         {
             Flash();
-            foreach (var player in PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner))
+            foreach (var player in stablePlayers)
             {
-                var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<Royalties>(), player);
+                if (player?.Creature?.CombatState == null)
+                    continue;
+
+                var card = combatState.CreateCard(ModelDb.Card<Royalties>(), player);
                 await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
                     card,
                     true,

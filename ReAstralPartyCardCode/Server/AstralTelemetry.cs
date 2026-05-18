@@ -411,6 +411,9 @@ internal static class AstralTelemetry
     {
         try
         {
+            if (!AstralNetPhaseGuard.Guard(AstralNetPhase.RunEnd, "telemetry run ended"))
+                return;
+
             var config = LoadConfig();
             var state = LoadState();
             if (!IsTelemetryEnabled(config, state))
@@ -427,6 +430,11 @@ internal static class AstralTelemetry
             if (gameType is NetGameType.Client or NetGameType.Replay)
             {
                 MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Upload skipped for netMode={gameType}");
+                return;
+            }
+            if (gameType is not (NetGameType.Singleplayer or NetGameType.Host or NetGameType.None))
+            {
+                MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Upload skipped for unsupported netMode={gameType}");
                 return;
             }
 

@@ -8,7 +8,6 @@ using MegaCrit.Sts2.Core.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
-[HarmonyPatch]
 public static class CooldownEnchantmentGrantPatch
 {
     public static MethodBase? TargetMethod()
@@ -25,7 +24,6 @@ public static class CooldownEnchantmentGrantPatch
                );
     }
 
-    [HarmonyPrefix]
     public static void Prefix(CardModel card)
     {
         if (!AstralPartyCardModel.ShouldAutoApplyCooldown(card))

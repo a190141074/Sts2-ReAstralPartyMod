@@ -136,7 +136,7 @@ public static class PersonaMultiplayerEffectHelper
     public static Task<RelicModel> ObtainRelicAsReward(Player owner, RelicModel relic)
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
-        if (CanUseRewardSynchronizer(owner, "relic reward"))
+        if (RewardContextPolicy.CanUseRewardSynchronizer(owner, "relic reward"))
             RunManager.Instance?.RewardSynchronizer?.SyncLocalObtainedRelic(canonicalRelic.ToMutable());
 
         return ObtainRelicAsRewardTracked(owner, canonicalRelic);
@@ -144,13 +144,13 @@ public static class PersonaMultiplayerEffectHelper
 
     public static void SyncGoldLostAsReward(Player owner, int goldLost)
     {
-        if (CanUseRewardSynchronizer(owner, "gold loss"))
+        if (RewardContextPolicy.CanUseRewardSynchronizer(owner, "gold loss"))
             RunManager.Instance?.RewardSynchronizer?.SyncLocalGoldLost(goldLost);
     }
 
     public static Task<RelicModel> ObtainRelicForMultiplayerSafeReward(Player owner, RelicModel relic)
     {
-        if (CanUseRewardSynchronizer(owner, "safe relic reward"))
+        if (RewardContextPolicy.CanUseRewardSynchronizer(owner, "safe relic reward"))
             return ObtainRelicAsReward(owner, relic);
 
         return ObtainRelicDeterministic(owner, relic);
@@ -265,44 +265,6 @@ public static class PersonaMultiplayerEffectHelper
         var obtained = await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
         AstralTelemetry.RecordObtainedToken(owner, canonicalRelic);
         return obtained;
-    }
-
-    private static bool CanUseRewardSynchronizer(Player owner, string operation)
-    {
-        var runManager = RunManager.Instance;
-        if (runManager == null)
-        {
-            MainFile.Logger.Warn($"Skipped reward sync for {operation}: RunManager unavailable.");
-            return false;
-        }
-
-        if (!LocalContext.IsMe(owner))
-            return false;
-
-        if (!runManager.IsSinglePlayerOrFakeMultiplayer)
-        {
-            if (CombatManager.Instance?.IsInProgress == true)
-            {
-                MainFile.Logger.Warn(
-                    $"Skipped reward sync for {operation}: multiplayer combat is in progress; deterministic path required.");
-                return false;
-            }
-
-            if (owner.RunState == null)
-            {
-                MainFile.Logger.Warn(
-                    $"Skipped reward sync for {operation}: no active run state for owner {owner.NetId}.");
-                return false;
-            }
-        }
-
-        if (runManager.RewardSynchronizer == null)
-        {
-            MainFile.Logger.Warn($"Skipped reward sync for {operation}: RewardSynchronizer unavailable.");
-            return false;
-        }
-
-        return true;
     }
 
     private static uint GetBestWeightedDeterministicScore(

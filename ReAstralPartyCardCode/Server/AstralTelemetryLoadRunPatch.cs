@@ -1,15 +1,23 @@
-using HarmonyLib;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
+using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
-[HarmonyPatch(typeof(NGame), "LoadRun", typeof(RunState), typeof(SerializableRoom))]
-public static class AstralTelemetryLoadRunPatch
+public sealed class AstralTelemetryLoadRunPatch : IPatchMethod
 {
-    [HarmonyPrefix]
-    public static void Prefix(RunState runState, ref Task __result)
+    public static string PatchId => "astral_telemetry_load_run_patch";
+    public static bool IsCritical => false;
+    public static string Description => "Restore Astral telemetry state after loading a run";
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(NGame), "LoadRun", [typeof(RunState), typeof(SerializableRoom)])];
+    }
+
+    public static void Postfix(RunState runState, ref Task __result)
     {
         __result = RunAfterLoadRun(__result, runState);
     }
