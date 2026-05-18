@@ -142,6 +142,14 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatches(
         [
             new ModPatchInfo(
+                "astral_relic_store_event_override_patch",
+                typeof(ActModel),
+                nameof(ActModel.PullNextEvent),
+                typeof(AstralRelicStoreEventOverridePatch),
+                false,
+                "Gameplay patch: force the first actual second-act event pull to become Astral Relic Store",
+                [typeof(RunState)]),
+            new ModPatchInfo(
                 "relic_grab_bag_populate_series_filter_patch",
                 typeof(RelicGrabBag),
                 nameof(RelicGrabBag.Populate),
@@ -167,22 +175,6 @@ internal static class GameplayStaticPatchCatalog
                 description:
                 "Version-fragile gameplay patch: open the starting persona relic selection after run start",
                 parameterTypes: [typeof(RunState)]),
-            new ModPatchInfo(
-                "astral_relic_store_modifier_start_run_patch",
-                typeof(NGame),
-                "StartRun",
-                typeof(AstralRelicStoreFirstEventModifierStartRunPatch),
-                false,
-                "Lifecycle patch: install the Astral Relic Store first-event modifier when a run starts",
-                [typeof(RunState)]),
-            new ModPatchInfo(
-                "astral_relic_store_modifier_load_run_patch",
-                typeof(NGame),
-                "LoadRun",
-                typeof(AstralRelicStoreFirstEventModifierLoadRunPatch),
-                false,
-                "Lifecycle patch: install the Astral Relic Store first-event modifier after loading a run",
-                [typeof(RunState), typeof(SerializableRoom)]),
             new ModPatchInfo(
                 "astral_telemetry_consent_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu),
@@ -382,4 +374,3 @@ internal static class GameplayDynamicPatchCatalog
                 patchId: "speed_roller_flight_consume");
     }
 }
-
