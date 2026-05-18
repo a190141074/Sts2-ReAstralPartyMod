@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillComeHereYou : AstralPartyCardModel
 {
     private const decimal DamageAmount = 5m;
@@ -59,3 +60,4 @@ public class SkillComeHereYou : AstralPartyCardModel
         await PowerCmd.Apply<DexterityPower>(cardPlay.Target, DexterityLoss, Owner.Creature, this, false);
     }
 }
+

@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillVampireBite : AstralPartyCardModel
 {
     private const decimal SelfDamageAmount = 6m;
@@ -50,3 +51,4 @@ public class SkillVampireBite : AstralPartyCardModel
         await PowerCmd.Apply<BloodthirstPower>(Owner.Creature, 1m, Owner.Creature, this, false);
     }
 }
+

@@ -17,6 +17,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillMudTruckCrash : AstralPartyCardModel
 {
     private const decimal FractureAmount = 1m;
@@ -86,3 +87,4 @@ public class SkillMudTruckCrash : AstralPartyCardModel
             await PowerCmd.Apply<FracturePower>(splashTarget, FractureAmount, Owner.Creature, this, false);
     }
 }
+

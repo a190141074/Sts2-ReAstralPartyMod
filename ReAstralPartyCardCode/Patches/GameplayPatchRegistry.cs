@@ -35,6 +35,7 @@ public static class GameplayPatchRegistry
     public static void RegisterAndApply()
     {
         var patcher = RitsuLibFramework.CreatePatcher(MainFile.ModId, "gameplay-patches", "gameplay patches");
+        patcher.RegisterPatch<MainMenuLoadedToastPatch>();
         patcher.RegisterPatches<GameplayStaticPatches>();
         patcher.ApplyDynamic(GameplayDynamicPatches.CreateBuilder(), true);
 

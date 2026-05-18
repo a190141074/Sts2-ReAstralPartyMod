@@ -17,6 +17,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillShadowFusion : AstralPartyCardModel
 {
     private sealed class ShadowFusionTemporaryStrengthPower : AstralPartyPowerModel
@@ -118,3 +119,4 @@ public class SkillShadowFusion : AstralPartyCardModel
         );
     }
 }
+

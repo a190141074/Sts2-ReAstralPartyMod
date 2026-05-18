@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillConcealingOperation : AstralPartyCardModel
 {
     private const decimal MarkAmount = 2m;
@@ -91,3 +92,4 @@ public class SkillConcealingOperation : AstralPartyCardModel
         };
     }
 }
+

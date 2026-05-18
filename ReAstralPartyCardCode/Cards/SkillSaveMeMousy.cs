@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillSaveMeMousy : AstralPartyCardModel
 {
     private const decimal CardsToDraw = 1m;
@@ -81,3 +82,4 @@ public class SkillSaveMeMousy : AstralPartyCardModel
             await CardGainAttribution.RunWithSource(this, () => CardPileCmd.Draw(choiceContext, CardsToDraw, Owner));
     }
 }
+

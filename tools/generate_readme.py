@@ -84,6 +84,18 @@ def load_manifest() -> dict:
     return load_json(MANIFEST_PATH)
 
 
+def format_dependency(dep: object) -> str:
+    if isinstance(dep, str):
+        return dep
+    if isinstance(dep, dict):
+        dep_id = dep.get("id", "")
+        min_version = dep.get("min_version")
+        if min_version:
+            return f"{dep_id} (>= {min_version})"
+        return str(dep_id)
+    return str(dep)
+
+
 def load_project_properties() -> dict:
     root = ET.fromstring(PROJECT_PATH.read_text(encoding="utf-8"))
     properties = {}
@@ -400,7 +412,7 @@ def build_readme() -> str:
         f"| 模组名称 | {manifest['name']} |",
         f"| 作者 | {manifest['author']} |",
         f"| 版本 | `{manifest['version']}` |",
-        f"| 前置 | `{', '.join(manifest.get('dependencies', []))}` |",
+        f"| 前置 | `{', '.join(format_dependency(dep) for dep in manifest.get('dependencies', []))}` |",
         f"| 目标框架 | `{project.get('TargetFramework', '')}` |",
         '| Godot SDK | `Godot.NET.Sdk 4.5.1` |',
         "| 入口文件 | `Scripts/MainFile.cs` |",

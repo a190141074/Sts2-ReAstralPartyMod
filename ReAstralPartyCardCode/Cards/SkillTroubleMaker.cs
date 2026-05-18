@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillTroubleMaker : AstralPartyCardModel
 {
     private int _cardsToShow = 3;
@@ -56,3 +57,4 @@ public class SkillTroubleMaker : AstralPartyCardModel
         await CardCmd.AutoPlay(choiceContext, cardToPlay, Owner.Creature, AutoPlayType.Default, false, true);
     }
 }
+

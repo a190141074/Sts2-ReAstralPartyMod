@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillFateWeakMprint : AstralPartyCardModel
 {
     private const decimal DebuffDuration = 2m;
@@ -52,3 +53,4 @@ public class SkillFateWeakMprint : AstralPartyCardModel
         );
     }
 }
+

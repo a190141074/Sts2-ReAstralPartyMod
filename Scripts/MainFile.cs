@@ -33,6 +33,9 @@ public class MainFile
         AstralKeywords.RegisterAll();
         PreloadSavedPropertyCache(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
+        RitsuLibFramework.GetContentRegistry(ModId).RegisterCardLibraryCompendiumSharedPoolFilter<PersonaSkillCardPool>(
+            "persona_skill_pool",
+            "res://ReAstralPartyMod/images/ui/persona_skill_pool.png");
         GameplayPatchRegistry.RegisterAndApply();
         AstralTelemetry.Initialize();
 
@@ -96,3 +99,4 @@ public class MainFile
         return Convert.ToHexString(hash);
     }
 }
+

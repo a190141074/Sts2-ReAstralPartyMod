@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillFamousBlade : AstralPartyCardModel
 {
     private const int BaseDamage = 2;
@@ -233,3 +234,4 @@ public class SkillFamousBlade : AstralPartyCardModel
         GawuCutter
     }
 }
+

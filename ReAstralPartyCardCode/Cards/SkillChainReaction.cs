@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillChainReaction : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
@@ -56,3 +57,4 @@ public class SkillChainReaction : AstralPartyCardModel
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(bite, true, CardPilePosition.Top, this);
     }
 }
+

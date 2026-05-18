@@ -15,6 +15,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillCyberAngel : AstralPartyCardModel
 {
     private const decimal BaseStarLightGain = 1m;
@@ -83,3 +84,4 @@ public class SkillCyberAngel : AstralPartyCardModel
             await PowerCmd.Apply<RegenPower>(Owner.Creature, RegenerationAmount, Owner.Creature, this, false);
     }
 }
+

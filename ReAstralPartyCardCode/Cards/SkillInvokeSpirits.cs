@@ -19,6 +19,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillInvokeSpirits : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
@@ -112,3 +113,4 @@ public class SkillInvokeSpirits : AstralPartyCardModel
         return Math.Ceiling(value * ratio);
     }
 }
+

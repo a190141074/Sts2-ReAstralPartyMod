@@ -12,6 +12,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillProductRestocking : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
@@ -24,7 +25,7 @@ public class SkillProductRestocking : AstralPartyCardModel
     public SkillProductRestocking() : base(
         0,
         CardType.Skill,
-        CardRarity.Rare,
+        CardRarity.Ancient,
         TargetType.Self)
     {
     }
@@ -69,3 +70,4 @@ public class SkillProductRestocking : AstralPartyCardModel
         await mascotGirlMimi.HandleProductRestockingDraw(choiceContext, this, cardsToDraw);
     }
 }
+

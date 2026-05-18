@@ -20,6 +20,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillMixedCocktails : AstralPartyCardModel
 {
     private const int MaxDiscardCount = 3;
@@ -169,3 +170,4 @@ public class SkillMixedCocktails : AstralPartyCardModel
         return selectedCards.ToList();
     }
 }
+

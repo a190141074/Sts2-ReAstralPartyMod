@@ -16,6 +16,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillUnstoppable : AstralPartyCardModel
 {
     private const decimal DrawAmount = 12m;
@@ -115,3 +116,4 @@ public class SkillUnstoppable : AstralPartyCardModel
         return BonusMudTruckOnesDigits.Contains(onesDigit);
     }
 }
+

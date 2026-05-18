@@ -18,6 +18,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(PersonaSkillCardPool))]
 public class SkillLivingFolio : AstralPartyCardModel
 {
     private const decimal BaseDamage = 2m;
@@ -156,3 +157,4 @@ public class SkillLivingFolio : AstralPartyCardModel
         DynamicVars["Damage"].BaseValue = GetCurrentDamageAmount();
     }
 }
+
