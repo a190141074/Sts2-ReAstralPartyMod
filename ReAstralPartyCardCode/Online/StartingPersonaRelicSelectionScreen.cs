@@ -1240,9 +1240,22 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         _selectionFinalized = true;
         foreach (var holder in _holdersById.Values)
-            holder.Disable();
+        {
+            if (!IsInstanceValid(holder))
+                continue;
 
-        _subtitleLabel.Text = subtitle;
+            try
+            {
+                holder.Disable();
+            }
+            catch (ObjectDisposedException)
+            {
+                // Late fallback commits can race with UI teardown; ignore disposed holders.
+            }
+        }
+
+        if (IsInstanceValid(_subtitleLabel))
+            _subtitleLabel.Text = subtitle;
     }
 
     private void UpdatePendingSubtitle()
