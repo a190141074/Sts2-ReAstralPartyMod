@@ -26,6 +26,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private const string CommonRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_blue.png";
     private const string UncommonRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_purple.png";
     private const string RareRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_gold.png";
+    private const string OptionBackgroundPath = "res://ReAstralPartyMod/images/ui/relic_background.png";
+    private const string SelectionFontPath = "res://ReAstralPartyMod/fonts/荆南波波黑-Bold.ttf";
 
     private readonly TaskCompletionSource<RefreshableTokenRelicSelectionResult> _completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly RunState _runState;
@@ -218,7 +220,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
             SizeFlagsVertical = SizeFlags.ShrinkCenter
         };
-        _holderContainer.AddThemeConstantOverride("separation", 132);
+        _holderContainer.AddThemeConstantOverride("separation", 64);
         _rootContainer.AddChild(new Control
         {
             SizeFlagsVertical = SizeFlags.ExpandFill,
@@ -257,7 +259,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             CreateRerollButtonStyle(new Color(1f, 0.86f, 0.22f), new Color(1f, 0.94f, 0.5f)));
         _rerollButton.AddThemeStyleboxOverride("disabled",
             CreateRerollButtonStyle(new Color(0.56f, 0.5f, 0.34f, 0.86f), new Color(0.72f, 0.66f, 0.48f, 0.92f)));
-        _rerollButton.AddThemeFontSizeOverride("font_size", 34);
+        ApplySelectionFontTheme(_rerollButton);
+        _rerollButton.AddThemeFontSizeOverride("font_size", 36);
         _rerollButton.AddThemeColorOverride("font_color", new Color(0.08f, 0.08f, 0.08f));
         _rerollButton.AddThemeColorOverride("font_hover_color", new Color(0.08f, 0.08f, 0.08f));
         _rerollButton.AddThemeColorOverride("font_pressed_color", new Color(0.08f, 0.08f, 0.08f));
@@ -267,7 +270,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         {
             Name = "RerollColumn",
             MouseFilter = MouseFilterEnum.Ignore,
-            CustomMinimumSize = new Vector2(146f, 0f),
+            CustomMinimumSize = new Vector2(360f, 0f),
             SizeFlagsVertical = SizeFlags.ShrinkCenter,
             Alignment = BoxContainer.AlignmentMode.Center
         };
@@ -326,39 +329,28 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             var relic = _options[index];
             var capturedIndex = index;
 
-            var optionColumn = new VBoxContainer
+            var optionPanel = new PanelContainer
+            {
+                Name = $"RefreshableTokenOptionPanel_{index}",
+                CustomMinimumSize = new Vector2(332f, 548f),
+                SizeFlagsVertical = SizeFlags.ShrinkCenter,
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            ApplyOptionPanelTheme(optionPanel);
+            _holderContainer.AddChild(optionPanel);
+
+            var cardRoot = new Control
             {
                 Name = $"RefreshableTokenOption_{index}",
-                CustomMinimumSize = new Vector2(340f, 0f),
-                SizeFlagsVertical = SizeFlags.ShrinkCenter,
+                CustomMinimumSize = new Vector2(332f, 548f),
                 MouseFilter = MouseFilterEnum.Pass
             };
-            optionColumn.AddThemeConstantOverride("separation", 10);
-            _holderContainer.AddChild(optionColumn);
-
-            var title = new Label
-            {
-                Text = relic.Title.GetFormattedText(),
-                HorizontalAlignment = HorizontalAlignment.Center,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                Modulate = new Color(1f, 0.86f, 0.2f),
-                CustomMinimumSize = new Vector2(340f, 48f),
-                AutowrapMode = TextServer.AutowrapMode.WordSmart
-            };
-            ApplyUniformTitleTheme(title);
-            optionColumn.AddChild(title);
-
-            var buttonCenter = new CenterContainer
-            {
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                CustomMinimumSize = new Vector2(0f, 196f)
-            };
-            optionColumn.AddChild(buttonCenter);
+            optionPanel.AddChild(cardRoot);
 
             var holderButton = new Button
             {
                 Name = $"RefreshableTokenRelicHolder_{index}",
-                CustomMinimumSize = new Vector2(230f, 230f),
+                CustomMinimumSize = new Vector2(332f, 548f),
                 Flat = true,
                 MouseFilter = MouseFilterEnum.Stop,
                 FocusMode = FocusModeEnum.All
@@ -368,38 +360,81 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             holderButton.AddThemeStyleboxOverride("hover", empty);
             holderButton.AddThemeStyleboxOverride("pressed", empty);
             holderButton.AddThemeStyleboxOverride("focus", empty);
-            buttonCenter.AddChild(holderButton);
+            holderButton.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+            cardRoot.AddChild(holderButton);
+
+            var titleBar = new PanelContainer
+            {
+                Name = $"RefreshableTokenTitleBar_{index}",
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            ApplyOptionTitleBarTheme(titleBar);
+            titleBar.SetAnchorsAndOffsetsPreset(LayoutPreset.TopWide);
+            titleBar.OffsetLeft = 0f;
+            titleBar.OffsetTop = 0f;
+            titleBar.OffsetRight = 0f;
+            titleBar.OffsetBottom = 60f;
+            cardRoot.AddChild(titleBar);
+
+            var title = new Label
+            {
+                Text = relic.Title.GetFormattedText(),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart
+            };
+            title.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+            ApplyUniformTitleTheme(title);
+            titleBar.AddChild(title);
 
             var iconCenter = new CenterContainer
             {
                 MouseFilter = MouseFilterEnum.Ignore
             };
-            iconCenter.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+            iconCenter.SetAnchorsAndOffsetsPreset(LayoutPreset.TopWide);
+            iconCenter.OffsetLeft = 0f;
+            iconCenter.OffsetTop = 74f;
+            iconCenter.OffsetRight = 0f;
+            iconCenter.OffsetBottom = 334f;
             holderButton.AddChild(iconCenter);
 
-            var relicBaseTexture = CreateRelicBaseTexture(relic, 208f);
+            var relicBaseTexture = CreateRelicBaseTexture(relic, 224f);
             if (relicBaseTexture != null)
                 iconCenter.AddChild(relicBaseTexture);
 
-            var relicTexture = CreateRelicTexture(relic, 176f);
+            var relicTexture = CreateRelicTexture(relic, 198f);
             iconCenter.AddChild(relicTexture);
+
+            var descriptionPanel = new PanelContainer
+            {
+                Name = $"RefreshableTokenDescriptionPanel_{index}",
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            descriptionPanel.SetAnchorsAndOffsetsPreset(LayoutPreset.BottomWide);
+            descriptionPanel.OffsetLeft = 14f;
+            descriptionPanel.OffsetTop = -196f;
+            descriptionPanel.OffsetRight = -14f;
+            descriptionPanel.OffsetBottom = -6f;
+            descriptionPanel.AddThemeStyleboxOverride("panel", CreateDescriptionPanelStyle());
+            cardRoot.AddChild(descriptionPanel);
 
             var description = new MegaRichTextLabel
             {
                 HorizontalAlignment = HorizontalAlignment.Left,
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                SizeFlagsVertical = SizeFlags.ExpandFill,
-                CustomMinimumSize = new Vector2(320f, 118f),
-                MaxFontSize = 21,
-                MinFontSize = 15,
+                MaxFontSize = 22,
+                MinFontSize = 17,
                 MouseFilter = MouseFilterEnum.Ignore,
                 BbcodeEnabled = true
             };
+            description.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
             ApplyDefaultMegaRichTextTheme(description);
-            description.AddThemeColorOverride("default_color", new Color(0.9f, 0.93f, 0.97f, 0.92f));
+            description.AddThemeColorOverride("default_color", new Color(0.98f, 0.98f, 0.98f, 0.96f));
+            description.AddThemeColorOverride("font_shadow_color", new Color(0f, 0f, 0f, 0f));
+            description.AddThemeConstantOverride("shadow_offset_x", 0);
+            description.AddThemeConstantOverride("shadow_offset_y", 0);
             description.SetTextAutoSize(relic.DynamicDescription.GetFormattedText());
-            optionColumn.AddChild(description);
+            descriptionPanel.AddChild(description);
 
             holderButton.Pressed += () => OnRelicSelected(capturedIndex);
             holderButton.MouseEntered += () => ShowHoverTip(holderButton, relicTexture, relic);
@@ -536,7 +571,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
 
     private static void ApplyDefaultMegaLabelTheme(MegaLabel label)
     {
-        var font = label.GetThemeDefaultFont();
+        var font = GetSelectionFont() ?? label.GetThemeDefaultFont();
         if (font != null)
             label.AddThemeFontOverride("font", font);
 
@@ -547,7 +582,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
 
     private static void ApplyDefaultMegaRichTextTheme(MegaRichTextLabel label)
     {
-        var font = label.GetThemeDefaultFont();
+        var font = GetSelectionFont() ?? label.GetThemeDefaultFont();
         if (font != null)
         {
             label.AddThemeFontOverride("normal_font", font);
@@ -570,11 +605,25 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
 
     private static void ApplyUniformTitleTheme(Label label)
     {
-        var font = label.GetThemeDefaultFont();
-        if (font != null)
-            label.AddThemeFontOverride("font", font);
+        ApplySelectionFontTheme(label);
 
-        label.AddThemeFontSizeOverride("font_size", 34);
+        label.AddThemeFontSizeOverride("font_size", 28);
+        label.AddThemeColorOverride("font_color", new Color(1f, 0.86f, 0.2f));
+        label.AddThemeColorOverride("font_shadow_color", new Color(0f, 0f, 0f, 0.55f));
+        label.AddThemeConstantOverride("shadow_offset_x", 1);
+        label.AddThemeConstantOverride("shadow_offset_y", 2);
+    }
+
+    private static void ApplySelectionFontTheme(Control control)
+    {
+        var font = GetSelectionFont();
+        if (font != null)
+            control.AddThemeFontOverride("font", font);
+    }
+
+    private static Font? GetSelectionFont()
+    {
+        return GD.Load<FontFile>(SelectionFontPath);
     }
 
     private static Texture2D? GetDisplayTexture(RelicModel relic)
@@ -591,6 +640,56 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             RelicRarity.Rare => GD.Load<Texture2D>(RareRelicBasePath),
             _ => null
         };
+    }
+
+    private static void ApplyOptionPanelTheme(PanelContainer panel)
+    {
+        var background = GD.Load<Texture2D>(OptionBackgroundPath);
+        if (background == null)
+            return;
+
+        var style = new StyleBoxTexture
+        {
+            Texture = background,
+            TextureMarginLeft = 24f,
+            TextureMarginTop = 24f,
+            TextureMarginRight = 24f,
+            TextureMarginBottom = 24f,
+            ModulateColor = Colors.White,
+            ContentMarginLeft = 0f,
+            ContentMarginRight = 0f,
+            ContentMarginTop = 0f,
+            ContentMarginBottom = 0f
+        };
+        panel.AddThemeStyleboxOverride("panel", style);
+    }
+
+    private static void ApplyOptionTitleBarTheme(PanelContainer panel)
+    {
+        var style = new StyleBoxFlat
+        {
+            BgColor = Colors.Black
+        };
+        style.SetCornerRadiusAll(0);
+        style.ContentMarginLeft = 12f;
+        style.ContentMarginRight = 12f;
+        style.ContentMarginTop = 6f;
+        style.ContentMarginBottom = 6f;
+        panel.AddThemeStyleboxOverride("panel", style);
+    }
+
+    private static StyleBoxFlat CreateDescriptionPanelStyle()
+    {
+        var style = new StyleBoxFlat
+        {
+            BgColor = new Color(0f, 0f, 0f, 0f)
+        };
+        style.SetCornerRadiusAll(26);
+        style.ContentMarginLeft = 18f;
+        style.ContentMarginRight = 18f;
+        style.ContentMarginTop = 16f;
+        style.ContentMarginBottom = 16f;
+        return style;
     }
 
     private static TextureRect? CreateRelicBaseTexture(RelicModel relic, float sideLength)
