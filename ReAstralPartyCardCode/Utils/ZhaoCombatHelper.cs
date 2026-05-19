@@ -4,7 +4,9 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -32,6 +34,8 @@ public static class ZhaoCombatHelper
         try
         {
             await CardCmd.AutoPlay(choiceContext, attackCard, target, AutoPlayType.Default, false, true);
+            if (ShouldTriggerNecrobinderUnleash(owner, source))
+                await AutoPlayNecrobinderUnleash(choiceContext, owner, target, source);
             return attackCard;
         }
         finally
@@ -108,5 +112,53 @@ public static class ZhaoCombatHelper
                 return i;
 
         return -1;
+    }
+
+    private static bool ShouldTriggerNecrobinderUnleash(Player owner, AbstractModel source)
+    {
+        if (owner.Character.Id.Entry != "NECROBINDER")
+            return false;
+
+        return source is PersonZhao;
+    }
+
+    private static async Task AutoPlayNecrobinderUnleash(
+        PlayerChoiceContext choiceContext,
+        Player owner,
+        Creature target,
+        AbstractModel source)
+    {
+        if (owner.Creature?.CombatState == null || !target.IsAlive)
+            return;
+        if (!HasUnleashAvailable(owner))
+            return;
+
+        var unleashCard = owner.Creature.CombatState.CreateCard(ModelDb.Card<Unleash>(), owner);
+        var extraAttackPower = owner.Creature.GetPower<ExtraAttackPower>();
+        if (extraAttackPower == null)
+            return;
+
+        extraAttackPower.BeginTriggeredAttack(unleashCard, target, 0m);
+        try
+        {
+            await CardCmd.AutoPlay(choiceContext, unleashCard, target, AutoPlayType.Default, false, true);
+        }
+        finally
+        {
+            extraAttackPower.EndTriggeredAttack(unleashCard);
+        }
+    }
+
+    private static bool HasUnleashAvailable(Player owner)
+    {
+        return PileType.Hand.GetPile(owner).Cards.Any(IsUnleashCard)
+               || PileType.Draw.GetPile(owner).Cards.Any(IsUnleashCard)
+               || PileType.Discard.GetPile(owner).Cards.Any(IsUnleashCard);
+    }
+
+    private static bool IsUnleashCard(CardModel card)
+    {
+        var canonicalId = card.CanonicalInstance?.Id ?? card.Id;
+        return canonicalId == ModelDb.Card<Unleash>().Id;
     }
 }

@@ -36,24 +36,33 @@ public class TokenGoldBufferShield : AstralPartyRelicModel
         Creature? dealer,
         CardModel? cardSource)
     {
-        if (Owner?.Creature == null)
+        var ownerCreature = Owner?.Creature;
+        if (ownerCreature == null)
             return;
-        if (target != Owner.Creature)
+        if (!IsOwnedByTarget(target, ownerCreature))
             return;
         if (result.UnblockedDamage <= 0m)
             return;
-        if (dealer == null || dealer.Side == Owner.Creature.Side)
+        if (dealer == null || dealer.Side == ownerCreature.Side)
             return;
 
         Flash();
-        await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, HealAmount, Owner.Creature, null, false);
+        await PowerCmd.Apply<HalfLifeHealPower>(ownerCreature, HealAmount, ownerCreature, null, false);
         await PowerCmd.Apply(
             ModelDb.Power<StarLightPower>().ToMutable(),
-            Owner.Creature,
+            ownerCreature,
             StarLightAmount,
-            Owner.Creature,
+            ownerCreature,
             null,
             false
         );
+    }
+
+    private static bool IsOwnedByTarget(Creature target, Creature ownerCreature)
+    {
+        if (target == ownerCreature)
+            return true;
+
+        return target.PetOwner == ownerCreature.Player;
     }
 }
