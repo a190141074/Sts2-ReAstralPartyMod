@@ -43,7 +43,11 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             $"Starting persona relic selection patch entered: seed={runState.Rng.StringSeed} players={runState.Players.Count}.");
         await originalTask;
         if (!AstralNetPhaseGuard.Guard(AstralNetPhase.StartRunBootstrap, "starting persona selection bootstrap"))
-            return;
+        {
+            MainFile.Logger.Warn(
+                "Starting persona relic selection bootstrap was not ready yet; waiting briefly instead of skipping.");
+            await WaitForBootstrapReadinessAsync();
+        }
 
         MainFile.Logger.Info("Starting persona relic selection patch resumed after StartRun task completed.");
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
@@ -99,6 +103,20 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         finally
         {
             screen.Close();
+        }
+    }
+
+    private static async Task WaitForBootstrapReadinessAsync()
+    {
+        for (var attempt = 0; attempt < 180; attempt++)
+        {
+            if (RunManager.Instance?.DebugOnlyGetState() != null)
+                return;
+
+            if (NGame.Instance != null && NOverlayStack.Instance != null)
+                return;
+
+            await Task.Yield();
         }
     }
 

@@ -292,6 +292,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         try
         {
+            await WaitForSelectionEnvironmentReadyAsync();
             await CollectSelectionsAsync();
             var results = ResolveSelectionResults();
             await AnimateSelectionResultsAsync(results);
@@ -302,6 +303,22 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             _completionSource.TrySetException(ex);
             MainFile.Logger.Error($"Starting persona relic shared selection failed: {ex}");
+        }
+    }
+
+    private async Task WaitForSelectionEnvironmentReadyAsync()
+    {
+        for (var frame = 0; frame < 180 && !_closed; frame++)
+        {
+            if (NOverlayStack.Instance != null &&
+                NGame.Instance != null &&
+                RunManager.Instance?.PlayerChoiceSynchronizer != null)
+                return;
+
+            if (NGame.Instance?.IsInsideTree() == true)
+                await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
+            else
+                await Task.Yield();
         }
     }
 
@@ -925,7 +942,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             while (!_multiplayerCommitSource.Task.IsCompleted && !_closed)
             {
-                var choiceId = _nextChoiceIdsByPlayer[player.NetId];
+                if (!_nextChoiceIdsByPlayer.TryGetValue(player.NetId, out var choiceId))
+                {
+                    MainFile.Logger.Warn(
+                        $"Starting persona selection remote observer missing choice id for player={player.NetId}; stopping observer.");
+                    return;
+                }
+
                 var waitTask = DeterministicMultiplayerChoiceHelper.WaitForRemoteIndexedEnvelopeAnyKind(
                     synchronizer,
                     player,

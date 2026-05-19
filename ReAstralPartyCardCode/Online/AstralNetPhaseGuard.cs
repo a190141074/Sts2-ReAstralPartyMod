@@ -61,13 +61,13 @@ internal static class AstralNetPhaseGuard
     public static string DetectPhase()
     {
         var runManager = RunManager.Instance;
-        if (runManager?.DebugOnlyGetState() == null)
-            return "lobby";
-
         if (CombatManager.Instance?.IsInProgress == true)
             return "combat";
 
         if (NOverlayStack.Instance == null || NGame.Instance == null)
+            return "start_run_bootstrap";
+
+        if (runManager?.DebugOnlyGetState() == null)
             return "start_run_bootstrap";
 
         if (NRun.Instance == null)
