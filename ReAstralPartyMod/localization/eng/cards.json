@@ -107,6 +107,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_UNSTOPPABLE.description": "Immediately gain [power]Ready to Strike[/power].\nDiscard all Attack cards in your hand.\nGain [blue]1[/blue] [card]Mud Truck Crash[/card].\nDraw [blue]12[/blue] cards.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_REMOTE_INTRUSION.title": "Remote Intrusion",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_REMOTE_INTRUSION.description": "Immediately gain [blue]1[/blue] Attack card to your hand; it costs [blue]0[/blue] this turn.\nThis turn, Attack cards you play do not trigger Cyber Kitty's passive firewall discard effect.",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TRUE_ME.title": "True Me",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TRUE_ME.description": "Choose a player. Both of you heal [blue]1[/blue] HP and gain [blue]1[/blue] temporary [red]Strength[/red].\nIf your [power]Warm[/power] is at [blue]5[/blue], consume all of it and gain temporary [red]Strength[/red] equal to your current [green]Dexterity[/green] this turn.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_VAMPIRE_BITE.title": "One Little Sip",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_VAMPIRE_BITE.description": "If your HP is above [blue]50[/blue]% of your current Max HP, take [blue]6[/blue] damage.\nGain [blue]1[/blue] [power]Bloodthirst[/power].",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_IRON_VIRGIN.title": "Iron Virgin",

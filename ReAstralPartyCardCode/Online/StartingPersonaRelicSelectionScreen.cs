@@ -187,7 +187,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         _subtitleLabel = new Label
         {
-            Text = BuildSelectionIntroSubtitle(),
+            Text = BuildSelectionIntroSubtitle(_runState),
             HorizontalAlignment = HorizontalAlignment.Center,
             AutowrapMode = TextServer.AutowrapMode.WordSmart
         };
@@ -1203,7 +1203,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (_localPlayer == null || !_selectionStates.TryGetValue(_localPlayer.NetId, out var localState) ||
             localState.SelectedRelic == null)
         {
-            _subtitleLabel.Text = BuildSelectionIntroSubtitle();
+            _subtitleLabel.Text = BuildSelectionIntroSubtitle(_runState);
             return;
         }
 
@@ -1218,9 +1218,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             : "所有玩家已选择，等待同步锁定……";
     }
 
-    private static string BuildSelectionIntroSubtitle()
+    private static string BuildSelectionIntroSubtitle(IRunState? runState)
     {
-        var runState = RunManager.Instance?.DebugOnlyGetState();
         return ReAstralPartyModSettingsManager.GetEnableDuplicatePersonas(runState)
             ? "所有玩家共享同一批人格。全员完成前可以改选；多人选择同一人格时，都会直接获得。"
             : "所有玩家共享同一批人格。全员完成前可以改选；若多人选中同一人格，则按稳定猜拳规则决定归属。";

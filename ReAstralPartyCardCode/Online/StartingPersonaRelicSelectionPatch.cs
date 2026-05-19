@@ -61,7 +61,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             return;
         }
 
-        var overlayStack = await WaitForOverlayStackAsync();
+        var overlayStack = NOverlayStack.Instance;
         if (overlayStack == null)
         {
             EndSelection(runKey, false);
@@ -97,20 +97,6 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         {
             screen.Close();
         }
-    }
-
-    private static async Task<NOverlayStack?> WaitForOverlayStackAsync()
-    {
-        for (var attempt = 0; attempt < 120; attempt++)
-        {
-            var overlayStack = NOverlayStack.Instance;
-            if (overlayStack != null && Godot.GodotObject.IsInstanceValid(overlayStack))
-                return overlayStack;
-
-            await Task.Yield();
-        }
-
-        return null;
     }
 
     private static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)

@@ -10,7 +10,6 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Runs;
-using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using STS2RitsuLib.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -95,54 +94,19 @@ internal static class ReAstralPartyRunSettingsSync
 
     private static PlayerChoiceResult CreateSnapshotChoiceResult(ReAstralPartyRunSettingsSnapshot snapshot)
     {
-        var payload = new List<int>
-        {
+        return PlayerChoiceResult.FromIndexes([
             snapshot.EnableAllPersonas ? 1 : 0,
             snapshot.EnableDuplicatePersonas ? 1 : 0,
             (int)snapshot.TokenSeriesMode,
             snapshot.EnablePureAngelMode ? 1 : 0
-        };
-        return AstralChoiceProtocol.CreateIndexedEnvelope(
-            AstralChoiceKind.RunSettingsSnapshot,
-            RunManager.Instance?.DebugOnlyGetState(),
-            "run_settings_snapshot",
-            0,
-            payload);
+        ]);
     }
 
     private static bool TryDecodeSnapshotChoiceResult(PlayerChoiceResult result,
         out ReAstralPartyRunSettingsSnapshot snapshot)
     {
         snapshot = null!;
-
-        if (!AstralChoiceProtocol.TryDecodeIndexedEnvelope(
-                result,
-                AstralChoiceKind.RunSettingsSnapshot,
-                RunManager.Instance?.DebugOnlyGetState(),
-                "run_settings_snapshot",
-                out _,
-                out var payload)
-            || payload.Count < 4)
-            return false;
-
-        snapshot = new ReAstralPartyRunSettingsSnapshot
-        {
-            EnableAllPersonas = payload[0] != 0,
-            EnableDuplicatePersonas = payload[1] != 0,
-            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[2])
-                ? (TokenSeriesMode)payload[2]
-                : TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = payload[3] != 0
-        };
-        return true;
-    }
-
-    private static bool TryDecodeSnapshotPayload(
-        IReadOnlyList<int> payload,
-        out ReAstralPartyRunSettingsSnapshot snapshot)
-    {
-        snapshot = null!;
-        if (payload.Count < 4)
+        if (!TryGetIndexPayload(result, out var payload) || payload.Count < 4)
             return false;
 
         snapshot = new ReAstralPartyRunSettingsSnapshot
@@ -175,13 +139,6 @@ internal static class ReAstralPartyRunSettingsSync
             var localSnapshot = CreateLocalSnapshot();
             state.SetSnapshot(localSnapshot);
             return localSnapshot;
-        }
-
-        if (!AstralNetPhaseGuard.Guard(AstralNetPhase.StartRunBootstrap, "run settings startup sync"))
-        {
-            var safeSnapshot = CreateSafeSnapshot();
-            state.SetSnapshot(safeSnapshot);
-            return safeSnapshot;
         }
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
@@ -218,15 +175,9 @@ internal static class ReAstralPartyRunSettingsSync
         if (!isHost)
         {
             var remoteChoiceId = synchronizer.ReserveChoiceId(authorityPlayer);
-            var remoteChoice = await DeterministicMultiplayerChoiceHelper.WaitForRemoteIndexedEnvelope(
-                synchronizer,
-                authorityPlayer,
-                remoteChoiceId,
-                AstralChoiceKind.RunSettingsSnapshot,
-                runState,
-                "run_settings_snapshot",
-                "run settings startup sync");
-            if (remoteChoice != null && TryDecodeSnapshotPayload(remoteChoice.Value.Payload, out var remoteSnapshot))
+            if (TryDecodeSnapshotChoiceResult(
+                    await synchronizer.WaitForRemoteChoice(authorityPlayer, remoteChoiceId),
+                    out var remoteSnapshot))
             {
                 state.SetSnapshot(remoteSnapshot);
                 MainFile.Logger.Info(
@@ -283,6 +234,24 @@ internal static class ReAstralPartyRunSettingsSync
         }
 
         return runManager.PlayerChoiceSynchronizer;
+    }
+
+    private static bool TryGetIndexPayload(PlayerChoiceResult result, out List<int> payload)
+    {
+        payload = [];
+        try
+        {
+            var indexes = result.AsIndexes();
+            if (indexes == null)
+                return false;
+
+            payload = indexes;
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
     }
 
     private sealed class RunSettingsSyncState

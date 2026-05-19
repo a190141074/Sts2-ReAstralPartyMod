@@ -161,6 +161,7 @@ internal static class GameplayStaticPatchCatalog
 
         patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
+        patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)
