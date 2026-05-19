@@ -7,7 +7,7 @@ using MegaCrit.Sts2.Core.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
-public static class AstralEventCardPool
+public static class AstralEventCardCatalog
 {
     private static readonly CardModel[] EventCards =
     [

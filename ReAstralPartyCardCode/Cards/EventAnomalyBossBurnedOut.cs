@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 212)]
 public class EventAnomalyBossBurnedOut : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
@@ -28,7 +29,7 @@ public class EventAnomalyBossBurnedOut : AstralPartyCardModel
         if (Owner?.Creature?.CombatState == null)
             return;
 
-        var offeredCards = AstralEventCardPool.CreateStableBossBurnedOutSafeCardsForPlayer(Owner, this, 3);
+        var offeredCards = AstralEventCardCatalog.CreateStableBossBurnedOutSafeCardsForPlayer(Owner, this, 3);
         if (offeredCards.Count > 0)
         {
             var selectedCard = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayer(

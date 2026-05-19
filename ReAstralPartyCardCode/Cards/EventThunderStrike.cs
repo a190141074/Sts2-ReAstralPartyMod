@@ -12,6 +12,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
  * 天打雷劈：全场单位受到伤�? */
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 13)]
 public class EventThunderStrike : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

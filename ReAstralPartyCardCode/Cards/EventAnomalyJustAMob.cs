@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 210)]
 public class EventAnomalyJustAMob : AstralPartyCardModel
 {
     private const decimal TemporaryDexterityAmount = 2m;

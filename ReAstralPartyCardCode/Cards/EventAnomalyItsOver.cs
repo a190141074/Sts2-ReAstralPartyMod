@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 204)]
 public class EventAnomalyItsOver : AstralPartyCardModel
 {
     private const decimal WeakAmount = 1m;

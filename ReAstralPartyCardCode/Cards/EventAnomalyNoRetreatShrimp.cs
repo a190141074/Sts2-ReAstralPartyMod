@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 207)]
 public class EventAnomalyNoRetreatShrimp : AstralPartyCardModel
 {
     private const decimal TemporaryStrengthAmount = 3m;

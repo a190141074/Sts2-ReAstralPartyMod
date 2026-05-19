@@ -94,7 +94,7 @@ public class PersonWeirdEgg : LegacyCooldownPersonaRelicBase
             return;
         if (cardPlay.Card is SkillTroubleMaker)
             return;
-        if (!AstralEventCardPool.IsEventCard(cardPlay.Card))
+        if (!AstralEventCardCatalog.IsEventCard(cardPlay.Card))
             return;
 
         Flash();

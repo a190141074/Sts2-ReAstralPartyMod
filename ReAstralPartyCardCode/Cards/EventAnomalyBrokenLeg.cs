@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 209)]
 public class EventAnomalyBrokenLeg : AstralPartyCardModel
 {
     private const decimal DamageAmount = 2m;

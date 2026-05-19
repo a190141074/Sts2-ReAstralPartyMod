@@ -13,6 +13,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 // Equality: set all allies to 1 HP and grant 50 Block.
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 3)]
 public class EventEquality : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

@@ -13,6 +13,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
  * 所有玩家获�?活力
  */
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 10)]
 public class EventRedHeatWarning : AstralPartyCardModel
 {
     protected override IEnumerable<DynamicVar> CanonicalVars => [new PowerVar<VigorPower>(5m)];

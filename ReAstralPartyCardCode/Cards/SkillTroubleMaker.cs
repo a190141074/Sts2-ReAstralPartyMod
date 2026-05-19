@@ -38,7 +38,7 @@ public class SkillTroubleMaker : AstralPartyCardModel
         RecordTelemetryOnPlay();
         if (CombatState == null || Owner == null) return;
 
-        var offeredCards = AstralEventCardPool.CreateStableTroubleMakerCardsForPlayer(Owner, this, _cardsToShow);
+        var offeredCards = AstralEventCardCatalog.CreateStableTroubleMakerCardsForPlayer(Owner, this, _cardsToShow);
 
         if (offeredCards.Count == 0) return;
 

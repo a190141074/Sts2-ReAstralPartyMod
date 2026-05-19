@@ -56,7 +56,7 @@ public class PersonalityDerivativeLivingFolio : AstralPartyRelicModel
             return Task.CompletedTask;
         if (cardPlay.Card is SkillTroubleMaker)
             return Task.CompletedTask;
-        if (!AstralEventCardPool.IsEventCard(cardPlay.Card))
+        if (!AstralEventCardCatalog.IsEventCard(cardPlay.Card))
             return Task.CompletedTask;
 
         AddStacksCapped(1);

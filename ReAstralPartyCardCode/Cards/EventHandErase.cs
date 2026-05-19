@@ -12,6 +12,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 // 6. 手牌抹除：给所有友方单位弃掉从右往左第一张牌
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 8)]
 public class EventHandErase : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 12)]
 public class EventThunderApproaches : AstralPartyCardModel
 {
     protected override IEnumerable<DynamicVar> CanonicalVars =>

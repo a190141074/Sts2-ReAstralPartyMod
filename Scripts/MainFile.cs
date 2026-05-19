@@ -34,9 +34,13 @@ public class MainFile
         PreloadSavedPropertyCache(assembly);
         SavedPropertyGovernance.LogGovernanceSummary(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
-        RitsuLibFramework.GetContentRegistry(ModId).RegisterCardLibraryCompendiumSharedPoolFilter<PersonaSkillCardPool>(
+        var contentRegistry = RitsuLibFramework.GetContentRegistry(ModId);
+        contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<PersonaSkillCardPool>(
             "persona_skill_pool",
             "res://ReAstralPartyMod/images/ui/persona_skill_pool.png");
+        contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<AstralEventCardPool>(
+            "astral_event_card_pool",
+            "res://ReAstralPartyMod/images/ui/astral_event_card_pool.png");
         GameplayPatchRegistry.RegisterAndApply();
         AstralTelemetry.Initialize();
         AstralChoiceProtocol.LogStartupDiagnostics();
@@ -103,4 +107,3 @@ public class MainFile
         return Convert.ToHexString(hash);
     }
 }
-

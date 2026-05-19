@@ -12,6 +12,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 // 加入哪个卡池
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 0)]
 public class EventAngelsDescent : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

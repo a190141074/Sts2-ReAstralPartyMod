@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 206)]
 public class EventAnomalyTransferRequest : AstralPartyCardModel
 {
     private const int GoldLossPerOtherPlayer = 3;

@@ -16,6 +16,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
  * 1~3你受�?伤害，其他玩家受�?伤害
  */
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 9)]
 public class EventPlayerRepresentative : AstralPartyCardModel
 {
     protected override IEnumerable<DynamicVar> CanonicalVars =>

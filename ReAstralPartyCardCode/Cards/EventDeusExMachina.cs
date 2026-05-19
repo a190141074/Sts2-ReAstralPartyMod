@@ -13,6 +13,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
  * 天降神兵
  * 从所有的事件�?除了机械降神)选择一张事件卡，打出两�? */
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 2)]
 public class EventDeusExMachina : AstralPartyCardModel
 {
     private static readonly LocString SelectionPrompt =
@@ -34,7 +35,7 @@ public class EventDeusExMachina : AstralPartyCardModel
     {
         if (CombatState == null || Owner == null) return;
 
-        var offeredCards = AstralEventCardPool.CreateMutableEventCardsForPlayer(Owner, typeof(EventDeusExMachina));
+        var offeredCards = AstralEventCardCatalog.CreateMutableEventCardsForPlayer(Owner, typeof(EventDeusExMachina));
 
         if (offeredCards.Count == 0) return;
 

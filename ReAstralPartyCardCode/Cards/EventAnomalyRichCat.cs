@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
+[RegisterCard(typeof(AstralEventCardPool), Order = 203)]
 public class EventAnomalyRichCat : AstralPartyCardModel
 {
     private const decimal HalfLifeHealAmount = 2m;
