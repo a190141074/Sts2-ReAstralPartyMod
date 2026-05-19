@@ -35,8 +35,10 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private const float HolderWidth = 136f;
     private const float HolderHeight = 136f;
     private const int MaxFightTieRounds = 4;
+    private const int MultiplayerChoiceMagic = unchecked((int)0x52415053);
+    private const int ChoiceKindSelectionUpdate = 1;
+    private const int ChoiceKindSelectionCommit = 2;
     private const int MaxSynchronizerWaitFrames = 600;
-    private const int MaxLocalPlayerResolveWaitFrames = 600;
     private const int SelectionCommitTimeoutMilliseconds = 10 * 60 * 1000;
     private const int SelectionCommitGraceMilliseconds = 5 * 1000;
 
@@ -48,7 +50,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private readonly List<Player> _orderedPlayers;
     private readonly Dictionary<ulong, PlayerSelectionState> _selectionStates = new();
     private readonly Dictionary<ModelId, NTreasureRoomRelicHolder> _holdersById = new();
-    private readonly Dictionary<NTreasureRoomRelicHolder, int> _holderOptionIndexes = new();
     private readonly Dictionary<ulong, uint> _nextChoiceIdsByPlayer = new();
     private readonly Dictionary<ulong, int> _selectionSequencesByPlayer = new();
     private readonly Dictionary<ulong, int> _pendingLocalSelectionIndexes = new();
@@ -68,9 +69,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private Player? _authorityPlayer;
     private bool _multiplayerCommitSent;
     private bool _closeQueued;
-    private readonly string _choiceSessionKey;
-    private int _deferredUnresolvedLocalSelectionIndex = -1;
-    private CommittedSelectionSnapshot? _resolvedSelectionSnapshot;
 
     public NetScreenType ScreenType => NetScreenType.None;
 
@@ -85,10 +83,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _orderedPlayers = runState.Players
             .OrderBy(static player => player.NetId)
             .ToList();
-        _localPlayer = ResolveLocalPlayer(_orderedPlayers);
+        _localPlayer = LocalContext.GetMe(_orderedPlayers) ?? _orderedPlayers.FirstOrDefault();
         _authorityPlayer = ResolveAuthorityPlayer(_orderedPlayers, _localPlayer);
-        _choiceSessionKey =
-            $"starting_persona_selection|{AstralChoiceProtocol.CreateRunScopeKey(runState)}|{_orderedPlayers.Count}";
 
         foreach (var player in _orderedPlayers)
         {
@@ -256,12 +252,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             _holderContainer.AddChild(holder);
             holder.Initialize(relic, _runState);
             holder.VoteContainer.Initialize(
-                player => PlayerSelectedHolder(player, GetHolderOptionIndex(holder)),
+                player => PlayerSelectedHolder(player, holder.Index),
                 _orderedPlayers);
             holder.Connect(NClickableControl.SignalName.Released,
                 Callable.From<NTreasureRoomRelicHolder>(_ => OnHolderSelected(holder)));
             _holdersById[relic.Id] = holder;
-            _holderOptionIndexes[holder] = index;
         }
 
         ApplyHolderLayout(_holdersById.Values.OrderBy(holder => holder.Index).ToList(), _relicOptions.Count);
@@ -295,9 +290,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         try
         {
-            await WaitForSelectionEnvironmentReadyAsync();
             await CollectSelectionsAsync();
-            var results = ResolveSelectionResultsFromCommittedSnapshot();
+            var results = ResolveSelectionResults();
             await AnimateSelectionResultsAsync(results);
             await AwardRelicsAsync(results);
             _completionSource.TrySetResult();
@@ -309,29 +303,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
     }
 
-    private async Task WaitForSelectionEnvironmentReadyAsync()
-    {
-        for (var frame = 0; frame < 180 && !_closed; frame++)
-        {
-            if (NOverlayStack.Instance != null &&
-                NGame.Instance != null &&
-                RunManager.Instance?.PlayerChoiceSynchronizer != null)
-                return;
-
-            if (NGame.Instance?.IsInsideTree() == true)
-                await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
-            else
-                await Task.Yield();
-        }
-    }
-
     private async Task CollectSelectionsAsync()
     {
-        RefreshLocalPlayerIdentity();
+        SaveAllOptionsAsSeen();
 
         if (RunManager.Instance.NetService.Type is NetGameType.Singleplayer or NetGameType.None)
         {
-            SaveAllOptionsAsSeen();
             var selectedIndex = await _singlePlayerChoiceSource.Task;
             ApplySelection(_localPlayer ?? _orderedPlayers[0], selectedIndex);
             AstralTelemetry.RecordPersonaChoice(
@@ -342,11 +319,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     [(_localPlayer ?? _orderedPlayers[0]).NetId] = selectedIndex
                 });
             FinalizeSelectionDisplay("选择已锁定，开始结算……");
-            _resolvedSelectionSnapshot = new CommittedSelectionSnapshot
-            {
-                SelectedIndexes = [selectedIndex],
-                AwardedIndexes = [selectedIndex]
-            };
             return;
         }
 
@@ -354,13 +326,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                                    ?? throw new InvalidOperationException(
                                        "PlayerChoiceSynchronizer was not ready for starting persona selection.");
         InitializeMultiplayerChoiceStreams(_multiplayerSynchronizer);
-        _ = TaskHelper.RunSafely(EnsureLocalPlayerIdentityReadyAsync());
         FlushPendingLocalSelectionIfNeeded();
         UpdatePendingSubtitle();
 
         foreach (var player in _orderedPlayers)
         {
-            if (ShouldSkipRemoteObserverForPlayer(player))
+            if (_localPlayer != null && player.NetId == _localPlayer.NetId)
                 continue;
 
             _ = ObserveRemoteSelectionsAsync(player, _multiplayerSynchronizer);
@@ -495,76 +466,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     player = null,
                     relic = relic
                 });
-        }
-
-        return results
-            .OrderBy(result => result.type)
-            .ThenBy(result => result.relic.Id.Entry, StringComparer.Ordinal)
-            .ToList();
-    }
-
-    private List<RelicPickingResult> ResolveSelectionResultsFromCommittedSnapshot()
-    {
-        if (_resolvedSelectionSnapshot?.AwardedIndexes == null ||
-            _resolvedSelectionSnapshot.AwardedIndexes.Count != _orderedPlayers.Count)
-            return ResolveSelectionResults();
-
-        var selectedIndexes = _resolvedSelectionSnapshot.SelectedIndexes;
-        var awardedIndexes = _resolvedSelectionSnapshot.AwardedIndexes;
-        var duplicatePersonasEnabled = ReAstralPartyModSettingsManager.GetEnableDuplicatePersonas(_runState);
-        var voteCountsByRelicIndex = new Dictionary<int, int>();
-
-        for (var i = 0; i < selectedIndexes.Count; i++)
-        {
-            var selectedIndex = selectedIndexes[i];
-            if (selectedIndex < 0 || selectedIndex >= _relicOptions.Count)
-                continue;
-
-            voteCountsByRelicIndex[selectedIndex] = voteCountsByRelicIndex.GetValueOrDefault(selectedIndex) + 1;
-        }
-
-        var results = new List<RelicPickingResult>();
-        var awardedRelicIndexes = new HashSet<int>();
-        for (var playerIndex = 0; playerIndex < _orderedPlayers.Count; playerIndex++)
-        {
-            var awardedIndex = awardedIndexes[playerIndex];
-            if (awardedIndex < 0 || awardedIndex >= _relicOptions.Count)
-                continue;
-
-            awardedRelicIndexes.Add(awardedIndex);
-            var selectedIndex = playerIndex < selectedIndexes.Count ? selectedIndexes[playerIndex] : -1;
-            var resultType = RelicPickingResultType.ConsolationPrize;
-            if (duplicatePersonasEnabled)
-            {
-                resultType = RelicPickingResultType.OnlyOnePlayerVoted;
-            }
-            else if (selectedIndex == awardedIndex)
-            {
-                var voteCount = voteCountsByRelicIndex.GetValueOrDefault(selectedIndex);
-                resultType = voteCount > 1
-                    ? RelicPickingResultType.FoughtOver
-                    : RelicPickingResultType.OnlyOnePlayerVoted;
-            }
-
-            results.Add(new RelicPickingResult
-            {
-                type = resultType,
-                relic = _relicOptions[awardedIndex],
-                player = _orderedPlayers[playerIndex]
-            });
-        }
-
-        for (var relicIndex = 0; relicIndex < _relicOptions.Count; relicIndex++)
-        {
-            if (awardedRelicIndexes.Contains(relicIndex))
-                continue;
-
-            results.Add(new RelicPickingResult
-            {
-                type = RelicPickingResultType.Skipped,
-                relic = _relicOptions[relicIndex],
-                player = null
-            });
         }
 
         return results
@@ -828,9 +729,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             awardedResults.Add((result.player, relic));
         }
 
-        if (IsInstanceValid(_subtitleLabel))
-            _subtitleLabel.Text = "人格已发放，正在保存……";
-
         await PersistStartingPersonaSelectionAsync(awardedResults);
         await Cmd.Wait(0.2f);
     }
@@ -857,7 +755,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private void OnHolderSelected(NTreasureRoomRelicHolder holder)
     {
-        var selectedIndex = GetHolderOptionIndex(holder);
         if (_selectionFinalized)
             return;
 
@@ -866,48 +763,36 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         if (RunManager.Instance.NetService.Type is NetGameType.Singleplayer or NetGameType.None)
         {
-            ApplySelection(_localPlayer ?? _orderedPlayers[0], selectedIndex);
+            ApplySelection(_localPlayer ?? _orderedPlayers[0], holder.Index);
             _subtitleLabel.Text = "已选择起始人格，开始结算……";
-            _singlePlayerChoiceSource.TrySetResult(selectedIndex);
+            _singlePlayerChoiceSource.TrySetResult(holder.Index);
             return;
         }
 
-        RefreshLocalPlayerIdentity();
         if (_localPlayer == null || _multiplayerSynchronizer == null ||
             !_nextChoiceIdsByPlayer.ContainsKey(_localPlayer.NetId))
         {
-            _deferredUnresolvedLocalSelectionIndex = selectedIndex;
             if (_localPlayer != null)
             {
-                _pendingLocalSelectionIndexes[_localPlayer.NetId] = selectedIndex;
-                ApplySelection(_localPlayer, selectedIndex);
+                _pendingLocalSelectionIndexes[_localPlayer.NetId] = holder.Index;
+                ApplySelection(_localPlayer, holder.Index);
                 UpdatePendingSubtitle();
             }
 
-            _subtitleLabel.Text = _localPlayer == null
-                ? "正在识别当前玩家，请稍候再试。"
-                : "联机同步尚未就绪，请稍候再试。";
+            _subtitleLabel.Text = "联机同步尚未就绪，请稍候再试。";
             return;
         }
 
-        if (_selectionStates[_localPlayer.NetId].SelectedRelic?.Id == _relicOptions[selectedIndex].Id)
+        if (_selectionStates[_localPlayer.NetId].SelectedRelic?.Id == _relicOptions[holder.Index].Id)
         {
             UpdatePendingSubtitle();
             return;
         }
 
-        ApplySelection(_localPlayer, selectedIndex);
-        SendLocalSelectionUpdate(selectedIndex);
+        ApplySelection(_localPlayer, holder.Index);
+        SendLocalSelectionUpdate(holder.Index);
         UpdatePendingSubtitle();
         MaybeCommitSelections();
-    }
-
-    private int GetHolderOptionIndex(NTreasureRoomRelicHolder holder)
-    {
-        if (_holderOptionIndexes.TryGetValue(holder, out var index))
-            return index;
-
-        return holder.Index;
     }
 
     private void RefreshVotes(bool animate = true)
@@ -994,8 +879,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private sealed class CommittedSelectionSnapshot
     {
         public required IReadOnlyList<int> SelectedIndexes { get; init; }
-
-        public IReadOnlyList<int>? AwardedIndexes { get; init; }
     }
 
     private static string FormatMove(RelicPickingFightMove move)
@@ -1034,23 +917,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             while (!_multiplayerCommitSource.Task.IsCompleted && !_closed)
             {
-                if (!_nextChoiceIdsByPlayer.TryGetValue(player.NetId, out var choiceId))
-                {
-                    MainFile.Logger.Warn(
-                        $"Starting persona selection remote observer missing choice id for player={player.NetId}; stopping observer.");
-                    return;
-                }
-
-                var waitTask = DeterministicMultiplayerChoiceHelper.WaitForRemoteIndexedEnvelopeAnyKind(
-                    synchronizer,
-                    player,
-                    choiceId,
-                    player.NetId == _authorityPlayer?.NetId
-                        ? [AstralChoiceKind.StartingPersonaSelectionUpdate, AstralChoiceKind.StartingPersonaSelectionCommit]
-                        : [AstralChoiceKind.StartingPersonaSelectionUpdate],
-                    _runState,
-                    _choiceSessionKey,
-                    "starting persona selection");
+                var choiceId = _nextChoiceIdsByPlayer[player.NetId];
+                var waitTask = synchronizer.WaitForRemoteChoice(player, choiceId);
                 var completedTask = await Task.WhenAny(waitTask, _multiplayerCommitSource.Task);
                 if (completedTask != waitTask)
                 {
@@ -1059,15 +927,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 }
 
                 var remoteChoice = await waitTask;
-                if (remoteChoice == null)
-                {
-                    MainFile.Logger.Error(
-                        $"Starting persona selection exhausted remote choice stream: player={player.NetId} choiceId={choiceId}.");
-                    return;
-                }
-
-                if (remoteChoice.Value.Kind == AstralChoiceKind.StartingPersonaSelectionUpdate &&
-                    TryDecodeSelectionUpdate(remoteChoice.Value.RawResult, out var sequence, out var selectedIndex))
+                if (TryDecodeSelectionUpdate(remoteChoice, out var sequence, out var selectedIndex))
                 {
                     _nextChoiceIdsByPlayer[player.NetId] = synchronizer.ReserveChoiceId(player);
                     ApplyRemoteSelectionUpdate(player, sequence, selectedIndex);
@@ -1075,24 +935,22 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     continue;
                 }
 
-                if (remoteChoice.Value.Kind == AstralChoiceKind.StartingPersonaSelectionCommit &&
-                    _authorityPlayer != null
+                if (_authorityPlayer != null
                     && player.NetId == _authorityPlayer.NetId
-                    && TryDecodeSelectionCommit(remoteChoice.Value.RawResult, out var selectedIndexes, out var awardedIndexes))
+                    && TryDecodeSelectionCommit(remoteChoice, out var selectedIndexes))
                 {
-                    _nextChoiceIdsByPlayer[player.NetId] = synchronizer.ReserveChoiceId(player);
                     MainFile.Logger.Info(
                         $"Starting persona selection received final commit: player={player.NetId} choiceId={choiceId}.");
                     _multiplayerCommitSource.TrySetResult(new CommittedSelectionSnapshot
                     {
-                        SelectedIndexes = selectedIndexes,
-                        AwardedIndexes = awardedIndexes
+                        SelectedIndexes = selectedIndexes
                     });
                     return;
                 }
 
                 MainFile.Logger.Warn(
-                    $"Starting persona selection ignored mismatched multiplayer choice after envelope wait: player={player.NetId} choiceId={choiceId}.");
+                    $"Starting persona selection skipped foreign multiplayer choice: player={player.NetId} choiceId={choiceId} result={remoteChoice}.");
+                _nextChoiceIdsByPlayer[player.NetId] = synchronizer.ReserveChoiceId(player);
             }
         }
         catch (ObjectDisposedException ex)
@@ -1103,6 +961,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         catch (Exception ex)
         {
             MainFile.Logger.Error($"Starting persona selection remote observer failed for player {player.NetId}: {ex}");
+            if (!_closed && !_selectionFinalized)
+                _multiplayerCommitSource.TrySetException(ex);
         }
     }
 
@@ -1147,8 +1007,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (!AreAllSelectionsSubmitted())
             return;
 
-        var committedSnapshot = BuildAuthorityCommittedSnapshot();
-        var selectedIndexes = committedSnapshot.SelectedIndexes;
+        var selectedIndexes = BuildCommittedSelectionIndexes();
         if (selectedIndexes.Any(index => index < 0 || index >= _relicOptions.Count))
         {
             MainFile.Logger.Warn(
@@ -1160,14 +1019,16 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _multiplayerSynchronizer.SyncLocalChoice(
             _authorityPlayer,
             choiceId,
-            CreateSelectionCommitChoiceResult(committedSnapshot));
-        _nextChoiceIdsByPlayer[_authorityPlayer.NetId] = _multiplayerSynchronizer.ReserveChoiceId(_authorityPlayer);
+            CreateSelectionCommitChoiceResult(selectedIndexes));
         _multiplayerCommitSent = true;
 
         MainFile.Logger.Info(
             $"Starting persona selection sent final commit: player={_authorityPlayer.NetId} choiceId={choiceId} indexes={string.Join(",", selectedIndexes)}.");
 
-        _multiplayerCommitSource.TrySetResult(committedSnapshot);
+        _multiplayerCommitSource.TrySetResult(new CommittedSelectionSnapshot
+        {
+            SelectedIndexes = selectedIndexes
+        });
     }
 
     private async Task<CommittedSelectionSnapshot> ResolveTimeoutFallbackAsync()
@@ -1235,35 +1096,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         };
     }
 
-    private CommittedSelectionSnapshot BuildAuthorityCommittedSnapshot()
-    {
-        var selectedIndexes = BuildCommittedSelectionIndexes();
-        var awardedIndexes = BuildAwardedIndexesFromCurrentSelections();
-        return new CommittedSelectionSnapshot
-        {
-            SelectedIndexes = selectedIndexes,
-            AwardedIndexes = awardedIndexes
-        };
-    }
-
-    private List<int> BuildAwardedIndexesFromCurrentSelections()
-    {
-        var awardedIndexes = Enumerable.Repeat(-1, _orderedPlayers.Count).ToList();
-        foreach (var result in ResolveSelectionResults())
-        {
-            if (result.player == null)
-                continue;
-
-            var playerIndex = _orderedPlayers.FindIndex(player => player.NetId == result.player.NetId);
-            if (playerIndex < 0)
-                continue;
-
-            awardedIndexes[playerIndex] = IndexOfRelic(_relicOptions, result.relic);
-        }
-
-        return awardedIndexes;
-    }
-
     private int SelectDeterministicTimeoutFallbackIndex(Player player, IReadOnlySet<int> reservedIndexes)
     {
         var orderedIndexes = Enumerable.Range(0, _relicOptions.Count)
@@ -1298,17 +1130,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         try
         {
-            var snapshot = new CommittedSelectionSnapshot
-            {
-                SelectedIndexes = selectedIndexes,
-                AwardedIndexes = BuildAwardedIndexesFromCurrentSelections()
-            };
             var choiceId = _nextChoiceIdsByPlayer[_authorityPlayer.NetId];
             _multiplayerSynchronizer.SyncLocalChoice(
                 _authorityPlayer,
                 choiceId,
-                CreateSelectionCommitChoiceResult(snapshot));
-            _nextChoiceIdsByPlayer[_authorityPlayer.NetId] = _multiplayerSynchronizer.ReserveChoiceId(_authorityPlayer);
+                CreateSelectionCommitChoiceResult(selectedIndexes));
             _multiplayerCommitSent = true;
 
             MainFile.Logger.Warn(
@@ -1336,112 +1162,36 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private void ApplyCommittedSelections(CommittedSelectionSnapshot snapshot)
     {
-        var normalizedSelectedIndexes = TryNormalizeCommittedSelectionIndexes(snapshot.SelectedIndexes, out var selectedIndexes)
-            ? selectedIndexes
-            : BuildTimeoutFallbackSnapshot().SelectedIndexes.ToList();
+        if (snapshot.SelectedIndexes.Count != _orderedPlayers.Count)
+            throw new InvalidOperationException(
+                $"Starting persona selection commit player count mismatch: expected {_orderedPlayers.Count}, got {snapshot.SelectedIndexes.Count}.");
 
         for (var i = 0; i < _orderedPlayers.Count; i++)
-            ApplySelection(_orderedPlayers[i], normalizedSelectedIndexes[i]);
-
-        var normalizedAwardedIndexes = TryNormalizeCommittedAwardedIndexes(snapshot.AwardedIndexes, out var awardedIndexes)
-            ? awardedIndexes
-            : BuildAwardedIndexesFromCurrentSelections();
-
-        _resolvedSelectionSnapshot = new CommittedSelectionSnapshot
         {
-            SelectedIndexes = normalizedSelectedIndexes,
-            AwardedIndexes = normalizedAwardedIndexes
-        };
+            if (snapshot.SelectedIndexes[i] < 0 || snapshot.SelectedIndexes[i] >= _relicOptions.Count)
+                throw new InvalidOperationException(
+                    $"Starting persona selection commit index out of range for player {_orderedPlayers[i].NetId}: {snapshot.SelectedIndexes[i]} / {_relicOptions.Count}.");
+
+            ApplySelection(_orderedPlayers[i], snapshot.SelectedIndexes[i]);
+        }
 
         AstralTelemetry.RecordPersonaChoice(
             _runState,
             _relicOptions,
             _orderedPlayers
-                .Select((player, index) => new KeyValuePair<ulong, int>(player.NetId, normalizedSelectedIndexes[index]))
+                .Select((player, index) => new KeyValuePair<ulong, int>(player.NetId, snapshot.SelectedIndexes[index]))
                 .ToDictionary());
 
         FinalizeSelectionDisplay("所有玩家已锁定选择，开始结算……");
-    }
-
-    private bool TryNormalizeCommittedSelectionIndexes(
-        IReadOnlyList<int> selectedIndexes,
-        out List<int> normalizedSelectedIndexes)
-    {
-        normalizedSelectedIndexes = [];
-        if (selectedIndexes.Count != _orderedPlayers.Count)
-        {
-            MainFile.Logger.Warn(
-                $"Starting persona selection commit player count mismatch: expected {_orderedPlayers.Count}, got {selectedIndexes.Count}; falling back to deterministic local snapshot.");
-            return false;
-        }
-
-        for (var i = 0; i < _orderedPlayers.Count; i++)
-        {
-            var selectedIndex = selectedIndexes[i];
-            if (selectedIndex < 0 || selectedIndex >= _relicOptions.Count)
-            {
-                MainFile.Logger.Warn(
-                    $"Starting persona selection commit index out of range for player {_orderedPlayers[i].NetId}: {selectedIndex} / {_relicOptions.Count}; falling back to deterministic local snapshot.");
-                return false;
-            }
-
-            normalizedSelectedIndexes.Add(selectedIndex);
-        }
-
-        return true;
-    }
-
-    private bool TryNormalizeCommittedAwardedIndexes(
-        IReadOnlyList<int>? awardedIndexes,
-        out List<int> normalizedAwardedIndexes)
-    {
-        normalizedAwardedIndexes = [];
-        if (awardedIndexes == null || awardedIndexes.Count == 0)
-            return false;
-
-        if (awardedIndexes.Count != _orderedPlayers.Count)
-        {
-            MainFile.Logger.Warn(
-                $"Starting persona selection awarded snapshot player count mismatch: expected {_orderedPlayers.Count}, got {awardedIndexes.Count}; recomputing locally.");
-            return false;
-        }
-
-        for (var i = 0; i < _orderedPlayers.Count; i++)
-        {
-            var awardedIndex = awardedIndexes[i];
-            if (awardedIndex < 0 || awardedIndex >= _relicOptions.Count)
-            {
-                MainFile.Logger.Warn(
-                    $"Starting persona selection awarded index out of range for player {_orderedPlayers[i].NetId}: {awardedIndex} / {_relicOptions.Count}; recomputing locally.");
-                return false;
-            }
-
-            normalizedAwardedIndexes.Add(awardedIndex);
-        }
-
-        return true;
     }
 
     private void FinalizeSelectionDisplay(string subtitle)
     {
         _selectionFinalized = true;
         foreach (var holder in _holdersById.Values)
-        {
-            if (!IsInstanceValid(holder))
-                continue;
+            holder.Disable();
 
-            try
-            {
-                holder.Disable();
-            }
-            catch (ObjectDisposedException)
-            {
-                // Late fallback commits can race with UI teardown; ignore disposed holders.
-            }
-        }
-
-        if (IsInstanceValid(_subtitleLabel))
-            _subtitleLabel.Text = subtitle;
+        _subtitleLabel.Text = subtitle;
     }
 
     private void UpdatePendingSubtitle()
@@ -1450,13 +1200,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
 
         var selectedCount = _selectionStates.Values.Count(static state => state.SelectedRelic != null);
-        if (_localPlayer == null)
-        {
-            _subtitleLabel.Text = "正在同步当前玩家身份，请稍候……";
-            return;
-        }
-
-        if (!_selectionStates.TryGetValue(_localPlayer.NetId, out var localState) ||
+        if (_localPlayer == null || !_selectionStates.TryGetValue(_localPlayer.NetId, out var localState) ||
             localState.SelectedRelic == null)
         {
             _subtitleLabel.Text = BuildSelectionIntroSubtitle();
@@ -1561,84 +1305,73 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         return IsInsideTree();
     }
 
-    private PlayerChoiceResult CreateSelectionUpdateChoiceResult(int sequence, int selectedIndex)
+    private static PlayerChoiceResult CreateSelectionUpdateChoiceResult(int sequence, int selectedIndex)
     {
-        return AstralChoiceProtocol.CreateIndexedEnvelope(
-            AstralChoiceKind.StartingPersonaSelectionUpdate,
-            _runState,
-            _choiceSessionKey,
-            sequence,
-            [selectedIndex]);
+        return PlayerChoiceResult.FromIndexes([
+            MultiplayerChoiceMagic, ChoiceKindSelectionUpdate, sequence, selectedIndex
+        ]);
     }
 
-    private PlayerChoiceResult CreateSelectionCommitChoiceResult(CommittedSelectionSnapshot snapshot)
+    private static PlayerChoiceResult CreateSelectionCommitChoiceResult(IReadOnlyList<int> selectedIndexes)
     {
-        var payload = new List<int>((snapshot.SelectedIndexes.Count * 2) + 2)
+        var payload = new List<int>(selectedIndexes.Count + 3)
         {
-            snapshot.SelectedIndexes.Count
+            MultiplayerChoiceMagic,
+            ChoiceKindSelectionCommit,
+            selectedIndexes.Count
         };
-        payload.AddRange(snapshot.SelectedIndexes);
-        var awardedIndexes = snapshot.AwardedIndexes ?? [];
-        payload.Add(awardedIndexes.Count);
-        payload.AddRange(awardedIndexes);
-        return AstralChoiceProtocol.CreateIndexedEnvelope(
-            AstralChoiceKind.StartingPersonaSelectionCommit,
-            _runState,
-            _choiceSessionKey,
-            0,
-            payload);
+        payload.AddRange(selectedIndexes);
+        return PlayerChoiceResult.FromIndexes(payload);
     }
 
-    private bool TryDecodeSelectionUpdate(PlayerChoiceResult result, out int sequence, out int selectedIndex)
+    private static bool TryDecodeSelectionUpdate(PlayerChoiceResult result, out int sequence, out int selectedIndex)
     {
         sequence = 0;
         selectedIndex = -1;
-        if (!AstralChoiceProtocol.TryDecodeIndexedEnvelope(
-                result,
-                AstralChoiceKind.StartingPersonaSelectionUpdate,
-                _runState,
-                _choiceSessionKey,
-                out sequence,
-                out var payload)
-            || payload.Count < 1)
+        if (!TryGetIndexPayload(result, out var payload)
+            || payload.Count < 4
+            || payload[0] != MultiplayerChoiceMagic
+            || payload[1] != ChoiceKindSelectionUpdate)
             return false;
 
-        selectedIndex = payload[0];
+        sequence = payload[2];
+        selectedIndex = payload[3];
         return true;
     }
 
-    private bool TryDecodeSelectionCommit(
-        PlayerChoiceResult result,
-        out IReadOnlyList<int> selectedIndexes,
-        out IReadOnlyList<int> awardedIndexes)
+    private static bool TryDecodeSelectionCommit(PlayerChoiceResult result, out IReadOnlyList<int> selectedIndexes)
     {
         selectedIndexes = [];
-        awardedIndexes = [];
-        if (!AstralChoiceProtocol.TryDecodeIndexedEnvelope(
-                result,
-                AstralChoiceKind.StartingPersonaSelectionCommit,
-                _runState,
-                _choiceSessionKey,
-                out _,
-                out var payload)
-            || payload.Count < 1)
+        if (!TryGetIndexPayload(result, out var payload)
+            || payload.Count < 3
+            || payload[0] != MultiplayerChoiceMagic
+            || payload[1] != ChoiceKindSelectionCommit)
             return false;
 
-        var playerCount = payload[0];
-        if (playerCount < 0 || payload.Count < playerCount + 1)
+        var playerCount = payload[2];
+        if (playerCount < 0 || payload.Count < playerCount + 3)
             return false;
 
-        selectedIndexes = payload.Skip(1).Take(playerCount).ToArray();
-        var awardedStartIndex = playerCount + 1;
-        if (payload.Count <= awardedStartIndex)
-            return true;
-
-        var awardedCount = payload[awardedStartIndex];
-        if (awardedCount < 0 || payload.Count < awardedStartIndex + awardedCount + 1)
-            return false;
-
-        awardedIndexes = payload.Skip(awardedStartIndex + 1).Take(awardedCount).ToArray();
+        selectedIndexes = payload.Skip(3).Take(playerCount).ToArray();
         return true;
+    }
+
+    private static bool TryGetIndexPayload(PlayerChoiceResult result, out List<int> payload)
+    {
+        payload = [];
+        try
+        {
+            var indexes = result.AsIndexes();
+            if (indexes == null)
+                return false;
+
+            payload = indexes;
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
     }
 
     private static int IndexOfRelic(IReadOnlyList<RelicModel> relics, RelicModel relic)
@@ -1664,7 +1397,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         var authorityNetId = netService.Type == NetGameType.Host
             ? netService.NetId
             : netService is INetClientGameService clientService
-                ? clientService.NetClient?.HostNetId ?? 0UL
+                ? clientService.NetClient.HostNetId
                 : 0UL;
 
         if (authorityNetId != 0UL)
@@ -1675,92 +1408,6 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
 
         return localPlayer ?? orderedPlayers.FirstOrDefault();
-    }
-
-    private static Player? ResolveLocalPlayer(IReadOnlyList<Player> orderedPlayers)
-    {
-        var localPlayer = LocalContext.GetMe(orderedPlayers);
-        if (localPlayer != null)
-            return localPlayer;
-
-        var localNetId = RunManager.Instance?.NetService?.NetId ?? 0UL;
-        if (localNetId == 0UL)
-            return null;
-
-        return orderedPlayers.FirstOrDefault(player => player.NetId == localNetId);
-    }
-
-    private bool ShouldSkipRemoteObserverForPlayer(Player player)
-    {
-        if (_localPlayer != null && player.NetId == _localPlayer.NetId)
-            return true;
-
-        var localNetId = RunManager.Instance?.NetService?.NetId ?? 0UL;
-        return localNetId != 0UL && player.NetId == localNetId;
-    }
-
-    private bool RefreshLocalPlayerIdentity(bool logOnAcquire = false)
-    {
-        var resolvedLocalPlayer = ResolveLocalPlayer(_orderedPlayers);
-        if (resolvedLocalPlayer == null)
-            return false;
-
-        var previousNetId = _localPlayer?.NetId ?? 0UL;
-        var changed = previousNetId != resolvedLocalPlayer.NetId;
-        _localPlayer = resolvedLocalPlayer;
-        _authorityPlayer = ResolveAuthorityPlayer(_orderedPlayers, _localPlayer);
-        if (changed && logOnAcquire)
-        {
-            MainFile.Logger.Info(
-                $"Starting persona selection resolved local player identity: local={_localPlayer.NetId} authority={_authorityPlayer?.NetId ?? 0UL}.");
-        }
-
-        return true;
-    }
-
-    private async Task EnsureLocalPlayerIdentityReadyAsync()
-    {
-        if (RefreshLocalPlayerIdentity(logOnAcquire: true))
-        {
-            FinalizeLocalPlayerResolution();
-            return;
-        }
-
-        for (var frame = 0; frame < MaxLocalPlayerResolveWaitFrames && !_closed && !_selectionFinalized; frame++)
-        {
-            if (NGame.Instance?.IsInsideTree() == true)
-                await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
-            else
-                await Task.Yield();
-
-            if (!RefreshLocalPlayerIdentity(logOnAcquire: true))
-                continue;
-
-            FinalizeLocalPlayerResolution();
-            return;
-        }
-
-        MainFile.Logger.Warn("Starting persona selection could not resolve local player identity before timeout.");
-    }
-
-    private void FinalizeLocalPlayerResolution()
-    {
-        SaveAllOptionsAsSeen();
-        CaptureDeferredSelectionForResolvedLocalPlayer();
-        FlushPendingLocalSelectionIfNeeded();
-        UpdatePendingSubtitle();
-    }
-
-    private void CaptureDeferredSelectionForResolvedLocalPlayer()
-    {
-        if (_localPlayer == null)
-            return;
-        if (_deferredUnresolvedLocalSelectionIndex < 0 || _deferredUnresolvedLocalSelectionIndex >= _relicOptions.Count)
-            return;
-
-        _pendingLocalSelectionIndexes[_localPlayer.NetId] = _deferredUnresolvedLocalSelectionIndex;
-        ApplySelection(_localPlayer, _deferredUnresolvedLocalSelectionIndex);
-        _deferredUnresolvedLocalSelectionIndex = -1;
     }
 
     private void FlushPendingLocalSelectionIfNeeded()

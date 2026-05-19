@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using HarmonyLib;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
@@ -19,7 +21,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 {
     public static string PatchId => "starting_persona_relic_selection_patch";
     public static bool IsCritical => false;
-    public static string Description => "Open the starting persona relic selection after starting relics are finalized";
+    public static string Description => "Open the starting persona relic selection after a run starts";
 
     private static readonly object SelectionLifecycleLock = new();
     private static readonly HashSet<string> ActiveRunKeys = [];
@@ -27,34 +29,20 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(RunManager), nameof(RunManager.FinalizeStartingRelics))];
+        return [new(typeof(NGame), "StartRun", [typeof(RunState)])];
     }
 
-    public static void Postfix(RunManager __instance, ref Task __result)
+    public static void Postfix(RunState runState, ref Task __result)
     {
-        __result = RunAfterFinalizeStartingRelics(__result, __instance);
+        __result = RunAfterStartRun(__result, runState);
     }
 
-    private static async Task RunAfterFinalizeStartingRelics(Task originalTask, RunManager runManager)
+    private static async Task RunAfterStartRun(Task originalTask, RunState runState)
     {
-        await originalTask;
-        var runState = runManager.DebugOnlyGetState();
-        if (runState == null)
-        {
-            MainFile.Logger.Warn("Starting persona relic selection skipped because run state was unavailable after starting relic finalization.");
-            return;
-        }
-
         MainFile.Logger.Info(
             $"Starting persona relic selection patch entered: seed={runState.Rng.StringSeed} players={runState.Players.Count}.");
-        if (!AstralNetPhaseGuard.Guard(AstralNetPhase.StartRunBootstrap, "starting persona selection bootstrap"))
-        {
-            MainFile.Logger.Warn(
-                "Starting persona relic selection bootstrap was not ready yet; waiting briefly instead of skipping.");
-            await WaitForBootstrapReadinessAsync();
-        }
-
-        MainFile.Logger.Info("Starting persona relic selection patch resumed after starting relic finalization.");
+        await originalTask;
+        MainFile.Logger.Info("Starting persona relic selection patch resumed after StartRun task completed.");
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         var gameType = RunManager.Instance.NetService.Type;
         MainFile.Logger.Info(
@@ -108,20 +96,6 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         finally
         {
             screen.Close();
-        }
-    }
-
-    private static async Task WaitForBootstrapReadinessAsync()
-    {
-        for (var attempt = 0; attempt < 180; attempt++)
-        {
-            if (RunManager.Instance?.DebugOnlyGetState() != null)
-                return;
-
-            if (NGame.Instance != null && NOverlayStack.Instance != null)
-                return;
-
-            await Task.Yield();
         }
     }
 
