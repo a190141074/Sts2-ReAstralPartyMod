@@ -48,6 +48,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private readonly List<Player> _orderedPlayers;
     private readonly Dictionary<ulong, PlayerSelectionState> _selectionStates = new();
     private readonly Dictionary<ModelId, NTreasureRoomRelicHolder> _holdersById = new();
+    private readonly Dictionary<NTreasureRoomRelicHolder, int> _holderOptionIndexes = new();
     private readonly Dictionary<ulong, uint> _nextChoiceIdsByPlayer = new();
     private readonly Dictionary<ulong, int> _selectionSequencesByPlayer = new();
     private readonly Dictionary<ulong, int> _pendingLocalSelectionIndexes = new();
@@ -254,11 +255,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             _holderContainer.AddChild(holder);
             holder.Initialize(relic, _runState);
             holder.VoteContainer.Initialize(
-                player => PlayerSelectedHolder(player, holder.Index),
+                player => PlayerSelectedHolder(player, GetHolderOptionIndex(holder)),
                 _orderedPlayers);
             holder.Connect(NClickableControl.SignalName.Released,
                 Callable.From<NTreasureRoomRelicHolder>(_ => OnHolderSelected(holder)));
             _holdersById[relic.Id] = holder;
+            _holderOptionIndexes[holder] = index;
         }
 
         ApplyHolderLayout(_holdersById.Values.OrderBy(holder => holder.Index).ToList(), _relicOptions.Count);
@@ -776,6 +778,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private void OnHolderSelected(NTreasureRoomRelicHolder holder)
     {
+        var selectedIndex = GetHolderOptionIndex(holder);
         if (_selectionFinalized)
             return;
 
@@ -784,9 +787,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         if (RunManager.Instance.NetService.Type is NetGameType.Singleplayer or NetGameType.None)
         {
-            ApplySelection(_localPlayer ?? _orderedPlayers[0], holder.Index);
+            ApplySelection(_localPlayer ?? _orderedPlayers[0], selectedIndex);
             _subtitleLabel.Text = "已选择起始人格，开始结算……";
-            _singlePlayerChoiceSource.TrySetResult(holder.Index);
+            _singlePlayerChoiceSource.TrySetResult(selectedIndex);
             return;
         }
 
@@ -794,11 +797,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (_localPlayer == null || _multiplayerSynchronizer == null ||
             !_nextChoiceIdsByPlayer.ContainsKey(_localPlayer.NetId))
         {
-            _deferredUnresolvedLocalSelectionIndex = holder.Index;
+            _deferredUnresolvedLocalSelectionIndex = selectedIndex;
             if (_localPlayer != null)
             {
-                _pendingLocalSelectionIndexes[_localPlayer.NetId] = holder.Index;
-                ApplySelection(_localPlayer, holder.Index);
+                _pendingLocalSelectionIndexes[_localPlayer.NetId] = selectedIndex;
+                ApplySelection(_localPlayer, selectedIndex);
                 UpdatePendingSubtitle();
             }
 
@@ -808,16 +811,24 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
         }
 
-        if (_selectionStates[_localPlayer.NetId].SelectedRelic?.Id == _relicOptions[holder.Index].Id)
+        if (_selectionStates[_localPlayer.NetId].SelectedRelic?.Id == _relicOptions[selectedIndex].Id)
         {
             UpdatePendingSubtitle();
             return;
         }
 
-        ApplySelection(_localPlayer, holder.Index);
-        SendLocalSelectionUpdate(holder.Index);
+        ApplySelection(_localPlayer, selectedIndex);
+        SendLocalSelectionUpdate(selectedIndex);
         UpdatePendingSubtitle();
         MaybeCommitSelections();
+    }
+
+    private int GetHolderOptionIndex(NTreasureRoomRelicHolder holder)
+    {
+        if (_holderOptionIndexes.TryGetValue(holder, out var index))
+            return index;
+
+        return holder.Index;
     }
 
     private void RefreshVotes(bool animate = true)
