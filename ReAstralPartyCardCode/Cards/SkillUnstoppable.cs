@@ -34,7 +34,7 @@ public class SkillUnstoppable : AstralPartyCardModel
         HoverTipFactory.FromPower<FracturePower>()
     ];
 
-    public SkillUnstoppable() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
+    public SkillUnstoppable() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
     {
     }
 
