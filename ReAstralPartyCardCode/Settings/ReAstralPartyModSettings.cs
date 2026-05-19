@@ -18,6 +18,8 @@ public enum TokenSeriesMode
 
 public sealed class ReAstralPartyModSettings
 {
+    public bool EnableExtremeMode { get; set; }
+
     public bool EnableAllPersonas { get; set; }
 
     public bool EnableDuplicatePersonas { get; set; }
@@ -53,6 +55,8 @@ public static class ReAstralPartyModSettingsManager
     private static bool _loggedMissingGameplaySnapshot;
 
     public static bool EnableAllPersonas => ReadRuntime(settings => settings.EnableAllPersonas);
+
+    public static bool EnableExtremeMode => ReadRuntime(settings => settings.EnableExtremeMode);
 
     public static bool EnableDuplicatePersonas => ReadRuntime(settings => settings.EnableDuplicatePersonas);
 
@@ -205,6 +209,19 @@ public static class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableExtremeMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableExtremeMode,
+            (settings, value) =>
+            {
+                settings.EnableExtremeMode = value;
+                ApplyRuntimeSettings(settings, "enable_extreme_mode");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label",
+                    value);
+            });
+
         var enableDuplicatePersonas = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -325,6 +342,12 @@ public static class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.description",
                         "At run start, show all registered personas instead of the default player-count-based subset."))
                 .AddToggle(
+                    "enable_extreme_mode",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label", "Enable Extreme Mode"),
+                    enableExtremeMode,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.description",
+                        "Reserved toggle. It currently has no gameplay effect."))
+                .AddToggle(
                     "enable_duplicate_personas",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.label", "Enable Duplicate Personas"),
                     enableDuplicatePersonas,
@@ -349,7 +372,11 @@ public static class ReAstralPartyModSettingsManager
                     },
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.description",
                         "Choose whether runs use two random expansions, all expansions, or no expansion series at all."),
-                    ModSettingsChoicePresentation.Dropdown)
+                    ModSettingsChoicePresentation.Dropdown))
+            .AddSection("other", section => section
+                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.other.title", "Other"))
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.other.description",
+                    "Additional reserved toggles and experimental options."))
                 .AddToggle(
                     "enable_pure_angel_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label", "Enable Pure Angel Mode"),
@@ -448,7 +475,7 @@ public static class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): all_personas={snapshot.EnableAllPersonas}, duplicate_personas={snapshot.EnableDuplicatePersonas}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): all_personas={snapshot.EnableAllPersonas}, extreme_mode={snapshot.EnableExtremeMode}, duplicate_personas={snapshot.EnableDuplicatePersonas}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     private static TokenSeriesMode ResolveTokenSeriesModeCore(ReAstralPartyModSettings settings)
@@ -504,6 +531,8 @@ public static class ReAstralPartyModSettingsManager
 
     private sealed class LocalRuntimeSettings
     {
+        public bool EnableExtremeMode { get; init; }
+
         public bool EnableAllPersonas { get; init; }
 
         public bool EnableDuplicatePersonas { get; init; }
@@ -526,6 +555,7 @@ public static class ReAstralPartyModSettingsManager
         {
             return new LocalRuntimeSettings
             {
+                EnableExtremeMode = settings.EnableExtremeMode,
                 EnableAllPersonas = settings.EnableAllPersonas,
                 EnableDuplicatePersonas = settings.EnableDuplicatePersonas,
                 EnablePlayRecommendation = settings.EnablePlayRecommendation,
