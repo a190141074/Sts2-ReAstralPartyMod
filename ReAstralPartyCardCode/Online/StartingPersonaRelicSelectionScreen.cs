@@ -36,6 +36,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private const float HolderHeight = 136f;
     private const int MaxFightTieRounds = 4;
     private const int MaxSynchronizerWaitFrames = 600;
+    private const int MaxLocalPlayerResolveWaitFrames = 600;
     private const int SelectionCommitTimeoutMilliseconds = 10 * 60 * 1000;
     private const int SelectionCommitGraceMilliseconds = 5 * 1000;
 
@@ -67,6 +68,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private bool _multiplayerCommitSent;
     private bool _closeQueued;
     private readonly string _choiceSessionKey;
+    private int _deferredUnresolvedLocalSelectionIndex = -1;
 
     public NetScreenType ScreenType => NetScreenType.None;
 
@@ -81,7 +83,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _orderedPlayers = runState.Players
             .OrderBy(static player => player.NetId)
             .ToList();
-        _localPlayer = LocalContext.GetMe(_orderedPlayers) ?? _orderedPlayers.FirstOrDefault();
+        _localPlayer = ResolveLocalPlayer(_orderedPlayers);
         _authorityPlayer = ResolveAuthorityPlayer(_orderedPlayers, _localPlayer);
         _choiceSessionKey =
             $"starting_persona_selection|{AstralChoiceProtocol.CreateRunScopeKey(runState)}|{_orderedPlayers.Count}";
@@ -305,10 +307,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private async Task CollectSelectionsAsync()
     {
-        SaveAllOptionsAsSeen();
+        RefreshLocalPlayerIdentity();
 
         if (RunManager.Instance.NetService.Type is NetGameType.Singleplayer or NetGameType.None)
         {
+            SaveAllOptionsAsSeen();
             var selectedIndex = await _singlePlayerChoiceSource.Task;
             ApplySelection(_localPlayer ?? _orderedPlayers[0], selectedIndex);
             AstralTelemetry.RecordPersonaChoice(
@@ -326,12 +329,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                                    ?? throw new InvalidOperationException(
                                        "PlayerChoiceSynchronizer was not ready for starting persona selection.");
         InitializeMultiplayerChoiceStreams(_multiplayerSynchronizer);
+        _ = TaskHelper.RunSafely(EnsureLocalPlayerIdentityReadyAsync());
         FlushPendingLocalSelectionIfNeeded();
         UpdatePendingSubtitle();
 
         foreach (var player in _orderedPlayers)
         {
-            if (_localPlayer != null && player.NetId == _localPlayer.NetId)
+            if (ShouldSkipRemoteObserverForPlayer(player))
                 continue;
 
             _ = ObserveRemoteSelectionsAsync(player, _multiplayerSynchronizer);
@@ -769,9 +773,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
         }
 
+        RefreshLocalPlayerIdentity();
         if (_localPlayer == null || _multiplayerSynchronizer == null ||
             !_nextChoiceIdsByPlayer.ContainsKey(_localPlayer.NetId))
         {
+            _deferredUnresolvedLocalSelectionIndex = holder.Index;
             if (_localPlayer != null)
             {
                 _pendingLocalSelectionIndexes[_localPlayer.NetId] = holder.Index;
@@ -779,7 +785,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 UpdatePendingSubtitle();
             }
 
-            _subtitleLabel.Text = "联机同步尚未就绪，请稍候再试。";
+            _subtitleLabel.Text = _localPlayer == null
+                ? "正在识别当前玩家，请稍候再试。"
+                : "联机同步尚未就绪，请稍候再试。";
             return;
         }
 
@@ -1220,7 +1228,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
 
         var selectedCount = _selectionStates.Values.Count(static state => state.SelectedRelic != null);
-        if (_localPlayer == null || !_selectionStates.TryGetValue(_localPlayer.NetId, out var localState) ||
+        if (_localPlayer == null)
+        {
+            _subtitleLabel.Text = "正在同步当前玩家身份，请稍候……";
+            return;
+        }
+
+        if (!_selectionStates.TryGetValue(_localPlayer.NetId, out var localState) ||
             localState.SelectedRelic == null)
         {
             _subtitleLabel.Text = BuildSelectionIntroSubtitle();
@@ -1423,6 +1437,92 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         }
 
         return localPlayer ?? orderedPlayers.FirstOrDefault();
+    }
+
+    private static Player? ResolveLocalPlayer(IReadOnlyList<Player> orderedPlayers)
+    {
+        var localPlayer = LocalContext.GetMe(orderedPlayers);
+        if (localPlayer != null)
+            return localPlayer;
+
+        var localNetId = RunManager.Instance?.NetService?.NetId ?? 0UL;
+        if (localNetId == 0UL)
+            return null;
+
+        return orderedPlayers.FirstOrDefault(player => player.NetId == localNetId);
+    }
+
+    private bool ShouldSkipRemoteObserverForPlayer(Player player)
+    {
+        if (_localPlayer != null && player.NetId == _localPlayer.NetId)
+            return true;
+
+        var localNetId = RunManager.Instance?.NetService?.NetId ?? 0UL;
+        return localNetId != 0UL && player.NetId == localNetId;
+    }
+
+    private bool RefreshLocalPlayerIdentity(bool logOnAcquire = false)
+    {
+        var resolvedLocalPlayer = ResolveLocalPlayer(_orderedPlayers);
+        if (resolvedLocalPlayer == null)
+            return false;
+
+        var previousNetId = _localPlayer?.NetId ?? 0UL;
+        var changed = previousNetId != resolvedLocalPlayer.NetId;
+        _localPlayer = resolvedLocalPlayer;
+        _authorityPlayer = ResolveAuthorityPlayer(_orderedPlayers, _localPlayer);
+        if (changed && logOnAcquire)
+        {
+            MainFile.Logger.Info(
+                $"Starting persona selection resolved local player identity: local={_localPlayer.NetId} authority={_authorityPlayer?.NetId ?? 0UL}.");
+        }
+
+        return true;
+    }
+
+    private async Task EnsureLocalPlayerIdentityReadyAsync()
+    {
+        if (RefreshLocalPlayerIdentity(logOnAcquire: true))
+        {
+            FinalizeLocalPlayerResolution();
+            return;
+        }
+
+        for (var frame = 0; frame < MaxLocalPlayerResolveWaitFrames && !_closed && !_selectionFinalized; frame++)
+        {
+            if (NGame.Instance?.IsInsideTree() == true)
+                await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
+            else
+                await Task.Yield();
+
+            if (!RefreshLocalPlayerIdentity(logOnAcquire: true))
+                continue;
+
+            FinalizeLocalPlayerResolution();
+            return;
+        }
+
+        MainFile.Logger.Warn("Starting persona selection could not resolve local player identity before timeout.");
+    }
+
+    private void FinalizeLocalPlayerResolution()
+    {
+        SaveAllOptionsAsSeen();
+        CaptureDeferredSelectionForResolvedLocalPlayer();
+        FlushPendingLocalSelectionIfNeeded();
+        UpdatePendingSubtitle();
+    }
+
+    private void CaptureDeferredSelectionForResolvedLocalPlayer()
+    {
+        if (_localPlayer == null)
+            return;
+        if (_deferredUnresolvedLocalSelectionIndex < 0 || _deferredUnresolvedLocalSelectionIndex >= _relicOptions.Count)
+            return;
+
+        _pendingLocalSelectionIndexes[_localPlayer.NetId] = _deferredUnresolvedLocalSelectionIndex;
+        ApplySelection(_localPlayer, _deferredUnresolvedLocalSelectionIndex);
+        _deferredUnresolvedLocalSelectionIndex = -1;
     }
 
     private void FlushPendingLocalSelectionIfNeeded()

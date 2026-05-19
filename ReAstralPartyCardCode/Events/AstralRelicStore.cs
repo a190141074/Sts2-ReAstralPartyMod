@@ -22,9 +22,9 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Events;
 [RegisterActEvent(typeof(Glory))]
 public sealed class AstralRelicStore : AstralPartyEventModel
 {
-    private const decimal MinimumGoldRequiredPerPlayer = 99m;
+    private const decimal MinimumGoldRequiredPerPlayer = 120m;
     private const decimal BluePackCost = 60m;
-    private const decimal PurplePackCost = 90m;
+    private const decimal PurplePackCost = 120m;
     private const decimal GoldPackCost = 180m;
     private const decimal InitialPointCost = 1m;
     private static readonly HashSet<string> ConsumedActs = [];
