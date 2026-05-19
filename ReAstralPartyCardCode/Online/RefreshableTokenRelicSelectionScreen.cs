@@ -23,6 +23,10 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOverlayScreen, IScreenContext
 {
+    private const string CommonRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_blue.png";
+    private const string UncommonRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_purple.png";
+    private const string RareRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_gold.png";
+
     private readonly TaskCompletionSource<RefreshableTokenRelicSelectionResult> _completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly RunState _runState;
     private readonly Player _owner;
@@ -373,6 +377,10 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             iconCenter.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
             holderButton.AddChild(iconCenter);
 
+            var relicBaseTexture = CreateRelicBaseTexture(relic, 208f);
+            if (relicBaseTexture != null)
+                iconCenter.AddChild(relicBaseTexture);
+
             var relicTexture = CreateRelicTexture(relic, 176f);
             iconCenter.AddChild(relicTexture);
 
@@ -572,6 +580,33 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private static Texture2D? GetDisplayTexture(RelicModel relic)
     {
         return relic.BigIcon ?? relic.Icon;
+    }
+
+    private static Texture2D? GetRelicBaseTexture(RelicModel relic)
+    {
+        return relic.Rarity switch
+        {
+            RelicRarity.Common => GD.Load<Texture2D>(CommonRelicBasePath),
+            RelicRarity.Uncommon => GD.Load<Texture2D>(UncommonRelicBasePath),
+            RelicRarity.Rare => GD.Load<Texture2D>(RareRelicBasePath),
+            _ => null
+        };
+    }
+
+    private static TextureRect? CreateRelicBaseTexture(RelicModel relic, float sideLength)
+    {
+        var texture = GetRelicBaseTexture(relic);
+        if (texture == null)
+            return null;
+
+        return new TextureRect
+        {
+            MouseFilter = MouseFilterEnum.Ignore,
+            Texture = texture,
+            CustomMinimumSize = new Vector2(sideLength, sideLength),
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize
+        };
     }
 
     private static TextureRect CreateRelicTexture(RelicModel relic, float sideLength)
