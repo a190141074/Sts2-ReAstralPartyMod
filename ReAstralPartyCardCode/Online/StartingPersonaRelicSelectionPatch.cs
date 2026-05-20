@@ -11,6 +11,7 @@ using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -305,9 +306,8 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         RunState runState,
         IReadOnlyList<RelicModel> source)
     {
-        if (!WindchaserCompat.IsLoaded())
-            return source;
-        if (!runState.Players.Any(WindchaserCompat.IsCharacter))
+        if (!CompatContentGate.ShouldForceStartingVariantPersonaForRun(
+                new CompatContentGate.RunStateLike(runState.Players)))
             return source;
 
         var forcedRelic = PersonaRelicRegistry.GetCanonicalVariantPersonaRelics()

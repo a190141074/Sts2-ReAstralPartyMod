@@ -1,4 +1,5 @@
 using MegaCrit.Sts2.Core.Models;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -22,13 +23,7 @@ public static class PersonaSkillCardFilter
 
     public static bool AllowCompendiumDisplay(CardModel? card)
     {
-        if (card == null)
-            return false;
-
-        if (card.GetType().Name == "SkillGrantSpark")
-            return WindchaserCompat.IsLoaded();
-
-        return true;
+        return CompatContentGate.IsCompendiumCardVisible(card);
     }
 
     public static Func<CardModel, bool> CreateCardPoolFilter()

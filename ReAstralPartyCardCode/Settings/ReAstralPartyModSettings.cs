@@ -6,6 +6,7 @@ using STS2RitsuLib.Utils.Persistence;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -592,7 +593,14 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_auto_phrase.label", "Enable Auto Phrase"),
                     enableAutoPhrase,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_auto_phrase.description",
-                        "Reserved toggle. It currently has no gameplay effect.")))
+                        "Reserved toggle. It currently has no gameplay effect."))
+                .AddSubpage(
+                    "compat_modules_subpage",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.label", "Compat Modules"),
+                    $"{MainFile.ModId}.compat_modules",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.button", "View"),
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.description",
+                        "Show the linked mods that Astral currently knows how to integrate with.")))
             .AddSection("telemetry", section => section
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.telemetry.title", "Telemetry"))
                 .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.telemetry.description",
@@ -663,6 +671,21 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_title", "Persona Ban List"),
                     BuildBannedPersonaManagerControl)),
             $"{MainFile.ModId}.banned_personas");
+
+        RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
+            .AsChildOf(MainFile.ModId)
+            .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.page_title", "Compat Modules"))
+            .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.page_description",
+                "Review the crossover mods Astral currently supports and whether each one is loaded."))
+            .AddSection("compat_modules_manager", section => section
+                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_title", "Linked Mods"))
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_description",
+                    "This page lists the linked mods that Astral can currently integrate with."))
+                .AddCustom(
+                    "compat_modules_manager_control",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_title", "Linked Mods"),
+                    BuildCompatModulesControl)),
+            $"{MainFile.ModId}.compat_modules");
     }
 
     private static ModSettingsText T(string key, string fallback)
@@ -726,6 +749,11 @@ public static partial class ReAstralPartyModSettingsManager
     private static Control BuildBannedPersonaManagerControl(IModSettingsUiActionHost host)
     {
         return new BannedPersonaManagerControl(host);
+    }
+
+    private static Control BuildCompatModulesControl(IModSettingsUiActionHost host)
+    {
+        return new CompatModulesInfoControl();
     }
 
     private static void UpdateBannedPersonaRelicIds(IEnumerable<ModelId> bannedRelicIds)
@@ -880,6 +908,224 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableTokenRelicNotifications = settings.EnableTokenRelicNotifications,
                 TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
                 EnablePureAngelMode = settings.EnablePureAngelMode
+            };
+        }
+    }
+
+    private sealed partial class CompatModulesInfoControl : VBoxContainer
+    {
+        public CompatModulesInfoControl()
+        {
+            SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            AddThemeConstantOverride("separation", 12);
+
+            var intro = new Label
+            {
+                Text = new LocString(
+                    "settings_ui",
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.intro").GetRawText(),
+                AutowrapMode = TextServer.AutowrapMode.WordSmart
+            };
+            AddChild(intro);
+
+            var tableCard = new PanelContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            tableCard.AddThemeStyleboxOverride("panel", CreateCompatTableCardStyle());
+            AddChild(tableCard);
+
+            var tableRoot = new VBoxContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            tableRoot.AddThemeConstantOverride("separation", 0);
+            tableCard.AddChild(tableRoot);
+
+            var headerRow = BuildCompatRow(
+                new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.column_name").GetRawText(),
+                new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.column_id").GetRawText(),
+                new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.column_status").GetRawText(),
+                null,
+                false,
+                true,
+                null);
+            tableRoot.AddChild(headerRow);
+
+            var supportedMods = OptionalModCompatRegistry.GetSupportedMods();
+            for (var index = 0; index < supportedMods.Count; index++)
+            {
+                var compatMod = supportedMods[index];
+                var isLoaded = OptionalModCompatRegistry.IsModLoaded(compatMod.ModId);
+                var statusText = new LocString(
+                    "settings_ui",
+                    isLoaded
+                        ? "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.status_loaded"
+                        : "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.status_not_loaded").GetRawText();
+                tableRoot.AddChild(BuildCompatRow(
+                    compatMod.DisplayName,
+                    compatMod.ModId,
+                    statusText,
+                    compatMod.ReleasePageUrl,
+                    isLoaded,
+                    false,
+                    index % 2 == 0));
+            }
+        }
+
+        private static PanelContainer BuildCompatRow(
+            string name,
+            string modId,
+            string status,
+            string? releasePageUrl,
+            bool loaded,
+            bool header,
+            bool? alternate)
+        {
+            var row = new PanelContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            row.AddThemeStyleboxOverride("panel", CreateCompatRowStyle(header, alternate));
+
+            var rowLayout = new HBoxContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            rowLayout.AddThemeConstantOverride("separation", 20);
+            row.AddChild(rowLayout);
+
+            rowLayout.AddChild(CreateCompatColumn(name, header, 0.38f));
+            rowLayout.AddChild(CreateCompatColumn(modId, header, 0.42f));
+            rowLayout.AddChild(CreateCompatStatusColumn(status, releasePageUrl, loaded, header, 0.20f));
+            return row;
+        }
+
+        private static Control CreateCompatColumn(string text, bool header, float ratio)
+        {
+            var column = new VBoxContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsStretchRatio = ratio,
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            column.AddChild(CreateCompatTextCell(text, header));
+            return column;
+        }
+
+        private static Control CreateCompatStatusColumn(
+            string text,
+            string? releasePageUrl,
+            bool loaded,
+            bool header,
+            float ratio)
+        {
+            var column = new VBoxContainer
+            {
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsStretchRatio = ratio,
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+
+            if (header || string.IsNullOrWhiteSpace(releasePageUrl))
+            {
+                column.AddChild(CreateCompatTextCell(text, header, loaded));
+                return column;
+            }
+
+            var linkButton = new LinkButton
+            {
+                Text = text,
+                Uri = releasePageUrl,
+                Underline = LinkButton.UnderlineMode.Always,
+                TooltipText = releasePageUrl,
+                SizeFlagsHorizontal = SizeFlags.ShrinkBegin
+            };
+            linkButton.AddThemeColorOverride("font_color", loaded
+                ? new Color(0.42f, 0.9f, 0.56f)
+                : new Color(0.95f, 0.38f, 0.38f));
+            linkButton.AddThemeColorOverride("font_hover_color", loaded
+                ? new Color(0.58f, 0.98f, 0.68f)
+                : new Color(1f, 0.52f, 0.52f));
+            linkButton.Pressed += () => OpenCompatLink(releasePageUrl);
+            column.AddChild(linkButton);
+            return column;
+        }
+
+        private static void OpenCompatLink(string releasePageUrl)
+        {
+            var error = OS.ShellOpen(releasePageUrl);
+            if (error != Error.Ok)
+            {
+                MainFile.Logger.Warn(
+                    $"[{MainFile.ModId}] Failed to open compat link '{releasePageUrl}': {error}");
+            }
+        }
+
+        private static Label CreateCompatTextCell(string text, bool header, bool loaded = false)
+        {
+            var label = new Label
+            {
+                Text = text,
+                AutowrapMode = TextServer.AutowrapMode.Off,
+                ClipText = true,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill
+            };
+            if (header)
+            {
+                label.AddThemeColorOverride("font_color", new Color(0.96f, 0.84f, 0.48f));
+            }
+            else if (text == new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.status_loaded").GetRawText()
+                     || text == new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.status_not_loaded").GetRawText())
+            {
+                label.AddThemeColorOverride("font_color", loaded
+                    ? new Color(0.42f, 0.9f, 0.56f)
+                    : new Color(0.95f, 0.38f, 0.38f));
+            }
+            return label;
+        }
+
+        private static StyleBoxFlat CreateCompatTableCardStyle()
+        {
+            return new StyleBoxFlat
+            {
+                BgColor = new Color(0.08f, 0.1f, 0.14f, 0.92f),
+                BorderColor = new Color(0.72f, 0.64f, 0.38f, 0.75f),
+                BorderWidthBottom = 2,
+                BorderWidthTop = 2,
+                BorderWidthLeft = 2,
+                BorderWidthRight = 2,
+                CornerRadiusTopLeft = 12,
+                CornerRadiusTopRight = 12,
+                CornerRadiusBottomLeft = 12,
+                CornerRadiusBottomRight = 12,
+                ContentMarginLeft = 12,
+                ContentMarginTop = 12,
+                ContentMarginRight = 12,
+                ContentMarginBottom = 12
+            };
+        }
+
+        private static StyleBoxFlat CreateCompatRowStyle(bool header, bool? alternate)
+        {
+            var background = header
+                ? new Color(0.2f, 0.16f, 0.08f, 0.95f)
+                : alternate == true
+                    ? new Color(0.14f, 0.17f, 0.22f, 0.78f)
+                    : new Color(0.11f, 0.13f, 0.18f, 0.7f);
+            var border = header
+                ? new Color(0.9f, 0.76f, 0.35f, 0.8f)
+                : new Color(0.38f, 0.44f, 0.58f, 0.45f);
+
+            return new StyleBoxFlat
+            {
+                BgColor = background,
+                BorderColor = border,
+                BorderWidthBottom = 1,
+                ContentMarginLeft = 12,
+                ContentMarginTop = 10,
+                ContentMarginRight = 12,
+                ContentMarginBottom = 10
             };
         }
     }

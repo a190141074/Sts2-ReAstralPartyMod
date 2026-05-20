@@ -4,6 +4,16 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 
 internal static class OptionalModCompatRegistry
 {
+    private static readonly IReadOnlyList<OptionalCompatModInfo> SupportedMods =
+    [
+        new("《风行者》", "Windchaser", "https://www.bilibili.com/video/BV145RpBCEG4/")
+    ];
+
+    public static IReadOnlyList<OptionalCompatModInfo> GetSupportedMods()
+    {
+        return SupportedMods;
+    }
+
     public static bool IsModLoaded(string modId)
     {
         if (string.IsNullOrWhiteSpace(modId))
@@ -22,3 +32,5 @@ internal static class OptionalModCompatRegistry
         }
     }
 }
+
+internal sealed record OptionalCompatModInfo(string ModId, string DisplayName, string? ReleasePageUrl);
