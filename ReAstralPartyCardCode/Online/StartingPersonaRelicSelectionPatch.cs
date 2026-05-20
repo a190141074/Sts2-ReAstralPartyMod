@@ -66,6 +66,10 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         {
             EndSelection(runKey, false);
             MainFile.Logger.Warn("Starting persona relic selection skipped because overlay stack is not ready.");
+            AstralNotificationService.ShowWarning(
+                AstralNotificationModule.Multiplayer,
+                "开局人格选择界面未能正常打开。",
+                "联机提示");
             return;
         }
 
@@ -74,6 +78,10 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         {
             EndSelection(runKey, false);
             MainFile.Logger.Warn("Starting persona relic selection skipped because no persona relics are registered.");
+            AstralNotificationService.ShowWarning(
+                AstralNotificationModule.Multiplayer,
+                "未找到可用的人格选项，请反馈日志。",
+                "联机提示");
             return;
         }
 

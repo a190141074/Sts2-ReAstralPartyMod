@@ -300,6 +300,10 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             _completionSource.TrySetException(ex);
             MainFile.Logger.Error($"Starting persona relic shared selection failed: {ex}");
+            AstralNotificationService.ShowError(
+                AstralNotificationModule.Multiplayer,
+                "开局人格选择同步失败，请把日志发给作者。",
+                "联机提示");
         }
     }
 
@@ -343,6 +347,10 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             MainFile.Logger.Warn(
                 "Starting persona relic selection timed out while waiting for the final synchronized lock; applying deterministic timeout fallback.");
+            AstralNotificationService.ShowWarning(
+                AstralNotificationModule.Multiplayer,
+                "开局人格选择同步超时，正在尝试自动补救。",
+                "联机提示");
             var timeoutSnapshot = await ResolveTimeoutFallbackAsync();
             ApplyCommittedSelections(timeoutSnapshot);
             return;

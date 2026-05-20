@@ -16,6 +16,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 public sealed class ReAstralPartyRunSettingsSnapshot
 {
+    public bool EnableExtremeMode { get; set; }
+
     public bool EnableAllPersonas { get; set; }
 
     public bool EnableDuplicatePersonas { get; set; }
@@ -74,6 +76,7 @@ internal static class ReAstralPartyRunSettingsSync
         var settings = ReAstralPartyModSettingsManager.ReadLocalSettings();
         return new ReAstralPartyRunSettingsSnapshot
         {
+            EnableExtremeMode = settings.EnableExtremeMode,
             EnableAllPersonas = settings.EnableAllPersonas,
             EnableDuplicatePersonas = settings.EnableDuplicatePersonas,
             TokenSeriesMode = ReAstralPartyModSettingsManager.ResolveTokenSeriesMode(settings),
@@ -85,6 +88,7 @@ internal static class ReAstralPartyRunSettingsSync
     {
         return new ReAstralPartyRunSettingsSnapshot
         {
+            EnableExtremeMode = false,
             EnableAllPersonas = false,
             EnableDuplicatePersonas = false,
             TokenSeriesMode = TokenSeriesMode.RandomTwo,
@@ -95,6 +99,7 @@ internal static class ReAstralPartyRunSettingsSync
     private static PlayerChoiceResult CreateSnapshotChoiceResult(ReAstralPartyRunSettingsSnapshot snapshot)
     {
         return PlayerChoiceResult.FromIndexes([
+            snapshot.EnableExtremeMode ? 1 : 0,
             snapshot.EnableAllPersonas ? 1 : 0,
             snapshot.EnableDuplicatePersonas ? 1 : 0,
             (int)snapshot.TokenSeriesMode,
@@ -109,14 +114,16 @@ internal static class ReAstralPartyRunSettingsSync
         if (!TryGetIndexPayload(result, out var payload) || payload.Count < 4)
             return false;
 
+        var payloadOffset = payload.Count >= 5 ? 1 : 0;
         snapshot = new ReAstralPartyRunSettingsSnapshot
         {
-            EnableAllPersonas = payload[0] != 0,
-            EnableDuplicatePersonas = payload[1] != 0,
-            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[2])
-                ? (TokenSeriesMode)payload[2]
+            EnableExtremeMode = payloadOffset > 0 && payload[0] != 0,
+            EnableAllPersonas = payload[payloadOffset] != 0,
+            EnableDuplicatePersonas = payload[payloadOffset + 1] != 0,
+            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[payloadOffset + 2])
+                ? (TokenSeriesMode)payload[payloadOffset + 2]
                 : TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = payload[3] != 0
+            EnablePureAngelMode = payload[payloadOffset + 3] != 0
         };
         return true;
     }
@@ -181,7 +188,7 @@ internal static class ReAstralPartyRunSettingsSync
             {
                 state.SetSnapshot(remoteSnapshot);
                 MainFile.Logger.Info(
-                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: all_personas={remoteSnapshot.EnableAllPersonas}, duplicate_personas={remoteSnapshot.EnableDuplicatePersonas}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}");
+                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, all_personas={remoteSnapshot.EnableAllPersonas}, duplicate_personas={remoteSnapshot.EnableDuplicatePersonas}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}");
                 return remoteSnapshot;
             }
         }
@@ -196,7 +203,7 @@ internal static class ReAstralPartyRunSettingsSync
             state.SetSnapshot(localSnapshot);
             synchronizer.SyncLocalChoice(authorityPlayer, choiceId, CreateSnapshotChoiceResult(localSnapshot));
             MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: all_personas={localSnapshot.EnableAllPersonas}, duplicate_personas={localSnapshot.EnableDuplicatePersonas}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}");
+                $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: extreme_mode={localSnapshot.EnableExtremeMode}, all_personas={localSnapshot.EnableAllPersonas}, duplicate_personas={localSnapshot.EnableDuplicatePersonas}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}");
             return localSnapshot;
         }
 

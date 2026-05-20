@@ -162,12 +162,12 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
+        patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)
     {
         patcher.RegisterPatch<StartingPersonaRelicSelectionPatch>();
-        patcher.RegisterPatch<AstralTelemetryConsentPatch>();
         patcher.RegisterPatch<AstralTelemetryStartRunPatch>();
         patcher.RegisterPatch<AstralTelemetryLoadRunPatch>();
         patcher.RegisterPatch<AstralTelemetryRunEndedPatch>();

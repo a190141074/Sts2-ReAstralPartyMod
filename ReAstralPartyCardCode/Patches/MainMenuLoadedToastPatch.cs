@@ -2,8 +2,8 @@ using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Nodes.Screens.MainMenu;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Patching.Models;
-using STS2RitsuLib.Ui.Toast;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
@@ -32,7 +32,7 @@ public sealed class MainMenuLoadedToastPatch : IPatchMethod
 
     private static void ShowStartupToasts()
     {
-        RitsuToastService.ShowInfo("已加载", "星引擎模组·ReAstralPartyMod");
+        AstralNotificationService.ShowInfo(AstralNotificationModule.Startup, "已加载", "星引擎模组·ReAstralPartyMod");
         ShowTelemetryToastIfEnabled();
     }
 
@@ -45,7 +45,8 @@ public sealed class MainMenuLoadedToastPatch : IPatchMethod
             return;
 
         _telemetryShown = true;
-        RitsuToastService.ShowInfo(
+        AstralNotificationService.ShowInfo(
+            AstralNotificationModule.Startup,
             "可以在【设置】-【ritsulib设置】-【星引擎模组】设置-【遥测】部分关闭",
             "已开启匿名数据收集用于模组平衡");
     }

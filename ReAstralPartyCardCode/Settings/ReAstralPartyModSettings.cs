@@ -6,6 +6,7 @@ using STS2RitsuLib.Ui.Toast;
 using STS2RitsuLib.Utils.Persistence;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
@@ -33,6 +34,14 @@ public sealed class ReAstralPartyModSettings
     public bool EnableAutoPhrase { get; set; }
 
     public bool EnableTelemetry { get; set; } = true;
+
+    public bool EnableStartupNotifications { get; set; } = true;
+
+    public bool EnableSettingsNotifications { get; set; } = true;
+
+    public bool EnableTelemetryNotifications { get; set; } = true;
+
+    public bool EnableMultiplayerNotifications { get; set; } = true;
 
     // Legacy bool setting kept for backward compatibility with older settings.json files.
     public bool? EnableAllTokenSeries { get; set; }
@@ -73,6 +82,15 @@ public static class ReAstralPartyModSettingsManager
     public static bool EnableAutoPhrase => ReadRuntime(settings => settings.EnableAutoPhrase);
 
     public static bool EnableTelemetry => ReadRuntime(settings => settings.EnableTelemetry);
+
+    public static bool EnableStartupNotifications => ReadRuntime(settings => settings.EnableStartupNotifications);
+
+    public static bool EnableSettingsNotifications => ReadRuntime(settings => settings.EnableSettingsNotifications);
+
+    public static bool EnableTelemetryNotifications => ReadRuntime(settings => settings.EnableTelemetryNotifications);
+
+    public static bool EnableMultiplayerNotifications =>
+        ReadRuntime(settings => settings.EnableMultiplayerNotifications);
 
     public static bool EnableHiddenBetaCardPortraitMode => ReadRuntime(settings =>
         settings.EnablePlayRecommendation
@@ -115,6 +133,20 @@ public static class ReAstralPartyModSettingsManager
             return false;
 
         return EnableAllPersonas;
+    }
+
+    public static bool GetEnableExtremeMode(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableExtremeMode;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableExtremeMode;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return EnableExtremeMode;
     }
 
     public static bool GetEnableDuplicatePersonas(IRunState? runState)
@@ -326,6 +358,58 @@ public static class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableStartupNotifications = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableStartupNotifications,
+            (settings, value) =>
+            {
+                settings.EnableStartupNotifications = value;
+                ApplyRuntimeSettings(settings, "enable_startup_notifications");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_startup_notifications.label",
+                    value);
+            });
+
+        var enableSettingsNotifications = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableSettingsNotifications,
+            (settings, value) =>
+            {
+                settings.EnableSettingsNotifications = value;
+                ApplyRuntimeSettings(settings, "enable_settings_notifications");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_settings_notifications.label",
+                    value);
+            });
+
+        var enableTelemetryNotifications = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableTelemetryNotifications,
+            (settings, value) =>
+            {
+                settings.EnableTelemetryNotifications = value;
+                ApplyRuntimeSettings(settings, "enable_telemetry_notifications");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry_notifications.label",
+                    value);
+            });
+
+        var enableMultiplayerNotifications = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableMultiplayerNotifications,
+            (settings, value) =>
+            {
+                settings.EnableMultiplayerNotifications = value;
+                ApplyRuntimeSettings(settings, "enable_multiplayer_notifications");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.label",
+                    value);
+            });
+
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
             .WithModDisplayName(T("RE_ASTRAL_PARTY_MOD_SETTINGS.mod_display_name", "Astral Party Mod"))
             .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.page_title", "Mod Settings"))
@@ -346,7 +430,7 @@ public static class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label", "Enable Extreme Mode"),
                     enableExtremeMode,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.description",
-                        "Reserved toggle. It currently has no gameplay effect."))
+                        "If combat is not won by the end of the player-side turn 16, that combat immediately counts as a loss."))
                 .AddToggle(
                     "enable_duplicate_personas",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.label", "Enable Duplicate Personas"),
@@ -419,7 +503,38 @@ public static class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.label", "Enable Anonymous Telemetry"),
                     enableTelemetry,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.description",
-                        "Allow anonymous usage statistics for personas, tokens, and skill cards."))));
+                        "Allow anonymous usage statistics for personas, tokens, and skill cards.")))
+            .AddSection("notifications", section => section
+                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.notifications.title", "Notifications"))
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.notifications.description",
+                    "Control which Astral toast notifications are shown to players."))
+                .AddToggle(
+                    "enable_startup_notifications",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_startup_notifications.label", "Enable Startup Notifications"),
+                    enableStartupNotifications,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_startup_notifications.description",
+                        "Show startup and mod-loaded notifications."))
+                .AddToggle(
+                    "enable_settings_notifications",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_settings_notifications.label",
+                        "Enable Settings Notifications"),
+                    enableSettingsNotifications,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_settings_notifications.description",
+                        "Show toast notifications when Astral settings are changed."))
+                .AddToggle(
+                    "enable_telemetry_notifications",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry_notifications.label",
+                        "Enable Telemetry Notifications"),
+                    enableTelemetryNotifications,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry_notifications.description",
+                        "Show telemetry upload success, warning, and error notifications."))
+                .AddToggle(
+                    "enable_multiplayer_notifications",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.label",
+                        "Enable Multiplayer Notifications"),
+                    enableMultiplayerNotifications,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.description",
+                        "Show important multiplayer selection and synchronization problem notifications."))));
     }
 
     private static ModSettingsText T(string key, string fallback)
@@ -435,7 +550,7 @@ public static class ReAstralPartyModSettingsManager
             enabled
                 ? "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_enabled"
                 : "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_disabled").GetRawText();
-        Callable.From(() => RitsuToastService.ShowInfo(title, body)).CallDeferred();
+        AstralNotificationService.ShowInfo(AstralNotificationModule.Settings, body, title);
     }
 
     private static void ShowTokenSeriesModeToast(TokenSeriesMode mode)
@@ -449,7 +564,7 @@ public static class ReAstralPartyModSettingsManager
             _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied"
         };
         var body = new LocString("settings_ui", bodyKey).GetRawText();
-        Callable.From(() => RitsuToastService.ShowInfo(title, body)).CallDeferred();
+        AstralNotificationService.ShowInfo(AstralNotificationModule.Settings, body, title);
     }
 
     private static void UpdatePersistentSettings(Action<ReAstralPartyModSettings> mutator, string reason)
@@ -547,6 +662,14 @@ public static class ReAstralPartyModSettingsManager
 
         public bool EnableTelemetry { get; init; } = true;
 
+        public bool EnableStartupNotifications { get; init; } = true;
+
+        public bool EnableSettingsNotifications { get; init; } = true;
+
+        public bool EnableTelemetryNotifications { get; init; } = true;
+
+        public bool EnableMultiplayerNotifications { get; init; } = true;
+
         public TokenSeriesMode TokenSeriesMode { get; init; } = TokenSeriesMode.RandomTwo;
 
         public bool EnablePureAngelMode { get; init; } = true;
@@ -563,6 +686,10 @@ public static class ReAstralPartyModSettingsManager
                 EnableTokenRecommendation = settings.EnableTokenRecommendation,
                 EnableAutoPhrase = settings.EnableAutoPhrase,
                 EnableTelemetry = settings.EnableTelemetry,
+                EnableStartupNotifications = settings.EnableStartupNotifications,
+                EnableSettingsNotifications = settings.EnableSettingsNotifications,
+                EnableTelemetryNotifications = settings.EnableTelemetryNotifications,
+                EnableMultiplayerNotifications = settings.EnableMultiplayerNotifications,
                 TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
                 EnablePureAngelMode = settings.EnablePureAngelMode
             };

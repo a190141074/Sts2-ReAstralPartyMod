@@ -1,8 +1,8 @@
-using System.Net.Http;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
@@ -14,12 +14,16 @@ using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+using STS2RitsuLib.Settings;
+using STS2RitsuLib.Telemetry;
+using STS2RitsuLib;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 internal static class AstralTelemetry
 {
-    private enum TelemetryConsentState
+    private enum LegacyTelemetryConsentState
     {
         Unknown = 0,
         Accepted = 1,
@@ -33,8 +37,8 @@ internal static class AstralTelemetry
         string ProjectToken,
         string PendingFile);
 
-    private sealed record TelemetryState(
-        TelemetryConsentState ConsentState,
+    private sealed record LegacyTelemetryState(
+        LegacyTelemetryConsentState ConsentState,
         bool ConsentPromptShown);
 
     private sealed record LegacyTelemetryConfig(bool Enabled, string Endpoint);
@@ -61,19 +65,7 @@ internal static class AstralTelemetry
         int TotalFloor,
         long RunTime);
 
-    private sealed record PostHogEnvelope(
-        [property: JsonPropertyName("api_key")]
-        string ApiKey,
-        [property: JsonPropertyName("batch")] IReadOnlyList<PostHogEvent> Batch);
-
-    private sealed record PostHogEvent(
-        [property: JsonPropertyName("event")] string Event,
-        [property: JsonPropertyName("distinct_id")]
-        string DistinctId,
-        [property: JsonPropertyName("properties")]
-        Dictionary<string, object?> Properties,
-        [property: JsonPropertyName("timestamp")]
-        string Timestamp);
+    private sealed record TelemetryEventRecord(string EventName, Dictionary<string, object?> Properties);
 
     internal sealed record PersonaChoiceRecord(
         int PlayerSlot,
@@ -108,30 +100,24 @@ internal static class AstralTelemetry
     private const string DefaultProvider = "posthog";
     private const string DefaultHost = "https://us.i.posthog.com";
     private const string DefaultProjectToken = "phc_tUUfTxDRKbzBcq24G78yPUu3w6TYkmCySG4cRwp7bJwC";
+    private const string ApplicantId = MainFile.ModId;
+    private const string BalanceRequestId = "astral_balance";
+    private const string RunHistoryRequestId = "run_history";
     private const string ConfigFileName = "telemetry_config.json";
     private const string LocalConfigFileName = "telemetry_config.local.json";
     private const string StateFileName = "telemetry_state.json";
-    private const string PendingFileName = "telemetry_pending.jsonl";
     private const string ActiveRunFileName = "telemetry_active_run.json";
-    private const string InstallSaltFileName = "telemetry_install_salt.txt";
-    private const int MaxPendingLines = 64;
     private const long MinRunTimeForUploadSeconds = 180;
-    private const string CaptureBatchPath = "/batch/";
 
     internal static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
-    private static readonly HttpClient HttpClient = new()
-    {
-        Timeout = TimeSpan.FromSeconds(5)
-    };
-
-    private static readonly object QueueLock = new();
     private static readonly object StateLock = new();
     private static readonly object ConfigLock = new();
     private static readonly HashSet<string> SubmittedRunIds = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, RunTelemetryState> ActiveRuns = new(StringComparer.Ordinal);
     private static TelemetryConfig? _cachedConfig;
-    private static TelemetryState? _cachedState;
+    private static ITelemetryClient? _telemetryClient;
+    private static bool _applicantRegistered;
 
     private sealed class RunTelemetryState
     {
@@ -158,17 +144,126 @@ internal static class AstralTelemetry
         int PersonaSkillUseCount,
         IReadOnlyList<string> ObtainedTokens);
 
+    private static void RegisterApplicantIfNeeded()
+    {
+        if (_applicantRegistered)
+            return;
+
+        var config = LoadConfig();
+        TelemetryRegistry.RegisterApplicant(new TelemetryApplicant
+        {
+            ApplicantId = ApplicantId,
+            OwnerModId = MainFile.ModId,
+            DisplayName = "Astral Party Mod",
+            DisplayNameText = ModSettingsText.LocString(
+                "settings_ui",
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.mod_display_name",
+                "Astral Party Mod"),
+            Adapter = CreateAdapter(config),
+            Requests =
+            [
+                TelemetryRequest.Custom(
+                    BalanceRequestId,
+                    ModSettingsText.LocString(
+                        "settings_ui",
+                        "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.description",
+                        "Allow anonymous usage statistics for personas, tokens, and skill cards.")),
+                TelemetryRequest.RunHistory(
+                    ModSettingsText.LocString(
+                        "settings_ui",
+                        "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry_run_history.description",
+                        "Allow anonymized vanilla run history to be uploaded for verification and diagnostics."),
+                    captureFilter: ShouldCaptureRunHistory)
+            ]
+        });
+
+        _telemetryClient = TelemetryApi.GetClient(ApplicantId);
+        _applicantRegistered = true;
+        TryMigrateLegacyConsent();
+    }
+
+    private static ITelemetryAdapter CreateAdapter(TelemetryConfig config)
+    {
+        if (string.Equals(config.Provider, DefaultProvider, StringComparison.OrdinalIgnoreCase))
+            return new PostHogTelemetryAdapter(config.Host, config.ProjectToken);
+
+        return new HttpJsonTelemetryAdapter(config.Host);
+    }
+
+    private static ITelemetryClient GetTelemetryClient()
+    {
+        RegisterApplicantIfNeeded();
+        return _telemetryClient ??= TelemetryApi.GetClient(ApplicantId);
+    }
+
+    private static bool TrySetRitsuLibConsent(bool enabled)
+    {
+        try
+        {
+            RegisterApplicantIfNeeded();
+            var telemetryAssembly = typeof(TelemetryApi).Assembly;
+            var consentStoreType = telemetryAssembly.GetType("STS2RitsuLib.Telemetry.TelemetryConsentStore");
+            if (consentStoreType == null)
+                return false;
+
+            var setApplicantConsent = consentStoreType.GetMethod(
+                "SetApplicantConsent",
+                BindingFlags.Public | BindingFlags.Static);
+            if (setApplicantConsent == null)
+                return false;
+
+            var consentStateType = telemetryAssembly.GetType("STS2RitsuLib.Telemetry.TelemetryConsentState");
+            if (consentStateType == null)
+                return false;
+
+            var consentStateName = enabled ? "Granted" : "Denied";
+            var consentState = Enum.Parse(consentStateType, consentStateName);
+            IEnumerable<string>? grantedRequests = enabled ? [BalanceRequestId, RunHistoryRequestId] : null;
+            setApplicantConsent.Invoke(null, [ApplicantId, consentState, grantedRequests]);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Consent bridge failed: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static void TryMigrateLegacyConsent()
+    {
+        try
+        {
+            var path = GetStatePath();
+            if (!File.Exists(path))
+                return;
+
+            var json = File.ReadAllText(path);
+            var legacyState = JsonSerializer.Deserialize<LegacyTelemetryState>(json, JsonOptions);
+            if (legacyState == null || legacyState.ConsentState == LegacyTelemetryConsentState.Unknown)
+                return;
+
+            TrySetRitsuLibConsent(legacyState.ConsentState == LegacyTelemetryConsentState.Accepted);
+            File.Delete(path);
+            MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Migrated legacy telemetry consent into RitsuLib.");
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Legacy consent migration failed: {ex.Message}");
+        }
+    }
+
     public static void Initialize()
     {
         try
         {
             EnsureConfigFile();
-            EnsureStateFile();
+            RegisterApplicantIfNeeded();
             SyncFromModSettings();
         }
         catch (Exception ex)
         {
             MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Config init failed: {ex.Message}");
+            ShowTelemetryErrorToast("匿名数据初始化失败", ex.Message);
         }
     }
 
@@ -177,44 +272,28 @@ internal static class AstralTelemetry
         try
         {
             var enabled = ReAstralPartyModSettingsManager.EnableTelemetry;
-            lock (ConfigLock)
-            {
-                var state = LoadStateCore();
-                if (state.ConsentState == TelemetryConsentState.Unknown)
-                    SaveStateCore(state with
-                    {
-                        ConsentState = enabled ? TelemetryConsentState.Accepted : TelemetryConsentState.Declined,
-                        ConsentPromptShown = true
-                    });
-            }
+            SetCollectionEnabledByConsent(enabled);
         }
         catch (Exception ex)
         {
             MainFile.Logger.Warn(
                 $"[{MainFile.ModId}][Telemetry] Failed to sync telemetry setting from mod settings: {ex.Message}");
+            ShowTelemetryWarningToast("匿名数据设置同步失败", ex.Message);
         }
     }
 
     public static bool ShouldShowConsentPrompt()
     {
-        var config = LoadConfig();
-        if (!config.Enabled)
-            return false;
-
-        var state = LoadState();
-        return state.ConsentState == TelemetryConsentState.Unknown;
+        return false;
     }
 
     public static void SetCollectionEnabledByConsent(bool enabled)
     {
-        lock (ConfigLock)
+        if (!TrySetRitsuLibConsent(enabled))
         {
-            var state = LoadStateCore();
-            SaveStateCore(state with
-            {
-                ConsentState = enabled ? TelemetryConsentState.Accepted : TelemetryConsentState.Declined,
-                ConsentPromptShown = true
-            });
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}][Telemetry] Failed to bridge telemetry consent to RitsuLib; local setting may not take effect immediately.");
+            ShowTelemetryWarningToast("匿名数据授权同步失败", "RitsuLib 遥测授权状态未能立即更新。");
         }
 
         MainFile.Logger.Info(
@@ -223,7 +302,8 @@ internal static class AstralTelemetry
 
     public static bool IsCollectionEnabled()
     {
-        return IsTelemetryEnabled(LoadConfig(), LoadState());
+        return ReAstralPartyModSettingsManager.EnableTelemetry &&
+               GetTelemetryClient().IsEnabled(BalanceRequestId);
     }
 
     public static void BeginNewRun(RunState? runState)
@@ -415,8 +495,7 @@ internal static class AstralTelemetry
                 return;
 
             var config = LoadConfig();
-            var state = LoadState();
-            if (!IsTelemetryEnabled(config, state))
+            if (!config.Enabled || !IsCollectionEnabled())
                 return;
 
             if (serializableRun.RunTime <= MinRunTimeForUploadSeconds)
@@ -445,12 +524,14 @@ internal static class AstralTelemetry
             if (!SubmittedRunIds.Add(payload.Run.RunId))
                 return;
 
-            var json = JsonSerializer.Serialize(payload, JsonOptions);
-            _ = Task.Run(() => UploadPendingThenCurrentAsync(config, json, payload.Run.RunId));
+            PublishPayload(payload, serializableRun);
+            MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Queued run={payload.Run.RunId} via RitsuLib telemetry.");
+            ShowTelemetrySuccessToast();
         }
         catch (Exception ex)
         {
             MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Upload scheduling failed: {ex.Message}");
+            ShowTelemetryErrorToast("匿名数据推送失败", ex.Message);
         }
         finally
         {
@@ -461,6 +542,20 @@ internal static class AstralTelemetry
                     DeleteActiveRunSnapshotLocked();
                 }
         }
+    }
+
+    private static void PublishPayload(RunEndedPayload payload, SerializableRun serializableRun)
+    {
+        var client = GetTelemetryClient();
+        foreach (var evt in BuildTelemetryEvents(payload))
+            client.Capture(evt.EventName, BalanceRequestId, evt.Properties);
+
+        if (client.IsEnabled(RunHistoryRequestId))
+            TelemetryApi.CaptureVanillaRunHistory(
+                ApplicantId,
+                JsonSerializer.SerializeToNode(serializableRun, JsonOptions) ?? new JsonObject(),
+                applicantPayload: BuildRunHistoryModPayload(payload),
+                properties: BuildRunHistoryProperties(payload));
     }
 
     private static RunEndedPayload? BuildPayload(RunState? runState, SerializableRun serializableRun, bool isVictory,
@@ -655,64 +750,6 @@ internal static class AstralTelemetry
         }
     }
 
-    private static async Task UploadPendingThenCurrentAsync(TelemetryConfig config, string currentJson, string runId)
-    {
-        var pending = ReadPendingPayloads();
-        pending.Add(currentJson);
-
-        var unsent = new List<string>();
-        foreach (var payload in pending.TakeLast(MaxPendingLines))
-        {
-            if (IsShortRunPayload(payload))
-                continue;
-
-            try
-            {
-                var runPayload = JsonSerializer.Deserialize<RunEndedPayload>(payload, JsonOptions);
-                if (runPayload == null)
-                    continue;
-
-                var envelope = BuildPostHogEnvelope(config, runPayload);
-                if (envelope.Batch.Count == 0)
-                    continue;
-
-                var contentJson = JsonSerializer.Serialize(envelope, JsonOptions);
-                using var content = new StringContent(contentJson, Encoding.UTF8, "application/json");
-                using var response = await HttpClient.PostAsync(BuildBatchEndpoint(config.Host), content);
-                if (!response.IsSuccessStatusCode)
-                    unsent.Add(payload);
-            }
-            catch
-            {
-                unsent.Add(payload);
-            }
-        }
-
-        WritePendingPayloads(unsent.TakeLast(MaxPendingLines).ToList());
-        if (unsent.Count == 0)
-            MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Uploaded run={runId}");
-        else
-            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Upload deferred unsent={unsent.Count}");
-    }
-
-    private static bool IsShortRunPayload(string json)
-    {
-        try
-        {
-            using var document = JsonDocument.Parse(json);
-            if (document.RootElement.TryGetProperty("run", out var run)
-                && run.TryGetProperty("runTime", out var runTimeElement)
-                && runTimeElement.TryGetInt64(out var runTime))
-                return runTime <= MinRunTimeForUploadSeconds;
-        }
-        catch
-        {
-            return false;
-        }
-
-        return false;
-    }
-
     private static TelemetryConfig LoadConfig()
     {
         lock (ConfigLock)
@@ -728,50 +765,8 @@ internal static class AstralTelemetry
 
         if (!File.Exists(configPath))
         {
-            var config = new TelemetryConfig(true, DefaultProvider, DefaultHost, DefaultProjectToken, PendingFileName);
+            var config = new TelemetryConfig(true, DefaultProvider, DefaultHost, DefaultProjectToken, string.Empty);
             WriteConfigFile(config);
-        }
-    }
-
-    private static void EnsureStateFile()
-    {
-        var statePath = GetStatePath();
-        Directory.CreateDirectory(GetDataDirectory());
-        if (File.Exists(statePath))
-            return;
-
-        SaveStateCore(new TelemetryState(TelemetryConsentState.Unknown, false));
-    }
-
-    private static List<string> ReadPendingPayloads()
-    {
-        lock (QueueLock)
-        {
-            var path = GetPendingPath();
-            if (!File.Exists(path))
-                return [];
-
-            return File.ReadLines(path)
-                .Where(static line => !string.IsNullOrWhiteSpace(line))
-                .TakeLast(MaxPendingLines)
-                .ToList();
-        }
-    }
-
-    private static void WritePendingPayloads(IReadOnlyList<string> payloads)
-    {
-        lock (QueueLock)
-        {
-            var path = GetPendingPath();
-            Directory.CreateDirectory(GetDataDirectory());
-            if (payloads.Count == 0)
-            {
-                if (File.Exists(path))
-                    File.Delete(path);
-                return;
-            }
-
-            File.WriteAllLines(path, payloads);
         }
     }
 
@@ -806,12 +801,6 @@ internal static class AstralTelemetry
     private static string GetStatePath()
     {
         return Path.Combine(GetDataDirectory(), StateFileName);
-    }
-
-    private static string GetPendingPath()
-    {
-        var pendingFile = LoadConfig().PendingFile;
-        return Path.Combine(GetDataDirectory(), string.IsNullOrWhiteSpace(pendingFile) ? PendingFileName : pendingFile);
     }
 
     private static string GetActiveRunPath()
@@ -899,7 +888,7 @@ internal static class AstralTelemetry
                     DefaultProvider,
                     DefaultHost,
                     DefaultProjectToken,
-                    PendingFileName);
+                    string.Empty);
                 WriteConfigFile(migrated);
                 MainFile.Logger.Info(
                     $"[{MainFile.ModId}][Telemetry] Migrated legacy telemetry config to PostHog format.");
@@ -912,55 +901,8 @@ internal static class AstralTelemetry
             MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Config read failed: {ex.Message}");
         }
 
-        _cachedConfig = new TelemetryConfig(true, DefaultProvider, DefaultHost, DefaultProjectToken, PendingFileName);
+        _cachedConfig = new TelemetryConfig(true, DefaultProvider, DefaultHost, DefaultProjectToken, string.Empty);
         return _cachedConfig;
-    }
-
-    private static TelemetryState LoadState()
-    {
-        lock (ConfigLock)
-        {
-            return LoadStateCore();
-        }
-    }
-
-    private static TelemetryState LoadStateCore()
-    {
-        if (_cachedState != null)
-            return _cachedState;
-
-        EnsureStateFile();
-        try
-        {
-            var json = File.ReadAllText(GetStatePath());
-            var state = JsonSerializer.Deserialize<TelemetryState>(json, JsonOptions);
-            if (state != null)
-            {
-                _cachedState = state;
-                return state;
-            }
-        }
-        catch (Exception ex)
-        {
-            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] State read failed: {ex.Message}");
-        }
-
-        _cachedState = new TelemetryState(TelemetryConsentState.Unknown, false);
-        return _cachedState;
-    }
-
-    private static void SaveStateCore(TelemetryState state)
-    {
-        Directory.CreateDirectory(GetDataDirectory());
-        File.WriteAllText(
-            GetStatePath(),
-            JsonSerializer.Serialize(state, new JsonSerializerOptions(JsonOptions) { WriteIndented = true }));
-        _cachedState = state;
-    }
-
-    private static bool IsTelemetryEnabled(TelemetryConfig config, TelemetryState state)
-    {
-        return config.Enabled && state.ConsentState == TelemetryConsentState.Accepted;
     }
 
     private static bool IsValidConfig(TelemetryConfig? config)
@@ -977,146 +919,8 @@ internal static class AstralTelemetry
             Provider = string.IsNullOrWhiteSpace(config.Provider) ? DefaultProvider : config.Provider,
             Host = string.IsNullOrWhiteSpace(config.Host) ? DefaultHost : config.Host.TrimEnd('/'),
             ProjectToken = config.ProjectToken.Trim(),
-            PendingFile = string.IsNullOrWhiteSpace(config.PendingFile) ? PendingFileName : config.PendingFile
+            PendingFile = config.PendingFile ?? string.Empty
         };
-    }
-
-    private static string BuildBatchEndpoint(string host)
-    {
-        return $"{host.TrimEnd('/')}{CaptureBatchPath}";
-    }
-
-    private static PostHogEnvelope BuildPostHogEnvelope(TelemetryConfig config, RunEndedPayload payload)
-    {
-        var events = new List<PostHogEvent>();
-        foreach (var choice in payload.PersonaChoices)
-        {
-            events.AddRange(CreatePersonaOptionOfferedEvents(payload, choice));
-            events.Add(CreatePersonaChoiceEvent(payload, choice));
-        }
-
-        foreach (var choice in payload.TokenChoices)
-        {
-            events.AddRange(CreateTokenOptionOfferedEvents(payload, choice));
-            events.Add(CreateTokenChoiceEvent(payload, choice));
-        }
-
-        foreach (var player in payload.Players)
-        {
-            foreach (var tokenId in player.ObtainedTokens)
-                events.Add(CreateTokenObtainedEvent(payload, player, tokenId));
-
-            events.Add(CreateRunFinishedEvent(payload, player));
-        }
-
-        return new PostHogEnvelope(config.ProjectToken, events);
-    }
-
-    private static IEnumerable<PostHogEvent> CreatePersonaOptionOfferedEvents(RunEndedPayload payload,
-        PersonaChoiceRecord choice)
-    {
-        foreach (var optionId in choice.Options)
-            yield return new PostHogEvent(
-                "astral_persona_option_offered",
-                CreateDistinctId(payload.Run.RunId, choice.PlayerSlot),
-                CreateBaseProperties(payload, choice.PlayerSlot, null, null)
-                    .With("option_id", optionId)
-                    .With("option_label", GetRelicLabel(optionId))
-                    .With("selected", choice.Selected)
-                    .With("selected_label", GetRelicLabel(choice.Selected))
-                    .With("is_selected", string.Equals(optionId, choice.Selected, StringComparison.Ordinal)),
-                payload.UploadedAtUtc);
-    }
-
-    private static IEnumerable<PostHogEvent> CreateTokenOptionOfferedEvents(RunEndedPayload payload,
-        TokenChoiceRecord choice)
-    {
-        foreach (var optionId in choice.Options)
-            yield return new PostHogEvent(
-                "astral_token_option_offered",
-                CreateDistinctId(payload.Run.RunId, choice.PlayerSlot),
-                CreateBaseProperties(payload, choice.PlayerSlot, null, null)
-                    .With("source", choice.Source)
-                    .With("option_id", optionId)
-                    .With("option_label", GetRelicLabel(optionId))
-                    .With("selected", choice.Selected)
-                    .With("selected_label", GetRelicLabel(choice.Selected))
-                    .With("is_selected", string.Equals(optionId, choice.Selected, StringComparison.Ordinal))
-                    .With("reroll_count", choice.RerollCount),
-                payload.UploadedAtUtc);
-    }
-
-    private static PostHogEvent CreatePersonaChoiceEvent(RunEndedPayload payload, PersonaChoiceRecord choice)
-    {
-        var optionLabels = choice.Options.Select(GetRelicLabel).ToArray();
-        return new PostHogEvent(
-            "astral_persona_choice",
-            CreateDistinctId(payload.Run.RunId, choice.PlayerSlot),
-            CreateBaseProperties(payload, choice.PlayerSlot, null, null)
-                .With("options", choice.Options.ToArray())
-                .With("option_labels", optionLabels)
-                .With("selected", choice.Selected)
-                .With("selected_label", GetRelicLabel(choice.Selected)),
-            payload.UploadedAtUtc);
-    }
-
-    private static PostHogEvent CreateTokenChoiceEvent(RunEndedPayload payload, TokenChoiceRecord choice)
-    {
-        var optionLabels = choice.Options.Select(GetRelicLabel).ToArray();
-        return new PostHogEvent(
-            "astral_token_choice",
-            CreateDistinctId(payload.Run.RunId, choice.PlayerSlot),
-            CreateBaseProperties(payload, choice.PlayerSlot, null, null)
-                .With("source", choice.Source)
-                .With("options", choice.Options.ToArray())
-                .With("option_labels", optionLabels)
-                .With("selected", choice.Selected)
-                .With("selected_label", GetRelicLabel(choice.Selected))
-                .With("reroll_count", choice.RerollCount),
-            payload.UploadedAtUtc);
-    }
-
-    private static PostHogEvent CreateTokenObtainedEvent(RunEndedPayload payload, PlayerRunTelemetry player,
-        string tokenId)
-    {
-        return new PostHogEvent(
-            "astral_token_obtained",
-            CreateDistinctId(payload.Run.RunId, player.Slot),
-            CreateBaseProperties(payload, player.Slot, player, player.PersonaSelected)
-                .With("token_id", tokenId)
-                .With("token_label", GetRelicLabel(tokenId))
-                .With("is_victory", payload.Run.IsVictory)
-                .With("run_time", payload.Run.RunTime)
-                .With("ascension", payload.Run.Ascension)
-                .With("current_act_index", payload.Run.CurrentActIndex)
-                .With("total_floor", payload.Run.TotalFloor)
-                .With("net_mode", payload.Run.NetMode)
-                .With("player_count", payload.Run.PlayerCount),
-            payload.UploadedAtUtc);
-    }
-
-    private static PostHogEvent CreateRunFinishedEvent(RunEndedPayload payload, PlayerRunTelemetry player)
-    {
-        return new PostHogEvent(
-            "astral_run_finished",
-            CreateDistinctId(payload.Run.RunId, player.Slot),
-            CreateBaseProperties(payload, player.Slot, player, player.PersonaSelected)
-                .With("character", player.Character)
-                .With("persona_selected", player.PersonaSelected)
-                .With("persona_selected_label", GetRelicLabel(player.PersonaSelected))
-                .With("persona_skill_card_id", player.PersonaSkillCardId)
-                .With("persona_skill_card_label", GetCardLabel(player.PersonaSkillCardId))
-                .With("persona_skill_use_count", player.PersonaSkillUseCount)
-                .With("obtained_tokens", player.ObtainedTokens.ToArray())
-                .With("obtained_token_labels", player.ObtainedTokens.Select(GetRelicLabel).ToArray())
-                .With("is_victory", payload.Run.IsVictory)
-                .With("run_time", payload.Run.RunTime)
-                .With("ascension", payload.Run.Ascension)
-                .With("current_act_index", payload.Run.CurrentActIndex)
-                .With("total_floor", payload.Run.TotalFloor)
-                .With("net_mode", payload.Run.NetMode)
-                .With("player_count", payload.Run.PlayerCount),
-            payload.UploadedAtUtc);
     }
 
     private static Dictionary<string, object?> CreateBaseProperties(
@@ -1142,9 +946,177 @@ internal static class AstralTelemetry
         };
     }
 
-    private static string CreateDistinctId(string runId, int playerSlot)
+    private static JsonObject BuildRunHistoryModPayload(RunEndedPayload payload)
     {
-        return Sha256Hex($"{runId}|{playerSlot}|{GetInstallSalt()}");
+        return new JsonObject
+        {
+            ["astral_run_payload"] = JsonSerializer.SerializeToNode(payload, JsonOptions)
+        };
+    }
+
+    private static Dictionary<string, object?> BuildRunHistoryProperties(RunEndedPayload payload)
+    {
+        return new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["payload_kind"] = "astral_run_history_with_mod_payload",
+            ["astral_run_id"] = payload.Run.RunId,
+            ["astral_net_mode"] = payload.Run.NetMode,
+            ["astral_player_count"] = payload.Run.PlayerCount,
+            ["astral_is_victory"] = payload.Run.IsVictory,
+            ["astral_run_time"] = payload.Run.RunTime
+        };
+    }
+
+    private static bool ShouldCaptureRunHistory(RunEndedEvent evt)
+    {
+        if (!ReAstralPartyModSettingsManager.EnableTelemetry)
+            return false;
+
+        if (evt.Run.RunTime <= MinRunTimeForUploadSeconds)
+            return false;
+
+        return RunManager.Instance?.NetService.Type is NetGameType.None or NetGameType.Singleplayer or NetGameType.Host;
+    }
+
+    private static void ShowTelemetrySuccessToast()
+    {
+        AstralNotificationService.ShowInfo(AstralNotificationModule.Telemetry, "匿名数据推送成功", "遥测");
+    }
+
+    private static void ShowTelemetryWarningToast(string body, string? title = null)
+    {
+        AstralNotificationService.ShowWarning(AstralNotificationModule.Telemetry, body, title);
+    }
+
+    private static void ShowTelemetryErrorToast(string body, string? title = null)
+    {
+        AstralNotificationService.ShowError(AstralNotificationModule.Telemetry, body, title);
+    }
+
+    private static IEnumerable<TelemetryEventRecord> BuildTelemetryEvents(RunEndedPayload payload)
+    {
+        foreach (var choice in payload.PersonaChoices)
+        {
+            foreach (var optionEvent in CreatePersonaOptionOfferedEvents(payload, choice))
+                yield return optionEvent;
+
+            yield return CreatePersonaChoiceEvent(payload, choice);
+        }
+
+        foreach (var choice in payload.TokenChoices)
+        {
+            foreach (var optionEvent in CreateTokenOptionOfferedEvents(payload, choice))
+                yield return optionEvent;
+
+            yield return CreateTokenChoiceEvent(payload, choice);
+        }
+
+        foreach (var player in payload.Players)
+        {
+            foreach (var tokenId in player.ObtainedTokens)
+                yield return CreateTokenObtainedEvent(payload, player, tokenId);
+
+            yield return CreateRunFinishedEvent(payload, player);
+        }
+    }
+
+    private static IEnumerable<TelemetryEventRecord> CreatePersonaOptionOfferedEvents(
+        RunEndedPayload payload,
+        PersonaChoiceRecord choice)
+    {
+        foreach (var optionId in choice.Options)
+            yield return new TelemetryEventRecord(
+                "astral_persona_option_offered",
+                CreateBaseProperties(payload, choice.PlayerSlot, null, null)
+                    .With("option_id", optionId)
+                    .With("option_label", GetRelicLabel(optionId))
+                    .With("selected", choice.Selected)
+                    .With("selected_label", GetRelicLabel(choice.Selected))
+                    .With("is_selected", string.Equals(optionId, choice.Selected, StringComparison.Ordinal)));
+    }
+
+    private static IEnumerable<TelemetryEventRecord> CreateTokenOptionOfferedEvents(
+        RunEndedPayload payload,
+        TokenChoiceRecord choice)
+    {
+        foreach (var optionId in choice.Options)
+            yield return new TelemetryEventRecord(
+                "astral_token_option_offered",
+                CreateBaseProperties(payload, choice.PlayerSlot, null, null)
+                    .With("source", choice.Source)
+                    .With("option_id", optionId)
+                    .With("option_label", GetRelicLabel(optionId))
+                    .With("selected", choice.Selected)
+                    .With("selected_label", GetRelicLabel(choice.Selected))
+                    .With("is_selected", string.Equals(optionId, choice.Selected, StringComparison.Ordinal))
+                    .With("reroll_count", choice.RerollCount));
+    }
+
+    private static TelemetryEventRecord CreatePersonaChoiceEvent(RunEndedPayload payload, PersonaChoiceRecord choice)
+    {
+        var optionLabels = choice.Options.Select(GetRelicLabel).ToArray();
+        return new TelemetryEventRecord(
+            "astral_persona_choice",
+            CreateBaseProperties(payload, choice.PlayerSlot, null, null)
+                .With("options", choice.Options.ToArray())
+                .With("option_labels", optionLabels)
+                .With("selected", choice.Selected)
+                .With("selected_label", GetRelicLabel(choice.Selected)));
+    }
+
+    private static TelemetryEventRecord CreateTokenChoiceEvent(RunEndedPayload payload, TokenChoiceRecord choice)
+    {
+        var optionLabels = choice.Options.Select(GetRelicLabel).ToArray();
+        return new TelemetryEventRecord(
+            "astral_token_choice",
+            CreateBaseProperties(payload, choice.PlayerSlot, null, null)
+                .With("source", choice.Source)
+                .With("options", choice.Options.ToArray())
+                .With("option_labels", optionLabels)
+                .With("selected", choice.Selected)
+                .With("selected_label", GetRelicLabel(choice.Selected))
+                .With("reroll_count", choice.RerollCount));
+    }
+
+    private static TelemetryEventRecord CreateTokenObtainedEvent(
+        RunEndedPayload payload,
+        PlayerRunTelemetry player,
+        string tokenId)
+    {
+        return new TelemetryEventRecord(
+            "astral_token_obtained",
+            CreateBaseProperties(payload, player.Slot, player, player.PersonaSelected)
+                .With("token_id", tokenId)
+                .With("token_label", GetRelicLabel(tokenId))
+                .With("is_victory", payload.Run.IsVictory)
+                .With("run_time", payload.Run.RunTime)
+                .With("ascension", payload.Run.Ascension)
+                .With("current_act_index", payload.Run.CurrentActIndex)
+                .With("total_floor", payload.Run.TotalFloor)
+                .With("net_mode", payload.Run.NetMode)
+                .With("player_count", payload.Run.PlayerCount));
+    }
+
+    private static TelemetryEventRecord CreateRunFinishedEvent(RunEndedPayload payload, PlayerRunTelemetry player)
+    {
+        return new TelemetryEventRecord(
+            "astral_run_finished",
+            CreateBaseProperties(payload, player.Slot, player, player.PersonaSelected)
+                .With("character", player.Character)
+                .With("persona_selected", player.PersonaSelected)
+                .With("persona_selected_label", GetRelicLabel(player.PersonaSelected))
+                .With("persona_skill_card_id", player.PersonaSkillCardId)
+                .With("persona_skill_card_label", GetCardLabel(player.PersonaSkillCardId))
+                .With("persona_skill_use_count", player.PersonaSkillUseCount)
+                .With("obtained_tokens", player.ObtainedTokens.ToArray())
+                .With("obtained_token_labels", player.ObtainedTokens.Select(GetRelicLabel).ToArray())
+                .With("is_victory", payload.Run.IsVictory)
+                .With("run_time", payload.Run.RunTime)
+                .With("ascension", payload.Run.Ascension)
+                .With("current_act_index", payload.Run.CurrentActIndex)
+                .With("total_floor", payload.Run.TotalFloor)
+                .With("net_mode", payload.Run.NetMode)
+                .With("player_count", payload.Run.PlayerCount));
     }
 
     private static string? GetRelicLabel(string? relicId)
@@ -1168,25 +1140,6 @@ internal static class AstralTelemetry
 
         var text = loc.GetRawText();
         return string.IsNullOrWhiteSpace(text) ? modelId : text;
-    }
-
-    private static string GetInstallSalt()
-    {
-        var saltPath = Path.Combine(GetDataDirectory(), InstallSaltFileName);
-        try
-        {
-            if (File.Exists(saltPath))
-                return File.ReadAllText(saltPath).Trim();
-
-            Directory.CreateDirectory(GetDataDirectory());
-            var salt = Guid.NewGuid().ToString("N");
-            File.WriteAllText(saltPath, salt);
-            return salt;
-        }
-        catch
-        {
-            return MainFile.ModId;
-        }
     }
 
     private static string Sha256Hex(string value)
