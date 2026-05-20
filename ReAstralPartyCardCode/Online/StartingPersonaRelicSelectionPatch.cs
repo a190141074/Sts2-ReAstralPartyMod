@@ -60,6 +60,10 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         if (!ShouldOpenStartingPersonaRelicSelection(runState, out var skipReason))
         {
             LogInfo("P008", $"Starting persona relic selection skipped: {skipReason}.");
+            if (skipReason.Contains("already own persona relics", StringComparison.Ordinal))
+            {
+                ShowWarning("P008", "启动门禁", "检测到至少一名玩家在开局阶段已经持有人格遗物，因此本轮人格选择被跳过。请反馈编号和日志。");
+            }
             return;
         }
 
@@ -77,7 +81,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         {
             EndSelection(runKey, false);
             LogWarn("P011", "Starting persona relic selection skipped because overlay stack is not ready.");
-            ShowWarning("P011", "开局人格选择界面未能正常打开。");
+            ShowWarning("P011", "界面打开", "未能拿到人格选择覆盖层，界面没有正常打开。请反馈编号。");
             return;
         }
 
@@ -86,7 +90,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         {
             EndSelection(runKey, false);
             LogWarn("P012", "Starting persona relic selection skipped because no persona relics are registered.");
-            ShowWarning("P012", "未找到可用的人格选项，请反馈日志。");
+            ShowWarning("P012", "选项构建", "未找到可用的人格选项。请反馈编号和日志。");
             return;
         }
 
@@ -159,12 +163,12 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         MainFile.Logger.Warn($"[{code}] {message}");
     }
 
-    private static void ShowWarning(string code, string body)
+    private static void ShowWarning(string code, string stage, string body)
     {
         AstralNotificationService.ShowWarning(
             AstralNotificationModule.Multiplayer,
-            body,
-            BuildToastTitle(code, PersonaToastTitle));
+            $"{body}\n阶段：{stage}",
+            BuildToastTitle(code, $"人格选择/{stage}"));
     }
 
     private static string BuildToastTitle(string code, string title)
