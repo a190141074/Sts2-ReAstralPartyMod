@@ -491,9 +491,6 @@ internal static class AstralTelemetry
     {
         try
         {
-            if (!AstralNetPhaseGuard.Guard(AstralNetPhase.RunEnd, "telemetry run ended"))
-                return;
-
             var config = LoadConfig();
             if (!config.Enabled || !IsCollectionEnabled())
                 return;
