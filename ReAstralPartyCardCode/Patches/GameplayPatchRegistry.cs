@@ -22,6 +22,7 @@ using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using STS2RitsuLib;
+using STS2RitsuLib.Combat.HandSize;
 using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Models;
@@ -141,6 +142,14 @@ internal static class GameplayStaticPatchCatalog
     {
         patcher.RegisterPatches(
         [
+            new ModPatchInfo(
+                "persona_max_hand_size_guard_patch",
+                typeof(MaxHandSizeCalculator),
+                nameof(MaxHandSizeCalculator.ApplyHookListenerModifiers),
+                typeof(PersonaMaxHandSizeGuardPatch),
+                false,
+                "Gameplay patch: guard persona relic max-hand-size modifiers when hook-listener enumeration misses them",
+                [typeof(Player), typeof(int)]),
             new ModPatchInfo(
                 "astral_relic_store_event_override_patch",
                 typeof(ActModel),
