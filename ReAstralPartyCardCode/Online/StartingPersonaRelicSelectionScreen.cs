@@ -28,7 +28,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOverlayScreen, IScreenContext
 {
-    private const string PersonaToastTitle = "联机提示";
     private const string BackgroundTexturePath =
         "res://ReAstralPartyMod/images/background/starting_persona_pelic_selection_screen.png";
 
@@ -304,10 +303,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             _completionSource.TrySetException(ex);
             MainFile.Logger.Error($"[P199] Starting persona relic shared selection failed: {ex}");
-            AstralNotificationService.ShowError(
+            AstralNotificationService.ShowDiagnosticError(
                 AstralNotificationModule.Multiplayer,
-                "开局人格选择整体流程失败，请把日志和编号发给作者。\n阶段：总流程",
-                BuildToastTitle("P199", "人格选择/总流程"));
+                AstralNotificationArea.PersonaSelection,
+                199,
+                "开局人格选择整体流程失败，请把日志和编号发给作者。",
+                "总流程");
         }
     }
 
@@ -353,10 +354,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             LogWarn("P104",
                 "Starting persona relic selection timed out while waiting for the final synchronized lock; applying deterministic timeout fallback.");
-            AstralNotificationService.ShowWarning(
+            AstralNotificationService.ShowDiagnosticWarning(
                 AstralNotificationModule.Multiplayer,
-                "全员选完后未能及时收到最终锁定，正在尝试自动补救。\n阶段：等待最终提交",
-                BuildToastTitle("P104", "人格选择/等待最终提交"));
+                AstralNotificationArea.PersonaSelection,
+                104,
+                "全员选完后未能及时收到最终锁定，正在尝试自动补救。",
+                "等待最终提交");
             var timeoutSnapshot = await ResolveTimeoutFallbackAsync();
             ApplyCommittedSelections(timeoutSnapshot);
             return;
@@ -980,10 +983,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             MainFile.Logger.Error($"[P120] Starting persona selection remote observer failed for player {player.NetId}: {ex}");
             if (!_closed && !_selectionFinalized)
             {
-                AstralNotificationService.ShowWarning(
+                AstralNotificationService.ShowDiagnosticWarning(
                     AstralNotificationModule.Multiplayer,
-                    $"远端玩家 {player.NetId} 的人格选择观察线程失败，后续可能出现穿过选择页或未正常同步。\n阶段：远端观察",
-                    BuildToastTitle("P120", "人格选择/远端观察"));
+                    AstralNotificationArea.PersonaSelection,
+                    120,
+                    $"远端玩家 {player.NetId} 的人格选择观察线程失败，后续可能出现穿过选择页或未正常同步。",
+                    "远端观察");
                 _multiplayerCommitSource.TrySetException(ex);
             }
         }
@@ -1080,10 +1085,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         LogWarn("P123",
             "Starting persona relic selection did not receive an authority final commit during grace period; applying local deterministic timeout fallback.");
-        AstralNotificationService.ShowWarning(
+        AstralNotificationService.ShowDiagnosticWarning(
             AstralNotificationModule.Multiplayer,
-            "宽限期内仍未收到房主最终提交，已改用本地确定性补救。\n阶段：宽限期最终提交",
-            BuildToastTitle("P123", "人格选择/宽限期最终提交"));
+            AstralNotificationArea.PersonaSelection,
+            123,
+            "宽限期内仍未收到房主最终提交，已改用本地确定性补救。",
+            "宽限期最终提交");
         _multiplayerCommitSource.TrySetResult(fallbackSnapshot);
         return fallbackSnapshot;
     }
@@ -1171,10 +1178,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             MainFile.Logger.Error(
                 $"[P127] Starting persona selection failed to broadcast timeout fallback final commit: {ex}");
-            AstralNotificationService.ShowError(
+            AstralNotificationService.ShowDiagnosticError(
                 AstralNotificationModule.Multiplayer,
-                "超时补救结果未能广播给其他玩家，请把日志和编号发给作者。\n阶段：超时补救广播",
-                BuildToastTitle("P127", "人格选择/超时补救广播"));
+                AstralNotificationArea.PersonaSelection,
+                127,
+                "超时补救结果未能广播给其他玩家，请把日志和编号发给作者。",
+                "超时补救广播");
         }
     }
 
@@ -1274,10 +1283,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         LogWarn("P129",
             $"Starting persona selection did not acquire PlayerChoiceSynchronizer within {MaxSynchronizerWaitFrames} frames.");
-        AstralNotificationService.ShowWarning(
+        AstralNotificationService.ShowDiagnosticWarning(
             AstralNotificationModule.Multiplayer,
-            "联机同步器长时间未就绪，请把日志和编号发给作者。\n阶段：等待同步器",
-            BuildToastTitle("P129", "人格选择/等待同步器"));
+            AstralNotificationArea.PersonaSelection,
+            129,
+            "联机同步器长时间未就绪，请把日志和编号发给作者。",
+            "等待同步器");
         return runManager.PlayerChoiceSynchronizer;
     }
 
@@ -1481,8 +1492,4 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         MainFile.Logger.Warn($"[{code}] {message}");
     }
 
-    private static string BuildToastTitle(string code, string title)
-    {
-        return $"【{code}】{title}";
-    }
 }

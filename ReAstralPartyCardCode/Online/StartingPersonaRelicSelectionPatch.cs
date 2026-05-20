@@ -19,7 +19,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 {
-    private const string PersonaToastTitle = "联机提示";
     public static string PatchId => "starting_persona_relic_selection_patch";
     public static bool IsCritical => false;
     public static string Description => "Open the starting persona relic selection after a run starts";
@@ -116,10 +115,12 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
                 AstralTelemetry.RecordPersonaChoice(runState, relicOptions, selectedIndexes);
                 LogInfo("P013",
                     $"Starting persona random clone mode applied: runKey={runKey} persona={sharedRelic.Id.Entry} players={runState.Players.Count}.");
-                AstralNotificationService.ShowInfo(
+                AstralNotificationService.ShowDiagnosticInfo(
                     AstralNotificationModule.Multiplayer,
+                    AstralNotificationArea.PersonaSelection,
+                    13,
                     $"本局统一人格：{sharedRelic.Title.GetFormattedText()}",
-                    BuildToastTitle("P013", "随机克隆模式"));
+                    "随机克隆模式");
                 EndSelection(runKey, true);
                 return;
             }
@@ -165,15 +166,12 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
     private static void ShowWarning(string code, string stage, string body)
     {
-        AstralNotificationService.ShowWarning(
+        AstralNotificationService.ShowDiagnosticWarning(
             AstralNotificationModule.Multiplayer,
-            $"{body}\n阶段：{stage}",
-            BuildToastTitle(code, $"人格选择/{stage}"));
-    }
-
-    private static string BuildToastTitle(string code, string title)
-    {
-        return $"【{code}】{title}";
+            AstralNotificationArea.PersonaSelection,
+            ParseCodeNumber(code),
+            body,
+            stage);
     }
 
     private static async Task WaitForBootstrapReadinessAsync()
@@ -325,5 +323,10 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             if (completed)
                 CompletedRunKeys.Add(runKey);
         }
+    }
+
+    private static int ParseCodeNumber(string code)
+    {
+        return int.TryParse(code.AsSpan(1), out var number) ? number : 0;
     }
 }
