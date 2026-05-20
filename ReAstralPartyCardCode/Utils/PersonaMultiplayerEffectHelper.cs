@@ -153,6 +153,12 @@ public static class PersonaMultiplayerEffectHelper
         if (RewardContextPolicy.CanUseRewardSynchronizer(owner, "safe relic reward"))
             return ObtainRelicAsReward(owner, relic);
 
+        AstralRelicDiagnosticHelper.ShowFallbackWarning(
+            owner,
+            relic,
+            "奖励同步回退",
+            1,
+            "奖励同步上下文不可用，已改走确定性直接发放。");
         return ObtainRelicDeterministic(owner, relic);
     }
 
@@ -241,6 +247,13 @@ public static class PersonaMultiplayerEffectHelper
 
     private static async Task<RelicModel> ObtainDuplicateInitialPointFallback(Player owner)
     {
+        var initialPoint = ModelDb.Relic<TokenGoldInitialPoint>();
+        AstralRelicDiagnosticHelper.ShowFallbackWarning(
+            owner,
+            initialPoint,
+            "重复初始点回退",
+            2,
+            $"检测到重复获得初始点，已改为发放 {DuplicateInitialPointFallbackEternalStarlightStacks} 层永恒星光。");
         var eternalStarlight = await TokenEternalStarlight.GrantStacks(
             owner,
             DuplicateInitialPointFallbackEternalStarlightStacks);
@@ -253,18 +266,34 @@ public static class PersonaMultiplayerEffectHelper
 
     private static async Task<RelicModel> ObtainRelicDeterministicTracked(Player owner, RelicModel canonicalRelic)
     {
-        MarkRelicAsSeenIfPossible(canonicalRelic);
-        var obtained = await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
-        AstralTelemetry.RecordObtainedToken(owner, canonicalRelic);
-        return obtained;
+        try
+        {
+            MarkRelicAsSeenIfPossible(canonicalRelic);
+            var obtained = await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
+            AstralTelemetry.RecordObtainedToken(owner, canonicalRelic);
+            return obtained;
+        }
+        catch (Exception ex)
+        {
+            AstralRelicDiagnosticHelper.ShowObtainFailure(owner, canonicalRelic, "确定性发放", 3, ex);
+            throw;
+        }
     }
 
     private static async Task<RelicModel> ObtainRelicAsRewardTracked(Player owner, RelicModel canonicalRelic)
     {
-        MarkRelicAsSeenIfPossible(canonicalRelic);
-        var obtained = await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
-        AstralTelemetry.RecordObtainedToken(owner, canonicalRelic);
-        return obtained;
+        try
+        {
+            MarkRelicAsSeenIfPossible(canonicalRelic);
+            var obtained = await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
+            AstralTelemetry.RecordObtainedToken(owner, canonicalRelic);
+            return obtained;
+        }
+        catch (Exception ex)
+        {
+            AstralRelicDiagnosticHelper.ShowObtainFailure(owner, canonicalRelic, "奖励发放", 4, ex);
+            throw;
+        }
     }
 
     private static uint GetBestWeightedDeterministicScore(

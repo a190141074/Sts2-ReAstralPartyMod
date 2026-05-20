@@ -744,7 +744,15 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             SaveManager.Instance.MarkRelicAsSeen(relic);
             MainFile.Logger.Info(
                 $"[P109] Starting persona selection awarding relic '{relic.Id.Entry}' to player {result.player.NetId}.");
-            await RelicCmd.Obtain(relic, result.player);
+            try
+            {
+                await RelicCmd.Obtain(relic, result.player);
+            }
+            catch (Exception ex)
+            {
+                AstralRelicDiagnosticHelper.ShowObtainFailure(result.player, relic, "人格发放", 109, ex);
+                throw;
+            }
             awardedResults.Add((result.player, relic));
         }
 

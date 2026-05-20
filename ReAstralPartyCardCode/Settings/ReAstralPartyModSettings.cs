@@ -47,6 +47,10 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableMultiplayerNotifications { get; set; } = true;
 
+    public bool EnablePersonaRelicNotifications { get; set; } = true;
+
+    public bool EnableTokenRelicNotifications { get; set; } = true;
+
     // Legacy bool setting kept for backward compatibility with older settings.json files.
     public bool? EnableAllTokenSeries { get; set; }
 
@@ -97,6 +101,12 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool EnableMultiplayerNotifications =>
         ReadRuntime(settings => settings.EnableMultiplayerNotifications);
+
+    public static bool EnablePersonaRelicNotifications =>
+        ReadRuntime(settings => settings.EnablePersonaRelicNotifications);
+
+    public static bool EnableTokenRelicNotifications =>
+        ReadRuntime(settings => settings.EnableTokenRelicNotifications);
 
     public static IReadOnlySet<ModelId> BannedPersonaRelicIds =>
         ReadRuntime(settings => settings.BannedPersonaRelicIds);
@@ -460,6 +470,32 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enablePersonaRelicNotifications = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnablePersonaRelicNotifications,
+            (settings, value) =>
+            {
+                settings.EnablePersonaRelicNotifications = value;
+                ApplyRuntimeSettings(settings, "enable_persona_relic_notifications");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.label",
+                    value);
+            });
+
+        var enableTokenRelicNotifications = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableTokenRelicNotifications,
+            (settings, value) =>
+            {
+                settings.EnableTokenRelicNotifications = value;
+                ApplyRuntimeSettings(settings, "enable_token_relic_notifications");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_relic_notifications.label",
+                    value);
+            });
+
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
             .WithModDisplayName(T("RE_ASTRAL_PARTY_MOD_SETTINGS.mod_display_name", "Astral Party Mod"))
             .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.page_title", "Mod Settings"))
@@ -597,7 +633,21 @@ public static partial class ReAstralPartyModSettingsManager
                         "Enable Multiplayer Notifications"),
                     enableMultiplayerNotifications,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.description",
-                        "Show important multiplayer selection and synchronization problem notifications."))));
+                        "Show important multiplayer selection and synchronization problem notifications."))
+                .AddToggle(
+                    "enable_persona_relic_notifications",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.label",
+                        "Enable Persona Relic Diagnostics"),
+                    enablePersonaRelicNotifications,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.description",
+                        "Show numbered diagnostic notifications for Astral persona, variant persona, and derivative relic problems."))
+                .AddToggle(
+                    "enable_token_relic_notifications",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_relic_notifications.label",
+                        "Enable Token Relic Diagnostics"),
+                    enableTokenRelicNotifications,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_relic_notifications.description",
+                        "Show numbered diagnostic notifications for Astral token relic fallback, obtain, and animation problems."))));
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
             .AsChildOf(MainFile.ModId)
@@ -800,6 +850,10 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableMultiplayerNotifications { get; init; } = true;
 
+        public bool EnablePersonaRelicNotifications { get; init; } = true;
+
+        public bool EnableTokenRelicNotifications { get; init; } = true;
+
         public TokenSeriesMode TokenSeriesMode { get; init; } = TokenSeriesMode.RandomTwo;
 
         public bool EnablePureAngelMode { get; init; } = true;
@@ -822,6 +876,8 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableSettingsNotifications = settings.EnableSettingsNotifications,
                 EnableTelemetryNotifications = settings.EnableTelemetryNotifications,
                 EnableMultiplayerNotifications = settings.EnableMultiplayerNotifications,
+                EnablePersonaRelicNotifications = settings.EnablePersonaRelicNotifications,
+                EnableTokenRelicNotifications = settings.EnableTokenRelicNotifications,
                 TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
                 EnablePureAngelMode = settings.EnablePureAngelMode
             };

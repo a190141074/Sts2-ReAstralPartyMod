@@ -1,7 +1,10 @@
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.Relics;
 using Godot;
+using System.Reflection;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
@@ -9,6 +12,12 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 public static class MultiplayerRelicAnimationSafetyPatch
 {
     private static int _skipLogCount;
+    private static int _personaToastCount;
+    private static int _tokenToastCount;
+    private static readonly FieldInfo? RelicField =
+        AccessTools.Field(typeof(NRelicInventoryHolder), "_relic")
+        ?? AccessTools.Field(typeof(NRelicInventoryHolder), "relic")
+        ?? AccessTools.Field(typeof(NRelicInventoryHolder), "Relic");
 
     [HarmonyPrefix]
     public static bool Prefix(NRelicInventoryHolder __instance, ref Task __result, out bool __state)
@@ -20,7 +29,7 @@ public static class MultiplayerRelicAnimationSafetyPatch
             return true;
         }
 
-        LogSkip("holder-not-in-tree");
+        ReportSkip(__instance, "holder-not-in-tree");
         __result = Task.CompletedTask;
         return false;
     }
@@ -42,11 +51,11 @@ public static class MultiplayerRelicAnimationSafetyPatch
         }
         catch (NullReferenceException) when (!IsNodeUsable(holder))
         {
-            LogSkip("holder-left-tree");
+            ReportSkip(holder, "holder-left-tree");
         }
         catch (ObjectDisposedException) when (!GodotObject.IsInstanceValid(holder))
         {
-            LogSkip("holder-disposed");
+            ReportSkip(holder, "holder-disposed");
         }
     }
 
@@ -55,9 +64,42 @@ public static class MultiplayerRelicAnimationSafetyPatch
         return GodotObject.IsInstanceValid(node) && node.IsInsideTree();
     }
 
-    private static void LogSkip(string reason)
+    private static void ReportSkip(NRelicInventoryHolder holder, string reason)
     {
         if (_skipLogCount++ < 5)
             Log.Warn($"[{MainFile.ModId}] Skipped relic acquired animation during multiplayer-safe cleanup: {reason}");
+
+        if (!TryGetRelic(holder, out var relic))
+            return;
+        if (!AstralRelicDiagnosticHelper.TryClassifyAstralRelic(relic, out var area, out var kind, out _))
+            return;
+
+        if (kind == AstralRelicDiagnosticKind.Persona)
+        {
+            if (_personaToastCount++ >= 2)
+                return;
+        }
+        else
+        {
+            if (_tokenToastCount++ >= 2)
+                return;
+        }
+
+        AstralNotificationService.ShowDiagnosticWarning(
+            AstralNotificationModule.Multiplayer,
+            area,
+            kind == AstralRelicDiagnosticKind.Persona ? 130 : 5,
+            $"遗物获得动画被安全跳过，遗物可能已正常获得但表现层未播放。\n遗物：{AstralRelicDiagnosticHelper.GetRelicDisplayName(relic)}",
+            "获得动画");
+    }
+
+    private static bool TryGetRelic(NRelicInventoryHolder holder, out RelicModel relic)
+    {
+        relic = null!;
+        if (RelicField?.GetValue(holder) is not RelicModel model)
+            return false;
+
+        relic = model;
+        return true;
     }
 }
