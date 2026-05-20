@@ -22,9 +22,13 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public bool EnableDuplicatePersonas { get; set; }
 
+    public bool EnableRandomCloneMode { get; set; }
+
     public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
 
     public bool EnablePureAngelMode { get; set; } = true;
+
+    public List<string> BannedPersonaRelicIdsSerialized { get; set; } = [];
 }
 
 internal static class ReAstralPartyRunSettingsSync
@@ -79,8 +83,13 @@ internal static class ReAstralPartyRunSettingsSync
             EnableExtremeMode = settings.EnableExtremeMode,
             EnableAllPersonas = settings.EnableAllPersonas,
             EnableDuplicatePersonas = settings.EnableDuplicatePersonas,
+            EnableRandomCloneMode = settings.EnableRandomCloneMode,
             TokenSeriesMode = ReAstralPartyModSettingsManager.ResolveTokenSeriesMode(settings),
-            EnablePureAngelMode = settings.EnablePureAngelMode
+            EnablePureAngelMode = settings.EnablePureAngelMode,
+            BannedPersonaRelicIdsSerialized = [.. settings.BannedPersonaRelicIds
+                .Where(static id => !string.IsNullOrWhiteSpace(id))
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(static id => id, StringComparer.Ordinal)]
         };
     }
 
@@ -91,19 +100,30 @@ internal static class ReAstralPartyRunSettingsSync
             EnableExtremeMode = false,
             EnableAllPersonas = false,
             EnableDuplicatePersonas = false,
+            EnableRandomCloneMode = false,
             TokenSeriesMode = TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = false
+            EnablePureAngelMode = false,
+            BannedPersonaRelicIdsSerialized = []
         };
     }
 
     private static PlayerChoiceResult CreateSnapshotChoiceResult(ReAstralPartyRunSettingsSnapshot snapshot)
     {
+        var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
+        var bannedSet = snapshot.BannedPersonaRelicIdsSerialized
+            .Where(static id => !string.IsNullOrWhiteSpace(id))
+            .ToHashSet(StringComparer.Ordinal);
+        var bannedFlags = personaRelics
+            .Select(relic => bannedSet.Contains((relic.CanonicalInstance?.Id ?? relic.Id).ToString()) ? 1 : 0);
+
         return PlayerChoiceResult.FromIndexes([
             snapshot.EnableExtremeMode ? 1 : 0,
             snapshot.EnableAllPersonas ? 1 : 0,
             snapshot.EnableDuplicatePersonas ? 1 : 0,
+            snapshot.EnableRandomCloneMode ? 1 : 0,
             (int)snapshot.TokenSeriesMode,
-            snapshot.EnablePureAngelMode ? 1 : 0
+            snapshot.EnablePureAngelMode ? 1 : 0,
+            .. bannedFlags
         ]);
     }
 
@@ -111,19 +131,32 @@ internal static class ReAstralPartyRunSettingsSync
         out ReAstralPartyRunSettingsSnapshot snapshot)
     {
         snapshot = null!;
-        if (!TryGetIndexPayload(result, out var payload) || payload.Count < 4)
+        if (!TryGetIndexPayload(result, out var payload) || payload.Count < 5)
             return false;
 
-        var payloadOffset = payload.Count >= 5 ? 1 : 0;
+        var payloadOffset = payload.Count >= 6 ? 1 : 0;
+        var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
+        var bannedStartIndex = payloadOffset + 5;
+        var bannedIds = new List<string>();
+        for (var i = 0; i < personaRelics.Count && bannedStartIndex + i < payload.Count; i++)
+        {
+            if (payload[bannedStartIndex + i] == 0)
+                continue;
+
+            bannedIds.Add((personaRelics[i].CanonicalInstance?.Id ?? personaRelics[i].Id).ToString());
+        }
+
         snapshot = new ReAstralPartyRunSettingsSnapshot
         {
             EnableExtremeMode = payloadOffset > 0 && payload[0] != 0,
             EnableAllPersonas = payload[payloadOffset] != 0,
             EnableDuplicatePersonas = payload[payloadOffset + 1] != 0,
-            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[payloadOffset + 2])
-                ? (TokenSeriesMode)payload[payloadOffset + 2]
+            EnableRandomCloneMode = payload[payloadOffset + 2] != 0,
+            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[payloadOffset + 3])
+                ? (TokenSeriesMode)payload[payloadOffset + 3]
                 : TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = payload[payloadOffset + 3] != 0
+            EnablePureAngelMode = payload[payloadOffset + 4] != 0,
+            BannedPersonaRelicIdsSerialized = bannedIds
         };
         return true;
     }
@@ -188,7 +221,7 @@ internal static class ReAstralPartyRunSettingsSync
             {
                 state.SetSnapshot(remoteSnapshot);
                 MainFile.Logger.Info(
-                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, all_personas={remoteSnapshot.EnableAllPersonas}, duplicate_personas={remoteSnapshot.EnableDuplicatePersonas}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}");
+                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, all_personas={remoteSnapshot.EnableAllPersonas}, duplicate_personas={remoteSnapshot.EnableDuplicatePersonas}, random_clone_mode={remoteSnapshot.EnableRandomCloneMode}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}, banned_personas={remoteSnapshot.BannedPersonaRelicIdsSerialized.Count}");
                 return remoteSnapshot;
             }
         }
@@ -203,7 +236,7 @@ internal static class ReAstralPartyRunSettingsSync
             state.SetSnapshot(localSnapshot);
             synchronizer.SyncLocalChoice(authorityPlayer, choiceId, CreateSnapshotChoiceResult(localSnapshot));
             MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: extreme_mode={localSnapshot.EnableExtremeMode}, all_personas={localSnapshot.EnableAllPersonas}, duplicate_personas={localSnapshot.EnableDuplicatePersonas}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}");
+                $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: extreme_mode={localSnapshot.EnableExtremeMode}, all_personas={localSnapshot.EnableAllPersonas}, duplicate_personas={localSnapshot.EnableDuplicatePersonas}, random_clone_mode={localSnapshot.EnableRandomCloneMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, banned_personas={localSnapshot.BannedPersonaRelicIdsSerialized.Count}");
             return localSnapshot;
         }
 

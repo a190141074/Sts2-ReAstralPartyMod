@@ -37,6 +37,12 @@ public static class PersonaRelicRegistry
         return PersonaRelics;
     }
 
+    public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelicsFiltered(
+        IReadOnlySet<ModelId>? bannedPersonaRelicIds)
+    {
+        return FilterBannedPersonaRelics(PersonaRelics, bannedPersonaRelicIds);
+    }
+
     public static IReadOnlyList<RelicModel> GetCanonicalVariantPersonaRelics()
     {
         return VariantPersonaRelics;
@@ -62,13 +68,34 @@ public static class PersonaRelicRegistry
 
     public static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(Player owner)
     {
+        return GetAvailablePersonaRelics(owner, bannedPersonaRelicIds: null);
+    }
+
+    public static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(
+        Player owner,
+        IReadOnlySet<ModelId>? bannedPersonaRelicIds)
+    {
         var ownedRelicIds = owner.Relics
             .Select(relic => relic.CanonicalInstance?.Id ?? relic.Id)
             .ToHashSet();
 
-        return GetCanonicalPersonaRelics()
+        return GetCanonicalPersonaRelicsFiltered(bannedPersonaRelicIds)
             .Where(relic => !ownedRelicIds.Contains(relic.CanonicalInstance?.Id ?? relic.Id))
             .ToList();
+    }
+
+    private static IReadOnlyList<RelicModel> FilterBannedPersonaRelics(
+        IReadOnlyList<RelicModel> source,
+        IReadOnlySet<ModelId>? bannedPersonaRelicIds)
+    {
+        if (bannedPersonaRelicIds == null || bannedPersonaRelicIds.Count == 0)
+            return source;
+
+        var filtered = source
+            .Where(relic => !bannedPersonaRelicIds.Contains(relic.CanonicalInstance?.Id ?? relic.Id))
+            .ToList();
+
+        return filtered.Count > 0 ? filtered : source;
     }
 
     private static bool IsVariantPersonaRelicId(ModelId id)

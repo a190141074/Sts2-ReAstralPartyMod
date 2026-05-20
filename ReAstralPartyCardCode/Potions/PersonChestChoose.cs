@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Potions;
 
@@ -73,6 +74,12 @@ public class PersonChestChoose : AstralPartyPotionModel
 
     private static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(MegaCrit.Sts2.Core.Entities.Players.Player owner)
     {
+        var bannedPersonaRelicIds = ReAstralPartyModSettingsManager.GetBannedPersonaRelicIds(owner.RunState);
+        var available = PersonaRelicRegistry.GetAvailablePersonaRelics(owner, bannedPersonaRelicIds);
+        if (available.Count > 0)
+            return available;
+
+        MainFile.Logger.Warn("ban list filtered all persona options; falling back to the full persona pool.");
         return PersonaRelicRegistry.GetAvailablePersonaRelics(owner);
     }
 }

@@ -85,6 +85,40 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             return;
         }
 
+        if (ReAstralPartyModSettingsManager.GetEnableRandomCloneMode(runState))
+        {
+            try
+            {
+                var sharedRelic = ChooseSharedRandomClonePersona(runState, relicOptions);
+                var sharedIndex = relicOptions
+                    .Select((relic, index) => new { relic, index })
+                    .First(entry => entry.relic.Id == sharedRelic.Id)
+                    .index;
+                MainFile.Logger.Info(
+                    $"Starting persona random clone mode applied: runKey={runKey} persona={sharedRelic.Id.Entry} players={runState.Players.Count}.");
+
+                foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+                    await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(player, sharedRelic);
+
+                var selectedIndexes = runState.Players
+                    .ToDictionary(
+                        static player => player.NetId,
+                        _ => sharedIndex);
+                AstralTelemetry.RecordPersonaChoice(runState, relicOptions, selectedIndexes);
+                AstralNotificationService.ShowInfo(
+                    AstralNotificationModule.Multiplayer,
+                    $"本局统一人格：{sharedRelic.Title.GetFormattedText()}",
+                    "随机克隆模式");
+                EndSelection(runKey, true);
+                return;
+            }
+            catch
+            {
+                EndSelection(runKey, false);
+                throw;
+            }
+        }
+
         MainFile.Logger.Info(
             $"Starting persona relic selection options prepared: count={relicOptions.Count} runKey={runKey}.");
         var screen = StartingPersonaRelicSelectionScreen.Create(runState, relicOptions);
@@ -130,9 +164,18 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
     private static IReadOnlyList<RelicModel> CreateStartingPersonaRelicOptions(RunState runState)
     {
-        var allPersonaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics()
+        var bannedPersonaRelicIds = ReAstralPartyModSettingsManager.GetBannedPersonaRelicIds(runState);
+        var allPersonaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelicsFiltered(bannedPersonaRelicIds)
             .OrderBy(relic => relic.Id.Entry)
             .ToList();
+
+        if (allPersonaRelics.Count == 0)
+        {
+            MainFile.Logger.Warn("ban list filtered all persona options; falling back to the full persona pool.");
+            allPersonaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics()
+                .OrderBy(relic => relic.Id.Entry)
+                .ToList();
+        }
 
         var ownedPersonaRelicIds = runState.Players
             .SelectMany(player => player.Relics)
@@ -177,6 +220,18 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
         options.AddRange(fallbackOptions.Take(targetCount - options.Count));
         return options;
+    }
+
+    private static RelicModel ChooseSharedRandomClonePersona(RunState runState, IReadOnlyList<RelicModel> options)
+    {
+        var selectedIndex = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+            0,
+            options.Count,
+            MainFile.ModId,
+            "starting_persona_random_clone_mode",
+            runState.Rng.StringSeed,
+            runState.Players.Count);
+        return options[selectedIndex];
     }
 
     private static string GetRunKey(RunState runState)
