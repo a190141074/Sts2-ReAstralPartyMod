@@ -28,6 +28,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOverlayScreen, IScreenContext
 {
+    private const string PersonaToastTitle = "联机提示";
     private const string BackgroundTexturePath =
         "res://ReAstralPartyMod/images/background/starting_persona_pelic_selection_screen.png";
 
@@ -290,20 +291,23 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         try
         {
+            LogInfo("P101", "Starting persona selection flow started.");
             await CollectSelectionsAsync();
             var results = ResolveSelectionResults();
+            LogInfo("P108", $"Starting persona selection resolved {results.Count} results.");
             await AnimateSelectionResultsAsync(results);
             await AwardRelicsAsync(results);
+            LogInfo("P110", "Starting persona selection awarding completed.");
             _completionSource.TrySetResult();
         }
         catch (Exception ex)
         {
             _completionSource.TrySetException(ex);
-            MainFile.Logger.Error($"Starting persona relic shared selection failed: {ex}");
+            MainFile.Logger.Error($"[P199] Starting persona relic shared selection failed: {ex}");
             AstralNotificationService.ShowError(
                 AstralNotificationModule.Multiplayer,
-                "开局人格选择同步失败，请把日志发给作者。",
-                "联机提示");
+                "开局人格选择同步失败，请把日志和编号发给作者。",
+                BuildToastTitle("P199", PersonaToastTitle));
         }
     }
 
@@ -329,7 +333,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _multiplayerSynchronizer = await WaitForPlayerChoiceSynchronizerAsync()
                                    ?? throw new InvalidOperationException(
                                        "PlayerChoiceSynchronizer was not ready for starting persona selection.");
+        LogInfo("P102", "Starting persona selection acquired PlayerChoiceSynchronizer.");
         InitializeMultiplayerChoiceStreams(_multiplayerSynchronizer);
+        LogInfo("P103", $"Starting persona selection initialized choice streams for {_orderedPlayers.Count} players.");
         FlushPendingLocalSelectionIfNeeded();
         UpdatePendingSubtitle();
 
@@ -345,18 +351,20 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         var completedTask = await Task.WhenAny(_multiplayerCommitSource.Task, timeoutTask);
         if (completedTask != _multiplayerCommitSource.Task)
         {
-            MainFile.Logger.Warn(
+            LogWarn("P104",
                 "Starting persona relic selection timed out while waiting for the final synchronized lock; applying deterministic timeout fallback.");
             AstralNotificationService.ShowWarning(
                 AstralNotificationModule.Multiplayer,
                 "开局人格选择同步超时，正在尝试自动补救。",
-                "联机提示");
+                BuildToastTitle("P104", PersonaToastTitle));
             var timeoutSnapshot = await ResolveTimeoutFallbackAsync();
             ApplyCommittedSelections(timeoutSnapshot);
             return;
         }
 
         var committedSnapshot = await _multiplayerCommitSource.Task;
+        LogInfo("P105",
+            $"Starting persona selection received committed snapshot with {committedSnapshot.SelectedIndexes.Count} players.");
         ApplyCommittedSelections(committedSnapshot);
     }
 
@@ -732,7 +740,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             var relic = result.relic.ToMutable();
             SaveManager.Instance.MarkRelicAsSeen(relic);
             MainFile.Logger.Info(
-                $"Starting persona selection awarding relic '{relic.Id.Entry}' to player {result.player.NetId}.");
+                $"[P109] Starting persona selection awarding relic '{relic.Id.Entry}' to player {result.player.NetId}.");
             await RelicCmd.Obtain(relic, result.player);
             awardedResults.Add((result.player, relic));
         }
@@ -746,19 +754,19 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         if (awardedResults.Count == 0)
         {
-            MainFile.Logger.Warn("Starting persona selection finished without awarding any relics; skipping run save.");
+            LogWarn("P111", "Starting persona selection finished without awarding any relics; skipping run save.");
             return;
         }
 
-        MainFile.Logger.Info(
+        LogInfo("P112",
             "Starting persona selection awarded relics: "
             + string.Join(
                 ", ",
                 awardedResults.Select(static entry => $"player={entry.Player.NetId}:{entry.Relic.Id.Entry}")));
 
-        MainFile.Logger.Info("Starting persona selection forcing current run save.");
+        LogInfo("P113", "Starting persona selection forcing current run save.");
         await SaveManager.Instance.SaveRun(null);
-        MainFile.Logger.Info("Starting persona selection current run save completed.");
+        LogInfo("P114", "Starting persona selection current run save completed.");
     }
 
     private void OnHolderSelected(NTreasureRoomRelicHolder holder)
@@ -788,6 +796,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             }
 
             _subtitleLabel.Text = "联机同步尚未就绪，请稍候再试。";
+            LogWarn("P115", "Starting persona selection ignored local click because multiplayer sync was not ready.");
             return;
         }
 
@@ -916,7 +925,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _nextChoiceIdsByPlayer[_localPlayer.NetId] = _multiplayerSynchronizer.ReserveChoiceId(_localPlayer);
 
         MainFile.Logger.Info(
-            $"Starting persona selection synced local update: player={_localPlayer.NetId} choiceId={choiceId} sequence={sequence} index={selectedIndex}.");
+            $"[P116] Starting persona selection synced local update: player={_localPlayer.NetId} choiceId={choiceId} sequence={sequence} index={selectedIndex}.");
     }
 
     private async Task ObserveRemoteSelectionsAsync(Player player, PlayerChoiceSynchronizer synchronizer)
@@ -947,7 +956,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     && player.NetId == _authorityPlayer.NetId
                     && TryDecodeSelectionCommit(remoteChoice, out var selectedIndexes))
                 {
-                    MainFile.Logger.Info(
+                    LogInfo("P117",
                         $"Starting persona selection received final commit: player={player.NetId} choiceId={choiceId}.");
                     _multiplayerCommitSource.TrySetResult(new CommittedSelectionSnapshot
                     {
@@ -956,19 +965,19 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     return;
                 }
 
-                MainFile.Logger.Warn(
+                LogWarn("P118",
                     $"Starting persona selection skipped foreign multiplayer choice: player={player.NetId} choiceId={choiceId} result={remoteChoice}.");
                 _nextChoiceIdsByPlayer[player.NetId] = synchronizer.ReserveChoiceId(player);
             }
         }
         catch (ObjectDisposedException ex)
         {
-            MainFile.Logger.Warn(
+            LogWarn("P119",
                 $"Starting persona selection remote observer disposed for player {player.NetId}; ignoring late UI update. {ex.Message}");
         }
         catch (Exception ex)
         {
-            MainFile.Logger.Error($"Starting persona selection remote observer failed for player {player.NetId}: {ex}");
+            MainFile.Logger.Error($"[P120] Starting persona selection remote observer failed for player {player.NetId}: {ex}");
             if (!_closed && !_selectionFinalized)
                 _multiplayerCommitSource.TrySetException(ex);
         }
@@ -995,7 +1004,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         _selectionSequencesByPlayer[player.NetId] = sequence;
         ApplySelection(player, selectedIndex);
-        MainFile.Logger.Info(
+        LogInfo("P121",
             $"Starting persona selection applied remote update: player={player.NetId} sequence={sequence} index={selectedIndex}.");
         UpdatePendingSubtitle();
     }
@@ -1030,7 +1039,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             CreateSelectionCommitChoiceResult(selectedIndexes));
         _multiplayerCommitSent = true;
 
-        MainFile.Logger.Info(
+        LogInfo("P122",
             $"Starting persona selection sent final commit: player={_authorityPlayer.NetId} choiceId={choiceId} indexes={string.Join(",", selectedIndexes)}.");
 
         _multiplayerCommitSource.TrySetResult(new CommittedSelectionSnapshot
@@ -1063,7 +1072,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (completedTask == _multiplayerCommitSource.Task)
             return await _multiplayerCommitSource.Task;
 
-        MainFile.Logger.Warn(
+        LogWarn("P123",
             "Starting persona relic selection did not receive an authority final commit during grace period; applying local deterministic timeout fallback.");
         _multiplayerCommitSource.TrySetResult(fallbackSnapshot);
         return fallbackSnapshot;
@@ -1091,11 +1100,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             selectedIndexes.Add(fallbackIndex);
             reservedIndexes.Add(fallbackIndex);
 
-            MainFile.Logger.Warn(
+            LogWarn("P124",
                 $"Starting persona selection timeout fallback assigned index {fallbackIndex} ({_relicOptions[fallbackIndex].Id.Entry}) to player {player.NetId}.");
         }
 
-        MainFile.Logger.Warn(
+        LogWarn("P125",
             $"Starting persona selection timeout fallback snapshot: {string.Join(",", selectedIndexes)}.");
 
         return new CommittedSelectionSnapshot
@@ -1145,13 +1154,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 CreateSelectionCommitChoiceResult(selectedIndexes));
             _multiplayerCommitSent = true;
 
-            MainFile.Logger.Warn(
+            LogWarn("P126",
                 $"Starting persona selection sent timeout fallback final commit: player={_authorityPlayer.NetId} choiceId={choiceId} indexes={string.Join(",", selectedIndexes)}.");
         }
         catch (Exception ex)
         {
             MainFile.Logger.Error(
-                $"Starting persona selection failed to broadcast timeout fallback final commit: {ex}");
+                $"[P127] Starting persona selection failed to broadcast timeout fallback final commit: {ex}");
         }
     }
 
@@ -1190,6 +1199,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 .Select((player, index) => new KeyValuePair<ulong, int>(player.NetId, snapshot.SelectedIndexes[index]))
                 .ToDictionary());
 
+        LogInfo("P128",
+            $"Starting persona selection applied committed snapshot: {string.Join(",", snapshot.SelectedIndexes)}.");
         FinalizeSelectionDisplay("所有玩家已锁定选择，开始结算……");
     }
 
@@ -1247,6 +1258,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 await Task.Yield();
         }
 
+        LogWarn("P129",
+            $"Starting persona selection did not acquire PlayerChoiceSynchronizer within {MaxSynchronizerWaitFrames} frames.");
+        AstralNotificationService.ShowWarning(
+            AstralNotificationModule.Multiplayer,
+            "开局人格选择联机同步器未就绪，请把日志和编号发给作者。",
+            BuildToastTitle("P129", PersonaToastTitle));
         return runManager.PlayerChoiceSynchronizer;
     }
 
@@ -1438,5 +1455,20 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _ = task.ContinueWith(
             static completedTask => { _ = completedTask.Exception; },
             TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously);
+    }
+
+    private static void LogInfo(string code, string message)
+    {
+        MainFile.Logger.Info($"[{code}] {message}");
+    }
+
+    private static void LogWarn(string code, string message)
+    {
+        MainFile.Logger.Warn($"[{code}] {message}");
+    }
+
+    private static string BuildToastTitle(string code, string title)
+    {
+        return $"【{code}】{title}";
     }
 }
