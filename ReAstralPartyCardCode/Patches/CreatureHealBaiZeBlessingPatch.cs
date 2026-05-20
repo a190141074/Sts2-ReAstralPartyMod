@@ -16,14 +16,28 @@ public sealed class CreatureHealBaiZeBlessingPatch : IPatchMethod
         return [new(typeof(CreatureCmd), nameof(CreatureCmd.Heal))];
     }
 
-    public static bool Prefix(Creature creature, ref decimal amount)
+    public static bool Prefix(Creature creature, ref decimal amount, out decimal __state)
     {
+        __state = 0m;
         if (!BaiZeBlessingPower.ShouldConvertHeal(creature, amount))
             return true;
 
-        var grantAmount = amount;
+        __state = amount;
         amount = 0m;
-        _ = PowerCmd.Apply<HalfLifeHealPower>(creature, grantAmount, creature, null, false);
         return true;
+    }
+
+    public static void Postfix(Creature creature, decimal __state, ref Task __result)
+    {
+        if (__state <= 0m)
+            return;
+
+        __result = RunAfterHeal(__result, creature, __state);
+    }
+
+    private static async Task RunAfterHeal(Task originalTask, Creature creature, decimal amount)
+    {
+        await originalTask;
+        await PowerCmd.Apply<HalfLifeHealPower>(creature, amount, creature, null, false);
     }
 }

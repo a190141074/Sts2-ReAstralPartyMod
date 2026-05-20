@@ -18,7 +18,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenExclusiveCrossedTwinCarp : AstralPartyRelicModel
 {
-    private bool _grantScheduled;
+    private bool _pendingGrant;
     private bool _isGrantingPower;
 
     public override RelicRarity Rarity => RelicRarity.Rare;
@@ -60,27 +60,31 @@ public class TokenExclusiveCrossedTwinCarp : AstralPartyRelicModel
         if (Owner.Creature.HasPower<CrossedTwinCarpPower>())
             return false;
 
-        ScheduleGrant();
+        _pendingGrant = true;
         return false;
     }
 
-    private void ScheduleGrant()
+    public override async Task AfterPowerAmountChanged(
+        PowerModel power,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource)
     {
-        if (_grantScheduled)
+        if (!_pendingGrant)
             return;
-
-        _grantScheduled = true;
-        _ = FlushGrantAsync();
-    }
-
-    private async Task FlushGrantAsync()
-    {
-        await Task.Yield();
-        _grantScheduled = false;
-
+        if (_isGrantingPower)
+            return;
         if (Owner?.Creature == null || Owner.Creature.HasPower<CrossedTwinCarpPower>())
+        {
+            _pendingGrant = false;
+            return;
+        }
+        if (power.Owner != Owner.Creature)
+            return;
+        if (power is not VigorPower || amount <= 0m)
             return;
 
+        _pendingGrant = false;
         await GrantCrossedTwinCarpPower();
     }
 

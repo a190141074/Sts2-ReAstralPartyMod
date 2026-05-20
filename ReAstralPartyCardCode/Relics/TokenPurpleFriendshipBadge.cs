@@ -14,9 +14,9 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
 {
-    private readonly HashSet<Creature> _pendingHealTargets = [];
-    private bool _pendingOwnerHeal;
-    private bool _flushScheduled;
+    private int _pendingTargetHeals;
+    private int _pendingOwnerHeals;
+    private bool _isResolvingPendingHeals;
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
@@ -43,14 +43,16 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
         Flash();
 
         if (canonicalPower is HalfLifeHealPower)
+        {
             modifiedAmount += 1m;
+            _pendingOwnerHeals++;
+        }
         else
-            _pendingHealTargets.Add(target);
+        {
+            _pendingTargetHeals++;
+            _pendingOwnerHeals++;
+        }
 
-        if (Owner?.Creature != null && target != Owner.Creature)
-            _pendingOwnerHeal = true;
-
-        ScheduleFlush();
         return canonicalPower is HalfLifeHealPower;
     }
 
@@ -70,44 +72,55 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
         return canonicalPower is HalfLifeHealPower or StarLightPower;
     }
 
-    private void ScheduleFlush()
+    public override async Task AfterPowerAmountChanged(
+        PowerModel power,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource)
     {
-        if (_flushScheduled)
+        if (_isResolvingPendingHeals)
             return;
-
-        _flushScheduled = true;
-        _ = FlushPendingHealsAsync();
-    }
-
-    private async Task FlushPendingHealsAsync()
-    {
-        await Task.Yield();
-
         if (Owner?.Creature == null || Owner.Creature.CombatState == null)
         {
             ResetPendingState();
             return;
         }
-
-        var pendingTargets = _pendingHealTargets.ToList();
-        var shouldHealOwner = _pendingOwnerHeal;
-        ResetPendingState();
+        if (applier != Owner.Creature)
+            return;
+        if (power.Owner == Owner.Creature)
+            return;
+        if (amount <= 0m)
+            return;
+        if (power is not HalfLifeHealPower and not StarLightPower)
+            return;
 
         await PersonaMultiplayerEffectHelper.RunAsDerivedSupportPower(async () =>
         {
-            foreach (var target in pendingTargets)
-                if (target.IsAlive)
-                    await PowerCmd.Apply<HalfLifeHealPower>(target, 1m, Owner.Creature, null, false);
+            _isResolvingPendingHeals = true;
+            try
+            {
+                if (power is StarLightPower && _pendingTargetHeals > 0 && power.Owner.IsAlive)
+                {
+                    _pendingTargetHeals--;
+                    await PowerCmd.Apply<HalfLifeHealPower>(power.Owner, 1m, Owner.Creature, null, false);
+                }
 
-            if (shouldHealOwner && Owner.Creature.IsAlive)
-                await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, 1m, Owner.Creature, null, false);
+                if (_pendingOwnerHeals > 0 && Owner.Creature.IsAlive)
+                {
+                    _pendingOwnerHeals--;
+                    await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, 1m, Owner.Creature, null, false);
+                }
+            }
+            finally
+            {
+                _isResolvingPendingHeals = false;
+            }
         });
     }
 
     private void ResetPendingState()
     {
-        _pendingHealTargets.Clear();
-        _pendingOwnerHeal = false;
-        _flushScheduled = false;
+        _pendingTargetHeals = 0;
+        _pendingOwnerHeals = 0;
     }
 }

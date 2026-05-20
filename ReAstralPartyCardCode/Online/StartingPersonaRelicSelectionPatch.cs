@@ -29,20 +29,35 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(NGame), "StartRun", [typeof(RunState)])];
+        return [new(typeof(RunManager), nameof(RunManager.FinalizeStartingRelics))];
     }
 
-    public static void Postfix(RunState runState, ref Task __result)
+    public static void Postfix(RunManager __instance, ref Task __result)
     {
-        __result = RunAfterStartRun(__result, runState);
+        __result = RunAfterFinalizeStartingRelics(__result, __instance);
     }
 
-    private static async Task RunAfterStartRun(Task originalTask, RunState runState)
+    private static async Task RunAfterFinalizeStartingRelics(Task originalTask, RunManager runManager)
     {
+        await originalTask;
+        var runState = runManager.DebugOnlyGetState();
+        if (runState == null)
+        {
+            MainFile.Logger.Warn(
+                "Starting persona relic selection skipped because run state was unavailable after starting relic finalization.");
+            return;
+        }
+
         MainFile.Logger.Info(
             $"Starting persona relic selection patch entered: seed={runState.Rng.StringSeed} players={runState.Players.Count}.");
-        await originalTask;
-        MainFile.Logger.Info("Starting persona relic selection patch resumed after StartRun task completed.");
+        if (!AstralNetPhaseGuard.Guard(AstralNetPhase.StartRunBootstrap, "starting persona selection bootstrap"))
+        {
+            MainFile.Logger.Warn(
+                "Starting persona relic selection bootstrap was not ready yet; waiting briefly instead of skipping.");
+            await WaitForBootstrapReadinessAsync();
+        }
+
+        MainFile.Logger.Info("Starting persona relic selection patch resumed after starting relic finalization.");
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         var gameType = RunManager.Instance.NetService.Type;
         MainFile.Logger.Info(
@@ -61,7 +76,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             return;
         }
 
-        var overlayStack = NOverlayStack.Instance;
+        var overlayStack = await WaitForOverlayStackAsync();
         if (overlayStack == null)
         {
             EndSelection(runKey, false);
@@ -139,6 +154,46 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         {
             screen.Close();
         }
+    }
+
+    private static async Task WaitForBootstrapReadinessAsync()
+    {
+        for (var attempt = 0; attempt < 300; attempt++)
+        {
+            if (RunManager.Instance?.DebugOnlyGetState() != null)
+                return;
+
+            var overlayStack = NOverlayStack.Instance;
+            if (NGame.Instance?.IsInsideTree() == true
+                && overlayStack != null
+                && Godot.GodotObject.IsInstanceValid(overlayStack)
+                && overlayStack.IsInsideTree())
+                return;
+
+            if (NGame.Instance?.IsInsideTree() == true)
+                await NGame.Instance.ToSignal(NGame.Instance.GetTree(), Godot.SceneTree.SignalName.ProcessFrame);
+            else
+                await Task.Yield();
+        }
+    }
+
+    private static async Task<NOverlayStack?> WaitForOverlayStackAsync()
+    {
+        for (var attempt = 0; attempt < 600; attempt++)
+        {
+            var overlayStack = NOverlayStack.Instance;
+            if (overlayStack != null
+                && Godot.GodotObject.IsInstanceValid(overlayStack)
+                && overlayStack.IsInsideTree())
+                return overlayStack;
+
+            if (NGame.Instance?.IsInsideTree() == true)
+                await NGame.Instance.ToSignal(NGame.Instance.GetTree(), Godot.SceneTree.SignalName.ProcessFrame);
+            else
+                await Task.Yield();
+        }
+
+        return null;
     }
 
     private static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)

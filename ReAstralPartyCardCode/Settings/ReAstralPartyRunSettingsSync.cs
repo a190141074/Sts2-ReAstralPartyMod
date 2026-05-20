@@ -35,6 +35,7 @@ internal static class ReAstralPartyRunSettingsSync
 {
     private static readonly AttachedState<RunState, RunSettingsSyncState> RunStates = new(() =>
         new RunSettingsSyncState());
+    private const int MaxClientSnapshotAttempts = 64;
 
     public static Task EnsureSyncedAsync(RunState runState)
     {
@@ -214,16 +215,25 @@ internal static class ReAstralPartyRunSettingsSync
         var isHost = netService.Type == NetGameType.Host;
         if (!isHost)
         {
-            var remoteChoiceId = synchronizer.ReserveChoiceId(authorityPlayer);
-            if (TryDecodeSnapshotChoiceResult(
-                    await synchronizer.WaitForRemoteChoice(authorityPlayer, remoteChoiceId),
-                    out var remoteSnapshot))
+            for (var attempt = 0; attempt < MaxClientSnapshotAttempts; attempt++)
             {
+                var remoteChoiceId = synchronizer.ReserveChoiceId(authorityPlayer);
+                var remoteChoice = await synchronizer.WaitForRemoteChoice(authorityPlayer, remoteChoiceId);
+                if (!TryDecodeSnapshotChoiceResult(remoteChoice, out var remoteSnapshot))
+                {
+                    MainFile.Logger.Warn(
+                        $"{MainFile.ModId} settings sync ignored foreign choice from authority player {authorityPlayer.NetId}: choiceId={remoteChoiceId} attempt={attempt + 1} result={remoteChoice}");
+                    continue;
+                }
+
                 state.SetSnapshot(remoteSnapshot);
                 MainFile.Logger.Info(
                     $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, all_personas={remoteSnapshot.EnableAllPersonas}, duplicate_personas={remoteSnapshot.EnableDuplicatePersonas}, random_clone_mode={remoteSnapshot.EnableRandomCloneMode}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}, banned_personas={remoteSnapshot.BannedPersonaRelicIdsSerialized.Count}");
                 return remoteSnapshot;
             }
+
+            MainFile.Logger.Warn(
+                $"{MainFile.ModId} settings sync did not receive a valid host snapshot after {MaxClientSnapshotAttempts} attempts; falling back to safe multiplayer defaults.");
         }
 
         var choiceId = synchronizer.ReserveChoiceId(authorityPlayer);

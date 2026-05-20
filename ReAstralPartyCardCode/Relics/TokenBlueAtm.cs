@@ -14,7 +14,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class TokenBlueAtm : AstralPartyRelicModel
 {
     private int _pendingSelfStarLight;
-    private bool _flushScheduled;
     private bool _isResolvingAtm;
 
     public override RelicRarity Rarity => RelicRarity.Common;
@@ -51,31 +50,34 @@ public class TokenBlueAtm : AstralPartyRelicModel
         modifiedAmount += 1m;
         _pendingSelfStarLight += 1;
         Flash();
-        ScheduleFlush();
         return true;
     }
 
-    private void ScheduleFlush()
+    public override async Task AfterPowerAmountChanged(
+        PowerModel power,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource)
     {
-        if (_flushScheduled)
+        if (_isResolvingAtm)
             return;
-
-        _flushScheduled = true;
-        _ = FlushPendingStarLightAsync();
-    }
-
-    private async Task FlushPendingStarLightAsync()
-    {
-        await Task.Yield();
-
-        if (Owner?.Creature == null || _pendingSelfStarLight <= 0)
+        if (_pendingSelfStarLight <= 0)
+            return;
+        if (Owner?.Creature == null)
         {
             ResetPendingState();
             return;
         }
+        if (power.Owner == Owner.Creature)
+            return;
+        if (power is not StarLightPower)
+            return;
+        if (applier != Owner.Creature)
+            return;
+        if (amount <= 0m)
+            return;
 
-        var pendingAmount = _pendingSelfStarLight;
-        ResetPendingState();
+        _pendingSelfStarLight--;
 
         _isResolvingAtm = true;
         try
@@ -83,7 +85,7 @@ public class TokenBlueAtm : AstralPartyRelicModel
             await PowerCmd.Apply(
                 ModelDb.Power<StarLightPower>().ToMutable(),
                 Owner.Creature,
-                pendingAmount,
+                1m,
                 Owner.Creature,
                 null,
                 false
@@ -98,6 +100,5 @@ public class TokenBlueAtm : AstralPartyRelicModel
     private void ResetPendingState()
     {
         _pendingSelfStarLight = 0;
-        _flushScheduled = false;
     }
 }

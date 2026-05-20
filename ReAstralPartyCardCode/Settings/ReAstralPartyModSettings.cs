@@ -740,8 +740,6 @@ public static partial class ReAstralPartyModSettingsManager
         if (netService == null)
             return false;
 
-        ReAstralPartyRunSettingsSync.BeginSyncIfNeeded(concreteRunState);
-
         if (netService.Type != NetGameType.Host)
             return false;
 
