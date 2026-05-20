@@ -11,7 +11,9 @@ using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Patching.Models;
 
@@ -249,14 +251,17 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
                 .Where(relic => !ownedPersonaRelicIds.Contains(relic.Id))
                 .ToList();
 
-            return allAvailableOptions.Count > 0 ? allAvailableOptions : allPersonaRelics;
+            var allModeOptions = allAvailableOptions.Count > 0 ? allAvailableOptions : allPersonaRelics;
+            return AddForcedWindchaserVariantIfNeeded(runState, allModeOptions);
         }
 
         var targetCount = runState.Players.Count * 2 + 2;
+        var weightedCandidates = ExpandWeightedStartingPersonaCandidates(
+            allPersonaRelics
+                .Where(relic => !ownedPersonaRelicIds.Contains(relic.Id))
+                .ToList());
         var options = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
-                allPersonaRelics
-                    .Where(relic => !ownedPersonaRelicIds.Contains(relic.Id))
-                    .ToList(),
+                weightedCandidates,
                 relic => relic.Id.Entry,
                 MainFile.ModId,
                 "starting_persona_primary_pool",
@@ -266,7 +271,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             .ToList();
 
         if (options.Count >= targetCount)
-            return options;
+            return AddForcedWindchaserVariantIfNeeded(runState, options);
 
         var selectedIds = options.Select(relic => relic.Id).ToHashSet();
         var fallbackOptions = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
@@ -280,7 +285,46 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             runState.Players.Count);
 
         options.AddRange(fallbackOptions.Take(targetCount - options.Count));
-        return options;
+        return AddForcedWindchaserVariantIfNeeded(runState, options);
+    }
+
+    private static List<RelicModel> ExpandWeightedStartingPersonaCandidates(IReadOnlyList<RelicModel> source)
+    {
+        var weighted = new List<RelicModel>();
+        foreach (var relic in source)
+        {
+            var weight = IsWindchaserVariantRelic(relic) ? 1 : 6;
+            for (var i = 0; i < weight; i++)
+                weighted.Add(relic);
+        }
+
+        return weighted;
+    }
+
+    private static IReadOnlyList<RelicModel> AddForcedWindchaserVariantIfNeeded(
+        RunState runState,
+        IReadOnlyList<RelicModel> source)
+    {
+        if (!WindchaserCompat.IsLoaded())
+            return source;
+        if (!runState.Players.Any(WindchaserCompat.IsCharacter))
+            return source;
+
+        var forcedRelic = PersonaRelicRegistry.GetCanonicalVariantPersonaRelics()
+            .FirstOrDefault(IsWindchaserVariantRelic);
+        if (forcedRelic == null)
+            return source;
+        if (source.Any(relic => relic.Id == forcedRelic.Id))
+            return source;
+
+        var result = source.ToList();
+        result.Add(forcedRelic);
+        return result;
+    }
+
+    private static bool IsWindchaserVariantRelic(RelicModel relic)
+    {
+        return (relic.CanonicalInstance ?? relic) is VariantPersonWindchaserThePlaneswalker;
     }
 
     private static RelicModel ChooseSharedRandomClonePersona(RunState runState, IReadOnlyList<RelicModel> options)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
@@ -34,7 +35,7 @@ public static class PersonaRelicRegistry
 
     public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelics()
     {
-        return PersonaRelics;
+        return FilterSoftCompatRelics(PersonaRelics);
     }
 
     public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelicsFiltered(
@@ -45,7 +46,7 @@ public static class PersonaRelicRegistry
 
     public static IReadOnlyList<RelicModel> GetCanonicalVariantPersonaRelics()
     {
-        return VariantPersonaRelics;
+        return FilterSoftCompatRelics(VariantPersonaRelics);
     }
 
     public static bool IsPersonaRelic(RelicModel? relic)
@@ -96,6 +97,19 @@ public static class PersonaRelicRegistry
             .ToList();
 
         return filtered.Count > 0 ? filtered : source;
+    }
+
+    private static IReadOnlyList<RelicModel> FilterSoftCompatRelics(IReadOnlyList<RelicModel> source)
+    {
+        return source
+            .Where(static relic => !IsWindchaserCompatRelic(relic) || WindchaserCompat.IsLoaded())
+            .ToList();
+    }
+
+    private static bool IsWindchaserCompatRelic(RelicModel relic)
+    {
+        var canonicalRelic = relic.CanonicalInstance ?? relic;
+        return canonicalRelic is VariantPersonWindchaserThePlaneswalker;
     }
 
     private static bool IsVariantPersonaRelicId(ModelId id)
