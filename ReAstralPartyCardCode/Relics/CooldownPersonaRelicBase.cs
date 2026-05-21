@@ -109,7 +109,7 @@ public abstract class CooldownPersonaRelicBase : PersonaRelicBase
 
     protected int GetMaxCounter()
     {
-        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter);
+        return ExtraBatteryRelicHelper.GetAdjustedCooldownMaxCounter(Owner, BaseMaxCounter, this);
     }
 
     protected void AdvanceCounter()

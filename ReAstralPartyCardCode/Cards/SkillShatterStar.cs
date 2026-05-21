@@ -53,7 +53,7 @@ public class SkillShatterStar : AstralPartyCardModel
         if (targetWasAlive && !target.IsAlive && sara != null)
         {
             sara.ReduceCooldownOne();
-            await AstralDivinePersonaHelper.TryGrantExtraTurn(Owner, this, "断星击杀");
+            await AstralDivinePersonaHelper.HandleShatterStarKillExtraTurn(Owner, sara, this);
         }
     }
 }

@@ -30,6 +30,7 @@ public class VariantPersonSara : CooldownPersonaRelicBase
     [SavedProperty] public int AstralParty_VariantPersonSaraCharge { get; set; }
     [SavedProperty] public bool AstralParty_VariantPersonSaraTriggeredExtraTurnThisTurn { get; set; }
     [SavedProperty] public int AstralParty_VariantPersonSaraLastProcessedRound { get; set; }
+    [SavedProperty] public int AstralParty_VariantPersonSaraPendingExtraTurnCount { get; set; }
 
     protected override int CounterValue
     {
@@ -64,19 +65,21 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         AstralParty_VariantPersonSaraCharge = 0;
         AstralParty_VariantPersonSaraTriggeredExtraTurnThisTurn = false;
         AstralParty_VariantPersonSaraLastProcessedRound = 0;
+        AstralParty_VariantPersonSaraPendingExtraTurnCount = 0;
         await AstralDivinePersonaHelper.EnsureDivineThrone(Owner);
         await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner!, 0);
+        await AstralMoveAgainDisplayHelper.Sync(Owner);
     }
 
     public override async Task BeforeCombatStart()
     {
-        AstralParty_VariantPersonSaraCharge = 0;
         AstralParty_VariantPersonSaraTriggeredExtraTurnThisTurn = false;
         AstralParty_VariantPersonSaraLastProcessedRound = 0;
         if (Owner != null)
         {
             await AstralDivinePersonaHelper.EnsureDivineThrone(Owner);
-            await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, 0);
+            await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, AstralParty_VariantPersonSaraCharge);
+            await AstralMoveAgainDisplayHelper.Sync(Owner);
         }
     }
 
@@ -123,6 +126,12 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         AstralParty_VariantPersonSaraCharge = 0;
         await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, 0);
         await PlayerCmd.GainEnergy(2m, Owner);
+        if (CombatManager.Instance.IsOverOrEnding)
+        {
+            QueuePendingExtraTurn();
+            return;
+        }
+
         await AstralDivinePersonaHelper.TryGrantExtraTurn(Owner, this, "萨拉21充能回合结束");
     }
 
@@ -138,11 +147,13 @@ public class VariantPersonSara : CooldownPersonaRelicBase
     public override async Task AfterCombatEnd(CombatRoom room)
     {
         await base.AfterCombatEnd(room);
-        AstralParty_VariantPersonSaraCharge = 0;
         AstralParty_VariantPersonSaraTriggeredExtraTurnThisTurn = false;
         AstralParty_VariantPersonSaraLastProcessedRound = 0;
         if (Owner != null)
-            await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, 0);
+        {
+            await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, AstralParty_VariantPersonSaraCharge);
+            await AstralMoveAgainDisplayHelper.Sync(Owner);
+        }
     }
 
     protected override async Task GrantCooldownCard()
@@ -163,5 +174,43 @@ public class VariantPersonSara : CooldownPersonaRelicBase
     public int GetCurrentCharge()
     {
         return Math.Max(AstralParty_VariantPersonSaraCharge, 0);
+    }
+
+    public override bool ShouldTakeExtraTurn(Player player)
+    {
+        return AstralParty_VariantPersonSaraPendingExtraTurnCount > 0 && player == Owner;
+    }
+
+    public override async Task AfterTakingExtraTurn(Player player)
+    {
+        if (player != Owner || AstralParty_VariantPersonSaraPendingExtraTurnCount <= 0)
+            return;
+
+        AstralParty_VariantPersonSaraPendingExtraTurnCount--;
+        if (AstralParty_VariantPersonSaraPendingExtraTurnCount < 0)
+            AstralParty_VariantPersonSaraPendingExtraTurnCount = 0;
+        await AstralMoveAgainDisplayHelper.Sync(Owner);
+        MainFile.Logger.Info(
+            $"[VariantPersonSara] Pending extra turn consumed | owner={Owner?.NetId} | remaining={AstralParty_VariantPersonSaraPendingExtraTurnCount}");
+    }
+
+    public bool TryQueuePendingShatterStarExtraTurn()
+    {
+        if (AstralParty_VariantPersonSaraPendingExtraTurnCount > 0)
+            return false;
+
+        QueuePendingExtraTurn();
+        return true;
+    }
+
+    public void QueuePendingExtraTurn()
+    {
+        AstralParty_VariantPersonSaraPendingExtraTurnCount++;
+        _ = AstralMoveAgainDisplayHelper.Sync(Owner);
+    }
+
+    public int GetPendingExtraTurnCount()
+    {
+        return AstralParty_VariantPersonSaraPendingExtraTurnCount;
     }
 }

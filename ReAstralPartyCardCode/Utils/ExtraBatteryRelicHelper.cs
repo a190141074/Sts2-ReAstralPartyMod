@@ -1,15 +1,21 @@
 using MegaCrit.Sts2.Core.Entities.Players;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class ExtraBatteryRelicHelper
 {
-    public static int GetAdjustedCooldownMaxCounter(Player? owner, int baseMaxCounter)
+    public static int GetAdjustedCooldownMaxCounter(Player? owner, int baseMaxCounter, PersonaRelicBase? sourceRelic = null)
     {
-        if (owner?.GetRelic<Relics.TokenGoldExtraBattery>() == null)
-            return baseMaxCounter;
+        var adjustedCounter = baseMaxCounter;
 
-        return Math.Max(1, baseMaxCounter - 1);
+        if (owner?.GetRelic<Relics.TokenGoldExtraBattery>() != null)
+            adjustedCounter--;
+
+        if (sourceRelic is VariantPersonSara && owner?.GetRelic<JewelryNightSkin>() != null)
+            adjustedCounter -= 2;
+
+        return Math.Max(1, adjustedCounter);
     }
 
     public static int GetAdjustedBionicJasmineStepThreshold(Player? owner, int baseThreshold)
