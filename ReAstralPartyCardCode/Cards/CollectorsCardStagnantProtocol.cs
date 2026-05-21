@@ -24,7 +24,7 @@ public class CollectorsCardStagnantProtocol : AstralPartyCardModel
         HoverTipFactory.FromPower<CosmosFreezesPower>()
     ];
 
-    public CollectorsCardStagnantProtocol() : base(1, CardType.Power, CardRarity.Rare, TargetType.Self)
+    public CollectorsCardStagnantProtocol() : base(2, CardType.Power, CardRarity.Rare, TargetType.Self)
     {
     }
 

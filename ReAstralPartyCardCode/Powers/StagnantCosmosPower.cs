@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -21,7 +22,7 @@ public class StagnantCosmosPower : AstralPartyPowerModel
     private sealed class PendingTrigger
     {
         public required CardModel Card { get; init; }
-        public required decimal PaidEnergy { get; init; }
+        public required decimal StagnationAmount { get; init; }
         public bool Consumed { get; set; }
     }
 
@@ -64,7 +65,7 @@ public class StagnantCosmosPower : AstralPartyPowerModel
         GetInternalData<Data>().PendingTriggers.Add(new PendingTrigger
         {
             Card = cardPlay.Card,
-            PaidEnergy = paidEnergy
+            StagnationAmount = AttackCardCostHelper.GetPlayedCost(cardPlay) + BonusStagnationAmount
         });
         return Task.CompletedTask;
     }
@@ -84,9 +85,10 @@ public class StagnantCosmosPower : AstralPartyPowerModel
 
         Flash();
         await PowerCmd.Apply<CosmosFreezesPower>(target, stagnationAmount, Owner, cardSource, false);
-        await PowerCmd.ModifyAmount(this, -ProtocolCostPerTrigger, Owner, cardSource, true);
-
-        if (Amount <= ProtocolCostPerTrigger)
+        var remainingAmount = Amount - ProtocolCostPerTrigger;
+        if (remainingAmount > 0m)
+            await PowerCmd.ModifyAmount(this, -ProtocolCostPerTrigger, Owner, cardSource, true);
+        else
             await PowerCmd.Remove(this);
     }
 
@@ -140,7 +142,7 @@ public class StagnantCosmosPower : AstralPartyPowerModel
             return false;
 
         pendingTrigger.Consumed = true;
-        stagnationAmount = pendingTrigger.PaidEnergy + BonusStagnationAmount;
+        stagnationAmount = pendingTrigger.StagnationAmount;
         return stagnationAmount > 0m;
     }
 
