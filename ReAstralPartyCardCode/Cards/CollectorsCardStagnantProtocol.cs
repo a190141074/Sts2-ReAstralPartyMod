@@ -31,6 +31,7 @@ public class CollectorsCardStagnantProtocol : AstralPartyCardModel
     protected override void OnUpgrade()
     {
         CardCmd.ApplyKeyword(this, CardKeyword.Innate);
+        EnergyCost.UpgradeBy(-1);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

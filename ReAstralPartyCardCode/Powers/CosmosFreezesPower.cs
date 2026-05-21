@@ -29,7 +29,7 @@ public class CosmosFreezesPower : AstralPartyPowerModel
         {
             var description = new LocString("powers",
                 "RE_ASTRAL_PARTY_MOD_POWER_COSMOS_FREEZES_POWER.description");
-            description.Add("TemporaryStrengthLoss", GetEquivalentStrengthLoss());
+            description.Add("ReductionPercent", GetCurrentReductionPercent());
             return description;
         }
     }
@@ -89,17 +89,13 @@ public class CosmosFreezesPower : AstralPartyPowerModel
             await PowerCmd.Remove(this);
     }
 
-    private int GetEquivalentStrengthLoss()
+    private int GetCurrentReductionPercent()
     {
-        if (Owner == null || Amount <= 0m)
+        if (Amount <= 0m)
             return 0;
 
-        var currentStrength = Math.Max(Owner.GetPowerAmount<StrengthPower>(), 0m);
-        if (currentStrength <= 0m)
-            return 0;
-
-        var reducedStrength = currentStrength * BaseReductionDenominator / (BaseReductionDenominator + Amount);
-        var strengthLoss = Math.Clamp(currentStrength - reducedStrength, 0m, currentStrength);
-        return (int)Math.Ceiling(strengthLoss);
+        var reducedDamageRatio = BaseReductionDenominator / (BaseReductionDenominator + Amount);
+        var reductionPercent = (1m - reducedDamageRatio) * 100m;
+        return (int)Math.Clamp(Math.Round(reductionPercent, MidpointRounding.AwayFromZero), 0m, 100m);
     }
 }
