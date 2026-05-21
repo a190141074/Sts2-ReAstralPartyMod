@@ -126,6 +126,7 @@ public static class PersonaMultiplayerEffectHelper
     public static Task<RelicModel> ObtainRelicDeterministic(Player owner, RelicModel relic)
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
+        ExclusiveRelicUnlockHelper.MarkRelicUnlockedForCurrentRunAndProfile(owner, canonicalRelic);
         if (canonicalRelic.Id == ModelDb.GetId<TokenGoldInitialPoint>() &&
             owner.GetRelic<TokenGoldInitialPoint>() != null)
             return ObtainDuplicateInitialPointFallback(owner);
@@ -136,6 +137,7 @@ public static class PersonaMultiplayerEffectHelper
     public static Task<RelicModel> ObtainRelicAsReward(Player owner, RelicModel relic)
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
+        ExclusiveRelicUnlockHelper.MarkRelicUnlockedForCurrentRunAndProfile(owner, canonicalRelic);
         if (RewardContextPolicy.CanUseRewardSynchronizer(owner, "relic reward"))
             RunManager.Instance?.RewardSynchronizer?.SyncLocalObtainedRelic(canonicalRelic.ToMutable());
 

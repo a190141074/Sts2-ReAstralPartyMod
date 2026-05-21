@@ -10,11 +10,13 @@ public static class RewardSyncHelper
 {
     public static Task<RelicModel> ObtainRelicAsReward(Player owner, RelicModel relic)
     {
+        ExclusiveRelicUnlockHelper.MarkRelicUnlockedForCurrentRunAndProfile(owner, relic);
         return PersonaMultiplayerEffectHelper.ObtainRelicAsReward(owner, relic);
     }
 
     public static Task<RelicModel> ObtainRelicAsRewardMultiplayerSafe(Player owner, RelicModel relic)
     {
+        ExclusiveRelicUnlockHelper.MarkRelicUnlockedForCurrentRunAndProfile(owner, relic);
         return PersonaMultiplayerEffectHelper.ObtainRelicForMultiplayerSafeReward(owner, relic);
     }
 }

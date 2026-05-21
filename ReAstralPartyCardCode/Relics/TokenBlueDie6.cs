@@ -1,9 +1,8 @@
 using MegaCrit.Sts2.Core.Models.RelicPools;
-using ReAstralPartyMod.ReAstralPartyCardCode.RelicPools;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-[RegisterRelic(typeof(DiceSeriesRelicPool))]
+[RegisterRelic(typeof(SharedRelicPool))]
 public class TokenBlueDie6 : TokenBlueDieRelicBase
 {
     protected override int TriggerRoundMultiple => 6;

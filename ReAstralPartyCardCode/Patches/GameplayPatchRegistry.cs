@@ -134,7 +134,7 @@ internal static class GameplayStaticPatchCatalog
                 typeof(MultiplayerRelicAnimationSafetyPatch),
                 false,
                 "UI patch: skip newly acquired relic animations when the inventory holder is no longer usable",
-                [typeof(Godot.Vector2?), typeof(Godot.Vector2?)])
+                [typeof(Godot.Vector2?), typeof(Godot.Vector2?)]),
         ]);
     }
 

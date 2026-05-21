@@ -1,19 +1,20 @@
 using System.Collections.Generic;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
-using ReAstralPartyMod.ReAstralPartyCardCode.RelicPools;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-[RegisterRelic(typeof(PvzNutSeriesRelicPool))]
+[RegisterRelic(typeof(EventRelicPool))]
 public class PvzHyperTemporalNut : AstralPartyRelicModel
 {
     private List<decimal> _hpSnapshots = [];
@@ -28,9 +29,14 @@ public class PvzHyperTemporalNut : AstralPartyRelicModel
     [SavedProperty] public bool AstralParty_PvzHyperTemporalNutUsedThisRun { get; set; }
     [SavedProperty] public bool AstralParty_PvzHyperTemporalNutFusionProcessed { get; set; }
 
-    public override RelicRarity Rarity => RelicRarity.Ancient;
+    public override RelicRarity Rarity => RelicRarity.Uncommon;
 
     public override bool ShouldReceiveCombatHooks => true;
+
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        AstralKeywords.CreateHoverTip(AstralKeywords.AstralFusionClueId)
+    ];
 
     public override bool IsUsedUp => AstralParty_PvzHyperTemporalNutUsedThisRun;
 

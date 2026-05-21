@@ -2,7 +2,7 @@ using MegaCrit.Sts2.Core.Models.RelicPools;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-[RegisterRelic(typeof(SharedRelicPool))]
+[RegisterRelic(typeof(EventRelicPool))]
 public class TokenBlueDie8 : TokenBlueDieRelicBase
 {
     protected override int TriggerRoundMultiple => 8;

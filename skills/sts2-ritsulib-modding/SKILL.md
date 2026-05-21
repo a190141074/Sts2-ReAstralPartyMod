@@ -9,6 +9,24 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 
 把这个 skill 当成“RitsuLib 前置 STS2 Mod 开发工作流”。它不替代 BaseLib skill；当仓库已经依赖 `STS2-RitsuLib`，或任务明确要求 `RegisterCard`、`ModTypeDiscoveryHub.RegisterModAssembly`、`ModCardTemplate`、`ModRelicTemplate`、`RitsuLibFramework` 时，优先使用这个 skill。
 
+## Top Priority Project Rules
+
+如果当前仓库存在以下文件，必须最先读取并优先执行其中规则：
+
+1. `B:\Documents\re-astral-party-mod\doc\AGENT.zh.md`
+2. `B:\Documents\re-astral-party-mod\doc\AGENT.md`
+
+执行顺序以中文文件优先，英文文件为补充。它们的内容高于本 skill 的其它一般性建议；若与本 skill 冲突，以这两个文件为准。
+
+## Updated Reference Roots
+
+- `D:\MOD\杀戮尖塔2mod制作\RitsuLib-doc\RitsuLib`
+  - 新版教程主入口，优先看这里的 `01 - 添加基础内容`、`02 - 玩法基底`、`03 - 模组工具`。
+- `D:\MOD\杀戮尖塔2mod制作\RitsuLib-code\Docs\zh`
+  - 当前 RitsuLib 中文 API 与注册器文档主入口。
+- `D:\MOD\杀戮尖塔2mod制作\Slay-the-Spire-2-gdsdecomp\src\Core`
+  - 当前反编译源码主入口，优先查这里的具体系统源码。
+
 默认按照这条优先级取证并落地方案：
 
 1. `RitsuLib-doc`

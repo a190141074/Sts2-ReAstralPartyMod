@@ -31,6 +31,8 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE.description": "手牌中只能存在[blue]1[/blue]张唯一。若手牌中已存在同名的[gold]唯一[/gold]牌，后加入手牌的那张会自动[gold]消耗[/gold]。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.title": "冷却",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.description": "这张牌同时拥有[gold]唯一[/gold]、[gold]保留[/gold]和[gold]消耗[/gold]效果。",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_FUSION_CLUE.title": "融合线索",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_FUSION_CLUE.description": "超时空坚果、卓越斗篷、律动残余、缓冲盾牌。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_INVESTIGATION_PROGRESS.title": "调查进度",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_INVESTIGATION_PROGRESS.description": "每当拥有[gold]调查目标[/gold]的目标被击杀时，击杀者会触发当前阶段的[gold]隐匿调查[/gold]事件牌，【人格：邦尼】持有者获得[blue]5[/blue]点[gold]星光[/gold]。\n每成功触发[blue]6[/blue]次，阶段向前推进：[gold]阶段1[/gold] -> [gold]阶段2[/gold] -> [gold]阶段3[/gold] -> [gold]真相揭露[/gold]。\n当[gold]真相揭露[/gold]再成功触发[blue]6[/blue]次后，对精英或Boss使用[gold]隐匿行动[/gold]时，会直接触发[gold]真相揭露[/gold]。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_SOLAR_BOMBARDMENT.title": "轨道轰炸",

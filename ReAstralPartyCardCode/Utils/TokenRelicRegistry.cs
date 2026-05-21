@@ -181,7 +181,8 @@ public static class TokenRelicRegistry
     public static bool IsTokenRelicPoolCandidate(RelicModel relic)
     {
         var id = relic.CanonicalInstance?.Id ?? relic.Id;
-        return !ExcludedFromRandomTokenPools.Contains(id);
+        return !ExcludedFromRandomTokenPools.Contains(id)
+               && !ExclusiveRelicUnlockHelper.IsExclusiveSourceRelic(relic);
     }
 
     public static bool IsSeriesTokenRelic(RelicModel relic)

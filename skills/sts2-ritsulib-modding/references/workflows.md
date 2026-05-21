@@ -9,6 +9,8 @@
 3. `B:\Documents\re-astral-party-mod\ReAstralPartyMod.csproj`
 4. `B:\Documents\re-astral-party-mod\ReAstralPartyMod.json`
 5. `B:\Documents\re-astral-party-mod\Scripts\MainFile.cs`
+6. `B:\Documents\re-astral-party-mod\doc\AGENT.zh.md`
+7. `B:\Documents\re-astral-party-mod\doc\AGENT.md`
 
 要确认的事实：
 
@@ -22,7 +24,7 @@
 
 先看：
 
-1. `RitsuLib-doc\01 - 添加卡牌\README.md`
+1. `RitsuLib-doc\RitsuLib\01 - 添加基础内容\01 - 添加卡牌\README.md`
 2. `RitsuLib-code\Interop\AutoRegistration\RegistrationAttributes.cs`
 3. `RitsuLib-code\Scaffolding\Content\ModCardTemplate.cs`
 4. `STS2_WineFox-main\Cards`
@@ -40,7 +42,7 @@
 
 先看：
 
-1. `RitsuLib-doc\03 - 添加新遗物\README.md`
+1. `RitsuLib-doc\RitsuLib\01 - 添加基础内容\03 - 添加新遗物\README.md`
 2. `RitsuLib-code` 中 `RegisterRelic`、`ModRelicTemplate`
 3. 当前仓库 `ReAstralPartyCardCode\Relics`
 4. WineFox `Relics`
@@ -56,7 +58,7 @@
 
 先看：
 
-1. `RitsuLib-doc\05 - 添加新能力\README.md`
+1. `RitsuLib-doc\RitsuLib\01 - 添加基础内容\05 - 添加新能力\README.md`
 2. `RitsuLib-code` 中 Power 相关模板和注册器
 3. 当前仓库 `ReAstralPartyCardCode\Powers`
 4. WineFox `Powers`
@@ -72,7 +74,7 @@
 
 先看：
 
-1. `RitsuLib-doc\06 - 添加新药水\README.md`
+1. `RitsuLib-doc\RitsuLib\01 - 添加基础内容\06 - 添加新药水\README.md`
 2. `RitsuLib-code` 中 `RegisterPotion` 和 `ModPotionTemplate`
 3. 当前仓库 `ReAstralPartyCardCode\Potions`
 
@@ -80,11 +82,11 @@
 
 按对应章节开始：
 
-- 事件: `12 - 添加新事件`
-- 先古之民: `07 - 添加先古之民`
-- 时间线: `09 - 添加时间线`
-- 附魔: `13 - 添加新附魔`
-- 人物: `14 - 添加新人物`
+- 事件: `RitsuLib\01 - 添加基础内容\12 - 添加新事件`
+- 先古之民: `RitsuLib\01 - 添加基础内容\07 - 添加先古之民`
+- 时间线: `RitsuLib\01 - 添加基础内容\09 - 添加时间线`
+- 附魔: `RitsuLib\01 - 添加基础内容\13 - 添加新附魔`
+- 人物: `RitsuLib\01 - 添加基础内容\14 - 添加新人物`
 
 流程固定：
 
@@ -100,6 +102,7 @@
 1. `B:\Documents\re-astral-party-mod\doc\从BaseLib 到 RitsuLib.md`
 2. 本 skill 的 `migration-map.md`
 3. `RitsuLib-code\Docs\zh\ContentPacksAndRegistries.md`
+4. `RitsuLib-code\Docs\zh\LocalizationAndKeywords.md`
 
 默认迁移顺序：
 

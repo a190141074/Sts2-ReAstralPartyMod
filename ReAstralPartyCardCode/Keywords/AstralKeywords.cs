@@ -28,7 +28,8 @@ public static class AstralKeywords
         AstralCollectionStem,
         AstralUniqueStem,
         AstralCooldownStem,
-        AstralInvestigationProgressStem
+        AstralInvestigationProgressStem,
+        AstralFusionClueStem
     ];
 
     private static bool _registered;
@@ -53,6 +54,7 @@ public static class AstralKeywords
     public const string AstralUniqueStem = "ASTRAL_UNIQUE";
     public const string AstralCooldownStem = "ASTRAL_COOLDOWN";
     public const string AstralInvestigationProgressStem = "ASTRAL_INVESTIGATION_PROGRESS";
+    public const string AstralFusionClueStem = "ASTRAL_FUSION_CLUE";
 
     public static string AstralEventId => GetId(AstralEventStem);
     public static string AstralStepsId => GetId(AstralStepsStem);
@@ -74,6 +76,7 @@ public static class AstralKeywords
     public static string AstralUniqueId => GetId(AstralUniqueStem);
     public static string AstralCooldownId => GetId(AstralCooldownStem);
     public static string AstralInvestigationProgressId => GetId(AstralInvestigationProgressStem);
+    public static string AstralFusionClueId => GetId(AstralFusionClueStem);
 
     public static CardKeyword AstralEvent => GetKeyword(AstralEventStem);
     public static CardKeyword AstralSteps => GetKeyword(AstralStepsStem);
@@ -95,6 +98,7 @@ public static class AstralKeywords
     public static CardKeyword AstralUnique => GetKeyword(AstralUniqueStem);
     public static CardKeyword AstralCooldown => GetKeyword(AstralCooldownStem);
     public static CardKeyword AstralInvestigationProgress => GetKeyword(AstralInvestigationProgressStem);
+    public static CardKeyword AstralFusionClue => GetKeyword(AstralFusionClueStem);
 
     public static void RegisterAll()
     {

@@ -74,6 +74,7 @@ public static class PersonaRelicCollectionPatch
         HashSet<RelicModel> allUnlockedRelics)
     {
         DiceSeriesHelper.ExpandSeenAndUnlockedDiceRelics(seenRelics, allUnlockedRelics);
+        ExclusiveRelicUnlockHelper.MarkRelicsSeenAndUnlockedForCollections(seenRelics, allUnlockedRelics);
 
         if (relicRarity != RelicRarity.Starter)
             return;

@@ -15,7 +15,7 @@ internal static class PvzNutRelicHelper
     private const string UltimateNutAttackImmunityContext = "pvz_ultimate_hyper_spacetime_nut_attack_immunity";
     private static readonly ModelId DistinguishedCapeId = new("RELIC", "DISTINGUISHED_CAPE");
     private static readonly ModelId BeatingRemnantId = new("RELIC", "BEATING_REMNANT");
-    private static readonly ModelId DemonTongueId = new("RELIC", "DEMON_TONGUE");
+    private static readonly ModelId BufferShieldId = ModelDb.GetId<TokenGoldBufferShield>();
 
     public static bool IsOwnedByTarget(Creature target, Creature ownerCreature)
     {
@@ -40,9 +40,9 @@ internal static class PvzNutRelicHelper
         return Math.Max(1m, Math.Ceiling(creature.MaxHp * 0.3m));
     }
 
-    public static decimal GetTwentyFivePercentOfMaxHp(Creature creature)
+    public static decimal GetTwentyPercentOfMaxHp(Creature creature)
     {
-        return Math.Max(1m, Math.Ceiling(creature.MaxHp * 0.25m));
+        return Math.Max(1m, Math.Ceiling(creature.MaxHp * 0.2m));
     }
 
     public static bool ShouldNegateEnemyAttack(Player owner, int hitOrdinal)
@@ -93,12 +93,12 @@ internal static class PvzNutRelicHelper
             return false;
         if (!PlayerOwnsUnmeltedRelic(owner, BeatingRemnantId, out var remnant) || remnant == null)
             return false;
-        if (!PlayerOwnsUnmeltedRelic(owner, DemonTongueId, out var tongue) || tongue == null)
+        if (!PlayerOwnsUnmeltedRelic(owner, BufferShieldId, out var bufferShield) || bufferShield == null)
             return false;
 
         relics.Add(cape);
         relics.Add(remnant);
-        relics.Add(tongue);
+        relics.Add(bufferShield);
         fusionRelics = relics;
         return true;
     }
@@ -134,5 +134,21 @@ internal static class PvzNutRelicHelper
         {
             return [];
         }
+    }
+
+    public static string SerializeDecimal(decimal value)
+    {
+        return value.ToString(CultureInfo.InvariantCulture);
+    }
+
+    public static decimal DeserializeDecimal(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return 0m;
+
+        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsed))
+            return parsed;
+
+        return 0m;
     }
 }

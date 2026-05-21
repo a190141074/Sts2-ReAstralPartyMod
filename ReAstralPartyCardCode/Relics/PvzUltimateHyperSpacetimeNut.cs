@@ -11,22 +11,40 @@ using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
-using ReAstralPartyMod.ReAstralPartyCardCode.RelicPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-[RegisterRelic(typeof(PvzNutSeriesRelicPool))]
+[RegisterRelic(typeof(EventRelicPool))]
 public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
 {
-    [SavedProperty] public decimal AstralParty_PvzUltimateHyperSpacetimeNutTurnHpLoss { get; set; }
-    [SavedProperty] public decimal AstralParty_PvzUltimateHyperSpacetimeNutCombatUnblockedDamageTaken { get; set; }
+    private const decimal ImmunityHealAmount = 1m;
+    private const decimal ImmunityStarLightAmount = 2m;
+    private decimal _turnHpLoss;
+    private decimal _combatUnblockedDamageTaken;
+
+    [SavedProperty]
+    private string AstralParty_PvzUltimateHyperSpacetimeNutTurnHpLoss
+    {
+        get => PvzNutRelicHelper.SerializeDecimal(_turnHpLoss);
+        set => _turnHpLoss = PvzNutRelicHelper.DeserializeDecimal(value);
+    }
+
+    [SavedProperty]
+    private string AstralParty_PvzUltimateHyperSpacetimeNutCombatUnblockedDamageTaken
+    {
+        get => PvzNutRelicHelper.SerializeDecimal(_combatUnblockedDamageTaken);
+        set => _combatUnblockedDamageTaken = PvzNutRelicHelper.DeserializeDecimal(value);
+    }
+
     [SavedProperty] public int AstralParty_PvzUltimateHyperSpacetimeNutPendingIntangibleCount { get; set; }
+    [SavedProperty] public int AstralParty_PvzUltimateHyperSpacetimeNutPendingImmunityRewardCount { get; set; }
     [SavedProperty] public int AstralParty_PvzUltimateHyperSpacetimeNutTurnsWithoutUnblockedDamage { get; set; }
     [SavedProperty] public int AstralParty_PvzUltimateHyperSpacetimeNutDamageEventOrdinal { get; set; }
     [SavedProperty] public int AstralParty_PvzUltimateHyperSpacetimeNutLastProcessedRound { get; set; }
 
-    public override RelicRarity Rarity => RelicRarity.Ancient;
+    public override RelicRarity Rarity => RelicRarity.Rare;
 
     public override bool ShouldReceiveCombatHooks => true;
 
@@ -53,7 +71,7 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
         if (player != Owner || Owner?.Creature == null)
             return;
 
-        AstralParty_PvzUltimateHyperSpacetimeNutTurnHpLoss = 0m;
+        _turnHpLoss = 0m;
         if (AstralParty_PvzUltimateHyperSpacetimeNutLastProcessedRound != Owner.Creature.CombatState?.RoundNumber)
             AstralParty_PvzUltimateHyperSpacetimeNutLastProcessedRound = Owner.Creature.CombatState?.RoundNumber ?? 0;
 
@@ -94,18 +112,19 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
             AstralParty_PvzUltimateHyperSpacetimeNutDamageEventOrdinal++;
             if (PvzNutRelicHelper.ShouldNegateEnemyAttack(Owner!, AstralParty_PvzUltimateHyperSpacetimeNutDamageEventOrdinal))
             {
+                AstralParty_PvzUltimateHyperSpacetimeNutPendingImmunityRewardCount++;
                 MainFile.Logger.Info(
                     $"[PvzUltimateNut] Deterministic immunity triggered | owner={Owner?.NetId} | hit={AstralParty_PvzUltimateHyperSpacetimeNutDamageEventOrdinal}");
                 return 0m;
             }
         }
 
-        var cap = PvzNutRelicHelper.GetTwentyFivePercentOfMaxHp(ownerCreature);
-        var remainingCap = Math.Max(0m, cap - AstralParty_PvzUltimateHyperSpacetimeNutTurnHpLoss);
+        var cap = PvzNutRelicHelper.GetTwentyPercentOfMaxHp(ownerCreature);
+        var remainingCap = Math.Max(0m, cap - _turnHpLoss);
         return Math.Min(amount, remainingCap);
     }
 
-    public override Task AfterDamageReceived(
+    public override async Task AfterDamageReceived(
         PlayerChoiceContext choiceContext,
         Creature target,
         DamageResult result,
@@ -115,27 +134,49 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
     {
         var ownerCreature = Owner?.Creature;
         if (ownerCreature == null)
-            return Task.CompletedTask;
+            return;
         if (!PvzNutRelicHelper.IsOwnedByTarget(target, ownerCreature))
-            return Task.CompletedTask;
+            return;
+
+        if (AstralParty_PvzUltimateHyperSpacetimeNutPendingImmunityRewardCount > 0 &&
+            PvzNutRelicHelper.IsEnemyAttackSource(ownerCreature, dealer, cardSource))
+        {
+            var rewardCount = AstralParty_PvzUltimateHyperSpacetimeNutPendingImmunityRewardCount;
+            AstralParty_PvzUltimateHyperSpacetimeNutPendingImmunityRewardCount = 0;
+            Flash();
+
+            for (var i = 0; i < rewardCount; i++)
+            {
+                await PowerCmd.Apply<HalfLifeHealPower>(ownerCreature, ImmunityHealAmount, ownerCreature, null, false);
+                await PowerCmd.Apply(
+                    ModelDb.Power<StarLightPower>().ToMutable(),
+                    ownerCreature,
+                    ImmunityStarLightAmount,
+                    ownerCreature,
+                    null,
+                    false
+                );
+            }
+
+            MainFile.Logger.Info(
+                $"[PvzUltimateNut] Granted immunity rewards | owner={Owner?.NetId} | count={rewardCount}");
+        }
 
         if (result.UnblockedDamage > 0m)
         {
-            AstralParty_PvzUltimateHyperSpacetimeNutTurnHpLoss += result.UnblockedDamage;
-            AstralParty_PvzUltimateHyperSpacetimeNutCombatUnblockedDamageTaken += result.UnblockedDamage;
+            _turnHpLoss += result.UnblockedDamage;
+            _combatUnblockedDamageTaken += result.UnblockedDamage;
             AstralParty_PvzUltimateHyperSpacetimeNutTurnsWithoutUnblockedDamage = 0;
 
             var threshold = PvzNutRelicHelper.GetThirtyPercentOfMaxHp(ownerCreature);
-            while (AstralParty_PvzUltimateHyperSpacetimeNutCombatUnblockedDamageTaken >= threshold)
+            while (_combatUnblockedDamageTaken >= threshold)
             {
-                AstralParty_PvzUltimateHyperSpacetimeNutCombatUnblockedDamageTaken -= threshold;
+                _combatUnblockedDamageTaken -= threshold;
                 AstralParty_PvzUltimateHyperSpacetimeNutPendingIntangibleCount++;
                 MainFile.Logger.Info(
                     $"[PvzUltimateNut] Queued intangible from cumulative damage | owner={Owner?.NetId} | pending={AstralParty_PvzUltimateHyperSpacetimeNutPendingIntangibleCount}");
             }
         }
-
-        return Task.CompletedTask;
     }
 
     public override Task AfterCombatEnd(CombatRoom room)
@@ -146,9 +187,10 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
 
     private void ResetCombatState()
     {
-        AstralParty_PvzUltimateHyperSpacetimeNutTurnHpLoss = 0m;
-        AstralParty_PvzUltimateHyperSpacetimeNutCombatUnblockedDamageTaken = 0m;
+        _turnHpLoss = 0m;
+        _combatUnblockedDamageTaken = 0m;
         AstralParty_PvzUltimateHyperSpacetimeNutPendingIntangibleCount = 0;
+        AstralParty_PvzUltimateHyperSpacetimeNutPendingImmunityRewardCount = 0;
         AstralParty_PvzUltimateHyperSpacetimeNutTurnsWithoutUnblockedDamage = 0;
         AstralParty_PvzUltimateHyperSpacetimeNutDamageEventOrdinal = 0;
         AstralParty_PvzUltimateHyperSpacetimeNutLastProcessedRound = 0;

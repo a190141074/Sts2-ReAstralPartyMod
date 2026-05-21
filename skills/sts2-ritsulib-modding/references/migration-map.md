@@ -16,6 +16,8 @@
 
 如果没做这一步，AutoRegistration 特性通常不会生效。
 
+迁移/取证时也应先读当前仓库 `doc/AGENT.zh.md` 与 `doc/AGENT.md`，它们的规则优先级高于本映射文件。
+
 ## 2. 注册特性
 
 | 场景 | BaseLib | RitsuLib |
