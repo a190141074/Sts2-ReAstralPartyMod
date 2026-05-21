@@ -366,7 +366,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         RunState runState,
         List<RelicModel> options)
     {
-        var allVariants = PersonaRelicRegistry.GetStartingVariantPersonaRelics()
+        var allVariants = PersonaRelicRegistry.GetStartingBuiltInVariantPersonaRelics()
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
         if (allVariants.Count == 0)
@@ -378,66 +378,46 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         LogInfo("P018",
             $"Starting persona variant chain started: initialOptions={options.Count} variantPool={allVariants.Count}.");
 
-        for (var roundIndex = 0;; roundIndex++)
+        var appendedCount = 0;
+        foreach (var variant in allVariants)
         {
-            var remainingVariants = allVariants
-                .Where(candidate => options.All(existing => existing.Id != candidate.Id))
-                .ToList();
-            if (remainingVariants.Count == 0)
+            if (options.Any(existing => existing.Id == variant.Id))
             {
                 LogInfo("P019",
-                    $"Starting persona variant chain stopped because variant pool is exhausted after round={roundIndex}.");
-                break;
+                    $"Starting persona variant independent roll skipped because variant is already present: relic={variant.Id.Entry}.");
+                continue;
             }
 
-            var shouldInject = ShouldInjectStartingVariantPersona(roundIndex, runState, options);
+            var shouldInject = ShouldInjectStartingVariantPersona(variant, runState);
             LogInfo("P020",
-                $"Starting persona variant chain roll: round={roundIndex} hit={shouldInject} remaining={remainingVariants.Count} chance={StartingVariantInjectionChancePercent}%.");
+                $"Starting persona variant independent roll: relic={variant.Id.Entry} hit={shouldInject} chance={StartingVariantInjectionChancePercent}%.");
             if (!shouldInject)
-                break;
+                continue;
 
-            var selectedVariant = ChooseInjectedStartingVariantPersona(roundIndex, runState, remainingVariants);
-            options.Add(selectedVariant);
+            options.Add(variant);
+            appendedCount++;
             LogInfo("P021",
-                $"Starting persona variant chain appended: round={roundIndex} relic={selectedVariant.Id.Entry} totalOptions={options.Count}.");
+                $"Starting persona variant appended: relic={variant.Id.Entry} totalOptions={options.Count}.");
         }
 
         LogInfo("P022",
-            $"Starting persona variant chain completed: totalOptions={options.Count} variantCount={options.Count(PersonaRelicRegistry.IsVariantPersonaRelic)}.");
+            $"Starting persona variant chain completed: totalOptions={options.Count} appended={appendedCount} variantCount={options.Count(PersonaRelicRegistry.IsVariantPersonaRelic)}.");
         return options;
     }
 
     private static bool ShouldInjectStartingVariantPersona(
-        int roundIndex,
-        RunState runState,
-        IReadOnlyList<RelicModel> currentOptions)
+        RelicModel variant,
+        RunState runState)
     {
         var roll = DeterministicMultiplayerChoiceHelper.RollDeterministically(
             0,
             100,
             MainFile.ModId,
-            "starting_variant_chain_roll",
+            "starting_variant_independent_roll",
             runState.Rng.StringSeed,
             runState.Players.Count,
-            roundIndex,
-            currentOptions.Count);
+            variant.Id.Entry);
         return roll < StartingVariantInjectionChancePercent;
-    }
-
-    private static RelicModel ChooseInjectedStartingVariantPersona(
-        int roundIndex,
-        RunState runState,
-        IReadOnlyList<RelicModel> remainingVariants)
-    {
-        return DeterministicMultiplayerChoiceHelper.PickDeterministically(
-                   remainingVariants,
-                   relic => relic.Id.Entry,
-                   MainFile.ModId,
-                   "starting_variant_chain_pick",
-                   runState.Rng.StringSeed,
-                   runState.Players.Count,
-                   roundIndex)
-               ?? throw new InvalidOperationException("Expected at least one remaining variant persona candidate.");
     }
 
     private static bool IsWindchaserVariantRelic(RelicModel relic)
