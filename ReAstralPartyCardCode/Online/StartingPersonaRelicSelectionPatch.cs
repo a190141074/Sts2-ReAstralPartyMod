@@ -269,8 +269,15 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
                 "starting_persona_primary_pool",
                 runState.Rng.StringSeed,
                 runState.Players.Count)
+            .DistinctBy(relic => relic.Id)
             .Take(targetCount)
             .ToList();
+
+        if (options.Count < targetCount)
+        {
+            LogInfo("P025",
+                $"Starting persona primary pool collapsed duplicate weighted rolls: uniqueOptions={options.Count} targetCount={targetCount} weightedCandidates={weightedCandidates.Count}.");
+        }
 
         if (options.Count >= targetCount)
             return ApplyStartingVariantPersonaPostProcessing(runState, options);
