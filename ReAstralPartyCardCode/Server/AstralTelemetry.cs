@@ -154,7 +154,7 @@ internal static class AstralTelemetry
             return;
 
         var config = LoadConfig();
-        TelemetryRegistry.RegisterApplicant(new TelemetryApplicant
+        RitsuLibFramework.RegisterTelemetryApplicant(new TelemetryApplicant
         {
             ApplicantId = ApplicantId,
             OwnerModId = MainFile.ModId,
@@ -181,7 +181,7 @@ internal static class AstralTelemetry
             ]
         });
 
-        _telemetryClient = TelemetryApi.GetClient(ApplicantId);
+        _telemetryClient = RitsuLibFramework.GetTelemetryClient(ApplicantId);
         _applicantRegistered = true;
         TryMigrateLegacyConsent();
     }
@@ -197,7 +197,7 @@ internal static class AstralTelemetry
     private static ITelemetryClient GetTelemetryClient()
     {
         RegisterApplicantIfNeeded();
-        return _telemetryClient ??= TelemetryApi.GetClient(ApplicantId);
+        return _telemetryClient ??= RitsuLibFramework.GetTelemetryClient(ApplicantId);
     }
 
     private static bool TrySetRitsuLibConsent(bool enabled)
@@ -205,25 +205,9 @@ internal static class AstralTelemetry
         try
         {
             RegisterApplicantIfNeeded();
-            var telemetryAssembly = typeof(TelemetryApi).Assembly;
-            var consentStoreType = telemetryAssembly.GetType("STS2RitsuLib.Telemetry.TelemetryConsentStore");
-            if (consentStoreType == null)
-                return false;
-
-            var setApplicantConsent = consentStoreType.GetMethod(
-                "SetApplicantConsent",
-                BindingFlags.Public | BindingFlags.Static);
-            if (setApplicantConsent == null)
-                return false;
-
-            var consentStateType = telemetryAssembly.GetType("STS2RitsuLib.Telemetry.TelemetryConsentState");
-            if (consentStateType == null)
-                return false;
-
-            var consentStateName = enabled ? "Granted" : "Denied";
-            var consentState = Enum.Parse(consentStateType, consentStateName);
             IEnumerable<string>? grantedRequests = enabled ? [BalanceRequestId, RunHistoryRequestId] : null;
-            setApplicantConsent.Invoke(null, [ApplicantId, consentState, grantedRequests]);
+            var consentState = enabled ? TelemetryConsentState.Granted : TelemetryConsentState.Denied;
+            RitsuLibFramework.SetTelemetryApplicantConsent(ApplicantId, consentState, grantedRequests);
             return true;
         }
         catch (Exception ex)
