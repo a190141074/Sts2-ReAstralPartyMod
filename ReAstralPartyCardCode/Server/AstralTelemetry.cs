@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Collections.Concurrent;
+using GodotTranslationServer = Godot.TranslationServer;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
@@ -115,6 +117,8 @@ internal static class AstralTelemetry
     private static readonly object ConfigLock = new();
     private static readonly HashSet<string> SubmittedRunIds = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, RunTelemetryState> ActiveRuns = new(StringComparer.Ordinal);
+    private static readonly ConcurrentDictionary<string, IReadOnlyDictionary<string, string>> LocalizationTableCache =
+        new(StringComparer.OrdinalIgnoreCase);
     private static TelemetryConfig? _cachedConfig;
     private static ITelemetryClient? _telemetryClient;
     private static bool _applicantRegistered;
@@ -926,6 +930,7 @@ internal static class AstralTelemetry
         PlayerRunTelemetry? player,
         string? personaSelected)
     {
+        var locale = GetCurrentClientLocale();
         return new Dictionary<string, object?>(StringComparer.Ordinal)
         {
             ["$process_person_profile"] = false,
@@ -937,9 +942,12 @@ internal static class AstralTelemetry
             ["run_id"] = payload.Run.RunId,
             ["seed_hash"] = payload.Run.SeedHash,
             ["player_slot"] = playerSlot,
+            ["client_locale"] = locale,
             ["character"] = player?.Character,
             ["persona_selected"] = personaSelected,
-            ["persona_selected_label"] = GetRelicLabel(personaSelected)
+            ["persona_selected_label"] = GetRelicLabel(personaSelected),
+            ["persona_selected_label_zhs"] = GetRelicLabel(personaSelected, "zhs"),
+            ["persona_selected_label_en"] = GetRelicLabel(personaSelected, "eng")
         };
     }
 
@@ -1027,8 +1035,12 @@ internal static class AstralTelemetry
                 CreateBaseProperties(payload, choice.PlayerSlot, null, null)
                     .With("option_id", optionId)
                     .With("option_label", GetRelicLabel(optionId))
+                    .With("option_label_zhs", GetRelicLabel(optionId, "zhs"))
+                    .With("option_label_en", GetRelicLabel(optionId, "eng"))
                     .With("selected", choice.Selected)
                     .With("selected_label", GetRelicLabel(choice.Selected))
+                    .With("selected_label_zhs", GetRelicLabel(choice.Selected, "zhs"))
+                    .With("selected_label_en", GetRelicLabel(choice.Selected, "eng"))
                     .With("is_selected", string.Equals(optionId, choice.Selected, StringComparison.Ordinal)));
     }
 
@@ -1043,8 +1055,12 @@ internal static class AstralTelemetry
                     .With("source", choice.Source)
                     .With("option_id", optionId)
                     .With("option_label", GetRelicLabel(optionId))
+                    .With("option_label_zhs", GetRelicLabel(optionId, "zhs"))
+                    .With("option_label_en", GetRelicLabel(optionId, "eng"))
                     .With("selected", choice.Selected)
                     .With("selected_label", GetRelicLabel(choice.Selected))
+                    .With("selected_label_zhs", GetRelicLabel(choice.Selected, "zhs"))
+                    .With("selected_label_en", GetRelicLabel(choice.Selected, "eng"))
                     .With("is_selected", string.Equals(optionId, choice.Selected, StringComparison.Ordinal))
                     .With("reroll_count", choice.RerollCount));
     }
@@ -1052,26 +1068,38 @@ internal static class AstralTelemetry
     private static TelemetryEventRecord CreatePersonaChoiceEvent(RunEndedPayload payload, PersonaChoiceRecord choice)
     {
         var optionLabels = choice.Options.Select(GetRelicLabel).ToArray();
+        var optionLabelsZhs = choice.Options.Select(optionId => GetRelicLabel(optionId, "zhs")).ToArray();
+        var optionLabelsEn = choice.Options.Select(optionId => GetRelicLabel(optionId, "eng")).ToArray();
         return new TelemetryEventRecord(
             "astral_persona_choice",
             CreateBaseProperties(payload, choice.PlayerSlot, null, null)
                 .With("options", choice.Options.ToArray())
                 .With("option_labels", optionLabels)
+                .With("option_labels_zhs", optionLabelsZhs)
+                .With("option_labels_en", optionLabelsEn)
                 .With("selected", choice.Selected)
-                .With("selected_label", GetRelicLabel(choice.Selected)));
+                .With("selected_label", GetRelicLabel(choice.Selected))
+                .With("selected_label_zhs", GetRelicLabel(choice.Selected, "zhs"))
+                .With("selected_label_en", GetRelicLabel(choice.Selected, "eng")));
     }
 
     private static TelemetryEventRecord CreateTokenChoiceEvent(RunEndedPayload payload, TokenChoiceRecord choice)
     {
         var optionLabels = choice.Options.Select(GetRelicLabel).ToArray();
+        var optionLabelsZhs = choice.Options.Select(optionId => GetRelicLabel(optionId, "zhs")).ToArray();
+        var optionLabelsEn = choice.Options.Select(optionId => GetRelicLabel(optionId, "eng")).ToArray();
         return new TelemetryEventRecord(
             "astral_token_choice",
             CreateBaseProperties(payload, choice.PlayerSlot, null, null)
                 .With("source", choice.Source)
                 .With("options", choice.Options.ToArray())
                 .With("option_labels", optionLabels)
+                .With("option_labels_zhs", optionLabelsZhs)
+                .With("option_labels_en", optionLabelsEn)
                 .With("selected", choice.Selected)
                 .With("selected_label", GetRelicLabel(choice.Selected))
+                .With("selected_label_zhs", GetRelicLabel(choice.Selected, "zhs"))
+                .With("selected_label_en", GetRelicLabel(choice.Selected, "eng"))
                 .With("reroll_count", choice.RerollCount));
     }
 
@@ -1085,6 +1113,8 @@ internal static class AstralTelemetry
             CreateBaseProperties(payload, player.Slot, player, player.PersonaSelected)
                 .With("token_id", tokenId)
                 .With("token_label", GetRelicLabel(tokenId))
+                .With("token_label_zhs", GetRelicLabel(tokenId, "zhs"))
+                .With("token_label_en", GetRelicLabel(tokenId, "eng"))
                 .With("is_victory", payload.Run.IsVictory)
                 .With("run_time", payload.Run.RunTime)
                 .With("ascension", payload.Run.Ascension)
@@ -1102,11 +1132,17 @@ internal static class AstralTelemetry
                 .With("character", player.Character)
                 .With("persona_selected", player.PersonaSelected)
                 .With("persona_selected_label", GetRelicLabel(player.PersonaSelected))
+                .With("persona_selected_label_zhs", GetRelicLabel(player.PersonaSelected, "zhs"))
+                .With("persona_selected_label_en", GetRelicLabel(player.PersonaSelected, "eng"))
                 .With("persona_skill_card_id", player.PersonaSkillCardId)
                 .With("persona_skill_card_label", GetCardLabel(player.PersonaSkillCardId))
+                .With("persona_skill_card_label_zhs", GetCardLabel(player.PersonaSkillCardId, "zhs"))
+                .With("persona_skill_card_label_en", GetCardLabel(player.PersonaSkillCardId, "eng"))
                 .With("persona_skill_use_count", player.PersonaSkillUseCount)
                 .With("obtained_tokens", player.ObtainedTokens.ToArray())
                 .With("obtained_token_labels", player.ObtainedTokens.Select(GetRelicLabel).ToArray())
+                .With("obtained_token_labels_zhs", player.ObtainedTokens.Select(tokenId => GetRelicLabel(tokenId, "zhs")).ToArray())
+                .With("obtained_token_labels_en", player.ObtainedTokens.Select(tokenId => GetRelicLabel(tokenId, "eng")).ToArray())
                 .With("is_victory", payload.Run.IsVictory)
                 .With("run_time", payload.Run.RunTime)
                 .With("ascension", payload.Run.Ascension)
@@ -1121,9 +1157,19 @@ internal static class AstralTelemetry
         return GetLocalizedTitle("relics", relicId);
     }
 
+    private static string? GetRelicLabel(string? relicId, string locale)
+    {
+        return GetLocalizedTitle("relics", relicId, locale);
+    }
+
     private static string? GetCardLabel(string? cardId)
     {
         return GetLocalizedTitle("cards", cardId);
+    }
+
+    private static string? GetCardLabel(string? cardId, string locale)
+    {
+        return GetLocalizedTitle("cards", cardId, locale);
     }
 
     private static string? GetLocalizedTitle(string group, string? modelId)
@@ -1137,6 +1183,97 @@ internal static class AstralTelemetry
 
         var text = loc.GetRawText();
         return string.IsNullOrWhiteSpace(text) ? modelId : text;
+    }
+
+    private static string? GetLocalizedTitle(string group, string? modelId, string locale)
+    {
+        if (string.IsNullOrWhiteSpace(modelId))
+            return null;
+
+        var normalizedLocale = NormalizeLocale(locale);
+        if (string.Equals(normalizedLocale, NormalizeLocale(GetCurrentClientLocale()), StringComparison.OrdinalIgnoreCase))
+            return GetLocalizedTitle(group, modelId);
+
+        var table = GetLocalizationTable(group, normalizedLocale);
+        if (table.TryGetValue($"{modelId}.title", out var text) && !string.IsNullOrWhiteSpace(text))
+            return text;
+
+        return modelId;
+    }
+
+    private static string GetCurrentClientLocale()
+    {
+        try
+        {
+            var locale = GodotTranslationServer.GetLocale();
+            return string.IsNullOrWhiteSpace(locale) ? "unknown" : locale;
+        }
+        catch
+        {
+            return "unknown";
+        }
+    }
+
+    private static string NormalizeLocale(string? locale)
+    {
+        if (string.IsNullOrWhiteSpace(locale))
+            return "unknown";
+
+        var normalized = locale.Trim().Replace('_', '-').ToLowerInvariant();
+        if (normalized.StartsWith("zh"))
+            return "zhs";
+        if (normalized.StartsWith("en"))
+            return "eng";
+
+        return normalized;
+    }
+
+    private static IReadOnlyDictionary<string, string> GetLocalizationTable(string group, string locale)
+    {
+        var normalizedLocale = NormalizeLocale(locale);
+        return LocalizationTableCache.GetOrAdd($"{normalizedLocale}:{group}", static key =>
+        {
+            var separatorIndex = key.IndexOf(':');
+            var resolvedLocale = separatorIndex >= 0 ? key[..separatorIndex] : "unknown";
+            var resolvedGroup = separatorIndex >= 0 ? key[(separatorIndex + 1)..] : key;
+            return LoadLocalizationTable(resolvedLocale, resolvedGroup);
+        });
+    }
+
+    private static IReadOnlyDictionary<string, string> LoadLocalizationTable(string locale, string group)
+    {
+        try
+        {
+            var assemblyPath = typeof(MainFile).Assembly.Location;
+            var modDirectory = Path.GetDirectoryName(assemblyPath);
+            if (string.IsNullOrWhiteSpace(modDirectory))
+                return new Dictionary<string, string>(StringComparer.Ordinal);
+
+            var path = Path.Combine(modDirectory, "ReAstralPartyMod", "localization", locale, $"{group}.json");
+            if (!File.Exists(path))
+                path = Path.Combine(Directory.GetParent(modDirectory)?.FullName ?? modDirectory, "ReAstralPartyMod", "localization", locale, $"{group}.json");
+            if (!File.Exists(path))
+                return new Dictionary<string, string>(StringComparer.Ordinal);
+
+            using var stream = File.OpenRead(path);
+            using var document = JsonDocument.Parse(stream);
+            if (document.RootElement.ValueKind != JsonValueKind.Object)
+                return new Dictionary<string, string>(StringComparer.Ordinal);
+
+            var dictionary = new Dictionary<string, string>(StringComparer.Ordinal);
+            foreach (var property in document.RootElement.EnumerateObject())
+            {
+                if (property.Value.ValueKind == JsonValueKind.String)
+                    dictionary[property.Name] = property.Value.GetString() ?? string.Empty;
+            }
+
+            return dictionary;
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Failed to load localization table locale={locale} group={group}: {ex.Message}");
+            return new Dictionary<string, string>(StringComparer.Ordinal);
+        }
     }
 
     private static string Sha256Hex(string value)

@@ -55,8 +55,7 @@ public class VariantPersonSara : CooldownPersonaRelicBase
     [
         HoverTipFactory.FromCard<SkillShatterStar>(),
         .. HoverTipFactory.FromRelic<PersonalityDerivativeDivineThrone>(),
-        HoverTipFactory.FromPower<DivineSonPower>(),
-        HoverTipFactory.FromPower<DivineThronePower>()
+        HoverTipFactory.FromPower<DivineSonPower>()
     ];
 
     public override async Task AfterObtained()

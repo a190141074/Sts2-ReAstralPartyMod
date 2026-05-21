@@ -24,6 +24,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.status_not_loaded": "Not Loaded",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label": "Enable All Personas",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.description": "Show every registered persona at run start instead of only a player-count-based subset.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.label": "Enable All Variant Personas",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.description": "At run start, additionally show every built-in Astral variant persona. Crossover variants that require linked mods are excluded. Changes apply to new runs only.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label": "Enable Extreme Mode",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.description": "If combat is not won by the end of the player-side turn 16, that combat immediately counts as a loss.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.label": "Enable Duplicate Personas",

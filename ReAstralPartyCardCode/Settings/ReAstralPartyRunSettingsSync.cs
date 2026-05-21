@@ -20,6 +20,8 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public bool EnableAllPersonas { get; set; }
 
+    public bool EnableAllVariantPersonas { get; set; }
+
     public bool EnableDuplicatePersonas { get; set; }
 
     public bool EnableRandomCloneMode { get; set; }
@@ -83,6 +85,7 @@ internal static class ReAstralPartyRunSettingsSync
         {
             EnableExtremeMode = settings.EnableExtremeMode,
             EnableAllPersonas = settings.EnableAllPersonas,
+            EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
             EnableDuplicatePersonas = settings.EnableDuplicatePersonas,
             EnableRandomCloneMode = settings.EnableRandomCloneMode,
             TokenSeriesMode = ReAstralPartyModSettingsManager.ResolveTokenSeriesMode(settings),
@@ -100,6 +103,7 @@ internal static class ReAstralPartyRunSettingsSync
         {
             EnableExtremeMode = false,
             EnableAllPersonas = false,
+            EnableAllVariantPersonas = false,
             EnableDuplicatePersonas = false,
             EnableRandomCloneMode = false,
             TokenSeriesMode = TokenSeriesMode.RandomTwo,
@@ -120,6 +124,7 @@ internal static class ReAstralPartyRunSettingsSync
         return PlayerChoiceResult.FromIndexes([
             snapshot.EnableExtremeMode ? 1 : 0,
             snapshot.EnableAllPersonas ? 1 : 0,
+            snapshot.EnableAllVariantPersonas ? 1 : 0,
             snapshot.EnableDuplicatePersonas ? 1 : 0,
             snapshot.EnableRandomCloneMode ? 1 : 0,
             (int)snapshot.TokenSeriesMode,
@@ -132,12 +137,12 @@ internal static class ReAstralPartyRunSettingsSync
         out ReAstralPartyRunSettingsSnapshot snapshot)
     {
         snapshot = null!;
-        if (!TryGetIndexPayload(result, out var payload) || payload.Count < 5)
+        if (!TryGetIndexPayload(result, out var payload) || payload.Count < 6)
             return false;
 
-        var payloadOffset = payload.Count >= 6 ? 1 : 0;
+        var payloadOffset = payload.Count >= 7 ? 1 : 0;
         var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
-        var bannedStartIndex = payloadOffset + 5;
+        var bannedStartIndex = payloadOffset + 6;
         var bannedIds = new List<string>();
         for (var i = 0; i < personaRelics.Count && bannedStartIndex + i < payload.Count; i++)
         {
@@ -151,12 +156,13 @@ internal static class ReAstralPartyRunSettingsSync
         {
             EnableExtremeMode = payloadOffset > 0 && payload[0] != 0,
             EnableAllPersonas = payload[payloadOffset] != 0,
-            EnableDuplicatePersonas = payload[payloadOffset + 1] != 0,
-            EnableRandomCloneMode = payload[payloadOffset + 2] != 0,
-            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[payloadOffset + 3])
-                ? (TokenSeriesMode)payload[payloadOffset + 3]
+            EnableAllVariantPersonas = payload[payloadOffset + 1] != 0,
+            EnableDuplicatePersonas = payload[payloadOffset + 2] != 0,
+            EnableRandomCloneMode = payload[payloadOffset + 3] != 0,
+            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[payloadOffset + 4])
+                ? (TokenSeriesMode)payload[payloadOffset + 4]
                 : TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = payload[payloadOffset + 4] != 0,
+            EnablePureAngelMode = payload[payloadOffset + 5] != 0,
             BannedPersonaRelicIdsSerialized = bannedIds
         };
         return true;
@@ -228,7 +234,7 @@ internal static class ReAstralPartyRunSettingsSync
 
                 state.SetSnapshot(remoteSnapshot);
                 MainFile.Logger.Info(
-                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, all_personas={remoteSnapshot.EnableAllPersonas}, duplicate_personas={remoteSnapshot.EnableDuplicatePersonas}, random_clone_mode={remoteSnapshot.EnableRandomCloneMode}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}, banned_personas={remoteSnapshot.BannedPersonaRelicIdsSerialized.Count}");
+                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, all_personas={remoteSnapshot.EnableAllPersonas}, all_variants={remoteSnapshot.EnableAllVariantPersonas}, duplicate_personas={remoteSnapshot.EnableDuplicatePersonas}, random_clone_mode={remoteSnapshot.EnableRandomCloneMode}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}, banned_personas={remoteSnapshot.BannedPersonaRelicIdsSerialized.Count}");
                 return remoteSnapshot;
             }
 
@@ -246,7 +252,7 @@ internal static class ReAstralPartyRunSettingsSync
             state.SetSnapshot(localSnapshot);
             synchronizer.SyncLocalChoice(authorityPlayer, choiceId, CreateSnapshotChoiceResult(localSnapshot));
             MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: extreme_mode={localSnapshot.EnableExtremeMode}, all_personas={localSnapshot.EnableAllPersonas}, duplicate_personas={localSnapshot.EnableDuplicatePersonas}, random_clone_mode={localSnapshot.EnableRandomCloneMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, banned_personas={localSnapshot.BannedPersonaRelicIdsSerialized.Count}");
+                $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: extreme_mode={localSnapshot.EnableExtremeMode}, all_personas={localSnapshot.EnableAllPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, duplicate_personas={localSnapshot.EnableDuplicatePersonas}, random_clone_mode={localSnapshot.EnableRandomCloneMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, banned_personas={localSnapshot.BannedPersonaRelicIdsSerialized.Count}");
             return localSnapshot;
         }
 

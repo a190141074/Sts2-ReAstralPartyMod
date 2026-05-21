@@ -50,6 +50,18 @@ public static class PersonaRelicRegistry
         return FilterSoftCompatRelics(VariantPersonaRelics);
     }
 
+    public static IReadOnlyList<RelicModel> GetStartingVariantPersonaRelics()
+    {
+        return GetCanonicalVariantPersonaRelics();
+    }
+
+    public static IReadOnlyList<RelicModel> GetStartingBuiltInVariantPersonaRelics()
+    {
+        return GetCanonicalVariantPersonaRelics()
+            .Where(relic => !CompatContentGate.IsExternalCompatRelic(relic))
+            .ToList();
+    }
+
     public static bool IsPersonaRelic(RelicModel? relic)
     {
         if (relic == null)

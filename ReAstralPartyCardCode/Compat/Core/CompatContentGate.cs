@@ -7,6 +7,19 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 
 internal static class CompatContentGate
 {
+    public static bool IsExternalCompatRelic(RelicModel? relic)
+    {
+        if (relic == null)
+            return false;
+
+        var canonicalRelic = relic.CanonicalInstance ?? relic;
+        return canonicalRelic switch
+        {
+            VariantPersonWindchaserThePlaneswalker => true,
+            _ => false
+        };
+    }
+
     public static bool IsGameplayRelicAvailable(RelicModel? relic)
     {
         if (relic == null)

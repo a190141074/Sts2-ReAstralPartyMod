@@ -26,6 +26,8 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableAllPersonas { get; set; }
 
+    public bool EnableAllVariantPersonas { get; set; }
+
     public bool EnableDuplicatePersonas { get; set; }
 
     public bool EnableRandomCloneMode { get; set; }
@@ -73,6 +75,8 @@ public static partial class ReAstralPartyModSettingsManager
     private static bool _loggedMissingGameplaySnapshot;
 
     public static bool EnableAllPersonas => ReadRuntime(settings => settings.EnableAllPersonas);
+
+    public static bool EnableAllVariantPersonas => ReadRuntime(settings => settings.EnableAllVariantPersonas);
 
     public static bool EnableExtremeMode => ReadRuntime(settings => settings.EnableExtremeMode);
 
@@ -153,6 +157,20 @@ public static partial class ReAstralPartyModSettingsManager
             return false;
 
         return EnableAllPersonas;
+    }
+
+    public static bool GetEnableAllVariantPersonas(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableAllVariantPersonas;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableAllVariantPersonas;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return EnableAllVariantPersonas;
     }
 
     public static bool GetEnableExtremeMode(IRunState? runState)
@@ -299,6 +317,19 @@ public static partial class ReAstralPartyModSettingsManager
                 ApplyRuntimeSettings(settings, "enable_extreme_mode");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label",
+                    value);
+            });
+
+        var enableAllVariantPersonas = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableAllVariantPersonas,
+            (settings, value) =>
+            {
+                settings.EnableAllVariantPersonas = value;
+                ApplyRuntimeSettings(settings, "enable_all_variant_personas");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.label",
                     value);
             });
 
@@ -512,6 +543,12 @@ public static partial class ReAstralPartyModSettingsManager
                     enableAllPersonas,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.description",
                         "At run start, show all registered personas instead of the default player-count-based subset."))
+                .AddToggle(
+                    "enable_all_variant_personas",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.label", "Enable All Variant Personas"),
+                    enableAllVariantPersonas,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.description",
+                        "At run start, append all built-in variant personas to the starting persona list. Linked crossover variants are excluded. Changes apply to new runs only."))
                 .AddToggle(
                     "enable_extreme_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label", "Enable Extreme Mode"),
@@ -743,7 +780,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): all_personas={snapshot.EnableAllPersonas}, extreme_mode={snapshot.EnableExtremeMode}, duplicate_personas={snapshot.EnableDuplicatePersonas}, random_clone_mode={snapshot.EnableRandomCloneMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, banned_personas={snapshot.BannedPersonaRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, duplicate_personas={snapshot.EnableDuplicatePersonas}, random_clone_mode={snapshot.EnableRandomCloneMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, banned_personas={snapshot.BannedPersonaRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     private static Control BuildBannedPersonaManagerControl(IModSettingsUiActionHost host)
@@ -856,6 +893,8 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableAllPersonas { get; init; }
 
+        public bool EnableAllVariantPersonas { get; init; }
+
         public bool EnableDuplicatePersonas { get; init; }
 
         public bool EnableRandomCloneMode { get; init; }
@@ -893,6 +932,7 @@ public static partial class ReAstralPartyModSettingsManager
                 BannedPersonaRelicIds = DeserializeModelIdSet(settings.BannedPersonaRelicIds),
                 EnableExtremeMode = settings.EnableExtremeMode,
                 EnableAllPersonas = settings.EnableAllPersonas,
+                EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
                 EnableDuplicatePersonas = settings.EnableDuplicatePersonas,
                 EnableRandomCloneMode = settings.EnableRandomCloneMode,
                 EnablePlayRecommendation = settings.EnablePlayRecommendation,
