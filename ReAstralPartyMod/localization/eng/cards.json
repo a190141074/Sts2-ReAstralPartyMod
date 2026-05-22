@@ -115,6 +115,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_DIVINE_PUNISHMENT.description": "Immediately gain {energyPrefix:energyIcons(1)}.\nIf the total [power]Divine Son[/power] stacks among all players is at least [blue]8[/blue], all players gain an additional {energyPrefix:energyIcons(1)} and each dispels up to [blue]2[/blue] debuffs.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CLEAR_OBSTACLE.title": "Precision Obstacle Clearance",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CLEAR_OBSTACLE.description": "Immediately trigger the target's [poison]Poison[/poison] and Doom once each, then remove all [poison]Poison[/poison] and Doom from that target.\nGain [blue]3[/blue] turns of [power]Overload Mode[/power].",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_PUNITIVE_JUDGMENT.title": "Punitive Judgment",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_PUNITIVE_JUDGMENT.description": "Deal [blue]21[/blue] damage to the target and apply [blue]1[/blue] [power]Blazing Solar Burn[/power].\nThen deal unblockable damage equal to [blue]11%[/blue] of the target's Max HP; against Bosses, this extra damage cannot exceed [blue]140%[/blue] of your Max HP.\nThis card's final damage is increased by [blue]3%[/blue] per stack of [power]Blazing Solar Burn[/power] on the target.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.title": "Grant Spark",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.description": "Choose [blue]1[/blue] of [blue]3[/blue] [gold]upgraded[/gold] cards from the [gold]Windchaser Spellbook[/gold] and add it to your hand.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_VAMPIRE_BITE.title": "One Little Sip",

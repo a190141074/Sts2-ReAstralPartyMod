@@ -115,6 +115,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_DIVINE_PUNISHMENT.description": "立即获得{energyPrefix:energyIcons(1)}。\n若场上所有玩家的[gold]神子[/gold]层数总和不少于[blue]8[/blue]，则所有玩家额外获得{energyPrefix:energyIcons(1)}，并各自驱散最多[blue]2[/blue]个负面能力。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CLEAR_OBSTACLE.title": "定点清除障碍",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CLEAR_OBSTACLE.description": "立即触发目标身上[gold]中毒[/gold]与[gold]灾厄[/gold]各[blue]1[/blue]次，然后清除目标所有[gold]中毒[/gold]与[gold]灾厄[/gold]。\n你获得[blue]3[/blue]回合的[gold]超载模式[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_PUNITIVE_JUDGMENT.title": "诛罚",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_PUNITIVE_JUDGMENT.description": "对目标造成[blue]21[/blue]点伤害，并施加[blue]1[/blue]层[gold]灼烧[/gold]。\n追加目标最大生命值[blue]11%[/blue]的[gold]无视格挡[/gold]伤害；若目标为Boss，该追加伤害不超过你最大生命值的[blue]140%[/blue]。\n目标每有[blue]1[/blue]层[gold]灼烧[/gold]，此牌最终伤害提高[blue]3%[/blue]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.title": "授予火花",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.description": "从[blue]3[/blue]张来自[gold]逐风者法术书[/gold]的[gold]已升级[/gold]卡牌中选择[blue]1[/blue]张加入你的手牌。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_VAMPIRE_BITE.title": "嘬你一口",
