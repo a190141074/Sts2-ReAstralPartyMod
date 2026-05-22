@@ -23,7 +23,9 @@ internal static class ParanoidEnchantmentHelper
 
     public static bool ShouldBlockManualPlay(CardModel? card)
     {
-        return HasParanoidEnchantment(card);
+        return HasParanoidEnchantment(card)
+               && card != null
+               && !IsCurrentlyAutoPlaying(card);
     }
 
     public static async Task TryAutoPlayOnOwnerHpLoss(CardModel? card, Creature creature, decimal delta)
@@ -68,6 +70,14 @@ internal static class ParanoidEnchantmentHelper
         lock (AutoPlayingCards)
         {
             AutoPlayingCards.Remove(card);
+        }
+    }
+
+    private static bool IsCurrentlyAutoPlaying(CardModel card)
+    {
+        lock (AutoPlayingCards)
+        {
+            return AutoPlayingCards.Contains(card);
         }
     }
 
