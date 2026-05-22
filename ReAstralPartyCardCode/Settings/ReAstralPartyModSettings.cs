@@ -54,6 +54,8 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableTokenRelicNotifications { get; set; } = true;
 
+    public bool EnableNeowDiagnosticsNotifications { get; set; } = true;
+
     // Legacy bool setting kept for backward compatibility with older settings.json files.
     public bool? EnableAllTokenSeries { get; set; }
 
@@ -112,6 +114,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool EnableTokenRelicNotifications =>
         ReadRuntime(settings => settings.EnableTokenRelicNotifications);
+
+    public static bool EnableNeowDiagnosticsNotifications =>
+        ReadRuntime(settings => settings.EnableNeowDiagnosticsNotifications);
 
     public static IReadOnlySet<ModelId> BannedPersonaRelicIds =>
         ReadRuntime(settings => settings.BannedPersonaRelicIds);
@@ -528,6 +533,19 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableNeowDiagnosticsNotifications = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableNeowDiagnosticsNotifications,
+            (settings, value) =>
+            {
+                settings.EnableNeowDiagnosticsNotifications = value;
+                ApplyRuntimeSettings(settings, "enable_neow_diagnostics_notifications");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_diagnostics_notifications.label",
+                    value);
+            });
+
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
             .WithModDisplayName(T("RE_ASTRAL_PARTY_MOD_SETTINGS.mod_display_name", "Astral Party Mod"))
             .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.page_title", "Mod Settings"))
@@ -651,7 +669,7 @@ public static partial class ReAstralPartyModSettingsManager
             .AddSection("notifications", section => section
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.notifications.title", "Notifications"))
                 .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.notifications.description",
-                    "Control which Astral toast notifications are shown to players."))
+                    "Control general Astral toast notifications."))
                 .AddToggle(
                     "enable_startup_notifications",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_startup_notifications.label", "Enable Startup Notifications"),
@@ -671,7 +689,12 @@ public static partial class ReAstralPartyModSettingsManager
                         "Enable Telemetry Notifications"),
                     enableTelemetryNotifications,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry_notifications.description",
-                        "Show telemetry upload success, warning, and error notifications."))
+                        "Show telemetry upload success, warning, and error notifications.")))
+            .AddSection("multiplayer_diagnostics", section => section
+                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.multiplayer_diagnostics.title",
+                    "Multiplayer Diagnostics"))
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.multiplayer_diagnostics.description",
+                    "Control numbered multiplayer diagnostics for synchronization, relic obtain chains, and NEOW event-room divergence tracking."))
                 .AddToggle(
                     "enable_multiplayer_notifications",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.label",
@@ -692,7 +715,14 @@ public static partial class ReAstralPartyModSettingsManager
                         "Enable Token Relic Diagnostics"),
                     enableTokenRelicNotifications,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_relic_notifications.description",
-                        "Show numbered diagnostic notifications for Astral token relic fallback, obtain, and animation problems."))));
+                        "Show numbered diagnostic notifications for Astral token relic fallback, obtain, and animation problems."))
+                .AddToggle(
+                    "enable_neow_diagnostics_notifications",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_diagnostics_notifications.label",
+                        "Enable NEOW Diagnostics"),
+                    enableNeowDiagnosticsNotifications,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_diagnostics_notifications.description",
+                        "Show targeted numbered diagnostics for the post-persona NEOW, Ancient layout, and event-room divergence window."))));
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
             .AsChildOf(MainFile.ModId)
@@ -921,6 +951,8 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableTokenRelicNotifications { get; init; } = true;
 
+        public bool EnableNeowDiagnosticsNotifications { get; init; } = true;
+
         public TokenSeriesMode TokenSeriesMode { get; init; } = TokenSeriesMode.RandomTwo;
 
         public bool EnablePureAngelMode { get; init; } = true;
@@ -946,6 +978,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableMultiplayerNotifications = settings.EnableMultiplayerNotifications,
                 EnablePersonaRelicNotifications = settings.EnablePersonaRelicNotifications,
                 EnableTokenRelicNotifications = settings.EnableTokenRelicNotifications,
+                EnableNeowDiagnosticsNotifications = settings.EnableNeowDiagnosticsNotifications,
                 TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
                 EnablePureAngelMode = settings.EnablePureAngelMode
             };

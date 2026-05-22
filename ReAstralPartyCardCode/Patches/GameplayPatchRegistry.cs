@@ -251,6 +251,7 @@ internal static class GameplayDynamicPatchCatalog
             isCritical: false,
             description: "UI patch: replace Junk Bot completed quest markers in run history",
             patchId: "junk_bot_quest_icon_history");
+        TryRegisterNeowDiagnosticsPatches(builder);
     }
 
     private static void TryRegisterJunkBotMapScreenPatch(DynamicPatchBuilder builder)
@@ -270,6 +271,49 @@ internal static class GameplayDynamicPatchCatalog
                 isCritical: false,
                 description: "UI patch: re-apply Junk Bot quest markers after map screen refresh",
                 patchId: "junk_bot_quest_icon_map_screen_refresh");
+    }
+
+    private static void TryRegisterNeowDiagnosticsPatches(DynamicPatchBuilder builder)
+    {
+        TryRegisterOptionalReadyPatch(
+            builder,
+            "MegaCrit.Sts2.Core.Nodes.Rooms.NEventRoom",
+            typeof(EventRoomNeowDiagnosticsPatch),
+            nameof(EventRoomNeowDiagnosticsPatch.Postfix),
+            "event_room_neow_diagnostics_ready",
+            "UI patch: capture targeted NEOW event-room diagnostics");
+
+        TryRegisterOptionalReadyPatch(
+            builder,
+            "MegaCrit.Sts2.Core.Nodes.Events.NAncientEventLayout",
+            typeof(AncientEventLayoutNeowDiagnosticsPatch),
+            nameof(AncientEventLayoutNeowDiagnosticsPatch.Postfix),
+            "ancient_event_layout_neow_diagnostics_ready",
+            "UI patch: capture targeted Ancient layout diagnostics");
+    }
+
+    private static void TryRegisterOptionalReadyPatch(
+        DynamicPatchBuilder builder,
+        string typeName,
+        Type patchType,
+        string patchMethodName,
+        string patchId,
+        string description)
+    {
+        var targetType = AccessTools.TypeByName(typeName);
+        if (targetType == null)
+            return;
+
+        var readyMethod = AccessTools.DeclaredMethod(targetType, "_Ready", Type.EmptyTypes);
+        if (readyMethod == null)
+            return;
+
+        builder.Add(
+            readyMethod,
+            postfix: DynamicPatchBuilder.FromMethod(patchType, patchMethodName),
+            isCritical: false,
+            description: description,
+            patchId: patchId);
     }
 
     private static void RegisterCompatibilityBridgePatches(DynamicPatchBuilder builder)

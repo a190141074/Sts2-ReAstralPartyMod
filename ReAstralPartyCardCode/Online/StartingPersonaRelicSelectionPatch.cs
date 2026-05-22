@@ -145,6 +145,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
                 $"Starting persona relic selection shown with {relicOptions.Count} persona relic options.");
             await screen.RelicPickingFinished();
             LogInfo("P016", "Starting persona relic selection screen completed.");
+            AstralNeowDiagnosticHelper.ReportPostPersonaSelectionWindow(runState, relicOptions.Count);
             EndSelection(runKey, true);
         }
         catch
