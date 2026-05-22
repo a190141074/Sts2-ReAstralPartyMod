@@ -92,20 +92,23 @@ internal static class AstralNeowDiagnosticHelper
 
         var unusualGroups = relics
             .GroupBy(static relic => relic.Rarity)
-            .Where(static group => group.Key is not (RelicRarity.Common or RelicRarity.Uncommon or RelicRarity.Rare))
+            .Where(static group => group.Key == RelicRarity.Ancient)
             .OrderBy(static group => group.Key.ToString(), StringComparer.Ordinal)
             .ToList();
         if (unusualGroups.Count == 0)
             return;
 
         var snapshot = BuildSnapshot(player.RunState);
+        if (!snapshot.IsEventLike && !snapshot.RefreshAncientLoaded)
+            return;
+
         var raritySummary = string.Join(
             " | ",
             unusualGroups.Select(group =>
                 $"{group.Key}:{string.Join(",", group.Take(4).Select(relic => (relic.CanonicalInstance ?? relic).Id.Entry))}"));
 
         MainFile.Logger.Warn(
-            $"[M204] Nonstandard relic rarity found in grab bag | owner={player.NetId} | {raritySummary} | {FormatSnapshotForLog(snapshot)}");
+            $"[M204] Ancient relic rarity found in grab bag during NEOW diagnostics window | owner={player.NetId} | {raritySummary} | {FormatSnapshotForLog(snapshot)}");
 
         var toastKey = $"M204:{snapshot.RunKey}:{player.NetId}:{raritySummary}";
         if (!TryAcquireToast(toastKey))
@@ -115,8 +118,8 @@ internal static class AstralNeowDiagnosticHelper
             AstralNotificationModule.Multiplayer,
             AstralNotificationArea.NeowDiagnostics,
             204,
-            $"发现非标准遗物稀有度进入随机遗物袋。\n玩家：{player.NetId}\n{raritySummary}\n{FormatSnapshotForBody(snapshot)}",
-            "Rarity异常");
+            $"发现 Ancient 稀有度遗物进入随机遗物袋。\n玩家：{player.NetId}\n{raritySummary}\n{FormatSnapshotForBody(snapshot)}",
+            "Ancient混入");
     }
 
     private static Snapshot BuildSnapshot(IRunState? runState)
