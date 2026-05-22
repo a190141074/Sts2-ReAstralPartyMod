@@ -122,6 +122,7 @@ internal static class AstralTelemetry
     private static TelemetryConfig? _cachedConfig;
     private static ITelemetryClient? _telemetryClient;
     private static bool _applicantRegistered;
+    private static string? _cachedManifestModVersion;
 
     private sealed class RunTelemetryState
     {
@@ -820,6 +821,34 @@ internal static class AstralTelemetry
 
     private static string GetModVersion()
     {
+        if (!string.IsNullOrWhiteSpace(_cachedManifestModVersion))
+            return _cachedManifestModVersion;
+
+        try
+        {
+            var manifestPath = TryGetModManifestPath();
+            if (!string.IsNullOrWhiteSpace(manifestPath) && File.Exists(manifestPath))
+            {
+                using var stream = File.OpenRead(manifestPath);
+                using var document = JsonDocument.Parse(stream);
+                if (document.RootElement.ValueKind == JsonValueKind.Object &&
+                    document.RootElement.TryGetProperty("version", out var versionElement) &&
+                    versionElement.ValueKind == JsonValueKind.String)
+                {
+                    var manifestVersion = versionElement.GetString()?.Trim();
+                    if (!string.IsNullOrWhiteSpace(manifestVersion))
+                    {
+                        _cachedManifestModVersion = manifestVersion;
+                        return manifestVersion;
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Failed to read mod manifest version: {ex.Message}");
+        }
+
         return typeof(MainFile).Assembly.GetName().Version?.ToString() ?? "unknown";
     }
 
@@ -1257,6 +1286,29 @@ internal static class AstralTelemetry
         {
             MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Failed to load localization table locale={locale} group={group}: {ex.Message}");
             return new Dictionary<string, string>(StringComparer.Ordinal);
+        }
+    }
+
+    private static string? TryGetModManifestPath()
+    {
+        try
+        {
+            var assemblyPath = typeof(MainFile).Assembly.Location;
+            var modDirectory = Path.GetDirectoryName(assemblyPath);
+            if (string.IsNullOrWhiteSpace(modDirectory))
+                return null;
+
+            var candidates = new[]
+            {
+                Path.Combine(modDirectory, "ReAstralPartyMod.json"),
+                Path.Combine(Directory.GetParent(modDirectory)?.FullName ?? modDirectory, "ReAstralPartyMod.json")
+            };
+
+            return candidates.FirstOrDefault(File.Exists);
+        }
+        catch
+        {
+            return null;
         }
     }
 

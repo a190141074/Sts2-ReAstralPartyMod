@@ -16,7 +16,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public class JewelryNightSkin : AstralPartyRelicModel
 {
-    private const int FallbackTurnThreshold = 6;
+    private const int FallbackTurnThreshold = 9;
 
     [SavedProperty] public int AstralParty_JewelryNightSkinTurnCounter { get; set; }
     [SavedProperty] public int AstralParty_JewelryNightSkinPendingExtraTurnCount { get; set; }

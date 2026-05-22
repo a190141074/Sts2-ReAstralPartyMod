@@ -13,7 +13,7 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_SARA.description": "· 每[blue]5[/blue]回合开始时，将[blue]1[/blue]张[gold]断星[/gold]加入手中。\n· 每命中[blue]1[/blue]名敌人，获得[blue]1[/blue]层[gold]充能[/gold]。\n· 每累计[blue]7[/blue]层[gold]充能[/gold]，所有玩家获得[blue]1[/blue]层[gold]神子[/gold]和[blue]1[/blue]层[gold]神座[/gold]。\n· 回合结束时，若[gold]充能[/gold]不少于[blue]21[/blue]且战斗未结束，则消耗全部[gold]充能[/gold]，获得{energyPrefix:energyIcons(2)}并尝试【再动】。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_SARA.flavor": "典藏系列",
   "RE_ASTRAL_PARTY_MOD_RELIC_JEWELRY_NIGHT_SKIN.title": "【饰品：夜之肤色】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_JEWELRY_NIGHT_SKIN.description": "· 若你持有[gold]【异格：萨拉】[/gold]，其冷却上限-[blue]2[/blue]。\n· 若你未持有[gold]【异格：萨拉】[/gold]，则每经过[blue]6[/blue]个自己的回合，获得[blue]1[/blue]次【再动】。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_JEWELRY_NIGHT_SKIN.description": "· 若你持有[gold]【异格：萨拉】[/gold]，其冷却上限-[blue]2[/blue]。\n· 若你未持有[gold]【异格：萨拉】[/gold]，则每经过[blue]9[/blue]个自己的回合，获得[blue]1[/blue]次【再动】；。",
   "RE_ASTRAL_PARTY_MOD_RELIC_JEWELRY_NIGHT_SKIN.flavor": "夜色贴着皮肤，像把下一轮行动提前藏好了。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PVZ_SIMPLE_NUT.title": "【普通坚果】",
   "RE_ASTRAL_PARTY_MOD_RELIC_PVZ_SIMPLE_NUT.description": "· 累计受到[blue]80[/blue]点未被格挡的伤害后，在的奖励中加入[blue]1[/blue]个[gold]超时空坚果[/gold]。\n· 整局只会触发[blue]1[/blue]次。",
