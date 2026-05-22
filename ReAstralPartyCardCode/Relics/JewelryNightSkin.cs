@@ -13,7 +13,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-[RegisterRelic(typeof(EventRelicPool))]
+[RegisterRelic(typeof(SharedRelicPool))]
 public class JewelryNightSkin : AstralPartyRelicModel
 {
     private const int FallbackTurnThreshold = 9;
