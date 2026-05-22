@@ -1,4 +1,6 @@
 {
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ASTRAL_COOLDOWN_ENCHANTMENT.title": "Cooldown Enchantment",
-  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ASTRAL_COOLDOWN_ENCHANTMENT.description": "This card has the effects of [gold]Unique[/gold], [gold]Retain[/gold], and [gold]Exhaust[/gold]."
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ASTRAL_COOLDOWN_ENCHANTMENT.description": "This card has the effects of [gold]Unique[/gold], [gold]Retain[/gold], and [gold]Exhaust[/gold].",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_PARANOID_ESSENCE_ENCHANTMENT.title": "Paranoid Enchantment",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_PARANOID_ESSENCE_ENCHANTMENT.description": "You cannot play this card manually. Whenever you receive unblocked damage, this card automatically plays from [gold]anywhere[/gold]."
 }

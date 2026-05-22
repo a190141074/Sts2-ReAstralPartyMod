@@ -1,4 +1,6 @@
 {
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ASTRAL_COOLDOWN_ENCHANTMENT.title": "冷却附魔",
-  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ASTRAL_COOLDOWN_ENCHANTMENT.description": "这张牌同时拥有[gold]唯一[/gold]、[gold]保留[/gold]和[gold]消耗[/gold]效果。"
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ASTRAL_COOLDOWN_ENCHANTMENT.description": "这张牌同时拥有[gold]唯一[/gold]、[gold]保留[/gold]和[gold]消耗[/gold]效果。",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_PARANOID_ESSENCE_ENCHANTMENT.title": "偏执附魔",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_PARANOID_ESSENCE_ENCHANTMENT.description": "你无法手动打出此牌。当你受到未被格挡的伤害时，[gold]不论何处[/gold]，此牌自动打出。"
 }
