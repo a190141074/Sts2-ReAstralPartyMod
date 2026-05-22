@@ -1,10 +1,12 @@
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Daily;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.RestSite;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
@@ -142,6 +144,59 @@ internal static class GameplayStaticPatchCatalog
     {
         patcher.RegisterPatches(
         [
+            new ModPatchInfo(
+                "card_model_paranoid_should_receive_hooks_patch",
+                typeof(CardModel),
+                nameof(CardModel.ShouldReceiveCombatHooks),
+                typeof(CardModelParanoidShouldReceiveCombatHooksPatch),
+                false,
+                "Gameplay patch: force all cards with the paranoid essence enchantment to receive combat hooks",
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
+                "card_model_paranoid_is_playable_patch",
+                typeof(CardModel),
+                "IsPlayable",
+                typeof(CardModelParanoidIsPlayablePatch),
+                false,
+                "Gameplay patch: prevent manual play for all cards with the paranoid essence enchantment",
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
+                "card_model_paranoid_after_current_hp_changed_patch",
+                typeof(CardModel),
+                nameof(CardModel.AfterCurrentHpChanged),
+                typeof(CardModelParanoidAfterCurrentHpChangedPatch),
+                false,
+                "Gameplay patch: auto-play all cards with the paranoid essence enchantment when their owner loses HP",
+                [typeof(MegaCrit.Sts2.Core.Entities.Creatures.Creature), typeof(decimal)]),
+            new ModPatchInfo(
+                "card_model_essence_enchantment_should_receive_hooks_patch",
+                typeof(CardModel),
+                nameof(CardModel.ShouldReceiveCombatHooks),
+                typeof(CardModelEssenceEnchantmentShouldReceiveCombatHooksPatch),
+                false,
+                "Gameplay patch: force all cards with eye of sun or sacred faith to receive combat hooks",
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
+                "card_model_essence_enchantment_after_card_played_patch",
+                typeof(CardModel),
+                nameof(CardModel.AfterCardPlayed),
+                typeof(CardModelEssenceEnchantmentAfterCardPlayedPatch),
+                false,
+                "Gameplay patch: advance eye of sun per-instance play counts and trigger burn on multiples of ten"),
+            new ModPatchInfo(
+                "card_model_essence_enchantment_modify_damage_patch",
+                typeof(CardModel),
+                nameof(CardModel.ModifyDamageAdditive),
+                typeof(CardModelEssenceEnchantmentModifyDamagePatch),
+                false,
+                "Gameplay patch: apply sacred faith permanent instance damage scaling"),
+            new ModPatchInfo(
+                "card_model_essence_enchantment_after_damage_given_patch",
+                typeof(CardModel),
+                nameof(CardModel.AfterDamageGiven),
+                typeof(CardModelEssenceEnchantmentAfterDamageGivenPatch),
+                false,
+                "Gameplay patch: record sacred faith permanent instance growth after kills"),
             new ModPatchInfo(
                 "persona_max_hand_size_guard_patch",
                 typeof(MaxHandSizeCalculator),

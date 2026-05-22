@@ -12,8 +12,10 @@ using STS2RitsuLib.Interop.AutoRegistration;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Events;
 
+[RegisterActEvent(typeof(Overgrowth))]
 [RegisterActEvent(typeof(Hive))]
 [RegisterActEvent(typeof(Underdocks))]
+[RegisterActEvent(typeof(Glory))]
 public sealed class VialEpisodeStore : AstralPartyEventModel
 {
     private const decimal MinimumGoldRequiredPerPlayer = 150m;

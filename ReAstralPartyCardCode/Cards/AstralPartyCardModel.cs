@@ -2,7 +2,6 @@ using System.Text.RegularExpressions;
 using Godot;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.Enchantments;
@@ -17,7 +16,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 public abstract partial class AstralPartyCardModel : ModCardTemplate
 {
     private static readonly Regex CamelCaseRegex = MyRegex();
-    private bool _isParanoidAutoPlaying;
 
     protected virtual bool ShouldAutoApplyCooldownEnchantment => false;
     protected virtual string CardId => CamelCaseRegex.Replace(GetType().Name, "$1_$2").ToLowerInvariant();
@@ -44,43 +42,10 @@ public abstract partial class AstralPartyCardModel : ModCardTemplate
     public override bool HasTurnEndInHandEffect =>
         base.HasTurnEndInHandEffect || Keywords.Contains(AstralKeywords.AstralTemporary);
 
-    public override bool ShouldReceiveCombatHooks =>
-        base.ShouldReceiveCombatHooks || Enchantment is ParanoidEssenceEnchantment;
-
-    protected override bool IsPlayable =>
-        Enchantment is not ParanoidEssenceEnchantment && base.IsPlayable;
-
     protected AstralPartyCardModel(int baseCost, CardType type, CardRarity rarity, TargetType target,
         bool showInCardLibrary = true, bool autoAdd = true)
         : base(baseCost, type, rarity, target, showInCardLibrary)
     {
-    }
-
-    public override async Task AfterCurrentHpChanged(Creature creature, decimal delta)
-    {
-        await base.AfterCurrentHpChanged(creature, delta);
-        if (Enchantment is not ParanoidEssenceEnchantment) return;
-        if (Owner?.Creature == null || creature != Owner.Creature) return;
-        if (delta >= 0m) return;
-        if (_isParanoidAutoPlaying) return;
-        if (Pile == null) return;
-
-        _isParanoidAutoPlaying = true;
-        try
-        {
-            await CardCmd.AutoPlay(
-                new ThrowingPlayerChoiceContext(),
-                this,
-                Owner.Creature,
-                AutoPlayType.Default,
-                true,
-                false
-            );
-        }
-        finally
-        {
-            _isParanoidAutoPlaying = false;
-        }
     }
 
     public override async Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
