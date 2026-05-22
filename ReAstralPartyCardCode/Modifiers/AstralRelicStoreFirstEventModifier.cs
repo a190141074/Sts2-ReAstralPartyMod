@@ -45,7 +45,6 @@ public sealed class AstralRelicStoreFirstEventModifier : ModifierModel
             return currentEvent;
         }
 
-        AstralRelicStore.MarkConsumedForCurrentAct(runState);
         MainFile.Logger.Info(
             $"AstralRelicStore modify-next-event applied | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | original={currentEvent.Id.Entry} | replacement={storeId.Entry}");
         return storeEvent;

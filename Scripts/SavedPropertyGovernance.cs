@@ -35,11 +35,11 @@ internal static class SavedPropertyGovernance
         ("Bonus", ["Bonus"]),
         ("Active", ["Active"]),
         ("NetBinding", ["NetIdRaw", "NetId"]),
-        ("UsageCount", ["UseCount", "Uses", "TriggerCount", "CardsPlayed", "Refunds"]),
+        ("UsageCount", ["UseCount", "Uses", "TriggerCount", "CardsPlayed", "Refunds", "GrowthCount", "RemainingTriggers"]),
         ("ResourceAmount", ["Amount", "Damage", "Strength", "Dexterity", "Energy", "Block", "Heal"]),
-        ("RunProgression", ["Floor", "ActIndex", "Round", "Steps", "Charges", "Quota", "Marked", "Coords"]),
+        ("RunProgression", ["Floor", "ActIndex", "Round", "Steps", "Charges", "Charge", "Quota", "Marked", "Coords", "Consecutive", "Visited", "PendingExtraTurn", "ThisRun", "AscensionCount", "RemainingRerolls"]),
         ("EconomyTracking", ["Spent", "Earned", "Accumulated", "Applied", "RewardCount"]),
-        ("StateFlag", ["IgnoreBlock", "Mode", "Initialization"])
+        ("StateFlag", ["IgnoreBlock", "Mode", "Initialization", "PaysOn", "FirstAttack", "Pending", "FusionProcessed", "Json", "RelicId"])
     ];
 
     public static void LogGovernanceSummary(Assembly assembly)

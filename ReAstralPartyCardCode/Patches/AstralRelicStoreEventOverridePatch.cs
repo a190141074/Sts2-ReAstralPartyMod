@@ -26,6 +26,18 @@ public sealed class AstralRelicStoreEventOverridePatch : IPatchMethod
         var storeId = storeEvent.Id;
         var storeVisited = runState.VisitedEventIds.Contains(storeId);
         var storeConsumedThisAct = AstralRelicStore.HasBeenConsumedThisAct(runState);
+
+        // If the modifier already returned the store event, defer MarkConsumedForCurrentAct to here
+        // (after PullNextEvent returns) so concurrent multiplayer calls inside PullNextEvent don't
+        // see a prematurely-consumed act and get a different event.
+        if (__result.Id == storeId && !storeConsumedThisAct)
+        {
+            AstralRelicStore.MarkConsumedForCurrentAct(runState);
+            MainFile.Logger.Info(
+                $"AstralRelicStore consume-marked-post-pull | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeVisited={storeVisited}");
+            return;
+        }
+
         if (!ShouldForceStoreEvent(__instance, runState, __result))
         {
             MainFile.Logger.Info(
