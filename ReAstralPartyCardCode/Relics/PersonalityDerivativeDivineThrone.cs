@@ -43,7 +43,7 @@ public class PersonalityDerivativeDivineThrone : AstralPartyRelicModel
         if (player != Owner || Owner?.Creature == null || !Owner.Creature.IsAlive)
             return;
 
-        var node = (int)Owner.Creature.GetPowerAmount<DorothyNodePower>();
+        var node = (int)Owner.Creature.GetPowerAmount<SaraNodePower>();
         if (node <= AstralDivinePersonaHelper.GetDivineNodeThresholdForAct(Owner))
             return;
 

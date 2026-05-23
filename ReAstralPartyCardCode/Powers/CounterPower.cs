@@ -44,6 +44,9 @@ public class CounterPower : AstralPartyPowerModel
             await CreatureCmd.Damage(choiceContext, dealer, retaliateDamage,
                 ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.SkipHurtAnim, Owner, null);
 
+            if (Owner.Player?.GetRelic<PersonGunsmithMoses>() != null)
+                await MosesCombatHelper.TryGainWeaknessInsight(Owner.Player, this);
+
             if (Owner.HasPower<InvokeSpiritsPower>() && dealer.IsAlive)
                 await InvokeSpiritsPower.TryTriggerChase(choiceContext, Owner, dealer, null, this);
         }

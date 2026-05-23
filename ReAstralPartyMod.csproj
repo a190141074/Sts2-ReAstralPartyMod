@@ -29,6 +29,7 @@
 		<CardPortraitExportStateDir>$(MSBuildProjectDirectory)\.tmp-card-portrait-export-state</CardPortraitExportStateDir>
 		<CardPortraitImportedDir>$(MSBuildProjectDirectory)\.godot\imported</CardPortraitImportedDir>
 		<CardPortraitExportScale>0.5</CardPortraitExportScale>
+		<EnableCardPortraitExportCompression>false</EnableCardPortraitExportCompression>
 	</PropertyGroup>
 
 	<Target Name="ValidateChineseLocalization" BeforeTargets="BeforeBuild">
@@ -582,7 +583,14 @@
 		<MakeDir Directories="$(ModOutputDir)"/>
 		<Exec
 				WorkingDirectory="$(MSBuildProjectDirectory)"
-				Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\CompressCardPortraitsForExport.ps1&quot; -Mode prepare -SourceDir &quot;$(CardPortraitSourceDir)&quot; -StateDir &quot;$(CardPortraitExportStateDir)&quot; -ImportedDir &quot;$(CardPortraitImportedDir)&quot; -Scale $(CardPortraitExportScale)"/>
+				Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\CompressCardPortraitsForExport.ps1&quot; -Mode prepare -SourceDir &quot;$(CardPortraitSourceDir)&quot; -StateDir &quot;$(CardPortraitExportStateDir)&quot; -ImportedDir &quot;$(CardPortraitImportedDir)&quot; -Scale $(CardPortraitExportScale)"
+				Condition="'$(EnableCardPortraitExportCompression)' == 'true'"/>
+		<Exec
+				WorkingDirectory="$(MSBuildProjectDirectory)"
+				Command="&quot;$(GodotEditorPath)&quot; --headless --path &quot;$(MSBuildProjectDirectory)&quot; --import"
+				EnvironmentVariables="STS2_SKIP_PCK_EXPORT=1"
+				IgnoreExitCode="false"
+				IgnoreStandardErrorWarningFormat="true"/>
 		<Exec
 				WorkingDirectory="$(MSBuildProjectDirectory)"
 				Command="&quot;$(GodotEditorPath)&quot; --headless --path &quot;$(MSBuildProjectDirectory)&quot; --export-pack &quot;$(GodotExportPreset)&quot; &quot;$(PckOutputPath)&quot;"
@@ -592,11 +600,11 @@
 		<Exec
 				WorkingDirectory="$(MSBuildProjectDirectory)"
 				Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\CompressCardPortraitsForExport.ps1&quot; -Mode restore -SourceDir &quot;$(CardPortraitSourceDir)&quot; -StateDir &quot;$(CardPortraitExportStateDir)&quot; -ImportedDir &quot;$(CardPortraitImportedDir)&quot;"
-				Condition="Exists('$(CardPortraitExportStateDir)')"/>
+				Condition="'$(EnableCardPortraitExportCompression)' == 'true' and Exists('$(CardPortraitExportStateDir)')"/>
 		<Error Condition="!Exists('$(PckOutputPath)')" Text="Godot export did not produce $(PckOutputPath)."/>
 	</Target>
 
-	<Target Name="RestoreCardPortraitsAfterFailedExport" AfterTargets="ExportModPck" Condition="Exists('$(CardPortraitExportStateDir)')">
+	<Target Name="RestoreCardPortraitsAfterFailedExport" AfterTargets="ExportModPck" Condition="'$(EnableCardPortraitExportCompression)' == 'true' and Exists('$(CardPortraitExportStateDir)')">
 		<Exec
 				WorkingDirectory="$(MSBuildProjectDirectory)"
 				Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\CompressCardPortraitsForExport.ps1&quot; -Mode restore -SourceDir &quot;$(CardPortraitSourceDir)&quot; -StateDir &quot;$(CardPortraitExportStateDir)&quot; -ImportedDir &quot;$(CardPortraitImportedDir)&quot;"/>

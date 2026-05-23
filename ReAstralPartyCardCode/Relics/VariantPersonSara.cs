@@ -60,7 +60,8 @@ public class VariantPersonSara : CooldownPersonaRelicBase
     [
         HoverTipFactory.FromCard<SkillShatterStar>(),
         .. HoverTipFactory.FromRelic<PersonalityDerivativeDivineThrone>(),
-        HoverTipFactory.FromPower<DivineSonPower>()
+        HoverTipFactory.FromPower<DivineSonPower>(),
+        HoverTipFactory.FromPower<SaraNodePower>()
     ];
 
     public override async Task AfterObtained()
@@ -75,6 +76,8 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount = 0;
         AstralParty_VariantPersonSaraPendingShatterStarFallbackCount = 0;
         await AstralDivinePersonaHelper.EnsureDivineThrone(Owner);
+        if (Owner?.Creature != null)
+            await PowerCmd.SetAmount<SaraNodePower>(Owner.Creature, 1m, Owner.Creature, null);
         await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner!, 0);
         await AstralMoveAgainDisplayHelper.Sync(Owner);
     }
@@ -97,6 +100,8 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         if (Owner != null)
         {
             await AstralDivinePersonaHelper.EnsureDivineThrone(Owner);
+            if (Owner.Creature != null && !Owner.Creature.HasPower<SaraNodePower>())
+                await PowerCmd.SetAmount<SaraNodePower>(Owner.Creature, 1m, Owner.Creature, null);
             await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, AstralParty_VariantPersonSaraCharge);
             await AstralMoveAgainDisplayHelper.Sync(Owner);
         }

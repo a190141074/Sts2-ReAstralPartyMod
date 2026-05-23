@@ -101,6 +101,23 @@ function Backup-ImportedCardPortraitArtifacts([string]$PortraitDir, [string]$Imp
     }
 }
 
+function Remove-ImportedCardPortraitArtifacts([string]$PortraitDir, [string]$ImportedRoot)
+{
+    if ([string]::IsNullOrWhiteSpace($ImportedRoot) -or -not (Test-Path -LiteralPath $ImportedRoot))
+    {
+        return
+    }
+
+    $pngFiles = Get-ChildItem -LiteralPath $PortraitDir -Filter "*.png" -File
+    foreach ($file in $pngFiles)
+    {
+        foreach ($importedFile in Get-ChildItem -LiteralPath $ImportedRoot -File | Where-Object { $_.Name -like "$($file.Name)-*" })
+        {
+            Remove-Item -LiteralPath $importedFile.FullName -Force -ErrorAction SilentlyContinue
+        }
+    }
+}
+
 function Restore-ImportedCardPortraitArtifacts([string]$ImportedRoot, [string]$ImportedBackupDir)
 {
     if ([string]::IsNullOrWhiteSpace($ImportedRoot) -or -not (Test-Path -LiteralPath $ImportedRoot) -or -not (Test-Path -LiteralPath $ImportedBackupDir))
@@ -140,6 +157,7 @@ function Prepare-CardPortraits([string]$PortraitDir, [string]$BackupStateDir, [s
 
     Copy-Item -LiteralPath $PortraitDir -Destination $sourceBackupDir -Recurse -Force
     Backup-ImportedCardPortraitArtifacts -PortraitDir $PortraitDir -ImportedRoot $ImportedRoot -ImportedBackupDir $importedBackupDir
+    Remove-ImportedCardPortraitArtifacts -PortraitDir $PortraitDir -ImportedRoot $ImportedRoot
 
     $pngFiles = Get-ChildItem -LiteralPath $PortraitDir -Filter "*.png" -File
     $originalTotalBytes = ($pngFiles | Measure-Object Length -Sum).Sum

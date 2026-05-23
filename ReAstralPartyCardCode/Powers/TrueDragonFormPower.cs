@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -24,7 +25,7 @@ public class TrueDragonFormPower : AstralPartyPowerModel
 
     public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
     {
-        if (Owner == null)
+        if (Owner == null || Owner.Player?.GetRelic<PersonXiaoLei>() == null)
             return;
 
         ApplyGlamToUpgradedAttackCards();
@@ -37,6 +38,9 @@ public class TrueDragonFormPower : AstralPartyPowerModel
 
     public override async Task AfterRemoved(Creature owner)
     {
+        if (owner.Player?.GetRelic<PersonXiaoLei>() == null)
+            return;
+
         await PowerCmd.Apply<StrengthPower>(owner, -StrengthBonus, owner, null, true);
         await PowerCmd.Apply<DexterityPower>(owner, -DexterityBonus, owner, null, true);
     }
@@ -49,6 +53,8 @@ public class TrueDragonFormPower : AstralPartyPowerModel
         CardModel? cardSource)
     {
         if (dealer != Owner)
+            return 0m;
+        if (Owner?.Player?.GetRelic<PersonXiaoLei>() == null)
             return 0m;
         if (amount <= 0m)
             return 0m;
