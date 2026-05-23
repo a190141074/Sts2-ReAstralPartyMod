@@ -2,7 +2,6 @@ using HarmonyLib;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Runs;
-using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -18,7 +17,6 @@ internal static class RelicGrabBagPopulateSeriesFilterPatch
             return;
 
         RemoveLockedSeriesRelics(__instance, player.RunState);
-        RemoveBannedRelics(__instance, player.RunState);
         AstralNeowDiagnosticHelper.ReportGrabBagRaritySnapshot(__instance, player);
     }
 
@@ -29,21 +27,6 @@ internal static class RelicGrabBagPopulateSeriesFilterPatch
             if (!TokenRelicRegistry.IsSeriesTokenRelic(relic))
                 continue;
             if (TokenRelicRegistry.IsRelicAvailableForRun(runState, relic))
-                continue;
-
-            grabBag.Remove(relic);
-        }
-    }
-
-    private static void RemoveBannedRelics(RelicGrabBag grabBag, IRunState runState)
-    {
-        var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
-        if (bannedRelicIds.Count == 0)
-            return;
-
-        foreach (var relic in BannedRelicRegistry.GetCanonicalBannableRelics())
-        {
-            if (!BannedRelicRegistry.IsBanned(bannedRelicIds, relic))
                 continue;
 
             grabBag.Remove(relic);
