@@ -144,8 +144,8 @@ internal static class ReAstralPartyRunSettingsSync
             return false;
 
         var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
-        var isLegacyPayload = payload.Count == personaRelics.Count + 7 || payload.Count == personaRelics.Count + 6;
-        var payloadOffset = payload.Count >= personaRelics.Count + 7 ? 1 : 0;
+        var isLegacyPayload = payload.Count == personaRelics.Count + 7;
+        var payloadOffset = isLegacyPayload ? 1 : 0;
         var bannedStartIndex = payloadOffset + (isLegacyPayload ? 6 : 5);
         var bannedIds = new List<string>();
         for (var i = 0; i < personaRelics.Count && bannedStartIndex + i < payload.Count; i++)
@@ -156,7 +156,7 @@ internal static class ReAstralPartyRunSettingsSync
             bannedIds.Add((personaRelics[i].CanonicalInstance?.Id ?? personaRelics[i].Id).ToString());
         }
 
-        var legacyRandomCloneMode = payload[payloadOffset + 3] != 0;
+        var legacyRandomCloneMode = isLegacyPayload && payload[payloadOffset + 3] != 0;
         snapshot = new ReAstralPartyRunSettingsSnapshot
         {
             EnableExtremeMode = payloadOffset > 0 && payload[0] != 0,

@@ -414,6 +414,21 @@ public static partial class ReAstralPartyModSettingsManager
                 ShowTokenSeriesModeToast(value);
             });
 
+        var startingPersonaMode = ModSettingsBindings.Global<ReAstralPartyModSettings, StartingPersonaMode>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => ResolveStartingPersonaMode(settings),
+            (settings, value) =>
+            {
+                settings.StartingPersonaMode = value;
+                settings.EnableDuplicatePersonas = null;
+                settings.EnableRandomCloneMode = null;
+                settings.StartingPersonaDisplayMode = null;
+                settings.StartingPersonaAssignmentMode = null;
+                ApplyRuntimeSettings(settings, "starting_persona_mode");
+                ShowStartingPersonaModeToast(value);
+            });
+
         var enablePureAngelMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -611,11 +626,33 @@ public static partial class ReAstralPartyModSettingsManager
                     enableExtremeMode,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.description",
                         "If combat is not won by the end of the player-side turn 16, that combat immediately counts as a loss."))
-                .AddCustom(
-                    "starting_persona_mode_selector",
+                .AddEnumChoice(
+                    "starting_persona_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.label",
                         "Starting Persona Mode"),
-                    BuildStartingPersonaModeSelectorControl)
+                    startingPersonaMode,
+                    value => value switch
+                    {
+                        StartingPersonaMode.Standard => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard",
+                            "Standard"),
+                        StartingPersonaMode.StandardDuplicate => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate",
+                            "Standard Duplicate"),
+                        StartingPersonaMode.RandomAssign => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign",
+                            "Random Assign Mode"),
+                        StartingPersonaMode.Clone => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone",
+                            "Clone Mode"),
+                        StartingPersonaMode.RandomClone => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone",
+                            "Random Clone Mode"),
+                        _ => ModSettingsText.Literal(value.ToString())
+                    },
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.description",
+                        "Choose one fixed starting-persona rule. Clicking any mode switches and saves it immediately."),
+                    ModSettingsChoicePresentation.Dropdown)
                 .AddEnumChoice(
                     "token_series_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.label", "Expansion Mode"),
@@ -1007,9 +1044,44 @@ public static partial class ReAstralPartyModSettingsManager
         return mode == StartingPersonaMode.StandardDuplicate;
     }
 
-    private static Control BuildStartingPersonaModeSelectorControl(IModSettingsUiActionHost host)
+    internal static string GetStartingPersonaModeTitle(StartingPersonaMode mode)
     {
-        return new StartingPersonaModeSelectorControl(host);
+        var key = mode switch
+        {
+            StartingPersonaMode.Standard => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard",
+            StartingPersonaMode.StandardDuplicate => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate",
+            StartingPersonaMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign",
+            StartingPersonaMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone",
+            StartingPersonaMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone",
+            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard"
+        };
+        return new LocString("settings_ui", key).GetRawText();
+    }
+
+    internal static string GetStartingPersonaModeDescription(StartingPersonaMode mode)
+    {
+        var key = mode switch
+        {
+            StartingPersonaMode.Standard => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description",
+            StartingPersonaMode.StandardDuplicate => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate.description",
+            StartingPersonaMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign.description",
+            StartingPersonaMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone.description",
+            StartingPersonaMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone.description",
+            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description"
+        };
+        return new LocString("settings_ui", key).GetRawText();
+    }
+
+    internal static string GetTokenSeriesModeTitle(TokenSeriesMode mode)
+    {
+        var key = mode switch
+        {
+            TokenSeriesMode.RandomTwo => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_random_two",
+            TokenSeriesMode.All => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all",
+            TokenSeriesMode.Disabled => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled",
+            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_random_two"
+        };
+        return new LocString("settings_ui", key).GetRawText();
     }
 
     private static Control BuildBannedRelicManagerControl(IModSettingsUiActionHost host, BannedRelicCategory category)
@@ -1667,128 +1739,4 @@ public static partial class ReAstralPartyModSettingsManager
         }
     }
 
-    private sealed partial class StartingPersonaModeSelectorControl : VBoxContainer
-    {
-        private readonly IModSettingsUiActionHost _host;
-        private readonly Dictionary<StartingPersonaMode, Button> _buttons = new();
-
-        public StartingPersonaModeSelectorControl(IModSettingsUiActionHost host)
-        {
-            _host = host;
-            SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            MouseFilter = MouseFilterEnum.Ignore;
-            AddThemeConstantOverride("separation", 10);
-
-            var intro = new Label
-            {
-                Text = new LocString("settings_ui",
-                    "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.description").GetRawText(),
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                MouseFilter = MouseFilterEnum.Ignore
-            };
-            AddChild(intro);
-
-            foreach (var mode in GetOrderedModes())
-            {
-                var card = new PanelContainer
-                {
-                    SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                    MouseFilter = MouseFilterEnum.Pass
-                };
-                AddChild(card);
-
-                var box = new VBoxContainer
-                {
-                    MouseFilter = MouseFilterEnum.Ignore
-                };
-                box.AddThemeConstantOverride("separation", 4);
-                card.AddChild(box);
-
-                var button = new Button
-                {
-                    Text = GetModeTitle(mode),
-                    Alignment = HorizontalAlignment.Left,
-                    SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                    MouseFilter = MouseFilterEnum.Stop
-                };
-                button.Pressed += () => SelectMode(mode);
-                box.AddChild(button);
-                _buttons[mode] = button;
-
-                box.AddChild(new Label
-                {
-                    Text = GetModeDescription(mode),
-                    AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                    MouseFilter = MouseFilterEnum.Ignore
-                });
-            }
-
-            RefreshVisuals();
-        }
-
-        private void SelectMode(StartingPersonaMode mode)
-        {
-            UpdatePersistentSettings(settings =>
-            {
-                settings.StartingPersonaMode = mode;
-                settings.EnableDuplicatePersonas = null;
-                settings.EnableRandomCloneMode = null;
-                settings.StartingPersonaDisplayMode = null;
-                settings.StartingPersonaAssignmentMode = null;
-            }, "starting_persona_mode");
-
-            ShowStartingPersonaModeToast(mode);
-            RefreshVisuals();
-            _host.RequestRefresh();
-        }
-
-        private void RefreshVisuals()
-        {
-            var currentMode = ConfiguredStartingPersonaMode;
-            foreach (var (mode, button) in _buttons)
-            {
-                button.Disabled = mode == currentMode;
-                button.Modulate = mode == currentMode
-                    ? new Color(1f, 0.92f, 0.52f, 1f)
-                    : Colors.White;
-            }
-        }
-
-        private static IEnumerable<StartingPersonaMode> GetOrderedModes()
-        {
-            yield return StartingPersonaMode.Standard;
-            yield return StartingPersonaMode.StandardDuplicate;
-            yield return StartingPersonaMode.RandomAssign;
-            yield return StartingPersonaMode.Clone;
-            yield return StartingPersonaMode.RandomClone;
-        }
-
-        private static string GetModeTitle(StartingPersonaMode mode)
-        {
-            var key = mode switch
-            {
-                StartingPersonaMode.Standard => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard",
-                StartingPersonaMode.StandardDuplicate => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate",
-                StartingPersonaMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign",
-                StartingPersonaMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone",
-                StartingPersonaMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone",
-                _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard"
-            };
-            return new LocString("settings_ui", key).GetRawText();
-        }
-
-        private static string GetModeDescription(StartingPersonaMode mode)
-        {
-            var key = mode switch
-            {
-                StartingPersonaMode.Standard => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description",
-                StartingPersonaMode.StandardDuplicate => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate.description",
-                StartingPersonaMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign.description",
-                StartingPersonaMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone.description",
-                StartingPersonaMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone.description",
-                _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description"
-            };
-            return new LocString("settings_ui", key).GetRawText();
-        }
-    }
 }
