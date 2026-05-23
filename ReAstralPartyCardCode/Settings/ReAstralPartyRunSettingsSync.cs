@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using STS2RitsuLib.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -42,6 +43,7 @@ internal static class ReAstralPartyRunSettingsSync
     private static readonly AttachedState<RunState, RunSettingsSyncState> RunStates = new(() =>
         new RunSettingsSyncState());
     private const int MaxClientSnapshotAttempts = 64;
+    private const string SnapshotSessionKey = "run_settings_snapshot";
 
     public static Task EnsureSyncedAsync(RunState runState)
     {
@@ -116,7 +118,19 @@ internal static class ReAstralPartyRunSettingsSync
         };
     }
 
-    private static PlayerChoiceResult CreateSnapshotChoiceResult(ReAstralPartyRunSettingsSnapshot snapshot)
+    private static PlayerChoiceResult CreateSnapshotChoiceResult(RunState runState,
+        ReAstralPartyRunSettingsSnapshot snapshot)
+    {
+        var payload = CreateSnapshotPayload(snapshot);
+        return AstralChoiceProtocol.CreateIndexedEnvelope(
+            AstralChoiceKind.RunSettingsSnapshot,
+            runState,
+            SnapshotSessionKey,
+            sequence: 0,
+            payload);
+    }
+
+    private static List<int> CreateSnapshotPayload(ReAstralPartyRunSettingsSnapshot snapshot)
     {
         var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
         var bannedSet = snapshot.BannedRelicIdsSerialized
@@ -125,7 +139,8 @@ internal static class ReAstralPartyRunSettingsSync
         var bannedFlags = personaRelics
             .Select(relic => bannedSet.Contains((relic.CanonicalInstance?.Id ?? relic.Id).ToString()) ? 1 : 0);
 
-        return PlayerChoiceResult.FromIndexes([
+        return
+        [
             snapshot.EnableExtremeMode ? 1 : 0,
             snapshot.EnableAllPersonas ? 1 : 0,
             snapshot.EnableAllVariantPersonas ? 1 : 0,
@@ -133,17 +148,43 @@ internal static class ReAstralPartyRunSettingsSync
             (int)snapshot.TokenSeriesMode,
             snapshot.EnablePureAngelMode ? 1 : 0,
             .. bannedFlags
-        ]);
+        ];
     }
 
-    private static bool TryDecodeSnapshotChoiceResult(PlayerChoiceResult result,
+    private static bool TryDecodeSnapshotChoiceResult(RunState runState, PlayerChoiceResult result,
         out ReAstralPartyRunSettingsSnapshot snapshot)
     {
         snapshot = null!;
-        if (!TryGetIndexPayload(result, out var payload) || payload.Count < 5)
+        if (AstralChoiceProtocol.TryDecodeIndexedEnvelope(
+                result,
+                AstralChoiceKind.RunSettingsSnapshot,
+                runState,
+                SnapshotSessionKey,
+                out _,
+                out var envelopedPayload))
+        {
+            return TryDecodeRawSnapshotPayload(envelopedPayload, out snapshot);
+        }
+
+        if (!TryGetIndexPayload(result, out var payload))
             return false;
 
+        if (!TryDecodeRawSnapshotPayload(payload, out snapshot))
+            return false;
+
+        MainFile.Logger.Info(
+            $"{MainFile.ModId} settings sync accepted a legacy/raw snapshot payload because no protocol envelope was present.");
+        return true;
+    }
+
+    private static bool TryDecodeRawSnapshotPayload(IReadOnlyList<int> payload,
+        out ReAstralPartyRunSettingsSnapshot snapshot)
+    {
+        snapshot = null!;
         var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
+        if (payload.Count != personaRelics.Count + 6 && payload.Count != personaRelics.Count + 7)
+            return false;
+
         var isLegacyPayload = payload.Count == personaRelics.Count + 7;
         var payloadOffset = isLegacyPayload ? 1 : 0;
         var bannedStartIndex = payloadOffset + (isLegacyPayload ? 6 : 5);
@@ -178,6 +219,7 @@ internal static class ReAstralPartyRunSettingsSync
             MainFile.Logger.Info(
                 $"{MainFile.ModId} settings sync decoded legacy starting persona payload and downgraded it to standard mode (legacy_random_clone_mode={legacyRandomCloneMode}).");
         }
+
         return true;
     }
 
@@ -238,7 +280,7 @@ internal static class ReAstralPartyRunSettingsSync
             {
                 var remoteChoiceId = synchronizer.ReserveChoiceId(authorityPlayer);
                 var remoteChoice = await synchronizer.WaitForRemoteChoice(authorityPlayer, remoteChoiceId);
-                if (!TryDecodeSnapshotChoiceResult(remoteChoice, out var remoteSnapshot))
+                if (!TryDecodeSnapshotChoiceResult(runState, remoteChoice, out var remoteSnapshot))
                 {
                     MainFile.Logger.Warn(
                         $"{MainFile.ModId} settings sync ignored foreign choice from authority player {authorityPlayer.NetId}: choiceId={remoteChoiceId} attempt={attempt + 1} result={remoteChoice}");
@@ -263,7 +305,7 @@ internal static class ReAstralPartyRunSettingsSync
         {
             var localSnapshot = CreateLocalSnapshot();
             state.SetSnapshot(localSnapshot);
-            synchronizer.SyncLocalChoice(authorityPlayer, choiceId, CreateSnapshotChoiceResult(localSnapshot));
+            synchronizer.SyncLocalChoice(authorityPlayer, choiceId, CreateSnapshotChoiceResult(runState, localSnapshot));
             MainFile.Logger.Info(
                 $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: extreme_mode={localSnapshot.EnableExtremeMode}, all_personas={localSnapshot.EnableAllPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, persona_mode={localSnapshot.StartingPersonaMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, banned_relics={localSnapshot.BannedRelicIdsSerialized.Count}");
             return localSnapshot;
