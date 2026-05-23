@@ -18,6 +18,27 @@ public enum TokenSeriesMode
     Disabled = 2
 }
 
+public enum StartingPersonaDisplayMode
+{
+    Manual = 0,
+    Automatic = 1
+}
+
+public enum StartingPersonaAssignmentMode
+{
+    Independent = 0,
+    Clone = 1
+}
+
+public enum StartingPersonaMode
+{
+    Standard = 0,
+    StandardDuplicate = 1,
+    RandomAssign = 2,
+    Clone = 3,
+    RandomClone = 4
+}
+
 public sealed class ReAstralPartyModSettings
 {
     public List<string> BannedRelicIds { get; set; } = new();
@@ -31,9 +52,15 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableAllVariantPersonas { get; set; }
 
-    public bool EnableDuplicatePersonas { get; set; }
+    // Legacy fields kept so older settings.json files still load cleanly.
+    public bool? EnableDuplicatePersonas { get; set; }
+    public bool? EnableRandomCloneMode { get; set; }
 
-    public bool EnableRandomCloneMode { get; set; }
+    public StartingPersonaDisplayMode? StartingPersonaDisplayMode { get; set; }
+
+    public StartingPersonaAssignmentMode? StartingPersonaAssignmentMode { get; set; }
+
+    public StartingPersonaMode StartingPersonaMode { get; set; } = StartingPersonaMode.Standard;
 
     public bool EnablePlayRecommendation { get; set; }
 
@@ -85,9 +112,8 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool EnableExtremeMode => ReadRuntime(settings => settings.EnableExtremeMode);
 
-    public static bool EnableDuplicatePersonas => ReadRuntime(settings => settings.EnableDuplicatePersonas);
-
-    public static bool EnableRandomCloneMode => ReadRuntime(settings => settings.EnableRandomCloneMode);
+    public static StartingPersonaMode ConfiguredStartingPersonaMode =>
+        ReadRuntime(settings => settings.StartingPersonaMode);
 
     public static TokenSeriesMode TokenSeriesMode => ReadRuntime(settings => settings.TokenSeriesMode);
 
@@ -200,29 +226,57 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool GetEnableDuplicatePersonas(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableDuplicatePersonas;
+            return ResolveAllowDuplicates(snapshot.StartingPersonaMode);
 
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableDuplicatePersonas;
+            return ResolveAllowDuplicates(localFallback.StartingPersonaMode);
 
         if (ShouldUseSafeGameplayFallback(runState))
             return false;
 
-        return EnableDuplicatePersonas;
+        return ResolveAllowDuplicates(ConfiguredStartingPersonaMode);
     }
 
-    public static bool GetEnableRandomCloneMode(IRunState? runState)
+    public static StartingPersonaDisplayMode GetStartingPersonaDisplayMode(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableRandomCloneMode;
+            return ResolveDisplayMode(snapshot.StartingPersonaMode);
 
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableRandomCloneMode;
+            return ResolveDisplayMode(localFallback.StartingPersonaMode);
 
         if (ShouldUseSafeGameplayFallback(runState))
-            return false;
+            return StartingPersonaDisplayMode.Manual;
 
-        return EnableRandomCloneMode;
+        return ResolveDisplayMode(ConfiguredStartingPersonaMode);
+    }
+
+    public static StartingPersonaAssignmentMode GetStartingPersonaAssignmentMode(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return ResolveAssignmentMode(snapshot.StartingPersonaMode);
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return ResolveAssignmentMode(localFallback.StartingPersonaMode);
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return StartingPersonaAssignmentMode.Independent;
+
+        return ResolveAssignmentMode(ConfiguredStartingPersonaMode);
+    }
+
+    public static StartingPersonaMode GetStartingPersonaMode(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.StartingPersonaMode;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.StartingPersonaMode;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return StartingPersonaMode.Standard;
+
+        return ConfiguredStartingPersonaMode;
     }
 
     public static TokenSeriesMode GetTokenSeriesMode(IRunState? runState)
@@ -345,32 +399,6 @@ public static partial class ReAstralPartyModSettingsManager
                 ApplyRuntimeSettings(settings, "enable_all_variant_personas");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.label",
-                    value);
-            });
-
-        var enableDuplicatePersonas = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
-            MainFile.ModId,
-            SettingsKey,
-            settings => settings.EnableDuplicatePersonas,
-            (settings, value) =>
-            {
-                settings.EnableDuplicatePersonas = value;
-                ApplyRuntimeSettings(settings, "enable_duplicate_personas");
-                ShowBoolSettingToast(
-                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.label",
-                    value);
-            });
-
-        var enableRandomCloneMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
-            MainFile.ModId,
-            SettingsKey,
-            settings => settings.EnableRandomCloneMode,
-            (settings, value) =>
-            {
-                settings.EnableRandomCloneMode = value;
-                ApplyRuntimeSettings(settings, "enable_random_clone_mode");
-                ShowBoolSettingToast(
-                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_random_clone_mode.label",
                     value);
             });
 
@@ -583,25 +611,11 @@ public static partial class ReAstralPartyModSettingsManager
                     enableExtremeMode,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.description",
                         "If combat is not won by the end of the player-side turn 16, that combat immediately counts as a loss."))
-                .AddToggle(
-                    "enable_duplicate_personas",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.label", "Enable Duplicate Personas"),
-                    enableDuplicatePersonas,
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_duplicate_personas.description",
-                        "Multiple players can choose the same starting persona without conflict."))
-                .AddToggle(
-                    "enable_random_clone_mode",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_random_clone_mode.label", "Enable Random Clone Mode"),
-                    enableRandomCloneMode,
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_random_clone_mode.description",
-                        "Skip starting persona selection and give every player the same random persona. Changes apply to new runs only."))
-                .AddSubpage(
-                    "banned_relics_subpage",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.label", "BAN Personas"),
-                    $"{MainFile.ModId}.banned_relics",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
-                        "Manage content removed from relevant offer pools. Changes apply to new runs only."))
+                .AddCustom(
+                    "starting_persona_mode_selector",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.label",
+                        "Starting Persona Mode"),
+                    BuildStartingPersonaModeSelectorControl)
                 .AddEnumChoice(
                     "token_series_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.label", "Expansion Mode"),
@@ -622,6 +636,17 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.description",
                         "Choose whether runs use two random expansions, all expansions, or no expansion series at all."),
                     ModSettingsChoicePresentation.Dropdown))
+            .AddSection("ban", section => section
+                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.ban.title", "BAN"))
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.ban.description",
+                    "Manage content removed from related offer pools. Changes apply to new runs only."))
+                .AddSubpage(
+                    "banned_relics_subpage",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.label", "BAN Personas"),
+                    $"{MainFile.ModId}.banned_relics",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
+                        "Manage content removed from relevant offer pools. Changes apply to new runs only.")))
             .AddSection("other", section => section
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.other.title", "Other"))
                 .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.other.description",
@@ -902,6 +927,28 @@ public static partial class ReAstralPartyModSettingsManager
         AstralNotificationService.ShowInfo(AstralNotificationModule.Settings, body, title);
     }
 
+    private static void ShowStartingPersonaModeToast(StartingPersonaMode mode)
+    {
+        var title = new LocString("settings_ui",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.label").GetRawText();
+        var bodyKey = mode switch
+        {
+            StartingPersonaMode.Standard =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard",
+            StartingPersonaMode.StandardDuplicate =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate",
+            StartingPersonaMode.RandomAssign =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign",
+            StartingPersonaMode.Clone =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone",
+            StartingPersonaMode.RandomClone =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone",
+            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied"
+        };
+        var body = new LocString("settings_ui", bodyKey).GetRawText();
+        AstralNotificationService.ShowInfo(AstralNotificationModule.Settings, body, title);
+    }
+
     private static void UpdatePersistentSettings(Action<ReAstralPartyModSettings> mutator, string reason)
     {
         try
@@ -927,7 +974,42 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, duplicate_personas={snapshot.EnableDuplicatePersonas}, random_clone_mode={snapshot.EnableRandomCloneMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+    }
+
+    internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
+    {
+        return StartingPersonaMode.Standard;
+    }
+
+    internal static StartingPersonaDisplayMode ResolveDisplayMode(StartingPersonaMode mode)
+    {
+        return mode switch
+        {
+            StartingPersonaMode.RandomAssign => StartingPersonaDisplayMode.Automatic,
+            StartingPersonaMode.RandomClone => StartingPersonaDisplayMode.Automatic,
+            _ => StartingPersonaDisplayMode.Manual
+        };
+    }
+
+    internal static StartingPersonaAssignmentMode ResolveAssignmentMode(StartingPersonaMode mode)
+    {
+        return mode switch
+        {
+            StartingPersonaMode.Clone => StartingPersonaAssignmentMode.Clone,
+            StartingPersonaMode.RandomClone => StartingPersonaAssignmentMode.Clone,
+            _ => StartingPersonaAssignmentMode.Independent
+        };
+    }
+
+    internal static bool ResolveAllowDuplicates(StartingPersonaMode mode)
+    {
+        return mode == StartingPersonaMode.StandardDuplicate;
+    }
+
+    private static Control BuildStartingPersonaModeSelectorControl(IModSettingsUiActionHost host)
+    {
+        return new StartingPersonaModeSelectorControl(host);
     }
 
     private static Control BuildBannedRelicManagerControl(IModSettingsUiActionHost host, BannedRelicCategory category)
@@ -1067,9 +1149,7 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableAllVariantPersonas { get; init; }
 
-        public bool EnableDuplicatePersonas { get; init; }
-
-        public bool EnableRandomCloneMode { get; init; }
+        public StartingPersonaMode StartingPersonaMode { get; init; } = StartingPersonaMode.Standard;
 
         public bool EnablePlayRecommendation { get; init; }
 
@@ -1107,8 +1187,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableExtremeMode = settings.EnableExtremeMode,
                 EnableAllPersonas = settings.EnableAllPersonas,
                 EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
-                EnableDuplicatePersonas = settings.EnableDuplicatePersonas,
-                EnableRandomCloneMode = settings.EnableRandomCloneMode,
+                StartingPersonaMode = ResolveStartingPersonaMode(settings),
                 EnablePlayRecommendation = settings.EnablePlayRecommendation,
                 EnableRouteRecommendation = settings.EnableRouteRecommendation,
                 EnableTokenRecommendation = settings.EnableTokenRecommendation,
@@ -1414,11 +1493,15 @@ public static partial class ReAstralPartyModSettingsManager
             footer.AddChild(new Button
             {
                 Text = new LocString("settings_ui",
-                    "RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.clear_all").GetRawText()
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.ban_all").GetRawText()
             });
             ((Button)footer.GetChild(0)).Pressed += () =>
             {
-                UpdateBannedRelicIds(Array.Empty<ModelId>());
+                var updated = new HashSet<ModelId>(BannedRelicIds);
+                foreach (var relic in BannedRelicRegistry.GetCanonicalRelics(_category))
+                    updated.Add(relic.CanonicalInstance?.Id ?? relic.Id);
+
+                UpdateBannedRelicIds(updated);
                 RefreshLists();
                 NotifyChanged();
             };
@@ -1426,11 +1509,15 @@ public static partial class ReAstralPartyModSettingsManager
             footer.AddChild(new Button
             {
                 Text = new LocString("settings_ui",
-                    "RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.reset_default").GetRawText()
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.clear_all").GetRawText()
             });
             ((Button)footer.GetChild(1)).Pressed += () =>
             {
-                UpdateBannedRelicIds(Array.Empty<ModelId>());
+                var updated = new HashSet<ModelId>(BannedRelicIds);
+                foreach (var relic in BannedRelicRegistry.GetCanonicalRelics(_category))
+                    updated.Remove(relic.CanonicalInstance?.Id ?? relic.Id);
+
+                UpdateBannedRelicIds(updated);
                 RefreshLists();
                 NotifyChanged();
             };
@@ -1577,6 +1664,131 @@ public static partial class ReAstralPartyModSettingsManager
             }
 
             _host.RequestRefresh();
+        }
+    }
+
+    private sealed partial class StartingPersonaModeSelectorControl : VBoxContainer
+    {
+        private readonly IModSettingsUiActionHost _host;
+        private readonly Dictionary<StartingPersonaMode, Button> _buttons = new();
+
+        public StartingPersonaModeSelectorControl(IModSettingsUiActionHost host)
+        {
+            _host = host;
+            SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            MouseFilter = MouseFilterEnum.Ignore;
+            AddThemeConstantOverride("separation", 10);
+
+            var intro = new Label
+            {
+                Text = new LocString("settings_ui",
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.description").GetRawText(),
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            AddChild(intro);
+
+            foreach (var mode in GetOrderedModes())
+            {
+                var card = new PanelContainer
+                {
+                    SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                    MouseFilter = MouseFilterEnum.Pass
+                };
+                AddChild(card);
+
+                var box = new VBoxContainer
+                {
+                    MouseFilter = MouseFilterEnum.Ignore
+                };
+                box.AddThemeConstantOverride("separation", 4);
+                card.AddChild(box);
+
+                var button = new Button
+                {
+                    Text = GetModeTitle(mode),
+                    Alignment = HorizontalAlignment.Left,
+                    SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                    MouseFilter = MouseFilterEnum.Stop
+                };
+                button.Pressed += () => SelectMode(mode);
+                box.AddChild(button);
+                _buttons[mode] = button;
+
+                box.AddChild(new Label
+                {
+                    Text = GetModeDescription(mode),
+                    AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                    MouseFilter = MouseFilterEnum.Ignore
+                });
+            }
+
+            RefreshVisuals();
+        }
+
+        private void SelectMode(StartingPersonaMode mode)
+        {
+            UpdatePersistentSettings(settings =>
+            {
+                settings.StartingPersonaMode = mode;
+                settings.EnableDuplicatePersonas = null;
+                settings.EnableRandomCloneMode = null;
+                settings.StartingPersonaDisplayMode = null;
+                settings.StartingPersonaAssignmentMode = null;
+            }, "starting_persona_mode");
+
+            ShowStartingPersonaModeToast(mode);
+            RefreshVisuals();
+            _host.RequestRefresh();
+        }
+
+        private void RefreshVisuals()
+        {
+            var currentMode = ConfiguredStartingPersonaMode;
+            foreach (var (mode, button) in _buttons)
+            {
+                button.Disabled = mode == currentMode;
+                button.Modulate = mode == currentMode
+                    ? new Color(1f, 0.92f, 0.52f, 1f)
+                    : Colors.White;
+            }
+        }
+
+        private static IEnumerable<StartingPersonaMode> GetOrderedModes()
+        {
+            yield return StartingPersonaMode.Standard;
+            yield return StartingPersonaMode.StandardDuplicate;
+            yield return StartingPersonaMode.RandomAssign;
+            yield return StartingPersonaMode.Clone;
+            yield return StartingPersonaMode.RandomClone;
+        }
+
+        private static string GetModeTitle(StartingPersonaMode mode)
+        {
+            var key = mode switch
+            {
+                StartingPersonaMode.Standard => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard",
+                StartingPersonaMode.StandardDuplicate => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate",
+                StartingPersonaMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign",
+                StartingPersonaMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone",
+                StartingPersonaMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone",
+                _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard"
+            };
+            return new LocString("settings_ui", key).GetRawText();
+        }
+
+        private static string GetModeDescription(StartingPersonaMode mode)
+        {
+            var key = mode switch
+            {
+                StartingPersonaMode.Standard => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description",
+                StartingPersonaMode.StandardDuplicate => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate.description",
+                StartingPersonaMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign.description",
+                StartingPersonaMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone.description",
+                StartingPersonaMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone.description",
+                _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description"
+            };
+            return new LocString("settings_ui", key).GetRawText();
         }
     }
 }
