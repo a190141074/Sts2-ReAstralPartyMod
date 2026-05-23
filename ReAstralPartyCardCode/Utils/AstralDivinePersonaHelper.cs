@@ -159,6 +159,6 @@ internal static class AstralDivinePersonaHelper
         sara.QueuePendingShatterStarExtraTurn();
         MainFile.Logger.Info(
             $"[AstralDivine] Queued Sara extra turn from Shatter Star kill for current combat | owner={owner.NetId} | pending={sara.GetPendingExtraTurnCount()}");
-        await Task.CompletedTask;
+        await AstralMoveAgainDisplayHelper.Sync(owner);
     }
 }

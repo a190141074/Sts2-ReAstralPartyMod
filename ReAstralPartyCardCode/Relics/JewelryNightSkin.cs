@@ -87,7 +87,11 @@ public class JewelryNightSkin : AstralPartyRelicModel
 
         AstralParty_JewelryNightSkinPendingExtraTurnCount--;
         if (AstralParty_JewelryNightSkinPendingExtraTurnCount < 0)
+        {
             AstralParty_JewelryNightSkinPendingExtraTurnCount = 0;
+            MainFile.Logger.Warn(
+                $"[JewelryNightSkin] Pending fallback extra turn count dropped below zero during consumption | owner={Owner?.NetId}");
+        }
         await AstralMoveAgainDisplayHelper.Sync(Owner);
         MainFile.Logger.Info($"[JewelryNightSkin] Pending fallback extra turn consumed | owner={Owner?.NetId} | remaining={AstralParty_JewelryNightSkinPendingExtraTurnCount}");
     }
