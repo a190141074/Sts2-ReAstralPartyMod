@@ -21,11 +21,6 @@ internal static class AstralDivinePersonaHelper
 {
     private const int SaraChargeThreshold = 7;
     private const decimal DivinePowerAmount = 1m;
-    private const string ExtraTurnDiagnosticStage = "额外回合";
-    private const string ShatterStarExtraTurnReason = "断星击杀";
-
-    private static readonly MethodInfo? GainTurnMethod = ResolveExtraTurnMethod();
-
     public static IReadOnlyList<Player> GetStablePlayers(Player owner)
     {
         return PersonaMultiplayerEffectHelper.GetStableCombatPlayers(owner);
@@ -159,91 +154,11 @@ internal static class AstralDivinePersonaHelper
         }
     }
 
-    public static bool TryGetOwnerCreature(AbstractModel? source, out Creature? creature)
-    {
-        creature = source switch
-        {
-            CardModel card => card.Owner?.Creature,
-            RelicModel relic => relic.Owner?.Creature,
-            PowerModel power => power.Owner,
-            _ => null
-        };
-        return creature != null;
-    }
-
-    public static async Task<bool> TryGrantExtraTurn(Player owner, AbstractModel? source, string reason)
-    {
-        if (GainTurnMethod == null)
-        {
-            MainFile.Logger.Warn($"[AstralDivine] Extra turn unavailable for {reason}; no stable game entry found.");
-            AstralNotificationService.ShowDiagnosticWarning(
-                AstralNotificationModule.Multiplayer,
-                AstralNotificationArea.Gameplay,
-                201,
-                $"当前版本未找到稳定的原版额外回合入口，已跳过【再动】。原因：{reason}",
-                ExtraTurnDiagnosticStage);
-            return false;
-        }
-
-        try
-        {
-            var parameters = GainTurnMethod.GetParameters();
-            object?[] args = parameters.Length switch
-            {
-                1 => [owner],
-                2 => [owner, TryGetOwnerCreature(source, out var creature) ? creature : owner.Creature],
-                _ => [owner]
-            };
-
-            var result = GainTurnMethod.Invoke(null, args);
-            if (result is Task task)
-                await task;
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            MainFile.Logger.Warn($"[AstralDivine] Failed to request extra turn for {reason}: {ex}");
-            AstralNotificationService.ShowDiagnosticWarning(
-                AstralNotificationModule.Multiplayer,
-                AstralNotificationArea.Gameplay,
-                202,
-                $"原版额外回合入口调用失败，已跳过【再动】。原因：{reason}",
-                ExtraTurnDiagnosticStage);
-            return false;
-        }
-    }
-
     public static async Task HandleShatterStarKillExtraTurn(Player owner, VariantPersonSara sara, AbstractModel? source)
     {
-        if (CombatManager.Instance.IsOverOrEnding)
-        {
-            var queued = sara.TryQueuePendingShatterStarExtraTurn();
-            MainFile.Logger.Info(
-                $"[AstralDivine] Shatter Star extra turn deferred through Sara pending hook | owner={owner.NetId} | queued={queued}");
-            return;
-        }
-
-        var granted = await TryGrantExtraTurn(owner, source, ShatterStarExtraTurnReason);
+        sara.QueuePendingShatterStarExtraTurn();
         MainFile.Logger.Info(
-            $"[AstralDivine] Shatter Star extra turn immediate result | owner={owner.NetId} | granted={granted}");
-    }
-
-    private static MethodInfo? ResolveExtraTurnMethod()
-    {
-        var playerCmdType = typeof(PlayerCmd);
-        return playerCmdType
-            .GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
-            .FirstOrDefault(method =>
-            {
-                if (!method.Name.Contains("Turn", StringComparison.OrdinalIgnoreCase))
-                    return false;
-                if (!method.Name.Contains("Extra", StringComparison.OrdinalIgnoreCase)
-                    && !method.Name.Contains("Bonus", StringComparison.OrdinalIgnoreCase))
-                    return false;
-
-                var parameters = method.GetParameters();
-                return parameters.Length >= 1 && parameters[0].ParameterType == typeof(Player);
-            });
+            $"[AstralDivine] Queued Sara extra turn from Shatter Star kill for current combat | owner={owner.NetId} | pending={sara.GetPendingExtraTurnCount()}");
+        await Task.CompletedTask;
     }
 }

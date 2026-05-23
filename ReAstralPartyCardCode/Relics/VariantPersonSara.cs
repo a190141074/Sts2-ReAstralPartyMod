@@ -31,6 +31,9 @@ public class VariantPersonSara : CooldownPersonaRelicBase
     [SavedProperty] public bool AstralParty_VariantPersonSaraTriggeredExtraTurnThisTurn { get; set; }
     [SavedProperty] public int AstralParty_VariantPersonSaraLastProcessedRound { get; set; }
     [SavedProperty] public int AstralParty_VariantPersonSaraPendingExtraTurnCount { get; set; }
+    [SavedProperty] public int AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount { get; set; }
+    [SavedProperty] public int AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount { get; set; }
+    [SavedProperty] public int AstralParty_VariantPersonSaraPendingShatterStarFallbackCount { get; set; }
 
     protected override int CounterValue
     {
@@ -66,6 +69,9 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         AstralParty_VariantPersonSaraTriggeredExtraTurnThisTurn = false;
         AstralParty_VariantPersonSaraLastProcessedRound = 0;
         AstralParty_VariantPersonSaraPendingExtraTurnCount = 0;
+        AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount = 0;
+        AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount = 0;
+        AstralParty_VariantPersonSaraPendingShatterStarFallbackCount = 0;
         await AstralDivinePersonaHelper.EnsureDivineThrone(Owner);
         await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner!, 0);
         await AstralMoveAgainDisplayHelper.Sync(Owner);
@@ -75,6 +81,16 @@ public class VariantPersonSara : CooldownPersonaRelicBase
     {
         AstralParty_VariantPersonSaraTriggeredExtraTurnThisTurn = false;
         AstralParty_VariantPersonSaraLastProcessedRound = 0;
+        AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount = 0;
+        if (AstralParty_VariantPersonSaraPendingShatterStarFallbackCount > 0)
+        {
+            var fallbackCount = AstralParty_VariantPersonSaraPendingShatterStarFallbackCount;
+            AstralParty_VariantPersonSaraPendingShatterStarFallbackCount = 0;
+            AstralParty_VariantPersonSaraPendingExtraTurnCount += fallbackCount;
+            AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount += fallbackCount;
+            MainFile.Logger.Info(
+                $"[VariantPersonSara] Restored Shatter Star fallback extra turn for next combat | owner={Owner?.NetId} | restored={fallbackCount} | pending={AstralParty_VariantPersonSaraPendingExtraTurnCount}");
+        }
         if (Owner != null)
         {
             await AstralDivinePersonaHelper.EnsureDivineThrone(Owner);
@@ -125,14 +141,9 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         AstralParty_VariantPersonSaraLastProcessedRound = roundNumber;
         AstralParty_VariantPersonSaraCharge = 0;
         await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, 0);
-        await PlayerCmd.GainEnergy(2m, Owner);
-        if (CombatManager.Instance.IsOverOrEnding)
-        {
-            QueuePendingExtraTurn();
-            return;
-        }
-
-        await AstralDivinePersonaHelper.TryGrantExtraTurn(Owner, this, "萨拉21充能回合结束");
+        QueuePendingExtraTurn(grantEnergyOnExtraTurnStart: true);
+        MainFile.Logger.Info(
+            $"[VariantPersonSara] Queued Sara extra turn from 21 charge | owner={Owner?.NetId} | pending={AstralParty_VariantPersonSaraPendingExtraTurnCount} | pendingEnergy={AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount}");
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -141,7 +152,15 @@ public class VariantPersonSara : CooldownPersonaRelicBase
             return;
 
         AstralParty_VariantPersonSaraTriggeredExtraTurnThisTurn = false;
-        await Task.CompletedTask;
+        if (AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount > 0)
+        {
+            AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount--;
+            if (AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount < 0)
+                AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount = 0;
+            await PlayerCmd.GainEnergy(2m, Owner);
+            MainFile.Logger.Info(
+                $"[VariantPersonSara] Granted 2 energy at extra turn start | owner={Owner?.NetId} | remainingPendingEnergy={AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount}");
+        }
     }
 
     public override async Task AfterCombatEnd(CombatRoom room)
@@ -149,6 +168,18 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         await base.AfterCombatEnd(room);
         AstralParty_VariantPersonSaraTriggeredExtraTurnThisTurn = false;
         AstralParty_VariantPersonSaraLastProcessedRound = 0;
+        if (AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount > 0)
+        {
+            var fallbackCount = Math.Min(AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount,
+                AstralParty_VariantPersonSaraPendingExtraTurnCount);
+            AstralParty_VariantPersonSaraPendingShatterStarFallbackCount += fallbackCount;
+            AstralParty_VariantPersonSaraPendingExtraTurnCount -= fallbackCount;
+            if (AstralParty_VariantPersonSaraPendingExtraTurnCount < 0)
+                AstralParty_VariantPersonSaraPendingExtraTurnCount = 0;
+            MainFile.Logger.Info(
+                $"[VariantPersonSara] Converted unresolved Shatter Star extra turn to fallback after combat end | owner={Owner?.NetId} | fallbackAdded={fallbackCount} | remainingPending={AstralParty_VariantPersonSaraPendingExtraTurnCount} | fallbackTotal={AstralParty_VariantPersonSaraPendingShatterStarFallbackCount}");
+        }
+        AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount = 0;
         if (Owner != null)
         {
             await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, AstralParty_VariantPersonSaraCharge);
@@ -189,23 +220,29 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         AstralParty_VariantPersonSaraPendingExtraTurnCount--;
         if (AstralParty_VariantPersonSaraPendingExtraTurnCount < 0)
             AstralParty_VariantPersonSaraPendingExtraTurnCount = 0;
+        if (AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount > 0)
+        {
+            AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount--;
+            if (AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount < 0)
+                AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount = 0;
+        }
         await AstralMoveAgainDisplayHelper.Sync(Owner);
         MainFile.Logger.Info(
-            $"[VariantPersonSara] Pending extra turn consumed | owner={Owner?.NetId} | remaining={AstralParty_VariantPersonSaraPendingExtraTurnCount}");
+            $"[VariantPersonSara] Pending extra turn consumed | owner={Owner?.NetId} | remaining={AstralParty_VariantPersonSaraPendingExtraTurnCount} | pendingEnergy={AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount} | pendingShatterThisCombat={AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount} | pendingShatterFallback={AstralParty_VariantPersonSaraPendingShatterStarFallbackCount}");
     }
 
-    public bool TryQueuePendingShatterStarExtraTurn()
-    {
-        if (AstralParty_VariantPersonSaraPendingExtraTurnCount > 0)
-            return false;
-
-        QueuePendingExtraTurn();
-        return true;
-    }
-
-    public void QueuePendingExtraTurn()
+    public void QueuePendingExtraTurn(bool grantEnergyOnExtraTurnStart = false)
     {
         AstralParty_VariantPersonSaraPendingExtraTurnCount++;
+        if (grantEnergyOnExtraTurnStart)
+            AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount++;
+        _ = AstralMoveAgainDisplayHelper.Sync(Owner);
+    }
+
+    public void QueuePendingShatterStarExtraTurn()
+    {
+        AstralParty_VariantPersonSaraPendingExtraTurnCount++;
+        AstralParty_VariantPersonSaraPendingShatterStarThisCombatCount++;
         _ = AstralMoveAgainDisplayHelper.Sync(Owner);
     }
 

@@ -31,7 +31,7 @@ public class SkillShatterStar : AstralPartyCardModel
         .. HoverTipFactory.FromRelic<PersonalityDerivativeDivineThrone>()
     ];
 
-    public SkillShatterStar() : base(2, CardType.Attack, CardRarity.Ancient, TargetType.AnyEnemy)
+    public SkillShatterStar() : base(2, CardType.Skill, CardRarity.Ancient, TargetType.AnyEnemy)
     {
     }
 

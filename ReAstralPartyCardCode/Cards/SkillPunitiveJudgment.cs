@@ -37,7 +37,7 @@ public class SkillPunitiveJudgment : AstralPartyCardModel
         HoverTipFactory.FromPower<RageOfFirePower>()
     ];
 
-    public SkillPunitiveJudgment() : base(2, CardType.Attack, CardRarity.Ancient, TargetType.AnyEnemy)
+    public SkillPunitiveJudgment() : base(2, CardType.Skill, CardRarity.Ancient, TargetType.AnyEnemy)
     {
     }
 
