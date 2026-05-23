@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Multiplayer.Game.Lobby;
 using MegaCrit.Sts2.Core.Nodes.HoverTips;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -59,8 +61,6 @@ internal static class CharacterSelectGameplayPreviewReadyPatch
             return;
 
         LobbyGameplaySettingsSync.Register();
-        if (!LobbyGameplaySettingsSync.TryGetSnapshot(out _))
-            LobbyGameplaySettingsSync.InitializeFromPersistent(ReAstralPartyModSettingsManager.ReadLocalSettings());
 
         var preview = new CharacterSelectGameplayPreviewPanel
         {
@@ -108,12 +108,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private OptionButton? _tokenSeriesModeOption;
     private Label? _footerLabel;
     private Label? _stateLabel;
+    private Godot.Timer? _refreshTimer;
     private bool _dragging;
     private Vector2 _dragPointerOffset;
     private bool _suppressUiEvents;
     private bool _handlersBound;
     private LobbyGameplayNetRole _lastKnownRole = LobbyGameplayNetRole.Pending;
     private INetGameService? _lastObservedNetService;
+    private StartRunLobby? _lastObservedLobby;
     private double _syncPollAccumulator;
     private double _requestRetryAccumulator;
     private double _secondsSinceSnapshotUpdate;
@@ -137,22 +139,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     public override void _Ready()
     {
         BuildUi();
+        BuildRefreshTimer();
         LobbyGameplaySettingsSync.SnapshotChanged += OnSnapshotChanged;
         _handlersBound = true;
-        RefreshFromCurrentState();
-    }
-
-    public override void _Process(double delta)
-    {
-        _syncPollAccumulator += delta;
-        _requestRetryAccumulator += delta;
-        _secondsSinceSnapshotUpdate += delta;
-
-        if (_syncPollAccumulator < 0.25d)
-            return;
-
-        _syncPollAccumulator = 0d;
         RefreshLobbySyncState();
+        RefreshFromCurrentState();
     }
 
     public override void _ExitTree()
@@ -258,6 +249,19 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         _footerLabel.AddThemeColorOverride("font_color", new Color(0.92f, 0.91f, 0.84f, 0.82f));
         _footerLabel.AddThemeFontSizeOverride("font_size", 15);
         body.AddChild(_footerLabel);
+    }
+
+    private void BuildRefreshTimer()
+    {
+        _refreshTimer = new Godot.Timer
+        {
+            WaitTime = 0.25d,
+            Autostart = true,
+            OneShot = false,
+            ProcessCallback = Godot.Timer.TimerProcessCallback.Idle
+        };
+        _refreshTimer.Timeout += OnRefreshTimerTimeout;
+        AddChild(_refreshTimer);
     }
 
     private Control BuildTitleBar()
@@ -486,18 +490,33 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void RefreshFromCurrentState()
     {
+        var role = GetCurrentRoleForUi();
         var snapshot = LobbyGameplaySettingsSync.TryGetSnapshot(out var current)
             ? current
-            : LobbyGameplaySettingsSync.BuildFallbackSnapshot();
+            : role == LobbyGameplayNetRole.Host
+                ? LobbyGameplaySettingsSync.BuildFallbackSnapshot()
+                : LobbyGameplaySettingsSync.BuildDefaultSnapshot();
         ApplySnapshotToUi(snapshot);
     }
 
     private void RefreshLobbySyncState()
     {
-        var netService = RunManager.Instance?.NetService;
-        var role = LobbyGameplayNetRoleHelper.GetCurrentRole(netService);
+        _requestRetryAccumulator += 0.25d;
+        _secondsSinceSnapshotUpdate += 0.25d;
+        var lobby = GetCharacterSelectLobby();
+        var netService = lobby?.NetService ?? RunManager.Instance?.NetService;
+        var role = LobbyGameplayNetRoleHelper.GetCurrentRole(lobby);
+        var lobbyChanged = !ReferenceEquals(_lastObservedLobby, lobby);
         var netServiceChanged = !ReferenceEquals(_lastObservedNetService, netService);
         var roleChanged = role != _lastKnownRole;
+
+        if (lobbyChanged)
+        {
+            _lastObservedLobby = lobby;
+            _initialRoleSyncPerformed = false;
+            _requestRetryAccumulator = 0d;
+            MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview observed lobby change; role={role} hostNetId={LobbyGameplayNetRoleHelper.GetHostNetId(lobby)} localNetId={lobby?.LocalPlayer.id ?? 0UL} players={lobby?.Players.Count ?? 0}.");
+        }
 
         if (netServiceChanged)
         {
@@ -535,7 +554,10 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         if (role == LobbyGameplayNetRole.Host)
         {
             if (!LobbyGameplaySettingsSync.TryGetSnapshot(out _))
+            {
                 LobbyGameplaySettingsSync.InitializeFromPersistent(ReAstralPartyModSettingsManager.ReadLocalSettings());
+                MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview initialized authoritative host snapshot from persistent settings.");
+            }
 
             if (!_initialRoleSyncPerformed)
             {
@@ -577,7 +599,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         _suppressUiEvents = true;
         try
         {
-            var role = LobbyGameplayNetRoleHelper.GetCurrentRole();
+            var role = GetCurrentRoleForUi();
             var isEditable = IsEditableByLocalPlayer(role);
             if (_allPersonasToggle != null)
             {
@@ -641,7 +663,41 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private static bool IsEditableByLocalPlayer(LobbyGameplayNetRole role)
     {
-        return role is LobbyGameplayNetRole.Host or LobbyGameplayNetRole.Singleplayer;
+        return role == LobbyGameplayNetRole.Host;
+    }
+
+    private LobbyGameplayNetRole GetCurrentRoleForUi()
+    {
+        return _lastObservedLobby != null
+            ? LobbyGameplayNetRoleHelper.GetCurrentRole(_lastObservedLobby)
+            : LobbyGameplayNetRoleHelper.GetCurrentRole(_lastObservedNetService);
+    }
+
+    private StartRunLobby? GetCharacterSelectLobby()
+    {
+        var current = GetParent();
+        while (current != null)
+        {
+            var lobbyProperty = current.GetType().GetProperty(
+                "Lobby",
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (lobbyProperty != null && typeof(StartRunLobby).IsAssignableFrom(lobbyProperty.PropertyType))
+            {
+                try
+                {
+                    if (lobbyProperty.GetValue(current) is StartRunLobby lobby)
+                        return lobby;
+                }
+                catch
+                {
+                    // Ignore and keep walking the parent chain.
+                }
+            }
+
+            current = current.GetParent();
+        }
+
+        return null;
     }
 
     private void OnSnapshotChanged(LobbyGameplaySettingsSnapshot snapshot)
@@ -671,7 +727,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void OnEnableAllPersonasToggled(bool value)
     {
-        if (_suppressUiEvents || !IsEditableByLocalPlayer(LobbyGameplayNetRoleHelper.GetCurrentRole()))
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableAllPersonas = value);
@@ -680,7 +736,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void OnEnableAllVariantPersonasToggled(bool value)
     {
-        if (_suppressUiEvents || !IsEditableByLocalPlayer(LobbyGameplayNetRoleHelper.GetCurrentRole()))
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableAllVariantPersonas = value);
@@ -689,7 +745,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void OnEnableExtremeModeToggled(bool value)
     {
-        if (_suppressUiEvents || !IsEditableByLocalPlayer(LobbyGameplayNetRoleHelper.GetCurrentRole()))
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableExtremeMode = value);
@@ -698,7 +754,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void OnStartingPersonaModeSelected(long selectedIndex)
     {
-        if (_suppressUiEvents || !IsEditableByLocalPlayer(LobbyGameplayNetRoleHelper.GetCurrentRole()))
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
             return;
 
         if (selectedIndex < 0 || selectedIndex >= StartingPersonaModes.Length)
@@ -711,7 +767,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void OnTokenSeriesModeSelected(long selectedIndex)
     {
-        if (_suppressUiEvents || !IsEditableByLocalPlayer(LobbyGameplayNetRoleHelper.GetCurrentRole()))
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
             return;
 
         if (selectedIndex < 0 || selectedIndex >= TokenSeriesModes.Length)
@@ -747,6 +803,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private static string GetText(string key)
     {
         return new LocString("settings_ui", key).GetRawText();
+    }
+
+    private void OnRefreshTimerTimeout()
+    {
+        RefreshLobbySyncState();
     }
 
     private void OnTitleBarGuiInput(InputEvent @event)

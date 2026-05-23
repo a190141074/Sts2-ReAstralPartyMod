@@ -1241,6 +1241,9 @@ public static partial class ReAstralPartyModSettingsManager
         if (netService == null)
             return false;
 
+        if (LobbyGameplaySettingsSync.IsRunStartPending)
+            return false;
+
         if (netService.Type != NetGameType.Host)
             return false;
 

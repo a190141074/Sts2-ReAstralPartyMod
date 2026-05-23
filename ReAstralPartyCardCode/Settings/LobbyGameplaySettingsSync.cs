@@ -1,5 +1,6 @@
 using System;
 using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Multiplayer.Game.Lobby;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Multiplayer.Messages.Game;
 using MegaCrit.Sts2.Core.Multiplayer.Serialization;
@@ -18,6 +19,19 @@ internal enum LobbyGameplayNetRole
 
 internal static class LobbyGameplayNetRoleHelper
 {
+    public static LobbyGameplayNetRole GetCurrentRole(StartRunLobby? lobby)
+    {
+        if (lobby == null)
+            return GetCurrentRole();
+
+        var hostNetId = GetHostNetId(lobby);
+        var localNetId = lobby.LocalPlayer.id;
+        if (hostNetId != 0UL && localNetId != 0UL)
+            return localNetId == hostNetId ? LobbyGameplayNetRole.Host : LobbyGameplayNetRole.Client;
+
+        return GetCurrentRole(lobby.NetService);
+    }
+
     public static LobbyGameplayNetRole GetCurrentRole(INetGameService? netService = null)
     {
         netService ??= RunManager.Instance?.NetService;
@@ -31,6 +45,25 @@ internal static class LobbyGameplayNetRoleHelper
             NetGameType.Client => LobbyGameplayNetRole.Client,
             _ => LobbyGameplayNetRole.Pending
         };
+    }
+
+    public static ulong GetHostNetId(StartRunLobby? lobby)
+    {
+        if (lobby == null)
+            return GetHostNetId();
+
+        var players = lobby.Players;
+        if (players is { Count: > 0 })
+        {
+            var hostPlayer = players
+                .OrderBy(static player => player.slotId)
+                .ThenBy(static player => player.id)
+                .FirstOrDefault();
+            if (hostPlayer.id != 0UL)
+                return hostPlayer.id;
+        }
+
+        return GetHostNetId(lobby.NetService);
     }
 
     public static ulong GetHostNetId(INetGameService? netService = null)
@@ -126,6 +159,11 @@ internal static class LobbyGameplaySettingsSync
     public static void InitializeFromPersistent(ReAstralPartyModSettings settings)
     {
         SetSnapshotInternal(LobbyGameplaySettingsSnapshot.FromPersistent(settings), "initialize_from_persistent", false);
+    }
+
+    public static LobbyGameplaySettingsSnapshot BuildDefaultSnapshot()
+    {
+        return new LobbyGameplaySettingsSnapshot();
     }
 
     public static LobbyGameplaySettingsSnapshot BuildFallbackSnapshot()
