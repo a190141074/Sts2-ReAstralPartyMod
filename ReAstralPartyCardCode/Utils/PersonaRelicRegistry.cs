@@ -42,7 +42,7 @@ public static class PersonaRelicRegistry
     public static IReadOnlyList<RelicModel> GetCanonicalPersonaRelicsFiltered(
         IReadOnlySet<ModelId>? bannedPersonaRelicIds)
     {
-        return FilterBannedPersonaRelics(PersonaRelics, bannedPersonaRelicIds);
+        return FilterBannedRelics(PersonaRelics, bannedPersonaRelicIds);
     }
 
     public static IReadOnlyList<RelicModel> GetCanonicalVariantPersonaRelics()
@@ -98,16 +98,14 @@ public static class PersonaRelicRegistry
             .ToList();
     }
 
-    private static IReadOnlyList<RelicModel> FilterBannedPersonaRelics(
+    private static IReadOnlyList<RelicModel> FilterBannedRelics(
         IReadOnlyList<RelicModel> source,
         IReadOnlySet<ModelId>? bannedPersonaRelicIds)
     {
         if (bannedPersonaRelicIds == null || bannedPersonaRelicIds.Count == 0)
             return source;
 
-        var filtered = source
-            .Where(relic => !bannedPersonaRelicIds.Contains(relic.CanonicalInstance?.Id ?? relic.Id))
-            .ToList();
+        var filtered = BannedRelicRegistry.FilterBannedRelics(source, bannedPersonaRelicIds);
 
         return filtered.Count > 0 ? filtered : source;
     }

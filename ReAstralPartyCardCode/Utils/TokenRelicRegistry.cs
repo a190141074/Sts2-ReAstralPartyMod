@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Relics;
 using MegaCrit.Sts2.Core.Random;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -130,7 +131,9 @@ public static class TokenRelicRegistry
 
     public static IReadOnlyList<RelicModel> GetCanonicalTokenRelics()
     {
-        return CanonicalTokenRelics;
+        return BannedRelicRegistry.FilterBannedRelics(
+            CanonicalTokenRelics,
+            ReAstralPartyModSettingsManager.BannedRelicIds);
     }
 
     public static IReadOnlyList<RelicModel> GetTokenRelicsByRarity(RelicRarity rarity)
@@ -152,6 +155,9 @@ public static class TokenRelicRegistry
             .Where(IsTokenRelicPoolCandidate)
             .Where(relic => !excludeDice || !DiceSeriesHelper.IsDiceSeriesRelic(relic))
             .Where(relic => TokenSeriesAvailabilityHelper.IsRelicAvailableForRun(runState, relic))
+            .Where(relic => !BannedRelicRegistry.IsBanned(
+                ReAstralPartyModSettingsManager.GetBannedRelicIds(runState),
+                relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
     }
@@ -215,7 +221,8 @@ public static class TokenRelicRegistry
 
     public static bool IsRelicAvailableForRun(IRunState? runState, RelicModel relic)
     {
-        return TokenSeriesAvailabilityHelper.IsRelicAvailableForRun(runState, relic);
+        return TokenSeriesAvailabilityHelper.IsRelicAvailableForRun(runState, relic)
+               && !BannedRelicRegistry.IsBanned(ReAstralPartyModSettingsManager.GetBannedRelicIds(runState), relic);
     }
 
     private static IReadOnlyList<RelicModel> GetFallbackCandidates(IRunState? runState, RelicRarity rolledRarity)
@@ -229,6 +236,9 @@ public static class TokenRelicRegistry
 
         return TokenSeriesAvailabilityHelper.FilterAvailableForRun(runState, GetCanonicalTokenRelics())
             .Where(IsTokenRelicPoolCandidate)
+            .Where(relic => !BannedRelicRegistry.IsBanned(
+                ReAstralPartyModSettingsManager.GetBannedRelicIds(runState),
+                relic))
             .ToList();
     }
 
