@@ -27,7 +27,7 @@ public class ReadyToStrikePower : AstralPartyPowerModel
 
     private const decimal InitialTemporaryStrengthAmount = 2m;
     private const decimal DrawnAttackTemporaryStrengthAmount = 1m;
-    private const decimal DrawnNonAttackVigorAmount = 1m;
+    private const decimal DrawnOtherCardTypeVigorAmount = 1m;
 
     private sealed class Data
     {
@@ -145,7 +145,9 @@ public class ReadyToStrikePower : AstralPartyPowerModel
                 return;
             }
 
-            await PowerCmd.Apply<VigorPower>(Owner, DrawnNonAttackVigorAmount, Owner, card, false);
+            if (card.Type != CardType.Skill)
+                await PowerCmd.Apply<VigorPower>(Owner, DrawnOtherCardTypeVigorAmount, Owner, card, false);
+
             UpdateStatusDisplay(GetDesiredTemporaryStrength(), GetCurrentVigorAmount());
             await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Bottom, this);
         }

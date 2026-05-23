@@ -50,6 +50,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private readonly IReadOnlyList<RelicModel> _relicOptions;
     private readonly StartingPersonaDisplayMode _displayMode;
     private readonly StartingPersonaAssignmentMode _assignmentMode;
+    private readonly bool _allowDuplicates;
     private readonly int _automaticSelectionCountdownSeconds;
     private readonly List<Player> _orderedPlayers;
     private readonly Dictionary<ulong, PlayerSelectionState> _selectionStates = new();
@@ -92,6 +93,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         _relicOptions = relicOptions;
         _displayMode = displayMode;
         _assignmentMode = assignmentMode;
+        _allowDuplicates = ReAstralPartyModSettingsManager.ResolveAllowDuplicates(
+            ReAstralPartyModSettingsManager.GetStartingPersonaMode(runState));
         _automaticSelectionCountdownSeconds = automaticSelectionCountdownSeconds;
         _orderedPlayers = runState.Players
             .OrderBy(static player => player.NetId)
@@ -506,7 +509,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (_assignmentMode == StartingPersonaAssignmentMode.Clone)
             return ResolveCloneSelectionResults();
 
-        if (ReAstralPartyModSettingsManager.GetEnableDuplicatePersonas(_runState))
+        if (_allowDuplicates)
             return ResolveSelectionResultsAllowingDuplicates();
 
         var votesByRelic = _relicOptions.ToDictionary(relic => relic.Id, _ => new List<Player>());

@@ -45,6 +45,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
     private static async Task RunAfterStartRun(Task originalTask, RunState runState)
     {
         await originalTask;
+        LobbyGameplaySettingsSync.MarkRunStarting();
         LogInfo("P002",
             $"Starting persona relic selection patch entered: seed={runState.Rng.StringSeed} players={runState.Players.Count}.");
         if (!AstralNetPhaseGuard.Guard(AstralNetPhase.StartRunBootstrap, "starting persona selection bootstrap"))
@@ -272,11 +273,29 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
     private static IReadOnlyList<RelicModel> CreateAutomaticStartingPersonaRelicOptions(RunState runState, int playerCount)
     {
-        var targetCount = Math.Max(1, playerCount);
         var pool = CreateAutomaticStartingPersonaPool(runState);
         if (pool.Count == 0)
             return [];
 
+        var uniquePool = new List<RelicModel>();
+        var uniquePoolIds = new HashSet<ModelId>();
+        foreach (var relic in pool)
+        {
+            var canonicalId = relic.CanonicalInstance?.Id ?? relic.Id;
+            if (!uniquePoolIds.Add(canonicalId))
+                continue;
+
+            uniquePool.Add(relic);
+        }
+
+        if (ReAstralPartyModSettingsManager.GetEnableAllPersonas(runState))
+        {
+            LogInfo("P027",
+                $"Starting persona automatic all-personas mode applied: uniqueOptions={uniquePool.Count} players={playerCount}.");
+            return uniquePool;
+        }
+
+        var targetCount = Math.Max(playerCount * 2 + 2, playerCount);
         var options = new List<RelicModel>(targetCount);
         var selectedIds = new HashSet<ModelId>();
 
@@ -295,7 +314,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             return options;
 
         LogWarn("P026",
-            $"Starting persona automatic mode had fewer unique options than players: unique={options.Count} target={targetCount}. Deterministic duplicates will be used to fill the screen.");
+            $"Starting persona automatic mode had fewer unique options than target count: unique={options.Count} target={targetCount}. Deterministic duplicates will be used to fill the screen.");
 
         for (var i = 0; options.Count < targetCount; i++)
             options.Add(pool[i % pool.Count]);

@@ -186,6 +186,9 @@ public static partial class ReAstralPartyModSettingsManager
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableAllPersonas;
 
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableAllPersonas;
+
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
             return localFallback.EnableAllPersonas;
 
@@ -199,6 +202,9 @@ public static partial class ReAstralPartyModSettingsManager
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableAllVariantPersonas;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableAllVariantPersonas;
 
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
             return localFallback.EnableAllVariantPersonas;
@@ -214,6 +220,9 @@ public static partial class ReAstralPartyModSettingsManager
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableExtremeMode;
 
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableExtremeMode;
+
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
             return localFallback.EnableExtremeMode;
 
@@ -227,6 +236,9 @@ public static partial class ReAstralPartyModSettingsManager
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
             return ResolveAllowDuplicates(snapshot.StartingPersonaMode);
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return ResolveAllowDuplicates(lobbySnapshot.StartingPersonaMode);
 
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
             return ResolveAllowDuplicates(localFallback.StartingPersonaMode);
@@ -242,6 +254,9 @@ public static partial class ReAstralPartyModSettingsManager
         if (TryGetRunSnapshot(runState, out var snapshot))
             return ResolveDisplayMode(snapshot.StartingPersonaMode);
 
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return ResolveDisplayMode(lobbySnapshot.StartingPersonaMode);
+
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
             return ResolveDisplayMode(localFallback.StartingPersonaMode);
 
@@ -255,6 +270,9 @@ public static partial class ReAstralPartyModSettingsManager
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
             return ResolveAssignmentMode(snapshot.StartingPersonaMode);
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return ResolveAssignmentMode(lobbySnapshot.StartingPersonaMode);
 
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
             return ResolveAssignmentMode(localFallback.StartingPersonaMode);
@@ -270,6 +288,9 @@ public static partial class ReAstralPartyModSettingsManager
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.StartingPersonaMode;
 
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.StartingPersonaMode;
+
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
             return localFallback.StartingPersonaMode;
 
@@ -283,6 +304,9 @@ public static partial class ReAstralPartyModSettingsManager
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.TokenSeriesMode;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.TokenSeriesMode;
 
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
             return localFallback.TokenSeriesMode;
@@ -1016,7 +1040,33 @@ public static partial class ReAstralPartyModSettingsManager
 
     internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
     {
-        return StartingPersonaMode.Standard;
+        if (Enum.IsDefined(typeof(StartingPersonaMode), settings.StartingPersonaMode))
+            return settings.StartingPersonaMode;
+
+        if (settings.EnableRandomCloneMode == true)
+            return StartingPersonaMode.RandomClone;
+
+        if (settings.StartingPersonaDisplayMode.HasValue || settings.StartingPersonaAssignmentMode.HasValue)
+        {
+            var displayMode = settings.StartingPersonaDisplayMode ?? StartingPersonaDisplayMode.Manual;
+            var assignmentMode = settings.StartingPersonaAssignmentMode ?? StartingPersonaAssignmentMode.Independent;
+            return (displayMode, assignmentMode) switch
+            {
+                (StartingPersonaDisplayMode.Automatic, StartingPersonaAssignmentMode.Clone) =>
+                    StartingPersonaMode.RandomClone,
+                (StartingPersonaDisplayMode.Automatic, StartingPersonaAssignmentMode.Independent) =>
+                    StartingPersonaMode.RandomAssign,
+                (StartingPersonaDisplayMode.Manual, StartingPersonaAssignmentMode.Clone) =>
+                    StartingPersonaMode.Clone,
+                _ => settings.EnableDuplicatePersonas == true
+                    ? StartingPersonaMode.StandardDuplicate
+                    : StartingPersonaMode.Standard
+            };
+        }
+
+        return settings.EnableDuplicatePersonas == true
+            ? StartingPersonaMode.StandardDuplicate
+            : StartingPersonaMode.Standard;
     }
 
     internal static StartingPersonaDisplayMode ResolveDisplayMode(StartingPersonaMode mode)
@@ -1080,6 +1130,18 @@ public static partial class ReAstralPartyModSettingsManager
             TokenSeriesMode.All => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all",
             TokenSeriesMode.Disabled => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled",
             _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_random_two"
+        };
+        return new LocString("settings_ui", key).GetRawText();
+    }
+
+    internal static string GetTokenSeriesModeDescription(TokenSeriesMode mode)
+    {
+        var key = mode switch
+        {
+            TokenSeriesMode.RandomTwo => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_random_two.description",
+            TokenSeriesMode.All => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all.description",
+            TokenSeriesMode.Disabled => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled.description",
+            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_random_two.description"
         };
         return new LocString("settings_ui", key).GetRawText();
     }
@@ -1184,6 +1246,11 @@ public static partial class ReAstralPartyModSettingsManager
 
         snapshot = ReadRuntime(static runtime => runtime);
         return true;
+    }
+
+    private static bool TryGetLobbyGameplaySnapshot(out LobbyGameplaySettingsSnapshot snapshot)
+    {
+        return LobbyGameplaySettingsSync.TryGetSnapshot(out snapshot);
     }
 
     private static bool ShouldUseSafeGameplayFallback(IRunState? runState)

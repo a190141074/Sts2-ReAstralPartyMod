@@ -306,6 +306,7 @@ internal static class GameplayDynamicPatchCatalog
             description: "UI patch: replace Junk Bot completed quest markers in run history",
             patchId: "junk_bot_quest_icon_history");
         TryRegisterNeowDiagnosticsPatches(builder);
+        CharacterSelectGameplayPreviewPatchRegistrar.TryRegister(builder);
     }
 
     private static void TryRegisterJunkBotMapScreenPatch(DynamicPatchBuilder builder)
