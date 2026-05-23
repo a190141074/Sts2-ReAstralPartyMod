@@ -14,10 +14,10 @@ public class JewelryEchoOfDivineLight : AstralPartyRelicModel
     public override RelicRarity Rarity => RelicRarity.Rare;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-        SinkouSetHelper.BuildSetDynamicVars(Owner);
+        SinkouSetHelper.BuildSetDynamicVars(IsMutable ? Owner : null);
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-        SinkouSetHelper.BuildSetHoverTips(Owner);
+        SinkouSetHelper.BuildSetHoverTips(IsMutable ? Owner : null);
 
     public override async Task AfterObtained()
     {

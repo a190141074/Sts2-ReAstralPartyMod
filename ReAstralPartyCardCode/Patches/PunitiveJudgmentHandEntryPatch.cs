@@ -20,7 +20,7 @@ public sealed class PunitiveJudgmentHandEntryPatch : IPatchMethod
     {
         return
         [
-            new(typeof(CardModel), nameof(CardModel.AfterCardChangedPiles),
+            new(typeof(AbstractModel), nameof(AbstractModel.AfterCardChangedPiles),
                 [typeof(CardModel), typeof(PileType), typeof(AbstractModel)])
         ];
     }

@@ -28,12 +28,12 @@ public class JewelrySolarCrown : AstralPartyRelicModel
     public override bool ShouldReceiveCombatHooks => true;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-        SinkouSetHelper.BuildSetDynamicVars(Owner);
+        SinkouSetHelper.BuildSetDynamicVars(IsMutable ? Owner : null);
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<WhereDivineLightShinesPower>(),
-        .. SinkouSetHelper.BuildSetHoverTips(Owner)
+        .. SinkouSetHelper.BuildSetHoverTips(IsMutable ? Owner : null)
     ];
 
     public override async Task AfterObtained()
