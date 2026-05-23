@@ -30,6 +30,8 @@ public class PersonalityDerivativeMysteriousDodgingMan : AstralPartyRelicModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<WeaknessInsightPower>(),
+        HoverTipFactory.FromPower<DefenseStancePower>(),
+        HoverTipFactory.FromPower<DodgeStancePower>(),
         HoverTipFactory.FromPower<ExposedFlawPower>()
     ];
 
@@ -41,7 +43,7 @@ public class PersonalityDerivativeMysteriousDodgingMan : AstralPartyRelicModel
 
     public override Task BeforeCombatStart()
     {
-        ResetCombatState();
+        AstralParty_PersonalityDerivativeMysteriousDodgingManLastProcessedRound = 0;
         return Task.CompletedTask;
     }
 
@@ -91,7 +93,7 @@ public class PersonalityDerivativeMysteriousDodgingMan : AstralPartyRelicModel
     private void ResetCombatState()
     {
         AstralParty_PersonalityDerivativeMysteriousDodgingManLastProcessedRound = 0;
-        AstralParty_PersonalityDerivativeMysteriousDodgingManCooldownCounter = 0;
+        AstralParty_PersonalityDerivativeMysteriousDodgingManCooldownCounter = 2;
         InvokeDisplayAmountChanged();
     }
 }

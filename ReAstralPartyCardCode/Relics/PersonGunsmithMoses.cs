@@ -44,8 +44,6 @@ public class PersonGunsmithMoses : CooldownPersonaRelicBase
     [
         HoverTipFactory.FromCard<SkillWeaknessAnalysis>(),
         HoverTipFactory.FromPower<WeaknessInsightPower>(),
-        HoverTipFactory.FromPower<DefenseStancePower>(),
-        HoverTipFactory.FromPower<DodgeStancePower>(),
         HoverTipFactory.FromPower<ExposedFlawPower>(),
         HoverTipFactory.FromPower<CounterPower>(),
         HoverTipFactory.FromPower<MosesNodePower>()
