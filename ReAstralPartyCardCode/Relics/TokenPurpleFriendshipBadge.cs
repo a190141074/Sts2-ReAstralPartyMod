@@ -94,28 +94,36 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
         if (power is not HalfLifeHealPower and not StarLightPower)
             return;
 
-        await PersonaMultiplayerEffectHelper.RunAsDerivedSupportPower(async () =>
+        await DerivedHealResolutionHelper.RunBatchedAsync(() =>
         {
             _isResolvingPendingHeals = true;
             try
             {
                 if (power is StarLightPower && _pendingTargetHeals > 0 && power.Owner.IsAlive)
                 {
-                    _pendingTargetHeals--;
-                    await PowerCmd.Apply<HalfLifeHealPower>(power.Owner, 1m, Owner.Creature, null, false);
+                    DerivedHealResolutionHelper.EnqueueHalfLifeHeal(
+                        power.Owner,
+                        _pendingTargetHeals,
+                        Owner.Creature,
+                        null);
+                    _pendingTargetHeals = 0;
                 }
 
                 if (_pendingOwnerHeals > 0 && Owner.Creature.IsAlive)
                 {
-                    _pendingOwnerHeals--;
-                    await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, 1m, Owner.Creature, null, false);
+                    DerivedHealResolutionHelper.EnqueueHalfLifeHeal(
+                        Owner.Creature,
+                        _pendingOwnerHeals,
+                        Owner.Creature,
+                        null);
+                    _pendingOwnerHeals = 0;
                 }
             }
             finally
             {
                 _isResolvingPendingHeals = false;
             }
-        });
+        }, "friendship_badge");
     }
 
     private void ResetPendingState()

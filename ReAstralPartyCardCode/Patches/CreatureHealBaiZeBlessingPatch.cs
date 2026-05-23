@@ -1,6 +1,7 @@
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -38,6 +39,11 @@ public sealed class CreatureHealBaiZeBlessingPatch : IPatchMethod
     private static async Task RunAfterHeal(Task originalTask, Creature creature, decimal amount)
     {
         await originalTask;
-        await PowerCmd.Apply<HalfLifeHealPower>(creature, amount, creature, null, false);
+        await DerivedHealResolutionHelper.EnqueueHalfLifeHealAndFlush(
+            creature,
+            amount,
+            creature,
+            null,
+            "bai_ze_blessing");
     }
 }

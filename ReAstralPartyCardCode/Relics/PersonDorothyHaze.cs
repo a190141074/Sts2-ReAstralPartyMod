@@ -114,11 +114,19 @@ public class PersonDorothyHaze : CooldownPersonaRelicBase
         if (player?.Creature == null || amount <= 0m)
             return;
 
+        await DerivedHealResolutionHelper.EnqueueWarmAndFlush(player, 1, null, "dorothy_heal");
+    }
+
+    internal static async Task ApplyWarmFromDerivedSupport(Player player, int amount, CardModel? source)
+    {
+        if (player?.Creature == null || amount <= 0)
+            return;
+
         var relic = player.GetRelic<PersonDorothyHaze>();
         if (relic == null)
             return;
 
-        await relic.GainWarm(1, null);
+        await relic.GainWarm(amount, source);
     }
 
     private async Task GainWarm(int amount, CardModel? source)
