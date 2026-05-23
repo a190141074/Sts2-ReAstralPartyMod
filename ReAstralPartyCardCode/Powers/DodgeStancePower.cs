@@ -18,6 +18,9 @@ public class DodgeStancePower : AstralPartyPowerModel
     private sealed class Data
     {
         public bool PendingWeaknessInsightGain;
+        public bool HadCounterBeforeDodge;
+        public decimal PendingCounterDamage;
+        public Creature? PendingCounterDealer;
     }
 
     public override PowerType Type => PowerType.Buff;
@@ -48,7 +51,11 @@ public class DodgeStancePower : AstralPartyPowerModel
         if (nodeValue <= exposedFlaw)
             return amount;
 
-        GetInternalData<Data>().PendingWeaknessInsightGain = true;
+        var data = GetInternalData<Data>();
+        data.PendingWeaknessInsightGain = true;
+        data.HadCounterBeforeDodge = Owner.GetPowerAmount<CounterPower>() > 0m;
+        data.PendingCounterDamage = amount;
+        data.PendingCounterDealer = dealer;
         Flash();
         return 0m;
     }
@@ -63,10 +70,17 @@ public class DodgeStancePower : AstralPartyPowerModel
     {
         if (Owner?.Player == null || target != Owner)
             return;
-        if (!GetInternalData<Data>().PendingWeaknessInsightGain)
+        var data = GetInternalData<Data>();
+        if (!data.PendingWeaknessInsightGain)
             return;
 
-        GetInternalData<Data>().PendingWeaknessInsightGain = false;
+        data.PendingWeaknessInsightGain = false;
+        if (data.HadCounterBeforeDodge)
+            await CounterPower.TryTriggerCounter(choiceContext, Owner, data.PendingCounterDealer, data.PendingCounterDamage, this);
+
+        data.HadCounterBeforeDodge = false;
+        data.PendingCounterDamage = 0m;
+        data.PendingCounterDealer = null;
         await PowerCmd.Apply<CounterPower>(Owner, 1m, Owner, null, false);
         await MosesCombatHelper.TryGainWeaknessInsight(
             Owner.Player,
@@ -86,7 +100,12 @@ public class DodgeStancePower : AstralPartyPowerModel
         await MosesCombatHelper.EnsureNodeCarrier(ownerPlayer);
         var nextNode = MosesCombatHelper.RollDodgeNodeValue(ownerPlayer, this);
         await PowerCmd.SetAmount<MosesNodePower>(Owner, nextNode, Owner, null);
-        GetInternalData<Data>().PendingWeaknessInsightGain = false;
+        var data = GetInternalData<Data>();
+        data.PendingWeaknessInsightGain = false;
+        data.HadCounterBeforeDodge = false;
+        data.PendingCounterDamage = 0m;
+        data.PendingCounterDealer = null;
+        await MosesCombatHelper.DecayWeaknessInsightAtTurnEnd(ownerPlayer);
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -94,9 +113,16 @@ public class DodgeStancePower : AstralPartyPowerModel
         if (Owner == null || Owner.Player != player)
             return;
 
-        if (GetInternalData<Data>().PendingWeaknessInsightGain)
+        var data = GetInternalData<Data>();
+        if (data.PendingWeaknessInsightGain)
         {
-            GetInternalData<Data>().PendingWeaknessInsightGain = false;
+            data.PendingWeaknessInsightGain = false;
+            if (data.HadCounterBeforeDodge)
+                await CounterPower.TryTriggerCounter(choiceContext, Owner, data.PendingCounterDealer, data.PendingCounterDamage, this);
+
+            data.HadCounterBeforeDodge = false;
+            data.PendingCounterDamage = 0m;
+            data.PendingCounterDealer = null;
             await PowerCmd.Apply<CounterPower>(Owner, 1m, Owner, null, false);
             await MosesCombatHelper.TryGainWeaknessInsight(
                 player,

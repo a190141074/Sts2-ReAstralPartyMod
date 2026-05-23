@@ -27,34 +27,56 @@ public class CounterPower : AstralPartyPowerModel
         if (Amount <= 0) return;
         if (result.UnblockedDamage <= 0) return;
         if (dealer == null || dealer == Owner || dealer.IsDead) return;
-        if (_activeRetaliations > 0) return;
+        await TryTriggerCounter(choiceContext, Owner, dealer, result.UnblockedDamage, this);
+    }
 
-        Flash();
+    public static async Task<bool> TryTriggerCounter(
+        PlayerChoiceContext choiceContext,
+        Creature owner,
+        Creature? dealer,
+        decimal triggeringDamage,
+        AbstractModel source)
+    {
+        if (owner == null || dealer == null)
+            return false;
+
+        var counterPower = owner.GetPower<CounterPower>();
+        if (counterPower == null || counterPower.Amount <= 0m)
+            return false;
+        if (triggeringDamage <= 0m)
+            return false;
+        if (dealer == owner || dealer.IsDead)
+            return false;
+        if (_activeRetaliations > 0)
+            return false;
+
+        counterPower.Flash();
 
         try
         {
             // Retaliation damage should not recursively trigger other retaliation-style effects.
             _activeRetaliations++;
-            decimal retaliateDamage = result.UnblockedDamage + Owner.GetPowerAmount<StrengthPower>();
-            if (Owner.Player?.GetRelic<PersonalityDerivativePandaMeng>() != null)
-                retaliateDamage += PandaPersonaHelper.GetEnemyAttackIntentSum(Owner);
+            decimal retaliateDamage = triggeringDamage + owner.GetPowerAmount<StrengthPower>();
+            if (owner.Player?.GetRelic<PersonalityDerivativePandaMeng>() != null)
+                retaliateDamage += PandaPersonaHelper.GetEnemyAttackIntentSum(owner);
             if (retaliateDamage <= 0m)
-                return;
+                return false;
 
             await CreatureCmd.Damage(choiceContext, dealer, retaliateDamage,
-                ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.SkipHurtAnim, Owner, null);
+                ValueProp.Unblockable | ValueProp.Unpowered | ValueProp.SkipHurtAnim, owner, null);
 
-            if (Owner.Player?.GetRelic<PersonGunsmithMoses>() != null)
-                await MosesCombatHelper.TryGainWeaknessInsight(Owner.Player, this);
+            if (owner.Player?.GetRelic<PersonGunsmithMoses>() != null)
+                await MosesCombatHelper.TryGainWeaknessInsight(owner.Player, source);
 
-            if (Owner.HasPower<InvokeSpiritsPower>() && dealer.IsAlive)
-                await InvokeSpiritsPower.TryTriggerChase(choiceContext, Owner, dealer, null, this);
+            if (owner.HasPower<InvokeSpiritsPower>() && dealer.IsAlive)
+                await InvokeSpiritsPower.TryTriggerChase(choiceContext, owner, dealer, null, source);
         }
         finally
         {
             _activeRetaliations--;
         }
 
-        await PowerCmd.Decrement(this);
+        await PowerCmd.Decrement(counterPower);
+        return true;
     }
 }

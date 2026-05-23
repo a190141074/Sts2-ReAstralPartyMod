@@ -19,6 +19,7 @@ public static class AstralKeywords
         AstralDiceSetStem,
         AstralFlashlightSetStem,
         AstralBoxingGlovesSetStem,
+        AstralListeningToSolarRoarSetStem,
         AstralDreamshipSeriesStem,
         AstralSpiritFestivalSeriesStem,
         AstralWaterTownSeriesStem,
@@ -44,6 +45,7 @@ public static class AstralKeywords
     public const string AstralDiceSetStem = "ASTRAL_DICE_SET";
     public const string AstralFlashlightSetStem = "ASTRAL_FLASHLIGHT_SET";
     public const string AstralBoxingGlovesSetStem = "ASTRAL_BOXING_GLOVES_SET";
+    public const string AstralListeningToSolarRoarSetStem = "ASTRAL_LISTENING_TO_SOLAR_ROAR_SET";
     public const string AstralDreamshipSeriesStem = "ASTRAL_DREAMSHIP_SERIES";
     public const string AstralSpiritFestivalSeriesStem = "ASTRAL_SPIRIT_FESTIVAL_SERIES";
     public const string AstralWaterTownSeriesStem = "ASTRAL_WATER_TOWN_SERIES";
@@ -66,6 +68,7 @@ public static class AstralKeywords
     public static string AstralDiceSetId => GetId(AstralDiceSetStem);
     public static string AstralFlashlightSetId => GetId(AstralFlashlightSetStem);
     public static string AstralBoxingGlovesSetId => GetId(AstralBoxingGlovesSetStem);
+    public static string AstralListeningToSolarRoarSetId => GetId(AstralListeningToSolarRoarSetStem);
     public static string AstralDreamshipSeriesId => GetId(AstralDreamshipSeriesStem);
     public static string AstralSpiritFestivalSeriesId => GetId(AstralSpiritFestivalSeriesStem);
     public static string AstralWaterTownSeriesId => GetId(AstralWaterTownSeriesStem);
@@ -88,6 +91,7 @@ public static class AstralKeywords
     public static CardKeyword AstralDiceSet => GetKeyword(AstralDiceSetStem);
     public static CardKeyword AstralFlashlightSet => GetKeyword(AstralFlashlightSetStem);
     public static CardKeyword AstralBoxingGlovesSet => GetKeyword(AstralBoxingGlovesSetStem);
+    public static CardKeyword AstralListeningToSolarRoarSet => GetKeyword(AstralListeningToSolarRoarSetStem);
     public static CardKeyword AstralDreamshipSeries => GetKeyword(AstralDreamshipSeriesStem);
     public static CardKeyword AstralSpiritFestivalSeries => GetKeyword(AstralSpiritFestivalSeriesStem);
     public static CardKeyword AstralWaterTownSeries => GetKeyword(AstralWaterTownSeriesStem);

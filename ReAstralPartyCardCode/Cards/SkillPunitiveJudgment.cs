@@ -84,9 +84,7 @@ public class SkillPunitiveJudgment : AstralPartyCardModel
 
         var multiplier = AstralSinkouHelper.GetPunitiveJudgmentDamageMultiplier(target);
         var baseDamage = DynamicVars["Damage"].BaseValue * multiplier;
-        var extraDamage = Math.Min(
-            AstralSinkouHelper.GetPunitiveJudgmentUnblockableDamage(Owner, target) * multiplier,
-            Math.Ceiling(Owner.Creature.MaxHp * 1.4m));
+        var extraDamage = AstralSinkouHelper.GetPunitiveJudgmentExtraDamage(Owner, target);
 
         await CreatureCmd.Damage(choiceContext, target, baseDamage, ValueProp.Move, Owner.Creature, this);
         await PowerCmd.Apply<BlazingSolarBurnPower>(target, 1m, Owner.Creature, this, false);

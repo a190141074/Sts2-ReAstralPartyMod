@@ -13,6 +13,8 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_FLASHLIGHT_SET.description": "只要你拥有至少[blue]1[/blue]件手电筒系列遗物，战斗开始时，为所有敌人施加[blue]1[/blue]层[gold]曝光[/gold]。\n击杀拥有[gold]曝光[/gold]的敌人时，获得[blue]1[/blue]层[gold]永恒星光[/gold]。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_BOXING_GLOVES_SET.title": "【套装·拳击手套】",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_BOXING_GLOVES_SET.description": "当你拥有任意[blue]2[/blue]件拳击手套时，战斗开始获得[blue]1[/blue]点[red]力量[/red]。\n当你拥有[blue]3[/blue]件拳击手套时，改为战斗开始获得[blue]3[/blue]点[red]力量[/red]。",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_LISTENING_TO_SOLAR_ROAR_SET.title": "【套装·聆听太阳的轰鸣】",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_LISTENING_TO_SOLAR_ROAR_SET.description": "同时集齐【异格：神光】、【饰品：微缩米伦】、【饰品：曜日天冠】、【饰品：神光的回响】时生效：\n· 你的回合开始时，所有敌人额外触发一次[gold]灼烧[/gold]。\n· 当[gold]诛罚[/gold]加入你的手牌时，若未升级则升级，并额外获得[gold]重放[/gold][blue]1[/blue]。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_DREAMSHIP_SERIES.title": "【系列·梦想号】",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_DREAMSHIP_SERIES.description": "属于[gold]梦想号[/gold]系列的特殊筹码。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_SPIRIT_FESTIVAL_SERIES.title": "【系列·御魂庆典】",

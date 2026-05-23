@@ -72,6 +72,17 @@ internal static class AstralSinkouHelper
         return Math.Min(rawDamage, damageCap);
     }
 
+    public static decimal GetPunitiveJudgmentExtraDamage(Player owner, Creature target)
+    {
+        var extraDamage = GetPunitiveJudgmentUnblockableDamage(owner, target);
+        if (!SinkouSetHelper.ShouldPunitiveJudgmentExtraDamageScaleWithBurn(owner))
+            return extraDamage;
+
+        return Math.Min(
+            extraDamage * GetPunitiveJudgmentDamageMultiplier(target),
+            Math.Ceiling(owner.Creature.MaxHp * PunitiveJudgmentExtraDamageCapRatio));
+    }
+
     public static async Task ApplyOrRefreshRageToAllEnemies(Player owner, AbstractModel source)
     {
         if (owner.Creature?.CombatState == null)

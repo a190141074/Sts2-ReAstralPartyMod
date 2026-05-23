@@ -15,6 +15,9 @@ public static class ExtraBatteryRelicHelper
         if (sourceRelic is VariantPersonSara && owner?.GetRelic<JewelryNightSkin>() != null)
             adjustedCounter -= 2;
 
+        if (sourceRelic is VariantPersonSinkou && owner?.GetRelic<JewelryEchoOfDivineLight>() != null)
+            adjustedCounter -= SinkouSetHelper.GetCurrentAct(owner) >= 2 ? 2 : 1;
+
         return Math.Max(1, adjustedCounter);
     }
 

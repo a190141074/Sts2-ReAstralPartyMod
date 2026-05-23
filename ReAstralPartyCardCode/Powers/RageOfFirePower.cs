@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -32,6 +33,8 @@ public class RageOfFirePower : AstralPartyPowerModel
         if (Amount <= 0m)
             return;
         if (cardSource?.Type != CardType.Attack)
+            return;
+        if (!SinkouSetHelper.CanTriggerRageBurn(cardSource.Owner))
             return;
         if (result.TotalDamage <= 0m)
             return;

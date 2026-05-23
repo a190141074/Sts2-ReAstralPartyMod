@@ -227,6 +227,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
+        patcher.RegisterPatch<PunitiveJudgmentHandEntryPatch>();
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)

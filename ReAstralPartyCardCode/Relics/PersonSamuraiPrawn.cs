@@ -110,6 +110,25 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonaRelicBase
         );
     }
 
+    public override bool TryModifyEnergyCostInCombat(CardModel card, decimal originalCost, out decimal modifiedCost)
+    {
+        modifiedCost = originalCost;
+
+        if (Owner == null)
+            return false;
+        if (card.Owner != Owner)
+            return false;
+        if (card.Pile?.Type != PileType.Hand)
+            return false;
+        if (card.Type != CardType.Attack || card.EnergyCost.CostsX)
+            return false;
+        if (card.EnergyCost.GetResolved() < 3)
+            return false;
+
+        modifiedCost = Math.Max(0m, originalCost - 1m);
+        return modifiedCost != originalCost;
+    }
+
     protected override Task AfterAdvanceCounterOnTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
         return Task.CompletedTask;

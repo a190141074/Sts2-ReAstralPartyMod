@@ -53,7 +53,7 @@ internal static class MosesCombatHelper
                 }
 
         return DeterministicMultiplayerChoiceHelper.RollDeterministically(
-            0,
+            1,
             upperBound + 1,
             MainFile.ModId,
             sourceCard.Id.Entry,
@@ -62,6 +62,24 @@ internal static class MosesCombatHelper
             owner.NetId,
             owner.Creature?.CombatState?.RoundNumber ?? 0,
             targetIndex);
+    }
+
+    public static async Task DecayWeaknessInsightAtTurnEnd(Player? owner)
+    {
+        if (owner?.Creature == null)
+            return;
+
+        var power = owner.Creature.GetPower<WeaknessInsightPower>();
+        if (power == null || power.Amount <= 0m)
+            return;
+
+        if (power.Amount <= 1m)
+        {
+            await PowerCmd.Remove(power);
+            return;
+        }
+
+        await PowerCmd.Decrement(power);
     }
 
     public static int RollDodgeNodeValue(Player owner, AbstractModel source)
