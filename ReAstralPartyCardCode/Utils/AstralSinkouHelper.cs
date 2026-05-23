@@ -8,7 +8,6 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -22,7 +21,7 @@ internal static class AstralSinkouHelper
     private const decimal MaxAttackBonusRatio = 0.475m;
     private const decimal PunitiveJudgmentBonusPerBurnRatio = 0.03m;
     private const decimal PunitiveJudgmentBonusMaxHpRatio = 0.11m;
-    private const decimal PunitiveJudgmentBossCapRatio = 1.4m;
+    private const decimal PunitiveJudgmentExtraDamageCapRatio = 1.4m;
     private const int RageDuration = 3;
 
     public static async Task EnsureAfterglow(Player? owner)
@@ -69,11 +68,8 @@ internal static class AstralSinkouHelper
     public static decimal GetPunitiveJudgmentUnblockableDamage(Player owner, Creature target)
     {
         var rawDamage = Math.Ceiling(target.MaxHp * PunitiveJudgmentBonusMaxHpRatio);
-        if (target.CombatState?.Encounter?.RoomType != RoomType.Boss)
-            return rawDamage;
-
-        var bossCap = Math.Ceiling(owner.Creature.MaxHp * PunitiveJudgmentBossCapRatio);
-        return Math.Min(rawDamage, bossCap);
+        var damageCap = Math.Ceiling(owner.Creature.MaxHp * PunitiveJudgmentExtraDamageCapRatio);
+        return Math.Min(rawDamage, damageCap);
     }
 
     public static async Task ApplyOrRefreshRageToAllEnemies(Player owner, AbstractModel source)

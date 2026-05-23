@@ -13,10 +13,8 @@
 		<!-- 改成你的杀戮尖塔 2 目录 -->
 		<Sts2Dir>D:\Steam\steamapps\common\Slay the Spire 2</Sts2Dir>
 		<Sts2DataDir>$(Sts2Dir)\data_sts2_windows_x86_64</Sts2DataDir>
-		<SecondarySts2Dir Condition="'$(SecondarySts2Dir)' == '' and Exists('D:\SteamLibrary\steamapps\common\Slay the Spire 2')">D:\SteamLibrary\steamapps\common\Slay the Spire 2</SecondarySts2Dir>
 		<GodotExportPreset>Windows Desktop</GodotExportPreset>
 		<ModOutputDir>$(Sts2Dir)\mods\$(MSBuildProjectName)\</ModOutputDir>
-		<SecondaryModOutputDir Condition="'$(SecondarySts2Dir)' != ''">$(SecondarySts2Dir)\mods\$(MSBuildProjectName)\</SecondaryModOutputDir>
 		<PckOutputPath>$(ModOutputDir)$(MSBuildProjectName).pck</PckOutputPath>
 		<GodotEditorPath Condition="'$(GodotEditorPath)' == '' and Exists('D:\MOD\杀戮尖塔2mod制作\megadot-4.5.1-m.8-windows-x86_64-llvm-editor-csharp\MegaDot_v4.5.1-stable_mono_win64.exe')">D:\MOD\杀戮尖塔2mod制作\megadot-4.5.1-m.8-windows-x86_64-llvm-editor-csharp\MegaDot_v4.5.1-stable_mono_win64.exe</GodotEditorPath>
 	</PropertyGroup>
@@ -24,6 +22,13 @@
 	<PropertyGroup>
 		<RunPckExport Condition="'$(RunPckExport)' == '' and '$(DesignTimeBuild)' != 'true'">true</RunPckExport>
 		<RunPckExport Condition="'$(RunPckExport)' == ''">false</RunPckExport>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<CardPortraitSourceDir>$(MSBuildProjectDirectory)\ReAstralPartyMod\images\card_portraits</CardPortraitSourceDir>
+		<CardPortraitExportStateDir>$(MSBuildProjectDirectory)\.tmp-card-portrait-export-state</CardPortraitExportStateDir>
+		<CardPortraitImportedDir>$(MSBuildProjectDirectory)\.godot\imported</CardPortraitImportedDir>
+		<CardPortraitExportScale>0.5</CardPortraitExportScale>
 	</PropertyGroup>
 
 	<Target Name="ValidateChineseLocalization" BeforeTargets="BeforeBuild">
@@ -577,11 +582,24 @@
 		<MakeDir Directories="$(ModOutputDir)"/>
 		<Exec
 				WorkingDirectory="$(MSBuildProjectDirectory)"
+				Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\CompressCardPortraitsForExport.ps1&quot; -Mode prepare -SourceDir &quot;$(CardPortraitSourceDir)&quot; -StateDir &quot;$(CardPortraitExportStateDir)&quot; -ImportedDir &quot;$(CardPortraitImportedDir)&quot; -Scale $(CardPortraitExportScale)"/>
+		<Exec
+				WorkingDirectory="$(MSBuildProjectDirectory)"
 				Command="&quot;$(GodotEditorPath)&quot; --headless --path &quot;$(MSBuildProjectDirectory)&quot; --export-pack &quot;$(GodotExportPreset)&quot; &quot;$(PckOutputPath)&quot;"
 				EnvironmentVariables="STS2_SKIP_PCK_EXPORT=1"
 				IgnoreExitCode="true"
 				IgnoreStandardErrorWarningFormat="true"/>
+		<Exec
+				WorkingDirectory="$(MSBuildProjectDirectory)"
+				Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\CompressCardPortraitsForExport.ps1&quot; -Mode restore -SourceDir &quot;$(CardPortraitSourceDir)&quot; -StateDir &quot;$(CardPortraitExportStateDir)&quot; -ImportedDir &quot;$(CardPortraitImportedDir)&quot;"
+				Condition="Exists('$(CardPortraitExportStateDir)')"/>
 		<Error Condition="!Exists('$(PckOutputPath)')" Text="Godot export did not produce $(PckOutputPath)."/>
+	</Target>
+
+	<Target Name="RestoreCardPortraitsAfterFailedExport" AfterTargets="ExportModPck" Condition="Exists('$(CardPortraitExportStateDir)')">
+		<Exec
+				WorkingDirectory="$(MSBuildProjectDirectory)"
+				Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\CompressCardPortraitsForExport.ps1&quot; -Mode restore -SourceDir &quot;$(CardPortraitSourceDir)&quot; -StateDir &quot;$(CardPortraitExportStateDir)&quot; -ImportedDir &quot;$(CardPortraitImportedDir)&quot;"/>
 	</Target>
 
 	<Target Name="WarnMissingGodot" AfterTargets="Build" Condition="'$(RunPckExport)' == 'true' and '$(STS2_SKIP_PCK_EXPORT)' != '1' and !Exists('$(GodotEditorPath)')">
@@ -595,12 +613,5 @@
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModOutputDir)\"/>
 		<Copy SourceFiles="$(MSBuildProjectName).json" DestinationFolder="$(ModOutputDir)\"/>
 		<Copy Condition="Exists('$(PckOutputPath)')" SourceFiles="$(PckOutputPath)" DestinationFolder="$(ModOutputDir)\"/>
-
-		<Message Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)'" Text="Copying mod to secondary Slay the Spire 2 mods folder..." Importance="high"/>
-		<MakeDir Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)'" Directories="$(SecondaryModOutputDir)"/>
-		<Copy Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)'" SourceFiles="$(TargetPath)" DestinationFolder="$(SecondaryModOutputDir)\"/>
-		<Copy Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)'" SourceFiles="$(MSBuildProjectName).json" DestinationFolder="$(SecondaryModOutputDir)\"/>
-		<Copy Condition="'$(SecondaryModOutputDir)' != '' and '$(SecondaryModOutputDir)' != '$(ModOutputDir)' and Exists('$(PckOutputPath)')" SourceFiles="$(PckOutputPath)" DestinationFolder="$(SecondaryModOutputDir)\"/>
 	</Target>
 </Project>
-
