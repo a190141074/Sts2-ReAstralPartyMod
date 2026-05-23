@@ -65,8 +65,13 @@ internal static class ReAstralPartyRunSettingsSync
                 if (completedTask.Exception == null)
                     return;
 
+                var message = completedTask.Exception.GetBaseException().Message;
                 MainFile.Logger.Warn(
-                    $"{MainFile.ModId} background settings sync failed: {completedTask.Exception.GetBaseException().Message}");
+                    $"{MainFile.ModId} background settings sync failed: {message}");
+                ShowSyncError(
+                    210,
+                    "后台同步",
+                    $"联机玩法设置后台同步失败，当前局可能会退回安全默认值。\n原因：{message}");
             },
             TaskContinuationOptions.OnlyOnFaulted);
     }
@@ -174,6 +179,10 @@ internal static class ReAstralPartyRunSettingsSync
 
         MainFile.Logger.Info(
             $"{MainFile.ModId} settings sync accepted a legacy/raw snapshot payload because no protocol envelope was present.");
+        ShowSyncWarning(
+            211,
+            "协议兼容",
+            "本局联机玩法设置使用了旧版裸 payload 兼容读取。若主客机模组版本不一致，可能导致设置解释分叉。");
         return true;
     }
 
@@ -186,8 +195,7 @@ internal static class ReAstralPartyRunSettingsSync
             return false;
 
         var isLegacyPayload = payload.Count == personaRelics.Count + 7;
-        var payloadOffset = isLegacyPayload ? 1 : 0;
-        var bannedStartIndex = payloadOffset + (isLegacyPayload ? 6 : 5);
+        var bannedStartIndex = isLegacyPayload ? 7 : 6;
         var bannedIds = new List<string>();
         for (var i = 0; i < personaRelics.Count && bannedStartIndex + i < payload.Count; i++)
         {
@@ -197,27 +205,31 @@ internal static class ReAstralPartyRunSettingsSync
             bannedIds.Add((personaRelics[i].CanonicalInstance?.Id ?? personaRelics[i].Id).ToString());
         }
 
-        var legacyRandomCloneMode = isLegacyPayload && payload[payloadOffset + 3] != 0;
+        var legacyRandomCloneMode = isLegacyPayload && payload[4] != 0;
         snapshot = new ReAstralPartyRunSettingsSnapshot
         {
-            EnableExtremeMode = payloadOffset > 0 && payload[0] != 0,
-            EnableAllPersonas = payload[payloadOffset] != 0,
-            EnableAllVariantPersonas = payload[payloadOffset + 1] != 0,
+            EnableExtremeMode = payload[0] != 0,
+            EnableAllPersonas = payload[1] != 0,
+            EnableAllVariantPersonas = payload[2] != 0,
             StartingPersonaMode = isLegacyPayload
                 ? StartingPersonaMode.Standard
-                : Enum.IsDefined(typeof(StartingPersonaMode), payload[payloadOffset + 2])
-                    ? (StartingPersonaMode)payload[payloadOffset + 2]
+                : Enum.IsDefined(typeof(StartingPersonaMode), payload[3])
+                    ? (StartingPersonaMode)payload[3]
                     : StartingPersonaMode.Standard,
-            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[payloadOffset + (isLegacyPayload ? 4 : 3)])
-                ? (TokenSeriesMode)payload[payloadOffset + (isLegacyPayload ? 4 : 3)]
+            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[isLegacyPayload ? 5 : 4])
+                ? (TokenSeriesMode)payload[isLegacyPayload ? 5 : 4]
                 : TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = payload[payloadOffset + (isLegacyPayload ? 5 : 4)] != 0,
+            EnablePureAngelMode = payload[isLegacyPayload ? 6 : 5] != 0,
             BannedRelicIdsSerialized = bannedIds
         };
         if (isLegacyPayload)
         {
             MainFile.Logger.Info(
                 $"{MainFile.ModId} settings sync decoded legacy starting persona payload and downgraded it to standard mode (legacy_random_clone_mode={legacyRandomCloneMode}).");
+            ShowSyncWarning(
+                212,
+                "旧协议降级",
+                $"检测到旧版开局人格设置同步协议，已按标准模式兼容降级处理。legacy_random_clone_mode={legacyRandomCloneMode}。");
         }
 
         return true;
@@ -231,6 +243,10 @@ internal static class ReAstralPartyRunSettingsSync
             var safeSnapshot = CreateSafeSnapshot();
             MainFile.Logger.Warn(
                 $"{MainFile.ModId} settings sync skipped because RunManager was unavailable; using safe multiplayer defaults.");
+            ShowSyncWarning(
+                213,
+                "同步前置",
+                "联机玩法设置同步时未拿到 RunManager，已退回安全默认值。");
             state.SetSnapshot(safeSnapshot);
             return safeSnapshot;
         }
@@ -249,6 +265,10 @@ internal static class ReAstralPartyRunSettingsSync
             var safeSnapshot = CreateSafeSnapshot();
             MainFile.Logger.Warn(
                 $"{MainFile.ModId} settings sync skipped because PlayerChoiceSynchronizer was unavailable; using safe multiplayer defaults.");
+            ShowSyncWarning(
+                214,
+                "同步前置",
+                "联机玩法设置同步时未拿到 PlayerChoiceSynchronizer，已退回安全默认值。");
             state.SetSnapshot(safeSnapshot);
             return safeSnapshot;
         }
@@ -259,6 +279,10 @@ internal static class ReAstralPartyRunSettingsSync
             var safeSnapshot = CreateSafeSnapshot();
             MainFile.Logger.Warn(
                 $"{MainFile.ModId} settings sync skipped because authority net id was unavailable; using safe multiplayer defaults.");
+            ShowSyncWarning(
+                215,
+                "主机识别",
+                "联机玩法设置同步时未识别到房主 NetId，已退回安全默认值。");
             state.SetSnapshot(safeSnapshot);
             return safeSnapshot;
         }
@@ -269,6 +293,10 @@ internal static class ReAstralPartyRunSettingsSync
             var safeSnapshot = CreateSafeSnapshot();
             MainFile.Logger.Warn(
                 $"{MainFile.ModId} settings sync skipped because authority player {authorityNetId} was unavailable; using safe multiplayer defaults.");
+            ShowSyncWarning(
+                216,
+                "主机识别",
+                $"联机玩法设置同步时未找到房主玩家 {authorityNetId}，已退回安全默认值。");
             state.SetSnapshot(safeSnapshot);
             return safeSnapshot;
         }
@@ -295,6 +323,10 @@ internal static class ReAstralPartyRunSettingsSync
 
             MainFile.Logger.Warn(
                 $"{MainFile.ModId} settings sync did not receive a valid host snapshot after {MaxClientSnapshotAttempts} attempts; falling back to safe multiplayer defaults.");
+            ShowSyncWarning(
+                217,
+                "接收主机设置",
+                $"客户端在 {MaxClientSnapshotAttempts} 次尝试后仍未收到有效的房主玩法设置快照，已退回安全默认值。");
         }
 
         var choiceId = synchronizer.ReserveChoiceId(authorityPlayer);
@@ -314,6 +346,10 @@ internal static class ReAstralPartyRunSettingsSync
         var fallbackSnapshot = CreateSafeSnapshot();
         MainFile.Logger.Warn(
             $"{MainFile.ModId} settings sync did not have a host authority path; using safe multiplayer defaults.");
+        ShowSyncWarning(
+            218,
+            "主机路径",
+            "联机玩法设置同步未进入有效的房主路径，已退回安全默认值。");
         state.SetSnapshot(fallbackSnapshot);
         return fallbackSnapshot;
     }
@@ -363,6 +399,26 @@ internal static class ReAstralPartyRunSettingsSync
         {
             return false;
         }
+    }
+
+    private static void ShowSyncWarning(int number, string stage, string body)
+    {
+        AstralNotificationService.ShowDiagnosticWarning(
+            AstralNotificationModule.Multiplayer,
+            AstralNotificationArea.Multiplayer,
+            number,
+            body,
+            stage);
+    }
+
+    private static void ShowSyncError(int number, string stage, string body)
+    {
+        AstralNotificationService.ShowDiagnosticError(
+            AstralNotificationModule.Multiplayer,
+            AstralNotificationArea.Multiplayer,
+            number,
+            body,
+            stage);
     }
 
     private sealed class RunSettingsSyncState

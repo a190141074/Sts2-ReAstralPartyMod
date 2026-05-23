@@ -22,18 +22,6 @@ internal static class AstralNeowDiagnosticHelper
         var snapshot = BuildSnapshot(runState);
         MainFile.Logger.Warn(
             $"[M201] Post-persona NEOW window snapshot | options={optionCount} | {FormatSnapshotForLog(snapshot)}");
-
-        if (!snapshot.IsEventLike && !snapshot.RefreshAncientLoaded)
-            return;
-        if (!TryAcquireToast($"M201:{snapshot.RunKey}"))
-            return;
-
-        AstralNotificationService.ShowDiagnosticWarning(
-            AstralNotificationModule.Multiplayer,
-            AstralNotificationArea.NeowDiagnostics,
-            201,
-            $"已进入人格选择后的事件收尾窗口。\n候选数：{optionCount}\n{FormatSnapshotForBody(snapshot)}",
-            "NEOW收尾");
     }
 
     public static void ReportEventRoomNodeReady(object? roomNode)
@@ -42,18 +30,6 @@ internal static class AstralNeowDiagnosticHelper
         var nodeType = roomNode?.GetType().FullName ?? "null";
         MainFile.Logger.Warn(
             $"[M202] Event room node ready | node={nodeType} | {FormatSnapshotForLog(snapshot)}");
-
-        if (!snapshot.IsEventLike && !nodeType.Contains("Event", StringComparison.OrdinalIgnoreCase))
-            return;
-        if (!TryAcquireToast($"M202:{snapshot.RunKey}:{nodeType}"))
-            return;
-
-        AstralNotificationService.ShowDiagnosticInfo(
-            AstralNotificationModule.Multiplayer,
-            AstralNotificationArea.NeowDiagnostics,
-            202,
-            $"检测到事件房节点进入。\n节点：{nodeType}\n{FormatSnapshotForBody(snapshot)}",
-            "事件房进入");
     }
 
     public static void ReportAncientLayoutReady(object? layoutNode)
@@ -63,20 +39,6 @@ internal static class AstralNeowDiagnosticHelper
         var optionCount = TryCountRelicLikeEntries(layoutNode);
         MainFile.Logger.Warn(
             $"[M203] Ancient layout ready | node={nodeType} | optionCount={optionCount} | {FormatSnapshotForLog(snapshot)}");
-
-        if (!snapshot.RefreshAncientLoaded
-            && !nodeType.Contains("Ancient", StringComparison.OrdinalIgnoreCase))
-            return;
-        if (!TryAcquireToast($"M203:{snapshot.RunKey}:{nodeType}"))
-            return;
-
-        var optionText = optionCount >= 0 ? optionCount.ToString() : "unknown";
-        AstralNotificationService.ShowDiagnosticWarning(
-            AstralNotificationModule.Multiplayer,
-            AstralNotificationArea.NeowDiagnostics,
-            203,
-            $"检测到 Ancient 事件布局。\n节点：{nodeType}\n布局选项数：{optionText}\n{FormatSnapshotForBody(snapshot)}",
-            "Ancient布局");
     }
 
     public static void ReportGrabBagRaritySnapshot(object? grabBag, Player? player)

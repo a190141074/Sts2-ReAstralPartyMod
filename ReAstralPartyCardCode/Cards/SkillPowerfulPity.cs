@@ -66,6 +66,8 @@ public class SkillPowerfulPity : AstralPartyCardModel
             var copiedCard = CreateCopiedCardForTarget(ownerCreature, selectedCard, targetPlayer);
             if (!copiedCard.Keywords.Contains(CardKeyword.Exhaust))
                 CardCmd.ApplyKeyword(copiedCard, CardKeyword.Exhaust);
+            if (!copiedCard.Keywords.Contains(CardKeyword.Ethereal))
+                CardCmd.ApplyKeyword(copiedCard, CardKeyword.Ethereal);
 
             await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
                 copiedCard,
