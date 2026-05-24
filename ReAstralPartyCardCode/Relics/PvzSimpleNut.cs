@@ -81,16 +81,18 @@ public class PvzSimpleNut : AstralPartyRelicModel
         if (!AstralParty_PvzSimpleNutGrantedThisRun && AstralParty_PvzSimpleNutReachedThresholdThisRun)
         {
             AstralParty_PvzSimpleNutGrantedThisRun = true;
-
-            if (Owner.GetRelic<PvzHyperTemporalNut>() == null)
-            {
-                await RewardSyncHelper.ObtainRelicAsRewardMultiplayerSafe(Owner, ModelDb.Relic<PvzHyperTemporalNut>());
-                MainFile.Logger.Info($"[PvzSimpleNut] Granted Hyper Temporal Nut via safe reward path | owner={Owner.NetId}");
-            }
-            else
-            {
-                MainFile.Logger.Info($"[PvzSimpleNut] Threshold reached but owner already has Hyper Temporal Nut | owner={Owner.NetId}");
-            }
+            await RelicOwnershipHelper.RunByRelicOwnershipAsync<PvzHyperTemporalNut>(
+                Owner,
+                whenOwned: () =>
+                {
+                    MainFile.Logger.Info($"[PvzSimpleNut] Threshold reached but owner already has Hyper Temporal Nut | owner={Owner.NetId}");
+                    return Task.CompletedTask;
+                },
+                whenMissing: async () =>
+                {
+                    await RewardSyncHelper.ObtainRelicAsRewardMultiplayerSafe(Owner, ModelDb.Relic<PvzHyperTemporalNut>());
+                    MainFile.Logger.Info($"[PvzSimpleNut] Granted Hyper Temporal Nut via safe reward path | owner={Owner.NetId}");
+                });
         }
     }
 }

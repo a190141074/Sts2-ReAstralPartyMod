@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -37,7 +38,7 @@ public class EventRedHeatWarning : AstralPartyCardModel
     {
         if (CombatState == null) return;
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
             await PowerCmd.Apply<VigorPower>(player.Creature, DynamicVars["VigorPower"].BaseValue, Owner.Creature,
                 this);
     }

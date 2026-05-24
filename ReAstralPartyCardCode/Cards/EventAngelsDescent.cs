@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 /*
@@ -40,6 +41,7 @@ public class EventAngelsDescent : AstralPartyCardModel
     {
         if (CombatState == null) return;
 
-        foreach (var creature in CombatState.Creatures) await CreatureCmd.Heal(creature, DynamicVars["Heal"].BaseValue);
+        foreach (var creature in EventCombatTargetHelper.GetAliveCreaturesExcludingPlayerSummons(CombatState))
+            await CreatureCmd.Heal(creature, DynamicVars["Heal"].BaseValue);
     }
 }

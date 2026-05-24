@@ -31,13 +31,16 @@ public class EventFightFun : AstralPartyCardModel
 
         var giantRockCard = ModelDb.Card<MegaCrit.Sts2.Core.Models.Cards.GiantRock>();
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
         {
             var card = CombatState.CreateCard(giantRockCard, player);
             CardCmd.Upgrade(card);
             card.AddKeyword(CardKeyword.Exhaust);
             card.AddKeyword(CardKeyword.Ethereal);
-            await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
+            await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
+                card,
+                CardPilePosition.Top,
+                this);
             await XiaoLeiAwakeningHelper.TryGrantAwakeningForGrantedCard(Owner, player);
         }
     }

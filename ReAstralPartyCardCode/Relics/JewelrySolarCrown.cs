@@ -20,8 +20,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class JewelrySolarCrown : AstralPartyRelicModel
 {
-    [SavedProperty] public string AstralParty_JewelrySolarCrownProcessedTargetsThisCard { get; set; } = string.Empty;
-    [SavedProperty] public string AstralParty_JewelrySolarCrownCurrentCardKey { get; set; } = string.Empty;
+    private readonly HashSet<Creature> _processedTargetsThisCard = [];
+    private CardModel? _currentTrackedCard;
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -39,8 +39,7 @@ public class JewelrySolarCrown : AstralPartyRelicModel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_JewelrySolarCrownProcessedTargetsThisCard = string.Empty;
-        AstralParty_JewelrySolarCrownCurrentCardKey = string.Empty;
+        ResetTrackedCardState();
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -71,8 +70,8 @@ public class JewelrySolarCrown : AstralPartyRelicModel
         if (cardPlay.Card.Owner != Owner)
             return Task.CompletedTask;
 
-        AstralParty_JewelrySolarCrownCurrentCardKey = GetCardKey(cardPlay.Card);
-        AstralParty_JewelrySolarCrownProcessedTargetsThisCard = string.Empty;
+        _currentTrackedCard = cardPlay.Card;
+        _processedTargetsThisCard.Clear();
         return Task.CompletedTask;
     }
 
@@ -95,24 +94,22 @@ public class JewelrySolarCrown : AstralPartyRelicModel
         if (!FlashlightRelicHelper.IsTrackedAttackCard(Owner, cardSource, 1))
             return;
 
-        var currentCardKey = GetCardKey(cardSource);
-        if (AstralParty_JewelrySolarCrownCurrentCardKey != currentCardKey)
+        if (!ReferenceEquals(_currentTrackedCard, cardSource))
         {
-            AstralParty_JewelrySolarCrownCurrentCardKey = currentCardKey;
-            AstralParty_JewelrySolarCrownProcessedTargetsThisCard = string.Empty;
+            _currentTrackedCard = cardSource;
+            _processedTargetsThisCard.Clear();
         }
 
-        var processedKey = $"{target.GetHashCode()}|";
-        if (AstralParty_JewelrySolarCrownProcessedTargetsThisCard.Contains(processedKey, StringComparison.Ordinal))
+        if (!_processedTargetsThisCard.Add(target))
             return;
 
-        AstralParty_JewelrySolarCrownProcessedTargetsThisCard += processedKey;
         Flash();
         await PowerCmd.Apply<BlazingSolarBurnPower>(target, 2m, Owner.Creature, cardSource, false);
     }
 
-    private static string GetCardKey(CardModel? card)
+    private void ResetTrackedCardState()
     {
-        return card == null ? string.Empty : $"{card.Id.Entry}:{card.GetHashCode()}";
+        _currentTrackedCard = null;
+        _processedTargetsThisCard.Clear();
     }
 }

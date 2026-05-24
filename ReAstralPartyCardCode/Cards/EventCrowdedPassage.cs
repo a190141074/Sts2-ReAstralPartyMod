@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
 using System.Linq;
 using System.Threading.Tasks;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -43,7 +44,7 @@ public class EventCrowdedPassage : AstralPartyCardModel
     {
         if (CombatState == null) return;
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
         {
             await PowerCmd.Apply<BufferPower>(player.Creature, DynamicVars["Buffer"].BaseValue, null, null);
             await PowerCmd.Apply<VulnerablePower>(player.Creature, DynamicVars["Vulnerable"].BaseValue, null, null);

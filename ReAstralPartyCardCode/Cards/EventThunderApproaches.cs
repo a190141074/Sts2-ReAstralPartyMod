@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -43,13 +44,10 @@ public class EventThunderApproaches : AstralPartyCardModel
         if (CombatState == null)
             return;
 
-        foreach (var creature in CombatState.Creatures.Where(creature =>
-                     creature.IsAlive
-                     && creature != Owner.Creature
-                     && creature.Side != Owner.Creature.Side))
+        foreach (var creature in EventCombatTargetHelper.GetAliveNonSummonEnemies(CombatState, Owner.Creature!))
             await CreatureCmd.Stun(creature);
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
         {
             await PowerCmd.Apply<RingingPower>(player.Creature, 1m, Owner.Creature, this);
             await PowerCmd.Apply<DrawCardsNextTurnPower>(player.Creature,

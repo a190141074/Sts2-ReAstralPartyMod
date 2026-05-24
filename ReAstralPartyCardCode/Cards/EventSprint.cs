@@ -1,4 +1,5 @@
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -39,7 +40,7 @@ public class EventSprint : AstralPartyCardModel
         if (CombatState == null)
             return;
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
         {
             await AstralTemporaryDexterityPower.Apply(player.Creature, DynamicVars["Dexterity"].BaseValue, this, null,
                 this);

@@ -43,17 +43,12 @@ public static class FateGuidanceCompatibilityHelper
         }
 
         var card = CreateFateGuidanceCard(combatState, recipient, sourceBlueWhale.Owner!.NetId);
-        var addResult = await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, true);
-        if (!addResult.success)
-        {
-            if (allowStoreForNextCombat)
-                sourceBlueWhale.AddPendingFateGuidanceForRecipient(recipient, 1);
-            return;
-        }
-
+        await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
+            card,
+            CardPilePosition.Top,
+            sourceBlueWhale);
         if (card.Pile?.Type == PileType.Hand)
         {
-            await GeneratedCardObserver.NotifyCardAddedToHand(card, sourceBlueWhale);
             await XiaoLeiAwakeningHelper.TryGrantAwakeningForGrantedCard(sourceBlueWhale.Owner, recipient);
             return;
         }

@@ -73,7 +73,7 @@ public static class AstralEventCardCatalog
     {
         var cards = CreateEventCards();
 
-        if (owner.GetRelic<PersonPoisonedApple>() != null)
+        if (RelicOwnershipHelper.HasRelic<PersonPoisonedApple>(owner))
             cards.AddRange(CreateInvestigationCards());
 
         return cards

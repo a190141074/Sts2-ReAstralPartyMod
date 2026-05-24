@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -54,7 +55,9 @@ public class EventPlayerRepresentative : AstralPartyCardModel
             PileType.Draw.GetPile(Owner).Cards.Count,
             PileType.Hand.GetPile(Owner).Cards.Count,
             PileType.Discard.GetPile(Owner).Cards.Count);
-        var teammates = CombatState.Players.Where(player => player != Owner).ToList();
+        var teammates = EventCombatTargetHelper.GetAlivePlayers(CombatState)
+            .Where(player => player != Owner)
+            .ToList();
 
         if (roll <= 3)
         {

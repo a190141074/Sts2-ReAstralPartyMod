@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -38,10 +39,10 @@ public class EventAnomalyItsOver : AstralPartyCardModel
         if (CombatState == null)
             return;
 
-        foreach (var creature in CombatState.Creatures.Where(creature => creature.IsAlive))
+        foreach (var creature in EventCombatTargetHelper.GetAliveCreaturesExcludingPlayerSummons(CombatState))
             await PowerCmd.Apply<WeakPower>(creature, WeakAmount, Owner?.Creature, this, false);
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
             await PowerCmd.Apply<StarLightPower>(player.Creature, StarLightAmount, Owner?.Creature, this, false);
     }
 }

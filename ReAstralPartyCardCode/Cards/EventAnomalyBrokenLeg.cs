@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -37,10 +38,10 @@ public class EventAnomalyBrokenLeg : AstralPartyCardModel
         if (CombatState == null)
             return;
 
-        foreach (var creature in CombatState.Creatures.Where(creature => creature.IsAlive))
+        foreach (var creature in EventCombatTargetHelper.GetAliveCreaturesExcludingPlayerSummons(CombatState))
             await CreatureCmd.Damage(choiceContext, creature, DamageAmount, ValueProp.Unpowered, Owner?.Creature, this);
 
-        foreach (var player in CombatState.Players.Where(player => player.Creature != null && player.Creature.IsAlive))
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
         {
             var giantRockNextTurn = ModelDb.Power<AnomalyGiantRockNextTurnPower>().ToMutable();
             await PowerCmd.Apply(giantRockNextTurn, player.Creature, 1m, Owner?.Creature, this, false);

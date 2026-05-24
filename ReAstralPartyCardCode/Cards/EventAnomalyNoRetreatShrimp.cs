@@ -1,4 +1,5 @@
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -34,7 +35,7 @@ public class EventAnomalyNoRetreatShrimp : AstralPartyCardModel
         if (CombatState == null)
             return;
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
             await AstralTemporaryStrengthPower.Apply(player.Creature, TemporaryStrengthAmount, this, Owner?.Creature,
                 this, true);
     }

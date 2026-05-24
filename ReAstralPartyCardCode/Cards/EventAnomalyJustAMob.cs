@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -34,7 +35,7 @@ public class EventAnomalyJustAMob : AstralPartyCardModel
         if (CombatState == null)
             return;
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
             await AstralTemporaryDexterityPower.Apply(player.Creature, TemporaryDexterityAmount, this, Owner?.Creature,
                 this, true);
     }

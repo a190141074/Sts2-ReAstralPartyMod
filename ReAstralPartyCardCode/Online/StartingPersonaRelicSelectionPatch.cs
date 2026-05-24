@@ -56,6 +56,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         }
 
         LogInfo("P004", "Starting persona relic selection patch resumed after StartRun task completed.");
+        await WaitForSafeMultiplayerStartupWindowAsync(runState);
         LogInfo("P005", "Starting persona relic selection waiting for run settings sync.");
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         LogInfo("P006", "Starting persona relic selection finished run settings sync.");
@@ -166,6 +167,44 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         }
     }
 
+    private static async Task WaitForSafeMultiplayerStartupWindowAsync(RunState runState)
+    {
+        var netType = RunManager.Instance?.NetService?.Type;
+        if (netType is not (NetGameType.Host or NetGameType.Client))
+            return;
+
+        const int maxWaitFrames = 1800;
+        var observedStartupEventWindow = false;
+        for (var attempt = 0; attempt < maxWaitFrames; attempt++)
+        {
+            if (!IsStartupEventWindowActive(runState))
+            {
+                if (observedStartupEventWindow)
+                {
+                    LogInfo("P004B",
+                        $"Starting persona relic selection left startup event window after {attempt} frames.");
+                }
+
+                return;
+            }
+
+            if (!observedStartupEventWindow)
+            {
+                observedStartupEventWindow = true;
+                LogInfo("P004A",
+                    "Starting persona relic selection detected startup event input window; waiting for it to finish before using multiplayer choice sync.");
+            }
+
+            await Task.Yield();
+        }
+
+        if (observedStartupEventWindow)
+        {
+            LogWarn("P004C",
+                $"Starting persona relic selection timed out while waiting for the startup event window to close after {maxWaitFrames} frames; continuing with sync anyway.");
+        }
+    }
+
     private static async Task<NOverlayStack?> WaitForOverlayStackAsync()
     {
         for (var attempt = 0; attempt < 120; attempt++)
@@ -178,6 +217,80 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         }
 
         return null;
+    }
+
+    private static bool IsStartupEventWindowActive(RunState runState)
+    {
+        var room = runState.CurrentRoom;
+        if (room == null)
+            return false;
+
+        var roomTypeName = room.GetType().FullName ?? room.GetType().Name;
+        if (roomTypeName.Contains("Event", StringComparison.OrdinalIgnoreCase) ||
+            roomTypeName.Contains("Ancient", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var roomKind = ReadMemberValue(room, "RoomType")?.ToString();
+        if (!string.IsNullOrWhiteSpace(roomKind) &&
+            roomKind.Contains("Event", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        var eventId = TryReadEventId(room);
+        return !string.IsNullOrWhiteSpace(eventId) &&
+               (eventId.Contains("NEOW", StringComparison.OrdinalIgnoreCase) ||
+                eventId.Contains("ANCIENT", StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string? TryReadEventId(object? room)
+    {
+        foreach (var memberName in new[] { "Event", "CurrentEvent", "_event", "eventModel" })
+        {
+            var value = ReadMemberValue(room, memberName);
+            if (value == null)
+                continue;
+
+            var idValue = ReadMemberValue(value, "Id");
+            var entry = ReadMemberValue(idValue, "Entry")?.ToString();
+            if (!string.IsNullOrWhiteSpace(entry))
+                return entry;
+
+            var asString = value.ToString();
+            if (!string.IsNullOrWhiteSpace(asString))
+                return asString;
+        }
+
+        return null;
+    }
+
+    private static object? ReadMemberValue(object? instance, string memberName)
+    {
+        if (instance == null)
+            return null;
+
+        try
+        {
+            const System.Reflection.BindingFlags flags =
+                System.Reflection.BindingFlags.Instance |
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.NonPublic;
+
+            var property = instance.GetType().GetProperty(memberName, flags);
+            if (property != null)
+                return property.GetValue(instance);
+
+            var field = instance.GetType().GetField(memberName, flags);
+            return field?.GetValue(instance);
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn(
+                $"Starting persona relic selection failed to inspect member '{memberName}' on {instance.GetType().FullName}: {ex.Message}");
+            return null;
+        }
     }
 
     private static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)

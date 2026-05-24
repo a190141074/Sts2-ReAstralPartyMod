@@ -58,10 +58,12 @@ internal static class SinkouSetHelper
 
     public static bool HasFullListeningToSolarRoarSet(Player? owner)
     {
-        return HasVariantSinkou(owner)
-               && HasMiniatureMilen(owner)
-               && HasSolarCrown(owner)
-               && HasEchoOfDivineLight(owner);
+        return RelicOwnershipHelper.HasAllRelics(
+            owner,
+            typeof(VariantPersonSinkou),
+            typeof(JewelryMiniatureMilen),
+            typeof(JewelrySolarCrown),
+            typeof(JewelryEchoOfDivineLight));
     }
 
     public static bool ShouldPunitiveJudgmentExtraDamageScaleWithBurn(Player? owner)

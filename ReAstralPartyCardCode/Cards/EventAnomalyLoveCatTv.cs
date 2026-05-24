@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -40,7 +41,7 @@ public class EventAnomalyLoveCatTv : AstralPartyCardModel
         if (CombatState == null || Owner?.Creature == null)
             return;
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
         {
             await AstralTemporaryStrengthPower.Apply(
                 player.Creature,
@@ -58,8 +59,7 @@ public class EventAnomalyLoveCatTv : AstralPartyCardModel
                 true);
         }
 
-        foreach (var enemy in CombatState.Creatures.Where(creature =>
-                     creature.IsAlive && creature.Side != Owner.Creature.Side))
+        foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(CombatState, Owner.Creature))
             await PowerCmd.Apply<StrengthPower>(enemy, -EnemyStrengthLoss, Owner.Creature, this, false);
     }
 }

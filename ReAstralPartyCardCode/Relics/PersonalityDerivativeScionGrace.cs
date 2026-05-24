@@ -57,9 +57,8 @@ public class PersonalityDerivativeScionGrace : AstralPartyRelicModel
                 continue;
 
             var card = combatState.CreateCard(ModelDb.Card<Royalties>(), player);
-            await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
+            await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
                 card,
-                true,
                 CardPilePosition.Top,
                 this);
         }

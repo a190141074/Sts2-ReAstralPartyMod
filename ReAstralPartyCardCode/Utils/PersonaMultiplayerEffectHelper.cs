@@ -63,6 +63,31 @@ public static class PersonaMultiplayerEffectHelper
         return true;
     }
 
+    public static async Task CopyCardToHandOrRedirectLivingFolioAsync(
+        Player? owner,
+        CardModel sourceCard,
+        AbstractModel? source,
+        CardPilePosition position,
+        bool setFreeThisTurn = false)
+    {
+        if (await TryRedirectLivingFolioCopyToDerivativeStacks(owner, sourceCard, source))
+            return;
+
+        var copiedCard = sourceCard.CreateClone();
+        if (!sourceCard.Keywords.Contains(CardKeyword.Exhaust)
+            && !copiedCard.Keywords.Contains(CardKeyword.Exhaust))
+            CardCmd.ApplyKeyword(copiedCard, CardKeyword.Exhaust);
+
+        if (setFreeThisTurn)
+            copiedCard.SetToFreeThisTurn();
+
+        await AddGeneratedCardToHandAndNotify(
+            copiedCard,
+            true,
+            position,
+            source);
+    }
+
     public static Task<IEnumerable<CardModel>> DrawCardsForPlayer(
         PlayerChoiceContext choiceContext,
         decimal count,
@@ -83,6 +108,18 @@ public static class PersonaMultiplayerEffectHelper
             await CardPileCmd.Add(card, PileType.Hand.GetPile(recipient), position, source);
             await GeneratedCardObserver.NotifyCardAddedToHand(card, source);
         });
+    }
+
+    public static Task MoveOwnedCombatCardToHandAndNotify(
+        CardModel card,
+        CardPilePosition position,
+        AbstractModel? source)
+    {
+        var recipient = card.Owner;
+        if (recipient?.Creature?.CombatState == null)
+            return AddGeneratedCardToHandAndNotify(card, true, position, source);
+
+        return MoveCombatCardToHandAndNotify(recipient, card, position, source);
     }
 
     public static Task GainGoldDeterministic(decimal amount, Player owner)

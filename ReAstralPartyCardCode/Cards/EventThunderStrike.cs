@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -37,7 +38,7 @@ public class EventThunderStrike : AstralPartyCardModel
     {
         if (CombatState == null) return;
 
-        foreach (var creature in CombatState.Creatures)
+        foreach (var creature in EventCombatTargetHelper.GetAliveCreaturesExcludingPlayerSummons(CombatState))
             await CreatureCmd.Damage(
                 choiceContext,
                 creature,

@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -38,9 +39,10 @@ public class EventEquality : AstralPartyCardModel
     {
         if (CombatState == null) return;
 
-        foreach (var player in CombatState.Players)
-            // 设置生命值为1�?            await CreatureCmd.SetCurrentHp(player.Creature, 1);
-            // 获得护盾
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
+        {
+            await CreatureCmd.SetCurrentHp(player.Creature, 1);
             await CreatureCmd.GainBlock(player.Creature, DynamicVars["Block"].BaseValue, ValueProp.Move, null);
+        }
     }
 }

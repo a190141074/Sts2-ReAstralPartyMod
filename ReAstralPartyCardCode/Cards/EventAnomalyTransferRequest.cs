@@ -38,7 +38,9 @@ public class EventAnomalyTransferRequest : AstralPartyCardModel
         if (Owner?.Creature == null || CombatState == null)
             return;
 
-        var otherPlayers = CombatState.Players.Where(player => player != Owner).ToList();
+        var otherPlayers = EventCombatTargetHelper.GetAlivePlayers(CombatState)
+            .Where(player => player != Owner)
+            .ToList();
         foreach (var player in otherPlayers)
         {
             if (player.Gold < GoldLossPerOtherPlayer)

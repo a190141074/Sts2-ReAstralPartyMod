@@ -29,7 +29,9 @@ public static class KawaiiPersonaHelper
         if (player == null)
             return false;
 
-        return player.GetRelic<PersonKawaiiAngel>() != null
-               || player.GetRelic<PersonNeedyGirl>() != null;
+        return RelicOwnershipHelper.HasAnyRelic(
+            player,
+            typeof(PersonKawaiiAngel),
+            typeof(PersonNeedyGirl));
     }
 }

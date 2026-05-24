@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -40,7 +41,7 @@ public class EventFoodSafetyDoom : AstralPartyCardModel
     {
         if (CombatState == null) return;
 
-        foreach (var creature in CombatState.Creatures)
+        foreach (var creature in EventCombatTargetHelper.GetAliveCreaturesExcludingPlayerSummons(CombatState))
             await PowerCmd.Apply<DoomPower>(creature, DynamicVars["DoomPower"].BaseValue, Owner.Creature, this);
     }
 }

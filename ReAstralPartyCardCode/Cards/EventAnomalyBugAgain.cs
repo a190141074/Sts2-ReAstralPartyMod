@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -33,8 +34,7 @@ public class EventAnomalyBugAgain : AstralPartyCardModel
         if (CombatState == null || Owner?.Creature == null)
             return;
 
-        foreach (var enemy in CombatState.Creatures.Where(creature =>
-                     creature.IsAlive && creature.Side != Owner.Creature.Side))
+        foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(CombatState, Owner.Creature))
             await CreatureCmd.Stun(enemy);
     }
 }

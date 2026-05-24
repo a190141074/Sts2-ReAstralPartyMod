@@ -69,9 +69,8 @@ public class SkillPowerfulPity : AstralPartyCardModel
             if (!copiedCard.Keywords.Contains(CardKeyword.Ethereal))
                 CardCmd.ApplyKeyword(copiedCard, CardKeyword.Ethereal);
 
-            await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
+            await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
                 copiedCard,
-                true,
                 CardPilePosition.Top,
                 this);
         }

@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -84,21 +83,12 @@ public class TokenGoldArcaneCodex : AstralPartyRelicModel
         InvokeDisplayAmountChanged();
 
         Flash();
-        if (await PersonaMultiplayerEffectHelper.TryRedirectLivingFolioCopyToDerivativeStacks(Owner, cardPlay.Card,
-                this))
-            return;
-
-        var copiedCard = cardPlay.Card.CreateClone();
-        if (!cardPlay.Card.Keywords.Contains(CardKeyword.Exhaust)
-            && !copiedCard.Keywords.Contains(CardKeyword.Exhaust))
-            CardCmd.ApplyKeyword(copiedCard, CardKeyword.Exhaust);
-
-        copiedCard.SetToFreeThisTurn();
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
-            copiedCard,
-            true,
+        await PersonaMultiplayerEffectHelper.CopyCardToHandOrRedirectLivingFolioAsync(
+            Owner,
+            cardPlay.Card,
+            this,
             CardPilePosition.Top,
-            this);
+            setFreeThisTurn: true);
     }
 
     private void ResetTurnState()

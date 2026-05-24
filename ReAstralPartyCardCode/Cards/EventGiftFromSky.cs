@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -43,7 +44,7 @@ public class EventGiftFromSky : AstralPartyCardModel
     {
         if (CombatState == null) return;
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
         {
             await CardGainAttribution.RunWithSource(this,
                 () => CardPileCmd.Draw(choiceContext, (int)DynamicVars["Cards"].BaseValue, player));

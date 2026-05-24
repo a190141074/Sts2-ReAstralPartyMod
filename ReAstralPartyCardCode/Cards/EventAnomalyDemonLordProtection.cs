@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -42,15 +43,14 @@ public class EventAnomalyDemonLordProtection : AstralPartyCardModel
         if (CombatState == null || Owner?.Creature == null)
             return;
 
-        foreach (var enemy in CombatState.Creatures.Where(creature =>
-                     creature.IsAlive && creature.Side != Owner.Creature.Side))
+        foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(CombatState, Owner.Creature))
         {
             await PowerCmd.Apply<MarkLockPower>(enemy, MarkAmount, Owner.Creature, this, false);
             await PowerCmd.Apply<VulnerablePower>(enemy, VulnerableAmount, Owner.Creature, this, false);
             await PowerCmd.Apply<WeakPower>(enemy, WeakAmount, Owner.Creature, this, false);
         }
 
-        foreach (var player in CombatState.Players)
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
             await PowerCmd.Apply<StarLightPower>(player.Creature, StarLightAmount, Owner.Creature, this, false);
     }
 }
