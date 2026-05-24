@@ -44,6 +44,7 @@ public class SkillNinjutsuCombo : AstralPartyCardModel
         await PlayerCmd.GainEnergy(1m, Owner);
 
         var baseAbilityCard = BaseAbilityCardRegistry.GetDeterministicCardModel(
+            Owner,
             MainFile.ModId,
             Id.Entry,
             Owner.RunState.Rng.StringSeed,

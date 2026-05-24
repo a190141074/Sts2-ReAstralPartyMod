@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -15,9 +16,30 @@ public static class BaseAbilityCardRegistry
         return CachedTypes.Value;
     }
 
+    public static IReadOnlyList<Type> GetCandidateTypes(Player? owner)
+    {
+        return GetCandidateTypes()
+            .Where(type => BaseAbilityHelper.IsCardTypeAvailableForPlayer(type, owner))
+            .ToArray();
+    }
+
     public static CardModel? GetDeterministicCardModel(params object?[] contextParts)
     {
         var candidates = GetCandidateTypes();
+        if (candidates.Count == 0)
+            return null;
+
+        var ordered = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
+            candidates,
+            type => type.Name,
+            contextParts);
+        var selectedType = ordered[0];
+        return ModelDb.GetById<CardModel>(ModelDb.GetId(selectedType));
+    }
+
+    public static CardModel? GetDeterministicCardModel(Player? owner, params object?[] contextParts)
+    {
+        var candidates = GetCandidateTypes(owner);
         if (candidates.Count == 0)
             return null;
 
