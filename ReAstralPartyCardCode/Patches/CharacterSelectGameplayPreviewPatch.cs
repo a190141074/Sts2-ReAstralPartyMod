@@ -121,6 +121,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private double _secondsSinceSnapshotUpdate;
     private bool _initialRoleSyncPerformed;
     private bool _syncErrorShown;
+    private bool _hasReceivedSnapshotForCurrentSession;
 
     public CharacterSelectGameplayPreviewPanel()
     {
@@ -515,6 +516,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             _lastObservedLobby = lobby;
             _initialRoleSyncPerformed = false;
             _requestRetryAccumulator = 0d;
+            _secondsSinceSnapshotUpdate = 0d;
+            _hasReceivedSnapshotForCurrentSession = false;
             MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview observed lobby change; role={role} hostNetId={LobbyGameplayNetRoleHelper.GetHostNetId(lobby)} localNetId={lobby?.LocalPlayer.id ?? 0UL} players={lobby?.Players.Count ?? 0}.");
         }
 
@@ -524,6 +527,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             _lastObservedNetService = netService;
             _initialRoleSyncPerformed = false;
             _requestRetryAccumulator = 0d;
+            _secondsSinceSnapshotUpdate = 0d;
+            _hasReceivedSnapshotForCurrentSession = false;
             MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview observed NetService change; role={role}.");
         }
 
@@ -533,7 +538,9 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             _lastKnownRole = role;
             _initialRoleSyncPerformed = false;
             _requestRetryAccumulator = 0d;
+            _secondsSinceSnapshotUpdate = 0d;
             _syncErrorShown = false;
+            _hasReceivedSnapshotForCurrentSession = false;
             RefreshFromCurrentState();
         }
 
@@ -559,6 +566,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview initialized authoritative host snapshot from persistent settings.");
             }
 
+            _hasReceivedSnapshotForCurrentSession = true;
+
             if (!_initialRoleSyncPerformed)
             {
                 _initialRoleSyncPerformed = true;
@@ -572,17 +581,20 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         if (!_initialRoleSyncPerformed)
         {
             _initialRoleSyncPerformed = true;
-            LobbyGameplaySettingsSync.RequestSnapshotFromHost();
-            _requestRetryAccumulator = 0d;
+            if (!_hasReceivedSnapshotForCurrentSession)
+            {
+                LobbyGameplaySettingsSync.RequestSnapshotFromHost();
+                _requestRetryAccumulator = 0d;
+            }
         }
 
-        if (_requestRetryAccumulator >= 1.5d)
+        if (!_hasReceivedSnapshotForCurrentSession && _requestRetryAccumulator >= 1.5d)
         {
             _requestRetryAccumulator = 0d;
             LobbyGameplaySettingsSync.RequestSnapshotFromHost();
         }
 
-        if (!_syncErrorShown && _secondsSinceSnapshotUpdate >= 6d)
+        if (!_hasReceivedSnapshotForCurrentSession && !_syncErrorShown && _secondsSinceSnapshotUpdate >= 6d)
         {
             _syncErrorShown = true;
             AstralNotificationService.ShowDiagnosticError(
@@ -704,6 +716,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     {
         _secondsSinceSnapshotUpdate = 0d;
         _syncErrorShown = false;
+        _hasReceivedSnapshotForCurrentSession = true;
         CallDeferred(nameof(ApplySnapshotDeferred), Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableAllVariantPersonas),
             Variant.From(snapshot.EnableExtremeMode), Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
     }
