@@ -894,6 +894,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 continue;
 
             var relic = result.relic.ToMutable();
+            if (PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(result.player, relic))
+            {
+                MainFile.Logger.Warn(
+                    $"[P108] Starting persona selection skipped banned relic '{relic.Id.Entry}' for player {result.player.NetId}.");
+                continue;
+            }
+
             SaveManager.Instance.MarkRelicAsSeen(relic);
             MainFile.Logger.Info(
                 $"[P109] Starting persona selection awarding relic '{relic.Id.Entry}' to player {result.player.NetId}.");

@@ -129,6 +129,13 @@ public sealed class AstralRelicStore : AstralPartyEventModel
     private static async Task GrantStorePurchase(Player owner, RelicModel relic)
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
+        if (PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, canonicalRelic))
+        {
+            MainFile.Logger.Warn(
+                $"AstralRelicStore skipped banned store relic '{canonicalRelic.Id.Entry}' for player {owner.NetId}.");
+            return;
+        }
+
         if (canonicalRelic.Id == ModelDb.GetId<TokenGoldInitialPoint>())
         {
             if (owner.GetRelic<TokenGoldInitialPoint>() != null)

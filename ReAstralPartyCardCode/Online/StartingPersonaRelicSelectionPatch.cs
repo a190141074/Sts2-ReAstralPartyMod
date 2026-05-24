@@ -454,8 +454,11 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
         if (ReAstralPartyModSettingsManager.GetEnableAllVariantPersonas(runState))
         {
+            var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
             foreach (var variant in PersonaRelicRegistry.GetStartingBuiltInVariantPersonaRelics())
             {
+                if (BannedRelicRegistry.IsBanned(bannedRelicIds, variant))
+                    continue;
                 if (pool.Any(existing => existing.Id == variant.Id))
                     continue;
 
@@ -498,6 +501,9 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             return source;
 
         var forcedRelic = PersonaRelicRegistry.GetCanonicalVariantPersonaRelics()
+            .Where(relic => !BannedRelicRegistry.IsBanned(
+                ReAstralPartyModSettingsManager.GetBannedRelicIds(runState),
+                relic))
             .FirstOrDefault(IsWindchaserVariantRelic);
         if (forcedRelic == null)
             return source;

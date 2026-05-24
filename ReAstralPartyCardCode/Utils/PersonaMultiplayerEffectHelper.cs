@@ -18,6 +18,7 @@ using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using MegaCrit.Sts2.Core.Helpers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
@@ -157,12 +158,19 @@ public static class PersonaMultiplayerEffectHelper
         if (existing != null)
             return existing;
 
-        return await RelicCmd.Obtain(ModelDb.Relic<T>().ToMutable(), owner);
+        var canonicalRelic = ModelDb.Relic<T>().CanonicalInstance ?? ModelDb.Relic<T>();
+        if (IsRelicBannedForOwner(owner, canonicalRelic))
+            return null;
+
+        return await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
     }
 
     public static Task<RelicModel> ObtainRelicDeterministic(Player owner, RelicModel relic)
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
+        if (IsRelicBannedForOwner(owner, canonicalRelic))
+            throw new InvalidOperationException($"Attempted to deterministically obtain banned relic '{canonicalRelic.Id}'.");
+
         ExclusiveRelicUnlockHelper.MarkRelicUnlockedForCurrentRunAndProfile(owner, canonicalRelic);
         if (canonicalRelic.Id == ModelDb.GetId<TokenGoldInitialPoint>() &&
             owner.GetRelic<TokenGoldInitialPoint>() != null)
@@ -174,6 +182,9 @@ public static class PersonaMultiplayerEffectHelper
     public static Task<RelicModel> ObtainRelicAsReward(Player owner, RelicModel relic)
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
+        if (IsRelicBannedForOwner(owner, canonicalRelic))
+            throw new InvalidOperationException($"Attempted to grant banned relic reward '{canonicalRelic.Id}'.");
+
         ExclusiveRelicUnlockHelper.MarkRelicUnlockedForCurrentRunAndProfile(owner, canonicalRelic);
         if (RewardContextPolicy.CanUseRewardSynchronizer(owner, "relic reward"))
             RunManager.Instance?.RewardSynchronizer?.SyncLocalObtainedRelic(canonicalRelic.ToMutable());
@@ -189,16 +200,20 @@ public static class PersonaMultiplayerEffectHelper
 
     public static Task<RelicModel> ObtainRelicForMultiplayerSafeReward(Player owner, RelicModel relic)
     {
+        var canonicalRelic = relic.CanonicalInstance ?? relic;
+        if (IsRelicBannedForOwner(owner, canonicalRelic))
+            throw new InvalidOperationException($"Attempted to grant banned multiplayer-safe relic reward '{canonicalRelic.Id}'.");
+
         if (RewardContextPolicy.CanUseRewardSynchronizer(owner, "safe relic reward"))
-            return ObtainRelicAsReward(owner, relic);
+            return ObtainRelicAsReward(owner, canonicalRelic);
 
         AstralRelicDiagnosticHelper.ShowFallbackWarning(
             owner,
-            relic,
+            canonicalRelic,
             "奖励同步回退",
             1,
             "奖励同步上下文不可用，已改走确定性直接发放。");
-        return ObtainRelicDeterministic(owner, relic);
+        return ObtainRelicDeterministic(owner, canonicalRelic);
     }
 
     public static IReadOnlyList<Player> GetStableCombatPlayers(Player owner)
@@ -358,5 +373,15 @@ public static class PersonaMultiplayerEffectHelper
     private static void MarkRelicAsSeenIfPossible(RelicModel relic)
     {
         SaveManager.Instance?.MarkRelicAsSeen(relic.CanonicalInstance ?? relic);
+    }
+
+    public static bool IsRelicBannedForOwner(Player? owner, RelicModel? relic)
+    {
+        if (owner?.RunState == null || relic == null)
+            return false;
+
+        return BannedRelicRegistry.IsBanned(
+            ReAstralPartyModSettingsManager.GetBannedRelicIds(owner.RunState),
+            relic);
     }
 }

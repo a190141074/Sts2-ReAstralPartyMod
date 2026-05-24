@@ -65,10 +65,13 @@ public class PersonalityDerivativeMascotGirlMimiTokenMemory : AstralPartyRelicMo
 
         foreach (var tokenRelicId in GetReadyRewardTokenIds())
         {
+            var tokenRelic = ModelDb.GetById<RelicModel>(tokenRelicId);
             if (MascotGirlMimiTokenMemoryHelper.PlayerOwnsTokenRelic(Owner, tokenRelicId))
                 continue;
+            if (PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(Owner, tokenRelic))
+                continue;
 
-            room.AddExtraReward(Owner, new RelicReward(ModelDb.GetById<RelicModel>(tokenRelicId).ToMutable(), Owner));
+            room.AddExtraReward(Owner, new RelicReward(tokenRelic.ToMutable(), Owner));
         }
 
         InvokeDisplayAmountChanged();
