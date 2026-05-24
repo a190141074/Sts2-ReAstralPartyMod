@@ -131,9 +131,7 @@ public static class TokenRelicRegistry
 
     public static IReadOnlyList<RelicModel> GetCanonicalTokenRelics()
     {
-        return BannedRelicRegistry.FilterBannedRelics(
-            CanonicalTokenRelics,
-            ReAstralPartyModSettingsManager.BannedRelicIds);
+        return CanonicalTokenRelics;
     }
 
     public static IReadOnlyList<RelicModel> GetTokenRelicsByRarity(RelicRarity rarity)
@@ -141,6 +139,9 @@ public static class TokenRelicRegistry
         return GetCanonicalTokenRelics()
             .Where(relic => relic.Rarity == rarity)
             .Where(IsTokenRelicPoolCandidate)
+            .Where(relic => !BannedRelicRegistry.IsBanned(
+                ReAstralPartyModSettingsManager.BannedRelicIds,
+                relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
     }
@@ -168,6 +169,9 @@ public static class TokenRelicRegistry
             .Where(relic => relic.Rarity == rarity)
             .Where(IsTokenRelicPoolCandidate)
             .Where(relic => !DiceSeriesHelper.IsDiceSeriesRelic(relic))
+            .Where(relic => !BannedRelicRegistry.IsBanned(
+                ReAstralPartyModSettingsManager.BannedRelicIds,
+                relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
     }

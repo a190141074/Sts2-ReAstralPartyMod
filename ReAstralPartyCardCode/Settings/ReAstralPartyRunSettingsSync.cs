@@ -140,11 +140,11 @@ internal static class ReAstralPartyRunSettingsSync
 
     private static List<int> CreateSnapshotPayload(ReAstralPartyRunSettingsSnapshot snapshot)
     {
-        var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
+        var bannableRelics = BannedRelicRegistry.GetCanonicalBannableRelics();
         var bannedSet = snapshot.BannedRelicIdsSerialized
             .Where(static id => !string.IsNullOrWhiteSpace(id))
             .ToHashSet(StringComparer.Ordinal);
-        var bannedFlags = personaRelics
+        var bannedFlags = bannableRelics
             .Select(relic => bannedSet.Contains((relic.CanonicalInstance?.Id ?? relic.Id).ToString()) ? 1 : 0);
 
         return
@@ -194,18 +194,22 @@ internal static class ReAstralPartyRunSettingsSync
     {
         snapshot = null!;
         var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
-        if (payload.Count != personaRelics.Count + 6 && payload.Count != personaRelics.Count + 7)
+        var bannableRelics = BannedRelicRegistry.GetCanonicalBannableRelics();
+        var isLegacyPayload = payload.Count == personaRelics.Count + 7;
+        var isPersonaOnlyPayload = payload.Count == personaRelics.Count + 6;
+        var isFullBannablePayload = payload.Count == bannableRelics.Count + 6;
+        if (!isLegacyPayload && !isPersonaOnlyPayload && !isFullBannablePayload)
             return false;
 
-        var isLegacyPayload = payload.Count == personaRelics.Count + 7;
         var bannedStartIndex = isLegacyPayload ? 7 : 6;
+        var bannedRelicSource = isFullBannablePayload ? bannableRelics : personaRelics;
         var bannedIds = new List<string>();
-        for (var i = 0; i < personaRelics.Count && bannedStartIndex + i < payload.Count; i++)
+        for (var i = 0; i < bannedRelicSource.Count && bannedStartIndex + i < payload.Count; i++)
         {
             if (payload[bannedStartIndex + i] == 0)
                 continue;
 
-            bannedIds.Add((personaRelics[i].CanonicalInstance?.Id ?? personaRelics[i].Id).ToString());
+            bannedIds.Add((bannedRelicSource[i].CanonicalInstance?.Id ?? bannedRelicSource[i].Id).ToString());
         }
 
         var legacyRandomCloneMode = isLegacyPayload && payload[4] != 0;
@@ -233,6 +237,15 @@ internal static class ReAstralPartyRunSettingsSync
                 212,
                 "旧协议降级",
                 $"检测到旧版开局人格设置同步协议，已按标准模式兼容降级处理。legacy_random_clone_mode={legacyRandomCloneMode}。");
+        }
+        else if (isPersonaOnlyPayload)
+        {
+            MainFile.Logger.Info(
+                $"{MainFile.ModId} settings sync decoded a persona-only banned relic payload for compatibility.");
+            ShowSyncWarning(
+                219,
+                "旧协议兼容",
+                "检测到旧版仅同步人格 ban 位的协议，本局的变体/衍生/Token/其他 ban 位可能未随主机同步。");
         }
 
         return true;

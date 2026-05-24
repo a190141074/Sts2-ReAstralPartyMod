@@ -524,7 +524,9 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         RunState runState,
         List<RelicModel> options)
     {
+        var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
         var builtInVariants = PersonaRelicRegistry.GetStartingBuiltInVariantPersonaRelics()
+            .Where(relic => !BannedRelicRegistry.IsBanned(bannedRelicIds, relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
         if (builtInVariants.Count == 0)
@@ -552,7 +554,9 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         RunState runState,
         List<RelicModel> options)
     {
+        var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
         var allVariants = PersonaRelicRegistry.GetStartingBuiltInVariantPersonaRelics()
+            .Where(relic => !BannedRelicRegistry.IsBanned(bannedRelicIds, relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
         if (allVariants.Count == 0)
