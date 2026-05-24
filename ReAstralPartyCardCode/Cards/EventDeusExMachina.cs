@@ -35,7 +35,14 @@ public class EventDeusExMachina : AstralPartyCardModel
     {
         if (CombatState == null || Owner == null) return;
 
-        var offeredCards = AstralEventCardCatalog.CreateMutableEventCardsForPlayer(Owner, typeof(EventDeusExMachina));
+        var offeredCards = AstralEventCardCatalog.CreateEventCards(typeof(EventDeusExMachina))
+            .Select(card =>
+            {
+                var displayCard = (card.CanonicalInstance ?? card).ToMutable();
+                displayCard.Owner = Owner;
+                return displayCard;
+            })
+            .ToList();
 
         if (offeredCards.Count == 0) return;
 

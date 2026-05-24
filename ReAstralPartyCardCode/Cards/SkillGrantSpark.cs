@@ -51,7 +51,7 @@ public class SkillGrantSpark : AstralPartyCardModel
         if (Owner?.Creature?.CombatState == null)
             return;
 
-        var offeredCards = WindchaserSpellbookHelper.CreateUpgradedMutableSpellbookCardsForPlayer(Owner);
+        var offeredCards = WindchaserSpellbookHelper.CreateUpgradedSpellbookCardsForPlayer(Owner);
         if (offeredCards.Count == 0)
             return;
 

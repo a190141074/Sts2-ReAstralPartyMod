@@ -50,25 +50,19 @@ public static class AstralEventCardCatalog
         ModelDb.GetId<EventsConcealingInvestigationD>()
     ];
 
-    public static List<CardModel> CreateMutableEventCardsForPlayer(Player owner, params Type[] excludedTypes)
+    public static List<CardModel> CreateEventCards(params Type[] excludedTypes)
     {
         HashSet<Type> excludedTypeSet = excludedTypes.Length == 0 ? [] : [..excludedTypes];
 
         return EventCards
             .Where(card => !excludedTypeSet.Contains(card.GetType()))
-            .Select(card =>
-            {
-                var mutableCard = card.ToMutable();
-                mutableCard.Owner = owner;
-                return mutableCard;
-            })
             .ToList();
     }
 
-    public static List<CardModel> CreateRandomMutableEventCardsForPlayer(Player owner, int count,
+    public static List<CardModel> CreateRandomEventCardsForPlayer(Player owner, int count,
         params Type[] excludedTypes)
     {
-        return CreateMutableEventCardsForPlayer(owner, excludedTypes)
+        return CreateEventCards(excludedTypes)
             .OrderBy(card => GetDeterministicEventCardSortKey(owner, card))
             .ThenBy(card => card.Id.Entry, StringComparer.Ordinal)
             .Take(count)
@@ -77,10 +71,10 @@ public static class AstralEventCardCatalog
 
     public static List<CardModel> CreateStableTroubleMakerCardsForPlayer(Player owner, CardModel sourceCard, int count)
     {
-        var cards = CreateMutableEventCardsForPlayer(owner);
+        var cards = CreateEventCards();
 
         if (owner.GetRelic<PersonPoisonedApple>() != null)
-            cards.AddRange(CreateMutableInvestigationCardsForPlayer(owner));
+            cards.AddRange(CreateInvestigationCards());
 
         return cards
             .OrderBy(card => GetTroubleMakerSortKey(owner, sourceCard, card))
@@ -92,7 +86,7 @@ public static class AstralEventCardCatalog
     public static List<CardModel> CreateStableBossBurnedOutSafeCardsForPlayer(Player owner, CardModel sourceCard,
         int count)
     {
-        var cards = CreateMutableEventCardsForPlayer(owner)
+        var cards = CreateEventCards()
             .Where(IsBossBurnedOutSafeCard)
             .ToList();
 
@@ -141,15 +135,9 @@ public static class AstralEventCardCatalog
         return pileType.GetPile(owner).Cards.Count;
     }
 
-    public static List<CardModel> CreateMutableInvestigationCardsForPlayer(Player owner)
+    public static List<CardModel> CreateInvestigationCards()
     {
         return InvestigationCards
-            .Select(card =>
-            {
-                var mutableCard = card.ToMutable();
-                mutableCard.Owner = owner;
-                return mutableCard;
-            })
             .ToList();
     }
 

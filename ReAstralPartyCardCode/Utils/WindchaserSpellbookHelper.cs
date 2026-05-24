@@ -8,15 +8,15 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class WindchaserSpellbookHelper
 {
-    public static IReadOnlyList<CardModel> CreateUpgradedMutableSpellbookCardsForPlayer(Player owner)
+    public static IReadOnlyList<CardModel> CreateUpgradedSpellbookCardsForPlayer(Player owner)
     {
         return WindchaserCompat.GetSpellbookCards()
             .Select(card =>
             {
-                var mutable = card.ToMutable();
-                mutable.Owner = owner;
-                CardCmd.Upgrade(mutable);
-                return mutable;
+                var upgradedCard = card.ToMutable();
+                upgradedCard.Owner = owner;
+                CardCmd.Upgrade(upgradedCard);
+                return upgradedCard;
             })
             .ToList();
     }

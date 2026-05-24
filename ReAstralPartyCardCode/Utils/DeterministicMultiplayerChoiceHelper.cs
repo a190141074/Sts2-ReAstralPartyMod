@@ -522,12 +522,29 @@ public static class DeterministicMultiplayerChoiceHelper
         var displayOptions = new List<CardModel>(options.Count);
         foreach (var option in options)
         {
-            var displayCard = option.CanonicalInstance == null ? option.ToMutable() : option;
-            displayCard.Owner ??= player;
+            var displayCard = CreateDisplayCardOption(player, option);
             displayOptions.Add(displayCard);
         }
 
         return displayOptions;
+    }
+
+    private static CardModel CreateDisplayCardOption(Player player, CardModel option)
+    {
+        var displayCard = (option.CanonicalInstance ?? option).ToMutable();
+        displayCard.Owner = player;
+
+        CopyDisplayUpgradeState(option, displayCard);
+        return displayCard;
+    }
+
+    private static void CopyDisplayUpgradeState(CardModel source, CardModel displayCard)
+    {
+        while (displayCard.CurrentUpgradeLevel < source.CurrentUpgradeLevel)
+        {
+            displayCard.UpgradeInternal();
+            displayCard.FinalizeUpgradeInternal();
+        }
     }
 
     private static int IndexOfRelic(IReadOnlyList<RelicModel> relics, RelicModel relic)

@@ -77,12 +77,6 @@ public static class VialEpisodeEventHelper
             .Take(3);
 
         return orderedCanonicals
-            .Select(card =>
-            {
-                var mutable = card.ToMutable();
-                mutable.Owner = owner;
-                return mutable;
-            })
             .ToList();
     }
 }

@@ -30,24 +30,18 @@ public static class AstralAnomalyEventCardPool
         .. AnomalyEventCards.Select(card => card.CanonicalInstance?.Id ?? card.Id)
     ];
 
-    public static List<CardModel> CreateMutableEventCardsForPlayer(Player owner, params Type[] excludedTypes)
+    public static List<CardModel> CreateEventCards(params Type[] excludedTypes)
     {
         HashSet<Type> excludedTypeSet = excludedTypes.Length == 0 ? [] : [.. excludedTypes];
 
         return AnomalyEventCards
             .Where(card => !excludedTypeSet.Contains(card.GetType()))
-            .Select(card =>
-            {
-                var mutableCard = card.ToMutable();
-                mutableCard.Owner = owner;
-                return mutableCard;
-            })
             .ToList();
     }
 
     public static List<CardModel> CreateStableAnomalyMakerCardsForPlayer(Player owner, CardModel sourceCard, int count)
     {
-        return CreateMutableEventCardsForPlayer(owner)
+        return CreateEventCards()
             .OrderBy(card => GetAnomalyMakerSortKey(owner, sourceCard, card))
             .ThenBy(card => card.Id.Entry, StringComparer.Ordinal)
             .Take(count)
