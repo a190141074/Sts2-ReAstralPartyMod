@@ -37,6 +37,11 @@ public class SamuraiPrawnHandCostCapPower : AstralPartyPowerModel
 
     protected override bool IsVisibleInternal => false;
 
+    protected override object InitInternalData()
+    {
+        return new Data();
+    }
+
     public override LocString Title => ModelDb.Relic<PersonSamuraiPrawn>().Title;
 
     public override LocString Description => ModelDb.Relic<PersonSamuraiPrawn>().DynamicDescription;

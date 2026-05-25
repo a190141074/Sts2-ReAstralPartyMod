@@ -133,6 +133,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_COLLECTORS_CARD_I_AM_DRAGON.description": "Deal {Damage:diff()} damage to all enemies and temporarily reduce their [red]Strength[/red] by {StrengthLoss:diff()}.\nAfter being played, when you take damage, automatically play this card from your [gold]Exhaust Pile[/gold]. Then return it to your [gold]Exhaust Pile[/gold].\nIf you have lost HP this turn, deal {BonusDamage:diff()} extra damage.",
   "RE_ASTRAL_PARTY_MOD_CARD_COLLECTORS_CARD_STAGNANT_PROTOCOL.title": "Stagnant Protocol",
   "RE_ASTRAL_PARTY_MOD_CARD_COLLECTORS_CARD_STAGNANT_PROTOCOL.description": "Gain [blue]100[/blue] [gold]Stagnant Protocol[/gold].",
+  "RE_ASTRAL_PARTY_MOD_CARD_COLLECTORS_CARD_YOU_HAVE_ME_TOO.title": "You Have Me Too",
+  "RE_ASTRAL_PARTY_MOD_CARD_COLLECTORS_CARD_YOU_HAVE_ME_TOO.description": "Choose another player. Both of you add [blue]1[/blue] random Base Ability card to your hand.",
   "RE_ASTRAL_PARTY_MOD_CARD_CURIOUS_CANDY_MACHINE.title": "Curious Candy Machine",
   "RE_ASTRAL_PARTY_MOD_CARD_CURIOUS_CANDY_MACHINE.description": "[exhaust]Exhaust[/exhaust], [retain]Retain[/retain], costs [blue]0[/blue].\nSpend [blue]12[/blue] Gold. Gain [blue]1[/blue] random candy potion.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_MUD_TRUCK_CRASH.title": "Mud Truck Crash",
