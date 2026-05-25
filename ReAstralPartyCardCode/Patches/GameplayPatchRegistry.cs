@@ -162,7 +162,7 @@ internal static class GameplayStaticPatchCatalog
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
                 "card_model_paranoid_after_current_hp_changed_patch",
-                typeof(CardModel),
+                typeof(AbstractModel),
                 nameof(CardModel.AfterCurrentHpChanged),
                 typeof(CardModelParanoidAfterCurrentHpChangedPatch),
                 false,
@@ -178,21 +178,21 @@ internal static class GameplayStaticPatchCatalog
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
                 "card_model_essence_enchantment_after_card_played_patch",
-                typeof(CardModel),
+                typeof(AbstractModel),
                 nameof(CardModel.AfterCardPlayed),
                 typeof(CardModelEssenceEnchantmentAfterCardPlayedPatch),
                 false,
                 "Gameplay patch: advance eye of sun per-instance play counts and trigger burn on multiples of ten"),
             new ModPatchInfo(
                 "card_model_essence_enchantment_modify_damage_patch",
-                typeof(CardModel),
+                typeof(AbstractModel),
                 nameof(CardModel.ModifyDamageAdditive),
                 typeof(CardModelEssenceEnchantmentModifyDamagePatch),
                 false,
                 "Gameplay patch: apply sacred faith permanent instance damage scaling"),
             new ModPatchInfo(
                 "card_model_essence_enchantment_after_damage_given_patch",
-                typeof(CardModel),
+                typeof(AbstractModel),
                 nameof(CardModel.AfterDamageGiven),
                 typeof(CardModelEssenceEnchantmentAfterDamageGivenPatch),
                 false,

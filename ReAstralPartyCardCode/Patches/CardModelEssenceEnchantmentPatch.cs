@@ -20,17 +20,20 @@ internal static class CardModelEssenceEnchantmentShouldReceiveCombatHooksPatch
     }
 }
 
-[HarmonyPatch(typeof(CardModel), nameof(CardModel.AfterCardPlayed))]
+[HarmonyPatch(typeof(AbstractModel), nameof(AbstractModel.AfterCardPlayed))]
 internal static class CardModelEssenceEnchantmentAfterCardPlayedPatch
 {
     [HarmonyPostfix]
     public static void Postfix(
-        CardModel __instance,
+        AbstractModel __instance,
         PlayerChoiceContext choiceContext,
         CardPlay cardPlay,
         ref Task __result)
     {
-        __result = ContinueAfterOriginal(__result, __instance, choiceContext, cardPlay);
+        if (__instance is not CardModel card)
+            return;
+
+        __result = ContinueAfterOriginal(__result, card, choiceContext, cardPlay);
     }
 
     private static async Task ContinueAfterOriginal(
@@ -47,12 +50,12 @@ internal static class CardModelEssenceEnchantmentAfterCardPlayedPatch
     }
 }
 
-[HarmonyPatch(typeof(CardModel), nameof(CardModel.ModifyDamageAdditive))]
+[HarmonyPatch(typeof(AbstractModel), nameof(AbstractModel.ModifyDamageAdditive))]
 internal static class CardModelEssenceEnchantmentModifyDamagePatch
 {
     [HarmonyPostfix]
     public static void Postfix(
-        CardModel __instance,
+        AbstractModel __instance,
         Creature? target,
         decimal amount,
         ValueProp props,
@@ -60,19 +63,22 @@ internal static class CardModelEssenceEnchantmentModifyDamagePatch
         CardModel? cardSource,
         ref decimal __result)
     {
-        if (cardSource != __instance)
+        if (__instance is not CardModel card)
             return;
 
-        __result += SacredFaithEnchantmentHelper.GetDamageBonus(__instance, amount);
+        if (cardSource != card)
+            return;
+
+        __result += SacredFaithEnchantmentHelper.GetDamageBonus(card, amount);
     }
 }
 
-[HarmonyPatch(typeof(CardModel), nameof(CardModel.AfterDamageGiven))]
+[HarmonyPatch(typeof(AbstractModel), nameof(AbstractModel.AfterDamageGiven))]
 internal static class CardModelEssenceEnchantmentAfterDamageGivenPatch
 {
     [HarmonyPostfix]
     public static void Postfix(
-        CardModel __instance,
+        AbstractModel __instance,
         PlayerChoiceContext choiceContext,
         Creature? dealer,
         DamageResult result,
@@ -81,7 +87,10 @@ internal static class CardModelEssenceEnchantmentAfterDamageGivenPatch
         CardModel? cardSource,
         ref Task __result)
     {
-        __result = ContinueAfterOriginal(__result, __instance, result, target, cardSource);
+        if (__instance is not CardModel card)
+            return;
+
+        __result = ContinueAfterOriginal(__result, card, result, target, cardSource);
     }
 
     private static async Task ContinueAfterOriginal(

@@ -27,17 +27,20 @@ internal static class CardModelParanoidIsPlayablePatch
     }
 }
 
-[HarmonyPatch(typeof(CardModel), nameof(CardModel.AfterCurrentHpChanged))]
+[HarmonyPatch(typeof(AbstractModel), nameof(AbstractModel.AfterCurrentHpChanged))]
 internal static class CardModelParanoidAfterCurrentHpChangedPatch
 {
     [HarmonyPostfix]
     public static void Postfix(
-        CardModel __instance,
+        AbstractModel __instance,
         Creature creature,
         decimal delta,
         ref Task __result)
     {
-        __result = ContinueAfterOriginal(__result, __instance, creature, delta);
+        if (__instance is not CardModel card)
+            return;
+
+        __result = ContinueAfterOriginal(__result, card, creature, delta);
     }
 
     private static async Task ContinueAfterOriginal(
