@@ -13,12 +13,13 @@ public class CollectorsCardYouHaveMeToo : AstralPartyCardModel
 
     protected override bool IsPlayable => BaseAbilityHelper.HasOtherLivingPlayerTarget(Owner);
 
-    public CollectorsCardYouHaveMeToo() : base(0, CardType.Skill, CardRarity.Uncommon, TargetType.AnyAlly)
+    public CollectorsCardYouHaveMeToo() : base(1, CardType.Skill, CardRarity.Uncommon, TargetType.AnyAlly)
     {
     }
 
     protected override void OnUpgrade()
     {
+        
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

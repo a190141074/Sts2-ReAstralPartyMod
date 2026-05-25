@@ -16,7 +16,9 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
 
@@ -82,9 +84,10 @@ public class PersonalityDerivativeXiaoLeiDragonGate : AstralPartyRelicModel
         if (AstralParty_PersonalityDerivativeXiaoLeiDragonGateFireCounter <= 0)
             return Task.CompletedTask;
 
+        var fireReduction = IsSingleplayerBoosted ? 2 : 1;
         AstralParty_PersonalityDerivativeXiaoLeiDragonGateFireCounter = Math.Max(
             0,
-            AstralParty_PersonalityDerivativeXiaoLeiDragonGateFireCounter - 1);
+            AstralParty_PersonalityDerivativeXiaoLeiDragonGateFireCounter - fireReduction);
         Flash();
         InvokeDisplayAmountChanged();
         return Task.CompletedTask;
@@ -98,6 +101,8 @@ public class PersonalityDerivativeXiaoLeiDragonGate : AstralPartyRelicModel
         AstralParty_PersonalityDerivativeXiaoLeiDragonGatePendingTurnStartEffect = true;
 
         var awakeningAmount = (int)Owner.Creature.GetPowerAmount<DragonAwakeningPower>();
+        if (IsSingleplayerBoosted)
+            awakeningAmount *= 2;
         if (awakeningAmount <= 0 || AstralParty_PersonalityDerivativeXiaoLeiDragonGateThunderCounter <= 0)
             return Task.CompletedTask;
 
@@ -112,6 +117,9 @@ public class PersonalityDerivativeXiaoLeiDragonGate : AstralPartyRelicModel
     private bool IsUnlocked =>
         AstralParty_PersonalityDerivativeXiaoLeiDragonGateThunderCounter <= 0
         && AstralParty_PersonalityDerivativeXiaoLeiDragonGateFireCounter <= 0;
+
+    private static bool IsSingleplayerBoosted =>
+        RunManager.Instance?.NetService?.Type is NetGameType.Singleplayer or NetGameType.None;
 
     private async Task GrantDragonsRoar()
     {
