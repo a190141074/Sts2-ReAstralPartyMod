@@ -74,12 +74,19 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonaRelicBase
         await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntent>(Owner);
     }
 
+    public override async Task BeforeCombatStart()
+    {
+        AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
+        await EnsureHandCostCapPower();
+    }
+
     protected override async Task BeforeCooldownCardCheck(
         PlayerChoiceContext choiceContext,
         MegaCrit.Sts2.Core.Entities.Players.Player player
     )
     {
         await EnsureSwordIntentRelic();
+        await EnsureHandCostCapPower();
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
     }
 
@@ -110,25 +117,6 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonaRelicBase
         );
     }
 
-    public override bool TryModifyEnergyCostInCombat(CardModel card, decimal originalCost, out decimal modifiedCost)
-    {
-        modifiedCost = originalCost;
-
-        if (Owner == null)
-            return false;
-        if (card.Owner != Owner)
-            return false;
-        if (card.Pile?.Type != PileType.Hand)
-            return false;
-        if (card.Type != CardType.Attack || card.EnergyCost.CostsX)
-            return false;
-        if (card.EnergyCost.GetResolved() < 3)
-            return false;
-
-        modifiedCost = Math.Max(0m, originalCost - 1m);
-        return modifiedCost != originalCost;
-    }
-
     protected override Task AfterAdvanceCounterOnTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
         return Task.CompletedTask;
@@ -156,5 +144,19 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonaRelicBase
             return;
 
         await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntent>(Owner);
+    }
+
+    private async Task EnsureHandCostCapPower()
+    {
+        if (Owner?.Creature == null || Owner.Creature.HasPower<SamuraiPrawnHandCostCapPower>())
+            return;
+
+        await PowerCmd.Apply(
+            ModelDb.Power<SamuraiPrawnHandCostCapPower>().ToMutable(),
+            Owner.Creature,
+            1m,
+            Owner.Creature,
+            null,
+            false);
     }
 }
