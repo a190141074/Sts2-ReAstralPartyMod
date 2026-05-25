@@ -10,6 +10,7 @@ internal enum AstralChoiceKind
     RelicSelection = 1,
     CanonicalCardSelection = 2,
     RefreshableRelicSelection = 3,
+    DeckCardMutationSelection = 4,
     StartingPersonaSelectionUpdate = 100,
     StartingPersonaSelectionCommit = 101,
     RunSettingsSnapshot = 200
