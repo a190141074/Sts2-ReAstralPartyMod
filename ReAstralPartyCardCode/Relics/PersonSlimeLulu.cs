@@ -97,35 +97,46 @@ public class PersonSlimeLulu : CooldownPersonaRelicBase
         CardModel? cardSource
     )
     {
-        if (Owner?.Creature == null || target != Owner.Creature)
+        var ownerCreature = Owner?.Creature;
+        if (ownerCreature == null)
+            return;
+        if (!IsOwnedByTarget(target, ownerCreature))
             return;
 
         if (result.UnblockedDamage <= 0)
             return;
 
-        if (Owner.Creature.CombatState != null)
-            await AdherentMucusPower.MarkUnblockedHitForBoundSlime(Owner.Creature.CombatState, Owner.NetId);
+        if (ownerCreature.CombatState != null)
+            await AdherentMucusPower.MarkUnblockedHitForBoundSlime(ownerCreature.CombatState, Owner.NetId);
 
         Flash();
 
         await PowerCmd.Apply<HalfLifeHealPower>(
-            Owner.Creature,
+            ownerCreature,
             1m,
-            Owner.Creature,
+            ownerCreature,
             null,
             false
         );
 
-        if (dealer != null && dealer.Side != Owner.Creature.Side && dealer.IsAlive)
+        if (dealer != null && dealer.Side != ownerCreature.Side && dealer.IsAlive)
             await AdherentMucusPower.Apply(
                 dealer,
                 Owner,
-                Owner.Creature,
+                ownerCreature,
                 cardSource
             );
 
         AdvanceCounter();
         RefreshCooldownDisplay();
+    }
+
+    private static bool IsOwnedByTarget(Creature target, Creature ownerCreature)
+    {
+        if (target == ownerCreature)
+            return true;
+
+        return target.PetOwner == ownerCreature.Player;
     }
 
     public override async Task BeforeSideTurnStart(
