@@ -107,14 +107,13 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         }
     }
 
-    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature? dealer, DamageResult result,
-        ValueProp props, Creature target, CardModel? cardSource)
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (Owner?.Creature?.CombatState == null || dealer != Owner.Creature)
+        if (Owner?.Creature?.CombatState == null)
             return;
-        if (target.Side == Owner.Creature.Side)
+        if (cardPlay.Card.Owner != Owner || cardPlay.Card.Type != CardType.Attack)
             return;
-        if (result.TotalDamage < 0m)
+        if (AttackCardCostHelper.GetPlayedCost(cardPlay) < 1)
             return;
 
         var before = AstralParty_VariantPersonSaraCharge;
@@ -123,7 +122,7 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         if (after / ChargeMilestone > before / ChargeMilestone)
         {
             Flash();
-            await AstralDivinePersonaHelper.SyncSaraMilestone(Owner, after, cardSource != null ? cardSource : this);
+            await AstralDivinePersonaHelper.SyncSaraMilestone(Owner, after, cardPlay.Card);
         }
         else
         {
