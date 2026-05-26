@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Reflection;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Events;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
+using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 using STS2RitsuLib;
 using STS2RitsuLib.Scaffolding.Ancients.Options;
@@ -15,6 +17,15 @@ internal static class NeowOptionInjectionHelper
 {
     private const string FaceTheShadowTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.FACE_THE_SHADOW";
+    private static readonly string[] CardCollectionMemberNames =
+    [
+        "Cards",
+        "_cards",
+        "CardModels",
+        "MasterDeck",
+        "StartingDeck"
+    ];
+
     private static readonly string[] RunDeckMemberNames =
     [
         "Deck",
@@ -70,6 +81,8 @@ internal static class NeowOptionInjectionHelper
                     throw new InvalidOperationException(
                         $"Failed to add Forgotten Roar to run deck for player {owner.NetId}.");
 
+                SaveManager.Instance?.MarkCardAsSeen(mutableCard.CanonicalInstance ?? mutableCard);
+
                 return Task.CompletedTask;
             });
     }
@@ -100,6 +113,13 @@ internal static class NeowOptionInjectionHelper
             return true;
         }
 
+        if (TryAddCardToPlayerDeckCompatibility(owner, card))
+        {
+            MainFile.Logger.Warn(
+                $"[NeowOptionInjectionHelper] Added Forgotten Roar via Player.Deck compatibility path | owner={owner.NetId} | playerDeckCount={owner.Deck?.Cards.Count ?? 0}");
+            return true;
+        }
+
         MainFile.Logger.Warn($"[NeowOptionInjectionHelper] Failed to locate run deck container for owner {owner.NetId}.");
         return false;
     }
@@ -113,6 +133,46 @@ internal static class NeowOptionInjectionHelper
             return;
 
         owner.Deck.AddInternal(card);
+    }
+
+    private static bool TryAddCardToPlayerDeckCompatibility(Player owner, CardModel card)
+    {
+        var deck = owner.Deck;
+        if (deck == null)
+            return false;
+
+        if (TryAddCardToList(deck.Cards, card))
+            return true;
+
+        foreach (var memberName in CardCollectionMemberNames)
+        {
+            var member = typeof(CardPile)
+                .GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .FirstOrDefault();
+            if (member == null)
+                continue;
+
+            if (TryAddCardToList(ReadMemberValue(deck, member), card))
+                return true;
+        }
+
+        if (deck.Cards.Contains(card))
+            return true;
+
+        deck.AddInternal(card);
+        return deck.Cards.Contains(card);
+    }
+
+    private static bool TryAddCardToList(object? source, CardModel card)
+    {
+        if (source is not IList list)
+            return false;
+
+        if (list.Contains(card))
+            return true;
+
+        list.Add(card);
+        return list.Contains(card);
     }
 
     private static object? ReadMemberValue(object source, MemberInfo member)

@@ -34,12 +34,13 @@ public class UltimateSkillForgottenRoar : UltimateSkillCardModel
         HoverTipFactory.FromPower<IronVirginWardPower>()
     ];
 
-    public UltimateSkillForgottenRoar() : base(2, CardType.Skill, CardRarity.Ancient, TargetType.AllEnemies)
+    public UltimateSkillForgottenRoar() : base(2, CardType.Attack, CardRarity.Ancient, TargetType.AllEnemies)
     {
     }
 
     protected override void OnUpgrade()
     {
+        AddKeyword(CardKeyword.Retain);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
