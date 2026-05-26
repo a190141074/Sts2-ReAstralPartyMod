@@ -33,6 +33,8 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE.description": "Only [blue]1[/blue] Unique card with the same name can remain in your hand. If a same-name [gold]Unique[/gold] card is already there, the later card added to hand is automatically [gold]Exhausted[/gold].",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.title": "Cooldown",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.description": "This card also has the effects of [gold]Unique[/gold], [gold]Retain[/gold], and [gold]Exhaust[/gold].",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ULTIMATE_SKILL.title": "Ultimate Skill",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ULTIMATE_SKILL.description": "Each Ultimate Skill card charges independently and cannot be played at first.\nWhenever you play an Attack card whose actual cost is at least [blue]1[/blue], this card gains [blue]1[/blue] charge, up to [blue]100[/blue].\nCharge does not reset when combat ends.\nWhen this card reaches [blue]100[/blue] charge, it can be played; after play, this card's charge returns to [blue]0[/blue].",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_FUSION_CLUE.title": "Fusion Clue",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_FUSION_CLUE.description": "Hyper Temporal Nut, Distinguished Cape, Beating Remnant, Buffer Shield.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_INVESTIGATION_PROGRESS.title": "Investigation Progress",

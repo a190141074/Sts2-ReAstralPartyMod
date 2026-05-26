@@ -29,6 +29,7 @@ public static class AstralKeywords
         AstralCollectionStem,
         AstralUniqueStem,
         AstralCooldownStem,
+        AstralUltimateSkillStem,
         AstralInvestigationProgressStem,
         AstralFusionClueStem
     ];
@@ -55,6 +56,7 @@ public static class AstralKeywords
     public const string AstralCollectionStem = "ASTRAL_COLLECTION";
     public const string AstralUniqueStem = "ASTRAL_UNIQUE";
     public const string AstralCooldownStem = "ASTRAL_COOLDOWN";
+    public const string AstralUltimateSkillStem = "ASTRAL_ULTIMATE_SKILL";
     public const string AstralInvestigationProgressStem = "ASTRAL_INVESTIGATION_PROGRESS";
     public const string AstralFusionClueStem = "ASTRAL_FUSION_CLUE";
 
@@ -78,6 +80,7 @@ public static class AstralKeywords
     public static string AstralCollectionId => GetId(AstralCollectionStem);
     public static string AstralUniqueId => GetId(AstralUniqueStem);
     public static string AstralCooldownId => GetId(AstralCooldownStem);
+    public static string AstralUltimateSkillId => GetId(AstralUltimateSkillStem);
     public static string AstralInvestigationProgressId => GetId(AstralInvestigationProgressStem);
     public static string AstralFusionClueId => GetId(AstralFusionClueStem);
 
@@ -101,6 +104,7 @@ public static class AstralKeywords
     public static CardKeyword AstralCollection => GetKeyword(AstralCollectionStem);
     public static CardKeyword AstralUnique => GetKeyword(AstralUniqueStem);
     public static CardKeyword AstralCooldown => GetKeyword(AstralCooldownStem);
+    public static CardKeyword AstralUltimateSkill => GetKeyword(AstralUltimateSkillStem);
     public static CardKeyword AstralInvestigationProgress => GetKeyword(AstralInvestigationProgressStem);
     public static CardKeyword AstralFusionClue => GetKeyword(AstralFusionClueStem);
 

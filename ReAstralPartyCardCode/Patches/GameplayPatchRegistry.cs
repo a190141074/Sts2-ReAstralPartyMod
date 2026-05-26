@@ -7,7 +7,9 @@ using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Events;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Multiplayer;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Multiplayer.Game.Lobby;
@@ -28,7 +30,6 @@ using STS2RitsuLib.Combat.HandSize;
 using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Models;
-using ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
@@ -129,6 +130,13 @@ internal static class GameplayStaticPatchCatalog
                 typeof(EventOptionLockedHoverUnfocusPatch),
                 false,
                 "UI patch: clean up hover tips for locked event options"),
+            new ModPatchInfo(
+                "neow_face_the_shadow_icon_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
+                "_Ready",
+                typeof(NeowFaceTheShadowIconPatch),
+                false,
+                "UI patch: attach the Face the Shadow icon"),
             new ModPatchInfo(
                 "multiplayer_relic_animation_safety_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Relics.NRelicInventoryHolder),

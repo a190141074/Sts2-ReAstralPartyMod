@@ -6,6 +6,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib;
 using STS2RitsuLib.Interop;
 
@@ -41,6 +42,7 @@ public class MainFile
         contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<AstralEventCardPool>(
             "astral_event_card_pool",
             "res://ReAstralPartyMod/images/ui/astral_event_card_pool.png");
+        NeowOptionInjectionHelper.Register();
         GameplayPatchRegistry.RegisterAndApply();
         AstralTelemetry.Initialize();
         AstralChoiceProtocol.LogStartupDiagnostics();
