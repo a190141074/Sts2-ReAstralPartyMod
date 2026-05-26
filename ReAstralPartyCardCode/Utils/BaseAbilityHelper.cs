@@ -59,7 +59,7 @@ internal static class BaseAbilityHelper
         if (owner.Creature?.CombatState == null)
             return null;
 
-        var selectedCard = BaseAbilityCardRegistry.GetDeterministicCardModel(owner, contextParts);
+        var selectedCard = BaseAbilityCardRegistry.GetStableRandomCardModel(owner, contextParts);
         if (selectedCard == null)
             return null;
 

@@ -41,11 +41,18 @@ public static class AstralAnomalyEventCardPool
 
     public static List<CardModel> CreateStableAnomalyMakerCardsForPlayer(Player owner, CardModel sourceCard, int count)
     {
-        return CreateEventCards()
-            .OrderBy(card => GetAnomalyMakerSortKey(owner, sourceCard, card))
-            .ThenBy(card => card.Id.Entry, StringComparer.Ordinal)
-            .Take(count)
-            .ToList();
+        return AstralStableRandom.PickDistinct(
+            CreateEventCards(),
+            count,
+            static card => card.Id.Entry,
+            owner.RunState,
+            MainFile.ModId,
+            "anomaly_event_pool",
+            "anomaly_maker",
+            AstralStableRandom.PlayerKey(owner),
+            sourceCard.Id.Entry,
+            owner.Creature?.CombatState?.RoundNumber ?? 0,
+            GetCombatPileSnapshot(owner));
     }
 
     public static bool IsAnomalyEventCard(CardModel? card)
@@ -57,28 +64,21 @@ public static class AstralAnomalyEventCardPool
         return AnomalyEventCardIds.Contains(id);
     }
 
-    private static uint GetAnomalyMakerSortKey(Player owner, CardModel sourceCard, CardModel candidate)
-    {
-        var key = string.Join(
-            "|",
-            owner.RunState.Rng.StringSeed,
-            owner.NetId,
-            owner.Creature?.CombatState?.RoundNumber ?? 0,
-            sourceCard.Id.Entry,
-            GetCombatPileCount(owner, PileType.Draw),
-            GetCombatPileCount(owner, PileType.Hand),
-            GetCombatPileCount(owner, PileType.Discard),
-            GetCombatPileCount(owner, PileType.Exhaust),
-            candidate.Id.Entry);
-
-        return (uint)StringHelper.GetDeterministicHashCode(key);
-    }
-
     private static int GetCombatPileCount(Player owner, PileType pileType)
     {
         if (owner.Creature?.CombatState == null)
             return 0;
 
         return pileType.GetPile(owner).Cards.Count;
+    }
+
+    private static string GetCombatPileSnapshot(Player owner)
+    {
+        return string.Join(
+            "|",
+            GetCombatPileCount(owner, PileType.Draw),
+            GetCombatPileCount(owner, PileType.Hand),
+            GetCombatPileCount(owner, PileType.Discard),
+            GetCombatPileCount(owner, PileType.Exhaust));
     }
 }

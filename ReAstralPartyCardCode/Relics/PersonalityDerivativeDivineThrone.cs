@@ -1,14 +1,10 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
-using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -36,18 +32,5 @@ public class PersonalityDerivativeDivineThrone : AstralPartyRelicModel
     {
         AstralParty_PersonalityDerivativeDivineThroneDisplayedCharge = Math.Max(amount, 0);
         InvokeDisplayAmountChanged();
-    }
-
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
-    {
-        if (player != Owner || Owner?.Creature == null || !Owner.Creature.IsAlive)
-            return;
-
-        var node = (int)Owner.Creature.GetPowerAmount<SaraNodePower>();
-        if (node <= AstralDivinePersonaHelper.GetDivineNodeThresholdForAct(Owner))
-            return;
-
-        SetDisplayedCharge(DisplayAmount + 1);
-        await Task.CompletedTask;
     }
 }

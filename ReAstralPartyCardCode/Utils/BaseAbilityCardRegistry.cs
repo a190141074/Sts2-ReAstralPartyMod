@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -23,31 +24,40 @@ public static class BaseAbilityCardRegistry
             .ToArray();
     }
 
-    public static CardModel? GetDeterministicCardModel(params object?[] contextParts)
+    public static CardModel? GetStableRandomCardModel(IRunState runState, params object?[] contextParts)
     {
         var candidates = GetCandidateTypes();
         if (candidates.Count == 0)
             return null;
 
-        var ordered = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
+        var selectedType = AstralStableRandom.Pick(
             candidates,
             type => type.Name,
+            runState,
             contextParts);
-        var selectedType = ordered[0];
+        if (selectedType == null)
+            return null;
+
         return ModelDb.GetById<CardModel>(ModelDb.GetId(selectedType));
     }
 
-    public static CardModel? GetDeterministicCardModel(Player? owner, params object?[] contextParts)
+    public static CardModel? GetStableRandomCardModel(Player? owner, params object?[] contextParts)
     {
+        if (owner?.RunState == null)
+            return null;
+
         var candidates = GetCandidateTypes(owner);
         if (candidates.Count == 0)
             return null;
 
-        var ordered = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
+        var selectedType = AstralStableRandom.Pick(
             candidates,
             type => type.Name,
+            owner.RunState,
             contextParts);
-        var selectedType = ordered[0];
+        if (selectedType == null)
+            return null;
+
         return ModelDb.GetById<CardModel>(ModelDb.GetId(selectedType));
     }
 

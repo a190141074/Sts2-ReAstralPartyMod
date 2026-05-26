@@ -64,19 +64,14 @@ public static class VialEpisodeEventHelper
     private static IReadOnlyList<CardModel> CreateRandomChoiceOptions(Player owner, string context,
         params Type[] cardTypes)
     {
-        var orderedCanonicals = DeterministicMultiplayerChoiceHelper
-            .OrderDeterministically(
-                cardTypes.Select(type => ModelDb.GetById<CardModel>(ModelDb.GetId(type))),
-                card => card.Id.Entry,
-                MainFile.ModId,
-                context,
-                owner.RunState.Rng.StringSeed,
-                owner.RunState.CurrentActIndex,
-                owner.RunState.ActFloor,
-                owner.NetId)
-            .Take(3);
-
-        return orderedCanonicals
-            .ToList();
+        return AstralStableRandom.PickDistinct(
+            cardTypes.Select(type => ModelDb.GetById<CardModel>(ModelDb.GetId(type))),
+            3,
+            static card => card.Id.Entry,
+            owner.RunState,
+            MainFile.ModId,
+            "vial_episode",
+            context,
+            AstralStableRandom.PlayerKey(owner));
     }
 }

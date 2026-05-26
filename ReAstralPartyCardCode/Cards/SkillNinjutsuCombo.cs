@@ -43,12 +43,11 @@ public class SkillNinjutsuCombo : AstralPartyCardModel
 
         await PlayerCmd.GainEnergy(1m, Owner);
 
-        var baseAbilityCard = BaseAbilityCardRegistry.GetDeterministicCardModel(
+        var baseAbilityCard = BaseAbilityCardRegistry.GetStableRandomCardModel(
             Owner,
             MainFile.ModId,
             Id.Entry,
-            Owner.RunState.Rng.StringSeed,
-            Owner.NetId,
+            AstralStableRandom.PlayerKey(Owner),
             Owner.Creature.CombatState.RoundNumber,
             PileType.Draw.GetPile(Owner).Cards.Count,
             PileType.Hand.GetPile(Owner).Cards.Count,

@@ -62,11 +62,15 @@ public static class AstralEventCardCatalog
     public static List<CardModel> CreateRandomEventCardsForPlayer(Player owner, int count,
         params Type[] excludedTypes)
     {
-        return CreateEventCards(excludedTypes)
-            .OrderBy(card => GetDeterministicEventCardSortKey(owner, card))
-            .ThenBy(card => card.Id.Entry, StringComparer.Ordinal)
-            .Take(count)
-            .ToList();
+        return AstralStableRandom.PickDistinct(
+            CreateEventCards(excludedTypes),
+            count,
+            static card => card.Id.Entry,
+            owner.RunState,
+            MainFile.ModId,
+            "event_card_pool",
+            "random_event_cards",
+            AstralStableRandom.PlayerKey(owner));
     }
 
     public static List<CardModel> CreateStableTroubleMakerCardsForPlayer(Player owner, CardModel sourceCard, int count)
@@ -76,11 +80,18 @@ public static class AstralEventCardCatalog
         if (RelicOwnershipHelper.HasRelic<PersonPoisonedApple>(owner))
             cards.AddRange(CreateInvestigationCards());
 
-        return cards
-            .OrderBy(card => GetTroubleMakerSortKey(owner, sourceCard, card))
-            .ThenBy(card => card.Id.Entry)
-            .Take(count)
-            .ToList();
+        return AstralStableRandom.PickDistinct(
+            cards,
+            count,
+            static card => card.Id.Entry,
+            owner.RunState,
+            MainFile.ModId,
+            "event_card_pool",
+            "trouble_maker",
+            AstralStableRandom.PlayerKey(owner),
+            sourceCard.Id.Entry,
+            owner.Creature?.CombatState?.RoundNumber ?? 0,
+            GetCombatPileSnapshot(owner));
     }
 
     public static List<CardModel> CreateStableBossBurnedOutSafeCardsForPlayer(Player owner, CardModel sourceCard,
@@ -90,41 +101,18 @@ public static class AstralEventCardCatalog
             .Where(IsBossBurnedOutSafeCard)
             .ToList();
 
-        return cards
-            .OrderBy(card => GetTroubleMakerSortKey(owner, sourceCard, card))
-            .ThenBy(card => card.Id.Entry, StringComparer.Ordinal)
-            .Take(count)
-            .ToList();
-    }
-
-    private static uint GetTroubleMakerSortKey(Player owner, CardModel sourceCard, CardModel candidate)
-    {
-        var key = string.Join(
-            "|",
-            owner.RunState.Rng.StringSeed,
-            owner.NetId,
-            owner.Creature?.CombatState?.RoundNumber ?? 0,
+        return AstralStableRandom.PickDistinct(
+            cards,
+            count,
+            static card => card.Id.Entry,
+            owner.RunState,
+            MainFile.ModId,
+            "event_card_pool",
+            "boss_burned_out",
+            AstralStableRandom.PlayerKey(owner),
             sourceCard.Id.Entry,
-            GetCombatPileCount(owner, PileType.Draw),
-            GetCombatPileCount(owner, PileType.Hand),
-            GetCombatPileCount(owner, PileType.Discard),
-            GetCombatPileCount(owner, PileType.Exhaust),
-            candidate.Id.Entry);
-
-        return (uint)StringHelper.GetDeterministicHashCode(key);
-    }
-
-    private static uint GetDeterministicEventCardSortKey(Player owner, CardModel candidate)
-    {
-        var key = string.Join(
-            "|",
-            owner.RunState.Rng.StringSeed,
-            owner.NetId,
-            owner.RunState.CurrentActIndex,
-            owner.RunState.ActFloor,
-            candidate.Id.Entry);
-
-        return (uint)StringHelper.GetDeterministicHashCode(key);
+            owner.Creature?.CombatState?.RoundNumber ?? 0,
+            GetCombatPileSnapshot(owner));
     }
 
     private static int GetCombatPileCount(Player owner, PileType pileType)
@@ -133,6 +121,16 @@ public static class AstralEventCardCatalog
             return 0;
 
         return pileType.GetPile(owner).Cards.Count;
+    }
+
+    private static string GetCombatPileSnapshot(Player owner)
+    {
+        return string.Join(
+            "|",
+            GetCombatPileCount(owner, PileType.Draw),
+            GetCombatPileCount(owner, PileType.Hand),
+            GetCombatPileCount(owner, PileType.Discard),
+            GetCombatPileCount(owner, PileType.Exhaust));
     }
 
     public static List<CardModel> CreateInvestigationCards()

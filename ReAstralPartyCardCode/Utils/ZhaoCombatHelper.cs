@@ -60,17 +60,18 @@ public static class ZhaoCombatHelper
             .Where(card => card.Type == CardType.Attack)
             .ToList();
         if (drawPileAttacks.Count > 0)
-            return DeterministicMultiplayerChoiceHelper.PickDeterministically(
+            return AstralStableRandom.Pick(
                 drawPileAttacks,
                 GetStableAttackCardKey,
+                owner.RunState,
                 MainFile.ModId,
                 "zhao_chase",
                 source.Id.Entry,
-                owner.RunState.Rng.StringSeed,
-                owner.NetId,
+                AstralStableRandom.PlayerKey(owner),
                 combatState.RoundNumber,
                 bonusDamage,
-                PileType.Draw);
+                PileType.Draw,
+                GetPileSnapshot(drawPileAttacks));
 
         var discardPileAttacks = PileType.Discard
             .GetPile(owner)
@@ -78,17 +79,18 @@ public static class ZhaoCombatHelper
             .Where(card => card.Type == CardType.Attack)
             .ToList();
         if (discardPileAttacks.Count > 0)
-            return DeterministicMultiplayerChoiceHelper.PickDeterministically(
+            return AstralStableRandom.Pick(
                 discardPileAttacks,
                 GetStableAttackCardKey,
+                owner.RunState,
                 MainFile.ModId,
                 "zhao_chase",
                 source.Id.Entry,
-                owner.RunState.Rng.StringSeed,
-                owner.NetId,
+                AstralStableRandom.PlayerKey(owner),
                 combatState.RoundNumber,
                 bonusDamage,
-                PileType.Discard);
+                PileType.Discard,
+                GetPileSnapshot(discardPileAttacks));
 
         return null;
     }
@@ -112,6 +114,11 @@ public static class ZhaoCombatHelper
                 return i;
 
         return -1;
+    }
+
+    private static string GetPileSnapshot(IReadOnlyList<CardModel> cards)
+    {
+        return string.Join(",", cards.Select(GetStableAttackCardKey));
     }
 
     private static bool ShouldTriggerNecrobinderUnleash(Player owner, AbstractModel source)
