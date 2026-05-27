@@ -10,6 +10,7 @@ internal static class SacredFaithEnchantmentHelper
 {
     private const decimal NormalKillGrowthPercent = 1.5m;
     private const decimal EliteOrBossKillGrowthPercent = 6m;
+    private const int PercentTenthsScale = 10;
 
     public static bool HasSacredFaith(CardModel? card)
     {
@@ -26,7 +27,7 @@ internal static class SacredFaithEnchantmentHelper
         if (card?.Enchantment is not EssenceSacredFaithEnchantment enchantment)
             return 1m;
 
-        return 1m + enchantment.AstralParty_SacredFaithPermanentDamagePercent / 100m;
+        return 1m + GetStoredPercent(enchantment) / 100m;
     }
 
     public static decimal GetDamageBonus(CardModel? card, decimal baseAmount)
@@ -45,8 +46,8 @@ internal static class SacredFaithEnchantmentHelper
         if (card?.Enchantment is not EssenceSacredFaithEnchantment enchantment)
             return;
 
-        enchantment.AstralParty_SacredFaithPermanentDamagePercent +=
-            IsEliteOrBoss(target) ? EliteOrBossKillGrowthPercent : NormalKillGrowthPercent;
+        enchantment.AstralParty_SacredFaithPermanentDamagePercentTenths +=
+            ConvertPercentToStoredValue(IsEliteOrBoss(target) ? EliteOrBossKillGrowthPercent : NormalKillGrowthPercent);
 
         TryRefreshDisplayedDamage(card);
     }
@@ -70,5 +71,15 @@ internal static class SacredFaithEnchantmentHelper
     {
         var roomType = target.CombatState?.Encounter?.RoomType;
         return roomType is RoomType.Elite or RoomType.Boss;
+    }
+
+    private static decimal GetStoredPercent(EssenceSacredFaithEnchantment enchantment)
+    {
+        return enchantment.AstralParty_SacredFaithPermanentDamagePercentTenths / (decimal)PercentTenthsScale;
+    }
+
+    private static int ConvertPercentToStoredValue(decimal percent)
+    {
+        return (int)(percent * PercentTenthsScale);
     }
 }

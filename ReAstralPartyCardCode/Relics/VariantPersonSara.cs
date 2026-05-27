@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -128,6 +129,8 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         {
             await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, after);
         }
+
+        RefreshShatterStarDamageDisplays();
     }
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
@@ -148,6 +151,7 @@ public class VariantPersonSara : CooldownPersonaRelicBase
         AstralParty_VariantPersonSaraLastProcessedRound = roundNumber;
         AstralParty_VariantPersonSaraCharge = 0;
         await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, 0);
+        RefreshShatterStarDamageDisplays();
         QueuePendingExtraTurn(grantEnergyOnExtraTurnStart: true);
         MainFile.Logger.Info(
             $"[VariantPersonSara] Queued Sara extra turn from 21 charge | owner={Owner?.NetId} | pending={AstralParty_VariantPersonSaraPendingExtraTurnCount} | pendingEnergy={AstralParty_VariantPersonSaraPendingExtraTurnEnergyCount} | readyEnergy={AstralParty_VariantPersonSaraReadyExtraTurnEnergyCount}");
@@ -281,5 +285,15 @@ public class VariantPersonSara : CooldownPersonaRelicBase
     public int GetPendingExtraTurnCount()
     {
         return AstralParty_VariantPersonSaraPendingExtraTurnCount;
+    }
+
+    private void RefreshShatterStarDamageDisplays()
+    {
+        var handCards = Owner == null ? null : PileType.Hand.GetPile(Owner)?.Cards;
+        if (handCards == null)
+            return;
+
+        foreach (var card in handCards.OfType<SkillShatterStar>())
+            card.RefreshDisplayedDamage();
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Gold;
@@ -166,7 +167,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             if (NGame.Instance != null && NOverlayStack.Instance != null)
                 return;
 
-            await Task.Yield();
+            await WaitForNextProcessFrameAsync();
         }
     }
 
@@ -198,7 +199,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
                     "Starting persona relic selection detected startup event input window; waiting for it to finish before using multiplayer choice sync.");
             }
 
-            await Task.Yield();
+            await WaitForNextProcessFrameAsync();
         }
 
         if (observedStartupEventWindow)
@@ -216,10 +217,21 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             if (overlayStack != null && Godot.GodotObject.IsInstanceValid(overlayStack))
                 return overlayStack;
 
-            await Task.Yield();
+            await WaitForNextProcessFrameAsync();
         }
 
         return null;
+    }
+
+    private static async Task WaitForNextProcessFrameAsync()
+    {
+        if (NGame.Instance?.IsInsideTree() == true)
+        {
+            await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
+            return;
+        }
+
+        await Task.Yield();
     }
 
     private static bool IsStartupEventWindowActive(RunState runState)

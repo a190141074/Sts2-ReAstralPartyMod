@@ -120,7 +120,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_FORGOTTEN_ROAR.title": "遗忘咆哮",
   "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_FORGOTTEN_ROAR.description": "[gold][b]终极[/b][/gold]\n结束回合；伤害免疫；击晕所有敌人，并对每个敌人造成{Repeat:diff()}次{Damage:diff()}点伤害。\n当前充能：[blue]{UltimateCharge:diff()}%[/blue]",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS.title": "弱点解析",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS.description": "若目标没有[gold]破绽[/gold]，则随机施加[blue]1[/blue]到[blue]6-当前【弱点识破】层数[/blue]层的[gold]破绽[/gold]，且更容易出现较低层数。\n然后选择进入[gold]防御[/gold]或[gold]闪避[/gold]姿态。\n此牌每回合可使用次数等于当前敌方单位数量，并返回你的手牌。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS.description": "若目标没有[gold]破绽[/gold]，则随机施加[blue]1[/blue]到[blue]6-当前【弱点识破】层数[/blue]层的[gold]破绽[/gold]。\n然后选择进入[gold]防御[/gold]或[gold]闪避[/gold]姿态。\n此牌每回合可使用次数等于当前敌方单位数量，并返回你的手牌。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS_CHOOSE_DEFENSE.title": "防御",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS_CHOOSE_DEFENSE.description": "进入[gold]防御[/gold]姿态。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS_CHOOSE_DODGE.title": "闪避",

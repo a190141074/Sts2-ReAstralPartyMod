@@ -52,9 +52,9 @@ internal static class MosesCombatHelper
                     break;
                 }
 
-        var rawAmount = DeterministicMultiplayerChoiceHelper.RollDeterministically(
-            0,
-            upperBound + 1,
+        return DeterministicMultiplayerChoiceHelper.RollDeterministically(
+            1,
+            Math.Max(2, upperBound + 1),
             MainFile.ModId,
             sourceCard.Id.Entry,
             nameof(ExposedFlawPower),
@@ -62,7 +62,6 @@ internal static class MosesCombatHelper
             owner.NetId,
             owner.Creature?.CombatState?.RoundNumber ?? 0,
             targetIndex);
-        return Math.Max(1, rawAmount);
     }
 
     public static async Task DecayWeaknessInsightAtTurnEnd(Player? owner)

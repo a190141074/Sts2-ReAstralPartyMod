@@ -6,7 +6,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Enchantments;
 [RegisterEnchantment]
 public class EssenceSacredFaithEnchantment : ModEnchantmentTemplate
 {
-    [SavedProperty] public decimal AstralParty_SacredFaithPermanentDamagePercent { get; set; }
+    [SavedProperty] public int AstralParty_SacredFaithPermanentDamagePercentTenths { get; set; }
 
     public override EnchantmentAssetProfile AssetProfile => new()
     {

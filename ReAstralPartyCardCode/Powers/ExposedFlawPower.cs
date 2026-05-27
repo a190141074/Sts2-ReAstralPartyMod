@@ -16,7 +16,7 @@ public class ExposedFlawPower : AstralPartyPowerModel
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
-        if (Owner == null || Amount <= 0m)
+        if (Owner == null || Owner.Player != player || Amount <= 0m)
             return;
 
         await PowerCmd.Remove(this);

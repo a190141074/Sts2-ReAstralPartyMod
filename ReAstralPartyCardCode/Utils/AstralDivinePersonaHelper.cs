@@ -56,8 +56,6 @@ internal static class AstralDivinePersonaHelper
             if (player.Creature == null)
                 continue;
 
-            await AstralTemporaryStrengthPower.Apply(player.Creature, 1m, source ?? ModelDb.Power<DivineThronePower>(),
-                owner.Creature, source as CardModel, true);
             await PowerCmd.Apply<DivineThronePower>(player.Creature, DivinePowerAmount, owner.Creature, source as CardModel,
                 false);
         }

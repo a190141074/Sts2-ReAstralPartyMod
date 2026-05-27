@@ -1,6 +1,5 @@
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
@@ -63,7 +62,6 @@ public class UltimateSkillForgottenRoar : UltimateSkillCardModel
             for (var i = 0; i < HitCount; i++)
                 await CreatureCmd.Damage(choiceContext, enemy, DamagePerHit, ValueProp.Move, Owner.Creature, this);
 
-        var endTurnAction = new EndPlayerTurnAction(Owner, 0);
-        await endTurnAction.Execute();
+        PlayerCmd.EndTurn(Owner, canBackOut: false);
     }
 }
