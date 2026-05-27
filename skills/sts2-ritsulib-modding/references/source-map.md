@@ -43,6 +43,13 @@
   - 结构参考项目。
   - 用于确认一个完整 RitsuLib mod 如何组织入口、卡牌目录、角色池、关键词、Power、Events、Relics、Commands、Content 等模块。
 
+### DevMode 调试工具箱
+
+- `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode`
+  - 游戏内测试、作弊、脚本与 mod 调试工具箱。
+  - 用于需要高频实机复现、快速生成测试内容、脚本化验证卡牌/遗物/事件、或排查“代码看起来对但游戏里不好复现”的请求。
+  - 优先看 `README.md`、`README.zh-CN.md`、`docs`、`manual`、`scripts`。
+
 ### 游戏反编译代码
 
 - `D:\MOD\杀戮尖塔2mod制作\Slay-the-Spire-2-gdsdecomp`
@@ -80,5 +87,6 @@
 2. 先从 `RitsuLib-doc\RitsuLib` 找新版章节。
 3. 再去 `RitsuLib-code\Docs\zh` 核对真实 API、特性、模板与签名。
 4. 再看当前仓库是否已有接近实现。
-5. 需要完整结构样例时看 WineFox。
-6. 仍然不够时再看 `Slay-the-Spire-2-gdsdecomp\src\Core`。
+5. 需要实机验证/调试工具时看 `STS2-DevMode`。
+6. 需要完整结构样例时看 WineFox。
+7. 仍然不够时再看 `Slay-the-Spire-2-gdsdecomp\src\Core`。

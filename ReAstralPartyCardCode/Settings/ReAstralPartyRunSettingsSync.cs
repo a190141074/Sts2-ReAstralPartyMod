@@ -19,6 +19,10 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 {
     public bool EnableExtremeMode { get; set; }
 
+    public bool EnableStartingInitialPoint { get; set; }
+
+    public bool EnableStartingPersonaSelection { get; set; } = true;
+
     public bool EnableAllPersonas { get; set; }
 
     public bool EnableAllVariantPersonas { get; set; }
@@ -95,6 +99,8 @@ internal static class ReAstralPartyRunSettingsSync
         LobbyGameplaySettingsSync.TryGetSnapshot(out var lobbySnapshot);
         return new ReAstralPartyRunSettingsSnapshot
         {
+            EnableStartingInitialPoint = lobbySnapshot?.EnableStartingInitialPoint ?? settings.EnableStartingInitialPoint,
+            EnableStartingPersonaSelection = lobbySnapshot?.EnableStartingPersonaSelection ?? settings.EnableStartingPersonaSelection,
             EnableAllPersonas = lobbySnapshot?.EnableAllPersonas ?? settings.EnableAllPersonas,
             EnableAllVariantPersonas = lobbySnapshot?.EnableAllVariantPersonas ?? settings.EnableAllVariantPersonas,
             StartingPersonaMode = lobbySnapshot?.StartingPersonaMode
@@ -117,6 +123,8 @@ internal static class ReAstralPartyRunSettingsSync
         return new ReAstralPartyRunSettingsSnapshot
         {
             EnableExtremeMode = false,
+            EnableStartingInitialPoint = false,
+            EnableStartingPersonaSelection = true,
             EnableAllPersonas = false,
             EnableAllVariantPersonas = false,
             StartingPersonaMode = StartingPersonaMode.Standard,
@@ -150,6 +158,8 @@ internal static class ReAstralPartyRunSettingsSync
         return
         [
             snapshot.EnableExtremeMode ? 1 : 0,
+            snapshot.EnableStartingInitialPoint ? 1 : 0,
+            snapshot.EnableStartingPersonaSelection ? 1 : 0,
             snapshot.EnableAllPersonas ? 1 : 0,
             snapshot.EnableAllVariantPersonas ? 1 : 0,
             (int)snapshot.StartingPersonaMode,
@@ -198,11 +208,15 @@ internal static class ReAstralPartyRunSettingsSync
         var isLegacyPayload = payload.Count == personaRelics.Count + 7;
         var isPersonaOnlyPayload = payload.Count == personaRelics.Count + 6;
         var isFullBannablePayload = payload.Count == bannableRelics.Count + 6;
-        if (!isLegacyPayload && !isPersonaOnlyPayload && !isFullBannablePayload)
+        var isPersonaOnlyPayloadV2 = payload.Count == personaRelics.Count + 8;
+        var isFullBannablePayloadV2 = payload.Count == bannableRelics.Count + 8;
+        if (!isLegacyPayload && !isPersonaOnlyPayload && !isFullBannablePayload && !isPersonaOnlyPayloadV2 &&
+            !isFullBannablePayloadV2)
             return false;
 
-        var bannedStartIndex = isLegacyPayload ? 7 : 6;
-        var bannedRelicSource = isFullBannablePayload ? bannableRelics : personaRelics;
+        var isV2Payload = isPersonaOnlyPayloadV2 || isFullBannablePayloadV2;
+        var bannedStartIndex = isLegacyPayload ? 7 : isV2Payload ? 8 : 6;
+        var bannedRelicSource = isFullBannablePayload || isFullBannablePayloadV2 ? bannableRelics : personaRelics;
         var bannedIds = new List<string>();
         for (var i = 0; i < bannedRelicSource.Count && bannedStartIndex + i < payload.Count; i++)
         {
@@ -216,17 +230,19 @@ internal static class ReAstralPartyRunSettingsSync
         snapshot = new ReAstralPartyRunSettingsSnapshot
         {
             EnableExtremeMode = payload[0] != 0,
-            EnableAllPersonas = payload[1] != 0,
-            EnableAllVariantPersonas = payload[2] != 0,
+            EnableStartingInitialPoint = isV2Payload ? payload[1] != 0 : false,
+            EnableStartingPersonaSelection = isV2Payload ? payload[2] != 0 : true,
+            EnableAllPersonas = payload[isV2Payload ? 3 : 1] != 0,
+            EnableAllVariantPersonas = payload[isV2Payload ? 4 : 2] != 0,
             StartingPersonaMode = isLegacyPayload
                 ? StartingPersonaMode.Standard
-                : Enum.IsDefined(typeof(StartingPersonaMode), payload[3])
-                    ? (StartingPersonaMode)payload[3]
+                : Enum.IsDefined(typeof(StartingPersonaMode), payload[isV2Payload ? 5 : 3])
+                    ? (StartingPersonaMode)payload[isV2Payload ? 5 : 3]
                     : StartingPersonaMode.Standard,
-            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[isLegacyPayload ? 5 : 4])
-                ? (TokenSeriesMode)payload[isLegacyPayload ? 5 : 4]
+            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[isLegacyPayload ? 5 : isV2Payload ? 6 : 4])
+                ? (TokenSeriesMode)payload[isLegacyPayload ? 5 : isV2Payload ? 6 : 4]
                 : TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = payload[isLegacyPayload ? 6 : 5] != 0,
+            EnablePureAngelMode = payload[isLegacyPayload ? 6 : isV2Payload ? 7 : 5] != 0,
             BannedRelicIdsSerialized = bannedIds
         };
         if (isLegacyPayload)
@@ -335,7 +351,7 @@ internal static class ReAstralPartyRunSettingsSync
                 state.SetSnapshot(remoteSnapshot);
                 LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
                 MainFile.Logger.Info(
-                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, all_personas={remoteSnapshot.EnableAllPersonas}, all_variants={remoteSnapshot.EnableAllVariantPersonas}, persona_mode={remoteSnapshot.StartingPersonaMode}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}, banned_relics={remoteSnapshot.BannedRelicIdsSerialized.Count}");
+                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, start_initial_point={remoteSnapshot.EnableStartingInitialPoint}, start_persona_selection={remoteSnapshot.EnableStartingPersonaSelection}, all_personas={remoteSnapshot.EnableAllPersonas}, all_variants={remoteSnapshot.EnableAllVariantPersonas}, persona_mode={remoteSnapshot.StartingPersonaMode}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}, banned_relics={remoteSnapshot.BannedRelicIdsSerialized.Count}");
                 return remoteSnapshot;
             }
 
@@ -358,7 +374,7 @@ internal static class ReAstralPartyRunSettingsSync
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
             synchronizer.SyncLocalChoice(authorityPlayer, choiceId, CreateSnapshotChoiceResult(runState, localSnapshot));
             MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: extreme_mode={localSnapshot.EnableExtremeMode}, all_personas={localSnapshot.EnableAllPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, persona_mode={localSnapshot.StartingPersonaMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, banned_relics={localSnapshot.BannedRelicIdsSerialized.Count}");
+                $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: extreme_mode={localSnapshot.EnableExtremeMode}, start_initial_point={localSnapshot.EnableStartingInitialPoint}, start_persona_selection={localSnapshot.EnableStartingPersonaSelection}, all_personas={localSnapshot.EnableAllPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, persona_mode={localSnapshot.StartingPersonaMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, banned_relics={localSnapshot.BannedRelicIdsSerialized.Count}");
             return localSnapshot;
         }
 

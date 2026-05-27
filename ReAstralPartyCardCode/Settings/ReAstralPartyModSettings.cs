@@ -48,6 +48,10 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableExtremeMode { get; set; }
 
+    public bool EnableStartingInitialPoint { get; set; }
+
+    public bool EnableStartingPersonaSelection { get; set; } = true;
+
     public bool EnableAllPersonas { get; set; }
 
     public bool EnableAllVariantPersonas { get; set; }
@@ -111,6 +115,10 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableAllVariantPersonas => ReadRuntime(settings => settings.EnableAllVariantPersonas);
 
     public static bool EnableExtremeMode => ReadRuntime(settings => settings.EnableExtremeMode);
+
+    public static bool EnableStartingInitialPoint => ReadRuntime(settings => settings.EnableStartingInitialPoint);
+
+    public static bool EnableStartingPersonaSelection => ReadRuntime(settings => settings.EnableStartingPersonaSelection);
 
     public static StartingPersonaMode ConfiguredStartingPersonaMode =>
         ReadRuntime(settings => settings.StartingPersonaMode);
@@ -196,6 +204,40 @@ public static partial class ReAstralPartyModSettingsManager
             return false;
 
         return EnableAllPersonas;
+    }
+
+    public static bool GetEnableStartingInitialPoint(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableStartingInitialPoint;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableStartingInitialPoint;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableStartingInitialPoint;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return EnableStartingInitialPoint;
+    }
+
+    public static bool GetEnableStartingPersonaSelection(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableStartingPersonaSelection;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableStartingPersonaSelection;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableStartingPersonaSelection;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableStartingPersonaSelection;
     }
 
     public static bool GetEnableAllVariantPersonas(IRunState? runState)
@@ -397,6 +439,32 @@ public static partial class ReAstralPartyModSettingsManager
                 ApplyRuntimeSettings(settings, "enable_all_personas");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label",
+                    value);
+            });
+
+        var enableStartingInitialPoint = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableStartingInitialPoint,
+            (settings, value) =>
+            {
+                settings.EnableStartingInitialPoint = value;
+                ApplyRuntimeSettings(settings, "enable_starting_initial_point");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label",
+                    value);
+            });
+
+        var enableStartingPersonaSelection = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableStartingPersonaSelection,
+            (settings, value) =>
+            {
+                settings.EnableStartingPersonaSelection = value;
+                ApplyRuntimeSettings(settings, "enable_starting_persona_selection");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label",
                     value);
             });
 
@@ -632,6 +700,18 @@ public static partial class ReAstralPartyModSettingsManager
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.title", "Gameplay"))
                 .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.description",
                     "These toggles apply globally across all profiles unless stated otherwise."))
+                .AddToggle(
+                    "enable_starting_initial_point",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label", "Enable Starting Initial Point"),
+                    enableStartingInitialPoint,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description",
+                        "At run start, every player automatically obtains Initial Point and loses 1 Gold."))
+                .AddToggle(
+                    "enable_starting_persona_selection",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label", "Enable Starting Persona Selection"),
+                    enableStartingPersonaSelection,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description",
+                        "If disabled, the run skips the starting persona selection entirely and no player starts with a persona relic."))
                 .AddToggle(
                     "enable_all_personas",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label", "Enable All Personas"),
@@ -1035,7 +1115,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -1287,6 +1367,10 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableExtremeMode { get; init; }
 
+        public bool EnableStartingInitialPoint { get; init; }
+
+        public bool EnableStartingPersonaSelection { get; init; } = true;
+
         public bool EnableAllPersonas { get; init; }
 
         public bool EnableAllVariantPersonas { get; init; }
@@ -1327,6 +1411,8 @@ public static partial class ReAstralPartyModSettingsManager
             {
                 BannedRelicIds = DeserializeModelIdSet(ResolveBannedRelicIds(settings)),
                 EnableExtremeMode = settings.EnableExtremeMode,
+                EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
+                EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
                 EnableAllPersonas = settings.EnableAllPersonas,
                 EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
                 StartingPersonaMode = ResolveStartingPersonaMode(settings),

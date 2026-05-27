@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Gold;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
@@ -24,6 +25,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 {
     private const int StartingVariantInjectionChancePercent = 17;
     private const int AutomaticSelectionCountdownSeconds = 5;
+    private const decimal StartingInitialPointGoldCost = 1m;
     public static string PatchId => "starting_persona_relic_selection_patch";
     public static bool IsCritical => false;
     public static string Description => "Open the starting persona relic selection after a run starts";
@@ -60,6 +62,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         LogInfo("P005", "Starting persona relic selection waiting for run settings sync.");
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         LogInfo("P006", "Starting persona relic selection finished run settings sync.");
+        await GrantStartingInitialPointIfEnabledAsync(runState);
         var gameType = RunManager.Instance.NetService.Type;
         LogInfo("P007",
             $"Starting persona relic selection run gate: netMode={gameType} players={runState.Players.Count}.");
@@ -295,6 +298,12 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
     private static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)
     {
+        if (!ReAstralPartyModSettingsManager.GetEnableStartingPersonaSelection(runState))
+        {
+            reason = "starting persona selection disabled by gameplay settings";
+            return false;
+        }
+
         var existingPersonaOwners = runState.Players
             .Where(player => player.Relics.Any(IsOwnedPersonaRelic))
             .Select(player => player.NetId)
@@ -307,6 +316,32 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
         reason = "fresh run without persona relics detected";
         return true;
+    }
+
+    private static async Task GrantStartingInitialPointIfEnabledAsync(RunState runState)
+    {
+        if (!ReAstralPartyModSettingsManager.GetEnableStartingInitialPoint(runState))
+            return;
+
+        foreach (var player in runState.Players)
+        {
+            if (player.Gold < StartingInitialPointGoldCost)
+            {
+                LogWarn("P006A",
+                    $"Starting Initial Point skipped for player {player.NetId} because gold={player.Gold} is below cost={StartingInitialPointGoldCost}.");
+                continue;
+            }
+
+            LogInfo("P006B",
+                $"Granting Starting Initial Point to player {player.NetId} | gold_before={player.Gold}.");
+            await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(
+                StartingInitialPointGoldCost,
+                player,
+                GoldLossType.Spent);
+            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(player, ModelDb.Relic<TokenGoldInitialPoint>());
+            LogInfo("P006C",
+                $"Granted Starting Initial Point to player {player.NetId} | gold_after={player.Gold}.");
+        }
     }
 
     private static bool IsOwnedPersonaRelic(RelicModel relic)

@@ -101,6 +101,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     ];
 
     private readonly Dictionary<Control, IReadOnlyList<IHoverTip>> _hoverTipsByControl = [];
+    private CheckButton? _startingInitialPointToggle;
+    private CheckButton? _startingPersonaSelectionToggle;
     private CheckButton? _allPersonasToggle;
     private CheckButton? _allVariantPersonasToggle;
     private CheckButton? _extremeModeToggle;
@@ -202,6 +204,16 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         root.AddChild(body);
 
         body.AddChild(BuildIntroLabel());
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description"),
+            out _startingInitialPointToggle,
+            OnEnableStartingInitialPointToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description"),
+            out _startingPersonaSelectionToggle,
+            OnEnableStartingPersonaSelectionToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.description"),
@@ -613,17 +625,32 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         {
             var role = GetCurrentRoleForUi();
             var isEditable = IsEditableByLocalPlayer(role);
+            var personaSelectionEnabled = snapshot.EnableStartingPersonaSelection;
+            if (_startingInitialPointToggle != null)
+            {
+                _startingInitialPointToggle.ButtonPressed = snapshot.EnableStartingInitialPoint;
+                _startingInitialPointToggle.Disabled = !isEditable;
+                _startingInitialPointToggle.Text = snapshot.EnableStartingInitialPoint ? "ON" : "OFF";
+            }
+
+            if (_startingPersonaSelectionToggle != null)
+            {
+                _startingPersonaSelectionToggle.ButtonPressed = snapshot.EnableStartingPersonaSelection;
+                _startingPersonaSelectionToggle.Disabled = !isEditable;
+                _startingPersonaSelectionToggle.Text = snapshot.EnableStartingPersonaSelection ? "ON" : "OFF";
+            }
+
             if (_allPersonasToggle != null)
             {
                 _allPersonasToggle.ButtonPressed = snapshot.EnableAllPersonas;
-                _allPersonasToggle.Disabled = !isEditable;
+                _allPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled;
                 _allPersonasToggle.Text = snapshot.EnableAllPersonas ? "ON" : "OFF";
             }
 
             if (_allVariantPersonasToggle != null)
             {
                 _allVariantPersonasToggle.ButtonPressed = snapshot.EnableAllVariantPersonas;
-                _allVariantPersonasToggle.Disabled = !isEditable;
+                _allVariantPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled;
                 _allVariantPersonasToggle.Text = snapshot.EnableAllVariantPersonas ? "ON" : "OFF";
             }
 
@@ -637,7 +664,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             if (_startingPersonaModeOption != null)
             {
                 _startingPersonaModeOption.Select(IndexOfStartingPersonaMode(snapshot.StartingPersonaMode));
-                _startingPersonaModeOption.Disabled = !isEditable;
+                _startingPersonaModeOption.Disabled = !isEditable || !personaSelectionEnabled;
             }
 
             if (_tokenSeriesModeOption != null)
@@ -648,12 +675,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
             if (_footerLabel != null)
             {
-                _footerLabel.Text = role switch
+                var footer = role switch
                 {
                     LobbyGameplayNetRole.Host or LobbyGameplayNetRole.Singleplayer => GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_host"),
                     LobbyGameplayNetRole.Client => GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_client"),
                     _ => "联机状态同步中，暂时只读。"
                 };
+                _footerLabel.Text = personaSelectionEnabled
+                    ? footer
+                    : $"{footer}\n{GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.disabled_hint")}";
             }
 
             if (_stateLabel != null)
@@ -717,15 +747,20 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         _secondsSinceSnapshotUpdate = 0d;
         _syncErrorShown = false;
         _hasReceivedSnapshotForCurrentSession = true;
-        CallDeferred(nameof(ApplySnapshotDeferred), Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableAllVariantPersonas),
-            Variant.From(snapshot.EnableExtremeMode), Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
+        CallDeferred(nameof(ApplySnapshotDeferred), Variant.From(snapshot.EnableStartingInitialPoint),
+            Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableAllPersonas),
+            Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
+            Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
     }
 
-    private void ApplySnapshotDeferred(bool enableAllPersonas, bool enableAllVariantPersonas, bool enableExtremeMode,
-        int startingPersonaMode, int tokenSeriesMode)
+    private void ApplySnapshotDeferred(bool enableStartingInitialPoint, bool enableStartingPersonaSelection,
+        bool enableAllPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode,
+        int tokenSeriesMode)
     {
         ApplySnapshotToUi(new LobbyGameplaySettingsSnapshot
         {
+            EnableStartingInitialPoint = enableStartingInitialPoint,
+            EnableStartingPersonaSelection = enableStartingPersonaSelection,
             EnableAllPersonas = enableAllPersonas,
             EnableAllVariantPersonas = enableAllVariantPersonas,
             EnableExtremeMode = enableExtremeMode,
@@ -744,6 +779,24 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableAllPersonas = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableStartingInitialPointToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingInitialPoint = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableStartingPersonaSelectionToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingPersonaSelection = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

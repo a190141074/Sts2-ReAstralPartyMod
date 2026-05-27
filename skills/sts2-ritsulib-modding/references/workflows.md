@@ -126,6 +126,19 @@
 7. 本地化、图片、场景路径是否缺失
 8. 再看 Harmony 与底层原生代码
 
+如果已经需要“进游戏高频复现 / 快速发资源 / 快速推进流程 / 脚本化验证”，补看：
+
+1. `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode\README.zh-CN.md`
+2. `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode\docs`
+3. `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode\manual`
+4. `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode\scripts`
+
+适用场景：
+
+- 快速复现卡牌、遗物、事件、能力问题
+- 需要游戏内脚本/控制台辅助验证
+- 需要把“代码核对”补成“实机可重复测试”
+
 ## 检索脚本使用方式
 
 ```powershell

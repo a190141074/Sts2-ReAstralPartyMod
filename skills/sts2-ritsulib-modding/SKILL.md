@@ -24,6 +24,9 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
   - 新版教程主入口，优先看这里的 `01 - 添加基础内容`、`02 - 玩法基底`、`03 - 模组工具`。
 - `D:\MOD\杀戮尖塔2mod制作\RitsuLib-code\Docs\zh`
   - 当前 RitsuLib 中文 API 与注册器文档主入口。
+- `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode`
+  - 游戏内测试、作弊、脚本执行与 mod 调试工具箱。
+  - 当任务涉及“如何更快复现/验证内容”“如何在游戏里直接测卡牌/遗物/事件”“如何做脚本化调试”时，优先把它作为实机验证参考。
 - `D:\MOD\杀戮尖塔2mod制作\Slay-the-Spire-2-gdsdecomp\src\Core`
   - 当前反编译源码主入口，优先查这里的具体系统源码。
 
@@ -32,8 +35,9 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 1. `RitsuLib-doc`
 2. `RitsuLib-code`
 3. 当前工作仓库
-4. `STS2_WineFox-main`
-5. 游戏反编译代码
+4. `STS2-DevMode`
+5. `STS2_WineFox-main`
+6. 游戏反编译代码
 
 ## Quick Start
 
@@ -145,6 +149,13 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 3. 再检查 `csproj`：RitsuLib、`sts2.dll`、`0Harmony.dll` 引用路径
 4. 再检查本地化、图片、场景路径
 5. 最后才看 Harmony、反编译代码、运行时分支行为
+
+如果任务已经进入“需要高频实机复现或快速验证”的阶段，再补看：
+
+- `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode`
+  - 优先查它的 README、docs、manual、scripts。
+  - 用来找游戏内直接生成卡牌/遗物、执行脚本、开调试开关、快速推进房间或战斗的做法。
+  - 这是验证与调试参考，不替代 RitsuLib 的注册/API 权威地位。
 
 如果怀疑符号或注册器名称写错，立刻运行：
 

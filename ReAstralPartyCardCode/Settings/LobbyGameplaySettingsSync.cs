@@ -85,6 +85,10 @@ internal static class LobbyGameplayNetRoleHelper
 
 public sealed class LobbyGameplaySettingsSnapshot
 {
+    public bool EnableStartingInitialPoint { get; set; }
+
+    public bool EnableStartingPersonaSelection { get; set; } = true;
+
     public bool EnableAllPersonas { get; set; }
 
     public bool EnableAllVariantPersonas { get; set; }
@@ -99,6 +103,8 @@ public sealed class LobbyGameplaySettingsSnapshot
     {
         return new LobbyGameplaySettingsSnapshot
         {
+            EnableStartingInitialPoint = EnableStartingInitialPoint,
+            EnableStartingPersonaSelection = EnableStartingPersonaSelection,
             EnableAllPersonas = EnableAllPersonas,
             EnableAllVariantPersonas = EnableAllVariantPersonas,
             EnableExtremeMode = EnableExtremeMode,
@@ -111,6 +117,8 @@ public sealed class LobbyGameplaySettingsSnapshot
     {
         return new LobbyGameplaySettingsSnapshot
         {
+            EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
+            EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
             EnableAllPersonas = settings.EnableAllPersonas,
             EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
             EnableExtremeMode = settings.EnableExtremeMode,
@@ -184,7 +192,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot updated: all_personas={updated.EnableAllPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot updated: start_initial_point={updated.EnableStartingInitialPoint}, start_persona_selection={updated.EnableStartingPersonaSelection}, all_personas={updated.EnableAllPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
         SnapshotChanged?.Invoke(updated.Clone());
     }
 
@@ -203,7 +211,7 @@ internal static class LobbyGameplaySettingsSync
 
         netService.SendMessage(new AstralLobbyGameplaySettingsSnapshotMessage(snapshot));
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     public static void RequestSnapshotFromHost()
@@ -315,7 +323,7 @@ internal static class LobbyGameplaySettingsSync
         var snapshot = message.ToSnapshot();
         SetSnapshotInternal(snapshot, $"remote_snapshot_from_{senderId}", true);
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     private static void HandleRequestMessage(AstralLobbyGameplaySettingsRequestMessage message, ulong senderId)
@@ -343,7 +351,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
         if (invokeEvent)
             SnapshotChanged?.Invoke(snapshot.Clone());
     }
@@ -357,8 +365,10 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 1;
+    private const int SchemaVersion = 2;
 
+    public bool EnableStartingInitialPoint { get; set; }
+    public bool EnableStartingPersonaSelection { get; set; }
     public bool EnableAllPersonas { get; set; }
     public bool EnableAllVariantPersonas { get; set; }
     public bool EnableExtremeMode { get; set; }
@@ -367,6 +377,8 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
 
     public AstralLobbyGameplaySettingsSnapshotMessage(LobbyGameplaySettingsSnapshot snapshot)
     {
+        EnableStartingInitialPoint = snapshot.EnableStartingInitialPoint;
+        EnableStartingPersonaSelection = snapshot.EnableStartingPersonaSelection;
         EnableAllPersonas = snapshot.EnableAllPersonas;
         EnableAllVariantPersonas = snapshot.EnableAllVariantPersonas;
         EnableExtremeMode = snapshot.EnableExtremeMode;
@@ -381,6 +393,8 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public void Serialize(PacketWriter writer)
     {
         writer.WriteInt(SchemaVersion);
+        writer.WriteBool(EnableStartingInitialPoint);
+        writer.WriteBool(EnableStartingPersonaSelection);
         writer.WriteBool(EnableAllPersonas);
         writer.WriteBool(EnableAllVariantPersonas);
         writer.WriteBool(EnableExtremeMode);
@@ -390,7 +404,18 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
 
     public void Deserialize(PacketReader reader)
     {
-        _ = reader.ReadInt();
+        var schemaVersion = reader.ReadInt();
+        if (schemaVersion >= 2)
+        {
+            EnableStartingInitialPoint = reader.ReadBool();
+            EnableStartingPersonaSelection = reader.ReadBool();
+        }
+        else
+        {
+            EnableStartingInitialPoint = false;
+            EnableStartingPersonaSelection = true;
+        }
+
         EnableAllPersonas = reader.ReadBool();
         EnableAllVariantPersonas = reader.ReadBool();
         EnableExtremeMode = reader.ReadBool();
@@ -402,6 +427,8 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     {
         return new LobbyGameplaySettingsSnapshot
         {
+            EnableStartingInitialPoint = EnableStartingInitialPoint,
+            EnableStartingPersonaSelection = EnableStartingPersonaSelection,
             EnableAllPersonas = EnableAllPersonas,
             EnableAllVariantPersonas = EnableAllVariantPersonas,
             EnableExtremeMode = EnableExtremeMode,
