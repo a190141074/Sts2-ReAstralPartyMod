@@ -1,0 +1,20 @@
+{
+  "RE_ASTRAL_PARTY_MOD_POTION_PERSON_CHEST_CHOOSE.title": "人格宝箱",
+  "RE_ASTRAL_PARTY_MOD_POTION_PERSON_CHEST_CHOOSE.description": "戦闘以外でのみ使用してください。あなたが所有していない 4 つの異なる 人格遗物 をランダムに公開します。 1を選択して入手してください。",
+  "RE_ASTRAL_PARTY_MOD_POTION_PERSON_CHEST_CHOOSE.selectionScreenHeader": "ペルソナを選択してください",
+  "RE_ASTRAL_PARTY_MOD_POTION_PERSON_CHEST_CHOOSE.selectionScreenPrompt": "取得する 人格遗物 を選択してください",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_SUPPORT_GUM.title": "糖果·支援口香糖",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_SUPPORT_GUM.description": "どのプレイヤーでも使用できます。ターゲットは HP [blue]6[/blue] を回復し、获得 の {energyPrefix:energyIcons(1)} を回復し、[gold]Doom[/gold] を除去します。",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_ENERGY_SUPPLEMENT_BAR.title": "糖果·能量补充棒",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_ENERGY_SUPPLEMENT_BAR.description": "[gold]Modification[/gold]を持つプレーヤーでのみ使用してください。ターゲットの 获得 は、[blue]2[/blue] [gold]Modification[/gold]、[blue]2[/blue] [gold]Doom[/gold]、[blue]3[/blue] 临时 [red]力量[/red]、および [blue]2[/blue] 回合 の [blue]2[/blue] 临时 [green]敏捷[/green] です。",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_BIG_BRAIN_GUMMY.title": "糖果·大聪明软糖",
+  "RE_ASTRAL_PARTY_MOD_POTION_CANDY_BIG_BRAIN_GUMMY.description": "どのプレイヤーでも使用できます。対象は[blue][/blue]枚のカードを引き、[gold]修正[/gold]と[gold]破滅[/gold]を取り除く。",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_ANOMALY_EVENT_POTION.title": "瓶装·异常事件",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_ANOMALY_EVENT_POTION.description": "戦闘時のみ使用してください。 [card]転送リクエスト[/card] を自動的に再生します。",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_NEUTRAL_EVENT_POTION.title": "瓶装·中性事件",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_NEUTRAL_EVENT_POTION.description": "戦闘時のみ使用してください。 [card]混雑した通路[/card]、[card]平等[/card]、[card]プレイヤー代表[/card]、[card]雷接近[/card]からランダムに 3 枚を引いて、1 枚を選んでプレイします。",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_GOOD_EVENT_POTION.title": "瓶装·好事件",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_GOOD_EVENT_POTION.description": "戦闘時のみ使用してください。 [card]Fight, Fun![/card]、[card]空からの贈り物[/card]、[card]レッドヒート警告[/card]、[card]スプリント[/card]からランダムに 3 つを引いて、1 つを選んでプレイします。",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_DEUS_EX_MACHINA_POTION.title": "瓶装·天降神兵",
+  "RE_ASTRAL_PARTY_MOD_POTION_VIAL_DEUS_EX_MACHINA_POTION.description": "戦闘時のみ使用してください。 [card]天降神兵[/card]を自動再生します。"
+}

@@ -1237,6 +1237,8 @@ internal static class AstralTelemetry
             return "zhs";
         if (normalized.StartsWith("en"))
             return "eng";
+        if (normalized.StartsWith("ja") || normalized.StartsWith("jp") || normalized == "jpn")
+            return "jpn";
 
         return normalized;
     }

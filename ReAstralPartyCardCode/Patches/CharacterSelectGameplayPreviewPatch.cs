@@ -84,6 +84,31 @@ internal static class CharacterSelectGameplayPreviewExitPatch
 
 internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 {
+    private enum PanelInteractionMode
+    {
+        None = 0,
+        Move = 1,
+        ResizeLeft = 2,
+        ResizeRight = 3,
+        ResizeTop = 4,
+        ResizeBottom = 5,
+        ResizeTopLeft = 6,
+        ResizeTopRight = 7,
+        ResizeBottomLeft = 8,
+        ResizeBottomRight = 9
+    }
+
+    private const float DefaultPanelPositionX = 1140f;
+    private const float DefaultPanelPositionY = 120f;
+    private const float DefaultPanelWidth = 470f;
+    private const float DefaultPanelHeight = 520f;
+    private const float PanelResizeHitThickness = 12f;
+    private const float PanelViewportMargin = 8f;
+    private const float PanelMinWidth = 380f;
+    private const float PanelCollapsedHeight = 88f;
+    private const float TitleBarHeight = 56f;
+    private const float PanelAspectRatio = DefaultPanelWidth / DefaultPanelHeight;
+
     private static readonly StartingPersonaMode[] StartingPersonaModes =
     [
         StartingPersonaMode.Standard,
@@ -108,11 +133,18 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private CheckButton? _extremeModeToggle;
     private OptionButton? _startingPersonaModeOption;
     private OptionButton? _tokenSeriesModeOption;
+    private PanelContainer? _shell;
+    private VBoxContainer? _body;
+    private Button? _collapseButton;
     private Label? _footerLabel;
     private Label? _stateLabel;
     private Godot.Timer? _refreshTimer;
-    private bool _dragging;
-    private Vector2 _dragPointerOffset;
+    private PanelInteractionMode _interactionMode;
+    private Vector2 _interactionMouseStart;
+    private Vector2 _interactionPositionStart;
+    private Vector2 _interactionSizeStart = new(DefaultPanelWidth, DefaultPanelHeight);
+    private Vector2 _expandedSize = new(DefaultPanelWidth, DefaultPanelHeight);
+    private bool _isCollapsed;
     private bool _suppressUiEvents;
     private bool _handlersBound;
     private LobbyGameplayNetRole _lastKnownRole = LobbyGameplayNetRole.Pending;
@@ -131,10 +163,10 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         AnchorTop = 0f;
         AnchorRight = 0f;
         AnchorBottom = 0f;
-        OffsetLeft = 1140f;
-        OffsetTop = 120f;
-        OffsetRight = 1610f;
-        OffsetBottom = 640f;
+        OffsetLeft = DefaultPanelPositionX;
+        OffsetTop = DefaultPanelPositionY;
+        OffsetRight = DefaultPanelPositionX + DefaultPanelWidth;
+        OffsetBottom = DefaultPanelPositionY + DefaultPanelHeight;
         MouseFilter = MouseFilterEnum.Pass;
         ProcessMode = ProcessModeEnum.Always;
     }
@@ -142,6 +174,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     public override void _Ready()
     {
         BuildUi();
+        RestoreSavedPanelState();
         BuildRefreshTimer();
         LobbyGameplaySettingsSync.SnapshotChanged += OnSnapshotChanged;
         _handlersBound = true;
@@ -154,7 +187,32 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         if (_handlersBound)
             LobbyGameplaySettingsSync.SnapshotChanged -= OnSnapshotChanged;
         _handlersBound = false;
+        EndInteraction(false);
+        PersistPanelState();
         ClearAllHoverTips();
+    }
+
+    public override void _Process(double delta)
+    {
+        if (_interactionMode != PanelInteractionMode.None)
+        {
+            if (Input.IsMouseButtonPressed(MouseButton.Left))
+                UpdateInteraction(GetGlobalMousePosition());
+            else
+                EndInteraction();
+
+            return;
+        }
+
+        UpdateCursorShape();
+    }
+
+    public override void _GuiInput(InputEvent @event)
+    {
+        if (_isCollapsed)
+            return;
+
+        HandleBodyInput(@event);
     }
 
     private void BuildUi()
@@ -180,6 +238,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         shell.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         shell.AddThemeStyleboxOverride("panel", CreateShellStyle());
         AddChild(shell);
+        _shell = shell;
 
         var root = new VBoxContainer
         {
@@ -202,6 +261,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         };
         body.AddThemeConstantOverride("separation", 10);
         root.AddChild(body);
+        _body = body;
 
         body.AddChild(BuildIntroLabel());
         body.AddChild(BuildBooleanRow(
@@ -262,6 +322,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         _footerLabel.AddThemeColorOverride("font_color", new Color(0.92f, 0.91f, 0.84f, 0.82f));
         _footerLabel.AddThemeFontSizeOverride("font_size", 15);
         body.AddChild(_footerLabel);
+
+        ApplyCollapsedState();
     }
 
     private void BuildRefreshTimer()
@@ -330,6 +392,18 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         _stateLabel.AddThemeColorOverride("font_color", new Color(0.88f, 0.92f, 0.96f, 0.76f));
         _stateLabel.AddThemeFontSizeOverride("font_size", 16);
         row.AddChild(_stateLabel);
+
+        _collapseButton = new Button
+        {
+            MouseFilter = MouseFilterEnum.Stop,
+            FocusMode = FocusModeEnum.Click,
+            CustomMinimumSize = new Vector2(68f, 34f),
+            SizeFlagsHorizontal = SizeFlags.ShrinkEnd,
+            TooltipText = GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.collapse_tooltip")
+        };
+        _collapseButton.Pressed += ToggleCollapsed;
+        row.AddChild(_collapseButton);
+        RefreshCollapseButtonText();
 
         return titleBar;
     }
@@ -876,29 +950,301 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         RefreshLobbySyncState();
     }
 
+    private void HandleBodyInput(InputEvent @event)
+    {
+        switch (@event)
+        {
+            case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true } when TryBeginResize():
+                AcceptEvent();
+                break;
+            case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false } when _interactionMode != PanelInteractionMode.None:
+                EndInteraction();
+                AcceptEvent();
+                break;
+            case InputEventMouseMotion:
+                UpdateCursorShape();
+                break;
+        }
+    }
+
     private void OnTitleBarGuiInput(InputEvent @event)
     {
         switch (@event)
         {
             case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true }:
-                _dragging = true;
-                _dragPointerOffset = GetGlobalMousePosition() - GlobalPosition;
+                BeginMove();
                 AcceptEvent();
                 break;
-            case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false }:
-                _dragging = false;
-                AcceptEvent();
-                break;
-            case InputEventMouseMotion when _dragging:
-                var viewportRect = GetViewportRect();
-                var panelSize = Size;
-                var target = GetGlobalMousePosition() - _dragPointerOffset;
-                target.X = Mathf.Clamp(target.X, 8f, Math.Max(8f, viewportRect.Size.X - panelSize.X - 8f));
-                target.Y = Mathf.Clamp(target.Y, 8f, Math.Max(8f, viewportRect.Size.Y - panelSize.Y - 8f));
-                GlobalPosition = target;
+            case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false } when _interactionMode == PanelInteractionMode.Move:
+                EndInteraction();
                 AcceptEvent();
                 break;
         }
+    }
+
+    private void BeginMove()
+    {
+        _interactionMode = PanelInteractionMode.Move;
+        _interactionMouseStart = GetGlobalMousePosition();
+        _interactionPositionStart = GlobalPosition;
+        _interactionSizeStart = Size;
+    }
+
+    private bool TryBeginResize()
+    {
+        var mode = ResolveResizeMode();
+        if (mode == PanelInteractionMode.None)
+            return false;
+
+        _interactionMode = mode;
+        _interactionMouseStart = GetGlobalMousePosition();
+        _interactionPositionStart = GlobalPosition;
+        _interactionSizeStart = Size;
+        return true;
+    }
+
+    private void UpdateInteraction(Vector2 mousePosition)
+    {
+        switch (_interactionMode)
+        {
+            case PanelInteractionMode.Move:
+                GlobalPosition = ClampPositionToViewport(_interactionPositionStart + (mousePosition - _interactionMouseStart), Size);
+                break;
+            case PanelInteractionMode.None:
+                break;
+            default:
+                ApplyResize(mousePosition);
+                break;
+        }
+    }
+
+    private void ApplyResize(Vector2 mousePosition)
+    {
+        var startRect = new Rect2(_interactionPositionStart, _interactionSizeStart);
+        var delta = mousePosition - _interactionMouseStart;
+        var targetWidth = _interactionSizeStart.X;
+
+        switch (_interactionMode)
+        {
+            case PanelInteractionMode.ResizeLeft:
+                targetWidth = _interactionSizeStart.X - delta.X;
+                break;
+            case PanelInteractionMode.ResizeRight:
+                targetWidth = _interactionSizeStart.X + delta.X;
+                break;
+            case PanelInteractionMode.ResizeTop:
+                targetWidth = _interactionSizeStart.X - (delta.Y * PanelAspectRatio);
+                break;
+            case PanelInteractionMode.ResizeBottom:
+                targetWidth = _interactionSizeStart.X + (delta.Y * PanelAspectRatio);
+                break;
+            case PanelInteractionMode.ResizeTopLeft:
+            case PanelInteractionMode.ResizeBottomRight:
+            case PanelInteractionMode.ResizeTopRight:
+            case PanelInteractionMode.ResizeBottomLeft:
+                var horizontal = _interactionMode is PanelInteractionMode.ResizeLeft or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeBottomLeft
+                    ? -delta.X
+                    : delta.X;
+                var vertical = _interactionMode is PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeTopRight
+                    ? -delta.Y * PanelAspectRatio
+                    : delta.Y * PanelAspectRatio;
+                targetWidth = _interactionSizeStart.X + (Mathf.Abs(horizontal) >= Mathf.Abs(vertical) ? horizontal : vertical);
+                break;
+        }
+
+        var maxWidth = GetMaxExpandedWidthForCurrentViewport(_interactionMode);
+        var clampedWidth = Mathf.Clamp(targetWidth, PanelMinWidth, Math.Max(PanelMinWidth, maxWidth));
+        var targetSize = new Vector2(clampedWidth, clampedWidth / PanelAspectRatio);
+        var targetPosition = startRect.Position;
+
+        if (_interactionMode is PanelInteractionMode.ResizeLeft or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeBottomLeft)
+            targetPosition.X = startRect.End.X - targetSize.X;
+
+        if (_interactionMode is PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeTopRight)
+            targetPosition.Y = startRect.End.Y - targetSize.Y;
+
+        targetPosition = ClampPositionToViewport(targetPosition, targetSize);
+        ApplyExpandedRect(targetPosition, targetSize);
+    }
+
+    private void EndInteraction(bool persist = true)
+    {
+        if (_interactionMode == PanelInteractionMode.None)
+            return;
+
+        _interactionMode = PanelInteractionMode.None;
+        UpdateCursorShape();
+        if (persist)
+            PersistPanelState();
+    }
+
+    private void ToggleCollapsed()
+    {
+        if (!_isCollapsed)
+            _expandedSize = SanitizeExpandedSize(Size);
+
+        _isCollapsed = !_isCollapsed;
+        ApplyCollapsedState();
+        PersistPanelState();
+    }
+
+    private void ApplyCollapsedState()
+    {
+        if (_body != null)
+            _body.Visible = !_isCollapsed;
+
+        if (_isCollapsed)
+        {
+            Size = new Vector2(_expandedSize.X, PanelCollapsedHeight);
+            GlobalPosition = ClampPositionToViewport(GlobalPosition, Size);
+        }
+        else
+        {
+            ApplyExpandedRect(GlobalPosition, _expandedSize);
+        }
+
+        RefreshCollapseButtonText();
+    }
+
+    private void RefreshCollapseButtonText()
+    {
+        if (_collapseButton == null)
+            return;
+
+        _collapseButton.Text = _isCollapsed
+            ? GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.expand_button")
+            : GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.collapse_button");
+        _collapseButton.TooltipText = _isCollapsed
+            ? GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.expand_tooltip")
+            : GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.collapse_tooltip");
+    }
+
+    private void RestoreSavedPanelState()
+    {
+        var state = ReAstralPartyModSettingsManager.LobbyPanelState;
+        _isCollapsed = state.IsCollapsed;
+        _expandedSize = SanitizeExpandedSize(new Vector2(state.Width, state.Height));
+        var visibleSize = _isCollapsed ? new Vector2(_expandedSize.X, PanelCollapsedHeight) : _expandedSize;
+        GlobalPosition = ClampPositionToViewport(new Vector2(state.PositionX, state.PositionY), visibleSize);
+        Size = visibleSize;
+        ApplyCollapsedState();
+    }
+
+    private void PersistPanelState()
+    {
+        var persistedSize = _isCollapsed ? _expandedSize : SanitizeExpandedSize(Size);
+        ReAstralPartyModSettingsManager.UpdateLobbyPanelState(_isCollapsed, GlobalPosition, persistedSize);
+    }
+
+    private void ApplyExpandedRect(Vector2 position, Vector2 size)
+    {
+        _expandedSize = SanitizeExpandedSize(size);
+        Size = _expandedSize;
+        GlobalPosition = ClampPositionToViewport(position, Size);
+    }
+
+    private Vector2 SanitizeExpandedSize(Vector2 size)
+    {
+        var minHeight = PanelMinWidth / PanelAspectRatio;
+        var maxWidth = GetMaxExpandedWidthForCurrentViewport(PanelInteractionMode.None);
+        var width = Mathf.Clamp(size.X, PanelMinWidth, Math.Max(PanelMinWidth, maxWidth));
+        var height = width / PanelAspectRatio;
+        if (height < minHeight)
+        {
+            height = minHeight;
+            width = height * PanelAspectRatio;
+        }
+
+        return new Vector2(width, height);
+    }
+
+    private float GetMaxExpandedWidthForCurrentViewport(PanelInteractionMode mode)
+    {
+        var viewport = GetViewportRect().Size;
+        var availableWidth = Math.Max(PanelMinWidth, viewport.X - (PanelViewportMargin * 2f));
+        var availableHeight = Math.Max(PanelCollapsedHeight, viewport.Y - (PanelViewportMargin * 2f));
+        var widthFromHeight = availableHeight * PanelAspectRatio;
+        var maxWidth = Math.Min(availableWidth, widthFromHeight);
+
+        if (mode == PanelInteractionMode.None)
+            return maxWidth;
+
+        var anchor = _interactionPositionStart;
+        var startRect = new Rect2(_interactionPositionStart, _interactionSizeStart);
+
+        if (mode is PanelInteractionMode.ResizeLeft or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeBottomLeft)
+            maxWidth = Math.Min(maxWidth, Math.Max(PanelMinWidth, startRect.End.X - PanelViewportMargin));
+
+        if (mode is PanelInteractionMode.ResizeRight or PanelInteractionMode.ResizeTopRight or PanelInteractionMode.ResizeBottomRight)
+            maxWidth = Math.Min(maxWidth, Math.Max(PanelMinWidth, viewport.X - anchor.X - PanelViewportMargin));
+
+        if (mode is PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeTopRight)
+            maxWidth = Math.Min(maxWidth, Math.Max(PanelMinWidth, (startRect.End.Y - PanelViewportMargin) * PanelAspectRatio));
+
+        if (mode is PanelInteractionMode.ResizeBottom or PanelInteractionMode.ResizeBottomLeft or PanelInteractionMode.ResizeBottomRight)
+            maxWidth = Math.Min(maxWidth, Math.Max(PanelMinWidth, (viewport.Y - anchor.Y - PanelViewportMargin) * PanelAspectRatio));
+
+        return Math.Max(PanelMinWidth, maxWidth);
+    }
+
+    private PanelInteractionMode ResolveResizeMode()
+    {
+        if (_isCollapsed)
+            return PanelInteractionMode.None;
+
+        var local = GetLocalMousePosition();
+        var nearLeft = local.X <= PanelResizeHitThickness;
+        var nearRight = local.X >= Size.X - PanelResizeHitThickness;
+        var nearTop = local.Y <= PanelResizeHitThickness;
+        var nearBottom = local.Y >= Size.Y - PanelResizeHitThickness;
+
+        if (nearLeft && nearTop)
+            return PanelInteractionMode.ResizeTopLeft;
+        if (nearRight && nearTop)
+            return PanelInteractionMode.ResizeTopRight;
+        if (nearLeft && nearBottom)
+            return PanelInteractionMode.ResizeBottomLeft;
+        if (nearRight && nearBottom)
+            return PanelInteractionMode.ResizeBottomRight;
+        if (nearLeft)
+            return PanelInteractionMode.ResizeLeft;
+        if (nearRight)
+            return PanelInteractionMode.ResizeRight;
+        if (nearTop)
+            return PanelInteractionMode.ResizeTop;
+        if (nearBottom)
+            return PanelInteractionMode.ResizeBottom;
+
+        return PanelInteractionMode.None;
+    }
+
+    private void UpdateCursorShape()
+    {
+        MouseDefaultCursorShape = ResolveCursorShape(_interactionMode != PanelInteractionMode.None
+            ? _interactionMode
+            : ResolveResizeMode());
+    }
+
+    private static CursorShape ResolveCursorShape(PanelInteractionMode mode)
+    {
+        return mode switch
+        {
+            PanelInteractionMode.ResizeLeft or PanelInteractionMode.ResizeRight => CursorShape.Hsize,
+            PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeBottom => CursorShape.Vsize,
+            PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeBottomRight => CursorShape.Fdiagsize,
+            PanelInteractionMode.ResizeTopRight or PanelInteractionMode.ResizeBottomLeft => CursorShape.Bdiagsize,
+            _ => CursorShape.Arrow
+        };
+    }
+
+    private Vector2 ClampPositionToViewport(Vector2 target, Vector2 panelSize)
+    {
+        var viewportRect = GetViewportRect();
+        target.X = Mathf.Clamp(target.X, PanelViewportMargin,
+            Math.Max(PanelViewportMargin, viewportRect.Size.X - panelSize.X - PanelViewportMargin));
+        target.Y = Mathf.Clamp(target.Y, PanelViewportMargin,
+            Math.Max(PanelViewportMargin, viewportRect.Size.Y - panelSize.Y - PanelViewportMargin));
+        return target;
     }
 
     private static StyleBoxFlat CreateShellStyle()

@@ -41,6 +41,19 @@ public enum StartingPersonaMode
 
 public sealed class ReAstralPartyModSettings
 {
+    public sealed class LobbyPanelStateModel
+    {
+        public bool IsCollapsed { get; set; }
+
+        public float PositionX { get; set; } = 1140f;
+
+        public float PositionY { get; set; } = 120f;
+
+        public float Width { get; set; } = 470f;
+
+        public float Height { get; set; } = 520f;
+    }
+
     public List<string> BannedRelicIds { get; set; } = new();
 
     // Legacy field kept so older settings.json files still load cleanly.
@@ -96,6 +109,8 @@ public sealed class ReAstralPartyModSettings
     public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
 
     public bool EnablePureAngelMode { get; set; } = true;
+
+    public LobbyPanelStateModel LobbyPanelState { get; set; } = new();
 }
 
 public static partial class ReAstralPartyModSettingsManager
@@ -126,6 +141,16 @@ public static partial class ReAstralPartyModSettingsManager
     public static TokenSeriesMode TokenSeriesMode => ReadRuntime(settings => settings.TokenSeriesMode);
 
     public static bool EnablePureAngelMode => ReadRuntime(settings => settings.EnablePureAngelMode);
+
+    public static ReAstralPartyModSettings.LobbyPanelStateModel LobbyPanelState =>
+        ReadRuntime(settings => new ReAstralPartyModSettings.LobbyPanelStateModel
+        {
+            IsCollapsed = settings.LobbyPanelState.IsCollapsed,
+            PositionX = settings.LobbyPanelState.PositionX,
+            PositionY = settings.LobbyPanelState.PositionY,
+            Width = settings.LobbyPanelState.Width,
+            Height = settings.LobbyPanelState.Height
+        });
 
     public static bool EnablePlayRecommendation => ReadRuntime(settings => settings.EnablePlayRecommendation);
 
@@ -417,6 +442,19 @@ public static partial class ReAstralPartyModSettingsManager
     internal static void SetEnableTelemetry(bool enabled)
     {
         UpdatePersistentSettings(settings => settings.EnableTelemetry = enabled, "set_enable_telemetry");
+    }
+
+    internal static void UpdateLobbyPanelState(bool isCollapsed, Vector2 globalPosition, Vector2 size)
+    {
+        UpdatePersistentSettings(settings =>
+        {
+            settings.LobbyPanelState ??= new ReAstralPartyModSettings.LobbyPanelStateModel();
+            settings.LobbyPanelState.IsCollapsed = isCollapsed;
+            settings.LobbyPanelState.PositionX = globalPosition.X;
+            settings.LobbyPanelState.PositionY = globalPosition.Y;
+            settings.LobbyPanelState.Width = size.X;
+            settings.LobbyPanelState.Height = size.Y;
+        }, "lobby_panel_state");
     }
 
     private static T ReadRuntime<T>(Func<LocalRuntimeSettings, T> selector)
@@ -1115,7 +1153,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -1361,6 +1399,19 @@ public static partial class ReAstralPartyModSettingsManager
 
     private sealed class LocalRuntimeSettings
     {
+        public sealed class LobbyPanelStateSnapshot
+        {
+            public bool IsCollapsed { get; init; }
+
+            public float PositionX { get; init; } = 1140f;
+
+            public float PositionY { get; init; } = 120f;
+
+            public float Width { get; init; } = 470f;
+
+            public float Height { get; init; } = 520f;
+        }
+
         public IReadOnlySet<ModelId> BannedRelicIds { get; init; } = new HashSet<ModelId>();
 
         public IReadOnlySet<ModelId> BannedPersonaRelicIds => BannedRelicIds;
@@ -1405,6 +1456,8 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnablePureAngelMode { get; init; } = true;
 
+        public LobbyPanelStateSnapshot LobbyPanelState { get; init; } = new();
+
         public static LocalRuntimeSettings FromPersistent(ReAstralPartyModSettings settings)
         {
             return new LocalRuntimeSettings
@@ -1429,7 +1482,15 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableTokenRelicNotifications = settings.EnableTokenRelicNotifications,
                 EnableNeowDiagnosticsNotifications = settings.EnableNeowDiagnosticsNotifications,
                 TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
-                EnablePureAngelMode = settings.EnablePureAngelMode
+                EnablePureAngelMode = settings.EnablePureAngelMode,
+                LobbyPanelState = new LobbyPanelStateSnapshot
+                {
+                    IsCollapsed = settings.LobbyPanelState?.IsCollapsed ?? false,
+                    PositionX = settings.LobbyPanelState?.PositionX ?? 1140f,
+                    PositionY = settings.LobbyPanelState?.PositionY ?? 120f,
+                    Width = settings.LobbyPanelState?.Width ?? 470f,
+                    Height = settings.LobbyPanelState?.Height ?? 520f
+                }
             };
         }
     }

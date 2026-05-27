@@ -115,38 +115,45 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     public string GetDisplayTitle(string language)
     {
+        var normalizedLanguage = NormalizeLanguage(language);
         if (!CanUseDynamicDisplay())
-            return language switch
+            return normalizedLanguage switch
             {
                 "zhs" => "名刀",
+                "jpn" => "名刀",
                 _ => "Famous Blade"
             };
 
         return GetDisplayTier() switch
         {
-            FamousBladeDisplayTier.Medium => language switch
+            FamousBladeDisplayTier.Medium => normalizedLanguage switch
             {
                 "zhs" => "名刀·中",
+                "jpn" => "名刀・中",
                 _ => "Famous Blade (Medium)"
             },
-            FamousBladeDisplayTier.Large => language switch
+            FamousBladeDisplayTier.Large => normalizedLanguage switch
             {
                 "zhs" => "名刀·大",
+                "jpn" => "名刀・大",
                 _ => "Famous Blade (Large)"
             },
-            FamousBladeDisplayTier.ExtraLarge => language switch
+            FamousBladeDisplayTier.ExtraLarge => normalizedLanguage switch
             {
                 "zhs" => "名刀·特大",
+                "jpn" => "名刀・特大",
                 _ => "Famous Blade (Extra Large)"
             },
-            FamousBladeDisplayTier.GawuCutter => language switch
+            FamousBladeDisplayTier.GawuCutter => normalizedLanguage switch
             {
                 "zhs" => "名刀·嘎呜切",
+                "jpn" => "名刀・ガウ切り",
                 _ => "Famous Blade (Gawu-Cutter)"
             },
-            _ => language switch
+            _ => normalizedLanguage switch
             {
                 "zhs" => "名刀",
+                "jpn" => "名刀",
                 _ => "Famous Blade"
             }
         };
@@ -218,6 +225,20 @@ public class SkillFamousBlade : AstralPartyCardModel
         }
 
         return $"{target.Side}:{target.LogName}";
+    }
+
+    private static string NormalizeLanguage(string language)
+    {
+        if (string.IsNullOrWhiteSpace(language))
+            return "eng";
+
+        var normalized = language.Trim().Replace('_', '-').ToLowerInvariant();
+        if (normalized.StartsWith("zh"))
+            return "zhs";
+        if (normalized.StartsWith("ja") || normalized.StartsWith("jp") || normalized == "jpn")
+            return "jpn";
+
+        return "eng";
     }
 
     private bool CanUseDynamicDisplay()
