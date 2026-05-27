@@ -51,6 +51,8 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
 
     public override PowerStackType StackType => PowerStackType.None;
 
+    public override bool ShouldReceiveCombatHooks => true;
+
     public override string? CustomIconPath => GetBridgedRelic()?.PackedIconPath ?? base.CustomIconPath;
 
     public override string? CustomBigIconPath =>
@@ -202,6 +204,11 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
     {
         return ForwardAsync(
             relic => relic.AfterDamageReceived(choiceContext, target, result, props, dealer, cardSource));
+    }
+
+    public override Task AfterCurrentHpChanged(Creature creature, decimal delta)
+    {
+        return ForwardAsync(relic => relic.AfterCurrentHpChanged(creature, delta));
     }
 
     public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
