@@ -134,7 +134,7 @@ internal static class GameplayStaticPatchCatalog
                 "neow_face_the_shadow_icon_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
                 "_Ready",
-                typeof(NeowFaceTheShadowIconPatch),
+                typeof(NeowDreamFaceTheShadowIconPatch),
                 false,
                 "UI patch: attach the Face the Shadow icon"),
             new ModPatchInfo(

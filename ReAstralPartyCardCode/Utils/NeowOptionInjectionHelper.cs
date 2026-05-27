@@ -15,8 +15,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class NeowOptionInjectionHelper
 {
-    private const string FaceTheShadowTextKey =
-        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.FACE_THE_SHADOW";
+    private const string DreamFaceTheShadowTextKey =
+        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW";
     private static readonly string[] CardCollectionMemberNames =
     [
         "Cards",
@@ -44,31 +44,31 @@ internal static class NeowOptionInjectionHelper
     public static void Register()
     {
         MainFile.Logger.Info(
-            "[NeowOptionInjectionHelper] Registering Face the Shadow through RitsuLib ancient-option registry.");
+            "[NeowOptionInjectionHelper] Registering Dream Face the Shadow through RitsuLib ancient-option registry.");
         RitsuLibFramework.RegisterAncientOption<Neow>(
             MainFile.ModId,
-            ModAncientOptionRule.Single(CreateForgottenRoarOption));
+            ModAncientOptionRule.Single(CreateDreamFaceTheShadowOption));
     }
 
-    private static EventOption? CreateForgottenRoarOption(AncientEventModel ancient)
+    private static EventOption? CreateDreamFaceTheShadowOption(AncientEventModel ancient)
     {
-        return new EventOption(ancient, () => ChooseForgottenRoar(ancient), FaceTheShadowTextKey)
+        return new EventOption(ancient, () => ChooseDreamFaceTheShadow(ancient), DreamFaceTheShadowTextKey)
         {
             HoverTips = ForgottenRoarHoverTips
         };
     }
 
-    private static async Task ChooseForgottenRoar(AncientEventModel ancient)
+    private static async Task ChooseDreamFaceTheShadow(AncientEventModel ancient)
     {
         var owner = ancient.Owner
                     ?? throw new InvalidOperationException(
-                        "Neow had no owner when Face the Shadow was chosen.");
+                        "Neow had no owner when Dream Face the Shadow was chosen.");
 
-        await AddForgottenRoarToDeck(owner);
+        await AddDreamFaceTheShadowCardToDeck(owner);
         CompleteAncient(ancient);
     }
 
-    private static Task AddForgottenRoarToDeck(Player owner)
+    private static Task AddDreamFaceTheShadowCardToDeck(Player owner)
     {
         return CardGainAttribution.RunWithSource(
             null,
