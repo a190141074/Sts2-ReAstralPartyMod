@@ -1,9 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
@@ -66,9 +66,9 @@ public class BronzeGongPower : AstralPartyPowerModel
         await PowerCmd.Apply<ReversedScalesHolographicPower>(Owner, addedAmount, applier, cardSource, false);
     }
 
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
-        if (Owner == null || side != Owner.Side || Amount <= 0m)
+        if (Owner?.Player == null || player != Owner.Player || Amount <= 0m)
             return;
 
         var holographicPower = Owner.GetPower<ReversedScalesHolographicPower>();

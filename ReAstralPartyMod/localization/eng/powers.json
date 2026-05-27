@@ -248,5 +248,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_KINGS_POWER_STRENGTH_POWER.smartDescription": "[blue]{Amount}[/blue] turn(s) remaining. Gain [blue]5[/blue] Strength each turn, then remove it at end of turn.",
   "RE_ASTRAL_PARTY_MOD_POWER_IMMOVABLE_DEXTERITY_POWER.title": "Immovable",
   "RE_ASTRAL_PARTY_MOD_POWER_IMMOVABLE_DEXTERITY_POWER.description": "[blue]{Amount}[/blue] turn(s) remaining. At the start of your turn, gain [blue]6[/blue] [green]Dexterity[/green]. At end of turn, remove the Dexterity gained from this power for that turn.",
-  "RE_ASTRAL_PARTY_MOD_POWER_IMMOVABLE_DEXTERITY_POWER.smartDescription": "[blue]{Amount}[/blue] turn(s) remaining. Gain [blue]6[/blue] Dexterity each turn, then remove it at end of turn."
+  "RE_ASTRAL_PARTY_MOD_POWER_IMMOVABLE_DEXTERITY_POWER.smartDescription": "[blue]{Amount}[/blue] turn(s) remaining. Gain [blue]6[/blue] Dexterity each turn, then remove it at end of turn.",
+  "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.title": "Art Knife",
+  "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.description": "While at full HP, gain [blue]{Amount}[/blue] temporary [red]Strength[/red]. Lose that Strength when you are no longer at full HP.",
+  "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.smartDescription": "At full HP, gain [blue]{Amount}[/blue] temporary [red]Strength[/red]. Lose it when you are no longer at full HP."
 }

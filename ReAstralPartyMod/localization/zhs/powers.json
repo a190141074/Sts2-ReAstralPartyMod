@@ -248,5 +248,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_KINGS_POWER_STRENGTH_POWER.smartDescription": "剩余[blue]{Amount}[/blue]回合。每回合开始获得[blue]5[/blue]点力量，回合结束回收。",
   "RE_ASTRAL_PARTY_MOD_POWER_IMMOVABLE_DEXTERITY_POWER.title": "岿然不动",
   "RE_ASTRAL_PARTY_MOD_POWER_IMMOVABLE_DEXTERITY_POWER.description": "剩余[blue]{Amount}[/blue]回合。你的回合开始时获得[blue]6[/blue]点[green]敏捷[/green]；回合结束时移除本回合因此获得的敏捷。",
-  "RE_ASTRAL_PARTY_MOD_POWER_IMMOVABLE_DEXTERITY_POWER.smartDescription": "剩余[blue]{Amount}[/blue]回合。每回合开始获得[blue]6[/blue]点敏捷，回合结束回收。"
+  "RE_ASTRAL_PARTY_MOD_POWER_IMMOVABLE_DEXTERITY_POWER.smartDescription": "剩余[blue]{Amount}[/blue]回合。每回合开始获得[blue]6[/blue]点敏捷，回合结束回收。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.title": "美工刀",
+  "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.description": "生命值为满时，获得[blue]{Amount}[/blue]点临时[red]力量[/red]；失去满血时移除这部分力量。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.smartDescription": "满血时获得[blue]{Amount}[/blue]点临时[red]力量[/red]；失去满血时移除。"
 }

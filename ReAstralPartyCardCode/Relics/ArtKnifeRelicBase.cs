@@ -1,24 +1,18 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
-using MegaCrit.Sts2.Core.Commands;
-using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
-using MegaCrit.Sts2.Core.Entities.Players;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
-using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using MegaCrit.Sts2.Core.Commands;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 public abstract class ArtKnifeRelicBase : AstralPartyRelicModel
 {
-    private bool _strengthApplied;
-
     protected abstract decimal StrengthBonus { get; }
     protected abstract CardType DamageCardType { get; }
     protected virtual decimal HealDamageDivisor => 1m;
@@ -33,49 +27,15 @@ public abstract class ArtKnifeRelicBase : AstralPartyRelicModel
 
     public override async Task BeforeCombatStart()
     {
-        await SyncStrengthState();
-    }
+        if (Owner?.Creature == null)
+            return;
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
-    {
-        if (player == Owner)
-            await SyncStrengthState();
-    }
-
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
-    {
-        if (Owner?.Creature != null && side == Owner.Creature.Side)
-            await SyncStrengthState();
-    }
-
-    public override async Task AfterDamageReceived(
-        PlayerChoiceContext choiceContext,
-        Creature target,
-        DamageResult result,
-        ValueProp props,
-        Creature? dealer,
-        CardModel? cardSource)
-    {
-        if (target == Owner?.Creature)
-            await SyncStrengthState();
-    }
-
-    public override async Task AfterCurrentHpChanged(Creature creature, decimal delta)
-    {
-        if (creature == Owner?.Creature)
-            await SyncStrengthState();
-    }
-
-    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
-    {
-        if (cardPlay.Card.Owner == Owner)
-            await SyncStrengthState();
-    }
-
-    public override Task AfterCombatEnd(CombatRoom room)
-    {
-        _strengthApplied = false;
-        return Task.CompletedTask;
+        await PowerCmd.Apply<ArtKnifeFullHpStrengthPower>(
+            Owner.Creature,
+            StrengthBonus,
+            Owner.Creature,
+            null,
+            true);
     }
 
     public override decimal ModifyDamageAdditive(
@@ -104,24 +64,5 @@ public abstract class ArtKnifeRelicBase : AstralPartyRelicModel
         return Owner?.Creature != null
                && Owner.Creature.MaxHp > 0m
                && Owner.Creature.CurrentHp >= Owner.Creature.MaxHp;
-    }
-
-    private async Task SyncStrengthState()
-    {
-        if (Owner?.Creature == null || Owner.Creature.CombatState == null)
-            return;
-
-        var shouldApply = IsAtFullHp();
-        if (shouldApply == _strengthApplied)
-            return;
-
-        _strengthApplied = shouldApply;
-        Flash();
-        await PowerCmd.Apply<StrengthPower>(
-            Owner.Creature,
-            shouldApply ? StrengthBonus : -StrengthBonus,
-            Owner.Creature,
-            null,
-            true);
     }
 }
