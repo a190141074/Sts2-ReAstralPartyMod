@@ -28,6 +28,10 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
     private const int ExactRoundRewardBase = 6;
     private const int ExactRoundRewardBonusPerRepeat = 2;
     private const int ExactRoundTarget = 6;
+    private const int MinNodeValue = 1;
+    private const int MaxNodeValue = 10;
+    private const int NodeRewardTarget = 6;
+    private const decimal NodeRewardStarLight = 6m;
 
     [SavedProperty] public int AstralParty_PersonBlueWhaleCounter { get; set; } = 1;
 
@@ -65,7 +69,9 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillFateWeakMprint>(),
-        HoverTipFactory.FromPower<FateWeakImprintPower>()
+        HoverTipFactory.FromPower<FateWeakImprintPower>(),
+        HoverTipFactory.FromPower<BlueWhaleNodePower>(),
+        HoverTipFactory.FromPower<StarLightPower>()
     ];
 
     public override async Task AfterObtained()
@@ -127,7 +133,12 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
     {
         await base.BeforeCombatStart();
 
-        if (Owner?.Creature?.CombatState == null || _pendingFateGuidanceByRecipientNetId.Count == 0)
+        if (Owner?.Creature == null)
+            return;
+
+        await PowerCmd.SetAmount<BlueWhaleNodePower>(Owner.Creature, MinNodeValue, Owner.Creature, null);
+
+        if (Owner.Creature.CombatState == null || _pendingFateGuidanceByRecipientNetId.Count == 0)
             return;
 
         var pendingEntries = _pendingFateGuidanceByRecipientNetId
@@ -152,6 +163,22 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
         }
 
         RemoveZeroPendingFateGuidanceEntries();
+    }
+
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    {
+        if (Owner?.Creature == null || player != Owner)
+            return;
+
+        var nextNode = (player.RunState?.Rng?.CombatTargets?.NextInt(MaxNodeValue) ?? 0) + MinNodeValue;
+        if ((int)Owner.Creature.GetPowerAmount<BlueWhaleNodePower>() != nextNode)
+            await PowerCmd.SetAmount<BlueWhaleNodePower>(Owner.Creature, nextNode, Owner.Creature, null);
+
+        if (nextNode != NodeRewardTarget)
+            return;
+
+        Flash();
+        await PowerCmd.Apply<StarLightPower>(Owner.Creature, NodeRewardStarLight, Owner.Creature, null, false);
     }
 
     internal void AddPendingFateGuidanceForRecipient(Player recipient, int amount)

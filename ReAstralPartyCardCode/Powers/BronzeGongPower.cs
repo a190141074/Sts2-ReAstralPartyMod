@@ -17,6 +17,7 @@ public class BronzeGongPower : AstralPartyPowerModel
     {
         public decimal ProcessedAmount;
         public decimal PendingAddedAmount;
+        public decimal AppliedHolographicAmount;
     }
 
     public override PowerType Type => PowerType.Buff;
@@ -64,6 +65,7 @@ public class BronzeGongPower : AstralPartyPowerModel
 
         await AstralTemporaryStrengthPower.Apply(Owner, addedAmount, this, applier, cardSource);
         await PowerCmd.Apply<ReversedScalesHolographicPower>(Owner, addedAmount, applier, cardSource, false);
+        data.AppliedHolographicAmount += addedAmount;
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -71,15 +73,17 @@ public class BronzeGongPower : AstralPartyPowerModel
         if (Owner?.Player == null || player != Owner.Player || Amount <= 0m)
             return;
 
+        var data = GetInternalData<Data>();
         var holographicPower = Owner.GetPower<ReversedScalesHolographicPower>();
-        if (holographicPower != null)
+        if (holographicPower != null && data.AppliedHolographicAmount > 0m)
         {
-            if (holographicPower.Amount <= Amount)
+            if (holographicPower.Amount <= data.AppliedHolographicAmount)
                 await PowerCmd.Remove(holographicPower);
             else
-                await PowerCmd.ModifyAmount(holographicPower, -Amount, Owner, null, true);
+                await PowerCmd.ModifyAmount(holographicPower, -data.AppliedHolographicAmount, Owner, null, true);
         }
 
+        data.AppliedHolographicAmount = 0m;
         await PowerCmd.Remove(this);
     }
 }

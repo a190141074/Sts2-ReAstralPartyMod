@@ -538,6 +538,7 @@
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png.import"/>
+		<Content Include="ReAstralPartyMod\localization\eng\ancients.json" />
 		<Content Include="ReAstralPartyMod\localization\eng\cards.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\card_keywords.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\enchantments.json"/>
