@@ -249,6 +249,25 @@ internal static class GameplayStaticPatchCatalog
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)
     {
         patcher.RegisterPatch<StartingPersonaRelicSelectionPatch>();
+        patcher.RegisterPatches(
+        [
+            new ModPatchInfo(
+                "starting_persona_neow_ready_initial_state_patch",
+                typeof(AncientEventModel),
+                "SetInitialEventState",
+                typeof(StartingPersonaNeowReadyInitialStatePatch),
+                false,
+                "Gameplay patch: replace the finished initial Neow page with a shared starting-persona ready page when the feature is enabled",
+                [typeof(bool)]),
+            new ModPatchInfo(
+                "starting_persona_neow_ready_is_shared_patch",
+                typeof(Neow),
+                nameof(EventModel.IsShared),
+                typeof(StartingPersonaNeowReadyIsSharedPatch),
+                false,
+                "Gameplay patch: treat the temporary starting-persona ready page as a shared Neow event",
+                harmonyMethodType: MethodType.Getter)
+        ]);
         patcher.RegisterPatch<AstralTelemetryStartRunPatch>();
         patcher.RegisterPatch<AstralTelemetryLoadRunPatch>();
         patcher.RegisterPatch<AstralTelemetryRunEndedPatch>();

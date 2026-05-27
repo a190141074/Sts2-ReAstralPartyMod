@@ -27,8 +27,8 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode`
   - 游戏内测试、作弊、脚本执行与 mod 调试工具箱。
   - 当任务涉及“如何更快复现/验证内容”“如何在游戏里直接测卡牌/遗物/事件”“如何做脚本化调试”时，优先把它作为实机验证参考。
-- `D:\MOD\杀戮尖塔2mod制作\Slay-the-Spire-2-gdsdecomp\src\Core`
-  - 当前反编译源码主入口，优先查这里的具体系统源码。
+- `D:\MOD\杀戮尖塔2mod制作\Slay-the-Spire-2-gdsdecomp`
+  - 当前反编译源码主入口，优先查该目录下 `src\Core` 的具体系统源码。
 
 默认按照这条优先级取证并落地方案：
 

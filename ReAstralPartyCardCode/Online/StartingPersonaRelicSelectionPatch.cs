@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Godot;
-using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Gold;
 using MegaCrit.Sts2.Core.Entities.Relics;
@@ -11,6 +10,7 @@ using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Screens.Overlays;
+using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
@@ -59,30 +59,32 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         }
 
         LogInfo("P004", "Starting persona relic selection patch resumed after StartRun task completed.");
-        await WaitForSafeMultiplayerStartupWindowAsync(runState);
         LogInfo("P005", "Starting persona relic selection waiting for run settings sync.");
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         LogInfo("P006", "Starting persona relic selection finished run settings sync.");
         await GrantStartingInitialPointIfEnabledAsync(runState);
-        var gameType = RunManager.Instance.NetService.Type;
-        LogInfo("P007",
-            $"Starting persona relic selection run gate: netMode={gameType} players={runState.Players.Count}.");
+        LogInfo("P007", "Starting persona relic selection run bootstrap completed; Neow ready-page flow will handle the actual persona selection entry.");
+    }
+
+    internal static async Task<bool> OpenSelectionOverlayAsync(RunState runState, string sourceTag)
+    {
         if (!ShouldOpenStartingPersonaRelicSelection(runState, out var skipReason))
         {
-            LogInfo("P008", $"Starting persona relic selection skipped: {skipReason}.");
+            LogInfo("P008", $"Starting persona relic selection skipped from {sourceTag}: {skipReason}.");
             if (skipReason.Contains("already own persona relics", StringComparison.Ordinal))
             {
                 ShowWarning("P008", "启动门禁", "检测到至少一名玩家在开局阶段已经持有人格遗物，因此本轮人格选择被跳过。请反馈编号和日志。");
             }
-            return;
+
+            return false;
         }
 
         var runKey = GetRunKey(runState);
         if (!TryBeginSelection(runKey))
         {
             LogInfo("P009",
-                $"Starting persona relic selection skipped because run '{runKey}' is already processing.");
-            return;
+                $"Starting persona relic selection skipped from {sourceTag} because run '{runKey}' is already processing.");
+            return false;
         }
 
         LogInfo("P010", "Starting persona relic selection waiting for overlay stack.");
@@ -92,7 +94,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             EndSelection(runKey, false);
             LogWarn("P011", "Starting persona relic selection skipped because overlay stack is not ready.");
             ShowWarning("P011", "界面打开", "未能拿到人格选择覆盖层，界面没有正常打开。请反馈编号。");
-            return;
+            return false;
         }
 
         var displayMode = ReAstralPartyModSettingsManager.GetStartingPersonaDisplayMode(runState);
@@ -105,11 +107,11 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             EndSelection(runKey, false);
             LogWarn("P012", "Starting persona relic selection skipped because no persona relics are registered.");
             ShowWarning("P012", "选项构建", "未找到可用的人格选项。请反馈编号和日志。");
-            return;
+            return false;
         }
 
         LogInfo("P014",
-            $"Starting persona relic selection options prepared: count={relicOptions.Count} runKey={runKey} displayMode={displayMode} assignmentMode={assignmentMode}.");
+            $"Starting persona selection overlay prepared from {sourceTag}: count={relicOptions.Count} runKey={runKey} displayMode={displayMode} assignmentMode={assignmentMode}.");
         var screen = StartingPersonaRelicSelectionScreen.Create(
             runState,
             relicOptions,
@@ -125,6 +127,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             LogInfo("P016", "Starting persona relic selection screen completed.");
             AstralNeowDiagnosticHelper.ReportPostPersonaSelectionWindow(runState, relicOptions.Count);
             EndSelection(runKey, true);
+            return true;
         }
         catch
         {
@@ -171,44 +174,6 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         }
     }
 
-    private static async Task WaitForSafeMultiplayerStartupWindowAsync(RunState runState)
-    {
-        var netType = RunManager.Instance?.NetService?.Type;
-        if (netType is not (NetGameType.Host or NetGameType.Client))
-            return;
-
-        const int maxWaitFrames = 1800;
-        var observedStartupEventWindow = false;
-        for (var attempt = 0; attempt < maxWaitFrames; attempt++)
-        {
-            if (!IsStartupEventWindowActive(runState))
-            {
-                if (observedStartupEventWindow)
-                {
-                    LogInfo("P004B",
-                        $"Starting persona relic selection left startup event window after {attempt} frames.");
-                }
-
-                return;
-            }
-
-            if (!observedStartupEventWindow)
-            {
-                observedStartupEventWindow = true;
-                LogInfo("P004A",
-                    "Starting persona relic selection detected startup event input window; waiting for it to finish before using multiplayer choice sync.");
-            }
-
-            await WaitForNextProcessFrameAsync();
-        }
-
-        if (observedStartupEventWindow)
-        {
-            LogWarn("P004C",
-                $"Starting persona relic selection timed out while waiting for the startup event window to close after {maxWaitFrames} frames; continuing with sync anyway.");
-        }
-    }
-
     private static async Task<NOverlayStack?> WaitForOverlayStackAsync()
     {
         for (var attempt = 0; attempt < 120; attempt++)
@@ -234,81 +199,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         await Task.Yield();
     }
 
-    private static bool IsStartupEventWindowActive(RunState runState)
-    {
-        var room = runState.CurrentRoom;
-        if (room == null)
-            return false;
-
-        var roomTypeName = room.GetType().FullName ?? room.GetType().Name;
-        if (roomTypeName.Contains("Event", StringComparison.OrdinalIgnoreCase) ||
-            roomTypeName.Contains("Ancient", StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
-        var roomKind = ReadMemberValue(room, "RoomType")?.ToString();
-        if (!string.IsNullOrWhiteSpace(roomKind) &&
-            roomKind.Contains("Event", StringComparison.OrdinalIgnoreCase))
-        {
-            return true;
-        }
-
-        var eventId = TryReadEventId(room);
-        return !string.IsNullOrWhiteSpace(eventId) &&
-               (eventId.Contains("NEOW", StringComparison.OrdinalIgnoreCase) ||
-                eventId.Contains("ANCIENT", StringComparison.OrdinalIgnoreCase));
-    }
-
-    private static string? TryReadEventId(object? room)
-    {
-        foreach (var memberName in new[] { "Event", "CurrentEvent", "_event", "eventModel" })
-        {
-            var value = ReadMemberValue(room, memberName);
-            if (value == null)
-                continue;
-
-            var idValue = ReadMemberValue(value, "Id");
-            var entry = ReadMemberValue(idValue, "Entry")?.ToString();
-            if (!string.IsNullOrWhiteSpace(entry))
-                return entry;
-
-            var asString = value.ToString();
-            if (!string.IsNullOrWhiteSpace(asString))
-                return asString;
-        }
-
-        return null;
-    }
-
-    private static object? ReadMemberValue(object? instance, string memberName)
-    {
-        if (instance == null)
-            return null;
-
-        try
-        {
-            const System.Reflection.BindingFlags flags =
-                System.Reflection.BindingFlags.Instance |
-                System.Reflection.BindingFlags.Public |
-                System.Reflection.BindingFlags.NonPublic;
-
-            var property = instance.GetType().GetProperty(memberName, flags);
-            if (property != null)
-                return property.GetValue(instance);
-
-            var field = instance.GetType().GetField(memberName, flags);
-            return field?.GetValue(instance);
-        }
-        catch (Exception ex)
-        {
-            MainFile.Logger.Warn(
-                $"Starting persona relic selection failed to inspect member '{memberName}' on {instance.GetType().FullName}: {ex.Message}");
-            return null;
-        }
-    }
-
-    private static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)
+    internal static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)
     {
         if (!ReAstralPartyModSettingsManager.GetEnableStartingPersonaSelection(runState))
         {
@@ -668,7 +559,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         return (relic.CanonicalInstance ?? relic) is VariantPersonWindchaserThePlaneswalker;
     }
 
-    private static string GetRunKey(RunState runState)
+    internal static string GetRunKey(RunState runState)
     {
         var orderedPlayers = runState.Players
             .Select(player => player.NetId.ToString())

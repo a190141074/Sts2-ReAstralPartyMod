@@ -89,4 +89,4 @@
 4. 再看当前仓库是否已有接近实现。
 5. 需要实机验证/调试工具时看 `STS2-DevMode`。
 6. 需要完整结构样例时看 WineFox。
-7. 仍然不够时再看 `Slay-the-Spire-2-gdsdecomp\src\Core`。
+7. 仍然不够时再看 `Slay-the-Spire-2-gdsdecomp` 下的 `src\Core`。

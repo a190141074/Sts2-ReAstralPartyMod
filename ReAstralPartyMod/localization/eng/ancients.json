@@ -1,4 +1,7 @@
 {
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.description": "When every player is ready, the starting persona selection will begin.",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.options.READY.title": "Ready for Persona Selection",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.options.READY.description": "Click to mark yourself ready. When all players are ready, the starting persona selection begins.",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW.title": "Dream - Face the Shadow",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW.description": "Add [card]Forgotten Roar[/card] to your deck."
 }
