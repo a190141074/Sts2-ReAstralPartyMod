@@ -113,17 +113,12 @@ public class PersonNinja : CooldownPersonaRelicBase
         if (_lastCopyableSkillCard == null)
             return;
 
-        var copiedCard = _lastCopyableSkillCard.CreateClone();
-        if (!_lastCopyableSkillCard.Keywords.Contains(CardKeyword.Exhaust)
-            && !copiedCard.Keywords.Contains(CardKeyword.Exhaust))
-            CardCmd.ApplyKeyword(copiedCard, CardKeyword.Exhaust);
-
         Flash();
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
-            copiedCard,
-            true,
-            CardPilePosition.Top,
-            this);
+        await PersonaMultiplayerEffectHelper.CopyCardToHandOrRedirectLivingFolioAsync(
+            Owner,
+            _lastCopyableSkillCard,
+            this,
+            CardPilePosition.Top);
     }
 
     internal void ReduceCooldown(int amount)

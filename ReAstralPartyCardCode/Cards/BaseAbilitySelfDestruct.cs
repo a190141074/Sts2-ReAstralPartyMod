@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -26,7 +27,8 @@ public class BaseAbilitySelfDestruct : AstralPartyCardModel
             return;
 
         await CreatureCmd.Damage(choiceContext, Owner.Creature, 3m, ValueProp.Unblockable | ValueProp.Unpowered, this);
-        foreach (var enemy in CombatState.GetOpponentsOf(Owner.Creature))
+        var enemies = CombatState.GetOpponentsOf(Owner.Creature).ToList();
+        foreach (var enemy in enemies)
         {
             if (!enemy.IsAlive)
                 continue;

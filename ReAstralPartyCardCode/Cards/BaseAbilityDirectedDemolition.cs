@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -25,8 +26,8 @@ public class BaseAbilityDirectedDemolition : AstralPartyCardModel
         if (CombatState == null || Owner?.Creature == null || cardPlay.Target == null)
             return;
 
-        var primaryTarget = cardPlay.Target;
-        foreach (var enemy in CombatState.GetOpponentsOf(Owner.Creature))
+        var enemies = CombatState.GetOpponentsOf(Owner.Creature).ToList();
+        foreach (var enemy in enemies)
         {
             if (!enemy.IsAlive)
                 continue;
