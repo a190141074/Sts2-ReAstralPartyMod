@@ -20,6 +20,7 @@ public class DodgeStancePower : AstralPartyPowerModel
         public bool PendingWeaknessInsightGain;
         public bool HadCounterBeforeDodge;
         public decimal PendingCounterDamage;
+        public decimal PendingDodgeBlockGain;
         public Creature? PendingCounterDealer;
     }
 
@@ -55,6 +56,7 @@ public class DodgeStancePower : AstralPartyPowerModel
         data.PendingWeaknessInsightGain = true;
         data.HadCounterBeforeDodge = Owner.GetPowerAmount<CounterPower>() > 0m;
         data.PendingCounterDamage = amount;
+        data.PendingDodgeBlockGain = Math.Ceiling(amount * 0.5m);
         data.PendingCounterDealer = dealer;
         Flash();
         return 0m;
@@ -78,8 +80,12 @@ public class DodgeStancePower : AstralPartyPowerModel
         if (data.HadCounterBeforeDodge)
             await CounterPower.TryTriggerCounter(choiceContext, Owner, data.PendingCounterDealer, data.PendingCounterDamage, this);
 
+        if (data.PendingDodgeBlockGain > 0m)
+            await CreatureCmd.GainBlock(Owner, data.PendingDodgeBlockGain, ValueProp.Move, null);
+
         data.HadCounterBeforeDodge = false;
         data.PendingCounterDamage = 0m;
+        data.PendingDodgeBlockGain = 0m;
         data.PendingCounterDealer = null;
         await PowerCmd.Apply<CounterPower>(Owner, 1m, Owner, null, false);
         await MosesCombatHelper.TryGainWeaknessInsight(
@@ -95,7 +101,7 @@ public class DodgeStancePower : AstralPartyPowerModel
         var ownerPlayer = Owner.Player;
         var currentBlock = Math.Max(0m, Owner.Block);
         if (currentBlock > 0m)
-            await CreatureCmd.LoseBlock(Owner, currentBlock);
+            await CreatureCmd.LoseBlock(Owner, Math.Ceiling(currentBlock * 0.5m));
 
         await MosesCombatHelper.EnsureNodeCarrier(ownerPlayer);
         var nextNode = MosesCombatHelper.RollDodgeNodeValue(ownerPlayer, this);
@@ -104,6 +110,7 @@ public class DodgeStancePower : AstralPartyPowerModel
         data.PendingWeaknessInsightGain = false;
         data.HadCounterBeforeDodge = false;
         data.PendingCounterDamage = 0m;
+        data.PendingDodgeBlockGain = 0m;
         data.PendingCounterDealer = null;
         await MosesCombatHelper.DecayWeaknessInsightAtTurnEnd(ownerPlayer);
     }
@@ -120,8 +127,12 @@ public class DodgeStancePower : AstralPartyPowerModel
             if (data.HadCounterBeforeDodge)
                 await CounterPower.TryTriggerCounter(choiceContext, Owner, data.PendingCounterDealer, data.PendingCounterDamage, this);
 
+            if (data.PendingDodgeBlockGain > 0m)
+                await CreatureCmd.GainBlock(Owner, data.PendingDodgeBlockGain, ValueProp.Move, null);
+
             data.HadCounterBeforeDodge = false;
             data.PendingCounterDamage = 0m;
+            data.PendingDodgeBlockGain = 0m;
             data.PendingCounterDealer = null;
             await PowerCmd.Apply<CounterPower>(Owner, 1m, Owner, null, false);
             await MosesCombatHelper.TryGainWeaknessInsight(
