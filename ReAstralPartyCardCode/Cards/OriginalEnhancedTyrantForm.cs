@@ -2,25 +2,23 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.CardPools;
-using MegaCrit.Sts2.Core.Models.RelicPools;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(SharedRelicPool))]
-public class SkillTyrantForm : AstralPartyCardModel
+[RegisterCard(typeof(RegentCardPool), StableEntryStem = "original_enhanced_tyrant_form")]
+public class OriginalEnhancedTyrantForm : AstralPartyCardModel
 {
     private const int BaseForge = 18;
     private const int BaseStarCostValue = 6;
 
-    protected override string CardId => "tyrant_form";
+    protected override string CardId => "original_enhanced_tyrant_form";
 
     public override int CanonicalStarCost => BaseStarCostValue;
 
@@ -38,7 +36,7 @@ public class SkillTyrantForm : AstralPartyCardModel
         HoverTipFactory.FromPower<TyrantFormPower>()
     ];
 
-    public SkillTyrantForm() : base(3, CardType.Power, CardRarity.Rare, TargetType.Self)
+    public OriginalEnhancedTyrantForm() : base(3, CardType.Power, CardRarity.Rare, TargetType.Self)
     {
     }
 
@@ -64,7 +62,6 @@ public class SkillTyrantForm : AstralPartyCardModel
             this,
             false);
 
-        var endTurnAction = new EndPlayerTurnAction(Owner, 0);
-        await endTurnAction.Execute();
+        PlayerCmd.EndTurn(Owner, canBackOut: false);
     }
 }

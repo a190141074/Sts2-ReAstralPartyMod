@@ -293,6 +293,8 @@
 		<Content Include="ReAstralPartyMod\images\powers\sword_aura_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\trident_empower_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\trident_empower_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\tyrant_form_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\tyrant_form_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\true_dragon_form_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\true_dragon_form_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\twin_shadows_power.png"/>

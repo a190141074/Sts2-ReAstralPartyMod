@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
@@ -20,15 +21,20 @@ public class TyrantFormPower : AstralPartyPowerModel
 
     public override bool ShouldReceiveCombatHooks => true;
 
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    {
+        if (Owner?.Player == null || player != Owner.Player)
+            return;
+
+        await ReturnSovereignBladesToHand();
+    }
+
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
         if (Owner?.Player == null || side != Owner.Side)
             return;
 
-        var sovereignBlades = Owner.Player.PlayerCombatState?.AllCards
-            .OfType<SovereignBlade>()
-            .Where(card => card.Owner == Owner.Player)
-            .ToList();
+        var sovereignBlades = GetOwnedSovereignBlades();
         if (sovereignBlades == null || sovereignBlades.Count == 0)
             return;
 
@@ -39,7 +45,7 @@ public class TyrantFormPower : AstralPartyPowerModel
                 break;
 
             if (sovereignBlade.Pile?.Type != PileType.Hand)
-                await CardPileCmd.Add(sovereignBlade, PileType.Hand, CardPilePosition.Top, this);
+                continue;
 
             if (!TyrantFormAutoPlayHelper.TryEnterAutoPlay(sovereignBlade))
                 continue;
@@ -59,6 +65,29 @@ public class TyrantFormPower : AstralPartyPowerModel
                 TyrantFormAutoPlayHelper.ExitAutoPlay(sovereignBlade);
             }
         }
+    }
+
+    private async Task ReturnSovereignBladesToHand()
+    {
+        var sovereignBlades = GetOwnedSovereignBlades();
+        if (sovereignBlades == null || sovereignBlades.Count == 0)
+            return;
+
+        foreach (var sovereignBlade in sovereignBlades)
+        {
+            if (sovereignBlade.Pile?.Type == PileType.Hand)
+                continue;
+
+            await CardPileCmd.Add(sovereignBlade, PileType.Hand, CardPilePosition.Top, this);
+        }
+    }
+
+    private List<SovereignBlade>? GetOwnedSovereignBlades()
+    {
+        return Owner?.Player?.PlayerCombatState?.AllCards
+            .OfType<SovereignBlade>()
+            .Where(card => card.Owner == Owner.Player)
+            .ToList();
     }
 
     private Creature? GetRandomLivingEnemy()

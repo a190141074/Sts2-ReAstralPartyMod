@@ -177,13 +177,6 @@ internal static class GameplayStaticPatchCatalog
                 "Gameplay patch: prevent manual play of Sovereign Blade while Tyrant Form is active",
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
-                "tyrant_form_sovereign_blade_result_patch",
-                typeof(MegaCrit.Sts2.Core.Models.Cards.SovereignBlade),
-                nameof(MegaCrit.Sts2.Core.Models.Cards.SovereignBlade.ModifyCardPlayResultPileTypeAndPosition),
-                typeof(TyrantFormSovereignBladeResultPatch),
-                false,
-                "Gameplay patch: return Sovereign Blade to hand after play while Tyrant Form is active"),
-            new ModPatchInfo(
                 "card_model_paranoid_after_current_hp_changed_patch",
                 typeof(AbstractModel),
                 nameof(CardModel.AfterCurrentHpChanged),

@@ -201,6 +201,6 @@
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_PASSING_BOMB.description": "Apply [blue]1[/blue] Passing Bomb.",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_EXPIRED_LUNCH.title": "Expired Lunch",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_EXPIRED_LUNCH.description": "Apply [blue]3[/blue] [poison]Poison[/poison].",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TYRANT_FORM.title": "Tyrant Form",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TYRANT_FORM.description": "[ethereal]Ethereal[/ethereal]\nForge {Forge:diff()}.\nEnd your turn.\nYou cannot manually play [card]Sovereign Blade[/card]. Instead, at the end of each turn, automatically play [card]Sovereign Blade[/card] from anywhere, then return it to your hand after it is played."
+  "RE_ASTRAL_PARTY_MOD_CARD_ORIGINAL_ENHANCED_TYRANT_FORM.title": "Tyrant Form",
+  "RE_ASTRAL_PARTY_MOD_CARD_ORIGINAL_ENHANCED_TYRANT_FORM.description": "[ethereal]Ethereal[/ethereal]\nForge {Forge:diff()}.\nEnd your turn.\nYou cannot manually play [card]Sovereign Blade[/card]. Instead, at the end of each turn, automatically play [card]Sovereign Blade[/card] from anywhere, then return it to your hand after it is played."
 }
