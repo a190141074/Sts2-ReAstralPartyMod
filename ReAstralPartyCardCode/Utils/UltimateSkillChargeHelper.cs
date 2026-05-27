@@ -36,10 +36,6 @@ public static class UltimateSkillChargeHelper
     {
         var seenCards = new HashSet<UltimateSkillCardModel>();
 
-        foreach (var card in EventDeckCardHelper.GetRunDeckCards(player).OfType<UltimateSkillCardModel>())
-            if (seenCards.Add(card))
-                yield return card;
-
         foreach (var pile in player.Piles)
             foreach (var card in pile.Cards)
                 if (card is UltimateSkillCardModel ultimateCard && seenCards.Add(ultimateCard))
