@@ -170,7 +170,12 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
         if (Owner?.Creature == null || player != Owner)
             return;
 
-        var nextNode = (player.RunState?.Rng?.CombatTargets?.NextInt(MaxNodeValue) ?? 0) + MinNodeValue;
+        var nextNode = NodePowerRollHelper.RollNodeValue(
+            player,
+            this,
+            nameof(BlueWhaleNodePower),
+            MinNodeValue,
+            MaxNodeValue);
         if ((int)Owner.Creature.GetPowerAmount<BlueWhaleNodePower>() != nextNode)
             await PowerCmd.SetAmount<BlueWhaleNodePower>(Owner.Creature, nextNode, Owner.Creature, null);
 

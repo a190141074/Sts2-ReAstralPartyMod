@@ -27,7 +27,7 @@ public class FengShuiNodePower : AstralPartyPowerModel
         if (Owner == null || Owner.Player != player)
             return;
 
-        var nextNode = (player.RunState?.Rng?.CombatTargets?.NextInt(MaxNode) ?? 0) + MinNode;
+        var nextNode = NodePowerRollHelper.RollNodeValue(player, this, nameof(FengShuiNodePower), MinNode, MaxNode);
         if (Amount != nextNode)
             await PowerCmd.SetAmount<FengShuiNodePower>(Owner, nextNode, Owner, null);
 

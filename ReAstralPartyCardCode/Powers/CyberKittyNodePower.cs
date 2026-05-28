@@ -1,10 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Godot;
-using ReAstralPartyMod.ReAstralPartyCardCode.cards;
-using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -18,6 +17,8 @@ using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.TestSupport;
+using ReAstralPartyMod.ReAstralPartyCardCode.cards;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -30,11 +31,13 @@ public class CyberKittyNodePower : AstralPartyPowerModel
     private const float PaddingDistanceFromOriginal = 50f;
     private const float TweenTime = 0.25f;
 
-    private sealed class Data
+    private sealed class VisualState
     {
         public int InitialAmount;
         public float InitialTargetPosition;
     }
+
+    private static readonly ConditionalWeakTable<CyberKittyNodePower, VisualState> VisualStates = new();
 
     public override PowerType Type => PowerType.Buff;
 
@@ -47,11 +50,6 @@ public class CyberKittyNodePower : AstralPartyPowerModel
         HoverTipFactory.FromCard<SkillMudTruckCrash>()
     ];
 
-    protected override object InitInternalData()
-    {
-        return new Data();
-    }
-
     public override Task AfterApplied(Creature? applier, CardModel? cardSource)
     {
         if (Owner == null || TestMode.IsOn || ShouldSuppressVisualOffset())
@@ -61,13 +59,16 @@ public class CyberKittyNodePower : AstralPartyPowerModel
         if (creatureNode == null)
             return Task.CompletedTask;
 
-        var data = GetInternalData<Data>();
-        data.InitialAmount = Math.Clamp(Amount, MinimumNodeValue, MaximumNodeValue);
-        data.InitialTargetPosition = creatureNode.GlobalPosition.X;
+        var visualState = GetVisualState();
+        visualState.InitialAmount = Math.Clamp(Amount, MinimumNodeValue, MaximumNodeValue);
+        visualState.InitialTargetPosition = creatureNode.GlobalPosition.X;
         return Task.CompletedTask;
     }
 
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier,
+    public override async Task AfterPowerAmountChanged(
+        PowerModel power,
+        decimal amount,
+        Creature? applier,
         CardModel? cardSource)
     {
         if (power != this)
@@ -94,20 +95,20 @@ public class CyberKittyNodePower : AstralPartyPowerModel
         if (ownerNode == null)
             return;
 
-        var data = GetInternalData<Data>();
-        if (data.InitialAmount <= 0)
+        var visualState = GetVisualState();
+        if (visualState.InitialAmount <= 0)
         {
-            data.InitialAmount = DefaultNodeValue;
-            data.InitialTargetPosition = ownerNode.GlobalPosition.X;
+            visualState.InitialAmount = DefaultNodeValue;
+            visualState.InitialTargetPosition = ownerNode.GlobalPosition.X;
         }
 
         var anchorX = ownerNode.GlobalPosition.X - PaddingDistanceFromMonster;
-        var upperBoundX = data.InitialTargetPosition + PaddingDistanceFromOriginal;
-        var slotSpacing = (upperBoundX - anchorX) / data.InitialAmount;
+        var upperBoundX = visualState.InitialTargetPosition + PaddingDistanceFromOriginal;
+        var slotSpacing = (upperBoundX - anchorX) / visualState.InitialAmount;
         var clampedAmount = Math.Clamp(Amount, MinimumNodeValue, MaximumNodeValue);
         var mirroredAmount = MaximumNodeValue - clampedAmount + MinimumNodeValue;
-        var usableAmount = Math.Min(mirroredAmount, data.InitialAmount);
-        var overflowAmount = Math.Max(mirroredAmount - data.InitialAmount, 0);
+        var usableAmount = Math.Min(mirroredAmount, visualState.InitialAmount);
+        var overflowAmount = Math.Max(mirroredAmount - visualState.InitialAmount, 0);
         var targetX = ownerNode.GlobalPosition.X - 400f
                       + slotSpacing * usableAmount
                       + slotSpacing * (overflowAmount / (overflowAmount + 2f));
@@ -122,5 +123,10 @@ public class CyberKittyNodePower : AstralPartyPowerModel
 
         tween.TweenProperty(playerNode, "global_position:x", targetX, TweenTime);
         await tween.ToSignal(tween, Tween.SignalName.Finished);
+    }
+
+    private VisualState GetVisualState()
+    {
+        return VisualStates.GetOrCreateValue(this);
     }
 }

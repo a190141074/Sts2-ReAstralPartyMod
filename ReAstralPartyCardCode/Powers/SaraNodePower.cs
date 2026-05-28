@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -22,7 +23,7 @@ public class SaraNodePower : AstralPartyPowerModel
         if (Owner == null || Owner.Player != player)
             return;
 
-        var nextNode = (player.RunState?.Rng?.CombatTargets?.NextInt(MaxNode) ?? 0) + MinNode;
+        var nextNode = NodePowerRollHelper.RollNodeValue(player, this, nameof(SaraNodePower), MinNode, MaxNode);
         if (Amount != nextNode)
             await PowerCmd.SetAmount<SaraNodePower>(Owner, nextNode, Owner, null);
     }
