@@ -49,6 +49,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
     {
         await originalTask;
         LobbyGameplaySettingsSync.MarkRunStarting();
+        StartingPersonaHostLaunchSync.Register();
         LogInfo("P002",
             $"Starting persona relic selection patch entered: seed={runState.Rng.StringSeed} players={runState.Players.Count}.");
         if (!AstralNetPhaseGuard.Guard(AstralNetPhase.StartRunBootstrap, "starting persona selection bootstrap"))

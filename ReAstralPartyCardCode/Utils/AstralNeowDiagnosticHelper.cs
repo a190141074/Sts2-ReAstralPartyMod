@@ -17,11 +17,12 @@ internal static class AstralNeowDiagnosticHelper
     private static readonly object ToastLock = new();
     private static readonly HashSet<string> ShownToastKeys = [];
 
-    public static void ReportPostPersonaSelectionWindow(IRunState? runState, int optionCount)
+    public static void ReportPostPersonaSelectionWindow(IRunState? runState, int selectionOptionCount)
     {
         var snapshot = BuildSnapshot(runState);
+        var neowOptionCount = TryCountCurrentEventOptions(runState);
         MainFile.Logger.Warn(
-            $"[M201] Post-persona NEOW window snapshot | options={optionCount} | {FormatSnapshotForLog(snapshot)}");
+            $"[M201] Post-persona NEOW window snapshot | selectionOptions={selectionOptionCount} | neowOptions={neowOptionCount} | {FormatSnapshotForLog(snapshot)}");
     }
 
     public static void ReportEventRoomNodeReady(object? roomNode)
@@ -194,6 +195,17 @@ internal static class AstralNeowDiagnosticHelper
         }
 
         return -1;
+    }
+
+    private static int TryCountCurrentEventOptions(IRunState? runState)
+    {
+        var room = runState?.CurrentRoom;
+        var eventModel = ReadMemberValue(room, "Event")
+                         ?? ReadMemberValue(room, "CurrentEvent")
+                         ?? ReadMemberValue(room, "_event")
+                         ?? ReadMemberValue(room, "eventModel");
+        var currentOptions = ReadMemberValue(eventModel, "CurrentOptions");
+        return currentOptions is ICollection collection ? collection.Count : -1;
     }
 
     private static IEnumerable<RelicModel> EnumerateRelicsFromObject(object instance)

@@ -1,4 +1,10 @@
 {
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.description": "ホストが開始すると、人格選択に入ります。",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.options.READY.title": "人格選択・準備段階",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.options.READY.description": "ホストのみ選択できます。選択すると、全員が人格選択に入ります。",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY_WAITING.description": "ホストが人格選択を開始するのを待っています。",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY_WAITING.options.WAITING.title": "ホストを待機中",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY_WAITING.options.WAITING.description": "人格選択を開始できるのはホストのみです。ホストの開始を待ってください。",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW.title": "ドリームランド・フェイシング・ザ・シャドウ",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW.description": "[gold] 忘却の咆哮[/gold] を [gold] デッキ[/gold] に追加します。"
 }

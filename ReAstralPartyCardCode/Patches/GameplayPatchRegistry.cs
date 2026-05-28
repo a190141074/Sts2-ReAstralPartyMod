@@ -257,16 +257,30 @@ internal static class GameplayStaticPatchCatalog
                 "SetInitialEventState",
                 typeof(StartingPersonaNeowReadyInitialStatePatch),
                 false,
-                "Gameplay patch: replace the finished initial Neow page with a shared starting-persona ready page when the feature is enabled",
+                "Gameplay patch: replace the finished initial Neow page with a starting-persona ready gate when the feature is enabled",
                 [typeof(bool)]),
             new ModPatchInfo(
-                "starting_persona_neow_ready_is_shared_patch",
-                typeof(Neow),
-                nameof(EventModel.IsShared),
-                typeof(StartingPersonaNeowReadyIsSharedPatch),
+                "starting_persona_neow_ready_option_release_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
+                "OnRelease",
+                typeof(StartingPersonaNeowReadyOptionReleasePatch),
                 false,
-                "Gameplay patch: treat the temporary starting-persona ready page as a shared Neow event",
-                harmonyMethodType: MethodType.Getter)
+                "Gameplay patch: intercept the starting-persona ready option before it enters the default Neow event flow"),
+            new ModPatchInfo(
+                "starting_persona_neow_ready_option_ui_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
+                "_Ready",
+                typeof(StartingPersonaNeowReadyOptionUiPatch),
+                false,
+                "Gameplay patch: make the starting-persona ready option locally non-interactable for clients"),
+            new ModPatchInfo(
+                "starting_persona_neow_ready_event_room_guard_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Rooms.NEventRoom),
+                "OptionButtonClicked",
+                typeof(StartingPersonaNeowReadyEventRoomGuardPatch),
+                false,
+                "Gameplay patch: swallow any ready-option clicks that leak into the default Neow event room handler",
+                [typeof(EventOption), typeof(int)]),
         ]);
         patcher.RegisterPatch<AstralTelemetryStartRunPatch>();
         patcher.RegisterPatch<AstralTelemetryLoadRunPatch>();

@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Godot;
 using HarmonyLib;
+using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Events;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Nodes.Events;
+using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
@@ -19,17 +24,24 @@ internal static class StartingPersonaNeowReadyFlow
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.description";
     private const string ReadyOptionTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.options.READY";
+    private const string WaitingOptionTextKey =
+        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY_WAITING.options.WAITING";
 
     private static readonly object SyncLock = new();
     private static readonly Dictionary<Neow, ReadyPageState> ReadyPages = [];
-    private static readonly HashSet<string> ActiveReadyRunKeys = [];
     private static readonly Dictionary<string, Task<bool>> SelectionTasksByRun = [];
+    private static readonly HashSet<string> LaunchingRunKeys = [];
     private static readonly MethodInfo? SetEventStateMethod = AccessTools.Method(
         typeof(EventModel),
         "SetEventState",
         [typeof(LocString), typeof(IEnumerable<EventOption>)]);
 
-    private sealed record ReadyPageState(IReadOnlyList<EventOption> OriginalOptions, LocString OriginalDescription);
+    private sealed record ReadyPageState(
+        string RunKey,
+        RunState RunState,
+        IReadOnlyList<EventOption> OriginalOptions,
+        LocString OriginalDescription,
+        bool Restored = false);
 
     internal static void TryReplaceInitialState(Neow neow)
     {
@@ -44,16 +56,17 @@ internal static class StartingPersonaNeowReadyFlow
             if (ReadyPages.ContainsKey(neow))
                 return;
 
+            var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
             ReadyPages[neow] = new ReadyPageState(
+                runKey,
+                runState,
                 neow.CurrentOptions.ToList(),
                 neow.Description ?? neow.InitialDescription);
         }
 
-        ArmReadyFlow(runState);
         var readyOptions = new[]
         {
-            new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
-                .ThatWontSaveToChoiceHistory()
+            CreateReadyOption(neow, runState)
         };
 
         if (SetEventStateMethod == null)
@@ -61,23 +74,17 @@ internal static class StartingPersonaNeowReadyFlow
 
         SetEventStateMethod.Invoke(neow, [CreateReadyPageDescription(), readyOptions]);
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Injected Neow ready page for run {StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
-    }
-
-    internal static bool IsReadyPageShared(Neow neow)
-    {
-        if (!TryResolveRunState(neow, out var runState))
-            return false;
-
-        lock (SyncLock)
-        {
-            return ActiveReadyRunKeys.Contains(StartingPersonaRelicSelectionPatch.GetRunKey(runState));
-        }
+            $"[StartingPersonaNeowReadyFlow] Ready page injected | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
     }
 
     internal static LocString CreateReadyPageDescription()
     {
         return new LocString("ancients", ReadyPageDescriptionKey);
+    }
+
+    internal static bool IsReadyOptionTextKey(string? textKey)
+    {
+        return string.Equals(textKey, ReadyOptionTextKey, StringComparison.OrdinalIgnoreCase);
     }
 
     private static bool ShouldInjectReadyPage(Neow neow, out RunState runState, out string reason)
@@ -91,59 +98,160 @@ internal static class StartingPersonaNeowReadyFlow
         return StartingPersonaRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out reason);
     }
 
+    private static EventOption CreateReadyOption(Neow neow, RunState runState)
+    {
+        var netService = RunManager.Instance?.NetService;
+        if (netService == null || netService.Type is NetGameType.None or NetGameType.Singleplayer)
+        {
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Host can start persona selection | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)} role=Singleplayer.");
+            return new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
+                .ThatWontSaveToChoiceHistory();
+        }
+
+        var role = LobbyGameplayNetRoleHelper.GetCurrentRole(netService);
+        if (role == LobbyGameplayNetRole.Host)
+        {
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Host can start persona selection | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)} role=Host.");
+            return new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
+                .ThatWontSaveToChoiceHistory();
+        }
+
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Non-host ready page shown with host-gated interaction | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)} role={role}.");
+        return new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
+            .ThatWontSaveToChoiceHistory();
+    }
+
     private static async Task OnReadyChosenAsync(Neow neow, RunState runState)
     {
         try
         {
-            await GetOrCreateSelectionTask(runState);
+            var netService = RunManager.Instance?.NetService;
+            if (netService != null && netService.Type == NetGameType.Client)
+            {
+                MainFile.Logger.Info(
+                    $"[StartingPersonaNeowReadyFlow] Ignored non-host ready activation | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
+                return;
+            }
+
+            if (netService != null && netService.Type == NetGameType.Host)
+            {
+                MainFile.Logger.Info(
+                    $"[StartingPersonaNeowReadyFlow] Host started persona selection from Neow ready page | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
+                StartingPersonaHostLaunchSync.BroadcastLaunch(runState);
+            }
+
+            await HandleReadyLaunchAsync(
+                StartingPersonaRelicSelectionPatch.GetRunKey(runState),
+                netService?.Type == NetGameType.Host ? "host_local_click" : "singleplayer_local_click");
         }
         catch (Exception ex)
         {
             MainFile.Logger.Warn(
-                $"[StartingPersonaNeowReadyFlow] Starting persona selection from Neow ready page failed: {ex}");
-        }
-        finally
-        {
-            RestoreOriginalOptionsOrFinish(neow);
+                $"[StartingPersonaNeowReadyFlow] Ready page selection flow failed: {ex}");
+            RestoreOriginalOptionsOrFinish(neow, "ready_selection_failed");
         }
     }
 
-    private static Task<bool> GetOrCreateSelectionTask(RunState runState)
+    internal static bool TryInterceptReadyOptionRelease(NEventOptionButton optionButton)
     {
+        if (optionButton.Event is not Neow neow)
+            return false;
+        if (!IsReadyOptionTextKey(optionButton.Option?.TextKey))
+            return false;
+        if (!TryResolveRunState(neow, out var runState) || runState == null)
+            return false;
+
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Intercepted ready option release outside default event flow | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
+        TaskHelper.RunSafely(OnReadyChosenAsync(neow, runState));
+        return true;
+    }
+
+    internal static bool TrySwallowReadyOptionAtEventRoomEntry(NEventRoom eventRoom, EventOption option, int index)
+    {
+        ArgumentNullException.ThrowIfNull(eventRoom);
+        ArgumentNullException.ThrowIfNull(option);
+
+        if (!IsReadyOptionTextKey(option.TextKey))
+            return false;
+        if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is not Neow neow)
+            return false;
+        if (!TryResolveRunState(neow, out var runState) || runState == null)
+            return false;
+
         var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Swallowed ready option at event room entry | runKey={runKey} index={index}.");
+        return true;
+    }
+
+    internal static void ApplyLocalReadyOptionUi(NEventOptionButton optionButton)
+    {
+        if (!IsReadyOptionTextKey(optionButton.Option?.TextKey))
+            return;
+
+        var netService = RunManager.Instance?.NetService;
+        if (netService == null || netService.Type is NetGameType.None or NetGameType.Singleplayer)
+            return;
+
+        var role = LobbyGameplayNetRoleHelper.GetCurrentRole(netService);
+        if (role == LobbyGameplayNetRole.Host)
+            return;
+
+        optionButton.MouseFilter = Control.MouseFilterEnum.Ignore;
+
+        var label = optionButton.GetNodeOrNull<Control>("%Text");
+        if (label is not null)
+        {
+            var waitingTitle = new LocString("ancients", $"{WaitingOptionTextKey}.title").GetFormattedText();
+            var waitingDescription = new LocString("ancients", $"{WaitingOptionTextKey}.description").GetFormattedText();
+            label.Set("text", $"[red][b]{waitingTitle}[/b][/red]\n{waitingDescription}");
+        }
+
+        optionButton.Modulate = new Color(optionButton.Modulate, 0.85f);
+    }
+
+    internal static Task HandleReadyLaunchAsync(string runKey, string sourceTag)
+    {
+        MainFile.Logger.Info($"[StartingPersonaNeowReadyFlow] Ready launch received | runKey={runKey} source={sourceTag}.");
         lock (SyncLock)
         {
             if (SelectionTasksByRun.TryGetValue(runKey, out var existingTask))
                 return existingTask;
 
-            var createdTask = RunSelectionTaskAsync(runState, runKey);
+            if (!TryResolveReadyRunState(runKey, out var runState))
+            {
+                MainFile.Logger.Warn(
+                    $"[StartingPersonaNeowReadyFlow] Ready launch ignored because no run state was available | runKey={runKey} source={sourceTag}.");
+                return Task.CompletedTask;
+            }
+
+            LaunchingRunKeys.Add(runKey);
+            var createdTask = RunSelectionTaskAsync(runState, runKey, sourceTag);
             SelectionTasksByRun[runKey] = createdTask;
             return createdTask;
         }
     }
 
-    private static async Task<bool> RunSelectionTaskAsync(RunState runState, string runKey)
+    private static async Task<bool> RunSelectionTaskAsync(RunState runState, string runKey, string sourceTag)
     {
         try
         {
-            return await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(runState, "neow_ready_page");
+            RestoreOriginalOptionsForRun(runKey, "ready_launch");
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Ready page restored before persona overlay | runKey={runKey} source={sourceTag}.");
+            return await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(runState, $"neow_ready_launch:{sourceTag}");
         }
         finally
         {
             lock (SyncLock)
             {
-                ActiveReadyRunKeys.Remove(runKey);
+                LaunchingRunKeys.Remove(runKey);
                 SelectionTasksByRun.Remove(runKey);
             }
-        }
-    }
-
-    private static void ArmReadyFlow(RunState runState)
-    {
-        var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
-        lock (SyncLock)
-        {
-            ActiveReadyRunKeys.Add(runKey);
         }
     }
 
@@ -159,7 +267,47 @@ internal static class StartingPersonaNeowReadyFlow
         return runState is not null;
     }
 
-    private static void RestoreOriginalOptionsOrFinish(Neow neow)
+    private static bool TryResolveReadyRunState(string runKey, out RunState? runState)
+    {
+        lock (SyncLock)
+        {
+            foreach (var state in ReadyPages.Values)
+            {
+                if (state.RunKey != runKey)
+                    continue;
+
+                runState = state.RunState;
+                return true;
+            }
+        }
+
+        var debugRunState = RunManager.Instance?.DebugOnlyGetState() as RunState;
+        if (debugRunState != null && StartingPersonaRelicSelectionPatch.GetRunKey(debugRunState) == runKey)
+        {
+            runState = debugRunState;
+            return true;
+        }
+
+        runState = null;
+        return false;
+    }
+
+    private static void RestoreOriginalOptionsForRun(string runKey, string reason)
+    {
+        List<Neow> neowsToRestore;
+        lock (SyncLock)
+        {
+            neowsToRestore = ReadyPages
+                .Where(pair => pair.Value.RunKey == runKey)
+                .Select(static pair => pair.Key)
+                .ToList();
+        }
+
+        foreach (var neow in neowsToRestore)
+            RestoreOriginalOptionsOrFinish(neow, reason);
+    }
+
+    private static void RestoreOriginalOptionsOrFinish(Neow neow, string reason)
     {
         ReadyPageState? state;
         lock (SyncLock)
@@ -171,7 +319,8 @@ internal static class StartingPersonaNeowReadyFlow
         if (state.OriginalOptions.Count == 0)
         {
             neow.StartPreFinished();
-            MainFile.Logger.Info("[StartingPersonaNeowReadyFlow] Restored Neow by finishing immediately because the original option page was empty.");
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Ready page restored by finishing Neow immediately because the original option page was empty | runKey={state.RunKey} reason={reason}.");
             return;
         }
 
@@ -180,7 +329,7 @@ internal static class StartingPersonaNeowReadyFlow
 
         SetEventStateMethod.Invoke(neow, [state.OriginalDescription, state.OriginalOptions]);
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Restored Neow original option page with {state.OriginalOptions.Count} option(s).");
+            $"[StartingPersonaNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={state.OriginalOptions.Count}.");
     }
 }
 
@@ -197,16 +346,32 @@ internal sealed class StartingPersonaNeowReadyInitialStatePatch
     }
 }
 
-[HarmonyPatch(typeof(Neow), nameof(EventModel.IsShared), MethodType.Getter)]
-internal sealed class StartingPersonaNeowReadyIsSharedPatch
+[HarmonyPatch(typeof(NEventOptionButton), "OnRelease")]
+internal static class StartingPersonaNeowReadyOptionReleasePatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix(NEventOptionButton __instance)
+    {
+        return !StartingPersonaNeowReadyFlow.TryInterceptReadyOptionRelease(__instance);
+    }
+}
+
+[HarmonyPatch(typeof(NEventOptionButton), "_Ready")]
+internal static class StartingPersonaNeowReadyOptionUiPatch
 {
     [HarmonyPostfix]
-    public static void Postfix(Neow __instance, ref bool __result)
+    public static void Postfix(NEventOptionButton __instance)
     {
-        if (__result)
-            return;
+        StartingPersonaNeowReadyFlow.ApplyLocalReadyOptionUi(__instance);
+    }
+}
 
-        if (StartingPersonaNeowReadyFlow.IsReadyPageShared(__instance))
-            __result = true;
+[HarmonyPatch(typeof(NEventRoom), "OptionButtonClicked")]
+internal static class StartingPersonaNeowReadyEventRoomGuardPatch
+{
+    [HarmonyPrefix]
+    public static bool Prefix(NEventRoom __instance, EventOption option, int index)
+    {
+        return !StartingPersonaNeowReadyFlow.TrySwallowReadyOptionAtEventRoomEntry(__instance, option, index);
     }
 }

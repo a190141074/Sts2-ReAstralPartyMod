@@ -61,7 +61,11 @@ public abstract class BaseAbilityRetaliationPowerBase : AstralPartyPowerModel
         CardModel? cardSource)
     {
         var data = GetInternalData<Data>();
+        if (data.IsReflecting)
+            return;
         if (data.PendingPower == null || data.PendingAmount <= 0m)
+            return;
+        if (power != data.PendingPower && power != this)
             return;
         if (data.PendingApplier == null || !data.PendingApplier.IsAlive || data.PendingApplier == Owner)
         {
@@ -81,12 +85,21 @@ public abstract class BaseAbilityRetaliationPowerBase : AstralPartyPowerModel
             return;
         }
 
+        var pendingPower = data.PendingPower;
+        var pendingAmount = data.PendingAmount;
+        var pendingApplier = data.PendingApplier;
+        if (pendingPower == null || pendingAmount <= 0m || pendingApplier == null)
+        {
+            ClearPending(data);
+            return;
+        }
+
         data.IsReflecting = true;
         try
         {
             Flash();
             await PowerCmd.ModifyAmount(this, -1m, Owner, null, true);
-            await PowerCmd.Apply(data.PendingPower.ToMutable(), target, data.PendingAmount, Owner, cardSource, false);
+            await PowerCmd.Apply(pendingPower.ToMutable(), target, pendingAmount, Owner, cardSource, false);
         }
         finally
         {
