@@ -4,22 +4,18 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
-using MegaCrit.Sts2.Core.ValueProps;
+using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
 {
-    private sealed class Data
-    {
-        public decimal AppliedStrengthBonus;
-    }
+    [SavedProperty] public decimal AstralParty_AppliedStrengthBonus { get; set; }
 
     public override PowerType Type => PowerType.Buff;
 
@@ -50,11 +46,6 @@ public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
     [
         HoverTipFactory.FromPower<StrengthPower>()
     ];
-
-    protected override object InitInternalData()
-    {
-        return new Data();
-    }
 
     protected override IEnumerable<string> GetCandidateIconPaths()
     {
@@ -89,27 +80,12 @@ public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
         await SyncStrengthBonus(Owner, null);
     }
 
-    public override async Task AfterDamageReceived(
-        PlayerChoiceContext choiceContext,
-        Creature target,
-        DamageResult result,
-        ValueProp props,
-        Creature? dealer,
-        CardModel? cardSource)
-    {
-        if (target != Owner)
-            return;
-
-        await SyncStrengthBonus(dealer, cardSource);
-    }
-
     public override async Task AfterRemoved(Creature? oldOwner)
     {
-        var data = GetInternalData<Data>();
-        if (oldOwner != null && data.AppliedStrengthBonus > 0m)
-            await PowerCmd.Apply<StrengthPower>(oldOwner, -data.AppliedStrengthBonus, oldOwner, null, true);
+        if (oldOwner != null && AstralParty_AppliedStrengthBonus != 0m)
+            await PowerCmd.Apply<StrengthPower>(oldOwner, -AstralParty_AppliedStrengthBonus, oldOwner, null, true);
 
-        data.AppliedStrengthBonus = 0m;
+        AstralParty_AppliedStrengthBonus = 0m;
     }
 
     private async Task SyncStrengthBonus(Creature? applier, CardModel? cardSource)
@@ -117,13 +93,12 @@ public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
         if (Owner == null)
             return;
 
-        var data = GetInternalData<Data>();
         var desiredStrengthBonus = IsAtFullHp() ? Amount : 0m;
-        var delta = desiredStrengthBonus - data.AppliedStrengthBonus;
+        var delta = desiredStrengthBonus - AstralParty_AppliedStrengthBonus;
         if (delta == 0m)
             return;
 
-        data.AppliedStrengthBonus = desiredStrengthBonus;
+        AstralParty_AppliedStrengthBonus = desiredStrengthBonus;
         await PowerCmd.Apply<StrengthPower>(Owner, delta, applier, cardSource, true);
     }
 

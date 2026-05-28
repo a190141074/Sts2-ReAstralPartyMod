@@ -52,6 +52,8 @@ public class PersonalityDerivativeMysteriousDodgingMan : AstralPartyRelicModel
         if (Owner?.Creature?.CombatState == null || player != Owner)
             return;
 
+        await RemoveExpiredExposedFlawFromOpponents();
+
         var roundNumber = Owner.Creature.CombatState.RoundNumber;
         if (AstralParty_PersonalityDerivativeMysteriousDodgingManLastProcessedRound == roundNumber)
             return;
@@ -64,9 +66,6 @@ public class PersonalityDerivativeMysteriousDodgingMan : AstralPartyRelicModel
         }
 
         if (AstralParty_PersonalityDerivativeMysteriousDodgingManCooldownCounter > 0)
-            return;
-
-        if (MosesCombatHelper.GetWeaknessInsightAmount(Owner) < 3)
             return;
 
         var enemies = CombatTargetOrdering.GetLivingOpponentsStable(Owner.Creature);
@@ -88,6 +87,20 @@ public class PersonalityDerivativeMysteriousDodgingMan : AstralPartyRelicModel
         await PowerCmd.Apply<ExposedFlawPower>(target, 1m, Owner.Creature, null, false);
         AstralParty_PersonalityDerivativeMysteriousDodgingManCooldownCounter = 2;
         InvokeDisplayAmountChanged();
+    }
+
+    private async Task RemoveExpiredExposedFlawFromOpponents()
+    {
+        if (Owner?.Creature == null)
+            return;
+
+        var enemies = CombatTargetOrdering.GetLivingOpponentsStable(Owner.Creature);
+        foreach (var enemy in enemies)
+        {
+            var exposedFlaw = enemy.GetPower<ExposedFlawPower>();
+            if (exposedFlaw?.Amount > 0m)
+                await PowerCmd.Remove(exposedFlaw);
+        }
     }
 
     private void ResetCombatState()

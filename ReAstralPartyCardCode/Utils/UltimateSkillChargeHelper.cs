@@ -20,6 +20,9 @@ public static class UltimateSkillChargeHelper
         foreach (var card in EnumerateOwnedUltimateCards(owner))
             card.AddCharge(1);
 
+        if (cardPlay.Card is UltimateSkillCardModel playedUltimate)
+            playedUltimate.AddCharge(-MaxCharge);
+
         return Task.CompletedTask;
     }
 
