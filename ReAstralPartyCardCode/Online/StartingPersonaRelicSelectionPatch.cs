@@ -125,6 +125,11 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             LogInfo("P015",
                 $"Starting persona relic selection shown with {relicOptions.Count} persona relic options.");
             await screen.RelicPickingFinished();
+            LogInfo("P016A", "Starting persona overlay result completed.");
+            LogInfo("P016B", "Starting persona overlay close requested.");
+            screen.Close();
+            await screen.WaitUntilClosedAsync();
+            LogInfo("P016C", "Starting persona overlay actually closed.");
             LogInfo("P016", "Starting persona relic selection screen completed.");
             AstralNeowDiagnosticHelper.ReportPostPersonaSelectionWindow(runState, relicOptions.Count);
             EndSelection(runKey, true);

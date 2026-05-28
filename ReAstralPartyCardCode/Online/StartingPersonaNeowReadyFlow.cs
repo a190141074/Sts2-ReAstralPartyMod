@@ -255,11 +255,10 @@ internal static class StartingPersonaNeowReadyFlow
         try
         {
             RestoreOriginalOptionsForRun(runKey, "ready_launch");
-            await RefreshRestoredNeowUiAsync(runState, runKey, "pre_overlay");
             MainFile.Logger.Info(
                 $"[StartingPersonaNeowReadyFlow] Ready page restored before persona overlay | runKey={runKey} source={sourceTag}.");
             var opened = await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(runState, $"neow_ready_launch:{sourceTag}");
-            await RefreshRestoredNeowUiAsync(runState, runKey, "post_overlay_verify");
+            await RefreshRestoredNeowUiAfterOverlayClosedAsync(runState, runKey, "post_overlay_verify");
             return opened;
         }
         finally
@@ -386,6 +385,18 @@ internal static class StartingPersonaNeowReadyFlow
         AstralNeowDiagnosticHelper.ReportReadyRestoreUiSnapshot(runState, layoutNode, $"{stage}:after_refresh");
     }
 
+    private static async Task RefreshRestoredNeowUiAfterOverlayClosedAsync(RunState runState, string runKey, string stage)
+    {
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Neow restore frame barrier begin | runKey={runKey} stage={stage}.");
+        await AwaitFramesAsync(2);
+        await RefreshRestoredNeowUiAsync(runState, runKey, $"{stage}:post_close_before_refresh");
+        await AwaitFramesAsync(1);
+        await RefreshRestoredNeowUiAsync(runState, runKey, $"{stage}:post_close_after_refresh");
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Neow restore frame barrier end | runKey={runKey} stage={stage}.");
+    }
+
     private static EventModel? TryResolveCurrentEventModel(RunState runState)
     {
         if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is EventModel localEvent)
@@ -474,6 +485,12 @@ internal static class StartingPersonaNeowReadyFlow
         }
 
         await Task.Yield();
+    }
+
+    private static async Task AwaitFramesAsync(int frameCount)
+    {
+        for (var frame = 0; frame < frameCount; frame++)
+            await AwaitProcessFrameAsync();
     }
 }
 

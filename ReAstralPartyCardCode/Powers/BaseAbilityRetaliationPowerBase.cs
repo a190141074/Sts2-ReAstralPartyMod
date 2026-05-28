@@ -48,7 +48,7 @@ public abstract class BaseAbilityRetaliationPowerBase : AstralPartyPowerModel
         if (data.IsReflecting)
             return false;
 
-        data.PendingPower = canonicalPower;
+        data.PendingPower = GetCanonicalPower(canonicalPower);
         data.PendingAmount = amount;
         data.PendingApplier = applier;
         return false;
@@ -85,7 +85,7 @@ public abstract class BaseAbilityRetaliationPowerBase : AstralPartyPowerModel
             return;
         }
 
-        var pendingPower = data.PendingPower;
+        var pendingPower = GetCanonicalPower(data.PendingPower);
         var pendingAmount = data.PendingAmount;
         var pendingApplier = data.PendingApplier;
         if (pendingPower == null || pendingAmount <= 0m || pendingApplier == null)
@@ -115,5 +115,13 @@ public abstract class BaseAbilityRetaliationPowerBase : AstralPartyPowerModel
         data.PendingPower = null;
         data.PendingAmount = 0m;
         data.PendingApplier = null;
+    }
+
+    private static PowerModel? GetCanonicalPower(PowerModel? power)
+    {
+        if (power == null)
+            return null;
+
+        return power.IsMutable ? ModelDb.GetById<PowerModel>(power.Id) : power;
     }
 }

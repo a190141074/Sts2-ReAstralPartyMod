@@ -44,6 +44,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private const int AutomaticSelectionMinimumCountdownMilliseconds = 250;
 
     private readonly TaskCompletionSource _completionSource = new();
+    private readonly TaskCompletionSource _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly TaskCompletionSource<int> _singlePlayerChoiceSource = new();
     private readonly TaskCompletionSource<CommittedSelectionSnapshot> _multiplayerCommitSource = new();
     private readonly RunState _runState;
@@ -138,6 +139,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         return _completionSource.Task;
     }
 
+    public Task WaitUntilClosedAsync()
+    {
+        return _overlayClosedSource.Task;
+    }
+
     public void Close()
     {
         if (_closed || _closeQueued)
@@ -163,7 +169,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     public void AfterOverlayClosed()
     {
+        if (_closed)
+            return;
+
         _closed = true;
+        _overlayClosedSource.TrySetResult();
         QueueFree();
     }
 
@@ -1594,7 +1604,16 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         finally
         {
             if (!_closed)
-                NOverlayStack.Instance?.Remove(this);
+            {
+                if (NOverlayStack.Instance != null && IsInsideTree())
+                    NOverlayStack.Instance.Remove(this);
+                else
+                {
+                    _closed = true;
+                    _overlayClosedSource.TrySetResult();
+                    QueueFree();
+                }
+            }
         }
     }
 
