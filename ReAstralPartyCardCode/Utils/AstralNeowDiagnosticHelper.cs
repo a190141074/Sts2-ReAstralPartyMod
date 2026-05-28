@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Reflection;
+using Godot;
+using MegaCrit.Sts2.Core.Events;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Nodes.Events;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
@@ -40,6 +43,18 @@ internal static class AstralNeowDiagnosticHelper
         var optionCount = TryCountRelicLikeEntries(layoutNode);
         MainFile.Logger.Warn(
             $"[M203] Ancient layout ready | node={nodeType} | optionCount={optionCount} | {FormatSnapshotForLog(snapshot)}");
+    }
+
+    public static void ReportReadyRestoreUiSnapshot(IRunState? runState, Node? layoutNode, string stage)
+    {
+        var snapshot = BuildSnapshot(runState);
+        var currentOptionCount = TryCountCurrentEventOptions(runState);
+        var currentOptionKeys = string.Join(",", TryReadCurrentEventOptionTextKeys(runState));
+        var optionButtonCount = TryCountOptionButtonNodes(layoutNode);
+        var optionButtonKeys = string.Join(",", TryReadOptionButtonTextKeys(layoutNode));
+        var layoutType = layoutNode?.GetType().FullName ?? "null";
+        MainFile.Logger.Warn(
+            $"[M205] Neow ready restore ui snapshot | stage={stage} | currentOptions={currentOptionCount} | optionButtons={optionButtonCount} | currentKeys={currentOptionKeys} | buttonKeys={optionButtonKeys} | layout={layoutType} | {FormatSnapshotForLog(snapshot)}");
     }
 
     public static void ReportGrabBagRaritySnapshot(object? grabBag, Player? player)
@@ -206,6 +221,82 @@ internal static class AstralNeowDiagnosticHelper
                          ?? ReadMemberValue(room, "eventModel");
         var currentOptions = ReadMemberValue(eventModel, "CurrentOptions");
         return currentOptions is ICollection collection ? collection.Count : -1;
+    }
+
+    private static IReadOnlyList<string> TryReadCurrentEventOptionTextKeys(IRunState? runState)
+    {
+        var room = runState?.CurrentRoom;
+        var eventModel = ReadMemberValue(room, "Event")
+                         ?? ReadMemberValue(room, "CurrentEvent")
+                         ?? ReadMemberValue(room, "_event")
+                         ?? ReadMemberValue(room, "eventModel");
+        var currentOptions = ReadMemberValue(eventModel, "CurrentOptions");
+        return ExtractOptionTextKeys(currentOptions);
+    }
+
+    private static int TryCountOptionButtonNodes(Node? layoutNode)
+    {
+        if (layoutNode == null)
+            return -1;
+
+        var optionsContainer = layoutNode.GetNodeOrNull<Node>("%OptionsContainer");
+        if (optionsContainer == null)
+            return -1;
+
+        return optionsContainer.GetChildren()
+            .OfType<Node>()
+            .Count(IsEventOptionButtonNode);
+    }
+
+    private static IReadOnlyList<string> TryReadOptionButtonTextKeys(Node? layoutNode)
+    {
+        if (layoutNode == null)
+            return [];
+
+        var optionsContainer = layoutNode.GetNodeOrNull<Node>("%OptionsContainer");
+        if (optionsContainer == null)
+            return [];
+
+        return optionsContainer.GetChildren()
+            .OfType<Node>()
+            .Where(IsEventOptionButtonNode)
+            .Select(node =>
+            {
+                if (node is NEventOptionButton typedButton)
+                    return typedButton.Option?.TextKey ?? "null";
+
+                return ReadMemberValue(node, "Option") is EventOption option
+                    ? option.TextKey ?? "null"
+                    : "unknown";
+            })
+            .ToList();
+    }
+
+    private static IReadOnlyList<string> ExtractOptionTextKeys(object? value)
+    {
+        if (value is not IEnumerable enumerable || value is string)
+            return [];
+
+        var keys = new List<string>();
+        foreach (var entry in enumerable)
+        {
+            if (entry is EventOption option)
+            {
+                keys.Add(option.TextKey ?? "null");
+                continue;
+            }
+
+            var textKey = ReadMemberValue(entry, "TextKey")?.ToString();
+            if (!string.IsNullOrWhiteSpace(textKey))
+                keys.Add(textKey);
+        }
+
+        return keys;
+    }
+
+    private static bool IsEventOptionButtonNode(Node node)
+    {
+        return node is NEventOptionButton || string.Equals(node.GetType().Name, nameof(NEventOptionButton), StringComparison.Ordinal);
     }
 
     private static IEnumerable<RelicModel> EnumerateRelicsFromObject(object instance)

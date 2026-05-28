@@ -1,5 +1,7 @@
 using MegaCrit.Sts2.Core.Saves.Runs;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using STS2RitsuLib.Scaffolding.Content;
+using MegaCrit.Sts2.Core.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Enchantments;
 
@@ -12,4 +14,10 @@ public class EssenceSacredFaithEnchantment : ModEnchantmentTemplate
     {
         IconPath = "res://ReAstralPartyMod/images/enchantments/essence_sacred_faith_enchantment.png"
     };
+
+    public override bool CanEnchant(CardModel card)
+    {
+        return base.CanEnchant(card)
+               && card.Type == CardType.Attack;
+    }
 }

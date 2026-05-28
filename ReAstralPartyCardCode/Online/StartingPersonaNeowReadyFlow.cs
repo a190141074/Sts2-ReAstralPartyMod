@@ -11,10 +11,12 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Events;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
@@ -35,6 +37,18 @@ internal static class StartingPersonaNeowReadyFlow
         typeof(EventModel),
         "SetEventState",
         [typeof(LocString), typeof(IEnumerable<EventOption>)]);
+    private static readonly MethodInfo? EventRoomSetupLayoutMethod =
+        AccessTools.Method(typeof(NEventRoom), "SetupLayout");
+    private static readonly MethodInfo? EventRoomRefreshEventStateMethod =
+        AccessTools.Method(typeof(NEventRoom), "RefreshEventState", [typeof(EventModel)]);
+    private static readonly MethodInfo? AncientLayoutInitializeVisualsMethod =
+        AccessTools.Method(typeof(NAncientEventLayout), "InitializeVisuals");
+    private static readonly MethodInfo? AncientLayoutUpdateBannerVisibilityMethod =
+        AccessTools.Method(typeof(NAncientEventLayout), "UpdateBannerVisibility");
+    private static readonly MethodInfo? AncientLayoutUpdateFakeNextButtonMethod =
+        AccessTools.Method(typeof(NAncientEventLayout), "UpdateFakeNextButton");
+    private static readonly MethodInfo? ControlUpdateMinimumSizeMethod =
+        AccessTools.Method(typeof(Control), "UpdateMinimumSize");
 
     private sealed record ReadyPageState(
         string RunKey,
@@ -241,9 +255,12 @@ internal static class StartingPersonaNeowReadyFlow
         try
         {
             RestoreOriginalOptionsForRun(runKey, "ready_launch");
+            await RefreshRestoredNeowUiAsync(runState, runKey, "pre_overlay");
             MainFile.Logger.Info(
                 $"[StartingPersonaNeowReadyFlow] Ready page restored before persona overlay | runKey={runKey} source={sourceTag}.");
-            return await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(runState, $"neow_ready_launch:{sourceTag}");
+            var opened = await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(runState, $"neow_ready_launch:{sourceTag}");
+            await RefreshRestoredNeowUiAsync(runState, runKey, "post_overlay_verify");
+            return opened;
         }
         finally
         {
@@ -330,6 +347,133 @@ internal static class StartingPersonaNeowReadyFlow
         SetEventStateMethod.Invoke(neow, [state.OriginalDescription, state.OriginalOptions]);
         MainFile.Logger.Info(
             $"[StartingPersonaNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={state.OriginalOptions.Count}.");
+    }
+
+    private static async Task RefreshRestoredNeowUiAsync(RunState runState, string runKey, string stage)
+    {
+        if (NGame.Instance?.IsInsideTree() != true)
+            return;
+
+        await AwaitProcessFrameAsync();
+
+        var eventRoom = FindCurrentEventRoom();
+        var layoutNode = FindCurrentAncientLayout(eventRoom);
+        AstralNeowDiagnosticHelper.ReportReadyRestoreUiSnapshot(runState, layoutNode, $"{stage}:before_refresh");
+
+        var eventModel = TryResolveCurrentEventModel(runState);
+        if (eventRoom != null && eventModel != null)
+        {
+            try
+            {
+                if (EventRoomSetupLayoutMethod?.Invoke(eventRoom, null) is Task setupTask)
+                    await setupTask;
+
+                EventRoomRefreshEventStateMethod?.Invoke(eventRoom, [eventModel]);
+            }
+            catch (Exception ex)
+            {
+                MainFile.Logger.Warn(
+                    $"[StartingPersonaNeowReadyFlow] Failed to rebuild Neow event room UI | runKey={runKey} stage={stage}: {ex}");
+            }
+        }
+
+        layoutNode = FindCurrentAncientLayout(eventRoom);
+        if (layoutNode != null)
+            ForceLayoutRefresh(layoutNode);
+
+        await AwaitProcessFrameAsync();
+        layoutNode = FindCurrentAncientLayout(eventRoom);
+        AstralNeowDiagnosticHelper.ReportReadyRestoreUiSnapshot(runState, layoutNode, $"{stage}:after_refresh");
+    }
+
+    private static EventModel? TryResolveCurrentEventModel(RunState runState)
+    {
+        if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is EventModel localEvent)
+            return localEvent;
+
+        var room = runState.CurrentRoom;
+        return AccessTools.Property(room?.GetType(), "Event")?.GetValue(room) as EventModel
+               ?? AccessTools.Property(room?.GetType(), "CurrentEvent")?.GetValue(room) as EventModel
+               ?? AccessTools.Field(room?.GetType(), "_event")?.GetValue(room) as EventModel
+               ?? AccessTools.Field(room?.GetType(), "eventModel")?.GetValue(room) as EventModel;
+    }
+
+    private static NEventRoom? FindCurrentEventRoom()
+    {
+        var currentScene = NGame.Instance?.GetTree()?.CurrentScene;
+        if (currentScene == null)
+            return null;
+        if (currentScene is NEventRoom eventRoom)
+            return eventRoom;
+
+        return currentScene
+            .FindChildren("*", nameof(NEventRoom), true, false)
+            .OfType<NEventRoom>()
+            .FirstOrDefault();
+    }
+
+    private static Node? FindCurrentAncientLayout(NEventRoom? eventRoom)
+    {
+        if (eventRoom?.Layout is Node directLayout)
+            return directLayout;
+
+        return eventRoom?
+            .FindChildren("*", nameof(NAncientEventLayout), true, false)
+            .OfType<Node>()
+            .FirstOrDefault();
+    }
+
+    private static void ForceLayoutRefresh(Node layoutNode)
+    {
+        RefreshNodeLayout(layoutNode);
+        foreach (var nodePath in new[] { "%ContentContainer", "%Content", "%DialogueContainer", "%OptionsContainer" })
+        {
+            if (layoutNode.GetNodeOrNull<Node>(nodePath) is { } child)
+                RefreshNodeLayout(child);
+        }
+
+        if (layoutNode is NAncientEventLayout ancientLayout)
+        {
+            AncientLayoutInitializeVisualsMethod?.Invoke(ancientLayout, null);
+            AncientLayoutUpdateBannerVisibilityMethod?.Invoke(ancientLayout, null);
+            AncientLayoutUpdateFakeNextButtonMethod?.Invoke(ancientLayout, null);
+        }
+
+        Callable.From(() =>
+        {
+            if (!GodotObject.IsInstanceValid(layoutNode))
+                return;
+
+            RefreshNodeLayout(layoutNode);
+            foreach (var nodePath in new[] { "%ContentContainer", "%Content", "%DialogueContainer", "%OptionsContainer" })
+            {
+                if (layoutNode.GetNodeOrNull<Node>(nodePath) is { } child)
+                    RefreshNodeLayout(child);
+            }
+        }).CallDeferred();
+    }
+
+    private static void RefreshNodeLayout(Node node)
+    {
+        if (node is Control control)
+        {
+            ControlUpdateMinimumSizeMethod?.Invoke(control, null);
+            control.QueueRedraw();
+        }
+
+        if (node is Container container)
+            container.QueueSort();
+    }
+
+    private static async Task AwaitProcessFrameAsync()
+    {
+        if (NGame.Instance?.IsInsideTree() == true)
+        {
+            await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
+            return;
+        }
+
+        await Task.Yield();
     }
 }
 
