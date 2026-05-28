@@ -113,6 +113,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SHATTER_STAR.description": "对目标造成[blue]21[/blue]点伤害。\n每有[blue]1[/blue]层[gold]充能[/gold]，此伤害提高[blue]7.7%[/blue]。\n若恰好击杀目标，则你的人格冷却-[blue]1[/blue]，并尝试【再动】。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_DIVINE_PUNISHMENT.title": "神罚",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_DIVINE_PUNISHMENT.description": "立即获得{energyPrefix:energyIcons(1)}。\n若场上所有玩家的[gold]神子[/gold]层数总和不少于[blue]8[/blue]，则所有玩家额外获得{energyPrefix:energyIcons(1)}，并各自驱散最多[blue]2[/blue]个负面能力。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_INNOCENT_WISH.title": "无垢之愿",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_INNOCENT_WISH.description": "获得能力[gold]无邪妄光[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CLEAR_OBSTACLE.title": "定点清除障碍",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CLEAR_OBSTACLE.description": "立即触发目标身上[gold]中毒[/gold]与[gold]灾厄[/gold]各[blue]1[/blue]次，然后清除目标所有[gold]中毒[/gold]与[gold]灾厄[/gold]。\n你获得[blue]3[/blue]回合的[gold]超载模式[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_PUNITIVE_JUDGMENT.title": "诛罚",
