@@ -1,10 +1,7 @@
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
-using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -15,7 +12,7 @@ internal static class AstralMoveAgainDisplayHelper
         if (owner?.Creature == null)
             return;
 
-        var desiredAmount = Math.Max(GetPendingCount(owner), 0);
+        var desiredAmount = PendingExtraTurnQueuePower.GetPendingCount(owner);
         if (desiredAmount <= 0)
         {
             var existingPower = owner.Creature.GetPower<MoveAgainPower>();
@@ -37,10 +34,6 @@ internal static class AstralMoveAgainDisplayHelper
 
     public static int GetPendingCount(Player? owner)
     {
-        if (owner == null)
-            return 0;
-
-        return owner.Relics.OfType<VariantPersonSara>().Sum(relic => relic.GetPendingExtraTurnCount())
-               + owner.Relics.OfType<JewelryNightSkin>().Sum(relic => relic.GetPendingExtraTurnCount());
+        return PendingExtraTurnQueuePower.GetPendingCount(owner);
     }
 }

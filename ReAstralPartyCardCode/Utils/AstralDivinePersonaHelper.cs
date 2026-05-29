@@ -154,9 +154,8 @@ internal static class AstralDivinePersonaHelper
 
     public static async Task HandleShatterStarKillExtraTurn(Player owner, VariantPersonSara sara, AbstractModel? source)
     {
-        sara.QueuePendingShatterStarExtraTurn();
+        await PendingExtraTurnQueuePower.EnqueueSaraShatterStarExtraTurn(owner);
         MainFile.Logger.Info(
-            $"[AstralDivine] Queued Sara extra turn from Shatter Star kill for current combat | owner={owner.NetId} | pending={sara.GetPendingExtraTurnCount()}");
-        await AstralMoveAgainDisplayHelper.Sync(owner);
+            $"[AstralDivine] Queued Sara extra turn from Shatter Star kill for current combat | owner={owner.NetId} | pending={PendingExtraTurnQueuePower.GetPendingCount(owner)}");
     }
 }

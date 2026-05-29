@@ -19,7 +19,6 @@ public class JewelryNightSkin : AstralPartyRelicModel
     private const int FallbackTurnThreshold = 9;
 
     [SavedProperty] public int AstralParty_JewelryNightSkinTurnCounter { get; set; }
-    [SavedProperty] public int AstralParty_JewelryNightSkinPendingExtraTurnCount { get; set; }
     [SavedProperty] public int AstralParty_JewelryNightSkinLastProcessedRound { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Rare;
@@ -35,7 +34,6 @@ public class JewelryNightSkin : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_JewelryNightSkinTurnCounter = 0;
-        AstralParty_JewelryNightSkinPendingExtraTurnCount = 0;
         AstralParty_JewelryNightSkinLastProcessedRound = 0;
         await AstralMoveAgainDisplayHelper.Sync(Owner);
     }
@@ -63,10 +61,10 @@ public class JewelryNightSkin : AstralPartyRelicModel
             return;
 
         AstralParty_JewelryNightSkinTurnCounter = 0;
-        AstralParty_JewelryNightSkinPendingExtraTurnCount++;
         Flash();
-        MainFile.Logger.Info($"[JewelryNightSkin] Queued fallback extra turn | owner={Owner.NetId} | pending={AstralParty_JewelryNightSkinPendingExtraTurnCount}");
-        await AstralMoveAgainDisplayHelper.Sync(Owner);
+        await PendingExtraTurnQueuePower.EnqueueNightSkinExtraTurn(Owner);
+        MainFile.Logger.Info(
+            $"[JewelryNightSkin] Queued fallback extra turn | owner={Owner.NetId} | pending={PendingExtraTurnQueuePower.GetPendingCount(Owner)}");
     }
 
     public override async Task AfterCombatEnd(CombatRoom room)
@@ -75,29 +73,4 @@ public class JewelryNightSkin : AstralPartyRelicModel
         await AstralMoveAgainDisplayHelper.Sync(Owner);
     }
 
-    public override bool ShouldTakeExtraTurn(Player player)
-    {
-        return player == Owner && AstralParty_JewelryNightSkinPendingExtraTurnCount > 0;
-    }
-
-    public override async Task AfterTakingExtraTurn(Player player)
-    {
-        if (player != Owner || AstralParty_JewelryNightSkinPendingExtraTurnCount <= 0)
-            return;
-
-        AstralParty_JewelryNightSkinPendingExtraTurnCount--;
-        if (AstralParty_JewelryNightSkinPendingExtraTurnCount < 0)
-        {
-            AstralParty_JewelryNightSkinPendingExtraTurnCount = 0;
-            MainFile.Logger.Warn(
-                $"[JewelryNightSkin] Pending fallback extra turn count dropped below zero during consumption | owner={Owner?.NetId}");
-        }
-        await AstralMoveAgainDisplayHelper.Sync(Owner);
-        MainFile.Logger.Info($"[JewelryNightSkin] Pending fallback extra turn consumed | owner={Owner?.NetId} | remaining={AstralParty_JewelryNightSkinPendingExtraTurnCount}");
-    }
-
-    public int GetPendingExtraTurnCount()
-    {
-        return AstralParty_JewelryNightSkinPendingExtraTurnCount;
-    }
 }
