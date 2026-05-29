@@ -7,6 +7,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class UltimateSkillChargeHelper
 {
+    private static readonly HashSet<UltimateSkillCardModel> SuppressedResetCards = [];
+
     public const int MaxCharge = 100;
 
     public static Task HandleAfterCardPlayed(CardPlay cardPlay)
@@ -21,9 +23,19 @@ public static class UltimateSkillChargeHelper
             card.AddCharge(1);
 
         if (cardPlay.Card is UltimateSkillCardModel playedUltimate)
+        {
+            if (SuppressedResetCards.Remove(playedUltimate))
+                return Task.CompletedTask;
+
             playedUltimate.AddCharge(-MaxCharge);
+        }
 
         return Task.CompletedTask;
+    }
+
+    public static void SuppressNextUltimateChargeReset(UltimateSkillCardModel card)
+    {
+        SuppressedResetCards.Add(card);
     }
 
     public static void RefreshUltimateCards(Player? player)

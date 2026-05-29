@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
@@ -46,14 +47,25 @@ public class UltimateSkillForgottenRoar : UltimateSkillCardModel
     {
         if (Owner?.Creature == null || CombatState == null)
             return;
+        if (CurrentCharge < UltimateSkillChargeHelper.MaxCharge)
+        {
+            UltimateSkillChargeHelper.SuppressNextUltimateChargeReset(this);
+
+            foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(CombatState, Owner.Creature))
+                await CreatureCmd.Stun(enemy);
+
+            foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
+                await PowerCmd.Apply<RingingPower>(player.Creature, 1m, Owner.Creature, this);
+
+            return;
+        }
+
         if (!TryConsumeFullCharge())
             return;
 
         await PowerCmd.Apply<IronVirginWardPower>(Owner.Creature, 1m, Owner.Creature, this, false);
 
-        var enemies = CombatState.Creatures
-            .Where(creature => creature.IsAlive && creature.Side != Owner.Creature.Side)
-            .ToList();
+        var enemies = EventCombatTargetHelper.GetAliveNonSummonEnemies(CombatState, Owner.Creature);
 
         foreach (var enemy in enemies)
             await CreatureCmd.Stun(enemy);

@@ -60,6 +60,8 @@ public abstract class UltimateSkillCardModel : AstralPartyCardModel
         InvokeDisplayAmountChangedMethod?.Invoke(this, null);
     }
 
+    protected int CurrentCharge => GetCurrentCharge();
+
     protected int GetCurrentCharge()
     {
         return Math.Clamp(AstralParty_UltimateSkillCharge, 0, UltimateSkillChargeHelper.MaxCharge);

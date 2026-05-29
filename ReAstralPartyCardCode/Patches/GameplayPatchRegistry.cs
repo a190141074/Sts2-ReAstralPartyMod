@@ -242,6 +242,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
+        patcher.RegisterPatch<DevConsoleUltimateChargeCommandPatch>();
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
         patcher.RegisterPatch<PunitiveJudgmentHandEntryPatch>();
     }
