@@ -17,7 +17,8 @@ internal static class EventDeckCardMutationHelper
     private enum DeckMutationKind
     {
         Upgrade = 1,
-        Downgrade = 2
+        Downgrade = 2,
+        Remove = 3
     }
 
     public static async Task Upgrade(Player owner, IReadOnlyList<CardModel> selectedCards, string context)
@@ -32,6 +33,13 @@ internal static class EventDeckCardMutationHelper
         var cardsToMutate = await SynchronizeDeckCards(owner, selectedCards, DeckMutationKind.Downgrade, context);
         foreach (var card in cardsToMutate)
             card.DowngradeInternal();
+    }
+
+    public static async Task Remove(Player owner, IReadOnlyList<CardModel> selectedCards, string context)
+    {
+        var cardsToMutate = await SynchronizeDeckCards(owner, selectedCards, DeckMutationKind.Remove, context);
+        foreach (var card in cardsToMutate)
+            EventDeckCardHelper.RemoveCardFromRunDeck(owner, card);
     }
 
     private static async Task<IReadOnlyList<CardModel>> SynchronizeDeckCards(
