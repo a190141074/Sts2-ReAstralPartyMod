@@ -220,6 +220,7 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
                 attemptNumber);
             if (removedCard != null)
             {
+                await EventDeckCardRemovalPreviewHelper.PlayShatterPreviewAsync(Owner, removedCard);
                 await EventDeckCardMutationHelper.Remove(
                     Owner,
                     [removedCard],
