@@ -19,35 +19,14 @@ internal static class EventDeckCardHelper
 
     public static List<CardModel> GetRunDeckCards(Player owner)
     {
+        if (owner.RunState == null)
+            MainFile.Logger.Warn($"[EventDeckCardHelper] Owner {owner.NetId} has no RunState; using Player.Deck fallback.");
+
         var cards = TryGetCardsFromPlayerDeck(owner);
         if (cards.Count > 0)
             return cards;
 
-        if (owner.RunState == null)
-        {
-            MainFile.Logger.Warn($"[EventDeckCardHelper] Owner {owner.NetId} has no RunState and no readable deck.");
-            return [];
-        }
-
-        var runStateType = owner.RunState.GetType();
-        foreach (var memberName in CardCollectionMemberNames)
-        {
-            var member = runStateType
-                .GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .FirstOrDefault();
-            if (member == null)
-                continue;
-
-            var extractedCards = ExtractCards(ReadMemberValue(owner.RunState, member), owner);
-            if (extractedCards.Count == 0)
-                continue;
-
-            MainFile.Logger.Info(
-                $"[EventDeckCardHelper] Resolved run deck via RunState member '{memberName}' for owner {owner.NetId}.");
-            return extractedCards;
-        }
-
-        MainFile.Logger.Warn($"[EventDeckCardHelper] Failed to locate run deck container for owner {owner.NetId}.");
+        MainFile.Logger.Warn($"[EventDeckCardHelper] Failed to locate readable run deck for owner {owner.NetId}.");
         return [];
     }
 
@@ -70,19 +49,21 @@ internal static class EventDeckCardHelper
         ArgumentNullException.ThrowIfNull(owner);
         ArgumentNullException.ThrowIfNull(card);
 
+        var beforeDeckCount = owner.Deck?.Cards.Count ?? -1;
         var removedFromPlayerDeck = TryRemoveCardFromPlayerDeck(owner, card);
         var removedFromRunState = TryRemoveCardFromRunState(owner, card);
+        var afterDeckCount = owner.Deck?.Cards.Count ?? -1;
         var removed = removedFromPlayerDeck || removedFromRunState;
 
         if (removed)
         {
             MainFile.Logger.Info(
-                $"[EventDeckCardHelper] Removed card '{card.Id.Entry}' from run deck for owner {owner.NetId} | playerDeck={removedFromPlayerDeck} | runState={removedFromRunState}.");
+                $"[EventDeckCardHelper] Removed card '{card.Id.Entry}' from run deck for owner {owner.NetId} | playerDeck={removedFromPlayerDeck} | runState={removedFromRunState} | deckCount={beforeDeckCount}->{afterDeckCount}.");
         }
         else
         {
             MainFile.Logger.Warn(
-                $"[EventDeckCardHelper] Failed to remove card '{card.Id.Entry}' from run deck for owner {owner.NetId}.");
+                $"[EventDeckCardHelper] Failed to remove card '{card.Id.Entry}' from run deck for owner {owner.NetId} | deckCount={beforeDeckCount}->{afterDeckCount}.");
         }
 
         return removed;
@@ -137,19 +118,11 @@ internal static class EventDeckCardHelper
         if (deck == null)
             return false;
 
-        var removed = RemoveCardFromCollection(deck.Cards, card);
-        foreach (var memberName in CardCollectionMemberNames)
-        {
-            var member = typeof(CardPile)
-                .GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .FirstOrDefault();
-            if (member == null)
-                continue;
+        if (!deck.Cards.Contains(card))
+            return false;
 
-            removed |= RemoveCardFromCollection(ReadMemberValue(deck, member), card);
-        }
-
-        return removed;
+        deck.RemoveInternal(card);
+        return true;
     }
 
     private static bool TryRemoveCardFromRunState(Player owner, CardModel card)
@@ -158,20 +131,20 @@ internal static class EventDeckCardHelper
         if (runState == null)
             return false;
 
-        var removed = false;
-        var runStateType = runState.GetType();
-        foreach (var memberName in CardCollectionMemberNames)
+        if (!ReferenceEquals(card.Owner, owner))
+            return false;
+
+        try
         {
-            var member = runStateType
-                .GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .FirstOrDefault();
-            if (member == null)
-                continue;
-
-            removed |= RemoveCardFromCollection(ReadMemberValue(runState, member), card);
+            runState.RemoveCard(card);
+            return true;
         }
-
-        return removed;
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn(
+                $"[EventDeckCardHelper] RunState.RemoveCard failed for '{card.Id.Entry}' owner {owner.NetId}: {ex.Message}");
+            return false;
+        }
     }
 
     private static List<CardModel> ExtractCards(object? source, Player owner)
@@ -192,23 +165,5 @@ internal static class EventDeckCardHelper
         }
 
         return cards;
-    }
-
-    private static bool RemoveCardFromCollection(object? source, CardModel card)
-    {
-        if (source is not IList list)
-            return false;
-
-        var removed = false;
-        for (var i = list.Count - 1; i >= 0; i--)
-        {
-            if (!ReferenceEquals(list[i], card))
-                continue;
-
-            list.RemoveAt(i);
-            removed = true;
-        }
-
-        return removed;
     }
 }

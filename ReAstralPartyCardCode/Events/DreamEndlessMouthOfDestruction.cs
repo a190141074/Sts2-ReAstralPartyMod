@@ -14,18 +14,16 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Interop.AutoRegistration;
+using System.Globalization;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Events;
 
-[RegisterActEvent(typeof(Overgrowth))]
 public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
 {
     private const string LogTag = "DreamEndlessMouthOfDestruction";
-    private const decimal InitialStrengthenCost = 30m;
-    private const decimal StrengthenCostReductionPerAttempt = 2m;
-    private const decimal MinimumStrengthenCost = 1m;
-    private const int FailureChanceStepPercent = 8;
-    private const int MaximumFailureChancePercent = 50;
+    private const decimal PaidStrengthenCost = 30m;
+    private const int FailureChanceStepPercent = 10;
+    private const int MaximumFailureChancePercent = 80;
     private const int MaxSynchronizerWaitFrames = 60;
     private const string InitialInfoTextKey =
         "RE_ASTRAL_PARTY_MOD_EVENT_DREAM_ENDLESS_MOUTH_OF_DESTRUCTION.pages.INITIAL.options.INFO";
@@ -39,8 +37,22 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
 
     protected override string EventId => "dream_endless_mouth_of_destruction";
 
+    public override bool IsAllowed(IRunState runState)
+    {
+        var runManager = RunManager.Instance;
+        if (runManager?.IsSinglePlayerOrFakeMultiplayer == true && runState.Players.Count > 1)
+            return false;
+
+        if (runState.Players.Count > 1)
+            return false;
+
+        return true;
+    }
+
     protected override IReadOnlyList<EventOption> GenerateInitialOptions()
     {
+        MainFile.Logger.Info(
+            $"[{LogTag}] {LogTag} event opened | owner={Owner?.NetId.ToString() ?? "null"} | attempts={AstralParty_DreamEndlessMouthOfDestructionStrengthenAttempts}");
         return CreateCurrentOptions(isInitialPage: true);
     }
 
@@ -194,8 +206,8 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
         await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(cost, Owner, GoldLossType.Spent);
 
         var failureChance = GetFailureChancePercent(attemptNumber);
-        var roll = await ResolveSyncedGameRoll(Owner, attemptNumber, "failure_roll", 100);
-        var strengthenFailed = roll < failureChance;
+        var roll = await ResolveSyncedGameRoll(Owner, attemptNumber, "failure_roll", 1, 11);
+        var strengthenFailed = roll <= failureChance / 10;
         MainFile.Logger.Info(
             $"[{LogTag}] {LogTag} strengthen attempt | owner={Owner.NetId} | attempt={attemptNumber} | cost={cost} | failureChance={failureChance} | roll={roll}");
 
@@ -301,7 +313,7 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
         if (orderedCandidates.Count == 0)
             return null;
 
-        var selectedIndex = await ResolveSyncedGameRoll(owner, attemptNumber, purpose, orderedCandidates.Count);
+        var selectedIndex = await ResolveSyncedGameRoll(owner, attemptNumber, purpose, 0, orderedCandidates.Count);
         return selectedIndex >= 0 && selectedIndex < orderedCandidates.Count
             ? orderedCandidates[selectedIndex]
             : orderedCandidates[0];
@@ -309,25 +321,29 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
 
     private static string BuildInfoOptionDescription(string textKey, int attemptNumber)
     {
-        return string.Format(
-            new LocString("events", $"{textKey}.description").GetRawText(),
-            GetStrengthenCost(attemptNumber),
-            GetFailureChancePercent(attemptNumber));
+        var template = new LocString("events", $"{textKey}.description").GetRawText();
+        return template
+            .Replace("{0}", GetStrengthenCost(attemptNumber).ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+            .Replace("{1}", GetFailureChancePercent(attemptNumber).ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
     }
 
     private static async Task<int> ResolveSyncedGameRoll(
         Player owner,
         int attemptNumber,
         string purpose,
+        int minInclusive,
         int maxExclusive)
     {
         ArgumentNullException.ThrowIfNull(owner);
 
-        var fallbackRoll = CreateDeterministicFallbackRoll(owner, attemptNumber, purpose, maxExclusive);
+        var fallbackRoll = CreateDeterministicFallbackRoll(owner, attemptNumber, purpose, minInclusive, maxExclusive);
         var runManager = RunManager.Instance;
         var netService = runManager?.NetService;
-        if (runManager == null || netService == null || netService.Type is NetGameType.None or NetGameType.Singleplayer)
-            return ConsumeGameRollOrFallback(owner, attemptNumber, purpose, maxExclusive, fallbackRoll);
+        if (runManager == null
+            || netService == null
+            || netService.Type is NetGameType.None or NetGameType.Singleplayer
+            || runManager.IsSinglePlayerOrFakeMultiplayer)
+            return ConsumeGameRollOrFallback(owner, attemptNumber, purpose, minInclusive, maxExclusive, fallbackRoll);
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
@@ -337,11 +353,14 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
             return fallbackRoll;
         }
 
-        var sessionKey = $"dream_endless_mouth_of_destruction.random|{purpose}|{owner.NetId}|{attemptNumber}|{maxExclusive}";
+        var sessionKey =
+            $"dream_endless_mouth_of_destruction.random|{purpose}|{owner.NetId}|{attemptNumber}|{minInclusive}|{maxExclusive}";
         var choiceId = synchronizer.ReserveChoiceId(owner);
         if (IsLocalPlayer(runManager, owner))
         {
-            var localRoll = ConsumeGameRollOrFallback(owner, attemptNumber, purpose, maxExclusive, fallbackRoll);
+            var localRoll = ConsumeGameRollOrFallback(owner, attemptNumber, purpose, minInclusive, maxExclusive, fallbackRoll);
+            MainFile.Logger.Info(
+                $"[{LogTag}] {LogTag} random resolution local | owner={owner.NetId} | attempt={attemptNumber} | purpose={purpose} | minInclusive={minInclusive} | maxExclusive={maxExclusive} | roll={localRoll}");
             synchronizer.SyncLocalChoice(
                 owner,
                 choiceId,
@@ -363,8 +382,12 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
             sessionKey,
             $"{LogTag}.{purpose}");
         var remoteRoll = remoteChoice?.Payload.Count > 0 ? remoteChoice.Value.Payload[0] : -1;
-        if (remoteRoll >= 0 && remoteRoll < maxExclusive)
+        if (remoteRoll >= minInclusive && remoteRoll < maxExclusive)
+        {
+            MainFile.Logger.Info(
+                $"[{LogTag}] {LogTag} random resolution remote | owner={owner.NetId} | attempt={attemptNumber} | purpose={purpose} | minInclusive={minInclusive} | maxExclusive={maxExclusive} | roll={remoteRoll}");
             return remoteRoll;
+        }
 
         MainFile.Logger.Warn(
             $"[{LogTag}] {LogTag} random resolution fell back to deterministic roll because remote payload was unavailable | owner={owner.NetId} | attempt={attemptNumber} | purpose={purpose} | fallbackRoll={fallbackRoll}");
@@ -375,28 +398,33 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
         Player owner,
         int attemptNumber,
         string purpose,
+        int minInclusive,
         int maxExclusive,
         int fallbackRoll)
     {
-        var rng = owner.RunState?.Rng?.TreasureRoomRelics;
+        var rng = owner.RunState?.Rng?.Niche;
         if (rng == null)
         {
             MainFile.Logger.Warn(
-                $"[{LogTag}] {LogTag} random resolution fell back to deterministic roll because TreasureRoomRelics RNG was unavailable | owner={owner.NetId} | attempt={attemptNumber} | purpose={purpose} | fallbackRoll={fallbackRoll}");
+                $"[{LogTag}] {LogTag} random resolution fell back to deterministic roll because Niche RNG was unavailable | owner={owner.NetId} | attempt={attemptNumber} | purpose={purpose} | fallbackRoll={fallbackRoll}");
             return fallbackRoll;
         }
 
-        return rng.NextInt(maxExclusive);
+        var roll = minInclusive + rng.NextInt(maxExclusive - minInclusive);
+        MainFile.Logger.Info(
+            $"[{LogTag}] {LogTag} random resolution consumed niche rng | owner={owner.NetId} | attempt={attemptNumber} | purpose={purpose} | minInclusive={minInclusive} | maxExclusive={maxExclusive} | counter={rng.Counter} | roll={roll}");
+        return roll;
     }
 
     private static int CreateDeterministicFallbackRoll(
         Player owner,
         int attemptNumber,
         string purpose,
+        int minInclusive,
         int maxExclusive)
     {
         return DeterministicMultiplayerChoiceHelper.RollDeterministically(
-            0,
+            minInclusive,
             maxExclusive,
             "dream_endless_mouth_of_destruction",
             purpose,
@@ -429,8 +457,7 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
         if (attemptNumber <= 1)
             return 0m;
 
-        var reducedCost = InitialStrengthenCost - (attemptNumber - 2) * StrengthenCostReductionPerAttempt;
-        return Math.Max(MinimumStrengthenCost, reducedCost);
+        return PaidStrengthenCost;
     }
 
     private static int GetFailureChancePercent(int attemptNumber)
