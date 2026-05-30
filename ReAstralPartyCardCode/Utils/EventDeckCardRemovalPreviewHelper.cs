@@ -6,8 +6,10 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Cards;
+using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.TestSupport;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -20,6 +22,9 @@ internal static class EventDeckCardRemovalPreviewHelper
         ArgumentNullException.ThrowIfNull(removedCard);
 
         if (TestMode.IsOn)
+            return;
+
+        if (!ShouldShowPreviewForLocalPlayer(owner))
             return;
 
         var previewContainer = NRun.Instance?.GlobalUi.CardPreviewContainer
@@ -37,6 +42,22 @@ internal static class EventDeckCardRemovalPreviewHelper
         {
             Log.Warn($"[{MainFile.ModId}] Failed to play event deck card shatter preview.\n{ex}");
         }
+    }
+
+    private static bool ShouldShowPreviewForLocalPlayer(Player owner)
+    {
+        var runManager = RunManager.Instance;
+        var netService = runManager?.NetService;
+        if (runManager == null || netService == null)
+            return true;
+
+        if (netService.Type is NetGameType.None or NetGameType.Singleplayer)
+            return true;
+
+        if (owner.NetId == 0UL || netService.NetId == 0UL)
+            return true;
+
+        return owner.NetId == netService.NetId;
     }
 }
 

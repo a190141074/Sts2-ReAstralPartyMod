@@ -1,3 +1,4 @@
+using Godot;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Gold;
@@ -6,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Events;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
@@ -18,12 +20,15 @@ using System.Globalization;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Events;
 
+[RegisterActEvent(typeof(Overgrowth))]
 public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
 {
     private const string LogTag = "DreamEndlessMouthOfDestruction";
+    private const string FailureChanceVarName = "FailureChance";
+    private const decimal MinimumGoldRequiredPerPlayer = 300m;
     private const decimal PaidStrengthenCost = 30m;
     private const int FailureChanceStepPercent = 10;
-    private const int MaximumFailureChancePercent = 80;
+    private const int MaximumFailureChancePercent = 70;
     private const int MaxSynchronizerWaitFrames = 60;
     private const string InitialInfoTextKey =
         "RE_ASTRAL_PARTY_MOD_EVENT_DREAM_ENDLESS_MOUTH_OF_DESTRUCTION.pages.INITIAL.options.INFO";
@@ -37,16 +42,15 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
 
     protected override string EventId => "dream_endless_mouth_of_destruction";
 
+    protected override IEnumerable<DynamicVar> CanonicalVars =>
+    [
+        new GoldVar(0),
+        new IntVar(FailureChanceVarName, 0)
+    ];
+
     public override bool IsAllowed(IRunState runState)
     {
-        var runManager = RunManager.Instance;
-        if (runManager?.IsSinglePlayerOrFakeMultiplayer == true && runState.Players.Count > 1)
-            return false;
-
-        if (runState.Players.Count > 1)
-            return false;
-
-        return true;
+        return runState.Players.All(player => player.Gold >= MinimumGoldRequiredPerPlayer);
     }
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions()
@@ -70,7 +74,7 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
 
         var title = new LocString("events", $"{textKey}.title").GetFormattedText();
         var attemptNumber = eventModel.AstralParty_DreamEndlessMouthOfDestructionStrengthenAttempts + 1;
-        var description = BuildInfoOptionDescription(textKey, attemptNumber);
+        var description = BuildInfoOptionDescription(attemptNumber);
         text = $"{title}\n{description}";
         return true;
     }
@@ -83,6 +87,7 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
 
     private IReadOnlyList<EventOption> CreateCurrentOptions(bool isInitialPage)
     {
+        RefreshInfoDynamicVars();
         var canStrengthen = CanStrengthen(out var strengthenOptionKey);
         var pageName = isInitialPage ? "INITIAL" : "LOOP";
         var infoKey = isInitialPage
@@ -107,6 +112,32 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
     {
         return new EventOption(this, NoOpInfoOption, textKey)
             .ThatWontSaveToChoiceHistory();
+    }
+
+    private void RefreshInfoDynamicVars()
+    {
+        var attemptNumber = AstralParty_DreamEndlessMouthOfDestructionStrengthenAttempts + 1;
+
+        if (DynamicVars.ContainsKey("Gold"))
+            DynamicVars["Gold"].BaseValue = GetStrengthenCost(attemptNumber);
+
+        if (DynamicVars.ContainsKey(FailureChanceVarName))
+            DynamicVars[FailureChanceVarName].BaseValue = GetFailureChancePercent(attemptNumber);
+    }
+
+    private static string BuildInfoOptionDescription(int attemptNumber)
+    {
+        var cost = GetStrengthenCost(attemptNumber).ToString(CultureInfo.InvariantCulture);
+        var failureChance = GetFailureChancePercent(attemptNumber).ToString(CultureInfo.InvariantCulture);
+        var locale = TranslationServer.GetLocale();
+
+        if (locale.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
+            return $"消耗金币：[gold]{cost}[/gold]丨失败几率：[red]{failureChance}%[/red]丨失败代价：[red]随机移除[/red]";
+
+        if (locale.StartsWith("ja", StringComparison.OrdinalIgnoreCase))
+            return $"消費ゴールド：[gold]{cost}[/gold]丨失敗確率：[red]{failureChance}%[/red]丨失敗代償：[red]ランダム除去[/red]";
+
+        return $"Gold Cost: [gold]{cost}[/gold] | Failure Chance: [red]{failureChance}%[/red] | Failure Cost: [red]Random removal[/red]";
     }
 
     private bool CanStrengthen(out string optionKey)
@@ -320,14 +351,6 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
             : orderedCandidates[0];
     }
 
-    private static string BuildInfoOptionDescription(string textKey, int attemptNumber)
-    {
-        var template = new LocString("events", $"{textKey}.description").GetRawText();
-        return template
-            .Replace("{0}", GetStrengthenCost(attemptNumber).ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
-            .Replace("{1}", GetFailureChancePercent(attemptNumber).ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
-    }
-
     private static async Task<int> ResolveSyncedGameRoll(
         Player owner,
         int attemptNumber,
@@ -385,8 +408,21 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
         var remoteRoll = remoteChoice?.Payload.Count > 0 ? remoteChoice.Value.Payload[0] : -1;
         if (remoteRoll >= minInclusive && remoteRoll < maxExclusive)
         {
+            var shadowRoll = ConsumeGameRollOrFallback(
+                owner,
+                attemptNumber,
+                $"{purpose}_remote_shadow",
+                minInclusive,
+                maxExclusive,
+                fallbackRoll);
+            if (shadowRoll != remoteRoll)
+            {
+                MainFile.Logger.Error(
+                    $"[{LogTag}] {LogTag} random resolution remote shadow mismatch | owner={owner.NetId} | attempt={attemptNumber} | purpose={purpose} | minInclusive={minInclusive} | maxExclusive={maxExclusive} | localShadowRoll={shadowRoll} | remotePayloadRoll={remoteRoll}");
+            }
+
             MainFile.Logger.Info(
-                $"[{LogTag}] {LogTag} random resolution remote | owner={owner.NetId} | attempt={attemptNumber} | purpose={purpose} | minInclusive={minInclusive} | maxExclusive={maxExclusive} | roll={remoteRoll}");
+                $"[{LogTag}] {LogTag} random resolution remote | owner={owner.NetId} | attempt={attemptNumber} | purpose={purpose} | minInclusive={minInclusive} | maxExclusive={maxExclusive} | roll={remoteRoll} | shadowRoll={shadowRoll}");
             return remoteRoll;
         }
 

@@ -2,7 +2,6 @@ using System.Reflection;
 using System.Security.Cryptography;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
-using MegaCrit.Sts2.Core.Models.Acts;
 using ReAstralPartyMod.ReAstralPartyCardCode.Events;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
@@ -44,8 +43,6 @@ public class MainFile
         contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<AstralEventCardPool>(
             "astral_event_card_pool",
             "res://ReAstralPartyMod/images/ui/astral_event_card_pool.png");
-        // Register this event explicitly because the current auto-registration pass is not picking it up.
-        contentRegistry.RegisterActEvent<Overgrowth, DreamEndlessMouthOfDestruction>();
         NeowOptionInjectionHelper.Register();
         GameplayPatchRegistry.RegisterAndApply();
         AstralTelemetry.Initialize();
