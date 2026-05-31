@@ -213,6 +213,14 @@ internal static class GameplayStaticPatchCatalog
                 "Gameplay patch: prevent manual play of Sovereign Blade while Tyrant Form is active",
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
+                "twelve_flowers_cup_manual_play_patch",
+                typeof(CardModel),
+                "IsPlayable",
+                typeof(TwelveFlowersCupManualPlayPatch),
+                false,
+                "Gameplay patch: prevent manual play of high-cost Attack cards while Variant Person Twelve Flowers Cup is active",
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
                 "card_model_paranoid_after_current_hp_changed_patch",
                 typeof(AbstractModel),
                 nameof(CardModel.AfterCurrentHpChanged),

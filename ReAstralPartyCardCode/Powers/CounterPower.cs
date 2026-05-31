@@ -57,6 +57,7 @@ public class CounterPower : AstralPartyPowerModel
             // Retaliation damage should not recursively trigger other retaliation-style effects.
             _activeRetaliations++;
             decimal retaliateDamage = triggeringDamage + owner.GetPowerAmount<StrengthPower>();
+            retaliateDamage += JingRuiPower.GetVigilDamageBonus(owner, retaliateDamage);
             if (owner.Player?.GetRelic<PersonalityDerivativePandaMeng>() != null)
                 retaliateDamage += PandaPersonaHelper.GetEnemyAttackIntentSum(owner);
             if (retaliateDamage <= 0m)

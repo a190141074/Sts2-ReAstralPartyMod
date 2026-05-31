@@ -459,5 +459,12 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_FENG_SHUI.flavor": "命理可以拿来算局，也可以拿来压人。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_FORTUNE_MISCHANCE.title": "【人格衍生：福祸相依】",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_FORTUNE_MISCHANCE.description": "· 初始层数为[blue]0[/blue]，最多[blue]9[/blue]层。\n· 在总楼层个位数为[blue]1[/blue]或[blue]6[/blue]时，层数+[blue]1[/blue]。\n· 回合开始时，刷新[gold]节点[/gold]为[blue]1[/blue]到[blue]10[/blue]。若为[blue]1[/blue]，对所有单位造成[blue]1[/blue]点伤害，并使【人格衍生：福祸相依】层数+[blue]1[/blue]；若为[blue]6[/blue]，【人格衍生：福祸相依】层数+[blue]1[/blue]。\n· 【人格：枫】使用[gold]运功[/gold]时，层数+[blue]1[/blue]。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_FORTUNE_MISCHANCE.flavor": "吉凶本来就是绑在一起算的。"
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_FORTUNE_MISCHANCE.flavor": "吉凶本来就是绑在一起算的。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_TWELVE_FLOWERS_CUP.title": "【异格：十二花卉杯】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_TWELVE_FLOWERS_CUP.description": "· 开战先将[blue]1[/blue]张[gold]十二香梦[/gold]加入手中，此后每[blue]4[/blue]回合开始时再加入[blue]1[/blue]张。\n· 你不能主动打出任意费用不低于[blue]1[/blue]的攻击牌；回合结束时可保留任意数量的攻击牌。\n· 当任意玩家受到未被格挡的伤害时，获得[blue]1[/blue]层[gold]惊蕊[/gold]；每累计获得[blue]3[/blue]层[gold]惊蕊[/gold]，获得[blue]1[/blue]层[gold]礼弹[/gold]，每回合最多因此触发[blue]3[/blue]次。\n· 带有[gold]落花[/gold]的敌方单位被击败时，自身立刻获得{energyPrefix:energyIcons(2)}；该效果每间隔[blue]2[/blue]个全局回合最多触发[blue]1[/blue]次。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_TWELVE_FLOWERS_CUP.flavor": "不是粉彩也不是斗彩，是五彩十二花卉杯。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_TWELVE_FLOWERS_CUP.retain_select_prompt": "选择要保留的攻击牌",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_POEM_GATHERING.title": "【人格衍生：四时干花书签】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_POEM_GATHERING.description": "· 你的回合结束时，获得[blue]1+玩家数量/2[/blue]层[gold]礼弹[/gold]（向下取整）。\n· 当你触发[gold]警戒反击[/gold]时，先失去当前生命值的[blue]10%[/blue]，并为本次反击目标施加[blue]1[/blue]层[gold]花藏不见[/gold]。\n· 当你进行[gold]警戒反击[/gold]时，若目标有护盾，则最终伤害提高[blue]25%[/blue]；该次结算完成后，自身回复最大生命值的[blue]10%[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_POEM_GATHERING.flavor": "清香和宿雨，佳色出晴烟。"
 }

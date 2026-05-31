@@ -269,5 +269,20 @@
   "RE_ASTRAL_PARTY_MOD_POWER_COIN_FRONT_POWER.smartDescription": "",
   "RE_ASTRAL_PARTY_MOD_POWER_COIN_BACK_POWER.title": "Coin: Tails",
   "RE_ASTRAL_PARTY_MOD_POWER_COIN_BACK_POWER.description": "",
-  "RE_ASTRAL_PARTY_MOD_POWER_COIN_BACK_POWER.smartDescription": ""
+  "RE_ASTRAL_PARTY_MOD_POWER_COIN_BACK_POWER.smartDescription": "",
+  "RE_ASTRAL_PARTY_MOD_POWER_FALLEN_FLOWER_POWER.title": "Fallen Flower",
+  "RE_ASTRAL_PARTY_MOD_POWER_FALLEN_FLOWER_POWER.description": "Damage taken is increased by [blue]12%[/blue].\nLasts [blue]2[/blue] turns. Reapplying refreshes the duration.",
+  "RE_ASTRAL_PARTY_MOD_POWER_FALLEN_FLOWER_POWER.smartDescription": "Take [blue]12%[/blue] more damage. Lasts [blue]2[/blue] turns; reapplying refreshes it.",
+  "RE_ASTRAL_PARTY_MOD_POWER_FLOWER_HIDDEN_UNSEEN_POWER.title": "Flower Hidden Unseen",
+  "RE_ASTRAL_PARTY_MOD_POWER_FLOWER_HIDDEN_UNSEEN_POWER.description": "Only damage taken from [power]Vigil Counter[/power] is increased, by [blue]12%[/blue] per stack.\nLasts [blue]2[/blue] turns, up to [blue]2[/blue] stacks.",
+  "RE_ASTRAL_PARTY_MOD_POWER_FLOWER_HIDDEN_UNSEEN_POWER.smartDescription": "Only amplifies [power]Vigil Counter[/power] damage taken. Lasts [blue]2[/blue] turns, up to [blue]2[/blue] stacks.",
+  "RE_ASTRAL_PARTY_MOD_POWER_JING_RUI_POWER.title": "Jing Rui",
+  "RE_ASTRAL_PARTY_MOD_POWER_JING_RUI_POWER.description": "Your [power]Counter[/power] and [power]Vigil Counter[/power] damage is increased by [blue]5%[/blue] per stack. Maximum [blue]12[/blue] stacks.",
+  "RE_ASTRAL_PARTY_MOD_POWER_JING_RUI_POWER.smartDescription": "Increases [power]Counter[/power] and [power]Vigil Counter[/power] damage. Maximum [blue]12[/blue] stacks.",
+  "RE_ASTRAL_PARTY_MOD_POWER_CEREMONIAL_BOMB_POWER.title": "Ceremonial Bomb",
+  "RE_ASTRAL_PARTY_MOD_POWER_CEREMONIAL_BOMB_POWER.description": "Whenever any player takes damage, consume [blue]1[/blue] stack and trigger [power]Vigil Counter[/power]. Multi-target damage checks each damaged player separately.",
+  "RE_ASTRAL_PARTY_MOD_POWER_CEREMONIAL_BOMB_POWER.smartDescription": "When any player takes damage, consume a stack and trigger [power]Vigil Counter[/power].",
+  "RE_ASTRAL_PARTY_MOD_POWER_VIGIL_COUNTER_POWER.title": "Vigil Counter",
+  "RE_ASTRAL_PARTY_MOD_POWER_VIGIL_COUNTER_POWER.description": "Against the damage source, automatically play the first valid Attack card in your hand from left to right. If none is available, draw the first Attack card in your draw pile that costs [blue]1[/blue] or less and play it immediately.",
+  "RE_ASTRAL_PARTY_MOD_POWER_VIGIL_COUNTER_POWER.smartDescription": "Auto-play a valid Attack from hand first; otherwise draw and immediately play a low-cost Attack from the draw pile."
 }
