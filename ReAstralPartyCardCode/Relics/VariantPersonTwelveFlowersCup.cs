@@ -241,20 +241,21 @@ public class VariantPersonTwelveFlowersCup : CooldownPersonaRelicBase
         if (Owner == null)
             return;
 
-        var attackCards = PileType.Hand.GetPile(Owner).Cards.Where(card => card.Type == CardType.Attack).ToList();
-        if (attackCards.Count == 0)
+        var eligibleAttackCount = PileType.Hand.GetPile(Owner).Cards.Count(card =>
+            card.Type == CardType.Attack && !card.ShouldRetainThisTurn);
+        if (eligibleAttackCount == 0)
             return;
 
-        var prefs = new CardSelectorPrefs(RetainSelectionPrompt, 0, attackCards.Count)
+        var prefs = new CardSelectorPrefs(RetainSelectionPrompt, 0, eligibleAttackCount)
         {
             Cancelable = true
         };
 
-        var selectedCards = await DeterministicMultiplayerChoiceHelper.SelectHandCardsForPlayer(
+        var selectedCards = await CardSelectCmd.FromHand(
             choiceContext,
             Owner,
             prefs,
-            card => card.Type == CardType.Attack,
+            card => card.Type == CardType.Attack && !card.ShouldRetainThisTurn,
             this);
 
         foreach (var card in selectedCards)

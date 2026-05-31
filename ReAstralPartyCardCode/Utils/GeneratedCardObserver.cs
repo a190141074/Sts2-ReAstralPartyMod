@@ -62,7 +62,7 @@ public static class GeneratedCardObserver
                     if (relic == null)
                         continue;
 
-                    await relic.HandleObservedCardGain(recipient, card);
+                    await relic.HandleObservedCardGain(recipient, source);
                 }
             }
             finally

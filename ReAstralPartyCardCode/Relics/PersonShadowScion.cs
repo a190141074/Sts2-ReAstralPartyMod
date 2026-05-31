@@ -84,10 +84,10 @@ public class PersonShadowScion : CooldownPersonaRelicBase
         if (Owner?.Creature?.CombatState == null || card.Owner == null)
             return;
 
-        await HandleObservedCardGain(card.Owner, card);
+        await HandleObservedCardGain(card.Owner, CardGainAttribution.Source);
     }
 
-    internal async Task HandleObservedCardGain(Player recipient, CardModel? source)
+    internal async Task HandleObservedCardGain(Player recipient, AbstractModel? source)
     {
         if (Owner?.Creature == null || recipient.Creature == null)
             return;
@@ -96,13 +96,15 @@ public class PersonShadowScion : CooldownPersonaRelicBase
         if (!CardGainAttribution.IsCausedBy(Owner))
             return;
 
+        var cardSource = source as CardModel;
+
         Flash();
         await PowerCmd.Apply(
             ModelDb.Power<StarLightPower>().ToMutable(),
             Owner.Creature,
             1m,
             Owner.Creature,
-            source,
+            cardSource,
             false
         );
 
@@ -111,7 +113,7 @@ public class PersonShadowScion : CooldownPersonaRelicBase
             recipient.Creature,
             1m,
             Owner.Creature,
-            source,
+            cardSource,
             false
         );
     }

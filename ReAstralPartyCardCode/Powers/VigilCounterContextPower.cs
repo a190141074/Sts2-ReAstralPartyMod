@@ -36,4 +36,14 @@ public class VigilCounterContextPower : AstralPartyPowerModel
 
         return bonus;
     }
+
+    public override bool ShouldPlay(CardModel card, AutoPlayType autoPlayType)
+    {
+        if (Owner == null || autoPlayType != AutoPlayType.Default)
+            return base.ShouldPlay(card, autoPlayType);
+
+        return VigilCounterCombatHelper.IsCurrentVigilCard(card, Owner)
+            ? true
+            : base.ShouldPlay(card, autoPlayType);
+    }
 }
