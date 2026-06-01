@@ -191,9 +191,9 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
             return;
         }
 
-        await EventDeckCardMutationHelper.Upgrade(
+        await EventDeckCardMutationHelper.UpgradeSingleWithSmithPreview(
             Owner,
-            [selectedCard],
+            selectedCard,
             "dream_endless_mouth_of_destruction.first_strengthen");
         MainFile.Logger.Info(
             $"[{LogTag}] {LogTag} strengthen success | owner={Owner.NetId} | attempt=1 | cost=0 | failureChance=0 | roll=0 | upgradedCard={selectedCard.Id.Entry}");
@@ -263,9 +263,9 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
         }
         else
         {
-            await EventDeckCardMutationHelper.Upgrade(
+            await EventDeckCardMutationHelper.UpgradeSingleWithSmithPreview(
                 Owner,
-                [selectedCard],
+                selectedCard,
                 $"dream_endless_mouth_of_destruction.upgrade.{attemptNumber}");
             MainFile.Logger.Info(
                 $"[{LogTag}] {LogTag} strengthen success | owner={Owner.NetId} | attempt={attemptNumber} | cost={cost} | failureChance={failureChance} | roll={roll} | upgradedCard={selectedCard.Id.Entry}");

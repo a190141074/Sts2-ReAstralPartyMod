@@ -1,18 +1,23 @@
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Nodes.Cards;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
+using System.Reflection;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class EventDeckCardMutationHelper
 {
     private const int MaxSynchronizerWaitFrames = 60;
+    private static readonly MethodInfo? UpgradeWithPreviewMethod = ResolveUpgradeWithPreviewMethod();
+    private static readonly object? HorizontalLayoutPreviewStyle = ResolveHorizontalLayoutPreviewStyle();
 
     private enum DeckMutationKind
     {
@@ -26,6 +31,64 @@ internal static class EventDeckCardMutationHelper
         var cardsToMutate = await SynchronizeDeckCards(owner, selectedCards, DeckMutationKind.Upgrade, context);
         foreach (var card in cardsToMutate)
             CardCmd.Upgrade(card);
+    }
+
+    public static async Task UpgradeSingleWithSmithPreview(Player owner, CardModel selectedCard, string context)
+    {
+        ArgumentNullException.ThrowIfNull(selectedCard);
+
+        var cardsToMutate = await SynchronizeDeckCards(owner, [selectedCard], DeckMutationKind.Upgrade, context);
+        var cardToMutate = cardsToMutate.FirstOrDefault();
+        if (cardToMutate == null)
+            return;
+
+        if (UpgradeWithPreviewMethod != null && HorizontalLayoutPreviewStyle != null)
+        {
+            UpgradeWithPreviewMethod.Invoke(null, new object?[] { new[] { cardToMutate }, HorizontalLayoutPreviewStyle });
+        }
+        else
+        {
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}] Smith preview upgrade reflection unavailable; falling back to plain upgrade | owner={owner.NetId} | context={context}");
+            CardCmd.Upgrade(cardToMutate);
+        }
+
+        if (cardToMutate.Pile?.Type != PileType.Deck)
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}] Event single upgrade replayed on non-deck pile | owner={owner.NetId} | context={context} | pile={cardToMutate.Pile?.Type.ToString() ?? "<null>"}");
+    }
+
+    private static MethodInfo? ResolveUpgradeWithPreviewMethod()
+    {
+        return typeof(CardCmd)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .FirstOrDefault(static method =>
+            {
+                if (!string.Equals(method.Name, nameof(CardCmd.Upgrade), StringComparison.Ordinal))
+                    return false;
+
+                var parameters = method.GetParameters();
+                return parameters.Length == 2
+                       && typeof(IEnumerable<CardModel>).IsAssignableFrom(parameters[0].ParameterType)
+                       && parameters[1].ParameterType.IsEnum
+                       && parameters[1].ParameterType.Name.Contains("CardPreviewStyle", StringComparison.Ordinal);
+            });
+    }
+
+    private static object? ResolveHorizontalLayoutPreviewStyle()
+    {
+        var previewStyleType = UpgradeWithPreviewMethod?.GetParameters().ElementAtOrDefault(1)?.ParameterType;
+        if (previewStyleType == null)
+            return null;
+
+        try
+        {
+            return Enum.Parse(previewStyleType, "HorizontalLayout", ignoreCase: false);
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     public static async Task Downgrade(Player owner, IReadOnlyList<CardModel> selectedCards, string context)

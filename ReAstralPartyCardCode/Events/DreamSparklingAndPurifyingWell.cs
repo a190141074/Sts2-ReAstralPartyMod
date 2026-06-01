@@ -75,9 +75,9 @@ public sealed class DreamSparklingAndPurifyingWell : AstralPartyEventModel
             return;
         }
 
-        await EventDeckCardMutationHelper.Upgrade(
+        await EventDeckCardMutationHelper.UpgradeSingleWithSmithPreview(
             Owner,
-            [selectedCard],
+            selectedCard,
             "dream_sparkling_and_purifying_well.upgrade_one");
         SetEventFinished(PageDescription("UPGRADE_FINISH"));
     }
