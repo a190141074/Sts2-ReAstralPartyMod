@@ -1,16 +1,14 @@
 using Godot;
 using MegaCrit.Sts2.Core.Nodes.Events;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
 internal static class NeowDreamFaceTheShadowIconPatch
 {
-    private const string DreamFaceTheShadowTextKey =
-        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW";
     private const string StartingPersonaReadyTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.options.READY";
 
-    private const string DreamFaceTheShadowIconPath = "res://ReAstralPartyMod/images/ancient/dream_face_the_shadow.png";
     private const string StartingPersonaReadyIconPath = "res://ReAstralPartyMod/images/ancient/starting_persona_ready.png";
 
     public static void Postfix(NEventOptionButton __instance)
@@ -46,8 +44,9 @@ internal static class NeowDreamFaceTheShadowIconPatch
 
     private static string? ResolveIconPath(string? textKey)
     {
-        if (string.Equals(textKey, DreamFaceTheShadowTextKey, StringComparison.OrdinalIgnoreCase))
-            return DreamFaceTheShadowIconPath;
+        var customIconPath = NeowOptionInjectionHelper.ResolveCustomNeowOptionIconPath(textKey);
+        if (customIconPath != null)
+            return customIconPath;
 
         if (string.Equals(textKey, StartingPersonaReadyTextKey, StringComparison.OrdinalIgnoreCase))
             return StartingPersonaReadyIconPath;

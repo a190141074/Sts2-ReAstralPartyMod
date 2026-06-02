@@ -6,5 +6,7 @@
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY_WAITING.options.WAITING.title": "Waiting for Host",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY_WAITING.options.WAITING.description": "Only the host can start the persona selection. Please wait for the host.",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW.title": "Dream - Face the Shadow",
-  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW.description": "Add [card]Forgotten Roar[/card] to your deck."
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW.description": "Add [card]Forgotten Roar[/card] to your deck.",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.RING_OF_SEVEN_CURSES.title": "Ring of Seven Curses",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.RING_OF_SEVEN_CURSES.description": "Gain [gold]Enigmatic Relic - Seven Curses[/gold], then automatically gain [gold]Enigmatic Relic - Seven Blessings[/gold]."
 }

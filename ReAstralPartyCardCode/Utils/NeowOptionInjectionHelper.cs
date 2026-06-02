@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Saves;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 using STS2RitsuLib;
 using STS2RitsuLib.Scaffolding.Ancients.Options;
@@ -15,8 +16,15 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class NeowOptionInjectionHelper
 {
+    private const string CandidatePoolVersion = "v1";
     private const string DreamFaceTheShadowTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW";
+    private const string RingOfSevenCursesTextKey =
+        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.RING_OF_SEVEN_CURSES";
+    private const string DreamFaceTheShadowIconPath =
+        "res://ReAstralPartyMod/images/ancient/dream_face_the_shadow.png";
+    private const string RingOfSevenCursesIconPath =
+        "res://ReAstralPartyMod/images/relic/enigmatic_seven_curses.png";
     private static readonly string[] CardCollectionMemberNames =
     [
         "Cards",
@@ -40,22 +48,71 @@ internal static class NeowOptionInjectionHelper
 
     private static readonly IReadOnlyList<IHoverTip> ForgottenRoarHoverTips =
         [HoverTipFactory.FromCard<UltimateSkillForgottenRoar>()];
+    private static readonly IReadOnlyList<IHoverTip> RingOfSevenCursesHoverTips =
+        [.. HoverTipFactory.FromRelic<EnigmaticSevenCurses>()];
 
     public static void Register()
     {
         MainFile.Logger.Info(
-            "[NeowOptionInjectionHelper] Registering Dream Face the Shadow through RitsuLib ancient-option registry.");
+            "[NeowOptionInjectionHelper] Registering randomized custom Neow option pool through RitsuLib ancient-option registry.");
         RitsuLibFramework.RegisterAncientOption<Neow>(
             MainFile.ModId,
-            ModAncientOptionRule.Single(CreateDreamFaceTheShadowOption));
+            ModAncientOptionRule.Single(CreateRandomCustomNeowOption));
     }
 
-    private static EventOption? CreateDreamFaceTheShadowOption(AncientEventModel ancient)
+    public static string? ResolveCustomNeowOptionIconPath(string? textKey)
     {
-        return new EventOption(ancient, () => ChooseDreamFaceTheShadow(ancient), DreamFaceTheShadowTextKey)
+        foreach (var candidate in BuildCandidateDefinitions())
         {
-            HoverTips = ForgottenRoarHoverTips
-        };
+            if (string.Equals(textKey, candidate.TextKey, StringComparison.OrdinalIgnoreCase))
+                return candidate.IconPath;
+        }
+
+        return null;
+    }
+
+    private static EventOption? CreateRandomCustomNeowOption(AncientEventModel ancient)
+    {
+        var availableCandidates = BuildCandidateDefinitions()
+            .Where(candidate => candidate.Condition?.Invoke(ancient) ?? true)
+            .OrderBy(candidate => candidate.StableKey, StringComparer.Ordinal)
+            .ToList();
+        if (availableCandidates.Count == 0)
+            return null;
+
+        var selectedIndex = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+            0,
+            availableCandidates.Count,
+            MainFile.ModId,
+            nameof(Neow),
+            "custom_option_pool",
+            CandidatePoolVersion,
+            ancient.Owner?.RunState?.Rng.StringSeed ?? "<null_seed>",
+            ancient.Owner?.RunState?.CurrentActIndex ?? -1,
+            ancient.Owner?.NetId.ToString() ?? "<null_owner>");
+        var selectedCandidate = availableCandidates[selectedIndex];
+        MainFile.Logger.Info(
+            $"[NeowOptionInjectionHelper] Selected custom Neow option | key={selectedCandidate.StableKey} | poolSize={availableCandidates.Count} | selectedIndex={selectedIndex}.");
+        return selectedCandidate.CreateOption(ancient);
+    }
+
+    private static IReadOnlyList<NeowOptionCandidateDefinition> BuildCandidateDefinitions()
+    {
+        return
+        [
+            new(
+                "dream_face_the_shadow",
+                DreamFaceTheShadowTextKey,
+                DreamFaceTheShadowIconPath,
+                ForgottenRoarHoverTips,
+                ChooseDreamFaceTheShadow),
+            new(
+                "ring_of_seven_curses",
+                RingOfSevenCursesTextKey,
+                RingOfSevenCursesIconPath,
+                RingOfSevenCursesHoverTips,
+                ChooseRingOfSevenCurses)
+        ];
     }
 
     private static async Task ChooseDreamFaceTheShadow(AncientEventModel ancient)
@@ -65,6 +122,16 @@ internal static class NeowOptionInjectionHelper
                         "Neow had no owner when Dream Face the Shadow was chosen.");
 
         await AddDreamFaceTheShadowCardToDeck(owner);
+        CompleteAncient(ancient);
+    }
+
+    private static async Task ChooseRingOfSevenCurses(AncientEventModel ancient)
+    {
+        var owner = ancient.Owner
+                    ?? throw new InvalidOperationException(
+                        "Neow had no owner when Ring of Seven Curses was chosen.");
+
+        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<EnigmaticSevenCurses>());
         CompleteAncient(ancient);
     }
 
@@ -191,5 +258,22 @@ internal static class NeowOptionInjectionHelper
             throw new InvalidOperationException("Failed to resolve AncientEventModel.Done via reflection.");
 
         DoneMethod.Invoke(ancient, null);
+    }
+
+    private sealed record NeowOptionCandidateDefinition(
+        string StableKey,
+        string TextKey,
+        string IconPath,
+        IReadOnlyList<IHoverTip> HoverTips,
+        Func<AncientEventModel, Task> OnChosen,
+        Func<AncientEventModel, bool>? Condition = null)
+    {
+        public EventOption CreateOption(AncientEventModel ancient)
+        {
+            return new EventOption(ancient, () => OnChosen(ancient), TextKey)
+            {
+                HoverTips = HoverTips
+            };
+        }
     }
 }

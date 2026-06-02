@@ -50,6 +50,15 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         }
 
         await RingOfSevenCursesHelper.EnsureRelicPairAsync<EnigmaticSevenBlessings>(Owner);
+        CursedScrollGrabBagHelper.NormalizeForOwner(Owner);
+        EnigmaticCursedScroll.RefreshCounterForOwner(Owner);
+    }
+
+    public override async Task AfterRemoved()
+    {
+        CursedScrollGrabBagHelper.NormalizeForOwner(Owner);
+        EnigmaticCursedScroll.RefreshCounterForOwner(Owner);
+        await base.AfterRemoved();
     }
 
     public override decimal ModifyDamageMultiplicative(

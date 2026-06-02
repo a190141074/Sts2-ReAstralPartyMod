@@ -23,21 +23,31 @@ public class EnigmaticCursedScroll : AstralPartyRelicModel
 
     public override int DisplayAmount => CursedScrollDeckHelper.GetWeightedCurseCount(Owner);
 
+    internal void RefreshCounter()
+    {
+        InvokeDisplayAmountChanged();
+    }
+
+    internal static void RefreshCounterForOwner(Player? owner)
+    {
+        owner?.GetRelic<EnigmaticCursedScroll>()?.RefreshCounter();
+    }
+
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        InvokeDisplayAmountChanged();
+        RefreshCounter();
     }
 
     public override Task BeforeCombatStart()
     {
-        InvokeDisplayAmountChanged();
+        RefreshCounter();
         return Task.CompletedTask;
     }
 
     public override Task AfterCombatEnd(CombatRoom room)
     {
-        InvokeDisplayAmountChanged();
+        RefreshCounter();
         return Task.CompletedTask;
     }
 
@@ -46,7 +56,7 @@ public class EnigmaticCursedScroll : AstralPartyRelicModel
         if (player != Owner)
             return;
 
-        InvokeDisplayAmountChanged();
+        RefreshCounter();
 
         var extraDraw = CursedScrollDeckHelper.GetExtraDrawCount(
             CursedScrollDeckHelper.GetWeightedCurseCount(Owner));

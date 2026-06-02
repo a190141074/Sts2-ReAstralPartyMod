@@ -1,5 +1,6 @@
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -9,6 +10,7 @@ internal static class CursedScrollDeckHelper
     private const decimal GoldGainBonusPerWeightedCurse = 0.10m;
     private const decimal HealGainBonusPerWeightedCurse = 0.06m;
     private const int ExtraDrawDivisor = 3;
+    private const int SevenCursesBonusWeightedCount = 7;
 
     public static int GetWeightedCurseCount(Player? owner)
     {
@@ -23,6 +25,9 @@ internal static class CursedScrollDeckHelper
 
             weightedCount += card.Keywords.Contains(CardKeyword.Eternal) ? 2 : 1;
         }
+
+        if (owner.GetRelic<EnigmaticSevenCurses>() != null)
+            weightedCount += SevenCursesBonusWeightedCount;
 
         return weightedCount;
     }

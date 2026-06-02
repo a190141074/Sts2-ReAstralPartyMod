@@ -17,6 +17,7 @@ internal static class RelicGrabBagPopulateSeriesFilterPatch
             return;
 
         RemoveLockedSeriesRelics(__instance, player.RunState);
+        CursedScrollGrabBagHelper.Normalize(__instance, player);
         AstralNeowDiagnosticHelper.ReportGrabBagRaritySnapshot(__instance, player);
     }
 
