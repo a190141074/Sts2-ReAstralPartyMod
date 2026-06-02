@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
+using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -28,6 +31,94 @@ internal static class RingOfSevenCursesHelper
             return;
 
         await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, canonicalRelic);
+    }
+
+    public static async Task EnsureSeriesIntegrityAsync(Player? owner)
+    {
+        if (owner == null)
+            return;
+
+        var curses = owner.GetRelic<EnigmaticSevenCurses>();
+        var blessings = owner.GetRelic<EnigmaticSevenBlessings>();
+        if (curses == null && blessings == null)
+            return;
+
+        if (curses == null)
+            await ObtainRelicIgnoringBanAsync<EnigmaticSevenCurses>(owner);
+        else if (blessings == null)
+            await ObtainRelicIgnoringBanAsync<EnigmaticSevenBlessings>(owner);
+
+        SyncSeriesRewardFlags(owner);
+    }
+
+    public static bool ShouldGrantSevenCursesMaxHpBonus(Player? owner, EnigmaticSevenCurses self)
+    {
+        return !(self.AstralParty_SevenCursesMaxHpBonusGranted ||
+                 owner?.GetRelic<EnigmaticSevenBlessings>()?.AstralParty_SevenCursesMaxHpBonusGranted == true);
+    }
+
+    public static bool ShouldGrantSevenBlessingsPotionSlots(Player? owner, EnigmaticSevenBlessings self)
+    {
+        return !(self.AstralParty_SevenBlessingsPotionSlotsGranted ||
+                 owner?.GetRelic<EnigmaticSevenCurses>()?.AstralParty_SevenBlessingsPotionSlotsGranted == true);
+    }
+
+    public static void MarkSevenCursesMaxHpBonusGranted(Player? owner)
+    {
+        if (owner == null)
+            return;
+
+        var curses = owner.GetRelic<EnigmaticSevenCurses>();
+        if (curses != null)
+            curses.AstralParty_SevenCursesMaxHpBonusGranted = true;
+
+        var blessings = owner.GetRelic<EnigmaticSevenBlessings>();
+        if (blessings != null)
+            blessings.AstralParty_SevenCursesMaxHpBonusGranted = true;
+    }
+
+    public static void MarkSevenBlessingsPotionSlotsGranted(Player? owner)
+    {
+        if (owner == null)
+            return;
+
+        var curses = owner.GetRelic<EnigmaticSevenCurses>();
+        if (curses != null)
+            curses.AstralParty_SevenBlessingsPotionSlotsGranted = true;
+
+        var blessings = owner.GetRelic<EnigmaticSevenBlessings>();
+        if (blessings != null)
+            blessings.AstralParty_SevenBlessingsPotionSlotsGranted = true;
+    }
+
+    public static void SyncSeriesRewardFlags(Player? owner)
+    {
+        if (owner == null)
+            return;
+
+        var curses = owner.GetRelic<EnigmaticSevenCurses>();
+        var blessings = owner.GetRelic<EnigmaticSevenBlessings>();
+        if (curses == null && blessings == null)
+            return;
+
+        var sevenCursesGranted =
+            (curses?.AstralParty_SevenCursesMaxHpBonusGranted ?? false) ||
+            (blessings?.AstralParty_SevenCursesMaxHpBonusGranted ?? false);
+        var sevenBlessingsGranted =
+            (curses?.AstralParty_SevenBlessingsPotionSlotsGranted ?? false) ||
+            (blessings?.AstralParty_SevenBlessingsPotionSlotsGranted ?? false);
+
+        if (curses != null)
+        {
+            curses.AstralParty_SevenCursesMaxHpBonusGranted = sevenCursesGranted;
+            curses.AstralParty_SevenBlessingsPotionSlotsGranted = sevenBlessingsGranted;
+        }
+
+        if (blessings != null)
+        {
+            blessings.AstralParty_SevenCursesMaxHpBonusGranted = sevenCursesGranted;
+            blessings.AstralParty_SevenBlessingsPotionSlotsGranted = sevenBlessingsGranted;
+        }
     }
 
     public static bool RollPermille(
@@ -81,6 +172,18 @@ internal static class RingOfSevenCursesHelper
         }
 
         return false;
+    }
+
+    private static async Task ObtainRelicIgnoringBanAsync<TMissing>(Player owner)
+        where TMissing : RelicModel
+    {
+        if (owner.GetRelic<TMissing>() != null)
+            return;
+
+        var canonicalRelic = ModelDb.Relic<TMissing>().CanonicalInstance ?? ModelDb.Relic<TMissing>();
+        ExclusiveRelicUnlockHelper.MarkRelicUnlockedForCurrentRunAndProfile(owner, canonicalRelic);
+        SaveManager.Instance?.MarkRelicAsSeen(canonicalRelic);
+        await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
     }
 
     private static List<CardModel> GetRewardCandidates(

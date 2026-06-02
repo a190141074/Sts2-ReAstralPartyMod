@@ -15,7 +15,7 @@ public class EnigmaticTheAcknowledgment : AstralPartyCardModel
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Unplayable, CardKeyword.Eternal];
 
     public EnigmaticTheAcknowledgment()
-        : base(-2, CardType.Curse, CardRarity.Ancient, TargetType.Self, showInCardLibrary: false)
+        : base(-2, CardType.Curse, CardRarity.Rare, TargetType.Self, showInCardLibrary: false)
     {
     }
 

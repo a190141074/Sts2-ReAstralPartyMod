@@ -35,6 +35,8 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsPendingExtraCardRewardCount { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsEnemyDeathRollSequence { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsSelfKillRollSequence { get; set; }
+    [SavedProperty] public bool AstralParty_SevenCursesMaxHpBonusGranted { get; set; }
+    [SavedProperty] public bool AstralParty_SevenBlessingsPotionSlotsGranted { get; set; }
 
     protected override string RelicId => "enigmatic_seven_blessings";
 
@@ -45,8 +47,14 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        await PlayerCmd.GainMaxPotionCount(PotionSlotsBonus, Owner);
+        if (RingOfSevenCursesHelper.ShouldGrantSevenBlessingsPotionSlots(Owner, this))
+        {
+            await PlayerCmd.GainMaxPotionCount(PotionSlotsBonus, Owner);
+            RingOfSevenCursesHelper.MarkSevenBlessingsPotionSlotsGranted(Owner);
+        }
+
         await RingOfSevenCursesHelper.EnsureRelicPairAsync<EnigmaticSevenCurses>(Owner);
+        RingOfSevenCursesHelper.SyncSeriesRewardFlags(Owner);
     }
 
     public override Task BeforeCombatStart()
@@ -136,6 +144,11 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         AstralParty_EnigmaticSevenBlessingsEnemyDeathRollSequence = 0;
         AstralParty_EnigmaticSevenBlessingsSelfKillRollSequence = 0;
         return Task.CompletedTask;
+    }
+
+    public override async Task AfterRoomEntered(AbstractRoom room)
+    {
+        await RingOfSevenCursesHelper.EnsureSeriesIntegrityAsync(Owner);
     }
 
     public override bool TryModifyRestSiteOptions(Player player, ICollection<RestSiteOption> options)

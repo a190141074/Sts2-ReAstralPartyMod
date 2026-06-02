@@ -14,7 +14,9 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -29,12 +31,16 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
     private const decimal BlockGainMultiplier = 0.7m;
     private const decimal ShopSelfDamagePercent = 0.07m;
     private const decimal MaxHpLossPercentOnPreventedDeath = 0.10m;
+    private const decimal AcknowledgmentBurnAmount = 1m;
 
     private bool _isGrowingExistingDebuffs;
 
+    [SavedProperty] public bool AstralParty_SevenCursesMaxHpBonusGranted { get; set; }
+    [SavedProperty] public bool AstralParty_SevenBlessingsPotionSlotsGranted { get; set; }
+
     protected override string RelicId => "enigmatic_seven_curses";
 
-    public override RelicRarity Rarity => RelicRarity.Rare;
+    public override RelicRarity Rarity => RelicRarity.Ancient;
 
     public override bool ShouldReceiveCombatHooks => true;
 
@@ -42,15 +48,18 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
     {
         await base.AfterObtained();
 
-        if (Owner?.Creature != null)
+        if (RingOfSevenCursesHelper.ShouldGrantSevenCursesMaxHpBonus(Owner, this) && Owner?.Creature != null)
         {
             await CreatureCmd.GainMaxHp(Owner.Creature, MaxHpBonus);
             var missingHeal = Math.Max(0m, Owner.Creature.MaxHp - Owner.Creature.CurrentHp);
             if (missingHeal > 0m)
                 await CreatureCmd.Heal(Owner.Creature, missingHeal, false);
+
+            RingOfSevenCursesHelper.MarkSevenCursesMaxHpBonusGranted(Owner);
         }
 
         await RingOfSevenCursesHelper.EnsureRelicPairAsync<EnigmaticSevenBlessings>(Owner);
+        RingOfSevenCursesHelper.SyncSeriesRewardFlags(Owner);
         CursedScrollGrabBagHelper.NormalizeForOwner(Owner);
         if (Owner != null)
         {
@@ -85,10 +94,31 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         if (target.CombatState?.Encounter?.RoomType is RoomType.Elite or RoomType.Boss)
             return 1m;
 
-        if (Owner.PlayerCombatState?.Hand?.Cards.Any(EnigmaticAcknowledgmentDeckHelper.IsAcknowledgmentCard) == true)
+        if (HasAcknowledgmentInHand())
             return 1m;
 
         return NonEliteBossDamageMultiplier;
+    }
+
+    public override async Task AfterDamageGiven(
+        PlayerChoiceContext choiceContext,
+        Creature? dealer,
+        DamageResult result,
+        ValueProp props,
+        Creature target,
+        CardModel? cardSource)
+    {
+        if (Owner?.Creature == null || dealer != Owner.Creature)
+            return;
+        if (!HasAcknowledgmentInHand())
+            return;
+        if (target.Side == Owner.Creature.Side || !target.IsAlive)
+            return;
+        if (result.TotalDamage <= 0m)
+            return;
+
+        Flash();
+        await PowerCmd.Apply<BlazingSolarBurnPower>(target, AcknowledgmentBurnAmount, Owner.Creature, cardSource, false);
     }
 
     public override decimal ModifyBlockMultiplicative(
@@ -105,6 +135,8 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
 
     public override async Task AfterRoomEntered(AbstractRoom room)
     {
+        await RingOfSevenCursesHelper.EnsureSeriesIntegrityAsync(Owner);
+
         if (Owner?.Creature == null || room.RoomType != RoomType.Shop)
             return;
 
@@ -195,5 +227,10 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             options.Remove(option);
 
         return healOptions.Count > 0;
+    }
+
+    private bool HasAcknowledgmentInHand()
+    {
+        return Owner?.PlayerCombatState?.Hand?.Cards.Any(EnigmaticAcknowledgmentDeckHelper.IsAcknowledgmentCard) == true;
     }
 }

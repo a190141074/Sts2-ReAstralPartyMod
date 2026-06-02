@@ -204,7 +204,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_EXPIRED_LUNCH.title": "Expired Lunch",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_EXPIRED_LUNCH.description": "Apply [blue]3[/blue] [poison]Poison[/poison].",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_THE_ACKNOWLEDGMENT.title": "Enigmatic Relic: Proof of Revelation",
-  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_THE_ACKNOWLEDGMENT.description": "While this is in your hand, ignore the damage reduction from the fourth curse of Ring of Seven Curses.",
+  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_THE_ACKNOWLEDGMENT.description": "While this is in your hand, ignore the damage reduction from the fourth curse of Ring of Seven Curses. Also, any damage you deal applies [blue]1[/blue] [power]Blazing Solar Burn[/power] to the target.",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_THE_ACKNOWLEDGMENT.flavor": "\"The light of revelation burns those who refuse to believe.\"",
   "RE_ASTRAL_PARTY_MOD_CARD_ORIGINAL_ENHANCED_TYRANT_FORM.title": "Tyrant Form",
   "RE_ASTRAL_PARTY_MOD_CARD_ORIGINAL_ENHANCED_TYRANT_FORM.description": "[ethereal]Ethereal[/ethereal]\nForge {Forge:diff()}.\nEnd your turn.\nYou cannot manually play [card]Sovereign Blade[/card]. Instead, at the end of each turn, automatically play [card]Sovereign Blade[/card] from anywhere, then return it to your hand after it is played.",
