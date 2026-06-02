@@ -17,8 +17,12 @@ public static class ExclusiveRelicUnlockHelper
         ModelDb.Relic<TokenBlueDie10>(),
         ModelDb.Relic<TokenBlueDie12>(),
         ModelDb.Relic<TokenBlueDie20>(),
-        ModelDb.Relic<PvzHyperTemporalNut>(),
-        ModelDb.Relic<PvzUltimateHyperSpacetimeNut>()
+        ModelDb.Relic<PvzRareHyperTemporalNut>(),
+        ModelDb.Relic<PvzRareSunshineNut>(),
+        ModelDb.Relic<PvzRareBigMouthedNut>(),
+        ModelDb.Relic<PvzRareAngmaoNut>(),
+        ModelDb.Relic<PvzUltimateHyperSpacetimeNut>(),
+        ModelDb.Relic<PvzUltimateSunshineEmperorNut>()
     ];
 
     private static readonly HashSet<ModelId> ExclusiveRelicIds = ExclusiveRelics

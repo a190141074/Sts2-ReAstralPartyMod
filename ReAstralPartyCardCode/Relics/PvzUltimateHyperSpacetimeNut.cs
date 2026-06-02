@@ -44,6 +44,8 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
     [SavedProperty] public int AstralParty_PvzUltimateHyperSpacetimeNutDamageEventOrdinal { get; set; }
     [SavedProperty] public int AstralParty_PvzUltimateHyperSpacetimeNutLastProcessedRound { get; set; }
 
+    protected override string RelicId => "pvz_ultimate_hyper_spacetime_nut";
+
     public override RelicRarity Rarity => RelicRarity.Rare;
 
     public override bool ShouldReceiveCombatHooks => true;

@@ -12,8 +12,12 @@ public sealed class PvzNutSeriesRelicPool : RelicPoolModel
     {
         return
         [
-            ModelDb.Relic<PvzHyperTemporalNut>(),
-            ModelDb.Relic<PvzUltimateHyperSpacetimeNut>()
+            ModelDb.Relic<PvzRareHyperTemporalNut>(),
+            ModelDb.Relic<PvzRareSunshineNut>(),
+            ModelDb.Relic<PvzRareBigMouthedNut>(),
+            ModelDb.Relic<PvzRareAngmaoNut>(),
+            ModelDb.Relic<PvzUltimateHyperSpacetimeNut>(),
+            ModelDb.Relic<PvzUltimateSunshineEmperorNut>()
         ];
     }
 }

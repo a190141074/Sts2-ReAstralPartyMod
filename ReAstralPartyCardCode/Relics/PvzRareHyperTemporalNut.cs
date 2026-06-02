@@ -15,19 +15,21 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PvzHyperTemporalNut : AstralPartyRelicModel
+public class PvzRareHyperTemporalNut : AstralPartyRelicModel
 {
     private List<decimal> _hpSnapshots = [];
 
     [SavedProperty]
-    private string AstralParty_PvzHyperTemporalNutHpSnapshotsJson
+    private string AstralParty_PvzRareHyperTemporalNutHpSnapshotsJson
     {
         get => PvzNutRelicHelper.SerializeHpSnapshots(_hpSnapshots);
         set => _hpSnapshots = PvzNutRelicHelper.DeserializeHpSnapshots(value);
     }
 
-    [SavedProperty] public bool AstralParty_PvzHyperTemporalNutUsedThisRun { get; set; }
-    [SavedProperty] public bool AstralParty_PvzHyperTemporalNutFusionProcessed { get; set; }
+    [SavedProperty] public bool AstralParty_PvzRareHyperTemporalNutUsedThisRun { get; set; }
+    [SavedProperty] public bool AstralParty_PvzRareHyperTemporalNutFusionProcessed { get; set; }
+
+    protected override string RelicId => "pvz_rare_hyper_temporal_nut";
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
@@ -38,14 +40,14 @@ public class PvzHyperTemporalNut : AstralPartyRelicModel
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralFusionClueId)
     ];
 
-    public override bool IsUsedUp => AstralParty_PvzHyperTemporalNutUsedThisRun;
+    public override bool IsUsedUp => AstralParty_PvzRareHyperTemporalNutUsedThisRun;
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
         _hpSnapshots.Clear();
-        AstralParty_PvzHyperTemporalNutUsedThisRun = false;
-        AstralParty_PvzHyperTemporalNutFusionProcessed = false;
+        AstralParty_PvzRareHyperTemporalNutUsedThisRun = false;
+        AstralParty_PvzRareHyperTemporalNutFusionProcessed = false;
     }
 
     public override Task BeforeCombatStart()
@@ -70,7 +72,7 @@ public class PvzHyperTemporalNut : AstralPartyRelicModel
     {
         if (creature != Owner?.Creature)
             return true;
-        if (AstralParty_PvzHyperTemporalNutUsedThisRun)
+        if (AstralParty_PvzRareHyperTemporalNutUsedThisRun)
             return true;
         return false;
     }
@@ -81,29 +83,29 @@ public class PvzHyperTemporalNut : AstralPartyRelicModel
             return;
 
         Flash();
-        AstralParty_PvzHyperTemporalNutUsedThisRun = true;
+        AstralParty_PvzRareHyperTemporalNutUsedThisRun = true;
         Status = RelicStatus.Disabled;
 
         var restoreAmount = ResolveRestoredHp(creature);
         MainFile.Logger.Info(
-            $"[PvzHyperTemporalNut] Prevented death | owner={Owner?.NetId} | restoreHp={restoreAmount} | snapshots={_hpSnapshots.Count}");
+            $"[PvzRareHyperTemporalNut] Prevented death | owner={Owner?.NetId} | restoreHp={restoreAmount} | snapshots={_hpSnapshots.Count}");
         await CreatureCmd.Heal(creature, Math.Max(1m, restoreAmount - creature.CurrentHp));
     }
 
     public override async Task AfterCombatEnd(CombatRoom room)
     {
-        if (Owner == null || AstralParty_PvzHyperTemporalNutFusionProcessed)
+        if (Owner == null || AstralParty_PvzRareHyperTemporalNutFusionProcessed)
             return;
         if (Owner.GetRelic<PvzUltimateHyperSpacetimeNut>() != null)
         {
-            AstralParty_PvzHyperTemporalNutFusionProcessed = true;
+            AstralParty_PvzRareHyperTemporalNutFusionProcessed = true;
             return;
         }
         if (!PvzNutRelicHelper.CanFuseUltimateNut(Owner, out var fusionRelics))
             return;
 
-        AstralParty_PvzHyperTemporalNutFusionProcessed = true;
-        MainFile.Logger.Info($"[PvzHyperTemporalNut] Fusing into ultimate nut | owner={Owner.NetId}");
+        AstralParty_PvzRareHyperTemporalNutFusionProcessed = true;
+        MainFile.Logger.Info($"[PvzRareHyperTemporalNut] Fusing into ultimate nut | owner={Owner.NetId}");
         await PvzNutRelicHelper.MeltRelicsAsync(fusionRelics);
         await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, ModelDb.Relic<PvzUltimateHyperSpacetimeNut>());
     }
@@ -117,7 +119,7 @@ public class PvzHyperTemporalNut : AstralPartyRelicModel
         if (_hpSnapshots.Count == 1)
             return ClampToPositive(_hpSnapshots[0], creature.MaxHp);
 
-        MainFile.Logger.Warn($"[PvzHyperTemporalNut] No snapshots available; falling back to 1 HP | owner={Owner?.NetId}");
+        MainFile.Logger.Warn($"[PvzRareHyperTemporalNut] No snapshots available; falling back to 1 HP | owner={Owner?.NetId}");
         return 1m;
     }
 
