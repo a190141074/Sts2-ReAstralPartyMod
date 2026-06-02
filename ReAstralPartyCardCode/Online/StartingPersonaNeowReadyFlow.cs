@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 using HarmonyLib;
@@ -49,6 +50,7 @@ internal static class StartingPersonaNeowReadyFlow
         AccessTools.Method(typeof(NAncientEventLayout), "UpdateFakeNextButton");
     private static readonly MethodInfo? ControlUpdateMinimumSizeMethod =
         AccessTools.Method(typeof(Control), "UpdateMinimumSize");
+    private static readonly AsyncLocal<int> InternalNeowRefreshDepth = new();
 
     private sealed record ReadyPageState(
         string RunKey,
@@ -56,6 +58,8 @@ internal static class StartingPersonaNeowReadyFlow
         IReadOnlyList<EventOption> OriginalOptions,
         LocString OriginalDescription,
         bool Restored = false);
+
+    internal static bool IsInternalNeowRefreshActive => InternalNeowRefreshDepth.Value > 0;
 
     internal static void TryReplaceInitialState(Neow neow)
     {
@@ -367,6 +371,7 @@ internal static class StartingPersonaNeowReadyFlow
                 if (EventRoomSetupLayoutMethod?.Invoke(eventRoom, null) is Task setupTask)
                     await setupTask;
 
+                using var _ = BeginInternalNeowRefreshScope(runKey, stage);
                 EventRoomRefreshEventStateMethod?.Invoke(eventRoom, [eventModel]);
             }
             catch (Exception ex)
@@ -491,6 +496,24 @@ internal static class StartingPersonaNeowReadyFlow
     {
         for (var frame = 0; frame < frameCount; frame++)
             await AwaitProcessFrameAsync();
+    }
+
+    private static IDisposable BeginInternalNeowRefreshScope(string runKey, string stage)
+    {
+        InternalNeowRefreshDepth.Value++;
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Entered internal Neow refresh scope | runKey={runKey} stage={stage} depth={InternalNeowRefreshDepth.Value}.");
+        return new InternalNeowRefreshScope(runKey, stage);
+    }
+
+    private sealed class InternalNeowRefreshScope(string runKey, string stage) : IDisposable
+    {
+        public void Dispose()
+        {
+            InternalNeowRefreshDepth.Value = Math.Max(0, InternalNeowRefreshDepth.Value - 1);
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Exited internal Neow refresh scope | runKey={runKey} stage={stage} depth={InternalNeowRefreshDepth.Value}.");
+        }
     }
 }
 

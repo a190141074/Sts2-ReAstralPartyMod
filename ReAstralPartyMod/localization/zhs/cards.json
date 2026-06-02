@@ -203,6 +203,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_PASSING_BOMB.description": "使目标获得[blue]1[/blue]层【传递炸弹】。",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_EXPIRED_LUNCH.title": "过期便当",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_EXPIRED_LUNCH.description": "施加[blue]3[/blue]层[gold]中毒[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_THE_ACKNOWLEDGMENT.title": "神秘遗物·启示之证",
+  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_THE_ACKNOWLEDGMENT.description": "在你手中时，无视七咒之戒第四诅咒的伤害减免。\n[purple]“启示的光芒会焚化那些拒绝信奉之人”[/purple]",
   "RE_ASTRAL_PARTY_MOD_CARD_ORIGINAL_ENHANCED_TYRANT_FORM.title": "暴君形态",
   "RE_ASTRAL_PARTY_MOD_CARD_ORIGINAL_ENHANCED_TYRANT_FORM.description": "锻造{Forge:diff()}。\n结束回合。\n你无法主动打出[gold]君王之剑[/gold]；取而代之，每回合结束时自动打出[gold]君王之剑[/gold]，[gold]无论何处[/gold]。并在打出后回到你手中。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TWELVE_FRAGRANT_DREAM.title": "十二香梦",

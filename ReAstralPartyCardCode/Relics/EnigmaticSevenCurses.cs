@@ -16,6 +16,7 @@ using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -33,7 +34,7 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
 
     protected override string RelicId => "enigmatic_seven_curses";
 
-    public override RelicRarity Rarity => RelicRarity.Ancient;
+    public override RelicRarity Rarity => RelicRarity.Rare;
 
     public override bool ShouldReceiveCombatHooks => true;
 
@@ -51,7 +52,11 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
 
         await RingOfSevenCursesHelper.EnsureRelicPairAsync<EnigmaticSevenBlessings>(Owner);
         CursedScrollGrabBagHelper.NormalizeForOwner(Owner);
-        EnigmaticCursedScroll.RefreshCounterForOwner(Owner);
+        if (Owner != null)
+        {
+            EnigmaticAcknowledgmentDeckHelper.EnsureInRunDeck(Owner);
+            EnigmaticCursedScroll.RefreshCounterForOwner(Owner);
+        }
     }
 
     public override async Task AfterRemoved()
@@ -78,6 +83,9 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             return 1m;
 
         if (target.CombatState?.Encounter?.RoomType is RoomType.Elite or RoomType.Boss)
+            return 1m;
+
+        if (Owner.PlayerCombatState?.Hand?.Cards.Any(EnigmaticAcknowledgmentDeckHelper.IsAcknowledgmentCard) == true)
             return 1m;
 
         return NonEliteBossDamageMultiplier;

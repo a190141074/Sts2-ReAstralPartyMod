@@ -201,6 +201,9 @@
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_PASSING_BOMB.description": "[blue]1[/blue] パッシングボムを適用します。",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_EXPIRED_LUNCH.title": "过期便当",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_EXPIRED_LUNCH.description": "[blue]3[/blue][poison]中毒[/poison]を適用します。",
+  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_THE_ACKNOWLEDGMENT.title": "神秘遺物・啓示の証",
+  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_THE_ACKNOWLEDGMENT.description": "手札にある間、七重咒の第四の呪いによるダメージ減少を無視する。",
+  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_THE_ACKNOWLEDGMENT.flavor": "「啓示の光は、信仰を拒む者たちを焼き尽くす」",
   "RE_ASTRAL_PARTY_MOD_CARD_ORIGINAL_ENHANCED_TYRANT_FORM.title": "タイラントフォーム",
   "RE_ASTRAL_PARTY_MOD_CARD_ORIGINAL_ENHANCED_TYRANT_FORM.description": "[ethereal]無[/ethereal]\n鍛造＜T2＞。\nラウンド終了。\n[王の剣]を積極的にプレイすることはできません。代わりに、[King's Sword] はどこにいても各ラウンドの終了時に自動的にプレイされます。プレイ後は手札に戻ります。"
 }

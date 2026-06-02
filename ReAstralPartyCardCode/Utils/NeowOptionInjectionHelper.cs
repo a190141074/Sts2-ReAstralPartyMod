@@ -7,6 +7,8 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 using STS2RitsuLib;
@@ -17,6 +19,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 internal static class NeowOptionInjectionHelper
 {
     private const string CandidatePoolVersion = "v1";
+    private static readonly object SyncLock = new();
     private const string DreamFaceTheShadowTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW";
     private const string RingOfSevenCursesTextKey =
@@ -46,23 +49,40 @@ internal static class NeowOptionInjectionHelper
     private static readonly MethodInfo? DoneMethod = typeof(AncientEventModel)
         .GetMethod("Done", BindingFlags.Instance | BindingFlags.NonPublic);
 
-    private static readonly IReadOnlyList<IHoverTip> ForgottenRoarHoverTips =
-        [HoverTipFactory.FromCard<UltimateSkillForgottenRoar>()];
-    private static readonly IReadOnlyList<IHoverTip> RingOfSevenCursesHoverTips =
-        [.. HoverTipFactory.FromRelic<EnigmaticSevenCurses>()];
+    private static readonly IReadOnlyList<NeowOptionCandidateDefinition> CandidateDefinitions =
+    [
+        new(
+            "dream_face_the_shadow",
+            DreamFaceTheShadowTextKey,
+            DreamFaceTheShadowIconPath,
+            CreateForgottenRoarHoverTips,
+            ChooseDreamFaceTheShadow),
+        new(
+            "ring_of_seven_curses",
+            RingOfSevenCursesTextKey,
+            RingOfSevenCursesIconPath,
+            CreateRingOfSevenCursesHoverTips,
+            ChooseRingOfSevenCurses)
+    ];
+    private static readonly Dictionary<string, string> SelectedCandidateKeysByRun = [];
 
     public static void Register()
     {
         MainFile.Logger.Info(
             "[NeowOptionInjectionHelper] Registering randomized custom Neow option pool through RitsuLib ancient-option registry.");
-        RitsuLibFramework.RegisterAncientOption<Neow>(
-            MainFile.ModId,
-            ModAncientOptionRule.Single(CreateRandomCustomNeowOption));
+        foreach (var candidate in CandidateDefinitions)
+        {
+            RitsuLibFramework.RegisterAncientOption<Neow>(
+                MainFile.ModId,
+                ModAncientOptionRule.Single(
+                    ancient => candidate.CreateOption(ancient),
+                    ancient => IsCandidateSelected(ancient, candidate.StableKey)));
+        }
     }
 
     public static string? ResolveCustomNeowOptionIconPath(string? textKey)
     {
-        foreach (var candidate in BuildCandidateDefinitions())
+        foreach (var candidate in CandidateDefinitions)
         {
             if (string.Equals(textKey, candidate.TextKey, StringComparison.OrdinalIgnoreCase))
                 return candidate.IconPath;
@@ -71,48 +91,47 @@ internal static class NeowOptionInjectionHelper
         return null;
     }
 
-    private static EventOption? CreateRandomCustomNeowOption(AncientEventModel ancient)
+    private static bool IsCandidateSelected(AncientEventModel ancient, string stableKey)
     {
-        var availableCandidates = BuildCandidateDefinitions()
-            .Where(candidate => candidate.Condition?.Invoke(ancient) ?? true)
-            .OrderBy(candidate => candidate.StableKey, StringComparer.Ordinal)
-            .ToList();
-        if (availableCandidates.Count == 0)
-            return null;
-
-        var selectedIndex = DeterministicMultiplayerChoiceHelper.RollDeterministically(
-            0,
-            availableCandidates.Count,
-            MainFile.ModId,
-            nameof(Neow),
-            "custom_option_pool",
-            CandidatePoolVersion,
-            ancient.Owner?.RunState?.Rng.StringSeed ?? "<null_seed>",
-            ancient.Owner?.RunState?.CurrentActIndex ?? -1,
-            ancient.Owner?.NetId.ToString() ?? "<null_owner>");
-        var selectedCandidate = availableCandidates[selectedIndex];
-        MainFile.Logger.Info(
-            $"[NeowOptionInjectionHelper] Selected custom Neow option | key={selectedCandidate.StableKey} | poolSize={availableCandidates.Count} | selectedIndex={selectedIndex}.");
-        return selectedCandidate.CreateOption(ancient);
+        return string.Equals(ResolveSelectedCandidateKey(ancient), stableKey, StringComparison.Ordinal);
     }
 
-    private static IReadOnlyList<NeowOptionCandidateDefinition> BuildCandidateDefinitions()
+    private static string? ResolveSelectedCandidateKey(AncientEventModel ancient)
     {
-        return
-        [
-            new(
-                "dream_face_the_shadow",
-                DreamFaceTheShadowTextKey,
-                DreamFaceTheShadowIconPath,
-                ForgottenRoarHoverTips,
-                ChooseDreamFaceTheShadow),
-            new(
-                "ring_of_seven_curses",
-                RingOfSevenCursesTextKey,
-                RingOfSevenCursesIconPath,
-                RingOfSevenCursesHoverTips,
-                ChooseRingOfSevenCurses)
-        ];
+        if (CandidateDefinitions.Count == 0)
+            return null;
+
+        var runState = ancient.Owner?.RunState as RunState;
+        var runKey = GetRunKey(runState, ancient.Owner);
+        lock (SyncLock)
+        {
+            if (SelectedCandidateKeysByRun.TryGetValue(runKey, out var cachedKey))
+                return cachedKey;
+
+            var selectedIndex = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+                0,
+                CandidateDefinitions.Count,
+                MainFile.ModId,
+                nameof(Neow),
+                "custom_option_pool",
+                CandidatePoolVersion,
+                ancient.Owner?.RunState?.Rng.StringSeed ?? "<null_seed>",
+                ancient.Owner?.RunState?.CurrentActIndex ?? -1,
+                ancient.Owner?.NetId.ToString() ?? "<null_owner>");
+            var selectedCandidate = CandidateDefinitions[selectedIndex];
+            SelectedCandidateKeysByRun[runKey] = selectedCandidate.StableKey;
+            MainFile.Logger.Info(
+                $"[NeowOptionInjectionHelper] Selected custom Neow option for run | runKey={runKey} | key={selectedCandidate.StableKey} | poolSize={CandidateDefinitions.Count} | selectedIndex={selectedIndex}.");
+            return selectedCandidate.StableKey;
+        }
+    }
+
+    private static string GetRunKey(RunState? runState, Player? owner)
+    {
+        if (runState != null)
+            return StartingPersonaRelicSelectionPatch.GetRunKey(runState);
+
+        return $"{owner?.RunState?.Rng.StringSeed ?? "<null_seed>"}|{owner?.NetId.ToString() ?? "<null_owner>"}";
     }
 
     private static async Task ChooseDreamFaceTheShadow(AncientEventModel ancient)
@@ -260,11 +279,21 @@ internal static class NeowOptionInjectionHelper
         DoneMethod.Invoke(ancient, null);
     }
 
+    private static IReadOnlyList<IHoverTip> CreateForgottenRoarHoverTips()
+    {
+        return [HoverTipFactory.FromCard<UltimateSkillForgottenRoar>()];
+    }
+
+    private static IReadOnlyList<IHoverTip> CreateRingOfSevenCursesHoverTips()
+    {
+        return [.. HoverTipFactory.FromRelic<EnigmaticSevenCurses>()];
+    }
+
     private sealed record NeowOptionCandidateDefinition(
         string StableKey,
         string TextKey,
         string IconPath,
-        IReadOnlyList<IHoverTip> HoverTips,
+        Func<IReadOnlyList<IHoverTip>> HoverTipFactory,
         Func<AncientEventModel, Task> OnChosen,
         Func<AncientEventModel, bool>? Condition = null)
     {
@@ -272,7 +301,7 @@ internal static class NeowOptionInjectionHelper
         {
             return new EventOption(ancient, () => OnChosen(ancient), TextKey)
             {
-                HoverTips = HoverTips
+                HoverTips = HoverTipFactory()
             };
         }
     }
