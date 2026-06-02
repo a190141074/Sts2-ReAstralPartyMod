@@ -35,7 +35,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_THUNDER_STRIKE.title": "天打雷劈",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_THUNDER_STRIKE.description": "[b]事件[/b]\n对所有单位造成{Damage:diff()}点伤害。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY.title": "食品安全",
-  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY.description": "[b]事件[/b]\n所有单位获得{Poison:diff()}层[gold]中毒[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY.description": "[b]事件[/b]\n所有非召唤敌人获得{Poison:diff()}层[gold]中毒[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY_DOOM.title": "食品安全",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY_DOOM.description": "[b]事件[/b]\n所有单位获得{DoomPower:diff()}层[gold]灾厄[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_RED_HEAT_WARNING.title": "红温警告",

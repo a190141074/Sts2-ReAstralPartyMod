@@ -41,7 +41,7 @@ public class EventFoodSafety : AstralPartyCardModel
     {
         if (CombatState == null) return;
 
-        foreach (var creature in EventCombatTargetHelper.GetAliveCreaturesExcludingPlayerSummons(CombatState))
+        foreach (var creature in EventCombatTargetHelper.GetAliveNonSummonEnemies(CombatState, Owner.Creature))
             await PowerCmd.Apply<PoisonPower>(creature, DynamicVars["Poison"].BaseValue, Owner.Creature, this);
     }
 }

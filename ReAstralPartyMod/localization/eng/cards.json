@@ -35,7 +35,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_THUNDER_STRIKE.title": "Thunder Strike",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_THUNDER_STRIKE.description": "Deal {Damage:diff()} damage to all creatures.",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY.title": "Food Safety",
-  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY.description": "Apply {Poison:diff()} [poison]Poison[/poison] to all creatures.",
+  "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY.description": "Apply {Poison:diff()} [poison]Poison[/poison] to all non-summon enemies.",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY_DOOM.title": "Food Safety",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_FOOD_SAFETY_DOOM.description": "Apply {DoomPower:diff()} Doom to all creatures.",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_RED_HEAT_WARNING.title": "Red Heat Warning",

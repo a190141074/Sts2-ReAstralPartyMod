@@ -6,8 +6,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 internal static class CursedScrollDeckHelper
 {
     private const decimal AttackDamageBonusPerWeightedCurse = 0.06m;
-    private const decimal GoldGainBonusPerWeightedCurse = 0.14m;
-    private const decimal HealGainBonusPerWeightedCurse = 0.08m;
+    private const decimal GoldGainBonusPerWeightedCurse = 0.10m;
+    private const decimal HealGainBonusPerWeightedCurse = 0.06m;
     private const int ExtraDrawDivisor = 3;
 
     public static int GetWeightedCurseCount(Player? owner)
