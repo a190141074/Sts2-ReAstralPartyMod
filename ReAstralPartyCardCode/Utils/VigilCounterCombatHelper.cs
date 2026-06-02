@@ -167,14 +167,7 @@ public static class VigilCounterCombatHelper
         finally
         {
             VigilCounterAutoPlayHelper.ExitAutoPlay(cardToPlay);
-            var finishedState = CurrentState.Value;
             CurrentState.Value = null;
-
-            if (finishedState?.AutoPlayedCardSuccessfully == true)
-                await PersonalityDerivativePoemGathering.AfterSuccessfulVigilCounterAutoPlay(
-                    choiceContext,
-                    owner,
-                    source);
         }
 
         return true;

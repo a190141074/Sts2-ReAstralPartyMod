@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
-using MegaCrit.Sts2.Core.Factories;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -55,11 +54,11 @@ internal static class RingOfSevenCursesHelper
         if (rewardCards.Count >= ExtraRewardCardOptionCount)
             return false;
 
-        var highestRarity = rewardCards
+        var lowestRarity = rewardCards
             .Select(result => result.Card.Rarity)
-            .OrderByDescending(GetRewardRarityRank)
+            .OrderBy(GetRewardRarityRank)
             .FirstOrDefault();
-        var targetRarity = GetNextHigherRarity(highestRarity);
+        var targetRarity = GetNextHigherRarity(lowestRarity);
 
         var excludedIds = rewardCards
             .Select(result => result.Card.CanonicalInstance?.Id ?? result.Card.Id)
@@ -67,28 +66,40 @@ internal static class RingOfSevenCursesHelper
 
         foreach (var rarity in EnumerateFallbackRarities(targetRarity))
         {
-            var candidates = options.GetPossibleCards(player)
-                .Where(card => card.Rarity == rarity)
-                .Where(card => IsRewardEligibleRarity(card.Rarity))
-                .Where(card => !excludedIds.Contains(card.Id))
-                .ToList();
+            var candidates = GetRewardCandidates(player, options, rarity, excludedIds);
             if (candidates.Count == 0)
                 continue;
 
-            var extraOptions = new CardCreationOptions(candidates, options.Source, CardRarityOddsType.Uniform)
-                .WithFlags(options.Flags | CardCreationFlags.NoModifyHooks);
-            if (options.RngOverride != null)
-                extraOptions.WithRngOverride(options.RngOverride);
+            var rng = options.RngOverride ?? player.PlayerRng.Rewards;
+            var selectedCanonical = rng.NextItem(candidates);
+            if (selectedCanonical == null)
+                continue;
 
-            var extraCard = CardFactory.CreateForReward(player, 1, extraOptions).FirstOrDefault();
-            if (extraCard == null)
-                return false;
-
-            rewardCards.Add(extraCard);
+            var createdCard = player.RunState.CreateCard(selectedCanonical, player);
+            rewardCards.Add(new CardCreationResult(createdCard));
             return true;
         }
 
         return false;
+    }
+
+    private static List<CardModel> GetRewardCandidates(
+        Player player,
+        CardCreationOptions options,
+        CardRarity rarity,
+        HashSet<ModelId> excludedIds)
+    {
+        IEnumerable<CardModel> source = rarity == CardRarity.Ancient
+            ? ModelDb.AllCards.Where(IsBaseGameCard)
+            : options.GetPossibleCards(player);
+
+        return source
+            .Where(card => card.Rarity == rarity)
+            .Where(card => IsRewardEligibleRarity(card.Rarity))
+            .Where(card => !excludedIds.Contains(card.Id))
+            .GroupBy(card => card.CanonicalInstance?.Id ?? card.Id)
+            .Select(group => group.First())
+            .ToList();
     }
 
     private static IEnumerable<CardRarity> EnumerateFallbackRarities(CardRarity startingRarity)
@@ -128,6 +139,11 @@ internal static class RingOfSevenCursesHelper
     private static bool IsRewardEligibleRarity(CardRarity rarity)
     {
         return rarity is CardRarity.Common or CardRarity.Uncommon or CardRarity.Rare or CardRarity.Ancient;
+    }
+
+    private static bool IsBaseGameCard(CardModel card)
+    {
+        return card.GetType().Assembly == typeof(CardModel).Assembly;
     }
 
     private static int GetRewardRarityRank(CardRarity rarity)

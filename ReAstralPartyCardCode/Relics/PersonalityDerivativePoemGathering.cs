@@ -64,18 +64,6 @@ public class PersonalityDerivativePoemGathering : AstralPartyRelicModel
 
         if (target.IsAlive)
             await PowerCmd.Apply<FlowerHiddenUnseenPower>(target, 1m, owner.Creature, null, false);
-    }
-
-    public static async Task AfterSuccessfulVigilCounterAutoPlay(
-        PlayerChoiceContext choiceContext,
-        MegaCrit.Sts2.Core.Entities.Players.Player owner,
-        MegaCrit.Sts2.Core.Models.AbstractModel source)
-    {
-        var derivative = owner.GetRelic<PersonalityDerivativePoemGathering>();
-        if (derivative == null || owner.Creature == null || !owner.Creature.IsAlive)
-            return;
-
-        derivative.Flash();
         var healAmount = Math.Max(1m, Math.Ceiling(owner.Creature.MaxHp * 0.1m));
         await CreatureCmd.Heal(owner.Creature, healAmount, true);
     }

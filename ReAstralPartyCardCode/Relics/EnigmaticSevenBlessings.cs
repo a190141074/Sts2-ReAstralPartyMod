@@ -28,6 +28,8 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     private const int SmithBonus = 4;
     private const int RelicDropPermille = 330;
     private const int ExtraCardRewardPermille = 115;
+    // TODO(ring_of_seven_curses): 标记地图节点，有33%概率掉落特殊产物。
+    // TODO(ring_of_seven_curses): 你可以在休息点制作和使用独特的遗物。
 
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsPendingExtraCardRewardCount { get; set; }
