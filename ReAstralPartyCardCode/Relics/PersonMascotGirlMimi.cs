@@ -26,6 +26,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class PersonMascotGirlMimi : CooldownPersonaRelicBase
 {
     private const int DrawsPerTokenMemoryChoice = 25;
+    private const int TokenChoiceCount = 3;
+    private const int TokenChoiceRerolls = 1;
     private const int PreferredBankCardWeight = 3;
 
     [SavedProperty] public int AstralParty_PersonMascotGirlMimiCounter { get; set; } = 1;
@@ -128,25 +130,24 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
         if (availableTokenRelics.Count == 0)
             return false;
 
-        var selectionOptions = PersonaMultiplayerEffectHelper.CreateWeightedDeterministicRelicChoiceOptions(
-            availableTokenRelics,
-            3,
-            relic => TokenRelicRegistry.IsBankCardTokenRelic(relic) ? PreferredBankCardWeight : 1,
-            MainFile.ModId,
-            Id.Entry,
-            Owner.RunState.Rng.StringSeed,
-            Owner.RunState.CurrentActIndex,
-            Owner.NetId,
-            AstralParty_PersonMascotGirlMimiProductRestockingDrawProgress,
-            sourceCard.Id.Entry);
+        var selectionOptions = BuildTokenChoiceOptions(sourceCard.Id.Entry, 0, new HashSet<ModelId>());
+        var selectionTitle = new LocString("relics", $"{memoryRelic.Id.Entry}.selectionScreenHeader").GetRawText();
+        var memoryGain = memoryRelic.PeekNextSelectionMemoryGain();
 
-        using var _ = RelicSelectionHeaderContext.Push(
-            new LocString("relics", $"{memoryRelic.Id.Entry}.selectionScreenHeader").GetRawText());
+        using var _ = RelicSelectionHeaderContext.Push(selectionTitle);
 
-        var selectedRelic = await DeterministicMultiplayerChoiceHelper.SelectRelicForPlayer(
+        var selectionResult = await DeterministicMultiplayerChoiceHelper.SelectRefreshableRelicForPlayer(
             Owner,
             selectionOptions,
-            $"{Id.Entry}.token-memory");
+            TokenChoiceRerolls,
+            selectionTitle,
+            GetTokenChoiceSubtitlePrefix(),
+            GetTokenChoiceHintText(memoryGain),
+            $"{Id.Entry}.token-memory",
+            (_, rerollOrdinal, historicalIds) =>
+                BuildTokenChoiceOptions(sourceCard.Id.Entry, rerollOrdinal + 1, historicalIds),
+            rerollHistory => RebuildTokenChoiceOptions(sourceCard.Id.Entry, rerollHistory));
+        var selectedRelic = selectionResult.SelectedRelic;
         if (selectedRelic == null)
             return false;
 
@@ -163,7 +164,84 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
 
         Flash();
         memoryRelic.Flash();
-        memoryRelic.RecordTemporaryTokenGain(selectedRelic.Id);
+        memoryRelic.RecordTemporaryTokenGain(selectedRelic.Id, memoryGain);
+        memoryRelic.MarkSuccessfulSelection();
         return true;
+    }
+
+    private static string GetTokenChoiceSubtitlePrefix()
+    {
+        return new LocString("relics", $"{ModelDb.Relic<PersonMascotGirlMimi>().Id.Entry}.selectionScreenSubtitlePrefix")
+            .GetRawText();
+    }
+
+    private static string GetTokenChoiceHintText(int memoryGain)
+    {
+        var template = new LocString("relics", $"{ModelDb.Relic<PersonMascotGirlMimi>().Id.Entry}.selectionScreenHint")
+            .GetRawText();
+        return string.Format(template, memoryGain);
+    }
+
+    private IReadOnlyList<RelicModel> BuildTokenChoiceOptions(
+        string sourceCardEntry,
+        int rerollOrdinal,
+        IReadOnlySet<ModelId> historicalIds)
+    {
+        if (Owner?.Creature == null)
+            return [];
+
+        var allCandidates = MascotGirlMimiTokenMemoryHelper
+            .GetBridgeableUnownedTokenRelics(Owner, Owner.Creature, false)
+            .ToList();
+        if (allCandidates.Count == 0)
+            return [];
+
+        var filteredCandidates = allCandidates
+            .Where(relic => !historicalIds.Contains(TokenRewardSelectionHelper.GetCanonicalId(relic)))
+            .ToList();
+        var candidates = filteredCandidates.Count >= TokenChoiceCount
+            ? filteredCandidates
+            : allCandidates;
+
+        return PersonaMultiplayerEffectHelper.CreateWeightedDeterministicRelicChoiceOptions(
+            candidates,
+            TokenChoiceCount,
+            relic => TokenRelicRegistry.IsBankCardTokenRelic(relic) ? PreferredBankCardWeight : 1,
+            MainFile.ModId,
+            Id.Entry,
+            "token-memory-reroll",
+            Owner.RunState.Rng.StringSeed,
+            Owner.RunState.CurrentActIndex,
+            Owner.NetId,
+            AstralParty_PersonMascotGirlMimiProductRestockingDrawProgress,
+            sourceCardEntry,
+            rerollOrdinal,
+            string.Join(",", historicalIds
+                .OrderBy(id => id.Entry, StringComparer.Ordinal)
+                .Select(id => id.Entry)));
+    }
+
+    private IReadOnlyList<RelicModel> RebuildTokenChoiceOptions(
+        string sourceCardEntry,
+        IReadOnlyList<int> rerollHistory)
+    {
+        var options = BuildTokenChoiceOptions(sourceCardEntry, 0, new HashSet<ModelId>());
+        if (options.Count == 0)
+            return [];
+
+        var seenIds = options
+            .Select(TokenRewardSelectionHelper.GetCanonicalId)
+            .ToHashSet();
+
+        for (var rerollOrdinal = 0; rerollOrdinal < rerollHistory.Count; rerollOrdinal++)
+        {
+            options = BuildTokenChoiceOptions(sourceCardEntry, rerollOrdinal + 1, seenIds);
+            if (options.Count == 0)
+                break;
+
+            seenIds.UnionWith(options.Select(TokenRewardSelectionHelper.GetCanonicalId));
+        }
+
+        return options;
     }
 }

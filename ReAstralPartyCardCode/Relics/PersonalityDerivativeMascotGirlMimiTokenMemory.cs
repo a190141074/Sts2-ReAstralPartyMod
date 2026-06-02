@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using Godot;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -21,6 +20,9 @@ public class PersonalityDerivativeMascotGirlMimiTokenMemory : AstralPartyRelicMo
 {
     private const int RewardThreshold = 3;
     private const int DrawsPerTokenAbilityChoice = 25;
+    private const int FirstSelectionMemoryGain = 3;
+    private const int SecondAndThirdSelectionMemoryGain = 2;
+    private const int DefaultSelectionMemoryGain = 1;
 
     private Dictionary<string, int> _temporaryTokenGainCounts = new(StringComparer.Ordinal);
     private HashSet<string> _readyRewardTokenIds = new(StringComparer.Ordinal);
@@ -40,6 +42,9 @@ public class PersonalityDerivativeMascotGirlMimiTokenMemory : AstralPartyRelicMo
         set => _readyRewardTokenIds = DeserializeReadyRewards(value);
     }
 
+    [SavedProperty]
+    private int AstralParty_PersonalityDerivativeMascotGirlMimiTokenMemorySuccessfulSelectionCount { get; set; }
+
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
     public override bool ShowCounter => Owner?.GetRelic<PersonMascotGirlMimi>() != null;
@@ -53,6 +58,7 @@ public class PersonalityDerivativeMascotGirlMimiTokenMemory : AstralPartyRelicMo
         await base.AfterObtained();
         _temporaryTokenGainCounts.Clear();
         _readyRewardTokenIds.Clear();
+        AstralParty_PersonalityDerivativeMascotGirlMimiTokenMemorySuccessfulSelectionCount = 0;
         InvokeDisplayAmountChanged();
     }
 
@@ -78,20 +84,32 @@ public class PersonalityDerivativeMascotGirlMimiTokenMemory : AstralPartyRelicMo
         return Task.CompletedTask;
     }
 
-    public void RecordTemporaryTokenGain(ModelId tokenRelicId)
+    public int PeekNextSelectionMemoryGain()
     {
-        if (tokenRelicId == ModelId.none)
+        return GetMemoryGainForSelectionIndex(
+            AstralParty_PersonalityDerivativeMascotGirlMimiTokenMemorySuccessfulSelectionCount);
+    }
+
+    public void RecordTemporaryTokenGain(ModelId tokenRelicId, int gainAmount)
+    {
+        if (tokenRelicId == ModelId.none || gainAmount <= 0)
             return;
 
         var tokenKey = tokenRelicId.ToString();
         _temporaryTokenGainCounts.TryGetValue(tokenKey, out var currentCount);
-        currentCount++;
+        currentCount = Math.Min(RewardThreshold, currentCount + gainAmount);
         _temporaryTokenGainCounts[tokenKey] = currentCount;
 
         if (currentCount >= RewardThreshold &&
             !MascotGirlMimiTokenMemoryHelper.PlayerOwnsTokenRelic(Owner, tokenRelicId))
             _readyRewardTokenIds.Add(tokenKey);
 
+        InvokeDisplayAmountChanged();
+    }
+
+    public void MarkSuccessfulSelection()
+    {
+        AstralParty_PersonalityDerivativeMascotGirlMimiTokenMemorySuccessfulSelectionCount++;
         InvokeDisplayAmountChanged();
     }
 
@@ -181,6 +199,16 @@ public class PersonalityDerivativeMascotGirlMimiTokenMemory : AstralPartyRelicMo
             mimi.AstralParty_PersonMascotGirlMimiProductRestockingDrawProgress,
             0,
             DrawsPerTokenAbilityChoice);
+    }
+
+    private static int GetMemoryGainForSelectionIndex(int successfulSelectionCount)
+    {
+        return successfulSelectionCount switch
+        {
+            <= 0 => FirstSelectionMemoryGain,
+            1 or 2 => SecondAndThirdSelectionMemoryGain,
+            _ => DefaultSelectionMemoryGain
+        };
     }
 
     private void CleanupOwnedRewardEntries()
