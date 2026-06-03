@@ -315,11 +315,6 @@ internal static class NTreasureRoomRelicCollectionExpandedPlayerPatch
     [HarmonyPrefix]
     public static void Prefix(NTreasureRoomRelicCollection __instance)
     {
-        Traverse.Create(__instance)
-            .Field<List<NTreasureRoomRelicHolder>>("_holdersInUse")
-            .Value?
-            .Clear();
-
         var holders = Traverse.Create(__instance)
             .Field<List<NTreasureRoomRelicHolder>>("_multiplayerHolders")
             .Value;
@@ -328,8 +323,14 @@ internal static class NTreasureRoomRelicCollectionExpandedPlayerPatch
         if (holders == null
             || holders.Count == 0
             || currentRelics == null
+            || currentRelics.Count == 0
             || currentRelics.Count <= holders.Count)
             return;
+
+        Traverse.Create(__instance)
+            .Field<List<NTreasureRoomRelicHolder>>("_holdersInUse")
+            .Value?
+            .Clear();
 
         var template = holders[^1];
         var parent = template.GetParent();
@@ -441,14 +442,15 @@ internal static class NTreasureRoomRelicCollectionDefaultFocusExpandedPlayerPatc
     [HarmonyPrefix]
     public static bool Prefix(NTreasureRoomRelicCollection __instance, ref Control? __result)
     {
+        var currentRelics = RunManager.Instance.TreasureRoomRelicSynchronizer.CurrentRelics;
+        if (currentRelics == null || currentRelics.Count == 0)
+            return true;
+
         var holdersInUse = Traverse.Create(__instance)
             .Field<List<NTreasureRoomRelicHolder>>("_holdersInUse")
             .Value;
         if (holdersInUse == null || holdersInUse.Count == 0)
-        {
-            __result = null;
-            return false;
-        }
+            return true;
 
         var runState = Traverse.Create(__instance)
             .Field<IRunState>("_runState")

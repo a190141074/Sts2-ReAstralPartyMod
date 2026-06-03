@@ -61,7 +61,7 @@ public abstract class EnigmaticUniqueMaterialRelicBase : AstralPartyRelicModel
         StoredStacks = Math.Max(0, StoredStacks - amount);
         InvokeDisplayAmountChanged();
         if (StoredStacks == 0 && !IsMelted)
-            await RelicCmd.Melt(this);
+            await RelicCmd.Remove(this);
     }
 
     public static async Task<T?> GrantStacks<T>(Player owner, int amount)

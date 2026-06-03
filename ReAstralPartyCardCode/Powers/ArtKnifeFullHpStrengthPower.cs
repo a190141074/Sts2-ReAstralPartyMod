@@ -10,12 +10,20 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
 {
-    [SavedProperty] public decimal AstralParty_AppliedStrengthBonus { get; set; }
+    private decimal _appliedStrengthBonus;
+
+    [SavedProperty]
+    private string AstralParty_AppliedStrengthBonusSerialized
+    {
+        get => PvzNutRelicHelper.SerializeDecimal(_appliedStrengthBonus);
+        set => _appliedStrengthBonus = PvzNutRelicHelper.DeserializeDecimal(value);
+    }
 
     public override PowerType Type => PowerType.Buff;
 
@@ -82,10 +90,10 @@ public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
 
     public override async Task AfterRemoved(Creature? oldOwner)
     {
-        if (oldOwner != null && AstralParty_AppliedStrengthBonus != 0m)
-            await PowerCmd.Apply<StrengthPower>(oldOwner, -AstralParty_AppliedStrengthBonus, oldOwner, null, true);
+        if (oldOwner != null && _appliedStrengthBonus != 0m)
+            await PowerCmd.Apply<StrengthPower>(oldOwner, -_appliedStrengthBonus, oldOwner, null, true);
 
-        AstralParty_AppliedStrengthBonus = 0m;
+        _appliedStrengthBonus = 0m;
     }
 
     private async Task SyncStrengthBonus(Creature? applier, CardModel? cardSource)
@@ -94,11 +102,11 @@ public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
             return;
 
         var desiredStrengthBonus = IsAtFullHp() ? Amount : 0m;
-        var delta = desiredStrengthBonus - AstralParty_AppliedStrengthBonus;
+        var delta = desiredStrengthBonus - _appliedStrengthBonus;
         if (delta == 0m)
             return;
 
-        AstralParty_AppliedStrengthBonus = desiredStrengthBonus;
+        _appliedStrengthBonus = desiredStrengthBonus;
         await PowerCmd.Apply<StrengthPower>(Owner, delta, applier, cardSource, true);
     }
 

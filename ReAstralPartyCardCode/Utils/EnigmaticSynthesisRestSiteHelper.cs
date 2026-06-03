@@ -78,12 +78,12 @@ internal static class EnigmaticSynthesisRestSiteHelper
         if (PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Relic))
             return false;
 
-        if (GetCanonicalId(recipe.Relic) == ModelDb.Relic<EnigmaticSynthesisTwistedHeart>().Id)
-            await EnigmaticSynthesisTwistedHeart.GrantStacks(owner, 1);
-        else
-            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, recipe.Relic);
+        var consumptionPlan = BuildConsumptionPlan(owner, recipe.Costs);
+        if (consumptionPlan == null)
+            return false;
 
-        await ConsumeMaterialsAsync(owner, recipe.Costs);
+        await ConsumeMaterialsAsync(consumptionPlan);
+        await GrantCraftResultAsync(owner, recipe.Relic);
         return true;
     }
 
@@ -127,8 +127,11 @@ internal static class EnigmaticSynthesisRestSiteHelper
             .ToList();
     }
 
-    private static async Task ConsumeMaterialsAsync(Player owner, IEnumerable<EnigmaticMaterialCost> costs)
+    private static List<(EnigmaticUniqueMaterialRelicBase Material, int Amount)>? BuildConsumptionPlan(
+        Player owner,
+        IEnumerable<EnigmaticMaterialCost> costs)
     {
+        var plan = new List<(EnigmaticUniqueMaterialRelicBase Material, int Amount)>();
         foreach (var cost in costs)
         {
             var remaining = Math.Max(0, cost.Amount);
@@ -142,10 +145,29 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 if (toConsume <= 0)
                     continue;
 
-                await material.ConsumeStacksAsync(toConsume);
+                plan.Add((material, toConsume));
                 remaining -= toConsume;
             }
+
+            if (remaining > 0)
+                return null;
         }
+
+        return plan;
+    }
+
+    private static async Task ConsumeMaterialsAsync(IEnumerable<(EnigmaticUniqueMaterialRelicBase Material, int Amount)> plan)
+    {
+        foreach (var (material, amount) in plan)
+            await material.ConsumeStacksAsync(amount);
+    }
+
+    private static async Task GrantCraftResultAsync(Player owner, RelicModel resultRelic)
+    {
+        if (GetCanonicalId(resultRelic) == ModelDb.Relic<EnigmaticSynthesisTwistedHeart>().Id)
+            await EnigmaticSynthesisTwistedHeart.GrantStacks(owner, 1);
+        else
+            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, resultRelic);
     }
 
     private static ModelId GetCanonicalId(RelicModel relic)

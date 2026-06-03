@@ -15,9 +15,22 @@ public class PvzRareGoldenNut : AstralPartyRelicModel
     private const decimal GoldThreshold = 100m;
     private const decimal HealAmount = 5m;
     private const decimal MaxHpAmount = 5m;
+    private decimal _spentGoldProgress;
+    private decimal _lastObservedGold;
 
-    [SavedProperty] public decimal AstralParty_PvzRareGoldenNutSpentGoldProgress { get; set; }
-    [SavedProperty] public decimal AstralParty_PvzRareGoldenNutLastObservedGold { get; set; }
+    [SavedProperty]
+    private string AstralParty_PvzRareGoldenNutSpentGoldProgressSerialized
+    {
+        get => PvzNutRelicHelper.SerializeDecimal(_spentGoldProgress);
+        set => _spentGoldProgress = PvzNutRelicHelper.DeserializeDecimal(value);
+    }
+
+    [SavedProperty]
+    private string AstralParty_PvzRareGoldenNutLastObservedGoldSerialized
+    {
+        get => PvzNutRelicHelper.SerializeDecimal(_lastObservedGold);
+        set => _lastObservedGold = PvzNutRelicHelper.DeserializeDecimal(value);
+    }
 
     protected override string RelicId => "pvz_rare_golden_nut";
 
@@ -27,19 +40,19 @@ public class PvzRareGoldenNut : AstralPartyRelicModel
 
     public override bool ShowCounter => true;
 
-    public override int DisplayAmount => Math.Max(0, (int)decimal.Floor(AstralParty_PvzRareGoldenNutSpentGoldProgress));
+    public override int DisplayAmount => Math.Max(0, (int)decimal.Floor(_spentGoldProgress));
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PvzRareGoldenNutSpentGoldProgress = 0m;
-        AstralParty_PvzRareGoldenNutLastObservedGold = Owner?.Gold ?? 0m;
+        _spentGoldProgress = 0m;
+        _lastObservedGold = Owner?.Gold ?? 0m;
         InvokeDisplayAmountChanged();
     }
 
     public override Task BeforeCombatStart()
     {
-        AstralParty_PvzRareGoldenNutLastObservedGold = Owner?.Gold ?? 0m;
+        _lastObservedGold = Owner?.Gold ?? 0m;
         return Task.CompletedTask;
     }
 
@@ -66,7 +79,7 @@ public class PvzRareGoldenNut : AstralPartyRelicModel
 
     public override Task AfterCombatEnd(MegaCrit.Sts2.Core.Rooms.CombatRoom room)
     {
-        AstralParty_PvzRareGoldenNutLastObservedGold = Owner?.Gold ?? 0m;
+        _lastObservedGold = Owner?.Gold ?? 0m;
         return Task.CompletedTask;
     }
 
@@ -76,18 +89,18 @@ public class PvzRareGoldenNut : AstralPartyRelicModel
             return;
 
         var currentGold = Owner.Gold;
-        var lostAmount = Math.Max(0m, AstralParty_PvzRareGoldenNutLastObservedGold - currentGold);
-        AstralParty_PvzRareGoldenNutLastObservedGold = currentGold;
+        var lostAmount = Math.Max(0m, _lastObservedGold - currentGold);
+        _lastObservedGold = currentGold;
         if (lostAmount <= 0m)
             return;
 
-        AstralParty_PvzRareGoldenNutSpentGoldProgress += lostAmount;
+        _spentGoldProgress += lostAmount;
         InvokeDisplayAmountChanged();
 
         var triggerCount = 0;
-        while (AstralParty_PvzRareGoldenNutSpentGoldProgress >= GoldThreshold)
+        while (_spentGoldProgress >= GoldThreshold)
         {
-            AstralParty_PvzRareGoldenNutSpentGoldProgress -= GoldThreshold;
+            _spentGoldProgress -= GoldThreshold;
             triggerCount++;
         }
 
@@ -103,6 +116,6 @@ public class PvzRareGoldenNut : AstralPartyRelicModel
         }
 
         MainFile.Logger.Info(
-            $"[PvzRareGoldenNut] Triggered from gold loss | owner={Owner?.NetId} | source={sourceTag} | lostAmount={lostAmount} | triggerCount={triggerCount} | remainingProgress={AstralParty_PvzRareGoldenNutSpentGoldProgress}");
+            $"[PvzRareGoldenNut] Triggered from gold loss | owner={Owner?.NetId} | source={sourceTag} | lostAmount={lostAmount} | triggerCount={triggerCount} | remainingProgress={_spentGoldProgress}");
     }
 }
