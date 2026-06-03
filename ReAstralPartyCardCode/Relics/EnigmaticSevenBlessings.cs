@@ -28,13 +28,16 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
 {
     private const int PotionSlotsBonus = 4;
     private const int SmithBonus = 4;
+    private const int BaseSpecialMaterialDropPermille = 300;
+    private const int SpecialMaterialDropPermillePerOtherPlayer = 10;
+    private const int SpecialMaterialDropPermillePerMissStreak = 140;
     private const int RelicDropPermille = 330;
-    private const int SpecialMaterialDropPermille = 330;
     private const int ExtraCardRewardPermille = 115;
     private readonly List<string> _pendingUniqueMaterialRewardKeys = [];
 
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsPendingExtraCardRewardCount { get; set; }
+    [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsUniqueMaterialMissStreak { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsEnemyDeathRollSequence { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsSelfKillRollSequence { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsEnemyDeathSpecialMaterialRollSequence { get; set; }
@@ -68,6 +71,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         if (RingOfSevenCursesHelper.ShouldGrantSevenBlessingsPotionSlots(Owner, this))
         {
             await PlayerCmd.GainMaxPotionCount(PotionSlotsBonus, Owner);
+            RingOfSevenCursesHelper.GrantSevenBlessingsRandomPotions(Owner, PotionSlotsBonus);
             RingOfSevenCursesHelper.MarkSevenBlessingsPotionSlotsGranted(Owner);
         }
 
@@ -257,8 +261,9 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         if (Owner?.RunState == null)
             return false;
 
+        var dropPermille = GetCurrentSpecialMaterialDropPermille();
         var didDropSpecialMaterial = RingOfSevenCursesHelper.RollPermille(
-            SpecialMaterialDropPermille,
+            dropPermille,
             MainFile.ModId,
             RingOfSevenCursesHelper.SeriesId,
             RelicId,
@@ -269,7 +274,10 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             Owner.NetId,
             sequence);
         if (!didDropSpecialMaterial)
+        {
+            AstralParty_EnigmaticSevenBlessingsUniqueMaterialMissStreak++;
             return false;
+        }
 
         var kind = EnigmaticRewardRegistry.RollUniqueMaterialKind(
             MainFile.ModId,
@@ -293,7 +301,18 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             Owner.NetId,
             sequence);
         _pendingUniqueMaterialRewardKeys.Add(EnigmaticRewardRegistry.CreateRewardKey(kind, amount));
+        AstralParty_EnigmaticSevenBlessingsUniqueMaterialMissStreak = 0;
         return true;
+    }
+
+    private int GetCurrentSpecialMaterialDropPermille()
+    {
+        var otherPlayerCount = Math.Max(0, (Owner?.RunState?.Players.Count ?? 1) - 1);
+        var thresholdPermille =
+            BaseSpecialMaterialDropPermille
+            + otherPlayerCount * SpecialMaterialDropPermillePerOtherPlayer
+            + AstralParty_EnigmaticSevenBlessingsUniqueMaterialMissStreak * SpecialMaterialDropPermillePerMissStreak;
+        return Math.Clamp(thresholdPermille, 0, 1000);
     }
 
     private void AddPendingSpecialMaterialRewards(CombatRoom room)

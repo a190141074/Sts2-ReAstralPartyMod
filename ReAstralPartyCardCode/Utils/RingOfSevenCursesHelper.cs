@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Potions;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
@@ -89,6 +90,36 @@ internal static class RingOfSevenCursesHelper
         var blessings = owner.GetRelic<EnigmaticSevenBlessings>();
         if (blessings != null)
             blessings.AstralParty_SevenBlessingsPotionSlotsGranted = true;
+    }
+
+    public static void GrantSevenBlessingsRandomPotions(Player? owner, int amount)
+    {
+        if (owner == null || amount <= 0)
+            return;
+
+        var candidates = GetSevenBlessingsPotionCandidates(owner);
+        if (candidates.Count == 0)
+        {
+            MainFile.Logger.Warn($"[RingOfSevenCursesHelper] No potion candidates for Seven Blessings | owner={owner.NetId}");
+            return;
+        }
+
+        for (var i = 0; i < amount; i++)
+        {
+            var roll = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+                0,
+                candidates.Count,
+                MainFile.ModId,
+                SeriesId,
+                nameof(GrantSevenBlessingsRandomPotions),
+                owner.RunState?.Rng.StringSeed,
+                owner.RunState?.CurrentActIndex,
+                owner.RunState?.TotalFloor,
+                owner.NetId,
+                i);
+            var selected = candidates[roll];
+            owner.AddPotionInternal(selected.ToMutable());
+        }
     }
 
     public static void SyncSeriesRewardFlags(Player? owner)
@@ -184,6 +215,27 @@ internal static class RingOfSevenCursesHelper
         ExclusiveRelicUnlockHelper.MarkRelicUnlockedForCurrentRunAndProfile(owner, canonicalRelic);
         SaveManager.Instance?.MarkRelicAsSeen(canonicalRelic);
         await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
+    }
+
+    private static List<PotionModel> GetSevenBlessingsPotionCandidates(Player owner)
+    {
+        var unlockState = owner.RunState?.UnlockState;
+        if (owner.Character == null || unlockState == null)
+            return [];
+
+        var characterPoolIds = ModelDb.AllCharacterPotionPools
+            .Select(pool => pool.Id)
+            .ToHashSet();
+        var sharedPools = ModelDb.AllPotionPools
+            .Where(pool => !characterPoolIds.Contains(pool.Id));
+
+        return owner.Character.PotionPool
+            .GetUnlockedPotions(unlockState)
+            .Concat(sharedPools.SelectMany(pool => pool.GetUnlockedPotions(unlockState)))
+            .GroupBy(potion => potion.CanonicalInstance?.Id ?? potion.Id)
+            .Select(group => group.First())
+            .OrderBy(potion => (potion.CanonicalInstance?.Id ?? potion.Id).Entry, StringComparer.Ordinal)
+            .ToList();
     }
 
     private static List<CardModel> GetRewardCandidates(

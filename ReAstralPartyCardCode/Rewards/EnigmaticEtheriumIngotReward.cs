@@ -61,7 +61,7 @@ internal static class EnigmaticRewardRegistry
                 static () => ModelDb.Relic<EnigmaticEtheriumIngot>(),
                 GrantMaterialStacks<EnigmaticEtheriumIngot>,
                 RelicRarity.Common,
-                0,
+                1,
                 3,
                 1,
                 true),
@@ -71,7 +71,7 @@ internal static class EnigmaticRewardRegistry
                 static () => ModelDb.Relic<EnigmaticNefariousEssence>(),
                 GrantMaterialStacks<EnigmaticNefariousEssence>,
                 RelicRarity.Common,
-                0,
+                1,
                 4,
                 1,
                 true),
@@ -81,7 +81,7 @@ internal static class EnigmaticRewardRegistry
                 static () => ModelDb.Relic<EnigmaticNetheriteIngot>(),
                 GrantMaterialStacks<EnigmaticNetheriteIngot>,
                 RelicRarity.Rare,
-                0,
+                1,
                 2,
                 1,
                 true),
@@ -285,9 +285,18 @@ public sealed class EnigmaticUniqueMaterialReward : ModCustomReward
         Amount = Math.Clamp(amount, _config.MinRewardAmount, _config.MaxRewardAmount);
     }
 
-    public override LocString Description => new(
-        "relics",
-        $"RE_ASTRAL_PARTY_MOD_REWARD_{_config.RelicIdEntry.ToUpperInvariant()}_{Amount}.description");
+    public override LocString Description
+    {
+        get
+        {
+            var description = new LocString(
+                "relics",
+                "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD.label");
+            description.Add("Material", _config.Relic.Title);
+            description.Add("Amount", Amount);
+            return description;
+        }
+    }
 
     protected override string RewardIconPath => ((AstralPartyRelicModel)_config.Relic).PublicBigIconPath;
 
