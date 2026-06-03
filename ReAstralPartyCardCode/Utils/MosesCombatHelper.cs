@@ -15,7 +15,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class MosesCombatHelper
 {
-    private const int MaxWeaknessInsightStacks = 4;
+    private const int MaxWeaknessInsightStacks = 3;
     private const int MaxNodeValue = 6;
     private const int ExposedFlawUpperBound = 6;
 
@@ -84,7 +84,7 @@ internal static class MosesCombatHelper
 
     public static int RollDodgeNodeValue(Player owner, AbstractModel source)
     {
-        var minNodeValue = Math.Min(MaxNodeValue, GetWeaknessInsightAmount(owner) + 1);
+        var minNodeValue = Math.Min(MaxNodeValue, GetWeaknessInsightAmount(owner));
         return DeterministicMultiplayerChoiceHelper.RollDeterministically(
             minNodeValue,
             MaxNodeValue + 1,

@@ -49,7 +49,7 @@ public class DodgeStancePower : AstralPartyPowerModel
 
         var nodeValue = Math.Max(0, (int)Owner.GetPowerAmount<MosesNodePower>());
         var exposedFlaw = Math.Max(0, (int)dealer.GetPowerAmount<ExposedFlawPower>());
-        if (nodeValue <= exposedFlaw)
+        if (nodeValue < exposedFlaw)
             return amount;
 
         var data = GetInternalData<Data>();
@@ -112,7 +112,6 @@ public class DodgeStancePower : AstralPartyPowerModel
         data.PendingCounterDamage = 0m;
         data.PendingDodgeBlockGain = 0m;
         data.PendingCounterDealer = null;
-        await MosesCombatHelper.DecayWeaknessInsightAtTurnEnd(ownerPlayer);
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)

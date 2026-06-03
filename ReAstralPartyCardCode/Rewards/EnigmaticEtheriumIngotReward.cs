@@ -47,11 +47,6 @@ internal sealed record EnigmaticUniqueMaterialConfig(
     {
         return $"{RelicIdEntry}_{amount}";
     }
-
-    public string RewardDescriptionLocKey(int amount)
-    {
-        return $"RE_ASTRAL_PARTY_MOD_REWARD_{RelicIdEntry.ToUpperInvariant()}_{amount}.description";
-    }
 }
 
 internal static class EnigmaticRewardRegistry
@@ -290,9 +285,9 @@ public sealed class EnigmaticUniqueMaterialReward : ModCustomReward
         Amount = Math.Clamp(amount, _config.MinRewardAmount, _config.MaxRewardAmount);
     }
 
-    protected override string DescriptionLocTable => "relics";
-
-    protected override string DescriptionLocKey => _config.RewardDescriptionLocKey(Amount);
+    public override LocString Description => new(
+        "relics",
+        $"RE_ASTRAL_PARTY_MOD_REWARD_{_config.RelicIdEntry.ToUpperInvariant()}_{Amount}.description");
 
     protected override string RewardIconPath => ((AstralPartyRelicModel)_config.Relic).PublicBigIconPath;
 

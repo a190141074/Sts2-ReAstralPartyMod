@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -9,7 +8,6 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
-using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
@@ -59,23 +57,6 @@ public class PersonGunsmithMoses : CooldownPersonaRelicBase
     {
         await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeMysteriousDodgingMan>(Owner);
         await MosesCombatHelper.EnsureNodeCarrier(Owner);
-    }
-
-    public override decimal ModifyDamageAdditive(
-        Creature? target,
-        decimal amount,
-        ValueProp props,
-        Creature? dealer,
-        CardModel? cardSource)
-    {
-        if (Owner?.Creature == null || dealer != Owner.Creature)
-            return 0m;
-        if (cardSource?.Owner != Owner || cardSource.Type != CardType.Attack)
-            return 0m;
-        if (target == null || target.Side == Owner.Creature.Side)
-            return 0m;
-
-        return MosesCombatHelper.GetEquivalentAttackBonus(Owner);
     }
 
     protected override async Task GrantCooldownCard()
