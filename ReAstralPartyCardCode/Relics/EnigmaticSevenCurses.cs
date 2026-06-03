@@ -32,8 +32,11 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
     private const decimal ShopSelfDamagePercent = 0.07m;
     private const decimal MaxHpLossPercentOnPreventedDeath = 0.10m;
     private const decimal AcknowledgmentBurnAmount = 1m;
+    private const decimal TwistBossDamageMultiplier = 4m;
+    private const decimal TwistDebuffBonusAmount = 3m;
 
     private bool _isGrowingExistingDebuffs;
+    private bool _isApplyingRevelationBurn;
 
     [SavedProperty] public bool AstralParty_SevenCursesMaxHpBonusGranted { get; set; }
     [SavedProperty] public bool AstralParty_SevenBlessingsPotionSlotsGranted { get; set; }
@@ -91,10 +94,15 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         if (dealer != Owner.Creature || target == null || target.Side == Owner.Creature.Side)
             return 1m;
 
+        var revelationKind = GetRevelationInHand();
+        if (revelationKind == EnigmaticRevelationKind.Twist &&
+            target.CombatState?.Encounter?.RoomType == RoomType.Boss)
+            return TwistBossDamageMultiplier;
+
         if (target.CombatState?.Encounter?.RoomType is RoomType.Elite or RoomType.Boss)
             return 1m;
 
-        if (HasAcknowledgmentInHand())
+        if (revelationKind != EnigmaticRevelationKind.None)
             return 1m;
 
         return NonEliteBossDamageMultiplier;
@@ -110,7 +118,7 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
     {
         if (Owner?.Creature == null || dealer != Owner.Creature)
             return;
-        if (!HasAcknowledgmentInHand())
+        if (GetRevelationInHand() == EnigmaticRevelationKind.None)
             return;
         if (target.Side == Owner.Creature.Side || !target.IsAlive)
             return;
@@ -118,7 +126,15 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<BlazingSolarBurnPower>(target, AcknowledgmentBurnAmount, Owner.Creature, cardSource, false);
+        _isApplyingRevelationBurn = true;
+        try
+        {
+            await PowerCmd.Apply<BlazingSolarBurnPower>(target, AcknowledgmentBurnAmount, Owner.Creature, cardSource, false);
+        }
+        finally
+        {
+            _isApplyingRevelationBurn = false;
+        }
     }
 
     public override decimal ModifyBlockMultiplicative(
@@ -159,18 +175,33 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
     {
         modifiedAmount = amount;
 
-        if (_isGrowingExistingDebuffs)
-            return false;
-        if (Owner?.Creature == null || target != Owner.Creature)
-            return false;
-        if (amount <= 0m)
-            return false;
-        if (canonicalPower.Type != PowerType.Debuff || canonicalPower.StackType != PowerStackType.Counter)
+        if (Owner?.Creature == null || amount <= 0m)
             return false;
 
-        modifiedAmount += 1m;
-        Flash();
-        return true;
+        var didModify = false;
+        if (!_isGrowingExistingDebuffs &&
+            target == Owner.Creature &&
+            canonicalPower.Type == PowerType.Debuff &&
+            canonicalPower.StackType == PowerStackType.Counter)
+        {
+            modifiedAmount += 1m;
+            didModify = true;
+        }
+
+        if (!_isApplyingRevelationBurn &&
+            GetRevelationInHand() == EnigmaticRevelationKind.Twist &&
+            applier == Owner.Creature &&
+            target.Side != Owner.Creature.Side &&
+            canonicalPower.Type == PowerType.Debuff &&
+            canonicalPower.StackType == PowerStackType.Counter)
+        {
+            modifiedAmount += TwistDebuffBonusAmount;
+            didModify = true;
+        }
+
+        if (didModify)
+            Flash();
+        return didModify;
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -229,8 +260,8 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         return healOptions.Count > 0;
     }
 
-    private bool HasAcknowledgmentInHand()
+    private EnigmaticRevelationKind GetRevelationInHand()
     {
-        return Owner?.PlayerCombatState?.Hand?.Cards.Any(EnigmaticAcknowledgmentDeckHelper.IsAcknowledgmentCard) == true;
+        return EnigmaticAcknowledgmentDeckHelper.GetRevelationInHand(Owner);
     }
 }

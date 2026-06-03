@@ -31,6 +31,8 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COLLECTION.description": "特殊卡组，主要具备纪念意义。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE.title": "唯一",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE.description": "手牌中只能存在[blue]1[/blue]张唯一。若手牌中已存在同名的[gold]唯一[/gold]牌，后加入手牌的那张会自动[gold]消耗[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE_MATERIAL.title": "独特素材",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE_MATERIAL.description": "用于[gold]神秘合成[/gold]的特殊素材。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.title": "冷却",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.description": "这张牌同时拥有[gold]唯一[/gold]、[gold]保留[/gold]和[gold]消耗[/gold]效果。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ULTIMATE_SKILL.title": "终极技能",

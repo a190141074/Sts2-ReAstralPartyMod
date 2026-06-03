@@ -1,0 +1,162 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Relics;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.RelicPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Rewards;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+
+namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+
+internal static class EnigmaticSynthesisRestSiteHelper
+{
+    private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
+    [
+        new(
+            ModelDb.Relic<EnigmaticSynthesisEtheriumHelmet>(),
+            false,
+            [new(EnigmaticUniqueMaterialKind.EtheriumIngot, 5)]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisEtheriumCuirass>(),
+            false,
+            [new(EnigmaticUniqueMaterialKind.EtheriumIngot, 8)]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisEtheriumGreaves>(),
+            false,
+            [new(EnigmaticUniqueMaterialKind.EtheriumIngot, 7)]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisEtheriumBoots>(),
+            false,
+            [new(EnigmaticUniqueMaterialKind.EtheriumIngot, 4)]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisTwistedHeart>(),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.EarthHeart, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 2),
+                new(EnigmaticUniqueMaterialKind.RedstoneDust, 2),
+                new(EnigmaticUniqueMaterialKind.GhastTear, 1),
+                new(EnigmaticUniqueMaterialKind.EnderEye, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisTheTwist>(),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.NetheriteIngot, 2),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 4),
+                new(EnigmaticUniqueMaterialKind.RedstoneDust, 1),
+                new(EnigmaticUniqueMaterialKind.TwistedHeart, 1)
+            ])
+    ];
+
+    public static bool CanUse(Player? owner)
+    {
+        return owner != null && GetEligibleRecipes(owner).Count > 0;
+    }
+
+    public static IReadOnlyList<RelicModel> GetEligibleRelics(Player? owner)
+    {
+        return GetEligibleRecipes(owner)
+            .Select(static recipe => recipe.Relic)
+            .ToList();
+    }
+
+    public static async Task<bool> TryCraftAsync(Player? owner, RelicModel? selectedRelic)
+    {
+        if (owner == null || selectedRelic == null)
+            return false;
+        if (!TryGetRecipe(selectedRelic, out var recipe))
+            return false;
+        if (!HasRequiredMaterials(owner, recipe))
+            return false;
+        if (!recipe.AllowDuplicateResult &&
+            owner.Relics.Any(owned => !owned.IsMelted && GetCanonicalId(owned) == GetCanonicalId(recipe.Relic)))
+            return false;
+        if (PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Relic))
+            return false;
+
+        if (GetCanonicalId(recipe.Relic) == ModelDb.Relic<EnigmaticSynthesisTwistedHeart>().Id)
+            await EnigmaticSynthesisTwistedHeart.GrantStacks(owner, 1);
+        else
+            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, recipe.Relic);
+
+        await ConsumeMaterialsAsync(owner, recipe.Costs);
+        return true;
+    }
+
+    private static IReadOnlyList<EnigmaticSynthesisRecipe> GetEligibleRecipes(Player? owner)
+    {
+        if (owner == null)
+            return [];
+
+        return Recipes
+            .Where(recipe => HasRequiredMaterials(owner, recipe))
+            .Where(recipe => recipe.AllowDuplicateResult ||
+                             owner.Relics.All(owned => owned.IsMelted || GetCanonicalId(owned) != GetCanonicalId(recipe.Relic)))
+            .Where(recipe => !PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Relic))
+            .ToList();
+    }
+
+    private static bool TryGetRecipe(RelicModel relic, out EnigmaticSynthesisRecipe recipe)
+    {
+        var canonicalId = GetCanonicalId(relic);
+        recipe = Recipes.FirstOrDefault(candidate => GetCanonicalId(candidate.Relic) == canonicalId);
+        return recipe.Relic != null;
+    }
+
+    private static bool HasRequiredMaterials(Player owner, EnigmaticSynthesisRecipe recipe)
+    {
+        return recipe.Costs.All(cost => GetTotalStacks(owner, cost.Kind) >= cost.Amount);
+    }
+
+    private static int GetTotalStacks(Player owner, EnigmaticUniqueMaterialKind kind)
+    {
+        return GetOwnedMaterials(owner, kind).Sum(static material => Math.Max(0, material.Stacks));
+    }
+
+    private static List<EnigmaticUniqueMaterialRelicBase> GetOwnedMaterials(Player owner, EnigmaticUniqueMaterialKind kind)
+    {
+        var targetId = EnigmaticRewardRegistry.GetConfig(kind).Relic.Id;
+        return owner.Relics
+            .OfType<EnigmaticUniqueMaterialRelicBase>()
+            .Where(material => !material.IsMelted && material.Stacks > 0 && GetCanonicalId(material) == targetId)
+            .OrderByDescending(material => material.Stacks)
+            .ToList();
+    }
+
+    private static async Task ConsumeMaterialsAsync(Player owner, IEnumerable<EnigmaticMaterialCost> costs)
+    {
+        foreach (var cost in costs)
+        {
+            var remaining = Math.Max(0, cost.Amount);
+            var materials = GetOwnedMaterials(owner, cost.Kind);
+            foreach (var material in materials)
+            {
+                if (remaining <= 0)
+                    break;
+
+                var toConsume = Math.Min(remaining, material.Stacks);
+                if (toConsume <= 0)
+                    continue;
+
+                await material.ConsumeStacksAsync(toConsume);
+                remaining -= toConsume;
+            }
+        }
+    }
+
+    private static ModelId GetCanonicalId(RelicModel relic)
+    {
+        return (relic.CanonicalInstance ?? relic).Id;
+    }
+
+    private readonly record struct EnigmaticMaterialCost(EnigmaticUniqueMaterialKind Kind, int Amount);
+
+    private readonly record struct EnigmaticSynthesisRecipe(
+        RelicModel Relic,
+        bool AllowDuplicateResult,
+        IReadOnlyList<EnigmaticMaterialCost> Costs);
+}

@@ -1,3 +1,4 @@
+using MegaCrit.Sts2.Core.Commands;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -21,6 +22,7 @@ public class EnigmaticTheAcknowledgment : AstralPartyCardModel
 
     protected override void OnUpgrade()
     {
+        CardCmd.ApplyKeyword(this, CardKeyword.Innate);
     }
 
     protected override Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

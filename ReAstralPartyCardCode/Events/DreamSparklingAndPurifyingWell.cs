@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Interop.AutoRegistration;
 
@@ -35,7 +36,8 @@ public sealed class DreamSparklingAndPurifyingWell : AstralPartyEventModel
         var alreadyVisited = runState is RunState concreteRunState
                              && concreteRunState.VisitedEventIds.Contains(ModelDb.GetId<DreamSparklingAndPurifyingWell>());
 
-        return !alreadyVisited
+        return ReAstralPartyModSettingsManager.GetEnableDreamSeriesEvents(runState)
+               && !alreadyVisited
                && runState.CurrentActIndex == 2
                && runState.Players.All(player => player.Gold >= MinimumGoldRequired);
     }

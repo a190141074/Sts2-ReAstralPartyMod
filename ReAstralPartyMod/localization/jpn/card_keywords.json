@@ -31,6 +31,8 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COLLECTION.description": "主に記念的な意味を持つ特別なカード群。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE.title": "のみ",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE.description": "手札には [blue]1[/blue] 枚の固有のカードのみを含めることができます。同じ名前の [gold] 固有の[/gold] カードがすでに手札にある場合、後から手札に追加されたカードは自動的に [gold][/gold] を消費します。",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE_MATERIAL.title": "独特素材",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE_MATERIAL.description": "[gold]神秘合成[/gold]に使う特殊な素材レリックです。同名の独特素材を重ねて入手した場合、新しい実体は増えず、既存の素材に統合されて層数だけ増えます。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.title": "クールダウン",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.description": "このカードはまた、[gold] 固有の[/gold] を持ち、[gold] は[/gold] を保持し、[gold] は[/gold] の効果を消費します。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ULTIMATE_SKILL.title": "究極のスキル",

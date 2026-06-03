@@ -100,11 +100,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private const float DefaultPanelPositionX = 1140f;
     private const float DefaultPanelPositionY = 120f;
-    private const float DefaultPanelWidth = 470f;
+    private const float DefaultPanelWidth = 440f;
     private const float DefaultPanelHeight = 520f;
     private const float PanelResizeHitThickness = 12f;
     private const float PanelViewportMargin = 8f;
-    private const float PanelMinWidth = 380f;
+    private const float PanelMinWidth = 360f;
     private const float PanelCollapsedHeight = 88f;
     private const float TitleBarHeight = 56f;
     private const float PanelAspectRatio = DefaultPanelWidth / DefaultPanelHeight;
@@ -128,6 +128,9 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private readonly Dictionary<Control, IReadOnlyList<IHoverTip>> _hoverTipsByControl = [];
     private CheckButton? _startingInitialPointToggle;
     private CheckButton? _startingPersonaSelectionToggle;
+    private CheckButton? _dreamSeriesEventsToggle;
+    private CheckButton? _enigmaticSeriesEventsToggle;
+    private CheckButton? _neowExtraOptionToggle;
     private CheckButton? _allPersonasToggle;
     private CheckButton? _allVariantPersonasToggle;
     private CheckButton? _extremeModeToggle;
@@ -274,6 +277,21 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description"),
             out _startingPersonaSelectionToggle,
             OnEnableStartingPersonaSelectionToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.description"),
+            out _dreamSeriesEventsToggle,
+            OnEnableDreamSeriesEventsToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.description"),
+            out _enigmaticSeriesEventsToggle,
+            OnEnableEnigmaticSeriesEventsToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description"),
+            out _neowExtraOptionToggle,
+            OnEnableNeowExtraOptionToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.description"),
@@ -714,6 +732,27 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _startingPersonaSelectionToggle.Text = snapshot.EnableStartingPersonaSelection ? "ON" : "OFF";
             }
 
+            if (_dreamSeriesEventsToggle != null)
+            {
+                _dreamSeriesEventsToggle.ButtonPressed = snapshot.EnableDreamSeriesEvents;
+                _dreamSeriesEventsToggle.Disabled = !isEditable;
+                _dreamSeriesEventsToggle.Text = snapshot.EnableDreamSeriesEvents ? "ON" : "OFF";
+            }
+
+            if (_enigmaticSeriesEventsToggle != null)
+            {
+                _enigmaticSeriesEventsToggle.ButtonPressed = snapshot.EnableEnigmaticSeriesEvents;
+                _enigmaticSeriesEventsToggle.Disabled = !isEditable;
+                _enigmaticSeriesEventsToggle.Text = snapshot.EnableEnigmaticSeriesEvents ? "ON" : "OFF";
+            }
+
+            if (_neowExtraOptionToggle != null)
+            {
+                _neowExtraOptionToggle.ButtonPressed = snapshot.EnableNeowExtraOption;
+                _neowExtraOptionToggle.Disabled = !isEditable;
+                _neowExtraOptionToggle.Text = snapshot.EnableNeowExtraOption ? "ON" : "OFF";
+            }
+
             if (_allPersonasToggle != null)
             {
                 _allPersonasToggle.ButtonPressed = snapshot.EnableAllPersonas;
@@ -822,19 +861,23 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         _syncErrorShown = false;
         _hasReceivedSnapshotForCurrentSession = true;
         CallDeferred(nameof(ApplySnapshotDeferred), Variant.From(snapshot.EnableStartingInitialPoint),
-            Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableAllPersonas),
-            Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
+            Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableDreamSeriesEvents),
+            Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableNeowExtraOption),
+            Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
             Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
     }
 
     private void ApplySnapshotDeferred(bool enableStartingInitialPoint, bool enableStartingPersonaSelection,
-        bool enableAllPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode,
-        int tokenSeriesMode)
+        bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableNeowExtraOption,
+        bool enableAllPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
     {
         ApplySnapshotToUi(new LobbyGameplaySettingsSnapshot
         {
             EnableStartingInitialPoint = enableStartingInitialPoint,
             EnableStartingPersonaSelection = enableStartingPersonaSelection,
+            EnableDreamSeriesEvents = enableDreamSeriesEvents,
+            EnableEnigmaticSeriesEvents = enableEnigmaticSeriesEvents,
+            EnableNeowExtraOption = enableNeowExtraOption,
             EnableAllPersonas = enableAllPersonas,
             EnableAllVariantPersonas = enableAllVariantPersonas,
             EnableExtremeMode = enableExtremeMode,
@@ -871,6 +914,33 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingPersonaSelection = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableDreamSeriesEventsToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableDreamSeriesEvents = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableEnigmaticSeriesEventsToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableEnigmaticSeriesEvents = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableNeowExtraOptionToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableNeowExtraOption = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

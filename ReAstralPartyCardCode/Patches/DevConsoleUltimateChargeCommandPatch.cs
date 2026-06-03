@@ -43,15 +43,21 @@ public sealed class DevConsoleUltimateChargeCommandPatch : IPatchMethod
                 return;
             }
 
-            if (commands.Contains(RapUltChargeHandConsoleCmd.CommandName))
-                return;
+            if (!commands.Contains(RapUltChargeHandConsoleCmd.CommandName))
+            {
+                commands[RapUltChargeHandConsoleCmd.CommandName] = new RapUltChargeHandConsoleCmd();
+                MainFile.Logger.Info("Registered dev console command: rapultchargehand");
+            }
 
-            commands[RapUltChargeHandConsoleCmd.CommandName] = new RapUltChargeHandConsoleCmd();
-            MainFile.Logger.Info("Registered dev console command: rapultchargehand");
+            if (!commands.Contains(RapEtheriumIngotConsoleCmd.CommandName))
+            {
+                commands[RapEtheriumIngotConsoleCmd.CommandName] = new RapEtheriumIngotConsoleCmd();
+                MainFile.Logger.Info("Registered dev console command: rapingot");
+            }
         }
         catch (Exception ex)
         {
-            MainFile.Logger.Error($"Failed to register rapultchargehand: {ex}");
+            MainFile.Logger.Error($"Failed to register dev console commands: {ex}");
         }
     }
 }

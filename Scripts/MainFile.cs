@@ -6,6 +6,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Events;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+using ReAstralPartyMod.ReAstralPartyCardCode.Rewards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib;
@@ -33,6 +34,7 @@ public class MainFile
         // Current content still references minted CardKeyword values while models materialize,
         // so keywords must be registered before assembly auto-discovery runs.
         AstralKeywords.RegisterAll();
+        EnigmaticRewardRegistry.RegisterAll();
         PreloadSavedPropertyCache(assembly);
         SavedPropertyGovernance.LogGovernanceSummary(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);

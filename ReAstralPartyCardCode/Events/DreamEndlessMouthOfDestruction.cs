@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Interop.AutoRegistration;
 using System.Globalization;
@@ -50,7 +51,8 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
 
     public override bool IsAllowed(IRunState runState)
     {
-        return runState.Players.All(player => player.Gold >= MinimumGoldRequiredPerPlayer);
+        return ReAstralPartyModSettingsManager.GetEnableDreamSeriesEvents(runState)
+               && runState.Players.All(player => player.Gold >= MinimumGoldRequiredPerPlayer);
     }
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions()

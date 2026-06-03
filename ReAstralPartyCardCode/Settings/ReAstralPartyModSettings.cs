@@ -49,7 +49,7 @@ public sealed class ReAstralPartyModSettings
 
         public float PositionY { get; set; } = 120f;
 
-        public float Width { get; set; } = 470f;
+        public float Width { get; set; } = 440f;
 
         public float Height { get; set; } = 520f;
     }
@@ -64,6 +64,12 @@ public sealed class ReAstralPartyModSettings
     public bool EnableStartingInitialPoint { get; set; }
 
     public bool EnableStartingPersonaSelection { get; set; } = true;
+
+    public bool EnableDreamSeriesEvents { get; set; } = true;
+
+    public bool EnableEnigmaticSeriesEvents { get; set; } = true;
+
+    public bool EnableNeowExtraOption { get; set; } = true;
 
     public bool EnableAllPersonas { get; set; }
 
@@ -134,6 +140,12 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableStartingInitialPoint => ReadRuntime(settings => settings.EnableStartingInitialPoint);
 
     public static bool EnableStartingPersonaSelection => ReadRuntime(settings => settings.EnableStartingPersonaSelection);
+
+    public static bool EnableDreamSeriesEvents => ReadRuntime(settings => settings.EnableDreamSeriesEvents);
+
+    public static bool EnableEnigmaticSeriesEvents => ReadRuntime(settings => settings.EnableEnigmaticSeriesEvents);
+
+    public static bool EnableNeowExtraOption => ReadRuntime(settings => settings.EnableNeowExtraOption);
 
     public static StartingPersonaMode ConfiguredStartingPersonaMode =>
         ReadRuntime(settings => settings.StartingPersonaMode);
@@ -229,6 +241,57 @@ public static partial class ReAstralPartyModSettingsManager
             return false;
 
         return EnableAllPersonas;
+    }
+
+    public static bool GetEnableDreamSeriesEvents(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableDreamSeriesEvents;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableDreamSeriesEvents;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableDreamSeriesEvents;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableDreamSeriesEvents;
+    }
+
+    public static bool GetEnableEnigmaticSeriesEvents(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableEnigmaticSeriesEvents;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableEnigmaticSeriesEvents;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableEnigmaticSeriesEvents;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableEnigmaticSeriesEvents;
+    }
+
+    public static bool GetEnableNeowExtraOption(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableNeowExtraOption;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableNeowExtraOption;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableNeowExtraOption;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableNeowExtraOption;
     }
 
     public static bool GetEnableStartingInitialPoint(IRunState? runState)
@@ -506,6 +569,45 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableDreamSeriesEvents = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableDreamSeriesEvents,
+            (settings, value) =>
+            {
+                settings.EnableDreamSeriesEvents = value;
+                ApplyRuntimeSettings(settings, "enable_dream_series_events");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label",
+                    value);
+            });
+
+        var enableEnigmaticSeriesEvents = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableEnigmaticSeriesEvents,
+            (settings, value) =>
+            {
+                settings.EnableEnigmaticSeriesEvents = value;
+                ApplyRuntimeSettings(settings, "enable_enigmatic_series_events");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.label",
+                    value);
+            });
+
+        var enableNeowExtraOption = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableNeowExtraOption,
+            (settings, value) =>
+            {
+                settings.EnableNeowExtraOption = value;
+                ApplyRuntimeSettings(settings, "enable_neow_extra_option");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label",
+                    value);
+            });
+
         var enableExtremeMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -750,6 +852,24 @@ public static partial class ReAstralPartyModSettingsManager
                     enableStartingPersonaSelection,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description",
                         "If disabled, the run skips the starting persona selection entirely and no player starts with a persona relic."))
+                .AddToggle(
+                    "enable_dream_series_events",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label", "Enable Dream Series Events"),
+                    enableDreamSeriesEvents,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.description",
+                        "Enable Dream-prefixed Astral event content for this run."))
+                .AddToggle(
+                    "enable_enigmatic_series_events",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.label", "Enable Enigmatic Series Content"),
+                    enableEnigmaticSeriesEvents,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.description",
+                        "Enable Enigmatic-prefixed Astral content, including the corresponding Neow branch."))
+                .AddToggle(
+                    "enable_neow_extra_option",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label", "Enable Neow Extra Option"),
+                    enableNeowExtraOption,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description",
+                        "Enable Astral's extra randomized fourth Neow option at run start."))
                 .AddToggle(
                     "enable_all_personas",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label", "Enable All Personas"),
@@ -1153,7 +1273,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -1407,7 +1527,7 @@ public static partial class ReAstralPartyModSettingsManager
 
             public float PositionY { get; init; } = 120f;
 
-            public float Width { get; init; } = 470f;
+            public float Width { get; init; } = 440f;
 
             public float Height { get; init; } = 520f;
         }
@@ -1421,6 +1541,12 @@ public static partial class ReAstralPartyModSettingsManager
         public bool EnableStartingInitialPoint { get; init; }
 
         public bool EnableStartingPersonaSelection { get; init; } = true;
+
+        public bool EnableDreamSeriesEvents { get; init; } = true;
+
+        public bool EnableEnigmaticSeriesEvents { get; init; } = true;
+
+        public bool EnableNeowExtraOption { get; init; } = true;
 
         public bool EnableAllPersonas { get; init; }
 
@@ -1466,6 +1592,9 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableExtremeMode = settings.EnableExtremeMode,
                 EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
                 EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
+                EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
+                EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
+                EnableNeowExtraOption = settings.EnableNeowExtraOption,
                 EnableAllPersonas = settings.EnableAllPersonas,
                 EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
                 StartingPersonaMode = ResolveStartingPersonaMode(settings),
@@ -1488,7 +1617,7 @@ public static partial class ReAstralPartyModSettingsManager
                     IsCollapsed = settings.LobbyPanelState?.IsCollapsed ?? false,
                     PositionX = settings.LobbyPanelState?.PositionX ?? 1140f,
                     PositionY = settings.LobbyPanelState?.PositionY ?? 120f,
-                    Width = settings.LobbyPanelState?.Width ?? 470f,
+                    Width = settings.LobbyPanelState?.Width ?? 440f,
                     Height = settings.LobbyPanelState?.Height ?? 520f
                 }
             };

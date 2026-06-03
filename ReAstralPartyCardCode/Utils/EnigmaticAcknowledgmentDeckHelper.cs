@@ -8,6 +8,13 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
+internal enum EnigmaticRevelationKind
+{
+    None = 0,
+    Acknowledgment = 1,
+    Twist = 2
+}
+
 internal static class EnigmaticAcknowledgmentDeckHelper
 {
     private const string AscendersBaneEntry = "ASCENDERS_BANE";
@@ -35,10 +42,10 @@ internal static class EnigmaticAcknowledgmentDeckHelper
         ArgumentNullException.ThrowIfNull(owner);
 
         var deckCards = EventDeckCardHelper.GetRunDeckCards(owner);
-        if (deckCards.Any(IsAcknowledgmentCard))
+        if (deckCards.Any(IsRevelationCard))
         {
             MainFile.Logger.Info(
-                $"[EnigmaticAcknowledgmentDeckHelper] already_present | owner={owner.NetId}");
+                $"[EnigmaticAcknowledgmentDeckHelper] revelation_already_present | owner={owner.NetId}");
             return true;
         }
 
@@ -56,7 +63,7 @@ internal static class EnigmaticAcknowledgmentDeckHelper
                 $"[EnigmaticAcknowledgmentDeckHelper] removed_ascenders_bane | owner={owner.NetId} | floor={ascendersBane.FloorAddedToDeck}");
         }
 
-        var mutableCard = CreateMutable(owner, ascendersBane);
+        var mutableCard = CreateMutable<EnigmaticTheAcknowledgment>(owner, ascendersBane);
         if (!TryAddCardToRunDeck(owner, mutableCard))
         {
             MainFile.Logger.Warn(
@@ -70,6 +77,61 @@ internal static class EnigmaticAcknowledgmentDeckHelper
         return true;
     }
 
+    public static bool ReplaceAcknowledgmentWithTwist(Player? owner)
+    {
+        if (owner == null)
+            return false;
+
+        var deckCards = EventDeckCardHelper.GetRunDeckCards(owner);
+        if (deckCards.Any(IsTwistCard))
+        {
+            MainFile.Logger.Info(
+                $"[EnigmaticAcknowledgmentDeckHelper] twist_already_present | owner={owner.NetId}");
+            return false;
+        }
+
+        var acknowledgment = deckCards.FirstOrDefault(IsAcknowledgmentCard);
+        if (acknowledgment == null)
+        {
+            MainFile.Logger.Info(
+                $"[EnigmaticAcknowledgmentDeckHelper] acknowledgment_missing_for_replace | owner={owner.NetId}");
+            return false;
+        }
+
+        if (!EventDeckCardHelper.RemoveCardFromRunDeck(owner, acknowledgment))
+        {
+            MainFile.Logger.Warn(
+                $"[EnigmaticAcknowledgmentDeckHelper] remove_acknowledgment_failed | owner={owner.NetId}");
+            return false;
+        }
+
+        var twist = CreateMutable<EnigmaticTheTwist>(owner, acknowledgment);
+        if (!TryAddCardToRunDeck(owner, twist))
+        {
+            MainFile.Logger.Warn(
+                $"[EnigmaticAcknowledgmentDeckHelper] add_twist_failed | owner={owner.NetId}");
+            return false;
+        }
+
+        SaveManager.Instance?.MarkCardAsSeen(twist.CanonicalInstance ?? twist);
+        MainFile.Logger.Info(
+            $"[EnigmaticAcknowledgmentDeckHelper] replaced_acknowledgment_with_twist | owner={owner.NetId} | upgraded={twist.CurrentUpgradeLevel}");
+        return true;
+    }
+
+    public static EnigmaticRevelationKind GetRevelationInHand(Player? owner)
+    {
+        var handCards = owner?.PlayerCombatState?.Hand?.Cards;
+        if (handCards == null)
+            return EnigmaticRevelationKind.None;
+
+        if (handCards.Any(IsTwistCard))
+            return EnigmaticRevelationKind.Twist;
+        if (handCards.Any(IsAcknowledgmentCard))
+            return EnigmaticRevelationKind.Acknowledgment;
+        return EnigmaticRevelationKind.None;
+    }
+
     public static bool IsAcknowledgmentCard(CardModel? card)
     {
         if (card == null)
@@ -81,12 +143,42 @@ internal static class EnigmaticAcknowledgmentDeckHelper
                || card.CanonicalInstance?.Id == targetId;
     }
 
-    private static CardModel CreateMutable(Player owner, CardModel? replacedCard = null)
+    public static bool IsTwistCard(CardModel? card)
     {
-        var mutableCard = ModelDb.Card<EnigmaticTheAcknowledgment>().ToMutable();
+        if (card == null)
+            return false;
+
+        var targetId = ModelDb.Card<EnigmaticTheTwist>().Id;
+        return card is EnigmaticTheTwist
+               || card.Id == targetId
+               || card.CanonicalInstance?.Id == targetId;
+    }
+
+    public static bool IsRevelationCard(CardModel? card)
+    {
+        return IsAcknowledgmentCard(card) || IsTwistCard(card);
+    }
+
+    private static CardModel CreateMutable<TCard>(Player owner, CardModel? replacedCard = null)
+        where TCard : CardModel
+    {
+        var mutableCard = ModelDb.Card<TCard>().ToMutable();
         mutableCard.Owner = owner;
         mutableCard.FloorAddedToDeck = replacedCard?.FloorAddedToDeck ?? 1;
+        CopyUpgradeState(replacedCard, mutableCard);
         return mutableCard;
+    }
+
+    private static void CopyUpgradeState(CardModel? source, CardModel mutableCard)
+    {
+        if (source == null)
+            return;
+
+        while (mutableCard.CurrentUpgradeLevel < source.CurrentUpgradeLevel)
+        {
+            mutableCard.UpgradeInternal();
+            mutableCard.FinalizeUpgradeInternal();
+        }
     }
 
     private static bool IsAscendersBane(CardModel? card)

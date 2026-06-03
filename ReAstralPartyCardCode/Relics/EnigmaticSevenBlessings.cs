@@ -17,6 +17,8 @@ using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Rewards;
+using ReAstralPartyMod.ReAstralPartyCardCode.RestSite;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -27,16 +29,32 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     private const int PotionSlotsBonus = 4;
     private const int SmithBonus = 4;
     private const int RelicDropPermille = 330;
+    private const int SpecialMaterialDropPermille = 330;
     private const int ExtraCardRewardPermille = 115;
-    // TODO(ring_of_seven_curses): 标记地图节点，有33%概率掉落特殊产物。
-    // TODO(ring_of_seven_curses): 你可以在休息点制作和使用独特的遗物。
+    private readonly List<string> _pendingUniqueMaterialRewardKeys = [];
 
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsPendingExtraCardRewardCount { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsEnemyDeathRollSequence { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsSelfKillRollSequence { get; set; }
+    [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsEnemyDeathSpecialMaterialRollSequence { get; set; }
+    [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsCombatEndSpecialMaterialRollSequence { get; set; }
     [SavedProperty] public bool AstralParty_SevenCursesMaxHpBonusGranted { get; set; }
     [SavedProperty] public bool AstralParty_SevenBlessingsPotionSlotsGranted { get; set; }
+    [SavedProperty]
+    private string AstralParty_EnigmaticSevenBlessingsPendingUniqueMaterialRewardsSerialized
+    {
+        get => string.Join("|", _pendingUniqueMaterialRewardKeys);
+        set
+        {
+            _pendingUniqueMaterialRewardKeys.Clear();
+            if (string.IsNullOrWhiteSpace(value))
+                return;
+
+            foreach (var key in value.Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                _pendingUniqueMaterialRewardKeys.Add(key);
+        }
+    }
 
     protected override string RelicId => "enigmatic_seven_blessings";
 
@@ -61,8 +79,11 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     {
         AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount = 0;
         AstralParty_EnigmaticSevenBlessingsPendingExtraCardRewardCount = 0;
+        _pendingUniqueMaterialRewardKeys.Clear();
         AstralParty_EnigmaticSevenBlessingsEnemyDeathRollSequence = 0;
         AstralParty_EnigmaticSevenBlessingsSelfKillRollSequence = 0;
+        AstralParty_EnigmaticSevenBlessingsEnemyDeathSpecialMaterialRollSequence = 0;
+        AstralParty_EnigmaticSevenBlessingsCombatEndSpecialMaterialRollSequence = 0;
         return Task.CompletedTask;
     }
 
@@ -86,13 +107,16 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             "enemy_death_relic",
             Owner.RunState.Rng.StringSeed,
             Owner.RunState.CurrentActIndex,
+            Owner.RunState.TotalFloor,
             Owner.NetId,
             sequence);
-        if (!didDropRelic)
-            return;
+        if (didDropRelic)
+        {
+            AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount++;
+            Flash();
+        }
 
-        AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount++;
-        Flash();
+        TryQueueEnemyDeathSpecialMaterialReward();
         await Task.CompletedTask;
     }
 
@@ -118,6 +142,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             "self_kill_card_reward",
             Owner.RunState.Rng.StringSeed,
             Owner.RunState.CurrentActIndex,
+            Owner.RunState.TotalFloor,
             Owner.NetId,
             sequence);
         if (!didGrantCardReward)
@@ -133,16 +158,23 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         if (Owner == null)
             return Task.CompletedTask;
 
+        TryQueueCombatEndSpecialMaterialReward();
+
         for (var i = 0; i < AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount; i++)
             room.AddExtraReward(Owner, new RelicReward(Owner));
 
         for (var i = 0; i < AstralParty_EnigmaticSevenBlessingsPendingExtraCardRewardCount; i++)
             room.AddExtraReward(Owner, new CardReward(CardCreationOptions.ForRoom(Owner, room.RoomType), 3, Owner));
 
+        AddPendingSpecialMaterialRewards(room);
+
         AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount = 0;
         AstralParty_EnigmaticSevenBlessingsPendingExtraCardRewardCount = 0;
+        _pendingUniqueMaterialRewardKeys.Clear();
         AstralParty_EnigmaticSevenBlessingsEnemyDeathRollSequence = 0;
         AstralParty_EnigmaticSevenBlessingsSelfKillRollSequence = 0;
+        AstralParty_EnigmaticSevenBlessingsEnemyDeathSpecialMaterialRollSequence = 0;
+        AstralParty_EnigmaticSevenBlessingsCombatEndSpecialMaterialRollSequence = 0;
         return Task.CompletedTask;
     }
 
@@ -156,12 +188,21 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         if (player != Owner)
             return false;
 
+        var modified = false;
         var smithOption = options.OfType<SmithRestSiteOption>().FirstOrDefault();
-        if (smithOption == null)
-            return false;
+        if (smithOption != null)
+        {
+            smithOption.SmithCount += SmithBonus;
+            modified = true;
+        }
 
-        smithOption.SmithCount += SmithBonus;
-        return true;
+        if (options.All(static option => option is not EnigmaticSynthesisRestSiteOption))
+        {
+            options.Add(new EnigmaticSynthesisRestSiteOption(player));
+            modified = true;
+        }
+
+        return modified;
     }
 
     public override bool TryModifyCardRewardOptions(
@@ -173,5 +214,99 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             return false;
 
         return RingOfSevenCursesHelper.TryAppendHigherRarityRewardCard(player, rewardCards, options);
+    }
+
+    private void TryQueueEnemyDeathSpecialMaterialReward()
+    {
+        if (Owner?.RunState == null)
+            return;
+
+        var sequence = AstralParty_EnigmaticSevenBlessingsEnemyDeathSpecialMaterialRollSequence++;
+        if (!TryQueueSpecialMaterialReward(
+            "enemy_death_special_material",
+            "enemy_death_special_material_kind",
+            "enemy_death_special_material_amount",
+            sequence))
+            return;
+
+        Flash();
+    }
+
+    private void TryQueueCombatEndSpecialMaterialReward()
+    {
+        if (Owner?.RunState == null)
+            return;
+
+        var sequence = AstralParty_EnigmaticSevenBlessingsCombatEndSpecialMaterialRollSequence++;
+        if (!TryQueueSpecialMaterialReward(
+            "combat_end_special_material",
+            "combat_end_special_material_kind",
+            "combat_end_special_material_amount",
+            sequence))
+            return;
+
+        Flash();
+    }
+
+    private bool TryQueueSpecialMaterialReward(
+        string dropSalt,
+        string kindSalt,
+        string amountSalt,
+        int sequence)
+    {
+        if (Owner?.RunState == null)
+            return false;
+
+        var didDropSpecialMaterial = RingOfSevenCursesHelper.RollPermille(
+            SpecialMaterialDropPermille,
+            MainFile.ModId,
+            RingOfSevenCursesHelper.SeriesId,
+            RelicId,
+            dropSalt,
+            Owner.RunState.Rng.StringSeed,
+            Owner.RunState.CurrentActIndex,
+            Owner.RunState.TotalFloor,
+            Owner.NetId,
+            sequence);
+        if (!didDropSpecialMaterial)
+            return false;
+
+        var kind = EnigmaticRewardRegistry.RollUniqueMaterialKind(
+            MainFile.ModId,
+            RingOfSevenCursesHelper.SeriesId,
+            RelicId,
+            kindSalt,
+            Owner.RunState.Rng.StringSeed,
+            Owner.RunState.CurrentActIndex,
+            Owner.RunState.TotalFloor,
+            Owner.NetId,
+            sequence);
+        var amount = EnigmaticRewardRegistry.RollRewardAmount(
+            kind,
+            MainFile.ModId,
+            RingOfSevenCursesHelper.SeriesId,
+            RelicId,
+            amountSalt,
+            Owner.RunState.Rng.StringSeed,
+            Owner.RunState.CurrentActIndex,
+            Owner.RunState.TotalFloor,
+            Owner.NetId,
+            sequence);
+        _pendingUniqueMaterialRewardKeys.Add(EnigmaticRewardRegistry.CreateRewardKey(kind, amount));
+        return true;
+    }
+
+    private void AddPendingSpecialMaterialRewards(CombatRoom room)
+    {
+        if (Owner == null || _pendingUniqueMaterialRewardKeys.Count == 0)
+            return;
+
+        foreach (var rewardKey in _pendingUniqueMaterialRewardKeys)
+        {
+            if (!EnigmaticRewardRegistry.TryParseRewardKey(rewardKey, out var kind, out var amount))
+                continue;
+
+            room.AddExtraReward(Owner, EnigmaticRewardRegistry.CreateUniqueMaterialReward(Owner, kind, amount));
+        }
     }
 }

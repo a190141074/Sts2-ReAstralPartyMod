@@ -145,11 +145,11 @@ internal static class RingOfSevenCursesHelper
         if (rewardCards.Count >= ExtraRewardCardOptionCount)
             return false;
 
-        var lowestRarity = rewardCards
+        var highestRarity = rewardCards
             .Select(result => result.Card.Rarity)
-            .OrderBy(GetRewardRarityRank)
+            .OrderByDescending(GetRewardRarityRank)
             .FirstOrDefault();
-        var targetRarity = GetNextHigherRarity(lowestRarity);
+        var targetRarity = GetNextHigherRarity(highestRarity);
 
         var excludedIds = rewardCards
             .Select(result => result.Card.CanonicalInstance?.Id ?? result.Card.Id)

@@ -31,6 +31,8 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COLLECTION.description": "A special card pool mainly intended for commemorative value.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE.title": "Unique",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE.description": "Only [blue]1[/blue] Unique card with the same name can remain in your hand. If a same-name [gold]Unique[/gold] card is already there, the later card added to hand is automatically [gold]Exhausted[/gold].",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE_MATERIAL.title": "Unique Material",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_UNIQUE_MATERIAL.description": "A special material relic used for [gold]Enigmatic Synthesis[/gold]. When you gain another copy of the same Unique Material, it merges into the existing relic and adds stacks instead of creating a duplicate relic.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.title": "Cooldown",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_COOLDOWN.description": "This card also has the effects of [gold]Unique[/gold], [gold]Retain[/gold], and [gold]Exhaust[/gold].",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ULTIMATE_SKILL.title": "Ultimate Skill",

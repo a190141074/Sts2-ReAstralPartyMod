@@ -22,7 +22,21 @@ public static class ExclusiveRelicUnlockHelper
         ModelDb.Relic<PvzRareBigMouthedNut>(),
         ModelDb.Relic<PvzRareAngmaoNut>(),
         ModelDb.Relic<PvzUltimateHyperSpacetimeNut>(),
-        ModelDb.Relic<PvzUltimateSunshineEmperorNut>()
+        ModelDb.Relic<PvzUltimateSunshineEmperorNut>(),
+        ModelDb.Relic<EnigmaticEtheriumIngot>(),
+        ModelDb.Relic<EnigmaticNefariousEssence>(),
+        ModelDb.Relic<EnigmaticNetheriteIngot>(),
+        ModelDb.Relic<EnigmaticRedstoneDust>(),
+        ModelDb.Relic<EnigmaticGhastTear>(),
+        ModelDb.Relic<EnigmaticBlazePowder>(),
+        ModelDb.Relic<EnigmaticEnderEye>(),
+        ModelDb.Relic<EnigmaticEarthHeart>(),
+        ModelDb.Relic<EnigmaticSynthesisTwistedHeart>(),
+        ModelDb.Relic<EnigmaticSynthesisEtheriumHelmet>(),
+        ModelDb.Relic<EnigmaticSynthesisEtheriumCuirass>(),
+        ModelDb.Relic<EnigmaticSynthesisEtheriumGreaves>(),
+        ModelDb.Relic<EnigmaticSynthesisEtheriumBoots>(),
+        ModelDb.Relic<EnigmaticSynthesisTheTwist>()
     ];
 
     private static readonly HashSet<ModelId> ExclusiveRelicIds = ExclusiveRelics

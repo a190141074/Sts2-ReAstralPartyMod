@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Saves;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 using STS2RitsuLib;
 using STS2RitsuLib.Scaffolding.Ancients.Options;
@@ -98,19 +99,25 @@ internal static class NeowOptionInjectionHelper
 
     private static string? ResolveSelectedCandidateKey(AncientEventModel ancient)
     {
-        if (CandidateDefinitions.Count == 0)
+        var runState = ancient.Owner?.RunState as RunState;
+        var eligibleCandidates = GetEligibleCandidates(runState);
+        if (eligibleCandidates.Count == 0)
             return null;
 
-        var runState = ancient.Owner?.RunState as RunState;
         var runKey = GetRunKey(runState, ancient.Owner);
         lock (SyncLock)
         {
             if (SelectedCandidateKeysByRun.TryGetValue(runKey, out var cachedKey))
-                return cachedKey;
+            {
+                if (eligibleCandidates.Any(candidate => string.Equals(candidate.StableKey, cachedKey, StringComparison.Ordinal)))
+                    return cachedKey;
+
+                SelectedCandidateKeysByRun.Remove(runKey);
+            }
 
             var selectedIndex = DeterministicMultiplayerChoiceHelper.RollDeterministically(
                 0,
-                CandidateDefinitions.Count,
+                eligibleCandidates.Count,
                 MainFile.ModId,
                 nameof(Neow),
                 "custom_option_pool",
@@ -118,12 +125,34 @@ internal static class NeowOptionInjectionHelper
                 ancient.Owner?.RunState?.Rng.StringSeed ?? "<null_seed>",
                 ancient.Owner?.RunState?.CurrentActIndex ?? -1,
                 ancient.Owner?.NetId.ToString() ?? "<null_owner>");
-            var selectedCandidate = CandidateDefinitions[selectedIndex];
+            var selectedCandidate = eligibleCandidates[selectedIndex];
             SelectedCandidateKeysByRun[runKey] = selectedCandidate.StableKey;
             MainFile.Logger.Info(
-                $"[NeowOptionInjectionHelper] Selected custom Neow option for run | runKey={runKey} | key={selectedCandidate.StableKey} | poolSize={CandidateDefinitions.Count} | selectedIndex={selectedIndex}.");
+                $"[NeowOptionInjectionHelper] Selected custom Neow option for run | runKey={runKey} | key={selectedCandidate.StableKey} | poolSize={eligibleCandidates.Count} | selectedIndex={selectedIndex}.");
             return selectedCandidate.StableKey;
         }
+    }
+
+    private static IReadOnlyList<NeowOptionCandidateDefinition> GetEligibleCandidates(RunState? runState)
+    {
+        if (!ReAstralPartyModSettingsManager.GetEnableNeowExtraOption(runState))
+            return [];
+
+        var eligible = new List<NeowOptionCandidateDefinition>(CandidateDefinitions.Count);
+        foreach (var candidate in CandidateDefinitions)
+        {
+            if (string.Equals(candidate.StableKey, "dream_face_the_shadow", StringComparison.Ordinal)
+                && !ReAstralPartyModSettingsManager.GetEnableDreamSeriesEvents(runState))
+                continue;
+
+            if (string.Equals(candidate.StableKey, "ring_of_seven_curses", StringComparison.Ordinal)
+                && !ReAstralPartyModSettingsManager.GetEnableEnigmaticSeriesEvents(runState))
+                continue;
+
+            eligible.Add(candidate);
+        }
+
+        return eligible;
     }
 
     private static string GetRunKey(RunState? runState, Player? owner)

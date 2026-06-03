@@ -28,6 +28,7 @@ public static class AstralKeywords
         AstralGhostAlleySetStem,
         AstralCollectionStem,
         AstralUniqueStem,
+        AstralUniqueMaterialStem,
         AstralCooldownStem,
         AstralUltimateSkillStem,
         AstralInvestigationProgressStem,
@@ -55,6 +56,7 @@ public static class AstralKeywords
     public const string AstralGhostAlleySetStem = "ASTRAL_GHOST_ALLEY_SET";
     public const string AstralCollectionStem = "ASTRAL_COLLECTION";
     public const string AstralUniqueStem = "ASTRAL_UNIQUE";
+    public const string AstralUniqueMaterialStem = "ASTRAL_UNIQUE_MATERIAL";
     public const string AstralCooldownStem = "ASTRAL_COOLDOWN";
     public const string AstralUltimateSkillStem = "ASTRAL_ULTIMATE_SKILL";
     public const string AstralInvestigationProgressStem = "ASTRAL_INVESTIGATION_PROGRESS";
@@ -79,6 +81,7 @@ public static class AstralKeywords
     public static string AstralGhostAlleySetId => GetId(AstralGhostAlleySetStem);
     public static string AstralCollectionId => GetId(AstralCollectionStem);
     public static string AstralUniqueId => GetId(AstralUniqueStem);
+    public static string AstralUniqueMaterialId => GetId(AstralUniqueMaterialStem);
     public static string AstralCooldownId => GetId(AstralCooldownStem);
     public static string AstralUltimateSkillId => GetId(AstralUltimateSkillStem);
     public static string AstralInvestigationProgressId => GetId(AstralInvestigationProgressStem);
@@ -103,6 +106,7 @@ public static class AstralKeywords
     public static CardKeyword AstralGhostAlleySet => GetKeyword(AstralGhostAlleySetStem);
     public static CardKeyword AstralCollection => GetKeyword(AstralCollectionStem);
     public static CardKeyword AstralUnique => GetKeyword(AstralUniqueStem);
+    public static CardKeyword AstralUniqueMaterial => GetKeyword(AstralUniqueMaterialStem);
     public static CardKeyword AstralCooldown => GetKeyword(AstralCooldownStem);
     public static CardKeyword AstralUltimateSkill => GetKeyword(AstralUltimateSkillStem);
     public static CardKeyword AstralInvestigationProgress => GetKeyword(AstralInvestigationProgressStem);
