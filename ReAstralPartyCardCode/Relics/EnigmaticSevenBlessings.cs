@@ -237,12 +237,14 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         {
             EnigmaticRewardRegistry.CreateUniqueMaterialReward(player, EnigmaticUniqueMaterialKind.EtheriumIngot, 2)
         };
+        var rolledDiscoveryKinds = new HashSet<EnigmaticUniqueMaterialKind>();
 
         var sequence = AstralParty_EnigmaticSevenBlessingsDiscoveryRollSequence++;
         for (var slotIndex = 0; slotIndex < 2; slotIndex++)
         {
-            var kind = EnigmaticRewardRegistry.RollUniqueMaterialKindWithRareBonus(
+            var kind = EnigmaticRewardRegistry.RollUniqueMaterialKindWithRareBonusExcluding(
                 DiscoveryRareMaterialWeightBonusPermille,
+                rolledDiscoveryKinds,
                 MainFile.ModId,
                 RingOfSevenCursesHelper.SeriesId,
                 RelicId,
@@ -253,6 +255,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
                 Owner.NetId,
                 sequence,
                 slotIndex);
+            rolledDiscoveryKinds.Add(kind);
             var amount = EnigmaticRewardRegistry.RollRewardAmount(
                 kind,
                 MainFile.ModId,

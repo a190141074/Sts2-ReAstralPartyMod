@@ -295,10 +295,15 @@ internal static class EnigmaticRewardRegistry
         int rareWeightBonusPermille,
         params object?[] contextParts)
     {
-        var availableKinds = MaterialConfigs.Values
-            .Where(static config => config.IncludeInSevenBlessingsPool && config.RewardPoolWeight > 0)
-            .OrderBy(config => config.RelicIdEntry, StringComparer.Ordinal)
-            .ToList();
+        return RollUniqueMaterialKindWithRareBonusExcluding(rareWeightBonusPermille, null, contextParts);
+    }
+
+    public static EnigmaticUniqueMaterialKind RollUniqueMaterialKindWithRareBonusExcluding(
+        int rareWeightBonusPermille,
+        IReadOnlyCollection<EnigmaticUniqueMaterialKind>? excludedKinds,
+        params object?[] contextParts)
+    {
+        var availableKinds = GetRewardPoolConfigs(excludedKinds);
         if (availableKinds.Count == 0)
             return EnigmaticUniqueMaterialKind.EtheriumIngot;
 
@@ -380,6 +385,16 @@ internal static class EnigmaticRewardRegistry
     {
         var config = GetConfig(kind);
         return Math.Clamp(amount, config.MinRewardAmount, config.MaxRewardAmount);
+    }
+
+    private static List<EnigmaticUniqueMaterialConfig> GetRewardPoolConfigs(
+        IReadOnlyCollection<EnigmaticUniqueMaterialKind>? excludedKinds)
+    {
+        return MaterialConfigs.Values
+            .Where(static config => config.IncludeInSevenBlessingsPool && config.RewardPoolWeight > 0)
+            .Where(config => excludedKinds == null || !excludedKinds.Contains(config.Kind))
+            .OrderBy(config => config.RelicIdEntry, StringComparer.Ordinal)
+            .ToList();
     }
 
     private static int GetPoolWeight(EnigmaticUniqueMaterialConfig config, int rareWeightBonusPermille)
