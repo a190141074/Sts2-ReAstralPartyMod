@@ -165,7 +165,10 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             return amount;
         if (amount <= 0m)
             return amount;
-        if (!SevenCursesDebuffProtectionHelper.IsDebuffDamage(target, props, dealer, cardSource))
+
+        var isDebuffDamage = SevenCursesDebuffProtectionHelper.IsDebuffDamage(target, props, dealer, cardSource);
+        var isNonCombatHpLoss = target.CombatState == null;
+        if (!isDebuffDamage && !isNonCombatHpLoss)
             return amount;
 
         var maxHpLoss = Math.Max(0m, target.CurrentHp - 1m);
@@ -174,7 +177,7 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             return amount;
 
         MainFile.Logger.Info(
-            $"[EnigmaticSevenCurses] Prevented debuff lethal damage | owner={Owner.NetId} | currentHp={target.CurrentHp} | incoming={amount} | clipped={clippedAmount} | dealer={dealer?.ModelId.ToString() ?? "<none>"} | card={cardSource?.Id.Entry ?? "<none>"}");
+            $"[EnigmaticSevenCurses] Prevented lethal hp loss | owner={Owner.NetId} | currentHp={target.CurrentHp} | incoming={amount} | clipped={clippedAmount} | nonCombat={isNonCombatHpLoss} | debuff={isDebuffDamage} | dealer={dealer?.ModelId.ToString() ?? "<none>"} | card={cardSource?.Id.Entry ?? "<none>"}");
         Flash();
         return clippedAmount;
     }

@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
+using ReAstralPartyMod.ReAstralPartyCardCode.Potions;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -18,6 +19,14 @@ internal static class RingOfSevenCursesHelper
 {
     public const string SeriesId = "ring_of_seven_curses";
     private const int ExtraRewardCardOptionCount = 4;
+    private const int BonusPersonaChestPermille = 70;
+    private static readonly PotionRarity[] SevenBlessingsPotionRarityPattern =
+    [
+        PotionRarity.Common,
+        PotionRarity.Uncommon,
+        PotionRarity.Uncommon,
+        PotionRarity.Rare
+    ];
 
     public static async Task EnsureRelicPairAsync<TMissing>(Player? owner)
         where TMissing : RelicModel
@@ -97,21 +106,25 @@ internal static class RingOfSevenCursesHelper
         if (owner == null || amount <= 0)
             return;
 
-        var candidates = GetSevenBlessingsPotionCandidates(owner);
-        if (candidates.Count == 0)
+        var slotsToGrant = Math.Min(amount, SevenBlessingsPotionRarityPattern.Length);
+        for (var i = 0; i < slotsToGrant; i++)
         {
-            MainFile.Logger.Warn($"[RingOfSevenCursesHelper] No potion candidates for Seven Blessings | owner={owner.NetId}");
-            return;
-        }
+            var rarity = SevenBlessingsPotionRarityPattern[i];
+            var candidates = GetSevenBlessingsSharedPotionCandidates(owner, rarity);
+            if (candidates.Count == 0)
+            {
+                MainFile.Logger.Warn(
+                    $"[RingOfSevenCursesHelper] No shared potion candidates for Seven Blessings | owner={owner.NetId} | rarity={rarity}");
+                continue;
+            }
 
-        for (var i = 0; i < amount; i++)
-        {
             var roll = DeterministicMultiplayerChoiceHelper.RollDeterministically(
                 0,
                 candidates.Count,
                 MainFile.ModId,
                 SeriesId,
                 nameof(GrantSevenBlessingsRandomPotions),
+                rarity.ToString(),
                 owner.RunState?.Rng.StringSeed,
                 owner.RunState?.CurrentActIndex,
                 owner.RunState?.TotalFloor,
@@ -120,6 +133,21 @@ internal static class RingOfSevenCursesHelper
             var selected = candidates[roll];
             owner.AddPotionInternal(selected.ToMutable());
         }
+
+        if (!RollPermille(
+                BonusPersonaChestPermille,
+                MainFile.ModId,
+                SeriesId,
+                nameof(GrantSevenBlessingsRandomPotions),
+                "bonus_persona_chest",
+                owner.RunState?.Rng.StringSeed,
+                owner.RunState?.CurrentActIndex,
+                owner.RunState?.TotalFloor,
+                owner.NetId))
+            return;
+
+        PlayerCmd.GainMaxPotionCount(1, owner);
+        owner.AddPotionInternal(ModelDb.Potion<PersonChestChoose>().ToMutable());
     }
 
     public static void SyncSeriesRewardFlags(Player? owner)
@@ -217,21 +245,19 @@ internal static class RingOfSevenCursesHelper
         await RelicCmd.Obtain(canonicalRelic.ToMutable(), owner);
     }
 
-    private static List<PotionModel> GetSevenBlessingsPotionCandidates(Player owner)
+    private static List<PotionModel> GetSevenBlessingsSharedPotionCandidates(Player owner, PotionRarity rarity)
     {
         var unlockState = owner.RunState?.UnlockState;
-        if (owner.Character == null || unlockState == null)
+        if (unlockState == null)
             return [];
 
         var characterPoolIds = ModelDb.AllCharacterPotionPools
             .Select(pool => pool.Id)
             .ToHashSet();
-        var sharedPools = ModelDb.AllPotionPools
-            .Where(pool => !characterPoolIds.Contains(pool.Id));
-
-        return owner.Character.PotionPool
-            .GetUnlockedPotions(unlockState)
-            .Concat(sharedPools.SelectMany(pool => pool.GetUnlockedPotions(unlockState)))
+        return ModelDb.AllPotionPools
+            .Where(pool => !characterPoolIds.Contains(pool.Id))
+            .SelectMany(pool => pool.GetUnlockedPotions(unlockState))
+            .Where(potion => potion.Rarity == rarity)
             .GroupBy(potion => potion.CanonicalInstance?.Id ?? potion.Id)
             .Select(group => group.First())
             .OrderBy(potion => (potion.CanonicalInstance?.Id ?? potion.Id).Entry, StringComparer.Ordinal)

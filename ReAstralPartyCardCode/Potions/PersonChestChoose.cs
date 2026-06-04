@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Potions;
@@ -41,6 +42,8 @@ public class PersonChestChoose : AstralPartyPotionModel
     {
         if (Owner == null)
             return;
+        if (Owner.RunState is RunState runState)
+            await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
 
         var availableRelics = GetAvailablePersonaRelics(Owner);
         if (availableRelics.Count == 0)
