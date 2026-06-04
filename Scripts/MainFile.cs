@@ -35,6 +35,7 @@ public class MainFile
         // so keywords must be registered before assembly auto-discovery runs.
         AstralKeywords.RegisterAll();
         EnigmaticRewardRegistry.RegisterAll();
+        StokovStarterBundleHelper.RegisterAll();
         SavedPropertyGovernance.LogGovernanceSummary(assembly);
         SavedPropertyCacheBootstrap.ScheduleVerification(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);

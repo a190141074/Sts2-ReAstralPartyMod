@@ -300,6 +300,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
         patcher.RegisterPatch<PlayerGainGoldEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<PunitiveJudgmentHandEntryPatch>();
+        patcher.RegisterPatch<StokovStarterRelicUpgradePatch>();
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)
