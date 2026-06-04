@@ -46,6 +46,25 @@ public sealed class ReAstralPartyRunSettingsSnapshot
         get => BannedRelicIdsSerialized;
         set => BannedRelicIdsSerialized = value;
     }
+
+    public ReAstralPartyRunSettingsSnapshot Clone()
+    {
+        return new ReAstralPartyRunSettingsSnapshot
+        {
+            EnableExtremeMode = EnableExtremeMode,
+            EnableStartingInitialPoint = EnableStartingInitialPoint,
+            EnableStartingPersonaSelection = EnableStartingPersonaSelection,
+            EnableDreamSeriesEvents = EnableDreamSeriesEvents,
+            EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
+            EnableNeowExtraOption = EnableNeowExtraOption,
+            EnableAllPersonas = EnableAllPersonas,
+            EnableAllVariantPersonas = EnableAllVariantPersonas,
+            StartingPersonaMode = StartingPersonaMode,
+            TokenSeriesMode = TokenSeriesMode,
+            EnablePureAngelMode = EnablePureAngelMode,
+            BannedRelicIdsSerialized = [.. BannedRelicIdsSerialized]
+        };
+    }
 }
 
 internal static class ReAstralPartyRunSettingsSync
@@ -92,10 +111,13 @@ internal static class ReAstralPartyRunSettingsSync
         if (runState is not RunState concreteRunState)
             return false;
 
+        if (ReAstralPartyModSettingsManager.TryGetStoredRunSettingsSnapshot(concreteRunState, out snapshot))
+            return true;
+
         if (!RunStates.TryGetValue(concreteRunState, out var state) || state.Snapshot == null)
             return false;
 
-        snapshot = state.Snapshot;
+        snapshot = state.Snapshot.Clone();
         return true;
     }
 
@@ -292,6 +314,13 @@ internal static class ReAstralPartyRunSettingsSync
 
     private static async Task<ReAstralPartyRunSettingsSnapshot> SyncAsync(RunState runState, RunSettingsSyncState state)
     {
+        if (ReAstralPartyModSettingsManager.TryGetStoredRunSettingsSnapshot(runState, out var storedSnapshot))
+        {
+            state.SetSnapshot(runState, storedSnapshot);
+            LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
+            return storedSnapshot;
+        }
+
         var runManager = RunManager.Instance;
         if (runManager == null)
         {
@@ -302,7 +331,7 @@ internal static class ReAstralPartyRunSettingsSync
                 213,
                 "同步前置",
                 "联机玩法设置同步时未拿到 RunManager，已退回安全默认值。");
-            state.SetSnapshot(safeSnapshot);
+            state.SetSnapshot(runState, safeSnapshot);
             return safeSnapshot;
         }
 
@@ -310,7 +339,7 @@ internal static class ReAstralPartyRunSettingsSync
         if (netService == null || netService.Type is NetGameType.None or NetGameType.Singleplayer)
         {
             var localSnapshot = CreateLocalSnapshot();
-            state.SetSnapshot(localSnapshot);
+            state.SetSnapshot(runState, localSnapshot);
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
             return localSnapshot;
         }
@@ -325,7 +354,7 @@ internal static class ReAstralPartyRunSettingsSync
                 214,
                 "同步前置",
                 "联机玩法设置同步时未拿到 PlayerChoiceSynchronizer，已退回安全默认值。");
-            state.SetSnapshot(safeSnapshot);
+            state.SetSnapshot(runState, safeSnapshot);
             return safeSnapshot;
         }
 
@@ -339,7 +368,7 @@ internal static class ReAstralPartyRunSettingsSync
                 215,
                 "主机识别",
                 "联机玩法设置同步时未识别到房主 NetId，已退回安全默认值。");
-            state.SetSnapshot(safeSnapshot);
+            state.SetSnapshot(runState, safeSnapshot);
             return safeSnapshot;
         }
 
@@ -353,7 +382,7 @@ internal static class ReAstralPartyRunSettingsSync
                 216,
                 "主机识别",
                 $"联机玩法设置同步时未找到房主玩家 {authorityNetId}，已退回安全默认值。");
-            state.SetSnapshot(safeSnapshot);
+            state.SetSnapshot(runState, safeSnapshot);
             return safeSnapshot;
         }
 
@@ -371,7 +400,7 @@ internal static class ReAstralPartyRunSettingsSync
                     continue;
                 }
 
-                state.SetSnapshot(remoteSnapshot);
+                state.SetSnapshot(runState, remoteSnapshot);
                 LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
                 MainFile.Logger.Info(
                     $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, start_initial_point={remoteSnapshot.EnableStartingInitialPoint}, start_persona_selection={remoteSnapshot.EnableStartingPersonaSelection}, dream_series={remoteSnapshot.EnableDreamSeriesEvents}, enigmatic_series={remoteSnapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={remoteSnapshot.EnableNeowExtraOption}, all_personas={remoteSnapshot.EnableAllPersonas}, all_variants={remoteSnapshot.EnableAllVariantPersonas}, persona_mode={remoteSnapshot.StartingPersonaMode}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}, banned_relics={remoteSnapshot.BannedRelicIdsSerialized.Count}");
@@ -393,7 +422,7 @@ internal static class ReAstralPartyRunSettingsSync
         if (isHost)
         {
             var localSnapshot = CreateLocalSnapshot();
-            state.SetSnapshot(localSnapshot);
+            state.SetSnapshot(runState, localSnapshot);
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
             synchronizer.SyncLocalChoice(authorityPlayer, choiceId, CreateSnapshotChoiceResult(runState, localSnapshot));
             MainFile.Logger.Info(
@@ -408,7 +437,7 @@ internal static class ReAstralPartyRunSettingsSync
             218,
             "主机路径",
             "联机玩法设置同步未进入有效的房主路径，已退回安全默认值。");
-        state.SetSnapshot(fallbackSnapshot);
+        state.SetSnapshot(runState, fallbackSnapshot);
         return fallbackSnapshot;
     }
 
@@ -498,12 +527,14 @@ internal static class ReAstralPartyRunSettingsSync
             }
         }
 
-        public void SetSnapshot(ReAstralPartyRunSettingsSnapshot snapshot)
+        public void SetSnapshot(RunState runState, ReAstralPartyRunSettingsSnapshot snapshot)
         {
             lock (_gate)
             {
-                Snapshot = snapshot;
+                Snapshot = snapshot.Clone();
             }
+
+            ReAstralPartyModSettingsManager.StoreRunSettingsSnapshot(runState, snapshot);
         }
     }
 }

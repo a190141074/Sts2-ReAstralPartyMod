@@ -1,6 +1,7 @@
 using Godot;
 using MegaCrit.Sts2.Core.Localization;
 using STS2RitsuLib;
+using STS2RitsuLib.RunData;
 using STS2RitsuLib.Settings;
 using STS2RitsuLib.Utils.Persistence;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
@@ -122,8 +123,10 @@ public sealed class ReAstralPartyModSettings
 public static partial class ReAstralPartyModSettingsManager
 {
     public const string SettingsKey = "settings";
+    private const string RunSettingsSnapshotKey = "gameplay_run_settings_snapshot";
 
     private static readonly object RuntimeSettingsGate = new();
+    private static RunSavedData<ReAstralPartyRunSettingsSnapshot> _runSettingsSnapshots = null!;
 
     private static LocalRuntimeSettings _runtimeSettings = LocalRuntimeSettings.FromPersistent(
         new ReAstralPartyModSettings());
@@ -223,6 +226,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool TryGetRunSnapshot(IRunState? runState, out ReAstralPartyRunSettingsSnapshot snapshot)
     {
+        if (TryGetStoredRunSettingsSnapshot(runState, out snapshot))
+            return true;
+
         return ReAstralPartyRunSettingsSync.TryGetSnapshot(runState, out snapshot);
     }
 
@@ -494,12 +500,58 @@ public static partial class ReAstralPartyModSettingsManager
                 SaveScope.Global,
                 static () => new ReAstralPartyModSettings(),
                 true);
+
+            _runSettingsSnapshots = RitsuLibFramework
+                .GetRunSavedDataStore(MainFile.ModId)
+                .Register(
+                    RunSettingsSnapshotKey,
+                    static () => new ReAstralPartyRunSettingsSnapshot(),
+                    new RunSavedDataOptions
+                    {
+                        WritePolicy = RunSavedDataWritePolicy.WhenNonDefault
+                    });
         }
 
         ApplyRuntimeSettings(ReadLocalSettings(), "register");
         RegisterSettingsPage();
         _registered = true;
         MainFile.Logger.Info($"{MainFile.ModId} mod settings registered.");
+    }
+
+    internal static bool TryGetStoredRunSettingsSnapshot(IRunState? runState, out ReAstralPartyRunSettingsSnapshot snapshot)
+    {
+        snapshot = null!;
+        if (runState is not RunState concreteRunState)
+            return false;
+
+        try
+        {
+            if (!_runSettingsSnapshots.TryGet(concreteRunState, out var storedSnapshot) || storedSnapshot == null)
+                return false;
+
+            snapshot = storedSnapshot.Clone();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"{MainFile.ModId} failed to read stored run settings snapshot: {ex.Message}");
+            return false;
+        }
+    }
+
+    internal static void StoreRunSettingsSnapshot(RunState runState, ReAstralPartyRunSettingsSnapshot snapshot)
+    {
+        ArgumentNullException.ThrowIfNull(runState);
+        ArgumentNullException.ThrowIfNull(snapshot);
+
+        try
+        {
+            _runSettingsSnapshots.Set(runState, snapshot.Clone());
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"{MainFile.ModId} failed to store run settings snapshot: {ex.Message}");
+        }
     }
 
     internal static void SetEnableTelemetry(bool enabled)
