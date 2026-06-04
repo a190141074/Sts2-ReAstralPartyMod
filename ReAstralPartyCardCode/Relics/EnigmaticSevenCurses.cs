@@ -230,8 +230,7 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         var didModify = false;
         if (!_isGrowingExistingDebuffs &&
             target == Owner.Creature &&
-            canonicalPower.Type == PowerType.Debuff &&
-            canonicalPower.StackType == PowerStackType.Counter)
+            StackableDebuffGrowthHelper.CanIncreaseIncomingStackableDebuff(canonicalPower, amount))
         {
             modifiedAmount += 1m;
             didModify = true;
@@ -241,8 +240,7 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             GetRevelationInHand() == EnigmaticRevelationKind.Twist &&
             applier == Owner.Creature &&
             target.Side != Owner.Creature.Side &&
-            canonicalPower.Type == PowerType.Debuff &&
-            canonicalPower.StackType == PowerStackType.Counter)
+            StackableDebuffGrowthHelper.CanIncreaseIncomingStackableDebuff(canonicalPower, amount))
         {
             modifiedAmount += TwistDebuffBonusAmount;
             didModify = true;

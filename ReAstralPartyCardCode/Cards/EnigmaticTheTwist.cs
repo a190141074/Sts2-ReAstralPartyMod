@@ -11,7 +11,7 @@ public class EnigmaticTheTwist : AstralPartyCardModel
 {
     protected override string CardId => "enigmatic_the_twist";
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Unplayable];
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Unplayable, CardKeyword.Eternal];
 
     public EnigmaticTheTwist()
         : base(-2, CardType.Curse, CardRarity.Rare, TargetType.Self, showInCardLibrary: false)

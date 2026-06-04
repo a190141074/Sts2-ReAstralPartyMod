@@ -14,11 +14,21 @@ internal static class StackableDebuffGrowthHelper
     private static readonly ConcurrentDictionary<Type, MethodInfo?> ClosedSetAmountMethods = new();
     private static readonly ConcurrentDictionary<string, byte> LoggedWarnings = new();
 
+    public static bool IsStackableCounterDebuff(PowerModel power)
+    {
+        return power.Type == PowerType.Debuff &&
+               power.StackType == PowerStackType.Counter;
+    }
+
+    public static bool CanIncreaseIncomingStackableDebuff(PowerModel canonicalPower, decimal amount)
+    {
+        return amount > 0m && IsStackableCounterDebuff(canonicalPower);
+    }
+
     public static bool CanGrowExistingStackableDebuff(PowerModel power)
     {
         return power.Owner != null &&
-               power.Type == PowerType.Debuff &&
-               power.StackType == PowerStackType.Counter &&
+               IsStackableCounterDebuff(power) &&
                power.Amount > 0m;
     }
 
