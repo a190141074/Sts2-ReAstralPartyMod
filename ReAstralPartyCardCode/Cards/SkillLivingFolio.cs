@@ -14,6 +14,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using STS2RitsuLib.Cards.DynamicVars;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -37,7 +38,7 @@ public class SkillLivingFolio : AstralPartyCardModel
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(BaseDamage, ValueProp.Move)
+        ModCardVars.Computed("Damage", BaseDamage, static card => ResolveDisplayedDamage(card as SkillLivingFolio))
     ];
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
@@ -52,13 +53,6 @@ public class SkillLivingFolio : AstralPartyCardModel
 
     protected override void OnUpgrade()
     {
-    }
-
-    public override async Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
-    {
-        await base.AfterCardChangedPiles(card, oldPileType, source);
-        if (card == this)
-            SyncDisplayedDamage();
     }
 
     public override (PileType, CardPilePosition) ModifyCardPlayResultPileTypeAndPosition(
@@ -104,7 +98,6 @@ public class SkillLivingFolio : AstralPartyCardModel
 
         var targetMarksBeforePlay = target.GetPowerAmount<MarkLockPower>();
         personDeityLin.RecordLivingFolioConsumption(1);
-        SyncDisplayedDamage();
 
         await CreatureCmd.Damage(
             choiceContext,
@@ -139,6 +132,11 @@ public class SkillLivingFolio : AstralPartyCardModel
         return BaseDamage + GetPermanentDamageBonus();
     }
 
+    private static decimal ResolveDisplayedDamage(SkillLivingFolio? card)
+    {
+        return card?.GetCurrentDamageAmount() ?? BaseDamage;
+    }
+
     private decimal GetCombatEnergyCost(decimal originalCost)
     {
         if (GetPermanentDamageBonus() > 11m)
@@ -151,10 +149,4 @@ public class SkillLivingFolio : AstralPartyCardModel
     {
         return Owner?.GetRelic<PersonDeityLin>()?.GetLivingFolioPermanentDamageBonus() ?? 0;
     }
-
-    private void SyncDisplayedDamage()
-    {
-        DynamicVars["Damage"].BaseValue = GetCurrentDamageAmount();
-    }
 }
-

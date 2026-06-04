@@ -9,4 +9,5 @@ public class EnigmaticSynthesisEtheriumBoots : EnigmaticSynthesisEtheriumArmorRe
     protected override string RelicId => "enigmatic_synthesis_etherium_boots";
 
     protected override decimal FullPlatingAmount => 2m;
+    protected override decimal FullRegenAmount => 1m;
 }

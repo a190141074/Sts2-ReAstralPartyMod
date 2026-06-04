@@ -37,6 +37,7 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
 
     private bool _isGrowingExistingDebuffs;
     private bool _isApplyingRevelationBurn;
+    private bool _isApplyingShopSelfDamage;
 
     [SavedProperty] public bool AstralParty_SevenCursesMaxHpBonusGranted { get; set; }
     [SavedProperty] public bool AstralParty_SevenBlessingsPotionSlotsGranted { get; set; }
@@ -89,7 +90,11 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             return 1m;
 
         if (target == Owner.Creature)
+        {
+            if (_isApplyingShopSelfDamage)
+                return 1m;
             return DamageTakenMultiplier;
+        }
 
         if (dealer != Owner.Creature || target == null || target.Side == Owner.Creature.Side)
             return 1m;
@@ -149,6 +154,31 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         return 1m;
     }
 
+    public override decimal ModifyHpLostAfterOsty(
+        Creature target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (Owner?.Creature == null || target != Owner.Creature)
+            return amount;
+        if (amount <= 0m)
+            return amount;
+        if (!SevenCursesDebuffProtectionHelper.IsDebuffDamage(target, props, dealer, cardSource))
+            return amount;
+
+        var maxHpLoss = Math.Max(0m, target.CurrentHp - 1m);
+        var clippedAmount = Math.Min(amount, maxHpLoss);
+        if (clippedAmount >= amount)
+            return amount;
+
+        MainFile.Logger.Info(
+            $"[EnigmaticSevenCurses] Prevented debuff lethal damage | owner={Owner.NetId} | currentHp={target.CurrentHp} | incoming={amount} | clipped={clippedAmount} | dealer={dealer?.ModelId.ToString() ?? "<none>"} | card={cardSource?.Id.Entry ?? "<none>"}");
+        Flash();
+        return clippedAmount;
+    }
+
     public override async Task AfterRoomEntered(AbstractRoom room)
     {
         await RingOfSevenCursesHelper.EnsureSeriesIntegrityAsync(Owner);
@@ -156,14 +186,30 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         if (Owner?.Creature == null || room.RoomType != RoomType.Shop)
             return;
 
+        var maxNonLethalDamage = Math.Max(0m, Owner.Creature.CurrentHp - 1m);
+        if (maxNonLethalDamage <= 0m)
+            return;
+
         var damage = Math.Max(1m, Math.Ceiling(Owner.Creature.CurrentHp * ShopSelfDamagePercent));
-        await CreatureCmd.Damage(
-            new ThrowingPlayerChoiceContext(),
-            Owner.Creature,
-            damage,
-            ValueProp.Unblockable | ValueProp.Unpowered,
-            null,
-            null);
+        damage = Math.Min(damage, maxNonLethalDamage);
+        if (damage <= 0m)
+            return;
+
+        _isApplyingShopSelfDamage = true;
+        try
+        {
+            await CreatureCmd.Damage(
+                new ThrowingPlayerChoiceContext(),
+                Owner.Creature,
+                damage,
+                ValueProp.Unblockable | ValueProp.Unpowered,
+                null,
+                null);
+        }
+        finally
+        {
+            _isApplyingShopSelfDamage = false;
+        }
     }
 
     public override bool TryModifyPowerAmountReceived(
@@ -210,7 +256,7 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             return;
 
         var debuffs = Owner.Creature.Powers
-            .Where(power => power.Type == PowerType.Debuff && power.StackType == PowerStackType.Counter)
+            .Where(StackableDebuffGrowthHelper.CanGrowExistingStackableDebuff)
             .OrderBy(power => power.Id.Entry, StringComparer.Ordinal)
             .ToList();
         if (debuffs.Count == 0)
@@ -220,16 +266,7 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         try
         {
             foreach (var debuff in debuffs)
-            {
-                var canonicalPower = ModelDb.GetById<PowerModel>(debuff.Id);
-                await PowerCmd.Apply(
-                    canonicalPower.ToMutable(),
-                    Owner.Creature,
-                    1m,
-                    debuff.Applier,
-                    null,
-                    false);
-            }
+                await StackableDebuffGrowthHelper.TryGrowExistingStackableDebuffAsync(debuff, 1m, null);
         }
         finally
         {
@@ -240,6 +277,8 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
     public override async Task AfterPreventingDeath(Creature creature)
     {
         if (creature != Owner?.Creature)
+            return;
+        if (SevenCursesDebuffProtectionHelper.IsInDebuffDamageContext)
             return;
 
         var maxHpLoss = Math.Max(1m, Math.Ceiling(creature.MaxHp * MaxHpLossPercentOnPreventedDeath));

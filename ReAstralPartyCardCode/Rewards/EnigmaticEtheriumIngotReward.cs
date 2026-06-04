@@ -61,8 +61,8 @@ internal static class EnigmaticRewardRegistry
                 static () => ModelDb.Relic<EnigmaticEtheriumIngot>(),
                 GrantMaterialStacks<EnigmaticEtheriumIngot>,
                 RelicRarity.Common,
-                1,
-                3,
+                2,
+                6,
                 1,
                 true),
             [EnigmaticUniqueMaterialKind.NefariousEssence] = new(

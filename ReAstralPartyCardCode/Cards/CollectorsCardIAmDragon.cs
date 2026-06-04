@@ -1,4 +1,3 @@
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,6 +15,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
+using STS2RitsuLib.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -29,7 +29,7 @@ public class CollectorsCardIAmDragon : AstralPartyCardModel
     private const decimal BaseBonusDamage = 3m;
     private const decimal BonusDamageUpgrade = 1m;
 
-    private static readonly ConcurrentDictionary<string, bool> LostHpThisTurnByPlayer = new();
+    private static readonly AttachedState<CollectorsCardIAmDragon, bool> LostHpThisTurn = new(() => false);
 
     private bool _isAutoPlaying;
 
@@ -173,32 +173,16 @@ public class CollectorsCardIAmDragon : AstralPartyCardModel
 
     private bool HasLostHpThisTurn()
     {
-        var ownerKey = GetOwnerKey();
-        return ownerKey != null
-               && LostHpThisTurnByPlayer.TryGetValue(ownerKey, out var lostHpThisTurn)
-               && lostHpThisTurn;
+        return LostHpThisTurn.GetValueOrDefault(this, false);
     }
 
     private void ResetLostHpThisTurnFlag()
     {
-        var ownerKey = GetOwnerKey();
-        if (ownerKey == null)
-            return;
-
-        LostHpThisTurnByPlayer[ownerKey] = false;
+        LostHpThisTurn[this] = false;
     }
 
     private void SetLostHpThisTurnFlag(bool value)
     {
-        var ownerKey = GetOwnerKey();
-        if (ownerKey == null)
-            return;
-
-        LostHpThisTurnByPlayer[ownerKey] = value;
-    }
-
-    private string? GetOwnerKey()
-    {
-        return Owner == null ? null : Owner.NetId.ToString();
+        LostHpThisTurn[this] = value;
     }
 }

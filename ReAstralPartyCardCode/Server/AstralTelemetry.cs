@@ -122,6 +122,7 @@ internal static class AstralTelemetry
     private static TelemetryConfig? _cachedConfig;
     private static ITelemetryClient? _telemetryClient;
     private static bool _applicantRegistered;
+    private static bool _lifecycleBridgeRegistered;
     private static string? _cachedManifestModVersion;
 
     private sealed class RunTelemetryState
@@ -246,6 +247,7 @@ internal static class AstralTelemetry
         try
         {
             EnsureConfigFile();
+            RegisterLifecycleBridgeIfNeeded();
             RegisterApplicantIfNeeded();
             SyncFromModSettings();
         }
@@ -293,6 +295,41 @@ internal static class AstralTelemetry
     {
         return ReAstralPartyModSettingsManager.EnableTelemetry &&
                GetTelemetryClient().IsEnabled(BalanceRequestId);
+    }
+
+    private static void RegisterLifecycleBridgeIfNeeded()
+    {
+        if (_lifecycleBridgeRegistered)
+            return;
+
+        _lifecycleBridgeRegistered = true;
+        RitsuLibFramework.SubscribeLifecycle<RunStartedEvent>(OnRunStarted, replayCurrentState: false);
+        RitsuLibFramework.SubscribeLifecycle<RunLoadedEvent>(OnRunLoaded, replayCurrentState: false);
+        RitsuLibFramework.SubscribeLifecycle<RunEndedEvent>(OnRunEndedFromLifecycle, replayCurrentState: false);
+    }
+
+    private static void OnRunStarted(RunStartedEvent evt)
+    {
+        if (!AstralNetPhaseGuard.Guard(AstralNetPhase.StartRunBootstrap, "telemetry start run"))
+            return;
+
+        BeginNewRun(evt.RunState);
+    }
+
+    private static void OnRunLoaded(RunLoadedEvent evt)
+    {
+        RestoreLoadedRun(evt.RunState);
+    }
+
+    private static void OnRunEndedFromLifecycle(RunEndedEvent evt)
+    {
+        if (evt.IsAbandoned)
+        {
+            DiscardPersistedRunState("abandon_run");
+            return;
+        }
+
+        OnRunEnded(RunManager.Instance?.DebugOnlyGetState(), evt.Run, evt.IsVictory);
     }
 
     public static void BeginNewRun(RunState? runState)

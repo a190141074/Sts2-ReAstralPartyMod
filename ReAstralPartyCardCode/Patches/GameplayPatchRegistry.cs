@@ -329,10 +329,6 @@ internal static class GameplayStaticPatchCatalog
                 "Gameplay patch: swallow any ready-option clicks that leak into the default Neow event room handler",
                 [typeof(EventOption), typeof(int)]),
         ]);
-        patcher.RegisterPatch<AstralTelemetryStartRunPatch>();
-        patcher.RegisterPatch<AstralTelemetryLoadRunPatch>();
-        patcher.RegisterPatch<AstralTelemetryRunEndedPatch>();
-        patcher.RegisterPatch<AstralTelemetryAbandonPatch>();
         patcher.RegisterPatch<AstralTelemetryDeleteCurrentRunPatch>();
         patcher.RegisterPatch<ReAstralPartyRunSettingsLoadPatch>();
     }

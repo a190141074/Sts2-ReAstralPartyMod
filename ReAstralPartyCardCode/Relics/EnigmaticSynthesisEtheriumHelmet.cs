@@ -9,4 +9,5 @@ public class EnigmaticSynthesisEtheriumHelmet : EnigmaticSynthesisEtheriumArmorR
     protected override string RelicId => "enigmatic_synthesis_etherium_helmet";
 
     protected override decimal FullPlatingAmount => 2m;
+    protected override decimal FullRegenAmount => 1m;
 }

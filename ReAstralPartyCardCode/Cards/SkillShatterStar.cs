@@ -13,6 +13,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+using STS2RitsuLib.Cards.DynamicVars;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -28,7 +29,7 @@ public class SkillShatterStar : AstralPartyCardModel
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(BaseDamage, ValueProp.Move)
+        ModCardVars.Computed(DamageVarName, BaseDamage, static card => ResolveDisplayedDamage(card as SkillShatterStar))
     ];
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
@@ -42,18 +43,6 @@ public class SkillShatterStar : AstralPartyCardModel
     {
     }
 
-    public override Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
-    {
-        RefreshDamageDisplay();
-        return base.AfterCardChangedPiles(card, oldPileType, source);
-    }
-
-    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
-    {
-        await base.AfterCardPlayed(choiceContext, cardPlay);
-        RefreshDamageDisplay();
-    }
-
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         RecordTelemetryOnPlay();
@@ -65,7 +54,7 @@ public class SkillShatterStar : AstralPartyCardModel
             return;
 
         var sara = Owner.GetRelic<VariantPersonSara>();
-        var damage = CalculateDamage(sara?.GetCurrentCharge() ?? 0);
+        var damage = CalculateDamageForCharge(sara?.GetCurrentCharge() ?? 0);
         var targetWasAlive = target.IsAlive;
         await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move, Owner.Creature, this);
         if (targetWasAlive && !target.IsAlive && sara != null)
@@ -73,26 +62,20 @@ public class SkillShatterStar : AstralPartyCardModel
             sara.ReduceCooldownOne();
             await AstralDivinePersonaHelper.HandleShatterStarKillExtraTurn(Owner, sara, this);
         }
-
-        RefreshDamageDisplay();
     }
 
-    private decimal CalculateDamage(int charge)
+    private static decimal ResolveDisplayedDamage(SkillShatterStar? card)
+    {
+        return CalculateDamageForCharge(card?.Owner?.GetRelic<VariantPersonSara>()?.GetCurrentCharge() ?? 0);
+    }
+
+    private static decimal CalculateDamageForCharge(int charge)
     {
         return BaseDamage * (1m + Math.Max(charge, 0) * DamageScalePerCharge);
     }
 
-    private void RefreshDamageDisplay()
-    {
-        if (!DynamicVars.ContainsKey(DamageVarName))
-            return;
-
-        var sara = Owner?.GetRelic<VariantPersonSara>();
-        DynamicVars[DamageVarName].BaseValue = CalculateDamage(sara?.GetCurrentCharge() ?? 0);
-    }
-
     public void RefreshDisplayedDamage()
     {
-        RefreshDamageDisplay();
+        // Computed dynamic vars derive their value from current charge and no longer need manual refresh.
     }
 }

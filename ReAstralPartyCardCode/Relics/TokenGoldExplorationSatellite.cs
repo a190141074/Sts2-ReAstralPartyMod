@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using STS2RitsuLib.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -21,8 +22,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class TokenGoldExplorationSatellite : AstralPartyRelicModel
 {
     private const int HandThreshold = 6;
-
-    [SavedProperty] public bool AstralParty_TokenGoldExplorationSatellitePendingRailgun { get; set; }
+    private static readonly SavedAttachedState<TokenGoldExplorationSatellite, bool> PendingRailgun =
+        new($"{MainFile.ModId}_token_gold_exploration_satellite_pending_railgun", _ => false);
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -37,7 +38,7 @@ public class TokenGoldExplorationSatellite : AstralPartyRelicModel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_TokenGoldExplorationSatellitePendingRailgun = false;
+        PendingRailgun[this] = false;
     }
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -57,10 +58,10 @@ public class TokenGoldExplorationSatellite : AstralPartyRelicModel
     {
         if (player != Owner || Owner?.Creature?.CombatState == null)
             return;
-        if (!AstralParty_TokenGoldExplorationSatellitePendingRailgun)
+        if (!PendingRailgun.GetValueOrDefault(this, false))
             return;
 
-        AstralParty_TokenGoldExplorationSatellitePendingRailgun = false;
+        PendingRailgun[this] = false;
         Flash();
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<BaseAbilityOrbitalRailgun>(), Owner);
@@ -73,14 +74,14 @@ public class TokenGoldExplorationSatellite : AstralPartyRelicModel
             return Task.CompletedTask;
 
         if (PileType.Hand.GetPile(Owner).Cards.Count < HandThreshold)
-            AstralParty_TokenGoldExplorationSatellitePendingRailgun = true;
+            PendingRailgun[this] = true;
 
         return Task.CompletedTask;
     }
 
     public override Task AfterCombatEnd(CombatRoom room)
     {
-        AstralParty_TokenGoldExplorationSatellitePendingRailgun = false;
+        PendingRailgun[this] = false;
         return Task.CompletedTask;
     }
 

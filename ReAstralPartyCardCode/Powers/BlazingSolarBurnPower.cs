@@ -34,7 +34,8 @@ public class BlazingSolarBurnPower : AstralPartyPowerModel
             : NormalMaxHpDamageRatio;
         var capDamage = Math.Ceiling(Owner.MaxHp * maxHpRatio);
         var finalDamage = Math.Max(1m, Math.Min(baseDamage, capDamage));
-        await CreatureCmd.Damage(new ThrowingPlayerChoiceContext(), Owner, finalDamage, ValueProp.Move, null, null);
+        using (SevenCursesDebuffProtectionHelper.EnterDebuffDamageContext())
+            await CreatureCmd.Damage(new ThrowingPlayerChoiceContext(), Owner, finalDamage, ValueProp.Move, null, null);
         await PowerCmd.SetAmount<BlazingSolarBurnPower>(Owner, Math.Max(0m, Amount - 1m), null, null);
     }
 }

@@ -28,14 +28,15 @@ public class TwinShadowsPower : AstralPartyPowerModel
             return;
 
         Flash();
-        await CreatureCmd.Damage(
-            new ThrowingPlayerChoiceContext(),
-            Owner,
-            ShadowDamage,
-            ValueProp.Unblockable | ValueProp.Unpowered,
-            Applier,
-            null
-        );
+        using (SevenCursesDebuffProtectionHelper.EnterDebuffDamageContext())
+            await CreatureCmd.Damage(
+                new ThrowingPlayerChoiceContext(),
+                Owner,
+                ShadowDamage,
+                ValueProp.Unblockable | ValueProp.Unpowered,
+                Applier,
+                null
+            );
 
         if (Owner.IsAlive)
             await PowerCmd.TickDownDuration(this);

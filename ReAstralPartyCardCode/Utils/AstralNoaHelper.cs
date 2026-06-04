@@ -101,11 +101,17 @@ internal static class AstralNoaHelper
     {
         var poisonAmount = GetRoundedPowerAmount(target.GetPowerAmount<PoisonPower>());
         if (poisonAmount > 0)
-            await CreatureCmd.Damage(choiceContext, target, poisonAmount, ValueProp.Unblockable, applier, source);
+        {
+            using (SevenCursesDebuffProtectionHelper.EnterDebuffDamageContext())
+                await CreatureCmd.Damage(choiceContext, target, poisonAmount, ValueProp.Unblockable, applier, source);
+        }
 
         var doomAmount = GetRoundedPowerAmount(target.GetPowerAmount<DoomPower>());
         if (doomAmount > 0 && target.IsAlive && doomAmount >= target.CurrentHp)
-            await CreatureCmd.Damage(choiceContext, target, target.CurrentHp, ValueProp.Unblockable | ValueProp.Unpowered, applier, source);
+        {
+            using (SevenCursesDebuffProtectionHelper.EnterDebuffDamageContext())
+                await CreatureCmd.Damage(choiceContext, target, target.CurrentHp, ValueProp.Unblockable | ValueProp.Unpowered, applier, source);
+        }
     }
 
     public static async Task ClearPoisonAndDoom(Creature target)

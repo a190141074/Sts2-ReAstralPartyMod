@@ -35,8 +35,8 @@ public class MainFile
         // so keywords must be registered before assembly auto-discovery runs.
         AstralKeywords.RegisterAll();
         EnigmaticRewardRegistry.RegisterAll();
-        PreloadSavedPropertyCache(assembly);
         SavedPropertyGovernance.LogGovernanceSummary(assembly);
+        SavedPropertyCacheBootstrap.ScheduleVerification(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
         var contentRegistry = RitsuLibFramework.GetContentRegistry(ModId);
         contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<PersonaSkillCardPool>(
@@ -59,20 +59,6 @@ public class MainFile
         _initialized = true;
         Logger.Info($"{ModId} initialized | build={buildMarker}");
         LogLoadedArtifacts(buildMarker);
-    }
-
-    private static void PreloadSavedPropertyCache(Assembly assembly)
-    {
-        try
-        {
-            var result = SavedPropertyCacheBootstrap.PreloadFromAssembly(assembly);
-            Logger.Info(
-                $"{ModId} saved properties | discovered_types={result.DiscoveredTypeCount} | injected_types={result.InjectedTypeCount} | discovered_properties={result.DiscoveredPropertyCount} | total_property_names={result.TotalPropertyNameCount} | net_id_bits={result.NetIdBitSize} | fingerprint={result.Fingerprint}");
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException("Failed to preload SavedProperty cache deterministically.", ex);
-        }
     }
 
     private static void LogLoadedArtifacts(string buildMarker)
