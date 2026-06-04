@@ -42,6 +42,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsSelfKillRollSequence { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsEnemyDeathSpecialMaterialRollSequence { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsCombatEndSpecialMaterialRollSequence { get; set; }
+    [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsDiscoveryRollSequence { get; set; }
     [SavedProperty] public bool AstralParty_SevenCursesMaxHpBonusGranted { get; set; }
     [SavedProperty] public bool AstralParty_SevenBlessingsPotionSlotsGranted { get; set; }
     [SavedProperty]
@@ -206,6 +207,12 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             modified = true;
         }
 
+        if (options.All(static option => option is not EnigmaticDiscoveryRestSiteOption))
+        {
+            options.Add(new EnigmaticDiscoveryRestSiteOption(player));
+            modified = true;
+        }
+
         return modified;
     }
 
@@ -218,6 +225,49 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             return false;
 
         return RingOfSevenCursesHelper.TryAppendHigherRarityRewardCard(player, rewardCards, options);
+    }
+
+    public IReadOnlyList<Reward> CreateDiscoveryRewards(Player player)
+    {
+        if (player != Owner || Owner?.RunState == null)
+            return [];
+
+        var rewards = new List<Reward>
+        {
+            EnigmaticRewardRegistry.CreateUniqueMaterialReward(player, EnigmaticUniqueMaterialKind.EtheriumIngot, 2)
+        };
+
+        var sequence = AstralParty_EnigmaticSevenBlessingsDiscoveryRollSequence++;
+        for (var slotIndex = 0; slotIndex < 2; slotIndex++)
+        {
+            var kind = EnigmaticRewardRegistry.RollUniqueMaterialKind(
+                MainFile.ModId,
+                RingOfSevenCursesHelper.SeriesId,
+                RelicId,
+                "rest_site_discovery_kind",
+                Owner.RunState.Rng.StringSeed,
+                Owner.RunState.CurrentActIndex,
+                Owner.RunState.TotalFloor,
+                Owner.NetId,
+                sequence,
+                slotIndex);
+            var amount = EnigmaticRewardRegistry.RollRewardAmount(
+                kind,
+                MainFile.ModId,
+                RingOfSevenCursesHelper.SeriesId,
+                RelicId,
+                "rest_site_discovery_amount",
+                Owner.RunState.Rng.StringSeed,
+                Owner.RunState.CurrentActIndex,
+                Owner.RunState.TotalFloor,
+                Owner.NetId,
+                sequence,
+                slotIndex);
+            rewards.Add(EnigmaticRewardRegistry.CreateUniqueMaterialReward(player, kind, amount));
+        }
+
+        MainFile.Logger.Info($"[EnigmaticSevenBlessings] Created discovery rewards | owner={Owner.NetId} | sequence={sequence} | rewardCount={rewards.Count}");
+        return rewards;
     }
 
     private void TryQueueEnemyDeathSpecialMaterialReward()
