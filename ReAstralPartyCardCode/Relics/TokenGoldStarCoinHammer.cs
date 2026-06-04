@@ -15,6 +15,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
+using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
@@ -34,6 +35,7 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
     private static int _activeBonusHits;
 
     [SavedProperty] public bool AstralParty_RelicGoldStarCoinHammerTriggeredThisTurn { get; set; }
+    [SavedProperty] public int AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -54,6 +56,7 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_RelicGoldStarCoinHammerTriggeredThisTurn = false;
+        AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill = 0;
         if (Owner != null)
         {
             if (TokenRelicBridgeInitializationContext.ShouldSkipOneTimeObtainRewards)
@@ -78,9 +81,23 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
         return Task.CompletedTask;
     }
 
+    public override Task BeforeCombatStart()
+    {
+        AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill = 0;
+        return Task.CompletedTask;
+    }
+
     public override Task AfterCombatEnd(CombatRoom room)
     {
         AstralParty_RelicGoldStarCoinHammerTriggeredThisTurn = false;
+        if (AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill > 0 && Owner != null)
+        {
+            room.AddExtraReward(
+                Owner,
+                new GoldReward(AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill, Owner, false));
+            AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill = 0;
+        }
+
         InvokeDisplayAmountChanged();
         return Task.CompletedTask;
     }
@@ -91,6 +108,22 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
             InvokeDisplayAmountChanged();
 
         return Task.CompletedTask;
+    }
+
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        if (cardPlay.Card.Owner != Owner)
+            return;
+
+        await TryFlushPendingStarLightReward(cardPlay.Card);
+    }
+
+    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    {
+        if (Owner?.Creature == null || side != Owner.Creature.Side)
+            return;
+
+        await TryFlushPendingStarLightReward(null);
     }
 
     public override async Task AfterDamageGiven(
@@ -114,6 +147,8 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
         var bonusDamage = CalculateBonusDamageAfterCost(Owner!.Gold);
         if (bonusDamage <= 0m)
             return;
+        if (!CanStillResolveBonusDamage(target))
+            return;
 
         try
         {
@@ -122,20 +157,16 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
                 choiceContext,
                 target,
                 bonusDamage,
-                ValueProp.Unpowered,
+                ValueProp.Unpowered | ValueProp.SkipHurtAnim,
                 Owner.Creature,
                 null
             );
 
             if (!target.IsAlive)
-                await PowerCmd.Apply(
-                    ModelDb.Power<StarLightPower>().ToMutable(),
-                    Owner.Creature,
-                    StarLightOnKill,
-                    Owner.Creature,
-                    null,
-                    false
-                );
+            {
+                AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill += (int)StarLightOnKill;
+                await TryFlushPendingStarLightReward(cardSource);
+            }
         }
         finally
         {
@@ -153,7 +184,7 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
             return false;
         if (dealer != Owner.Creature)
             return false;
-        if (target.Side == Owner.Creature.Side || !target.IsAlive)
+        if (target.Side == Owner.Creature.Side || !CanStillResolveBonusDamage(target))
             return false;
         if (result.TotalDamage <= 0)
             return false;
@@ -185,5 +216,33 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
     public void RefreshDisplayedBonusDamage()
     {
         InvokeDisplayAmountChanged();
+    }
+
+    private bool CanStillResolveBonusDamage(Creature target)
+    {
+        if (Owner?.Creature?.CombatState == null)
+            return false;
+        if (CombatManager.Instance.IsOverOrEnding)
+            return false;
+
+        return target.IsAlive
+               && target.IsHittable
+               && target.CombatState == Owner.Creature.CombatState;
+    }
+
+    private async Task TryFlushPendingStarLightReward(CardModel? source)
+    {
+        if (AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill <= 0)
+            return;
+        if (Owner?.Creature == null)
+            return;
+        if (CombatManager.Instance.IsOverOrEnding)
+            return;
+        if (Owner.Creature.CombatState == null || !Owner.Creature.IsAlive)
+            return;
+
+        var pendingAmount = AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill;
+        AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill = 0;
+        await PowerCmd.Apply<StarLightPower>(Owner.Creature, pendingAmount, Owner.Creature, source, false);
     }
 }

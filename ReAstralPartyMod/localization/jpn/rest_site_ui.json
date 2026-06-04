@@ -9,5 +9,5 @@
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_SYNTHESIS.description_disabled": "[blue]独特素材[/blue]を消費して、特別な[gold]神秘合成[/gold]レリックを作成します。十分な[blue]独特素材[/blue]と、条件を満たすレシピが必要です。この選択肢は休憩回数を消費せず、何度でも使用できます。",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_SYNTHESIS.selection_header": "神秘合成レリックを選択",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.name": "神秘発見",
-  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.description": "[blue]独特素材[/blue]報酬を[blue]3[/blue]個得る。そのうち[blue]1[/blue]個は必ず[blue]【以太インゴット】[/blue][blue]2[/blue]層になる。この選択肢は休憩回数を消費する。"
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.description": "[blue]独特素材[/blue]報酬を[blue]3[/blue]個得る。そのうち[blue]1[/blue]個は必ず[blue]【以太インゴット】[/blue][blue]2[/blue]層になる。残りのランダム素材枠では、レア独特素材の出現確率が[blue]33%[/blue]上がる。この選択肢は休憩回数を消費する。"
 }

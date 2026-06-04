@@ -117,6 +117,14 @@ internal static class GameplayStaticPatchCatalog
                 "UI patch: append current open token series icon to the normal-mode top bar",
                 [typeof(IRunState)]),
             new ModPatchInfo(
+                "enigmatic_synthesis_top_bar_button_placement_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.CommonUi.NTopBar),
+                nameof(MegaCrit.Sts2.Core.Nodes.CommonUi.NTopBar.Initialize),
+                typeof(EnigmaticSynthesisTopBarButtonPlacementPatch),
+                false,
+                "UI patch: move the enigmatic synthesis formula button to the left of the map button",
+                [typeof(IRunState)]),
+            new ModPatchInfo(
                 "event_option_locked_hover_focus_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
                 "OnFocus",
@@ -285,11 +293,12 @@ internal static class GameplayStaticPatchCatalog
 
         patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
-        patcher.RegisterPatch<CreatureHealEnigmaticCursedScrollPatch>();
+        patcher.RegisterPatch<CreatureHealEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
         patcher.RegisterPatch<DevConsoleUltimateChargeCommandPatch>();
+        patcher.RegisterPatch<EnigmaticSynthesisXpScrollRestSitePatch>();
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
-        patcher.RegisterPatch<PlayerGainGoldEnigmaticCursedScrollPatch>();
+        patcher.RegisterPatch<PlayerGainGoldEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<PunitiveJudgmentHandEntryPatch>();
     }
 

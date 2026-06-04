@@ -13,8 +13,12 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(SharedRelicPool))]
-public class EnigmaticCursedScroll : AstralPartyRelicModel
+public class EnigmaticSynthesisCursedScroll : AstralPartyRelicModel
 {
+    protected override string RelicId => "enigmatic_synthesis_cursed_scroll";
+
+    protected override string IconBasePath => "res://ReAstralPartyMod/images/relic/enigmatic_synthesis_cursed_scroll";
+
     public override RelicRarity Rarity => RelicRarity.Rare;
 
     public override bool ShouldReceiveCombatHooks => true;
@@ -30,7 +34,7 @@ public class EnigmaticCursedScroll : AstralPartyRelicModel
 
     internal static void RefreshCounterForOwner(Player? owner)
     {
-        owner?.GetRelic<EnigmaticCursedScroll>()?.RefreshCounter();
+        owner?.GetRelic<EnigmaticSynthesisCursedScroll>()?.RefreshCounter();
     }
 
     public override async Task AfterObtained()
@@ -87,7 +91,7 @@ public class EnigmaticCursedScroll : AstralPartyRelicModel
 
     public static decimal AdjustGoldGainAmount(Player? player, decimal amount)
     {
-        if (player?.GetRelic<EnigmaticCursedScroll>() == null)
+        if (player?.GetRelic<EnigmaticSynthesisCursedScroll>() == null)
             return amount;
 
         var weightedCurseCount = CursedScrollDeckHelper.GetWeightedCurseCount(player);
@@ -97,7 +101,7 @@ public class EnigmaticCursedScroll : AstralPartyRelicModel
     public static decimal AdjustHealAmount(Creature? creature, decimal amount)
     {
         var player = creature?.Player;
-        if (player == null || player.Creature != creature || player.GetRelic<EnigmaticCursedScroll>() == null)
+        if (player == null || player.Creature != creature || player.GetRelic<EnigmaticSynthesisCursedScroll>() == null)
             return amount;
 
         var weightedCurseCount = CursedScrollDeckHelper.GetWeightedCurseCount(player);

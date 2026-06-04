@@ -5,11 +5,11 @@ using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
-public sealed class CreatureHealEnigmaticCursedScrollPatch : IPatchMethod
+public sealed class CreatureHealEnigmaticSynthesisCursedScrollPatch : IPatchMethod
 {
-    public static string PatchId => "creature_heal_enigmatic_cursed_scroll";
+    public static string PatchId => "creature_heal_enigmatic_synthesis_cursed_scroll";
 
-    public static string Description => "Increase healing received by Enigmatic Cursed Scroll owner based on weighted curse count";
+    public static string Description => "Increase healing received by Enigmatic Synthesis Cursed Scroll owner based on weighted curse count";
 
     public static bool IsCritical => false;
 
@@ -23,7 +23,7 @@ public sealed class CreatureHealEnigmaticCursedScrollPatch : IPatchMethod
         if (amount <= 0m)
             return true;
 
-        amount = EnigmaticCursedScroll.AdjustHealAmount(creature, amount);
+        amount = EnigmaticSynthesisCursedScroll.AdjustHealAmount(creature, amount);
         return true;
     }
 }

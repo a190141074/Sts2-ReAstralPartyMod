@@ -49,8 +49,49 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 new(EnigmaticUniqueMaterialKind.NefariousEssence, 4),
                 new(EnigmaticUniqueMaterialKind.RedstoneDust, 1),
                 new(EnigmaticUniqueMaterialKind.TwistedHeart, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisCursedScroll>(),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.PhantomMembrane, 2),
+                new(EnigmaticUniqueMaterialKind.TwistedHeart, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.DarkestScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.RedstoneDust, 2),
+                new(EnigmaticUniqueMaterialKind.EnchantedBook, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisAvariceScroll>(),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.GoldIngot, 4),
+                new(EnigmaticUniqueMaterialKind.GemRing, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.DarkestScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.TwistedHeart, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisXpScroll>(),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.ExperienceBottle, 4),
+                new(EnigmaticUniqueMaterialKind.EnderEye, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.TriccScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.Emerald, 1)
             ])
     ];
+
+    public static IReadOnlyList<EnigmaticSynthesisRecipeView> AllRecipes { get; } = Recipes
+        .Select(static recipe => new EnigmaticSynthesisRecipeView(
+            recipe.Relic,
+            recipe.AllowDuplicateResult,
+            recipe.Costs.Select(static cost => new EnigmaticMaterialCostView(cost.Kind, cost.Amount)).ToList()))
+        .ToList();
 
     public static bool CanUse(Player? owner)
     {
@@ -85,6 +126,23 @@ internal static class EnigmaticSynthesisRestSiteHelper
         await ConsumeMaterialsAsync(consumptionPlan);
         await GrantCraftResultAsync(owner, recipe.Relic);
         return true;
+    }
+
+    public static int GetOwnedMaterialStacks(Player? owner, EnigmaticUniqueMaterialKind kind)
+    {
+        return owner == null ? 0 : GetTotalStacks(owner, kind);
+    }
+
+    public static bool CanCraft(Player? owner, EnigmaticSynthesisRecipeView recipe)
+    {
+        if (owner == null)
+            return false;
+
+        return recipe.Costs.All(cost => GetOwnedMaterialStacks(owner, cost.Kind) >= cost.Amount)
+               && (recipe.AllowDuplicateResult ||
+                   owner.Relics.All(owned =>
+                       owned.IsMelted || GetCanonicalId(owned) != GetCanonicalId(recipe.ResultRelic)))
+               && !PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.ResultRelic);
     }
 
     private static IReadOnlyList<EnigmaticSynthesisRecipe> GetEligibleRecipes(Player? owner)
@@ -182,3 +240,12 @@ internal static class EnigmaticSynthesisRestSiteHelper
         bool AllowDuplicateResult,
         IReadOnlyList<EnigmaticMaterialCost> Costs);
 }
+
+internal sealed record EnigmaticMaterialCostView(
+    EnigmaticUniqueMaterialKind Kind,
+    int Amount);
+
+internal sealed record EnigmaticSynthesisRecipeView(
+    RelicModel ResultRelic,
+    bool AllowDuplicateResult,
+    IReadOnlyList<EnigmaticMaterialCostView> Costs);

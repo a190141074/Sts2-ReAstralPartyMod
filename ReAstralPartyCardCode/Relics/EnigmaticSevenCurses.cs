@@ -68,14 +68,14 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         if (Owner != null)
         {
             EnigmaticAcknowledgmentDeckHelper.EnsureInRunDeck(Owner);
-            EnigmaticCursedScroll.RefreshCounterForOwner(Owner);
+            EnigmaticSynthesisCursedScroll.RefreshCounterForOwner(Owner);
         }
     }
 
     public override async Task AfterRemoved()
     {
         CursedScrollGrabBagHelper.NormalizeForOwner(Owner);
-        EnigmaticCursedScroll.RefreshCounterForOwner(Owner);
+        EnigmaticSynthesisCursedScroll.RefreshCounterForOwner(Owner);
         await base.AfterRemoved();
     }
 
@@ -187,6 +187,8 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         await RingOfSevenCursesHelper.EnsureSeriesIntegrityAsync(Owner);
 
         if (Owner?.Creature == null || room.RoomType != RoomType.Shop)
+            return;
+        if (Owner.GetRelic<EnigmaticGemRing>() != null || EnigmaticSynthesisAvariceScroll.PreventsShopEntryDamage(Owner))
             return;
 
         var maxNonLethalDamage = Math.Max(0m, Owner.Creature.CurrentHp - 1m);

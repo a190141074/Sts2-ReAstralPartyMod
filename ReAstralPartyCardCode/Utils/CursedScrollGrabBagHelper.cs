@@ -35,7 +35,7 @@ internal static class CursedScrollGrabBagHelper
         if (!deques.TryGetValue(RelicRarity.Rare, out var rareDeque) || rareDeque.Count == 0)
             return;
 
-        var scrollId = ModelDb.Relic<EnigmaticCursedScroll>().Id;
+        var scrollId = ModelDb.Relic<EnigmaticSynthesisCursedScroll>().Id;
         var existingScroll = rareDeque.FirstOrDefault(relic => relic.Id == scrollId);
         if (existingScroll == null)
             return;

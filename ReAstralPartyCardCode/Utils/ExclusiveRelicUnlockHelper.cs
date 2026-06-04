@@ -31,12 +31,23 @@ public static class ExclusiveRelicUnlockHelper
         ModelDb.Relic<EnigmaticBlazePowder>(),
         ModelDb.Relic<EnigmaticEnderEye>(),
         ModelDb.Relic<EnigmaticEarthHeart>(),
+        ModelDb.Relic<EnigmaticPhantomMembrane>(),
+        ModelDb.Relic<EnigmaticDarkestScroll>(),
+        ModelDb.Relic<EnigmaticEnchantedBook>(),
+        ModelDb.Relic<EnigmaticDye>(),
+        ModelDb.Relic<EnigmaticEnchantedFeather>(),
+        ModelDb.Relic<EnigmaticGemRing>(),
+        ModelDb.Relic<EnigmaticGoldIngot>(),
+        ModelDb.Relic<EnigmaticTriccScroll>(),
+        ModelDb.Relic<EnigmaticExperienceBottle>(),
+        ModelDb.Relic<EnigmaticEmerald>(),
         ModelDb.Relic<EnigmaticSynthesisTwistedHeart>(),
         ModelDb.Relic<EnigmaticSynthesisEtheriumHelmet>(),
         ModelDb.Relic<EnigmaticSynthesisEtheriumCuirass>(),
         ModelDb.Relic<EnigmaticSynthesisEtheriumGreaves>(),
         ModelDb.Relic<EnigmaticSynthesisEtheriumBoots>(),
-        ModelDb.Relic<EnigmaticSynthesisTheTwist>()
+        ModelDb.Relic<EnigmaticSynthesisTheTwist>(),
+        ModelDb.Relic<EnigmaticSynthesisAvariceScroll>()
     ];
 
     private static readonly HashSet<ModelId> ExclusiveRelicIds = ExclusiveRelics

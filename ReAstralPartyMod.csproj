@@ -538,6 +538,7 @@
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_big.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png.import"/>
+		<Content Include="ReAstralPartyMod\images\ui\enigmatic_synthesis_formula.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png.import"/>
 		<Content Include="ReAstralPartyMod\localization\eng\ancients.json" />
@@ -552,6 +553,7 @@
 		<Content Include="ReAstralPartyMod\localization\eng\relics.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\relic_collection.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\rest_site_ui.json"/>
+		<Content Include="ReAstralPartyMod\localization\eng\static_hover_tips.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\settings_ui.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\ancients.json" />
 		<Content Include="ReAstralPartyMod\localization\jpn\cards.json"/>
@@ -565,6 +567,7 @@
 		<Content Include="ReAstralPartyMod\localization\jpn\relics.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\relic_collection.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\rest_site_ui.json"/>
+		<Content Include="ReAstralPartyMod\localization\jpn\static_hover_tips.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\settings_ui.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\ancients.json" />
 		<Content Include="ReAstralPartyMod\localization\zhs\cards.json"/>
@@ -577,6 +580,7 @@
 		<Content Include="ReAstralPartyMod\localization\zhs\relics.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\relic_collection.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\rest_site_ui.json"/>
+		<Content Include="ReAstralPartyMod\localization\zhs\static_hover_tips.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\settings_ui.json"/>
 	</ItemGroup>
 

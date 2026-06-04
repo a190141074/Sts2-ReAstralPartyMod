@@ -33,6 +33,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     private const int SpecialMaterialDropPermillePerMissStreak = 140;
     private const int RelicDropPermille = 330;
     private const int ExtraCardRewardPermille = 115;
+    private const int DiscoveryRareMaterialWeightBonusPermille = 330;
     private readonly List<string> _pendingUniqueMaterialRewardKeys = [];
 
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount { get; set; }
@@ -240,7 +241,8 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         var sequence = AstralParty_EnigmaticSevenBlessingsDiscoveryRollSequence++;
         for (var slotIndex = 0; slotIndex < 2; slotIndex++)
         {
-            var kind = EnigmaticRewardRegistry.RollUniqueMaterialKind(
+            var kind = EnigmaticRewardRegistry.RollUniqueMaterialKindWithRareBonus(
+                DiscoveryRareMaterialWeightBonusPermille,
                 MainFile.ModId,
                 RingOfSevenCursesHelper.SeriesId,
                 RelicId,
@@ -361,7 +363,8 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         var thresholdPermille =
             BaseSpecialMaterialDropPermille
             + otherPlayerCount * SpecialMaterialDropPermillePerOtherPlayer
-            + AstralParty_EnigmaticSevenBlessingsUniqueMaterialMissStreak * SpecialMaterialDropPermillePerMissStreak;
+            + AstralParty_EnigmaticSevenBlessingsUniqueMaterialMissStreak * SpecialMaterialDropPermillePerMissStreak
+            + EnigmaticSynthesisAvariceScroll.GetUniqueMaterialDropBonusPermille(Owner);
         return Math.Clamp(thresholdPermille, 0, 1000);
     }
 

@@ -9,5 +9,5 @@
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_SYNTHESIS.description_disabled": "Spend [blue]Unique Materials[/blue] to craft unique [gold]Enigmatic Synthesis[/gold] relics. You need enough [blue]Unique Materials[/blue] and at least one currently craftable recipe. This option does not consume a rest-site action and can be used repeatedly.",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_SYNTHESIS.selection_header": "Choose an Enigmatic Synthesis Relic",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.name": "Enigmatic Discovery",
-  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.description": "Gain [blue]3[/blue] [blue]Unique Material[/blue] rewards. [blue]1[/blue] of them is guaranteed to be [blue]2[/blue] stacks of [blue][Etherium Ingot][/blue]. This option consumes a rest-site action."
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.description": "Gain [blue]3[/blue] [blue]Unique Material[/blue] rewards. [blue]1[/blue] of them is guaranteed to be [blue]2[/blue] stacks of [blue][Etherium Ingot][/blue]. Rare Unique Materials are [blue]33%[/blue] more likely in the remaining random slots. This option consumes a rest-site action."
 }
