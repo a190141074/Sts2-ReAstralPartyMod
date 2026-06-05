@@ -77,7 +77,8 @@ internal static class NeowOptionInjectionHelper
                 MainFile.ModId,
                 ModAncientOptionRule.Single(
                     ancient => candidate.CreateOption(ancient),
-                    ancient => IsCandidateSelected(ancient, candidate.StableKey)));
+                    ancient => ShouldInjectCustomOption(ancient)
+                              && IsCandidateSelected(ancient, candidate.StableKey)));
         }
     }
 
@@ -97,9 +98,33 @@ internal static class NeowOptionInjectionHelper
         return string.Equals(ResolveSelectedCandidateKey(ancient), stableKey, StringComparison.Ordinal);
     }
 
+    private static bool ShouldInjectCustomOption(AncientEventModel ancient)
+    {
+        var accepted = TrueStartingNeowGateHelper.ShouldExposeCustomNeowOptions(ancient, out var runState, out var reason);
+        TrueStartingNeowGateHelper.LogGateDecision(
+            nameof(NeowOptionInjectionHelper),
+            "custom_option",
+            ancient,
+            accepted,
+            reason,
+            runState);
+        return accepted;
+    }
+
     private static string? ResolveSelectedCandidateKey(AncientEventModel ancient)
     {
-        var runState = ancient.Owner?.RunState as RunState;
+        if (!TrueStartingNeowGateHelper.ShouldExposeCustomNeowOptions(ancient, out var runState, out var reason))
+        {
+            TrueStartingNeowGateHelper.LogGateDecision(
+                nameof(NeowOptionInjectionHelper),
+                "custom_option",
+                ancient,
+                false,
+                reason,
+                runState);
+            return null;
+        }
+
         var eligibleCandidates = GetEligibleCandidates(runState);
         if (eligibleCandidates.Count == 0)
             return null;
@@ -128,7 +153,7 @@ internal static class NeowOptionInjectionHelper
             var selectedCandidate = eligibleCandidates[selectedIndex];
             SelectedCandidateKeysByRun[runKey] = selectedCandidate.StableKey;
             MainFile.Logger.Info(
-                $"[NeowOptionInjectionHelper] Selected custom Neow option for run | runKey={runKey} | key={selectedCandidate.StableKey} | poolSize={eligibleCandidates.Count} | selectedIndex={selectedIndex}.");
+                $"[NeowOptionInjectionHelper] Custom Neow option considered on true Neow | runKey={runKey} | key={selectedCandidate.StableKey} | poolSize={eligibleCandidates.Count} | selectedIndex={selectedIndex}.");
             return selectedCandidate.StableKey;
         }
     }
