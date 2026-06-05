@@ -283,6 +283,8 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             return;
         if (SevenCursesDebuffProtectionHelper.IsInDebuffDamageContext)
             return;
+        if (EscapeScrollDeathProtectionHelper.IsActive)
+            return;
 
         var maxHpLoss = Math.Max(1m, Math.Ceiling(creature.MaxHp * MaxHpLossPercentOnPreventedDeath));
         await CreatureCmd.LoseMaxHp(new ThrowingPlayerChoiceContext(), creature, maxHpLoss, false);

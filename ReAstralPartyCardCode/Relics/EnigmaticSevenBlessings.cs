@@ -34,6 +34,60 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     private const int RelicDropPermille = 330;
     private const int ExtraCardRewardPermille = 115;
     private const int DiscoveryRareMaterialWeightBonusPermille = 330;
+    private const int DiscoveryUnownedMaterialWeightBonusPermille = 330;
+    private static readonly IReadOnlyCollection<EnigmaticUniqueMaterialKind> DefaultSpecialMaterialKinds =
+    [
+        EnigmaticUniqueMaterialKind.EtheriumIngot,
+        EnigmaticUniqueMaterialKind.NefariousEssence,
+        EnigmaticUniqueMaterialKind.NetheriteIngot,
+        EnigmaticUniqueMaterialKind.RedstoneDust,
+        EnigmaticUniqueMaterialKind.GhastTear,
+        EnigmaticUniqueMaterialKind.BlazePowder,
+        EnigmaticUniqueMaterialKind.EnderEye,
+        EnigmaticUniqueMaterialKind.EarthHeart,
+        EnigmaticUniqueMaterialKind.PhantomMembrane,
+        EnigmaticUniqueMaterialKind.DarkestScroll,
+        EnigmaticUniqueMaterialKind.EnchantedBook,
+        EnigmaticUniqueMaterialKind.Dye,
+        EnigmaticUniqueMaterialKind.EnchantedFeather,
+        EnigmaticUniqueMaterialKind.GemRing,
+        EnigmaticUniqueMaterialKind.GoldIngot,
+        EnigmaticUniqueMaterialKind.TriccScroll,
+        EnigmaticUniqueMaterialKind.ExperienceBottle,
+        EnigmaticUniqueMaterialKind.Emerald,
+        EnigmaticUniqueMaterialKind.AwkwardPotion,
+        EnigmaticUniqueMaterialKind.LapisLazuli,
+        EnigmaticUniqueMaterialKind.CryingObsidian,
+        EnigmaticUniqueMaterialKind.AstralDust,
+        EnigmaticUniqueMaterialKind.HeartOfTheSea
+    ];
+    private static readonly IReadOnlyCollection<EnigmaticUniqueMaterialKind> EliteSpecialMaterialKinds =
+    [
+        EnigmaticUniqueMaterialKind.EtheriumIngot,
+        EnigmaticUniqueMaterialKind.NefariousEssence,
+        EnigmaticUniqueMaterialKind.NetheriteIngot,
+        EnigmaticUniqueMaterialKind.RedstoneDust,
+        EnigmaticUniqueMaterialKind.GhastTear,
+        EnigmaticUniqueMaterialKind.BlazePowder,
+        EnigmaticUniqueMaterialKind.EnderEye,
+        EnigmaticUniqueMaterialKind.EarthHeart,
+        EnigmaticUniqueMaterialKind.PhantomMembrane,
+        EnigmaticUniqueMaterialKind.DarkestScroll,
+        EnigmaticUniqueMaterialKind.EnchantedBook,
+        EnigmaticUniqueMaterialKind.Dye,
+        EnigmaticUniqueMaterialKind.EnchantedFeather,
+        EnigmaticUniqueMaterialKind.GemRing,
+        EnigmaticUniqueMaterialKind.GoldIngot,
+        EnigmaticUniqueMaterialKind.TriccScroll,
+        EnigmaticUniqueMaterialKind.ExperienceBottle,
+        EnigmaticUniqueMaterialKind.Emerald,
+        EnigmaticUniqueMaterialKind.AwkwardPotion,
+        EnigmaticUniqueMaterialKind.LapisLazuli,
+        EnigmaticUniqueMaterialKind.CryingObsidian,
+        EnigmaticUniqueMaterialKind.AstralDust,
+        EnigmaticUniqueMaterialKind.HeartOfTheSea,
+        EnigmaticUniqueMaterialKind.NetherStar
+    ];
     private readonly List<string> _pendingUniqueMaterialRewardKeys = [];
 
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount { get; set; }
@@ -44,6 +98,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsEnemyDeathSpecialMaterialRollSequence { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsCombatEndSpecialMaterialRollSequence { get; set; }
     [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsDiscoveryRollSequence { get; set; }
+    [SavedProperty] public int AstralParty_EnigmaticSevenBlessingsAbyssalHeartDropCount { get; set; }
     [SavedProperty] public bool AstralParty_SevenCursesMaxHpBonusGranted { get; set; }
     [SavedProperty] public bool AstralParty_SevenBlessingsPotionSlotsGranted { get; set; }
     [SavedProperty]
@@ -165,6 +220,8 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             return Task.CompletedTask;
 
         TryQueueCombatEndSpecialMaterialReward();
+        TryQueueBossGuaranteedNetherStar(room);
+        TryQueueBossGuaranteedAbyssalHeart(room);
 
         for (var i = 0; i < AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount; i++)
             room.AddExtraReward(Owner, new RelicReward(Owner));
@@ -240,10 +297,12 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         var rolledDiscoveryKinds = new HashSet<EnigmaticUniqueMaterialKind>();
 
         var sequence = AstralParty_EnigmaticSevenBlessingsDiscoveryRollSequence++;
-        for (var slotIndex = 0; slotIndex < 2; slotIndex++)
+        for (var slotIndex = 0; slotIndex < 3; slotIndex++)
         {
-            var kind = EnigmaticRewardRegistry.RollUniqueMaterialKindWithRareBonusExcluding(
+            var kind = EnigmaticRewardRegistry.RollUniqueMaterialKindWithBonuses(
+                Owner,
                 DiscoveryRareMaterialWeightBonusPermille,
+                DiscoveryUnownedMaterialWeightBonusPermille,
                 rolledDiscoveryKinds,
                 MainFile.ModId,
                 RingOfSevenCursesHelper.SeriesId,
@@ -334,7 +393,9 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             return false;
         }
 
-        var kind = EnigmaticRewardRegistry.RollUniqueMaterialKind(
+        var kind = EnigmaticRewardRegistry.RollUniqueMaterialKindFromIncludedKinds(
+            GetCurrentSpecialMaterialKinds(),
+            0,
             MainFile.ModId,
             RingOfSevenCursesHelper.SeriesId,
             RelicId,
@@ -358,6 +419,42 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         _pendingUniqueMaterialRewardKeys.Add(EnigmaticRewardRegistry.CreateRewardKey(kind, amount));
         AstralParty_EnigmaticSevenBlessingsUniqueMaterialMissStreak = 0;
         return true;
+    }
+
+    private IReadOnlyCollection<EnigmaticUniqueMaterialKind> GetCurrentSpecialMaterialKinds()
+    {
+        return Owner?.Creature?.CombatState?.Encounter?.RoomType == RoomType.Elite
+            ? EliteSpecialMaterialKinds
+            : DefaultSpecialMaterialKinds;
+    }
+
+    private void TryQueueBossGuaranteedNetherStar(CombatRoom room)
+    {
+        if (room.RoomType != RoomType.Boss || Owner == null)
+            return;
+
+        room.AddExtraReward(Owner, EnigmaticRewardRegistry.CreateUniqueMaterialReward(
+            Owner,
+            EnigmaticUniqueMaterialKind.NetherStar,
+            1));
+    }
+
+    private void TryQueueBossGuaranteedAbyssalHeart(CombatRoom room)
+    {
+        if (room.RoomType != RoomType.Boss || Owner?.RunState == null)
+            return;
+        if (AstralParty_EnigmaticSevenBlessingsAbyssalHeartDropCount >= 4)
+            return;
+
+        var actIndex = Owner.RunState.CurrentActIndex;
+        if (actIndex != 1 && actIndex != 3)
+            return;
+
+        room.AddExtraReward(Owner, EnigmaticRewardRegistry.CreateUniqueMaterialReward(
+            Owner,
+            EnigmaticUniqueMaterialKind.AbyssalHeart,
+            1));
+        AstralParty_EnigmaticSevenBlessingsAbyssalHeartDropCount++;
     }
 
     private int GetCurrentSpecialMaterialDropPermille()

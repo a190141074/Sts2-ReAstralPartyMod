@@ -17,8 +17,6 @@ public class EnigmaticSynthesisCursedScroll : AstralPartyRelicModel
 {
     protected override string RelicId => "enigmatic_synthesis_cursed_scroll";
 
-    protected override string IconBasePath => "res://ReAstralPartyMod/images/relic/enigmatic_synthesis_cursed_scroll";
-
     public override RelicRarity Rarity => RelicRarity.Rare;
 
     public override bool ShouldReceiveCombatHooks => true;
@@ -86,6 +84,20 @@ public class EnigmaticSynthesisCursedScroll : AstralPartyRelicModel
 
         return CursedScrollDeckHelper.GetAttackDamageBonus(
             amount,
+            CursedScrollDeckHelper.GetWeightedCurseCount(Owner));
+    }
+
+    public override decimal ModifyDamageMultiplicative(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (Owner?.Creature == null || target != Owner.Creature)
+            return 1m;
+
+        return CursedScrollDeckHelper.GetDamageTakenMultiplier(
             CursedScrollDeckHelper.GetWeightedCurseCount(Owner));
     }
 

@@ -32,5 +32,7 @@ public sealed class EnigmaticSynthesisXpScrollRestSitePatch : IPatchMethod
 
         var player = __instance.Characters.FirstOrDefault(character => character.Player.NetId == playerId)?.Player;
         player?.GetRelic<EnigmaticSynthesisXpScroll>()?.OnRestSiteOptionResolved(option);
+        player?.GetRelic<EnigmaticSynthesisHeavenScroll>()?.OnRestSiteOptionResolved(option is SmithRestSiteOption);
+        player?.GetRelic<EnigmaticSynthesisEnchanterPearl>()?.OnRestSiteOptionResolved(option is SmithRestSiteOption);
     }
 }

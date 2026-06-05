@@ -83,6 +83,68 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 new(EnigmaticUniqueMaterialKind.TriccScroll, 1),
                 new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
                 new(EnigmaticUniqueMaterialKind.Emerald, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisRecallPotion>(),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.EnderEye, 1),
+                new(EnigmaticUniqueMaterialKind.AwkwardPotion, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisEscapeScroll>(),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.PhantomMembrane, 4),
+                new(EnigmaticUniqueMaterialKind.RecallPotion, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.TriccScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.EnderEye, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisHeavenScroll>(),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.GoldIngot, 2),
+                new(EnigmaticUniqueMaterialKind.NetherStar, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.TriccScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.LapisLazuli, 2),
+                new(EnigmaticUniqueMaterialKind.EnderEye, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisEnchanterPearl>(),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.Emerald, 1),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 2),
+                new(EnigmaticUniqueMaterialKind.EnderEye, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 1),
+                new(EnigmaticUniqueMaterialKind.CryingObsidian, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisCosmicHeart>(),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.AstralDust, 4),
+                new(EnigmaticUniqueMaterialKind.NetherStar, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 2),
+                new(EnigmaticUniqueMaterialKind.HeartOfTheSea, 1),
+                new(EnigmaticUniqueMaterialKind.EnderEye, 1)
+            ]),
+        new(
+            ModelDb.Relic<EnigmaticSynthesisTheInfinitum>(),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.CosmicHeart, 2),
+                new(EnigmaticUniqueMaterialKind.EnchanterPearl, 1),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 2),
+                new(EnigmaticUniqueMaterialKind.TheTwist, 1),
+                new(EnigmaticUniqueMaterialKind.NetheriteIngot, 2),
+                new(EnigmaticUniqueMaterialKind.AbyssalHeart, 1)
             ])
     ];
 

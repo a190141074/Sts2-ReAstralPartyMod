@@ -9,6 +9,8 @@ internal static class CursedScrollDeckHelper
     private const decimal AttackDamageBonusPerWeightedCurse = 0.06m;
     private const decimal GoldGainBonusPerWeightedCurse = 0.10m;
     private const decimal HealGainBonusPerWeightedCurse = 0.06m;
+    private const decimal DamageReductionPerWeightedCurse = 0.02m;
+    private const decimal MinimumDamageMultiplier = 0.30m;
     private const int ExtraDrawDivisor = 3;
     private const int SevenCursesBonusWeightedCount = 7;
 
@@ -56,5 +58,13 @@ internal static class CursedScrollDeckHelper
     public static int GetExtraDrawCount(int weightedCurseCount)
     {
         return weightedCurseCount <= 0 ? 0 : weightedCurseCount / ExtraDrawDivisor;
+    }
+
+    public static decimal GetDamageTakenMultiplier(int weightedCurseCount)
+    {
+        if (weightedCurseCount <= 0)
+            return 1m;
+
+        return Math.Max(MinimumDamageMultiplier, 1m - weightedCurseCount * DamageReductionPerWeightedCurse);
     }
 }
