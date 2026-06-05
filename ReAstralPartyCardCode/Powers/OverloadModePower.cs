@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -33,11 +34,21 @@ public class OverloadModePower : AstralPartyPowerModel
             return;
         if (target.Side == Owner.Side)
             return;
-        if (result.TotalDamage < 0m)
+        if (result.TotalDamage <= 0m)
             return;
 
-        await PowerCmd.Apply<PoisonPower>(target, 1m, Owner, cardSource, false);
-        await PowerCmd.Apply<DoomPower>(target, 1m, Owner, cardSource, false);
+        await StackableDebuffGrowthHelper.TryApplyOrGrowStackableDebuffAsync<PoisonPower>(
+            target,
+            1m,
+            Owner,
+            cardSource,
+            false);
+        await StackableDebuffGrowthHelper.TryApplyOrGrowStackableDebuffAsync<DoomPower>(
+            target,
+            1m,
+            Owner,
+            cardSource,
+            false);
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)

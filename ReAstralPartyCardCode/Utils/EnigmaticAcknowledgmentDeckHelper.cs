@@ -12,7 +12,8 @@ internal enum EnigmaticRevelationKind
 {
     None = 0,
     Acknowledgment = 1,
-    Twist = 2
+    Twist = 2,
+    Infinitum = 3
 }
 
 internal static class EnigmaticAcknowledgmentDeckHelper
@@ -119,12 +120,56 @@ internal static class EnigmaticAcknowledgmentDeckHelper
         return true;
     }
 
+    public static bool ReplaceTwistWithInfinitum(Player? owner)
+    {
+        if (owner == null)
+            return false;
+
+        var deckCards = EventDeckCardHelper.GetRunDeckCards(owner);
+        if (deckCards.Any(IsInfinitumCard))
+        {
+            MainFile.Logger.Info(
+                $"[EnigmaticAcknowledgmentDeckHelper] infinitum_already_present | owner={owner.NetId}");
+            return false;
+        }
+
+        var twist = deckCards.FirstOrDefault(IsTwistCard);
+        if (twist == null)
+        {
+            MainFile.Logger.Info(
+                $"[EnigmaticAcknowledgmentDeckHelper] twist_missing_for_replace | owner={owner.NetId}");
+            return false;
+        }
+
+        if (!EventDeckCardHelper.RemoveCardFromRunDeck(owner, twist))
+        {
+            MainFile.Logger.Warn(
+                $"[EnigmaticAcknowledgmentDeckHelper] remove_twist_failed | owner={owner.NetId}");
+            return false;
+        }
+
+        var infinitum = CreateMutable<EnigmaticTheInfinitum>(owner, twist);
+        if (!TryAddCardToRunDeck(owner, infinitum))
+        {
+            MainFile.Logger.Warn(
+                $"[EnigmaticAcknowledgmentDeckHelper] add_infinitum_failed | owner={owner.NetId}");
+            return false;
+        }
+
+        SaveManager.Instance?.MarkCardAsSeen(infinitum.CanonicalInstance ?? infinitum);
+        MainFile.Logger.Info(
+            $"[EnigmaticAcknowledgmentDeckHelper] replaced_twist_with_infinitum | owner={owner.NetId} | upgraded={infinitum.CurrentUpgradeLevel}");
+        return true;
+    }
+
     public static EnigmaticRevelationKind GetRevelationInHand(Player? owner)
     {
         var handCards = owner?.PlayerCombatState?.Hand?.Cards;
         if (handCards == null)
             return EnigmaticRevelationKind.None;
 
+        if (handCards.Any(IsInfinitumCard))
+            return EnigmaticRevelationKind.Infinitum;
         if (handCards.Any(IsTwistCard))
             return EnigmaticRevelationKind.Twist;
         if (handCards.Any(IsAcknowledgmentCard))
@@ -154,9 +199,20 @@ internal static class EnigmaticAcknowledgmentDeckHelper
                || card.CanonicalInstance?.Id == targetId;
     }
 
+    public static bool IsInfinitumCard(CardModel? card)
+    {
+        if (card == null)
+            return false;
+
+        var targetId = ModelDb.Card<EnigmaticTheInfinitum>().Id;
+        return card is EnigmaticTheInfinitum
+               || card.Id == targetId
+               || card.CanonicalInstance?.Id == targetId;
+    }
+
     public static bool IsRevelationCard(CardModel? card)
     {
-        return IsAcknowledgmentCard(card) || IsTwistCard(card);
+        return IsAcknowledgmentCard(card) || IsTwistCard(card) || IsInfinitumCard(card);
     }
 
     private static CardModel CreateMutable<TCard>(Player owner, CardModel? replacedCard = null)

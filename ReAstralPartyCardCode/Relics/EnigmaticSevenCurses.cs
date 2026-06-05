@@ -34,13 +34,22 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
     private const decimal AcknowledgmentBurnAmount = 1m;
     private const decimal TwistBossDamageMultiplier = 4m;
     private const decimal TwistDebuffBonusAmount = 3m;
+    private const decimal InfinitumBossDamageMultiplier = 3m;
+    private const decimal InfinitumDebuffBonusAmount = 2m;
+    private const decimal InfinitumLifestealPercent = 0.10m;
+    private const decimal InfinitumMinDamageFloor = 8m;
+    private const int InfinitumDeathProtectionPermille = 850;
 
     private bool _isGrowingExistingDebuffs;
     private bool _isApplyingRevelationBurn;
     private bool _isApplyingShopSelfDamage;
+    private bool _pendingInfinitumDeathProtection;
+    private bool _skipPreventedDeathPenaltyOnce;
 
     [SavedProperty] public bool AstralParty_SevenCursesMaxHpBonusGranted { get; set; }
     [SavedProperty] public bool AstralParty_SevenBlessingsPotionSlotsGranted { get; set; }
+    [SavedProperty] public int AstralParty_SevenCursesInfinitumDebuffRollCounter { get; set; }
+    [SavedProperty] public int AstralParty_SevenCursesInfinitumDeathRollCounter { get; set; }
 
     protected override string RelicId => "enigmatic_seven_curses";
 
@@ -103,6 +112,9 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         if (revelationKind == EnigmaticRevelationKind.Twist &&
             target.CombatState?.Encounter?.RoomType == RoomType.Boss)
             return TwistBossDamageMultiplier;
+        if (revelationKind == EnigmaticRevelationKind.Infinitum &&
+            target.CombatState?.Encounter?.RoomType == RoomType.Boss)
+            return InfinitumBossDamageMultiplier;
 
         if (target.CombatState?.Encounter?.RoomType is RoomType.Elite or RoomType.Boss)
             return 1m;
@@ -123,12 +135,27 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
     {
         if (Owner?.Creature == null || dealer != Owner.Creature)
             return;
-        if (GetRevelationInHand() == EnigmaticRevelationKind.None)
+        var revelationKind = GetRevelationInHand();
+        if (revelationKind == EnigmaticRevelationKind.None)
             return;
         if (target.Side == Owner.Creature.Side || !target.IsAlive)
             return;
         if (result.TotalDamage <= 0m)
             return;
+
+        if (revelationKind == EnigmaticRevelationKind.Infinitum)
+        {
+            Flash();
+
+            var healAmount = Math.Max(1m, Math.Ceiling(result.TotalDamage * InfinitumLifestealPercent));
+            await CreatureCmd.Heal(Owner.Creature, healAmount, false);
+
+            if (!target.IsAlive)
+                return;
+
+            await ApplyRandomInfinitumDebuff(target, cardSource);
+            return;
+        }
 
         Flash();
         _isApplyingRevelationBurn = true;
@@ -152,6 +179,25 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         if (target == Owner?.Creature)
             return BlockGainMultiplier;
         return 1m;
+    }
+
+    public override decimal ModifyDamageAdditive(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (Owner?.Creature == null || dealer != Owner.Creature)
+            return 0m;
+        if (target == null || target.Side == Owner.Creature.Side)
+            return 0m;
+        if (amount <= 0m)
+            return 0m;
+        if (GetRevelationInHand() != EnigmaticRevelationKind.Infinitum)
+            return 0m;
+
+        return Math.Max(0m, InfinitumMinDamageFloor - amount);
     }
 
     public override decimal ModifyHpLostAfterOsty(
@@ -248,6 +294,15 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
             didModify = true;
         }
 
+        if (GetRevelationInHand() == EnigmaticRevelationKind.Infinitum &&
+            applier == Owner.Creature &&
+            target.Side != Owner.Creature.Side &&
+            StackableDebuffGrowthHelper.CanIncreaseIncomingStackableDebuff(canonicalPower, amount))
+        {
+            modifiedAmount += InfinitumDebuffBonusAmount;
+            didModify = true;
+        }
+
         if (didModify)
             Flash();
         return didModify;
@@ -277,10 +332,47 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         }
     }
 
+    public override bool ShouldDieLate(Creature creature)
+    {
+        if (creature != Owner?.Creature)
+            return true;
+        if (GetRevelationInHand() != EnigmaticRevelationKind.Infinitum)
+            return true;
+        if (_pendingInfinitumDeathProtection)
+            return false;
+
+        var didPreventDeath = RingOfSevenCursesHelper.RollPermille(
+            InfinitumDeathProtectionPermille,
+            MainFile.ModId,
+            RelicId,
+            nameof(ShouldDieLate),
+            "infinitum_death_protection",
+            Owner.RunState?.Rng.StringSeed,
+            Owner.RunState?.CurrentActIndex,
+            Owner.RunState?.TotalFloor,
+            Owner.NetId,
+            AstralParty_SevenCursesInfinitumDeathRollCounter++);
+        if (!didPreventDeath)
+            return true;
+
+        _pendingInfinitumDeathProtection = true;
+        _skipPreventedDeathPenaltyOnce = true;
+        return false;
+    }
+
     public override async Task AfterPreventingDeath(Creature creature)
     {
         if (creature != Owner?.Creature)
             return;
+        if (_skipPreventedDeathPenaltyOnce)
+        {
+            _pendingInfinitumDeathProtection = false;
+            _skipPreventedDeathPenaltyOnce = false;
+            Flash();
+            if (creature.CurrentHp <= 0m)
+                await CreatureCmd.SetCurrentHp(creature, 1m);
+            return;
+        }
         if (SevenCursesDebuffProtectionHelper.IsInDebuffDamageContext)
             return;
         if (EscapeScrollDeathProtectionHelper.IsActive)
@@ -307,5 +399,53 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
     private EnigmaticRevelationKind GetRevelationInHand()
     {
         return EnigmaticAcknowledgmentDeckHelper.GetRevelationInHand(Owner);
+    }
+
+    private async Task ApplyRandomInfinitumDebuff(Creature target, CardModel? cardSource)
+    {
+        if (Owner?.Creature == null)
+            return;
+
+        var selectedDebuff = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+            0,
+            5,
+            MainFile.ModId,
+            RelicId,
+            nameof(ApplyRandomInfinitumDebuff),
+            Owner.RunState?.Rng.StringSeed,
+            Owner.RunState?.CurrentActIndex,
+            Owner.RunState?.TotalFloor,
+            Owner.NetId,
+            target.ModelId.ToString(),
+            AstralParty_SevenCursesInfinitumDebuffRollCounter++);
+
+        switch (selectedDebuff)
+        {
+            case 0:
+                await StackableDebuffGrowthHelper.TryApplyOrGrowStackableDebuffAsync<DoomPower>(
+                    target,
+                    1m,
+                    Owner.Creature,
+                    cardSource,
+                    false);
+                break;
+            case 1:
+                await StackableDebuffGrowthHelper.TryApplyOrGrowStackableDebuffAsync<PoisonPower>(
+                    target,
+                    1m,
+                    Owner.Creature,
+                    cardSource,
+                    false);
+                break;
+            case 2:
+                await PowerCmd.Apply<VulnerablePower>(target, 1m, Owner.Creature, cardSource, false);
+                break;
+            case 3:
+                await PowerCmd.Apply<WeakPower>(target, 1m, Owner.Creature, cardSource, false);
+                break;
+            default:
+                await PowerCmd.Apply<BlazingSolarBurnPower>(target, 1m, Owner.Creature, cardSource, false);
+                break;
+        }
     }
 }

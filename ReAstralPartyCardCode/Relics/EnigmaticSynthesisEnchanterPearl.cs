@@ -92,6 +92,7 @@ public class EnigmaticSynthesisEnchanterPearl : EnigmaticUniqueMaterialRelicBase
     {
         var candidates = ModelDb.AllCards
             .Where(card => card.Type == CardType.Curse)
+            .Where(card => !EnigmaticAcknowledgmentDeckHelper.IsInfinitumCard(card))
             .GroupBy(card => card.CanonicalInstance?.Id ?? card.Id)
             .Select(group => group.First())
             .OrderBy(card => (card.CanonicalInstance?.Id ?? card.Id).Entry, StringComparer.Ordinal)

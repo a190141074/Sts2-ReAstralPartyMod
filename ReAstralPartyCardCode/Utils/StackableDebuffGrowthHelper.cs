@@ -83,6 +83,25 @@ internal static class StackableDebuffGrowthHelper
         }
     }
 
+    public static async Task<bool> TryApplyOrGrowStackableDebuffAsync<TPower>(
+        Creature target,
+        decimal amount,
+        Creature? applier,
+        CardModel? source = null,
+        bool isSourceGenerated = false)
+        where TPower : PowerModel
+    {
+        if (amount <= 0m)
+            return false;
+
+        var existingPower = target.GetPower<TPower>();
+        if (existingPower != null && CanGrowExistingStackableDebuff(existingPower))
+            return await TryGrowExistingStackableDebuffAsync(existingPower, amount, source);
+
+        await PowerCmd.Apply<TPower>(target, amount, applier, source, isSourceGenerated);
+        return true;
+    }
+
     private static MethodInfo? GetClosedSetAmountMethod(Type powerType)
     {
         return ClosedSetAmountMethods.GetOrAdd(

@@ -18,8 +18,6 @@ public class EnigmaticSynthesisCosmicHeart : EnigmaticUniqueMaterialRelicBase
 
     protected override string RelicId => "enigmatic_synthesis_cosmic_heart";
 
-    protected override string IconBasePath => "res://ReAstralPartyMod/images/relic/enigmatic_heart_of_the_sea";
-
     public override RelicRarity Rarity => RelicRarity.Rare;
 
     public static Task<EnigmaticSynthesisCosmicHeart?> GrantStacks(Player owner, int amount)
