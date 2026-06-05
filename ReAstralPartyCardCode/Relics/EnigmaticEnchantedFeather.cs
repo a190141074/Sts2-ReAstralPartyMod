@@ -6,7 +6,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class EnigmaticEnchantedFeather : EnigmaticUniqueMaterialRelicBase
+public class EnigmaticEnchantedFeather : EnigmaticStackableUniqueMaterialRelicBase
 {
     [SavedProperty] public int AstralParty_EnigmaticEnchantedFeatherStacks { get; set; } = 1;
 

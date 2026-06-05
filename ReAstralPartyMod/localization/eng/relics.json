@@ -559,6 +559,8 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_TWISTED_HEART.flavor": "It is no longer an organ, only obsession twisted into the shape of one.",
   "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD.label": "{Material} [blue]+{Amount}[/blue]",
   "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD.description": "Unique Material: Gain [blue]{0}[/blue] [blue]{1}[/blue] stack(s).",
+  "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD_INSTANCE.label": "{Material} [blue]x{Amount}[/blue]",
+  "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD_INSTANCE.description": "Unique Material: Gain [blue]{0}[/blue] copies of [blue]{1}[/blue].",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_HELMET.title": "Etherium Helmet",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_HELMET.description": "Enigmatic Synthesis cost: [blue]5[/blue] [blue]Etherium Ingots[/blue].\nAt combat start, gain [blue]2[/blue] [gold]Plating[/gold] and [blue]1[/blue] [gold]Regen[/gold] if you have [gold]Enigmatic Relic: Seven Curses[/gold]; otherwise gain only [blue]1[/blue] [gold]Plating[/gold].",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_HELMET.flavor": "Protect the head first. The malice can stay everywhere else.",
@@ -618,5 +620,8 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_COSMIC_HEART.flavor": "Several incompatible celestial echoes compressed into a single heartbeat.",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_THE_INFINITUM.title": "The Infinitum",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_THE_INFINITUM.description": "· When obtained, replace [gold]The Twist[/gold] in your run deck with [gold]The Infinitum[/gold].\n· While its Curse card is in your hand, deal [blue]200%[/blue] more damage to Boss enemies.\n· While its Curse card is in your hand, whenever you apply a stackable [red]Debuff[/red] and it can gain more stacks, apply [blue]2[/blue] extra stacks.\n· While its Curse card is in your hand, after you deal damage, heal for [blue]10%[/blue] of that damage, minimum [blue]1[/blue].\n· While its Curse card is in your hand, lethal damage to you has an [blue]85%[/blue] chance to be negated.\n· While its Curse card is in your hand, your damage dealt cannot go below [blue]8[/blue].\n· While its Curse card is in your hand, after you deal damage, randomly apply [blue]1[/blue] of Doom, Poison, Vulnerable, Weak, or [power]Blazing Solar Burn[/power].",
-  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_THE_INFINITUM.flavor": "Some lines are not unfinished. They were never meant to stop."
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_THE_INFINITUM.flavor": "Some lines are not unfinished. They were never meant to stop.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.title": "Void Stone",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.description": "· A [gold]Unique Material[/gold] used for [gold]Enigmatic Synthesis[/gold].\n· You may use [gold]Oblivion[/gold] at rest sites.\n· Cards obliviated this way are recorded; whenever a matching card later enters your run deck, it is removed immediately.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.flavor": "It does not care what disappears. It only cares that certain things never get to remain again."
 }

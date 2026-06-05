@@ -1,6 +1,7 @@
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -24,6 +25,13 @@ public sealed class CreatureGainBlockWhisperPatch : IPatchMethod
             return true;
 
         amount = WhisperPower.AdjustBlockAmount(creature, amount);
+        if (amount > 0m &&
+            amount < 1m &&
+            creature.Player?.Creature == creature &&
+            creature.Player.GetRelic<EnigmaticSevenCurses>() != null)
+        {
+            amount = 1m;
+        }
         return true;
     }
 }

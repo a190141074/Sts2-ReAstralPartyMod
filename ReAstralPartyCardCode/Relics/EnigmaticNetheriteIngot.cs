@@ -6,7 +6,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class EnigmaticNetheriteIngot : EnigmaticUniqueMaterialRelicBase
+public class EnigmaticNetheriteIngot : EnigmaticStackableUniqueMaterialRelicBase
 {
     [SavedProperty] public int AstralParty_EnigmaticNetheriteIngotStacks { get; set; } = 1;
 

@@ -44,12 +44,12 @@ internal static class AstralNoaHelper
         if (originalAmount <= 0m)
             return 0;
 
-        return (int)Math.Floor(originalAmount / 10m) * 3;
+        return StableNumericStateHelper.FloorDivisionToNonNegativeInt(originalAmount, 10m) * 3;
     }
 
     public static int GetRoundedPowerAmount(decimal amount)
     {
-        return Math.Max(0, (int)Math.Round(amount, MidpointRounding.AwayFromZero));
+        return StableNumericStateHelper.RoundToNonNegativeInt(amount);
     }
 
     public static int GetNextThreshold(int currentThreshold)

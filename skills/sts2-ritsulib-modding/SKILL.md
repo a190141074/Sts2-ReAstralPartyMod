@@ -56,6 +56,7 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - 先做最小可运行切片：入口、依赖、1 个内容类型、本地化、图标或场景路径，然后再扩展复杂联动。
 - 当前项目已经是 RitsuLib 前置项目；如果用户在这个仓库里提问，优先对齐它的入口、命名、资源路径和本地化约定。
 - `STS2_WineFox-main` 是高价值 RitsuLib 实战案例，但不要无脑照抄。先抽取结构模式，再贴合当前仓库实现。
+- 如果本轮排查/修复得到的是一种后续很可能反复出现、且对这个仓库长期制作有帮助的注意事项、稳定性规则、实现约束或排错经验，默认要主动询问用户是否需要把它补进 skill，避免之后重复遗漏。
 
 ## Task Routing
 
@@ -177,6 +178,34 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - Harmony 仅保留给 RitsuLib 没覆盖的运行时 patch
 
 如果任务是继续开发这个仓库，优先复用它自己的组织方式，而不是强行改成 WineFox 的目录结构。
+
+## Repo Stability Note
+
+当前仓库已经有一条需要长期坚持的数值边界规则，处理 `decimal` 时必须优先遵守：
+
+- `decimal` 只用于运行时计算和公式推导。
+- 一旦跨到存档、联机同步、奖励状态、计数器显示、HP 快照、阈值里程碑这类边界，必须改成稳定标量形态。
+- 默认优先使用 `ReAstralPartyCardCode\Utils\StableNumericStateHelper.cs`：
+  - `SerializeDecimal` / `DeserializeDecimal`
+  - `SerializeDecimalSequence` / `DeserializeDecimalSequence`
+  - `FloorToNonNegativeInt`
+  - `RoundToNonNegativeInt`
+  - `FloorDivisionToNonNegativeInt`
+  - `ClampCeilingToInt`
+
+明确要求：
+
+- 不要给 `[SavedProperty]` 直接挂 `decimal`。
+- 不要把 `decimal` 直接作为需要持久化或奖励同步的字段形态。
+- 不要在多个文件里重复手写 `Math.Floor`、`Math.Round`、`Math.Ceiling` 到 `int` 的边界转换逻辑；优先收口到 `StableNumericStateHelper`。
+- 如果原版或现有逻辑允许百分比/倍率先产生小数，保留小数计算；真正应用到游戏整数资源时，再统一按固定规则落整。
+
+默认策略：
+
+1. 公式阶段保留 `decimal`
+2. 状态保存阶段转为 `string`/`int`/其他 BaseLib 支持类型
+3. 显示与计数阶段走统一 helper
+4. 需要 deterministic 阈值结算时，统一复用 helper，不再各自实现
 
 ## Resources
 

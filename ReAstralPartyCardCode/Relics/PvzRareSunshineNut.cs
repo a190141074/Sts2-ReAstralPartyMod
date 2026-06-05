@@ -20,8 +20,8 @@ public class PvzRareSunshineNut : AstralPartyRelicModel
     [SavedProperty]
     private string AstralParty_PvzRareSunshineNutRunDamageTaken
     {
-        get => PvzNutRelicHelper.SerializeDecimal(_runDamageTaken);
-        set => _runDamageTaken = PvzNutRelicHelper.DeserializeDecimal(value);
+        get => StableNumericStateHelper.SerializeDecimal(_runDamageTaken);
+        set => _runDamageTaken = StableNumericStateHelper.DeserializeDecimal(value);
     }
 
     [SavedProperty] public int AstralParty_PvzRareSunshineNutResolvedRewardCount { get; set; }

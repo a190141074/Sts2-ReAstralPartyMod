@@ -27,15 +27,15 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
     [SavedProperty]
     private string AstralParty_PvzUltimateHyperSpacetimeNutTurnHpLoss
     {
-        get => PvzNutRelicHelper.SerializeDecimal(_turnHpLoss);
-        set => _turnHpLoss = PvzNutRelicHelper.DeserializeDecimal(value);
+        get => StableNumericStateHelper.SerializeDecimal(_turnHpLoss);
+        set => _turnHpLoss = StableNumericStateHelper.DeserializeDecimal(value);
     }
 
     [SavedProperty]
     private string AstralParty_PvzUltimateHyperSpacetimeNutCombatUnblockedDamageTaken
     {
-        get => PvzNutRelicHelper.SerializeDecimal(_combatUnblockedDamageTaken);
-        set => _combatUnblockedDamageTaken = PvzNutRelicHelper.DeserializeDecimal(value);
+        get => StableNumericStateHelper.SerializeDecimal(_combatUnblockedDamageTaken);
+        set => _combatUnblockedDamageTaken = StableNumericStateHelper.DeserializeDecimal(value);
     }
 
     [SavedProperty] public int AstralParty_PvzUltimateHyperSpacetimeNutPendingIntangibleCount { get; set; }

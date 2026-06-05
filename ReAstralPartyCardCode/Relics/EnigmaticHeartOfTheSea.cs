@@ -6,7 +6,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class EnigmaticHeartOfTheSea : EnigmaticUniqueMaterialRelicBase
+public class EnigmaticHeartOfTheSea : EnigmaticStackableUniqueMaterialRelicBase
 {
     [SavedProperty] public int AstralParty_EnigmaticHeartOfTheSeaStacks { get; set; } = 1;
 

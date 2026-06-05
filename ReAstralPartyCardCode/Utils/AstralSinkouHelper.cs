@@ -134,6 +134,6 @@ internal static class AstralSinkouHelper
 
     public static int GetRoundedPowerAmount(decimal amount)
     {
-        return Math.Max(0, Convert.ToInt32(decimal.Round(amount, 0, MidpointRounding.AwayFromZero)));
+        return StableNumericStateHelper.RoundToNonNegativeInt(amount);
     }
 }

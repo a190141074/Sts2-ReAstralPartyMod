@@ -41,8 +41,8 @@ public class PvzSimpleNut : AstralPartyRelicModel
     [SavedProperty]
     private string AstralParty_PvzSimpleNutRunDamageTaken
     {
-        get => PvzNutRelicHelper.SerializeDecimal(_runDamageTaken);
-        set => _runDamageTaken = PvzNutRelicHelper.DeserializeDecimal(value);
+        get => StableNumericStateHelper.SerializeDecimal(_runDamageTaken);
+        set => _runDamageTaken = StableNumericStateHelper.DeserializeDecimal(value);
     }
 
     public override RelicRarity Rarity => RelicRarity.Common;
@@ -51,7 +51,7 @@ public class PvzSimpleNut : AstralPartyRelicModel
 
     public override bool ShowCounter => true;
 
-    public override int DisplayAmount => Math.Max(0, (int)decimal.Floor(_runDamageTaken));
+    public override int DisplayAmount => StableNumericStateHelper.FloorToNonNegativeInt(_runDamageTaken);
 
     public override async Task AfterObtained()
     {
@@ -88,7 +88,7 @@ public class PvzSimpleNut : AstralPartyRelicModel
         var beforePendingRewardCount = _pendingRewardRelicIds.Count;
 
         _runDamageTaken += result.UnblockedDamage;
-        var totalTriggeredMilestones = (int)decimal.Floor(_runDamageTaken / DamageThreshold);
+        var totalTriggeredMilestones = StableNumericStateHelper.FloorDivisionToNonNegativeInt(_runDamageTaken, DamageThreshold);
         var accountedMilestones = AstralParty_PvzSimpleNutResolvedMilestoneCount + AstralParty_PvzSimpleNutPendingChoiceCount +
                                   _pendingRewardRelicIds.Count;
         var newlyPendingChoices = Math.Max(0, totalTriggeredMilestones - accountedMilestones);

@@ -10,28 +10,38 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 public abstract class EnigmaticUniqueMaterialRelicBase : AstralPartyRelicModel
 {
-    protected abstract int StoredStacks { get; set; }
+    protected virtual int StoredStacks
+    {
+        get => 1;
+        set { }
+    }
 
-    public override bool ShowCounter => true;
-
-    public override int DisplayAmount => Stacks;
-
-    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    protected new virtual IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralUniqueMaterialId)
     ];
 
+    protected override IEnumerable<IHoverTip> AdditionalHoverTips => ExtraHoverTips;
+    public virtual bool IsStackableForSynthesis => true;
+    public virtual int SynthesisAmount => IsStackableForSynthesis ? Stacks : 1;
     public int Stacks => Math.Max(StoredStacks, 0);
+
+    public override bool ShowCounter => IsStackableForSynthesis;
+
+    public override int DisplayAmount => IsStackableForSynthesis ? Stacks : 0;
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
+        if (!IsStackableForSynthesis)
+            return;
 
         var existing = Owner?.Relics
             .OfType<EnigmaticUniqueMaterialRelicBase>()
             .FirstOrDefault(relic =>
                 !ReferenceEquals(relic, this)
                 && !relic.IsMelted
+                && relic.IsStackableForSynthesis
                 && GetCanonicalRelicId(relic) == GetCanonicalRelicId(this));
         if (existing != null)
         {
@@ -46,17 +56,23 @@ public abstract class EnigmaticUniqueMaterialRelicBase : AstralPartyRelicModel
 
     public void AddStacks(int amount)
     {
-        if (amount <= 0)
+        if (amount <= 0 || !IsStackableForSynthesis)
             return;
 
         StoredStacks = Math.Max(0, StoredStacks + amount);
         InvokeDisplayAmountChanged();
     }
 
-    public async Task ConsumeStacksAsync(int amount)
+    public virtual async Task ConsumeForSynthesisAsync(int amount)
     {
         if (amount <= 0)
             return;
+        if (!IsStackableForSynthesis)
+        {
+            if (!IsMelted)
+                await RelicCmd.Remove(this);
+            return;
+        }
 
         StoredStacks = Math.Max(0, StoredStacks - amount);
         InvokeDisplayAmountChanged();
@@ -64,8 +80,13 @@ public abstract class EnigmaticUniqueMaterialRelicBase : AstralPartyRelicModel
             await RelicCmd.Remove(this);
     }
 
+    public Task ConsumeStacksAsync(int amount)
+    {
+        return ConsumeForSynthesisAsync(amount);
+    }
+
     public static async Task<T?> GrantStacks<T>(Player owner, int amount)
-        where T : EnigmaticUniqueMaterialRelicBase
+        where T : EnigmaticStackableUniqueMaterialRelicBase
     {
         if (amount <= 0)
             return owner.GetRelic<T>();
@@ -86,5 +107,32 @@ public abstract class EnigmaticUniqueMaterialRelicBase : AstralPartyRelicModel
     private static ModelId GetCanonicalRelicId(RelicModel relic)
     {
         return (relic.CanonicalInstance ?? relic).Id;
+    }
+}
+
+public abstract class EnigmaticStackableUniqueMaterialRelicBase : EnigmaticUniqueMaterialRelicBase
+{
+}
+
+public abstract class EnigmaticNonStackableUniqueMaterialRelicBase : EnigmaticUniqueMaterialRelicBase
+{
+    public override bool IsStackableForSynthesis => false;
+
+    public static async Task<IReadOnlyList<T>> GrantCopies<T>(Player owner, int amount)
+        where T : EnigmaticNonStackableUniqueMaterialRelicBase
+    {
+        var granted = new List<T>();
+        if (amount <= 0)
+            return granted;
+
+        var canonicalRelic = ModelDb.Relic<T>();
+        for (var i = 0; i < amount; i++)
+        {
+            var obtained = await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, canonicalRelic);
+            if (obtained is T typed)
+                granted.Add(typed);
+        }
+
+        return granted;
     }
 }

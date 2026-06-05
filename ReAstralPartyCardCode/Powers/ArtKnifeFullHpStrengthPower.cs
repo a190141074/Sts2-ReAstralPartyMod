@@ -21,8 +21,8 @@ public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
     [SavedProperty]
     private string AstralParty_AppliedStrengthBonusSerialized
     {
-        get => PvzNutRelicHelper.SerializeDecimal(_appliedStrengthBonus);
-        set => _appliedStrengthBonus = PvzNutRelicHelper.DeserializeDecimal(value);
+        get => StableNumericStateHelper.SerializeDecimal(_appliedStrengthBonus);
+        set => _appliedStrengthBonus = StableNumericStateHelper.DeserializeDecimal(value);
     }
 
     public override PowerType Type => PowerType.Buff;

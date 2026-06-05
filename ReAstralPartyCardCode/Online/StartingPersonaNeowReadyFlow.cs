@@ -65,24 +65,9 @@ internal static class StartingPersonaNeowReadyFlow
     {
         if (!ShouldInjectReadyPage(neow, out var runState, out var reason))
         {
-            TrueStartingNeowGateHelper.LogGateDecision(
-                nameof(StartingPersonaNeowReadyFlow),
-                "ready_page",
-                neow,
-                false,
-                reason,
-                null);
             MainFile.Logger.Info($"[StartingPersonaNeowReadyFlow] Skipped Neow ready page: {reason}.");
             return;
         }
-
-        TrueStartingNeowGateHelper.LogGateDecision(
-            nameof(StartingPersonaNeowReadyFlow),
-            "ready_page",
-            neow,
-            true,
-            reason,
-            runState);
 
         lock (SyncLock)
         {
@@ -107,7 +92,7 @@ internal static class StartingPersonaNeowReadyFlow
 
         SetEventStateMethod.Invoke(neow, [CreateReadyPageDescription(), readyOptions]);
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Ready page injected on true Neow | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
+            $"[StartingPersonaNeowReadyFlow] Ready page injected | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
     }
 
     internal static LocString CreateReadyPageDescription()
@@ -122,7 +107,13 @@ internal static class StartingPersonaNeowReadyFlow
 
     private static bool ShouldInjectReadyPage(Neow neow, out RunState runState, out string reason)
     {
-        return TrueStartingNeowGateHelper.ShouldInjectReadyPage(neow, out runState, out reason);
+        if (!TryResolveRunState(neow, out runState))
+        {
+            reason = "Neow owner or run state was unavailable";
+            return false;
+        }
+
+        return StartingPersonaRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out reason);
     }
 
     private static EventOption CreateReadyOption(Neow neow, RunState runState)

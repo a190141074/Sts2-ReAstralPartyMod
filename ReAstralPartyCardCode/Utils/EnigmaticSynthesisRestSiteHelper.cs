@@ -192,7 +192,7 @@ internal static class EnigmaticSynthesisRestSiteHelper
 
     public static int GetOwnedMaterialStacks(Player? owner, EnigmaticUniqueMaterialKind kind)
     {
-        return owner == null ? 0 : GetTotalStacks(owner, kind);
+        return owner == null ? 0 : GetOwnedSynthesisAmount(owner, kind);
     }
 
     public static bool CanCraft(Player? owner, EnigmaticSynthesisRecipeView recipe)
@@ -229,12 +229,12 @@ internal static class EnigmaticSynthesisRestSiteHelper
 
     private static bool HasRequiredMaterials(Player owner, EnigmaticSynthesisRecipe recipe)
     {
-        return recipe.Costs.All(cost => GetTotalStacks(owner, cost.Kind) >= cost.Amount);
+        return recipe.Costs.All(cost => GetOwnedSynthesisAmount(owner, cost.Kind) >= cost.Amount);
     }
 
-    private static int GetTotalStacks(Player owner, EnigmaticUniqueMaterialKind kind)
+    private static int GetOwnedSynthesisAmount(Player owner, EnigmaticUniqueMaterialKind kind)
     {
-        return GetOwnedMaterials(owner, kind).Sum(static material => Math.Max(0, material.Stacks));
+        return GetOwnedMaterials(owner, kind).Sum(static material => Math.Max(0, material.SynthesisAmount));
     }
 
     private static List<EnigmaticUniqueMaterialRelicBase> GetOwnedMaterials(Player owner, EnigmaticUniqueMaterialKind kind)
@@ -242,8 +242,8 @@ internal static class EnigmaticSynthesisRestSiteHelper
         var targetId = EnigmaticRewardRegistry.GetConfig(kind).Relic.Id;
         return owner.Relics
             .OfType<EnigmaticUniqueMaterialRelicBase>()
-            .Where(material => !material.IsMelted && material.Stacks > 0 && GetCanonicalId(material) == targetId)
-            .OrderByDescending(material => material.Stacks)
+            .Where(material => !material.IsMelted && material.SynthesisAmount > 0 && GetCanonicalId(material) == targetId)
+            .OrderByDescending(material => material.SynthesisAmount)
             .ToList();
     }
 
@@ -261,7 +261,7 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 if (remaining <= 0)
                     break;
 
-                var toConsume = Math.Min(remaining, material.Stacks);
+                var toConsume = Math.Min(remaining, material.SynthesisAmount);
                 if (toConsume <= 0)
                     continue;
 
@@ -279,7 +279,7 @@ internal static class EnigmaticSynthesisRestSiteHelper
     private static async Task ConsumeMaterialsAsync(IEnumerable<(EnigmaticUniqueMaterialRelicBase Material, int Amount)> plan)
     {
         foreach (var (material, amount) in plan)
-            await material.ConsumeStacksAsync(amount);
+            await material.ConsumeForSynthesisAsync(amount);
     }
 
     private static async Task GrantCraftResultAsync(Player owner, RelicModel resultRelic)

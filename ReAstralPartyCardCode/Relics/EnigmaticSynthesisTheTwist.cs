@@ -7,7 +7,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class EnigmaticSynthesisTheTwist : EnigmaticUniqueMaterialRelicBase
+public class EnigmaticSynthesisTheTwist : EnigmaticStackableUniqueMaterialRelicBase
 {
     [SavedProperty] public int AstralParty_EnigmaticSynthesisTheTwistStacks { get; set; } = 1;
 

@@ -43,14 +43,22 @@ public enum EnigmaticUniqueMaterialKind
     AstralDust = 26,
     HeartOfTheSea = 27,
     CosmicHeart = 28,
-    TheTwist = 29
+    TheTwist = 29,
+    VoidStone = 30
+}
+
+public enum EnigmaticUniqueMaterialSynthesisMode
+{
+    Stackable = 0,
+    NonStackable = 1
 }
 
 internal sealed record EnigmaticUniqueMaterialConfig(
     EnigmaticUniqueMaterialKind Kind,
     string RelicIdEntry,
     Func<RelicModel> RelicResolver,
-    Func<Player, int, Task<EnigmaticUniqueMaterialRelicBase?>> GrantStacksAsync,
+    EnigmaticUniqueMaterialSynthesisMode SynthesisMode,
+    Func<Player, int, Task> GrantRewardAsync,
     RelicRarity Rarity,
     int MinRewardAmount,
     int MaxRewardAmount,
@@ -80,6 +88,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.EtheriumIngot,
                 "enigmatic_etherium_ingot",
                 static () => ModelDb.Relic<EnigmaticEtheriumIngot>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticEtheriumIngot>,
                 RelicRarity.Common,
                 2,
@@ -90,6 +99,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.NefariousEssence,
                 "enigmatic_nefarious_essence",
                 static () => ModelDb.Relic<EnigmaticNefariousEssence>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticNefariousEssence>,
                 RelicRarity.Common,
                 1,
@@ -100,6 +110,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.NetheriteIngot,
                 "enigmatic_netherite_ingot",
                 static () => ModelDb.Relic<EnigmaticNetheriteIngot>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticNetheriteIngot>,
                 RelicRarity.Rare,
                 1,
@@ -110,6 +121,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.RedstoneDust,
                 "enigmatic_redstone_dust",
                 static () => ModelDb.Relic<EnigmaticRedstoneDust>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticRedstoneDust>,
                 RelicRarity.Common,
                 1,
@@ -120,6 +132,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.GhastTear,
                 "enigmatic_ghast_tear",
                 static () => ModelDb.Relic<EnigmaticGhastTear>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticGhastTear>,
                 RelicRarity.Rare,
                 1,
@@ -130,6 +143,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.BlazePowder,
                 "enigmatic_blaze_powder",
                 static () => ModelDb.Relic<EnigmaticBlazePowder>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticBlazePowder>,
                 RelicRarity.Common,
                 1,
@@ -140,6 +154,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.EnderEye,
                 "enigmatic_ender_eye",
                 static () => ModelDb.Relic<EnigmaticEnderEye>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticEnderEye>,
                 RelicRarity.Rare,
                 1,
@@ -150,6 +165,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.EarthHeart,
                 "enigmatic_earth_heart",
                 static () => ModelDb.Relic<EnigmaticEarthHeart>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticEarthHeart>,
                 RelicRarity.Rare,
                 1,
@@ -160,6 +176,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.TwistedHeart,
                 "enigmatic_synthesis_twisted_heart",
                 static () => ModelDb.Relic<EnigmaticSynthesisTwistedHeart>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticSynthesisTwistedHeart>,
                 RelicRarity.Rare,
                 1,
@@ -170,6 +187,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.PhantomMembrane,
                 "enigmatic_phantom_membrane",
                 static () => ModelDb.Relic<EnigmaticPhantomMembrane>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticPhantomMembrane>,
                 RelicRarity.Rare,
                 1,
@@ -180,6 +198,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.DarkestScroll,
                 "enigmatic_darkest_scroll",
                 static () => ModelDb.Relic<EnigmaticDarkestScroll>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticDarkestScroll>,
                 RelicRarity.Rare,
                 1,
@@ -190,6 +209,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.EnchantedBook,
                 "enigmatic_enchanted_book",
                 static () => ModelDb.Relic<EnigmaticEnchantedBook>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticEnchantedBook>,
                 RelicRarity.Rare,
                 1,
@@ -200,6 +220,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.Dye,
                 "enigmatic_dye",
                 static () => ModelDb.Relic<EnigmaticDye>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticDye>,
                 RelicRarity.Common,
                 1,
@@ -210,6 +231,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.EnchantedFeather,
                 "enigmatic_enchanted_feather",
                 static () => ModelDb.Relic<EnigmaticEnchantedFeather>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticEnchantedFeather>,
                 RelicRarity.Common,
                 1,
@@ -220,6 +242,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.GemRing,
                 "enigmatic_gem_ring",
                 static () => ModelDb.Relic<EnigmaticGemRing>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticGemRing>,
                 RelicRarity.Rare,
                 1,
@@ -230,6 +253,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.GoldIngot,
                 "enigmatic_gold_ingot",
                 static () => ModelDb.Relic<EnigmaticGoldIngot>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticGoldIngot>,
                 RelicRarity.Rare,
                 1,
@@ -240,6 +264,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.TriccScroll,
                 "enigmatic_tricc_scroll",
                 static () => ModelDb.Relic<EnigmaticTriccScroll>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticTriccScroll>,
                 RelicRarity.Common,
                 1,
@@ -250,6 +275,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.ExperienceBottle,
                 "enigmatic_experience_bottle",
                 static () => ModelDb.Relic<EnigmaticExperienceBottle>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticExperienceBottle>,
                 RelicRarity.Rare,
                 1,
@@ -260,6 +286,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.Emerald,
                 "enigmatic_emerald",
                 static () => ModelDb.Relic<EnigmaticEmerald>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticEmerald>,
                 RelicRarity.Rare,
                 1,
@@ -270,6 +297,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.AwkwardPotion,
                 "enigmatic_awkward_potion",
                 static () => ModelDb.Relic<EnigmaticAwkwardPotion>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticAwkwardPotion>,
                 RelicRarity.Common,
                 1,
@@ -280,6 +308,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.RecallPotion,
                 "enigmatic_synthesis_recall_potion",
                 static () => ModelDb.Relic<EnigmaticSynthesisRecallPotion>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticSynthesisRecallPotion>,
                 RelicRarity.Uncommon,
                 1,
@@ -290,6 +319,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.NetherStar,
                 "enigmatic_nether_star",
                 static () => ModelDb.Relic<EnigmaticNetherStar>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticNetherStar>,
                 RelicRarity.Rare,
                 1,
@@ -300,6 +330,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.LapisLazuli,
                 "enigmatic_lapis_lazuli",
                 static () => ModelDb.Relic<EnigmaticLapisLazuli>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticLapisLazuli>,
                 RelicRarity.Uncommon,
                 2,
@@ -310,6 +341,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.CryingObsidian,
                 "enigmatic_crying_obsidian",
                 static () => ModelDb.Relic<EnigmaticCryingObsidian>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticCryingObsidian>,
                 RelicRarity.Rare,
                 1,
@@ -320,6 +352,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.EnchanterPearl,
                 "enigmatic_synthesis_enchanter_pearl",
                 static () => ModelDb.Relic<EnigmaticSynthesisEnchanterPearl>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticSynthesisEnchanterPearl>,
                 RelicRarity.Rare,
                 1,
@@ -330,6 +363,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.AbyssalHeart,
                 "enigmatic_abyssal_heart",
                 static () => ModelDb.Relic<EnigmaticAbyssalHeart>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticAbyssalHeart>,
                 RelicRarity.Rare,
                 1,
@@ -340,6 +374,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.AstralDust,
                 "enigmatic_astral_dust",
                 static () => ModelDb.Relic<EnigmaticAstralDust>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticAstralDust>,
                 RelicRarity.Rare,
                 1,
@@ -350,6 +385,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.HeartOfTheSea,
                 "enigmatic_heart_of_the_sea",
                 static () => ModelDb.Relic<EnigmaticHeartOfTheSea>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticHeartOfTheSea>,
                 RelicRarity.Rare,
                 1,
@@ -360,6 +396,7 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.CosmicHeart,
                 "enigmatic_synthesis_cosmic_heart",
                 static () => ModelDb.Relic<EnigmaticSynthesisCosmicHeart>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticSynthesisCosmicHeart>,
                 RelicRarity.Rare,
                 1,
@@ -370,7 +407,19 @@ internal static class EnigmaticRewardRegistry
                 EnigmaticUniqueMaterialKind.TheTwist,
                 "enigmatic_synthesis_the_twist",
                 static () => ModelDb.Relic<EnigmaticSynthesisTheTwist>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticSynthesisTheTwist>,
+                RelicRarity.Rare,
+                1,
+                1,
+                0,
+                false),
+            [EnigmaticUniqueMaterialKind.VoidStone] = new(
+                EnigmaticUniqueMaterialKind.VoidStone,
+                "enigmatic_void_stone",
+                static () => ModelDb.Relic<EnigmaticVoidStone>(),
+                EnigmaticUniqueMaterialSynthesisMode.NonStackable,
+                GrantMaterialCopies<EnigmaticVoidStone>,
                 RelicRarity.Rare,
                 1,
                 1,
@@ -409,14 +458,14 @@ internal static class EnigmaticRewardRegistry
 
     public static EnigmaticUniqueMaterialKind RollUniqueMaterialKind(params object?[] contextParts)
     {
-        return RollUniqueMaterialKindWithBonuses(null, 0, 0, null, contextParts);
+        return RollUniqueMaterialKindWithBonuses(null, 0, 0, 0, null, contextParts);
     }
 
     public static EnigmaticUniqueMaterialKind RollUniqueMaterialKindWithRareBonus(
         int rareWeightBonusPermille,
         params object?[] contextParts)
     {
-        return RollUniqueMaterialKindWithBonuses(null, rareWeightBonusPermille, 0, null, contextParts);
+        return RollUniqueMaterialKindWithBonuses(null, rareWeightBonusPermille, 0, 0, null, contextParts);
     }
 
     public static EnigmaticUniqueMaterialKind RollUniqueMaterialKindWithRareBonusExcluding(
@@ -424,13 +473,14 @@ internal static class EnigmaticRewardRegistry
         IReadOnlyCollection<EnigmaticUniqueMaterialKind>? excludedKinds,
         params object?[] contextParts)
     {
-        return RollUniqueMaterialKindWithBonuses(null, rareWeightBonusPermille, 0, excludedKinds, contextParts);
+        return RollUniqueMaterialKindWithBonuses(null, rareWeightBonusPermille, 0, 0, excludedKinds, contextParts);
     }
 
     public static EnigmaticUniqueMaterialKind RollUniqueMaterialKindWithBonuses(
         Player? owner,
         int rareWeightBonusPermille,
         int unownedWeightBonusPermille,
+        int ownedWeightPenaltyPermille,
         IReadOnlyCollection<EnigmaticUniqueMaterialKind>? excludedKinds,
         params object?[] contextParts)
     {
@@ -438,14 +488,24 @@ internal static class EnigmaticRewardRegistry
         if (availableKinds.Count == 0)
             return EnigmaticUniqueMaterialKind.EtheriumIngot;
 
-        var totalWeight = availableKinds.Sum(config => GetPoolWeight(config, owner, rareWeightBonusPermille, unownedWeightBonusPermille));
+        var totalWeight = availableKinds.Sum(config => GetPoolWeight(
+            config,
+            owner,
+            rareWeightBonusPermille,
+            unownedWeightBonusPermille,
+            ownedWeightPenaltyPermille));
         var roll = DeterministicMultiplayerChoiceHelper.RollDeterministically(
             0,
             totalWeight,
             contextParts);
         foreach (var config in availableKinds)
         {
-            var weight = GetPoolWeight(config, owner, rareWeightBonusPermille, unownedWeightBonusPermille);
+            var weight = GetPoolWeight(
+                config,
+                owner,
+                rareWeightBonusPermille,
+                unownedWeightBonusPermille,
+                ownedWeightPenaltyPermille);
             if (roll < weight)
                 return config.Kind;
 
@@ -456,25 +516,40 @@ internal static class EnigmaticRewardRegistry
     }
 
     public static EnigmaticUniqueMaterialKind RollUniqueMaterialKindFromIncludedKinds(
+        Player? owner,
         IReadOnlyCollection<EnigmaticUniqueMaterialKind> includedKinds,
         int rareWeightBonusPermille,
+        int ownedWeightPenaltyPermille,
+        IReadOnlyDictionary<EnigmaticUniqueMaterialKind, int>? weightOverrides,
         params object?[] contextParts)
     {
         var allowed = MaterialConfigs.Values
             .Where(config => includedKinds.Contains(config.Kind))
-            .Where(static config => config.IncludeInSevenBlessingsPool && config.RewardPoolWeight > 0)
+            .Where(config => config.IncludeInSevenBlessingsPool && GetEffectivePoolWeight(config, weightOverrides) > 0)
             .ToList();
         if (allowed.Count == 0)
             return EnigmaticUniqueMaterialKind.EtheriumIngot;
 
-        var totalWeight = allowed.Sum(config => GetPoolWeight(config, null, rareWeightBonusPermille, 0));
+        var totalWeight = allowed.Sum(config => GetPoolWeight(
+            config,
+            owner,
+            rareWeightBonusPermille,
+            0,
+            ownedWeightPenaltyPermille,
+            weightOverrides));
         var roll = DeterministicMultiplayerChoiceHelper.RollDeterministically(
             0,
             totalWeight,
             contextParts);
         foreach (var config in allowed)
         {
-            var weight = GetPoolWeight(config, null, rareWeightBonusPermille, 0);
+            var weight = GetPoolWeight(
+                config,
+                owner,
+                rareWeightBonusPermille,
+                0,
+                ownedWeightPenaltyPermille,
+                weightOverrides);
             if (roll < weight)
                 return config.Kind;
 
@@ -541,6 +616,11 @@ internal static class EnigmaticRewardRegistry
         return new EnigmaticUniqueMaterialReward(player, kind, amount);
     }
 
+    public static bool IsStackable(EnigmaticUniqueMaterialKind kind)
+    {
+        return GetConfig(kind).SynthesisMode == EnigmaticUniqueMaterialSynthesisMode.Stackable;
+    }
+
     private static int ClampRewardAmount(EnigmaticUniqueMaterialKind kind, int amount)
     {
         var config = GetConfig(kind);
@@ -561,24 +641,48 @@ internal static class EnigmaticRewardRegistry
         EnigmaticUniqueMaterialConfig config,
         Player? owner,
         int rareWeightBonusPermille,
-        int unownedWeightBonusPermille)
+        int unownedWeightBonusPermille,
+        int ownedWeightPenaltyPermille,
+        IReadOnlyDictionary<EnigmaticUniqueMaterialKind, int>? weightOverrides = null)
     {
-        var baseWeightPermille = config.RewardPoolWeight * 1000;
+        var effectivePoolWeight = GetEffectivePoolWeight(config, weightOverrides);
+        var baseWeightPermille = effectivePoolWeight * 1000;
         if (rareWeightBonusPermille > 0 && config.Rarity == RelicRarity.Rare)
-            baseWeightPermille += config.RewardPoolWeight * rareWeightBonusPermille;
+            baseWeightPermille += effectivePoolWeight * rareWeightBonusPermille;
 
         if (unownedWeightBonusPermille > 0 &&
             owner != null &&
             EnigmaticSynthesisRestSiteHelper.GetOwnedMaterialStacks(owner, config.Kind) <= 0)
-            baseWeightPermille += config.RewardPoolWeight * unownedWeightBonusPermille;
+            baseWeightPermille += effectivePoolWeight * unownedWeightBonusPermille;
+
+        if (ownedWeightPenaltyPermille > 0 &&
+            owner != null &&
+            EnigmaticSynthesisRestSiteHelper.GetOwnedMaterialStacks(owner, config.Kind) > 0)
+            baseWeightPermille = Math.Max(1, baseWeightPermille * (1000 - ownedWeightPenaltyPermille) / 1000);
 
         return baseWeightPermille;
     }
 
-    private static async Task<EnigmaticUniqueMaterialRelicBase?> GrantMaterialStacks<T>(Player owner, int amount)
-        where T : EnigmaticUniqueMaterialRelicBase
+    private static int GetEffectivePoolWeight(
+        EnigmaticUniqueMaterialConfig config,
+        IReadOnlyDictionary<EnigmaticUniqueMaterialKind, int>? weightOverrides)
     {
-        return await EnigmaticUniqueMaterialRelicBase.GrantStacks<T>(owner, amount);
+        if (weightOverrides != null && weightOverrides.TryGetValue(config.Kind, out var overrideWeight))
+            return Math.Max(0, overrideWeight);
+
+        return config.RewardPoolWeight;
+    }
+
+    private static async Task GrantMaterialStacks<T>(Player owner, int amount)
+        where T : EnigmaticStackableUniqueMaterialRelicBase
+    {
+        await EnigmaticUniqueMaterialRelicBase.GrantStacks<T>(owner, amount);
+    }
+
+    private static async Task GrantMaterialCopies<T>(Player owner, int amount)
+        where T : EnigmaticNonStackableUniqueMaterialRelicBase
+    {
+        await EnigmaticNonStackableUniqueMaterialRelicBase.GrantCopies<T>(owner, amount);
     }
 }
 
@@ -602,7 +706,9 @@ public sealed class EnigmaticUniqueMaterialReward : ModCustomReward
         {
             var description = new LocString(
                 "relics",
-                "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD.label");
+                _config.SynthesisMode == EnigmaticUniqueMaterialSynthesisMode.Stackable
+                    ? "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD.label"
+                    : "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD_INSTANCE.label");
             description.Add("Material", _config.Relic.Title);
             description.Add("Amount", Amount);
             return description;
@@ -629,7 +735,7 @@ public sealed class EnigmaticUniqueMaterialReward : ModCustomReward
         if (Player == null)
             return false;
 
-        await _config.GrantStacksAsync(Player, Amount);
+        await _config.GrantRewardAsync(Player, Amount);
         return true;
     }
 }

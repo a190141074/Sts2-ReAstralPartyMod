@@ -15,7 +15,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class EnigmaticSynthesisEnchanterPearl : EnigmaticUniqueMaterialRelicBase
+public class EnigmaticSynthesisEnchanterPearl : EnigmaticStackableUniqueMaterialRelicBase
 {
     private static readonly string[] CardCollectionMemberNames =
     [
@@ -132,6 +132,7 @@ public class EnigmaticSynthesisEnchanterPearl : EnigmaticUniqueMaterialRelicBase
 
             list.Add(card);
             SyncPlayerDeck(owner, card);
+            EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
             return true;
         }
 
@@ -168,6 +169,7 @@ public class EnigmaticSynthesisEnchanterPearl : EnigmaticUniqueMaterialRelicBase
         }
 
         deck.AddInternal(card);
+        EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
         return deck.Cards.Contains(card);
     }
 

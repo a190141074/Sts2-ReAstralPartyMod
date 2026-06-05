@@ -21,15 +21,15 @@ public class PvzRareGoldenNut : AstralPartyRelicModel
     [SavedProperty]
     private string AstralParty_PvzRareGoldenNutSpentGoldProgressSerialized
     {
-        get => PvzNutRelicHelper.SerializeDecimal(_spentGoldProgress);
-        set => _spentGoldProgress = PvzNutRelicHelper.DeserializeDecimal(value);
+        get => StableNumericStateHelper.SerializeDecimal(_spentGoldProgress);
+        set => _spentGoldProgress = StableNumericStateHelper.DeserializeDecimal(value);
     }
 
     [SavedProperty]
     private string AstralParty_PvzRareGoldenNutLastObservedGoldSerialized
     {
-        get => PvzNutRelicHelper.SerializeDecimal(_lastObservedGold);
-        set => _lastObservedGold = PvzNutRelicHelper.DeserializeDecimal(value);
+        get => StableNumericStateHelper.SerializeDecimal(_lastObservedGold);
+        set => _lastObservedGold = StableNumericStateHelper.DeserializeDecimal(value);
     }
 
     protected override string RelicId => "pvz_rare_golden_nut";
@@ -40,7 +40,7 @@ public class PvzRareGoldenNut : AstralPartyRelicModel
 
     public override bool ShowCounter => true;
 
-    public override int DisplayAmount => Math.Max(0, (int)decimal.Floor(_spentGoldProgress));
+    public override int DisplayAmount => StableNumericStateHelper.FloorToNonNegativeInt(_spentGoldProgress);
 
     public override async Task AfterObtained()
     {

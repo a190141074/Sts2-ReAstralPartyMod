@@ -22,8 +22,8 @@ public class PvzRareHyperTemporalNut : AstralPartyRelicModel
     [SavedProperty]
     private string AstralParty_PvzRareHyperTemporalNutHpSnapshotsJson
     {
-        get => PvzNutRelicHelper.SerializeHpSnapshots(_hpSnapshots);
-        set => _hpSnapshots = PvzNutRelicHelper.DeserializeHpSnapshots(value);
+        get => StableNumericStateHelper.SerializeDecimalSequence(_hpSnapshots);
+        set => _hpSnapshots = StableNumericStateHelper.DeserializeDecimalSequence(value);
     }
 
     [SavedProperty] public bool AstralParty_PvzRareHyperTemporalNutUsedThisRun { get; set; }

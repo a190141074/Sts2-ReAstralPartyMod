@@ -18,9 +18,11 @@ public class EnigmaticSynthesisEscapeScroll : AstralPartyRelicModel
     private const decimal BaseFlatMaxHpLoss = 14m;
     private const decimal SevenCursesMaxHpLossPercent = 0.07m;
     private const decimal SevenCursesFlatMaxHpLoss = 7m;
-    private const decimal MissingSnapshotFallbackHp = 20m;
+    private const int MissingSnapshotFallbackHp = 20;
 
-    [SavedProperty] public decimal AstralParty_EnigmaticSynthesisEscapeScrollLastRestSiteHpSnapshot { get; set; } = MissingSnapshotFallbackHp;
+    // Store the snapshot as an integer HP value so persistence and reward sync never depend on decimal SavedProperty support.
+    [SavedProperty] public int AstralParty_EnigmaticSynthesisEscapeScrollLastRestSiteHpSnapshot { get; set; } = MissingSnapshotFallbackHp;
+
     [SavedProperty] public int AstralParty_EnigmaticSynthesisEscapeScrollCooldownProgress { get; set; }
     [SavedProperty] public bool AstralParty_EnigmaticSynthesisEscapeScrollReady { get; set; } = true;
 
@@ -111,7 +113,7 @@ public class EnigmaticSynthesisEscapeScroll : AstralPartyRelicModel
         if (Owner?.Creature == null)
             return;
 
-        AstralParty_EnigmaticSynthesisEscapeScrollLastRestSiteHpSnapshot = Math.Clamp(
+        AstralParty_EnigmaticSynthesisEscapeScrollLastRestSiteHpSnapshot = StableNumericStateHelper.ClampCeilingToInt(
             Owner.Creature.CurrentHp,
             1m,
             Owner.Creature.MaxHp);

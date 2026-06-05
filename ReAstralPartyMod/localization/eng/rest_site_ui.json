@@ -9,5 +9,7 @@
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_SYNTHESIS.description_disabled": "Spend [blue]Unique Materials[/blue] to craft unique [gold]Enigmatic Synthesis[/gold] relics. You need enough [blue]Unique Materials[/blue] and at least one currently craftable recipe. This option does not consume a rest-site action and can be used repeatedly.",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_SYNTHESIS.selection_header": "Choose an Enigmatic Synthesis Relic",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.name": "Enigmatic Discovery",
-  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.description": "Gain [blue]4[/blue] [blue]Unique Material[/blue] rewards. [blue]1[/blue] of them is guaranteed to be [blue]2[/blue] stacks of [blue][Etherium Ingot][/blue]. In the remaining random slots, unowned Unique Materials are [blue]33%[/blue] more likely and Rare Unique Materials are [blue]33%[/blue] more likely. This option consumes a rest-site action."
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.description": "Gain [blue]4[/blue] [blue]Unique Material[/blue] rewards. [blue]1[/blue] of them is guaranteed to be [blue]2[/blue] stacks of [blue][Etherium Ingot][/blue]. In the remaining random slots, unowned Unique Materials are [blue]33%[/blue] more likely and Rare Unique Materials are [blue]33%[/blue] more likely. This option consumes a rest-site action.",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_OBLIVION.name": "Oblivion",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_OBLIVION.description": "Choose [blue]1[/blue] card in your run deck to remove, including [blue]Eternal[/blue], then gain [blue]2[/blue] random [blue]Unique Material[/blue] rewards. This option consumes a rest-site action."
 }

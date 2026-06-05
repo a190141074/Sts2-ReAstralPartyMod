@@ -77,8 +77,7 @@ internal static class NeowOptionInjectionHelper
                 MainFile.ModId,
                 ModAncientOptionRule.Single(
                     ancient => candidate.CreateOption(ancient),
-                    ancient => ShouldInjectCustomOption(ancient)
-                              && IsCandidateSelected(ancient, candidate.StableKey)));
+                    ancient => IsCandidateSelected(ancient, candidate.StableKey)));
         }
     }
 
@@ -98,33 +97,9 @@ internal static class NeowOptionInjectionHelper
         return string.Equals(ResolveSelectedCandidateKey(ancient), stableKey, StringComparison.Ordinal);
     }
 
-    private static bool ShouldInjectCustomOption(AncientEventModel ancient)
-    {
-        var accepted = TrueStartingNeowGateHelper.ShouldExposeCustomNeowOptions(ancient, out var runState, out var reason);
-        TrueStartingNeowGateHelper.LogGateDecision(
-            nameof(NeowOptionInjectionHelper),
-            "custom_option",
-            ancient,
-            accepted,
-            reason,
-            runState);
-        return accepted;
-    }
-
     private static string? ResolveSelectedCandidateKey(AncientEventModel ancient)
     {
-        if (!TrueStartingNeowGateHelper.ShouldExposeCustomNeowOptions(ancient, out var runState, out var reason))
-        {
-            TrueStartingNeowGateHelper.LogGateDecision(
-                nameof(NeowOptionInjectionHelper),
-                "custom_option",
-                ancient,
-                false,
-                reason,
-                runState);
-            return null;
-        }
-
+        var runState = ancient.Owner?.RunState as RunState;
         var eligibleCandidates = GetEligibleCandidates(runState);
         if (eligibleCandidates.Count == 0)
             return null;
@@ -153,7 +128,7 @@ internal static class NeowOptionInjectionHelper
             var selectedCandidate = eligibleCandidates[selectedIndex];
             SelectedCandidateKeysByRun[runKey] = selectedCandidate.StableKey;
             MainFile.Logger.Info(
-                $"[NeowOptionInjectionHelper] Custom Neow option considered on true Neow | runKey={runKey} | key={selectedCandidate.StableKey} | poolSize={eligibleCandidates.Count} | selectedIndex={selectedIndex}.");
+                $"[NeowOptionInjectionHelper] Selected custom Neow option for run | runKey={runKey} | key={selectedCandidate.StableKey} | poolSize={eligibleCandidates.Count} | selectedIndex={selectedIndex}.");
             return selectedCandidate.StableKey;
         }
     }
@@ -248,6 +223,7 @@ internal static class NeowOptionInjectionHelper
 
             list.Add(card);
             SyncPlayerDeck(owner, card);
+            EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
             MainFile.Logger.Info(
                 $"[NeowOptionInjectionHelper] Added Forgotten Roar to run deck | owner={owner.NetId} | member={memberName} | runDeckCount={list.Count} | playerDeckCount={owner.Deck?.Cards.Count ?? 0}");
             return true;
@@ -300,6 +276,7 @@ internal static class NeowOptionInjectionHelper
             return true;
 
         deck.AddInternal(card);
+        EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
         return deck.Cards.Contains(card);
     }
 

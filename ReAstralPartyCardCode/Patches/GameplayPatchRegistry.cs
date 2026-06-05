@@ -296,6 +296,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<CreatureHealEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
         patcher.RegisterPatch<DevConsoleUltimateChargeCommandPatch>();
+        patcher.RegisterPatch<EnigmaticOblivionDeckEntryPatch>();
         patcher.RegisterPatch<EnigmaticSynthesisXpScrollRestSitePatch>();
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
         patcher.RegisterPatch<PlayerGainGoldEnigmaticSynthesisCursedScrollPatch>();

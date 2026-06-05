@@ -532,6 +532,8 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_TWISTED_HEART.flavor": "一緒にしてはいけないものを、一つの心臓の形に捻じ込んだ。",
   "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD.label": "{Material}[blue]+{Amount}[/blue]",
   "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD.description": "独特素材：[blue]{1}[/blue]を[blue]{0}[/blue]層獲得する。",
+  "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD_INSTANCE.label": "{Material}[blue] x{Amount}[/blue]",
+  "RE_ASTRAL_PARTY_MOD_UNIQUE_MATERIAL_REWARD_INSTANCE.description": "独特素材：[blue]{1}[/blue]を[blue]{0}[/blue]個獲得する。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_HELMET.title": "エーテリウムヘルメット",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_HELMET.description": "神秘合成コスト：[blue]エーテリウムインゴット[/blue] [blue]5[/blue]。\n戦闘開始時、[gold]神秘遺物・七重咒[/gold]を持っていれば[blue]2[/blue]層の[gold]覆甲[/gold]と[blue]1[/blue]層の[gold]再生[/gold]、そうでなければ[blue]1[/blue]層の[gold]覆甲[/gold]を得る。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_HELMET.flavor": "まず頭を守れ。悪意は他の場所に残しておけばいい。",
@@ -561,5 +563,8 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_EMERALD.flavor": "価値そのものみたいな色をしていて、さらに賭けさせる気だけは強い。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_XP_SCROLL.title": "永遠の叡智の巻物",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_XP_SCROLL.description": "休憩地で鍛造せずに行動を終えるたび、次の鍛造の強化回数が[blue]1[/blue]増える。これは累積する。\n[gold]神秘遺物・七重咒[/gold]を持っているなら、この増加量は2倍になる。\nこのレリックは現在蓄積している追加鍛造回数を表示する。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_XP_SCROLL.flavor": "何かを急いで教える代わりに、使われなかった鍛造の機会だけを丁寧に書き留めていく。"
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_XP_SCROLL.flavor": "何かを急いで教える代わりに、使われなかった鍛造の機会だけを丁寧に書き留めていく。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.title": "虚無心石",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.description": "[gold]神秘合成[/gold]に使う[gold]独特素材[/gold]。\n休憩地で[gold]湮滅[/gold]を行える。\n湮滅したカードは記録され、以後同じカードがランデッキに加わると即座に取り除かれる。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.flavor": "何を呑み込むかではなく、何が二度と残れないかだけを覚えている。"
 }

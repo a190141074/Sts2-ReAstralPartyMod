@@ -6,7 +6,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class EnigmaticSynthesisCosmicHeart : EnigmaticUniqueMaterialRelicBase
+public class EnigmaticSynthesisCosmicHeart : EnigmaticStackableUniqueMaterialRelicBase
 {
     [SavedProperty] public int AstralParty_EnigmaticSynthesisCosmicHeartStacks { get; set; } = 1;
 

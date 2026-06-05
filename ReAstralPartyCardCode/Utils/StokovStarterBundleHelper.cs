@@ -275,6 +275,7 @@ internal static class StokovStarterBundleHelper
 
             list.Add(card);
             SyncPlayerDeck(owner, card);
+            EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
             return true;
         }
 
@@ -311,6 +312,7 @@ internal static class StokovStarterBundleHelper
         }
 
         deck.AddInternal(card);
+        EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
         return deck.Cards.Contains(card);
     }
 

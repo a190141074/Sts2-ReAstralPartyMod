@@ -35,6 +35,13 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     private const int ExtraCardRewardPermille = 115;
     private const int DiscoveryRareMaterialWeightBonusPermille = 330;
     private const int DiscoveryUnownedMaterialWeightBonusPermille = 330;
+    private const int OwnedSpecialMaterialWeightPenaltyPermille = 330;
+    private const int BossBonusSpecialMaterialRewardCount = 3;
+    private static readonly IReadOnlyDictionary<EnigmaticUniqueMaterialKind, int> EliteSpecialMaterialWeightOverrides =
+        new Dictionary<EnigmaticUniqueMaterialKind, int>
+        {
+            [EnigmaticUniqueMaterialKind.NetherStar] = 1
+        };
     private static readonly IReadOnlyCollection<EnigmaticUniqueMaterialKind> DefaultSpecialMaterialKinds =
     [
         EnigmaticUniqueMaterialKind.EtheriumIngot,
@@ -222,6 +229,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         TryQueueCombatEndSpecialMaterialReward();
         TryQueueBossGuaranteedNetherStar(room);
         TryQueueBossGuaranteedAbyssalHeart(room);
+        TryQueueBossBonusSpecialMaterialRewards(room);
 
         for (var i = 0; i < AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount; i++)
             room.AddExtraReward(Owner, new RelicReward(Owner));
@@ -303,6 +311,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
                 Owner,
                 DiscoveryRareMaterialWeightBonusPermille,
                 DiscoveryUnownedMaterialWeightBonusPermille,
+                0,
                 rolledDiscoveryKinds,
                 MainFile.ModId,
                 RingOfSevenCursesHelper.SeriesId,
@@ -394,8 +403,11 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         }
 
         var kind = EnigmaticRewardRegistry.RollUniqueMaterialKindFromIncludedKinds(
+            Owner,
             GetCurrentSpecialMaterialKinds(),
             0,
+            OwnedSpecialMaterialWeightPenaltyPermille,
+            GetCurrentSpecialMaterialWeightOverrides(),
             MainFile.ModId,
             RingOfSevenCursesHelper.SeriesId,
             RelicId,
@@ -428,6 +440,13 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             : DefaultSpecialMaterialKinds;
     }
 
+    private IReadOnlyDictionary<EnigmaticUniqueMaterialKind, int>? GetCurrentSpecialMaterialWeightOverrides()
+    {
+        return Owner?.Creature?.CombatState?.Encounter?.RoomType == RoomType.Elite
+            ? EliteSpecialMaterialWeightOverrides
+            : null;
+    }
+
     private void TryQueueBossGuaranteedNetherStar(CombatRoom room)
     {
         if (room.RoomType != RoomType.Boss || Owner == null)
@@ -455,6 +474,49 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             EnigmaticUniqueMaterialKind.AbyssalHeart,
             1));
         AstralParty_EnigmaticSevenBlessingsAbyssalHeartDropCount++;
+    }
+
+    private void TryQueueBossBonusSpecialMaterialRewards(CombatRoom room)
+    {
+        if (room.RoomType != RoomType.Boss || Owner?.RunState == null)
+            return;
+
+        var excludedKinds = new HashSet<EnigmaticUniqueMaterialKind>
+        {
+            EnigmaticUniqueMaterialKind.EtheriumIngot
+        };
+        for (var slotIndex = 0; slotIndex < BossBonusSpecialMaterialRewardCount; slotIndex++)
+        {
+            var kind = EnigmaticRewardRegistry.RollUniqueMaterialKindWithBonuses(
+                Owner,
+                0,
+                0,
+                OwnedSpecialMaterialWeightPenaltyPermille,
+                excludedKinds,
+                MainFile.ModId,
+                RingOfSevenCursesHelper.SeriesId,
+                RelicId,
+                "boss_bonus_special_material_kind",
+                Owner.RunState.Rng.StringSeed,
+                Owner.RunState.CurrentActIndex,
+                Owner.RunState.TotalFloor,
+                Owner.NetId,
+                slotIndex);
+            excludedKinds.Add(kind);
+
+            var amount = EnigmaticRewardRegistry.RollRewardAmount(
+                kind,
+                MainFile.ModId,
+                RingOfSevenCursesHelper.SeriesId,
+                RelicId,
+                "boss_bonus_special_material_amount",
+                Owner.RunState.Rng.StringSeed,
+                Owner.RunState.CurrentActIndex,
+                Owner.RunState.TotalFloor,
+                Owner.NetId,
+                slotIndex);
+            room.AddExtraReward(Owner, EnigmaticRewardRegistry.CreateUniqueMaterialReward(Owner, kind, amount));
+        }
     }
 
     private int GetCurrentSpecialMaterialDropPermille()

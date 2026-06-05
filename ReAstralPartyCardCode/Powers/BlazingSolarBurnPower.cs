@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -19,7 +20,7 @@ public class BlazingSolarBurnPower : AstralPartyPowerModel
 
     public override PowerStackType StackType => PowerStackType.Counter;
 
-    public override int DisplayAmount => Math.Max(0, Convert.ToInt32(decimal.Round(Amount, 0, MidpointRounding.AwayFromZero)));
+    public override int DisplayAmount => StableNumericStateHelper.RoundToNonNegativeInt(Amount);
 
     public override async Task AfterSideTurnStart(CombatSide side, CombatState combatState)
     {

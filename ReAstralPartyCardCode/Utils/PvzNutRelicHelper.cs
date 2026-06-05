@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Text.Json;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -124,7 +122,7 @@ internal static class PvzNutRelicHelper
         var normalized = total % threshold;
         if (normalized < 0m)
             normalized += threshold;
-        return Math.Max(0, (int)decimal.Floor(normalized));
+        return StableNumericStateHelper.FloorToNonNegativeInt(normalized);
     }
 
     public static RelicModel? GetVanillaRelicByEntry(string entry)
@@ -192,40 +190,21 @@ internal static class PvzNutRelicHelper
 
     public static string SerializeHpSnapshots(IReadOnlyList<decimal> snapshots)
     {
-        return JsonSerializer.Serialize(snapshots.Select(value => value.ToString(CultureInfo.InvariantCulture)).ToArray());
+        return StableNumericStateHelper.SerializeDecimalSequence(snapshots);
     }
 
     public static List<decimal> DeserializeHpSnapshots(string value)
     {
-        try
-        {
-            var raw = JsonSerializer.Deserialize<string[]>(value) ?? [];
-            return raw
-                .Select(item => decimal.TryParse(item, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsed)
-                    ? parsed
-                    : -1m)
-                .Where(item => item >= 0m)
-                .ToList();
-        }
-        catch
-        {
-            return [];
-        }
+        return StableNumericStateHelper.DeserializeDecimalSequence(value);
     }
 
     public static string SerializeDecimal(decimal value)
     {
-        return value.ToString(CultureInfo.InvariantCulture);
+        return StableNumericStateHelper.SerializeDecimal(value);
     }
 
     public static decimal DeserializeDecimal(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-            return 0m;
-
-        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsed))
-            return parsed;
-
-        return 0m;
+        return StableNumericStateHelper.DeserializeDecimal(value);
     }
 }

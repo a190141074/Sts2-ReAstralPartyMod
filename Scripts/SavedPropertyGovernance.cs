@@ -6,6 +6,23 @@ namespace ReAstralPartyMod;
 
 internal static class SavedPropertyGovernance
 {
+    private static readonly HashSet<Type> SupportedScalarTypes =
+    [
+        typeof(bool),
+        typeof(byte),
+        typeof(sbyte),
+        typeof(short),
+        typeof(ushort),
+        typeof(int),
+        typeof(uint),
+        typeof(long),
+        typeof(ulong),
+        typeof(float),
+        typeof(double),
+        typeof(char),
+        typeof(string)
+    ];
+
     private static readonly string[] ForbiddenNameMarkers =
     [
         "Ui",
@@ -73,6 +90,7 @@ internal static class SavedPropertyGovernance
             foreach (var property in GetSavedProperties(modelType))
             {
                 propertyCount++;
+                var unsupportedTypeReason = GetUnsupportedTypeReason(property.PropertyType);
                 var matchedCategory = ResolveCategory(property.Name);
                 if (matchedCategory != null)
                 {
@@ -84,6 +102,9 @@ internal static class SavedPropertyGovernance
                     uncategorizedWarnings.Add($"{modelType.FullName}.{property.Name}");
 
                 fingerprintParts.Add($"{modelType.FullName}.{property.Name}:{matchedCategory ?? "uncategorized"}");
+
+                if (unsupportedTypeReason != null)
+                    warnings.Add($"unsupported_type:{modelType.FullName}.{property.Name}:{unsupportedTypeReason}");
 
                 if (!ForbiddenNameMarkers.Any(marker =>
                         property.Name.Contains(marker, StringComparison.OrdinalIgnoreCase)))
@@ -117,6 +138,22 @@ internal static class SavedPropertyGovernance
             .Where(static property => property.GetCustomAttribute<SavedPropertyAttribute>() != null)
             .OrderBy(static property => property.Name, StringComparer.Ordinal)
             .ToArray();
+    }
+
+    private static string? GetUnsupportedTypeReason(Type propertyType)
+    {
+        if (SupportedScalarTypes.Contains(propertyType))
+            return null;
+
+        // BaseLib reward/save sync is sensitive to unsupported SavedProperty types; call these out explicitly at startup.
+        var nullableUnderlyingType = Nullable.GetUnderlyingType(propertyType);
+        if (nullableUnderlyingType != null)
+            return $"nullable:{nullableUnderlyingType.FullName}";
+
+        if (propertyType == typeof(decimal))
+            return "decimal";
+
+        return propertyType.FullName ?? propertyType.Name;
     }
 
     private static string? ResolveCategory(string propertyName)
