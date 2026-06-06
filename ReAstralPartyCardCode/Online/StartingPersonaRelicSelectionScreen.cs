@@ -323,6 +323,13 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     return;
                 }
 
+                if (IsDestinedCloneMode() && !IsLocalAuthorityPlayer())
+                {
+                    holder.MouseFilter = MouseFilterEnum.Ignore;
+                    holder.Disable();
+                    return;
+                }
+
                 holder.MouseFilter = MouseFilterEnum.Stop;
                 holder.Enable();
             })).SetDelay(delay + 0.5f);
@@ -508,6 +515,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private bool AreAllSelectionsSubmitted()
     {
+        if (IsDestinedCloneMode())
+            return TryGetAuthoritySelectedIndex(out _);
+
         return _selectionStates.Values.All(static state => state.SelectedRelic != null);
     }
 
@@ -622,6 +632,23 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private List<StartingPersonaSelectionResult> ResolveCloneSelectionResults()
     {
+        if (IsDestinedCloneMode())
+        {
+            if (!TryGetAuthoritySelectedIndex(out var authoritySelectedIndex))
+                return [];
+
+            var authorityRelic = _relicOptions[authoritySelectedIndex];
+            return _orderedPlayers
+                .Select(player => new StartingPersonaSelectionResult
+                {
+                    type = RelicPickingResultType.OnlyOnePlayerVoted,
+                    relic = authorityRelic,
+                    optionIndex = authoritySelectedIndex,
+                    player = player
+                })
+                .ToList();
+        }
+
         var selectedIndexes = BuildCommittedSelectionIndexes()
             .Where(index => index >= 0 && index < _relicOptions.Count)
             .ToList();
@@ -757,9 +784,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private async Task AnimateSelectionResultsAsync(List<StartingPersonaSelectionResult> results)
     {
-        _subtitleLabel.Text = _assignmentMode == StartingPersonaAssignmentMode.Clone
-            ? "最终人格已锁定，开始结算归属。"
-            : "选择已锁定，开始结算归属。";
+        _subtitleLabel.Text = IsDestinedCloneMode()
+            ? "房主人格已锁定，开始统一结算。"
+            : _assignmentMode == StartingPersonaAssignmentMode.Clone
+                ? "最终人格已锁定，开始结算归属。"
+                : "选择已锁定，开始结算归属。";
         var remainingAnimationsByOptionIndex = results
             .Where(result => result.type != RelicPickingResultType.Skipped && result.player != null)
             .GroupBy(result => result.optionIndex)
@@ -956,6 +985,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             return;
 
         if (_displayMode == StartingPersonaDisplayMode.Automatic)
+            return;
+
+        if (IsDestinedCloneMode() && !IsLocalAuthorityPlayer())
             return;
 
         if (Time.GetTicksMsec() - _openedTicks <= 200uL)
@@ -1324,6 +1356,18 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             };
         }
 
+        if (IsDestinedCloneMode())
+        {
+            var authorityFallbackIndex = ResolveAuthorityTimeoutFallbackIndex();
+            var destinedCloneIndexes = Enumerable.Repeat(authorityFallbackIndex, _orderedPlayers.Count).ToList();
+            LogWarn("P125",
+                $"Starting persona selection timeout fallback snapshot: {string.Join(",", destinedCloneIndexes)}.");
+            return new CommittedSelectionSnapshot
+            {
+                SelectedIndexes = destinedCloneIndexes
+            };
+        }
+
         var selectedIndexes = new List<int>(_orderedPlayers.Count);
         var reservedIndexes = new HashSet<int>();
 
@@ -1416,6 +1460,14 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private List<int> BuildCommittedSelectionIndexes()
     {
+        if (IsDestinedCloneMode())
+        {
+            if (!TryGetAuthoritySelectedIndex(out var authoritySelectedIndex))
+                return Enumerable.Repeat(-1, _orderedPlayers.Count).ToList();
+
+            return Enumerable.Repeat(authoritySelectedIndex, _orderedPlayers.Count).ToList();
+        }
+
         return _orderedPlayers
             .Select(player =>
             {
@@ -1484,9 +1536,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         LogInfo("P128",
             $"Starting persona selection applied committed snapshot: {string.Join(",", snapshot.SelectedIndexes)}.");
-        FinalizeSelectionDisplay(_assignmentMode == StartingPersonaAssignmentMode.Clone
-            ? "最终人格已锁定，开始结算……"
-            : "所有玩家已锁定选择，开始结算……");
+        FinalizeSelectionDisplay(IsDestinedCloneMode()
+            ? "房主人格已锁定，开始统一结算……"
+            : _assignmentMode == StartingPersonaAssignmentMode.Clone
+                ? "最终人格已锁定，开始结算……"
+                : "所有玩家已锁定选择，开始结算……");
     }
 
     private void FinalizeSelectionDisplay(string subtitle)
@@ -1510,7 +1564,21 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (_localPlayer == null || !_selectionStates.TryGetValue(_localPlayer.NetId, out var localState) ||
             localState.SelectedRelic == null)
         {
+            if (IsDestinedCloneMode() && !IsLocalAuthorityPlayer())
+            {
+                _subtitleLabel.Text = "当前为天命克隆模式：仅房主可以选择人格，锁定后会统一发给所有玩家。";
+                return;
+            }
+
             _subtitleLabel.Text = BuildSelectionIntroSubtitle(_runState);
+            return;
+        }
+
+        if (IsDestinedCloneMode())
+        {
+            _subtitleLabel.Text = RunManager.Instance.NetService.Type == NetGameType.Host
+                ? "已更新房主人格选择；锁定前可以继续改选。"
+                : "房主已更新人格选择，等待房主锁定……";
             return;
         }
 
@@ -1537,6 +1605,9 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
         if (mode == StartingPersonaMode.Clone)
             return "当前为克隆模式：所有玩家先正常选择，锁定后会从已提交选择中稳定随机命中 1 个，并为所有玩家统一发放。";
+
+        if (mode == StartingPersonaMode.DestinedClone)
+            return "当前为天命克隆模式：仅房主选择的人格会生效，锁定后统一发给所有玩家；其他玩家无法选择。";
 
         if (mode == StartingPersonaMode.StandardDuplicate)
         {
@@ -1793,6 +1864,43 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             else
                 await Task.Yield();
         }
+    }
+
+    private bool IsDestinedCloneMode()
+    {
+        return ReAstralPartyModSettingsManager.GetStartingPersonaMode(_runState) == StartingPersonaMode.DestinedClone;
+    }
+
+    private bool IsLocalAuthorityPlayer()
+    {
+        return _localPlayer != null && _authorityPlayer != null && _localPlayer.NetId == _authorityPlayer.NetId;
+    }
+
+    private bool TryGetAuthoritySelectedIndex(out int selectedIndex)
+    {
+        selectedIndex = -1;
+        if (_authorityPlayer == null)
+            return false;
+
+        if (!_selectionStates.TryGetValue(_authorityPlayer.NetId, out var authorityState) || authorityState.SelectedRelic == null)
+            return false;
+
+        selectedIndex = IndexOfRelic(_relicOptions, authorityState.SelectedRelic);
+        return selectedIndex >= 0 && selectedIndex < _relicOptions.Count;
+    }
+
+    private int ResolveAuthorityTimeoutFallbackIndex()
+    {
+        if (_authorityPlayer == null)
+            return 0;
+
+        if (TryGetAuthoritySelectedIndex(out var selectedIndex))
+            return selectedIndex;
+
+        var fallbackIndex = SelectDeterministicTimeoutFallbackIndex(_authorityPlayer, new HashSet<int>());
+        LogWarn("P124",
+            $"Starting persona selection timeout fallback assigned index {fallbackIndex} ({_relicOptions[fallbackIndex].Id.Entry}) to authority player {_authorityPlayer.NetId}.");
+        return fallbackIndex;
     }
 
     private static void ObserveTaskFault(Task task)

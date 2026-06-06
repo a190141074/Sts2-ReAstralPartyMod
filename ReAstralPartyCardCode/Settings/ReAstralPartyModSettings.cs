@@ -37,7 +37,8 @@ public enum StartingPersonaMode
     StandardDuplicate = 1,
     RandomAssign = 2,
     Clone = 3,
-    RandomClone = 4
+    RandomClone = 4,
+    DestinedClone = 5
 }
 
 public sealed class ReAstralPartyModSettings
@@ -962,6 +963,9 @@ public static partial class ReAstralPartyModSettingsManager
                         StartingPersonaMode.RandomClone => T(
                             "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone",
                             "Random Clone Mode"),
+                        StartingPersonaMode.DestinedClone => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone",
+                            "Destined Clone Mode"),
                         _ => ModSettingsText.Literal(value.ToString())
                     },
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.description",
@@ -1294,6 +1298,8 @@ public static partial class ReAstralPartyModSettingsManager
                 "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone",
             StartingPersonaMode.RandomClone =>
                 "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone",
+            StartingPersonaMode.DestinedClone =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone",
             _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied"
         };
         var body = new LocString("settings_ui", bodyKey).GetRawText();
@@ -1375,6 +1381,7 @@ public static partial class ReAstralPartyModSettingsManager
         {
             StartingPersonaMode.Clone => StartingPersonaAssignmentMode.Clone,
             StartingPersonaMode.RandomClone => StartingPersonaAssignmentMode.Clone,
+            StartingPersonaMode.DestinedClone => StartingPersonaAssignmentMode.Clone,
             _ => StartingPersonaAssignmentMode.Independent
         };
     }
@@ -1393,6 +1400,7 @@ public static partial class ReAstralPartyModSettingsManager
             StartingPersonaMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign",
             StartingPersonaMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone",
             StartingPersonaMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone",
+            StartingPersonaMode.DestinedClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone",
             _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard"
         };
         return new LocString("settings_ui", key).GetRawText();
@@ -1407,6 +1415,7 @@ public static partial class ReAstralPartyModSettingsManager
             StartingPersonaMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign.description",
             StartingPersonaMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone.description",
             StartingPersonaMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone.description",
+            StartingPersonaMode.DestinedClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone.description",
             _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description"
         };
         return new LocString("settings_ui", key).GetRawText();

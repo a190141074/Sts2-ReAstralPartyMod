@@ -47,7 +47,8 @@ public enum EnigmaticUniqueMaterialKind
     VoidStone = 30,
     BlazeRod = 31,
     EnderRod = 32,
-    EnderPearl = 33
+    EnderPearl = 33,
+    EvilIngot = 34
 }
 
 public enum EnigmaticUniqueMaterialSynthesisMode
@@ -456,6 +457,17 @@ internal static class EnigmaticRewardRegistry
                 static () => ModelDb.Relic<EnigmaticVoidStone>(),
                 EnigmaticUniqueMaterialSynthesisMode.NonStackable,
                 GrantMaterialCopies<EnigmaticVoidStone>,
+                RelicRarity.Rare,
+                1,
+                1,
+                0,
+                false),
+            [EnigmaticUniqueMaterialKind.EvilIngot] = new(
+                EnigmaticUniqueMaterialKind.EvilIngot,
+                "enigmatic_synthesis_evil_ingot",
+                static () => ModelDb.Relic<EnigmaticSynthesisEvilIngot>(),
+                EnigmaticUniqueMaterialSynthesisMode.Stackable,
+                GrantMaterialStacks<EnigmaticSynthesisEvilIngot>,
                 RelicRarity.Rare,
                 1,
                 1,

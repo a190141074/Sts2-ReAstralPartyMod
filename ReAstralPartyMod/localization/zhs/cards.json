@@ -140,7 +140,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_COLLECTORS_CARD_YOU_HAVE_ME_TOO.title": "你有我有",
   "RE_ASTRAL_PARTY_MOD_CARD_COLLECTORS_CARD_YOU_HAVE_ME_TOO.description": "[b]典藏[/b]\n指定另一名玩家。你与其各获得[blue]1[/blue]张随机基础技能牌。",
   "RE_ASTRAL_PARTY_MOD_CARD_CURIOUS_CANDY_MACHINE.title": "怪奇糖果机",
-  "RE_ASTRAL_PARTY_MOD_CARD_CURIOUS_CANDY_MACHINE.description": "[exhaust]消耗[/exhaust]，[retain]保留[/retain]，[blue]0[/blue]费用。\n使用后扣除[blue]12[/blue]金币，获得随机[blue]1[/blue]种糖果系列药水。",
+  "RE_ASTRAL_PARTY_MOD_CARD_CURIOUS_CANDY_MACHINE.description": "使用后扣除[blue]12[/blue]金币，获得随机[blue]1[/blue]种糖果系列药水。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_MUD_TRUCK_CRASH.title": "泥头车，创死死！",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_MUD_TRUCK_CRASH.description": "造成{Damage:diff()}点伤害。\n对所有其他敌人造成等量的伤害，并施加[gold]骨折[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NINJUTSU_COMBO.title": "忍术连击",

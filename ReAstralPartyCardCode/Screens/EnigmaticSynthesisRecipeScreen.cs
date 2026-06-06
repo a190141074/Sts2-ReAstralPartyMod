@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Godot;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -27,11 +28,16 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
     private static readonly Color InsufficientSlotAccent = new(0.82f, 0.32f, 0.28f, 0.95f);
     private static readonly Color CraftableColor = new(0.9f, 0.82f, 0.36f, 1f);
     private static readonly Color MissingColor = new(0.83f, 0.55f, 0.5f, 1f);
+    private static readonly Color HighlightBorderColor = new(1f, 0.88f, 0.5f, 1f);
+    private static readonly Color HighlightFillColor = new(0.29f, 0.25f, 0.14f, 1f);
     private static EnigmaticSynthesisRecipeScreen? _instance;
 
     private Player? _player;
     private GridContainer _recipeList = null!;
+    private ScrollContainer _scroll = null!;
     private Button _closeButton = null!;
+    private readonly Dictionary<int, PanelContainer> _recipeCardsByIndex = [];
+    private long _highlightSequence;
 
     public NetScreenType ScreenType => NetScreenType.None;
     public bool UseSharedBackstop => true;
@@ -126,14 +132,14 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
         _closeButton.AddThemeStyleboxOverride("focus", CreateButtonStyle(new Color(0.32f, 0.33f, 0.37f, 1f)));
         header.AddChild(_closeButton);
 
-        var scroll = new ScrollContainer
+        _scroll = new ScrollContainer
         {
             HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
             SizeFlagsHorizontal = SizeFlags.ExpandFill,
             SizeFlagsVertical = SizeFlags.ExpandFill,
             CustomMinimumSize = new Vector2(0f, 700f)
         };
-        root.AddChild(scroll);
+        root.AddChild(_scroll);
 
         _recipeList = new GridContainer
         {
@@ -143,7 +149,7 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
         };
         _recipeList.AddThemeConstantOverride("h_separation", 18);
         _recipeList.AddThemeConstantOverride("v_separation", 18);
-        scroll.AddChild(_recipeList);
+        _scroll.AddChild(_recipeList);
     }
 
     private void RefreshRecipes()
@@ -151,14 +157,19 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
         if (_recipeList == null)
             return;
 
+        _recipeCardsByIndex.Clear();
         foreach (var child in _recipeList.GetChildren())
             child.QueueFree();
 
         foreach (var recipe in EnigmaticSynthesisRestSiteHelper.AllRecipes)
-            _recipeList.AddChild(CreateRecipeCard(recipe));
+        {
+            var card = CreateRecipeCard(recipe);
+            _recipeCardsByIndex[recipe.Index] = card;
+            _recipeList.AddChild(card);
+        }
     }
 
-    private Control CreateRecipeCard(EnigmaticSynthesisRecipeView recipe)
+    private PanelContainer CreateRecipeCard(EnigmaticSynthesisRecipeView recipe)
     {
         var craftable = EnigmaticSynthesisRestSiteHelper.CanCraft(_player, recipe);
         var card = new PanelContainer
@@ -293,13 +304,18 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
         var relic = config.Relic;
         var ownedAmount = EnigmaticSynthesisRestSiteHelper.GetOwnedMaterialStacks(_player, kind);
         var sufficient = ownedAmount >= requiredIndex;
+        var hasSourceRecipe = EnigmaticSynthesisRestSiteHelper.TryGetSourceRecipeIndex(kind, out var sourceRecipeIndex);
 
         var panel = new PanelContainer
         {
             CustomMinimumSize = new Vector2(96f, 96f),
             MouseFilter = MouseFilterEnum.Stop
         };
-        panel.AddThemeStyleboxOverride("panel", CreateSlotStyle(SlotColor, sufficient ? SufficientSlotAccent : InsufficientSlotAccent));
+        panel.AddThemeStyleboxOverride("panel", CreateSlotStyle(
+            SlotColor,
+            sufficient ? SufficientSlotAccent : InsufficientSlotAccent));
+        if (hasSourceRecipe)
+            panel.MouseDefaultCursorShape = CursorShape.PointingHand;
 
         var root = new VBoxContainer
         {
@@ -344,7 +360,22 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
 
         panel.MouseEntered += () => ShowRelicHover(panel, relic);
         panel.MouseExited += () => NHoverTipSet.Remove(panel);
+        if (hasSourceRecipe)
+            panel.GuiInput += @event => OnIngredientSlotGuiInput(@event, sourceRecipeIndex);
         return panel;
+    }
+
+    private void OnIngredientSlotGuiInput(InputEvent @event, int sourceRecipeIndex)
+    {
+        if (@event is not InputEventMouseButton
+            {
+                ButtonIndex: MouseButton.Left,
+                Pressed: true,
+                DoubleClick: false
+            })
+            return;
+
+        _ = NavigateToRecipeAsync(sourceRecipeIndex);
     }
 
     private readonly record struct ExpandedIngredientSlot(
@@ -436,6 +467,36 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
         NHoverTipSet.CreateAndShow(owner, relic.HoverTips, HoverTip.GetHoverTipAlignment(owner));
     }
 
+    private async Task NavigateToRecipeAsync(int recipeIndex)
+    {
+        if (!_recipeCardsByIndex.TryGetValue(recipeIndex, out var card))
+            return;
+
+        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        if (!GodotObject.IsInstanceValid(card) || !GodotObject.IsInstanceValid(_scroll))
+            return;
+
+        _scroll.EnsureControlVisible(card);
+        await HighlightRecipeCardAsync(recipeIndex, card);
+    }
+
+    private async Task HighlightRecipeCardAsync(int recipeIndex, PanelContainer card)
+    {
+        var ticket = ++_highlightSequence;
+        card.AddThemeStyleboxOverride("panel", CreateRecipeCardStyle(highlighted: true));
+
+        var pulse = card.CreateTween().SetLoops(2);
+        pulse.TweenProperty(card, "modulate", new Color(1f, 1f, 1f, 0.9f), 0.12f);
+        pulse.TweenProperty(card, "modulate", Colors.White, 0.12f);
+        await ToSignal(GetTree().CreateTimer(0.65f), SceneTreeTimer.SignalName.Timeout);
+
+        if (!GodotObject.IsInstanceValid(card) || ticket != _highlightSequence)
+            return;
+
+        card.Modulate = Colors.White;
+        card.AddThemeStyleboxOverride("panel", CreateRecipeCardStyle());
+    }
+
     private static StyleBoxFlat CreateFrameStyle()
     {
         var style = new StyleBoxFlat
@@ -452,12 +513,12 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
         return style;
     }
 
-    private static StyleBoxFlat CreateRecipeCardStyle()
+    private static StyleBoxFlat CreateRecipeCardStyle(bool highlighted = false)
     {
         var style = new StyleBoxFlat
         {
-            BgColor = new Color(0.21f, 0.22f, 0.25f, 1f),
-            BorderColor = new Color(0.41f, 0.43f, 0.47f, 1f),
+            BgColor = highlighted ? HighlightFillColor : new Color(0.21f, 0.22f, 0.25f, 1f),
+            BorderColor = highlighted ? HighlightBorderColor : new Color(0.41f, 0.43f, 0.47f, 1f),
             ContentMarginLeft = 18f,
             ContentMarginTop = 18f,
             ContentMarginRight = 18f,

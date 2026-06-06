@@ -46,6 +46,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone.description": "まず全プレイヤーが通常通り選択し、提出された性格の中から安定してランダムで1キャラを当たり、全プレイヤーに配布されます。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone": "ランダムクローンモード",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone.description": "手動選択できない性格候補をプレイヤー人数分表示します。 5秒後、安定して1つがランダムにヒットし、すべてのプレイヤーに送信されます。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone": "天命クローンモード",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone.description": "ホストが選んだ性格だけが有効になり、ロック後に全プレイヤーへ統一配布されます。他プレイヤーの選択は無効です。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.disabled_hint": "性格選択がオフになっているため、上記の性格関連の設定は数値を保持するだけで実際には反映されません。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.label": "禁止 ビット",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button": "管理",

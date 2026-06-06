@@ -589,3 +589,6 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_SWORD.description": "· あなたの基本打撃は[gold]エーテリウム大剣・薙ぎ払い[/gold]に置き換わる。\n· [gold]エーテリウム大剣・薙ぎ払い[/gold]は[blue]1[/blue]コストの全体攻撃カードで、使用後に消耗する。\n· 予兆[blue]2[/blue]： [gold]エーテリウム大剣・薙ぎ払い[/gold]を手札に加える。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_SWORD.flavor": "振ったあとすぐには戻らず、二ターン後にまた手の中へ立ち戻る。"
 }
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_EVIL_INGOT.title": "極悪インゴット",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_EVIL_INGOT.description": "[gold]神秘合成[/gold]に使う[gold]独特素材[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_EVIL_INGOT.flavor": "幾つもの悪意をまとめて精錬し、塊にしたようだ。",

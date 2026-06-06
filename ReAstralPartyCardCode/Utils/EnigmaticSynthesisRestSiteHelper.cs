@@ -185,6 +185,14 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 new(EnigmaticUniqueMaterialKind.BlazeRod, 2),
                 new(EnigmaticUniqueMaterialKind.AstralDust, 2),
                 new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
+            ]),
+        new(
+            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EvilIngot, 1),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.GhastTear, 4),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 4),
+                new(EnigmaticUniqueMaterialKind.NetheriteIngot, 1)
             ])
     ];
 
@@ -278,6 +286,29 @@ internal static class EnigmaticSynthesisRestSiteHelper
                        owned.IsMelted || GetCanonicalId(owned) != GetCanonicalId(internalRecipe.Result.ResultRelic)))
                && (internalRecipe.Result.ResultRelic == null
                    || !PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, internalRecipe.Result.ResultRelic));
+    }
+
+    public static bool TryGetSourceRecipeIndex(EnigmaticUniqueMaterialKind kind, out int recipeIndex)
+    {
+        var targetRelicId = EnigmaticRewardRegistry.GetConfig(kind).Relic.Id;
+        for (var i = 0; i < Recipes.Count; i++)
+        {
+            var result = Recipes[i].Result;
+            if (result.ResultKind == kind)
+            {
+                recipeIndex = i;
+                return true;
+            }
+
+            if (result.ResultRelic != null && GetCanonicalId(result.ResultRelic) == targetRelicId)
+            {
+                recipeIndex = i;
+                return true;
+            }
+        }
+
+        recipeIndex = -1;
+        return false;
     }
 
     private static IReadOnlyList<EnigmaticSynthesisRecipe> GetEligibleRecipes(Player? owner)

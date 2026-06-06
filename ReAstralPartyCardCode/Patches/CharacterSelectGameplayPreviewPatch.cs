@@ -115,7 +115,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         StartingPersonaMode.StandardDuplicate,
         StartingPersonaMode.RandomAssign,
         StartingPersonaMode.Clone,
-        StartingPersonaMode.RandomClone
+        StartingPersonaMode.RandomClone,
+        StartingPersonaMode.DestinedClone
     ];
 
     private static readonly TokenSeriesMode[] TokenSeriesModes =
