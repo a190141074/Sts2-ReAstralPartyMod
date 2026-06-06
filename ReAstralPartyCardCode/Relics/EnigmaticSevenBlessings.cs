@@ -49,8 +49,8 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         EnigmaticUniqueMaterialKind.NetheriteIngot,
         EnigmaticUniqueMaterialKind.RedstoneDust,
         EnigmaticUniqueMaterialKind.GhastTear,
-        EnigmaticUniqueMaterialKind.BlazePowder,
-        EnigmaticUniqueMaterialKind.EnderEye,
+        EnigmaticUniqueMaterialKind.BlazeRod,
+        EnigmaticUniqueMaterialKind.EnderPearl,
         EnigmaticUniqueMaterialKind.EarthHeart,
         EnigmaticUniqueMaterialKind.PhantomMembrane,
         EnigmaticUniqueMaterialKind.DarkestScroll,
@@ -75,8 +75,8 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         EnigmaticUniqueMaterialKind.NetheriteIngot,
         EnigmaticUniqueMaterialKind.RedstoneDust,
         EnigmaticUniqueMaterialKind.GhastTear,
-        EnigmaticUniqueMaterialKind.BlazePowder,
-        EnigmaticUniqueMaterialKind.EnderEye,
+        EnigmaticUniqueMaterialKind.BlazeRod,
+        EnigmaticUniqueMaterialKind.EnderPearl,
         EnigmaticUniqueMaterialKind.EarthHeart,
         EnigmaticUniqueMaterialKind.PhantomMembrane,
         EnigmaticUniqueMaterialKind.DarkestScroll,
@@ -185,6 +185,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         }
 
         TryQueueEnemyDeathSpecialMaterialReward();
+        TryQueueAvariceEmeraldReward("enemy_death_emerald", sequence);
         await Task.CompletedTask;
     }
 
@@ -227,6 +228,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             return Task.CompletedTask;
 
         TryQueueCombatEndSpecialMaterialReward();
+        TryQueueAvariceEmeraldReward("combat_end_emerald", AstralParty_EnigmaticSevenBlessingsCombatEndSpecialMaterialRollSequence);
         TryQueueBossGuaranteedNetherStar(room);
         TryQueueBossGuaranteedAbyssalHeart(room);
         TryQueueBossBonusSpecialMaterialRewards(room);
@@ -372,6 +374,26 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
             sequence))
             return;
 
+        Flash();
+    }
+
+    private void TryQueueAvariceEmeraldReward(string sourceTag, int sequence)
+    {
+        if (Owner?.RunState == null)
+            return;
+
+        var reward = EnigmaticSynthesisAvariceScroll.TryCreateBonusEmeraldReward(
+            Owner,
+            sourceTag,
+            sequence,
+            AstralParty_EnigmaticSevenBlessingsPendingRelicRewardCount,
+            AstralParty_EnigmaticSevenBlessingsPendingExtraCardRewardCount,
+            _pendingUniqueMaterialRewardKeys.Count);
+        if (reward == null)
+            return;
+
+        _pendingUniqueMaterialRewardKeys.Add(
+            EnigmaticRewardRegistry.CreateRewardKey(EnigmaticUniqueMaterialKind.Emerald, 1));
         Flash();
     }
 

@@ -185,7 +185,7 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
 
         var title = new Label
         {
-            Text = recipe.ResultRelic.Title.GetFormattedText(),
+            Text = recipe.Result.DisplayRelic.Title.GetFormattedText(),
             SizeFlagsHorizontal = SizeFlags.ExpandFill,
             ClipText = true,
             MouseFilter = MouseFilterEnum.Ignore
@@ -226,7 +226,7 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
         arrow.AddThemeColorOverride("font_color", new Color(0.85f, 0.85f, 0.78f, 1f));
         layout.AddChild(arrow);
 
-        layout.AddChild(CreateResultPanel(recipe.ResultRelic));
+        layout.AddChild(CreateResultPanel(recipe.Result));
         return card;
     }
 
@@ -362,8 +362,9 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
         return panel;
     }
 
-    private Control CreateResultPanel(RelicModel relic)
+    private Control CreateResultPanel(EnigmaticSynthesisRecipeResult result)
     {
+        var relic = result.DisplayRelic;
         var panel = new PanelContainer
         {
             CustomMinimumSize = new Vector2(220f, 220f),
@@ -411,6 +412,19 @@ public sealed partial class EnigmaticSynthesisRecipeScreen : Control, ICapstoneS
         name.AddThemeFontSizeOverride("font_size", 18);
         name.AddThemeColorOverride("font_color", Colors.White);
         root.AddChild(name);
+
+        if (result.ResultAmount > 1)
+        {
+            var amount = new Label
+            {
+                Text = $"x{result.ResultAmount}",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                MouseFilter = MouseFilterEnum.Ignore
+            };
+            amount.AddThemeFontSizeOverride("font_size", 18);
+            amount.AddThemeColorOverride("font_color", new Color(0.92f, 0.82f, 0.46f, 1f));
+            root.AddChild(amount);
+        }
 
         panel.MouseEntered += () => ShowRelicHover(panel, relic);
         panel.MouseExited += () => NHoverTipSet.Remove(panel);

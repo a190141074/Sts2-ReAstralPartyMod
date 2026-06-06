@@ -15,7 +15,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class EnigmaticSynthesisEnchanterPearl : EnigmaticStackableUniqueMaterialRelicBase
+public class EnigmaticSynthesisEnchanterPearl : EnigmaticNonStackableUniqueMaterialRelicBase
 {
     private static readonly string[] CardCollectionMemberNames =
     [
@@ -35,14 +35,7 @@ public class EnigmaticSynthesisEnchanterPearl : EnigmaticStackableUniqueMaterial
         "StartingDeck"
     ];
 
-    [SavedProperty] public int AstralParty_EnigmaticSynthesisEnchanterPearlStacks { get; set; } = 1;
     [SavedProperty] public int AstralParty_EnigmaticSynthesisEnchanterPearlCurseRollSequence { get; set; }
-
-    protected override int StoredStacks
-    {
-        get => AstralParty_EnigmaticSynthesisEnchanterPearlStacks;
-        set => AstralParty_EnigmaticSynthesisEnchanterPearlStacks = value;
-    }
 
     protected override string RelicId => "enigmatic_synthesis_enchanter_pearl";
 
@@ -78,9 +71,9 @@ public class EnigmaticSynthesisEnchanterPearl : EnigmaticStackableUniqueMaterial
         Flash();
     }
 
-    public static Task<EnigmaticSynthesisEnchanterPearl?> GrantStacks(Player owner, int amount)
+    public static Task<IReadOnlyList<EnigmaticSynthesisEnchanterPearl>> GrantCopies(Player owner, int amount)
     {
-        return EnigmaticUniqueMaterialRelicBase.GrantStacks<EnigmaticSynthesisEnchanterPearl>(owner, amount);
+        return EnigmaticNonStackableUniqueMaterialRelicBase.GrantCopies<EnigmaticSynthesisEnchanterPearl>(owner, amount);
     }
 
     private bool HasSevenCurses()

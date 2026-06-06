@@ -1,7 +1,7 @@
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Rewards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -38,19 +38,15 @@ public class EnigmaticOblivionRestSiteOption : AstralPartyRestSiteOptionModel
             return false;
         }
 
-        var selectedCanonicalCard = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayer(
-            new ThrowingPlayerChoiceContext(),
+        var selectedCards = await CardSelectCmd.FromDeckGeneric(
             Owner,
-            deckCards,
-            true,
-            $"{OptionKey}.deck");
-        if (selectedCanonicalCard == null)
-        {
-            RefreshEnabled();
-            return false;
-        }
-
-        var selectedDeckCard = EnigmaticOblivionDeckHelper.FindMatchingDeckCard(Owner, selectedCanonicalCard);
+            new CardSelectorPrefs(Description, 1)
+            {
+                Cancelable = true,
+                RequireManualConfirmation = true
+            },
+            static _ => true);
+        var selectedDeckCard = selectedCards.FirstOrDefault();
         if (selectedDeckCard == null)
         {
             RefreshEnabled();

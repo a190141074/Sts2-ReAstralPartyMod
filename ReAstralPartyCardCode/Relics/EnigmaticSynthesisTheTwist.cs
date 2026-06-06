@@ -7,16 +7,8 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class EnigmaticSynthesisTheTwist : EnigmaticStackableUniqueMaterialRelicBase
+public class EnigmaticSynthesisTheTwist : EnigmaticNonStackableUniqueMaterialRelicBase
 {
-    [SavedProperty] public int AstralParty_EnigmaticSynthesisTheTwistStacks { get; set; } = 1;
-
-    protected override int StoredStacks
-    {
-        get => AstralParty_EnigmaticSynthesisTheTwistStacks;
-        set => AstralParty_EnigmaticSynthesisTheTwistStacks = value;
-    }
-
     protected override string RelicId => "enigmatic_synthesis_the_twist";
 
     public override RelicRarity Rarity => RelicRarity.Rare;
@@ -27,8 +19,8 @@ public class EnigmaticSynthesisTheTwist : EnigmaticStackableUniqueMaterialRelicB
         EnigmaticAcknowledgmentDeckHelper.ReplaceAcknowledgmentWithTwist(Owner);
     }
 
-    public static Task<EnigmaticSynthesisTheTwist?> GrantStacks(Player owner, int amount)
+    public static Task<IReadOnlyList<EnigmaticSynthesisTheTwist>> GrantCopies(Player owner, int amount)
     {
-        return EnigmaticUniqueMaterialRelicBase.GrantStacks<EnigmaticSynthesisTheTwist>(owner, amount);
+        return EnigmaticNonStackableUniqueMaterialRelicBase.GrantCopies<EnigmaticSynthesisTheTwist>(owner, amount);
     }
 }
