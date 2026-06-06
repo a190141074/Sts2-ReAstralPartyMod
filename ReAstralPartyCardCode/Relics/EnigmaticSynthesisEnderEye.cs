@@ -16,7 +16,7 @@ public class EnigmaticSynthesisEnderEye : EnigmaticStackableUniqueMaterialRelicB
         set => AstralParty_EnigmaticSynthesisEnderEyeStacks = value;
     }
 
-    protected override string RelicId => "enigmatic_synthesisender_eye";
+    protected override string RelicId => "enigmatic_synthesis_ender_eye";
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 

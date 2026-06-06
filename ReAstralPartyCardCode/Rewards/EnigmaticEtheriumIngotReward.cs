@@ -157,7 +157,7 @@ internal static class EnigmaticRewardRegistry
                 false),
             [EnigmaticUniqueMaterialKind.EnderEye] = new(
                 EnigmaticUniqueMaterialKind.EnderEye,
-                "enigmatic_synthesisender_eye",
+                "enigmatic_synthesis_ender_eye",
                 static () => ModelDb.Relic<EnigmaticSynthesisEnderEye>(),
                 EnigmaticUniqueMaterialSynthesisMode.Stackable,
                 GrantMaterialStacks<EnigmaticSynthesisEnderEye>,
