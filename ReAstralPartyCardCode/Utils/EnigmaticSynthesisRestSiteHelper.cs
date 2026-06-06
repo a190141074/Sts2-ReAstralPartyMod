@@ -13,8 +13,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class EnigmaticSynthesisRestSiteHelper
 {
-    private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
-    [
+private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
+[
         new(
             EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumScythe>()),
             false,
@@ -72,6 +72,39 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 new(EnigmaticUniqueMaterialKind.TwistedHeart, 1)
             ]),
         new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisTheInfinitum>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.CosmicHeart, 2),
+                new(EnigmaticUniqueMaterialKind.EnchanterPearl, 1),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 2),
+                new(EnigmaticUniqueMaterialKind.TheTwist, 1),
+                new(EnigmaticUniqueMaterialKind.NetheriteIngot, 2),
+                new(EnigmaticUniqueMaterialKind.AbyssalHeart, 1)
+            ]),
+        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEnchanterPearl>()),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.Emerald, 1),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 2),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 1),
+                new(EnigmaticUniqueMaterialKind.CryingObsidian, 1)
+            ]),
+        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisHeavenScroll>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.GoldIngot, 2),
+                new(EnigmaticUniqueMaterialKind.NetherStar, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.TriccScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.LapisLazuli, 2),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
+            ]),
+        new(
             EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisCursedScroll>()),
             false,
             [
@@ -106,25 +139,6 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 new(EnigmaticUniqueMaterialKind.Emerald, 1)
             ]),
         new(
-            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisRecallPotion>()),
-            true,
-            [
-                new(EnigmaticUniqueMaterialKind.EnderPearl, 1),
-                new(EnigmaticUniqueMaterialKind.AwkwardPotion, 1),
-                new(EnigmaticUniqueMaterialKind.BlazePowder, 1)
-            ]),
-        new(
-            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EnderEye, 1),
-            true,
-            [
-                new(EnigmaticUniqueMaterialKind.BlazePowder, 1),
-                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
-            ]),
-        new(
-            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.BlazePowder, 2),
-            true,
-            [new(EnigmaticUniqueMaterialKind.BlazeRod, 1)]),
-        new(
             EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEscapeScroll>()),
             false,
             [
@@ -136,26 +150,23 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
             ]),
         new(
-            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisHeavenScroll>()),
-            false,
+            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.BlazePowder, 2),
+            true,
+            [new(EnigmaticUniqueMaterialKind.BlazeRod, 1)]),
+        new(
+            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EnderEye, 1),
+            true,
             [
-                new(EnigmaticUniqueMaterialKind.GoldIngot, 2),
-                new(EnigmaticUniqueMaterialKind.NetherStar, 1),
-                new(EnigmaticUniqueMaterialKind.Dye, 1),
-                new(EnigmaticUniqueMaterialKind.TriccScroll, 1),
-                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
-                new(EnigmaticUniqueMaterialKind.LapisLazuli, 2),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 1),
                 new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
             ]),
         new(
-            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEnchanterPearl>()),
+            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EnderRod, 2),
             true,
             [
-                new(EnigmaticUniqueMaterialKind.Emerald, 1),
-                new(EnigmaticUniqueMaterialKind.NefariousEssence, 2),
-                new(EnigmaticUniqueMaterialKind.EnderPearl, 1),
-                new(EnigmaticUniqueMaterialKind.BlazePowder, 1),
-                new(EnigmaticUniqueMaterialKind.CryingObsidian, 1)
+                new(EnigmaticUniqueMaterialKind.BlazeRod, 2),
+                new(EnigmaticUniqueMaterialKind.AstralDust, 2),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
             ]),
         new(
             EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisCosmicHeart>()),
@@ -168,33 +179,22 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
             ]),
         new(
-            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisTheInfinitum>()),
-            false,
-            [
-                new(EnigmaticUniqueMaterialKind.CosmicHeart, 2),
-                new(EnigmaticUniqueMaterialKind.EnchanterPearl, 1),
-                new(EnigmaticUniqueMaterialKind.NefariousEssence, 2),
-                new(EnigmaticUniqueMaterialKind.TheTwist, 1),
-                new(EnigmaticUniqueMaterialKind.NetheriteIngot, 2),
-                new(EnigmaticUniqueMaterialKind.AbyssalHeart, 1)
-            ]),
-        new(
-            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EnderRod, 2),
-            true,
-            [
-                new(EnigmaticUniqueMaterialKind.BlazeRod, 2),
-                new(EnigmaticUniqueMaterialKind.AstralDust, 2),
-                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
-            ]),
-        new(
             EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EvilIngot, 1),
             true,
             [
                 new(EnigmaticUniqueMaterialKind.GhastTear, 4),
                 new(EnigmaticUniqueMaterialKind.NefariousEssence, 4),
                 new(EnigmaticUniqueMaterialKind.NetheriteIngot, 1)
+            ]),
+        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisRecallPotion>()),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1),
+                new(EnigmaticUniqueMaterialKind.AwkwardPotion, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 1)
             ])
-    ];
+];
 
     public static IReadOnlyList<EnigmaticSynthesisRecipeView> AllRecipes { get; } = Recipes
         .Select(static (recipe, index) => new EnigmaticSynthesisRecipeView(
@@ -226,7 +226,8 @@ internal static class EnigmaticSynthesisRestSiteHelper
             return false;
         if (recipe.Result.ResultRelic != null
             && !recipe.AllowDuplicateResult
-            && owner.Relics.Any(owned => !owned.IsMelted && GetCanonicalId(owned) == GetCanonicalId(recipe.Result.ResultRelic)))
+            && owner.Relics.Any(owned =>
+                !owned.IsMelted && GetCanonicalId(owned) == GetCanonicalId(recipe.Result.ResultRelic)))
             return false;
         if (recipe.Result.ResultRelic != null
             && PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
@@ -251,7 +252,8 @@ internal static class EnigmaticSynthesisRestSiteHelper
             return false;
         if (recipe.Result.ResultRelic != null
             && !recipe.AllowDuplicateResult
-            && owner.Relics.Any(owned => !owned.IsMelted && GetCanonicalId(owned) == GetCanonicalId(recipe.Result.ResultRelic)))
+            && owner.Relics.Any(owned =>
+                !owned.IsMelted && GetCanonicalId(owned) == GetCanonicalId(recipe.Result.ResultRelic)))
             return false;
         if (recipe.Result.ResultRelic != null
             && PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
@@ -320,7 +322,8 @@ internal static class EnigmaticSynthesisRestSiteHelper
             .Where(recipe => HasRequiredMaterials(owner, recipe))
             .Where(recipe => recipe.Result.ResultRelic == null
                              || recipe.AllowDuplicateResult
-                             || owner.Relics.All(owned => owned.IsMelted || GetCanonicalId(owned) != GetCanonicalId(recipe.Result.ResultRelic)))
+                             || owner.Relics.All(owned =>
+                                 owned.IsMelted || GetCanonicalId(owned) != GetCanonicalId(recipe.Result.ResultRelic)))
             .Where(recipe => recipe.Result.ResultRelic == null
                              || !PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
             .ToList();
@@ -329,7 +332,8 @@ internal static class EnigmaticSynthesisRestSiteHelper
     private static bool TryGetRecipe(RelicModel relic, out EnigmaticSynthesisRecipe recipe)
     {
         var canonicalId = GetCanonicalId(relic);
-        recipe = Recipes.FirstOrDefault(candidate => candidate.Result.ResultRelic != null && GetCanonicalId(candidate.Result.ResultRelic) == canonicalId);
+        recipe = Recipes.FirstOrDefault(candidate =>
+            candidate.Result.ResultRelic != null && GetCanonicalId(candidate.Result.ResultRelic) == canonicalId);
         return recipe.Result.ResultRelic != null;
     }
 
@@ -355,12 +359,14 @@ internal static class EnigmaticSynthesisRestSiteHelper
         return GetOwnedMaterials(owner, kind).Sum(static material => Math.Max(0, material.SynthesisAmount));
     }
 
-    private static List<EnigmaticUniqueMaterialRelicBase> GetOwnedMaterials(Player owner, EnigmaticUniqueMaterialKind kind)
+    private static List<EnigmaticUniqueMaterialRelicBase> GetOwnedMaterials(Player owner,
+        EnigmaticUniqueMaterialKind kind)
     {
         var targetId = EnigmaticRewardRegistry.GetConfig(kind).Relic.Id;
         return owner.Relics
             .OfType<EnigmaticUniqueMaterialRelicBase>()
-            .Where(material => !material.IsMelted && material.SynthesisAmount > 0 && GetCanonicalId(material) == targetId)
+            .Where(material =>
+                !material.IsMelted && material.SynthesisAmount > 0 && GetCanonicalId(material) == targetId)
             .OrderByDescending(material => material.SynthesisAmount)
             .ToList();
     }
@@ -394,7 +400,8 @@ internal static class EnigmaticSynthesisRestSiteHelper
         return plan;
     }
 
-    private static async Task ConsumeMaterialsAsync(IEnumerable<(EnigmaticUniqueMaterialRelicBase Material, int Amount)> plan)
+    private static async Task ConsumeMaterialsAsync(
+        IEnumerable<(EnigmaticUniqueMaterialRelicBase Material, int Amount)> plan)
     {
         foreach (var (material, amount) in plan)
             await material.ConsumeForSynthesisAsync(amount);
@@ -404,7 +411,8 @@ internal static class EnigmaticSynthesisRestSiteHelper
     {
         if (result.ResultKind != null)
         {
-            await EnigmaticRewardRegistry.GetConfig(result.ResultKind.Value).GrantRewardAsync(owner, result.ResultAmount);
+            await EnigmaticRewardRegistry.GetConfig(result.ResultKind.Value)
+                .GrantRewardAsync(owner, result.ResultAmount);
             return;
         }
 
@@ -424,13 +432,11 @@ internal static class EnigmaticSynthesisRestSiteHelper
     {
         var index = -1;
         for (var i = 0; i < Recipes.Count; i++)
-        {
             if (Recipes[i].Equals(recipe))
             {
                 index = i;
                 break;
             }
-        }
 
         if (index < 0)
             throw new InvalidOperationException("Failed to resolve enigmatic synthesis recipe index.");

@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enigmatic Synthesis Recipe Sorter</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #182028;
+      --panel-2: #202b35;
+      --border: #31404d;
+      --text: #edf2f7;
+      --muted: #9fb0c1;
+      --accent: #e0b64d;
+      --accent-2: #67b7dc;
+      --danger: #bf616a;
+      --ok: #88c07a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
+      background: linear-gradient(180deg, #0c1014, #131a21 45%, #0d1217);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(420px, 640px) minmax(420px, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(24, 32, 40, 0.96);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    .panel h2 {
+      margin: 0 0 12px 0;
+      font-size: 20px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #10161c;
+      background: var(--accent);
+    }
+
+    button.secondary {
+      color: var(--text);
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+    }
+
+    button.ghost {
+      color: var(--accent-2);
+      background: transparent;
+      border: 1px solid rgba(103, 183, 220, 0.45);
+    }
+
+    .status {
+      min-height: 22px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .status.ok { color: var(--ok); }
+    .status.warn { color: var(--accent); }
+    .status.err { color: var(--danger); }
+
+    .recipe-list {
+      display: grid;
+      gap: 10px;
+      min-height: 420px;
+    }
+
+    .recipe-card {
+      display: grid;
+      gap: 8px;
+      padding: 14px 14px 12px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(36, 47, 58, 0.98), rgba(28, 37, 46, 0.98));
+      border: 1px solid rgba(78, 95, 111, 0.7);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .recipe-card.dragging {
+      opacity: 0.45;
+      cursor: grabbing;
+    }
+
+    .recipe-card.drop-target {
+      outline: 2px solid var(--accent-2);
+      outline-offset: 2px;
+    }
+
+    .recipe-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+    }
+
+    .recipe-index {
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .recipe-name {
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .recipe-type {
+      color: var(--accent-2);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .recipe-costs {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .hint {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 760px;
+      resize: vertical;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #0d1217;
+      color: var(--text);
+      padding: 14px;
+      font-family: Consolas, "Cascadia Code", monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      tab-size: 4;
+    }
+
+    .output-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1200px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      textarea {
+        min-height: 420px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <h1>神秘合成表排序工具</h1>
+      <p>左侧拖拽调整顺序，右侧会生成可直接替换到 <code>EnigmaticSynthesisRestSiteHelper.cs</code> 的 <code>Recipes = [...]</code> 代码块。</p>
+      <p>这个工具是独立本地页面，不会自动改代码。你调好顺序后，复制右侧结果替换回仓库即可。</p>
+    </section>
+
+    <section class="layout">
+      <div class="panel">
+        <h2>拖拽排序</h2>
+        <div class="toolbar">
+          <button id="resetButton" class="secondary" type="button">恢复当前仓库顺序</button>
+          <button id="exportButton" type="button">重新生成代码</button>
+        </div>
+        <div id="status" class="status">已载入当前合成表顺序。</div>
+        <div id="recipeList" class="recipe-list" aria-label="Recipe list"></div>
+        <div class="hint">
+          提示：拖拽卡片即可调整顺序。右侧代码块会保留每条配方的完整 C# 内容，只改条目先后。
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>导出代码</h2>
+        <div class="toolbar">
+          <button id="copyButton" class="ghost" type="button">复制到剪贴板</button>
+        </div>
+        <div class="output-meta">
+          <span id="recipeCount"></span>
+          <span>替换位置：<code>EnigmaticSynthesisRestSiteHelper.cs</code></span>
+        </div>
+        <textarea id="output" spellcheck="false"></textarea>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const initialRecipes = [
+      {
+        name: "以太镰刀",
+        type: "Relic",
+        costs: "以太锭 x2, 末影棍 x2",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumScythe>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.EtheriumIngot, 2),
+                new(EnigmaticUniqueMaterialKind.EnderRod, 2)
+            ])`
+      },
+      {
+        name: "以太阔剑",
+        type: "Relic",
+        costs: "以太锭 x4, 末影棍 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumSword>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.EtheriumIngot, 4),
+                new(EnigmaticUniqueMaterialKind.EnderRod, 1)
+            ])`
+      },
+      {
+        name: "以太斧",
+        type: "Relic",
+        costs: "以太锭 x4, 末影棍 x2",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumAxe>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.EtheriumIngot, 4),
+                new(EnigmaticUniqueMaterialKind.EnderRod, 2)
+            ])`
+      },
+      {
+        name: "以太头盔",
+        type: "Relic",
+        costs: "以太锭 x5",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumHelmet>()),
+            false,
+            [new(EnigmaticUniqueMaterialKind.EtheriumIngot, 5)])`
+      },
+      {
+        name: "以太胸甲",
+        type: "Relic",
+        costs: "以太锭 x8",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumCuirass>()),
+            false,
+            [new(EnigmaticUniqueMaterialKind.EtheriumIngot, 8)])`
+      },
+      {
+        name: "以太护腿",
+        type: "Relic",
+        costs: "以太锭 x7",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumGreaves>()),
+            false,
+            [new(EnigmaticUniqueMaterialKind.EtheriumIngot, 7)])`
+      },
+      {
+        name: "以太靴",
+        type: "Relic",
+        costs: "以太锭 x4",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumBoots>()),
+            false,
+            [new(EnigmaticUniqueMaterialKind.EtheriumIngot, 4)])`
+      },
+      {
+        name: "倒转之启",
+        type: "Material Relic",
+        costs: "大地之心 x1, 烈焰粉 x2, 红石粉 x2, 恶魂之泪 x1, 末影珍珠 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisTwistedHeart>()),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.EarthHeart, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 2),
+                new(EnigmaticUniqueMaterialKind.RedstoneDust, 2),
+                new(EnigmaticUniqueMaterialKind.GhastTear, 1),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
+            ])`
+      },
+      {
+        name: "倒转之启遗物",
+        type: "Relic",
+        costs: "下界合金锭 x2, 邪恶精髓 x4, 红石粉 x1, 倒转之启 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisTheTwist>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.NetheriteIngot, 2),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 4),
+                new(EnigmaticUniqueMaterialKind.RedstoneDust, 1),
+                new(EnigmaticUniqueMaterialKind.TwistedHeart, 1)
+            ])`
+      },
+      {
+        name: "千咒卷轴",
+        type: "Relic",
+        costs: "幻翼膜 x2, 倒转之启 x1, 墨囊 x1, 空卷轴 x1, 羽毛 x1, 红石粉 x2, 魔法书 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisCursedScroll>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.PhantomMembrane, 2),
+                new(EnigmaticUniqueMaterialKind.TwistedHeart, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.DarkestScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.RedstoneDust, 2),
+                new(EnigmaticUniqueMaterialKind.EnchantedBook, 1)
+            ])`
+      },
+      {
+        name: "无尽贪婪契约",
+        type: "Relic",
+        costs: "金锭 x4, 宝石戒指 x1, 墨囊 x1, 空卷轴 x1, 羽毛 x1, 倒转之启 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisAvariceScroll>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.GoldIngot, 4),
+                new(EnigmaticUniqueMaterialKind.GemRing, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.DarkestScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.TwistedHeart, 1)
+            ])`
+      },
+      {
+        name: "永恒智慧卷轴",
+        type: "Relic",
+        costs: "经验瓶 x4, 末影珍珠 x1, 墨囊 x1, 空卷轴 x1, 羽毛 x1, 绿宝石 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisXpScroll>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.ExperienceBottle, 4),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.TriccScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.Emerald, 1)
+            ])`
+      },
+      {
+        name: "召回药水",
+        type: "Material Relic",
+        costs: "末影珍珠 x1, 粗制的药水 x1, 烈焰粉 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisRecallPotion>()),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1),
+                new(EnigmaticUniqueMaterialKind.AwkwardPotion, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 1)
+            ])`
+      },
+      {
+        name: "末影之眼",
+        type: "Material x1",
+        costs: "烈焰粉 x1, 末影珍珠 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EnderEye, 1),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 1),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
+            ])`
+      },
+      {
+        name: "烈焰粉 x2",
+        type: "Material x2",
+        costs: "烈焰棒 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.BlazePowder, 2),
+            true,
+            [new(EnigmaticUniqueMaterialKind.BlazeRod, 1)])`
+      },
+      {
+        name: "死后召回卷轴",
+        type: "Relic",
+        costs: "幻翼膜 x4, 召回药水 x1, 墨囊 x1, 空卷轴 x1, 羽毛 x1, 末影珍珠 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEscapeScroll>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.PhantomMembrane, 4),
+                new(EnigmaticUniqueMaterialKind.RecallPotion, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.TriccScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
+            ])`
+      },
+      {
+        name: "天堂之礼",
+        type: "Relic",
+        costs: "金锭 x2, 下界之星 x1, 墨囊 x1, 空卷轴 x1, 羽毛 x1, 青金石 x2, 末影珍珠 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisHeavenScroll>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.GoldIngot, 2),
+                new(EnigmaticUniqueMaterialKind.NetherStar, 1),
+                new(EnigmaticUniqueMaterialKind.Dye, 1),
+                new(EnigmaticUniqueMaterialKind.TriccScroll, 1),
+                new(EnigmaticUniqueMaterialKind.EnchantedFeather, 1),
+                new(EnigmaticUniqueMaterialKind.LapisLazuli, 2),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
+            ])`
+      },
+      {
+        name: "附魔师的珍珠",
+        type: "Material Relic",
+        costs: "绿宝石 x1, 邪恶精髓 x2, 末影珍珠 x1, 烈焰粉 x1, 哭泣的黑曜石 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEnchanterPearl>()),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.Emerald, 1),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 2),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 1),
+                new(EnigmaticUniqueMaterialKind.CryingObsidian, 1)
+            ])`
+      },
+      {
+        name: "寰宇之心",
+        type: "Material Relic",
+        costs: "星尘 x4, 下界之星 x1, 烈焰粉 x2, 海洋之心 x1, 末影珍珠 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisCosmicHeart>()),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.AstralDust, 4),
+                new(EnigmaticUniqueMaterialKind.NetherStar, 1),
+                new(EnigmaticUniqueMaterialKind.BlazePowder, 2),
+                new(EnigmaticUniqueMaterialKind.HeartOfTheSea, 1),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
+            ])`
+      },
+      {
+        name: "无止之言",
+        type: "Relic",
+        costs: "寰宇之心 x2, 附魔师的珍珠 x1, 邪恶精髓 x2, 倒转之启 x1, 下界合金锭 x2, 深渊之心 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisTheInfinitum>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.CosmicHeart, 2),
+                new(EnigmaticUniqueMaterialKind.EnchanterPearl, 1),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 2),
+                new(EnigmaticUniqueMaterialKind.TheTwist, 1),
+                new(EnigmaticUniqueMaterialKind.NetheriteIngot, 2),
+                new(EnigmaticUniqueMaterialKind.AbyssalHeart, 1)
+            ])`
+      },
+      {
+        name: "末影棍 x2",
+        type: "Material x2",
+        costs: "烈焰棒 x2, 星尘 x2, 末影珍珠 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EnderRod, 2),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.BlazeRod, 2),
+                new(EnigmaticUniqueMaterialKind.AstralDust, 2),
+                new(EnigmaticUniqueMaterialKind.EnderPearl, 1)
+            ])`
+      },
+      {
+        name: "极恶锭",
+        type: "Material x1",
+        costs: "恶魂之泪 x4, 邪恶精髓 x4, 下界合金锭 x1",
+        code: `        new(
+            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EvilIngot, 1),
+            true,
+            [
+                new(EnigmaticUniqueMaterialKind.GhastTear, 4),
+                new(EnigmaticUniqueMaterialKind.NefariousEssence, 4),
+                new(EnigmaticUniqueMaterialKind.NetheriteIngot, 1)
+            ])`
+      }
+    ];
+
+    const recipeList = document.getElementById("recipeList");
+    const output = document.getElementById("output");
+    const status = document.getElementById("status");
+    const recipeCount = document.getElementById("recipeCount");
+    const resetButton = document.getElementById("resetButton");
+    const exportButton = document.getElementById("exportButton");
+    const copyButton = document.getElementById("copyButton");
+
+    let recipes = initialRecipes.map((recipe) => ({ ...recipe }));
+    let draggedIndex = -1;
+
+    function setStatus(message, kind = "") {
+      status.textContent = message;
+      status.className = `status ${kind}`.trim();
+    }
+
+    function renderList() {
+      recipeList.innerHTML = "";
+      recipes.forEach((recipe, index) => {
+        const card = document.createElement("div");
+        card.className = "recipe-card";
+        card.draggable = true;
+        card.dataset.index = String(index);
+
+        card.innerHTML = `
+          <div class="recipe-head">
+            <div>
+              <div class="recipe-index">#${String(index + 1).padStart(2, "0")}</div>
+              <div class="recipe-name">${escapeHtml(recipe.name)}</div>
+            </div>
+            <div class="recipe-type">${escapeHtml(recipe.type)}</div>
+          </div>
+          <div class="recipe-costs">${escapeHtml(recipe.costs)}</div>
+        `;
+
+        card.addEventListener("dragstart", () => {
+          draggedIndex = index;
+          card.classList.add("dragging");
+        });
+
+        card.addEventListener("dragend", () => {
+          draggedIndex = -1;
+          recipeList.querySelectorAll(".recipe-card").forEach((node) => {
+            node.classList.remove("dragging", "drop-target");
+          });
+        });
+
+        card.addEventListener("dragover", (event) => {
+          event.preventDefault();
+          if (draggedIndex < 0 || draggedIndex === index) {
+            return;
+          }
+          recipeList.querySelectorAll(".recipe-card").forEach((node) => {
+            node.classList.remove("drop-target");
+          });
+          card.classList.add("drop-target");
+        });
+
+        card.addEventListener("dragleave", () => {
+          card.classList.remove("drop-target");
+        });
+
+        card.addEventListener("drop", (event) => {
+          event.preventDefault();
+          if (draggedIndex < 0 || draggedIndex === index) {
+            return;
+          }
+
+          const moved = recipes.splice(draggedIndex, 1)[0];
+          const insertIndex = draggedIndex < index ? index : index;
+          recipes.splice(insertIndex, 0, moved);
+          renderList();
+          regenerateOutput();
+          setStatus(`已调整顺序：${moved.name} -> 第 ${insertIndex + 1} 位。`, "ok");
+        });
+
+        recipeList.appendChild(card);
+      });
+
+      recipeCount.textContent = `当前共 ${recipes.length} 条配方`;
+    }
+
+    function regenerateOutput() {
+      const body = recipes.map((recipe) => recipe.code).join(",\n");
+      output.value = `private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =\n[\n${body}\n];`;
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    resetButton.addEventListener("click", () => {
+      recipes = initialRecipes.map((recipe) => ({ ...recipe }));
+      renderList();
+      regenerateOutput();
+      setStatus("已恢复到当前仓库顺序。", "warn");
+    });
+
+    exportButton.addEventListener("click", () => {
+      regenerateOutput();
+      setStatus("已重新生成可替换代码。", "ok");
+    });
+
+    copyButton.addEventListener("click", async () => {
+      regenerateOutput();
+      try {
+        await navigator.clipboard.writeText(output.value);
+        setStatus("已复制生成结果到剪贴板。", "ok");
+      } catch {
+        output.focus();
+        output.select();
+        setStatus("剪贴板写入失败，已自动选中右侧文本，请手动复制。", "warn");
+      }
+    });
+
+    renderList();
+    regenerateOutput();
+  </script>
+</body>
+</html>
