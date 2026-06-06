@@ -2,8 +2,9 @@ using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Localization;
-using MegaCrit.Sts2.Core.Rewards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Rewards;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.RestSite;
 
@@ -24,10 +25,10 @@ public class EnigmaticDiscoveryRestSiteOption : AstralPartyRestSiteOptionModel
         if (relic == null)
             return false;
 
-        IReadOnlyList<Reward> rewards;
+        IReadOnlyList<EnigmaticRestSiteMaterialReward> rewards;
         try
         {
-            rewards = relic.CreateDiscoveryRewards(Owner);
+            rewards = relic.CreateDiscoveryRewardResults(Owner);
         }
         catch (Exception ex)
         {
@@ -38,9 +39,14 @@ public class EnigmaticDiscoveryRestSiteOption : AstralPartyRestSiteOptionModel
         if (rewards.Count == 0)
             return false;
 
-        await RewardsCmd.OfferCustom(Owner, rewards.ToList());
+        var rewardScreenRewards = rewards
+            .Select(reward => EnigmaticRewardRegistry.CreateUniqueMaterialReward(Owner, reward.Kind, reward.Amount))
+            .ToList();
+
+        MainFile.Logger.Info(
+            $"[EnigmaticDiscoveryRestSiteOption] discovery rewards resolved for rest-site reward screen | owner={Owner.NetId} | rewardCount={rewardScreenRewards.Count}");
+        await RewardsCmd.OfferCustom(Owner, rewardScreenRewards);
         relic.Flash();
-        MainFile.Logger.Info($"[EnigmaticDiscoveryRestSiteOption] Offered discovery rewards | owner={Owner.NetId} | rewardCount={rewards.Count}");
         return true;
     }
 }

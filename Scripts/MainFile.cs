@@ -52,6 +52,7 @@ public class MainFile
         AstralChoiceProtocol.LogStartupDiagnostics();
         AstralNetPhaseGuard.LogStartupDiagnostics();
         RewardContextPolicy.LogStartupDiagnostics();
+        EnigmaticUniqueMaterialRewardSync.Register();
 
         var buildMarker = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                           ?? assembly.GetName().Version?.ToString()

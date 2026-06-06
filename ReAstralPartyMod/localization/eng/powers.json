@@ -287,5 +287,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_VIGIL_COUNTER_POWER.smartDescription": "Auto-play the first valid Attack in hand whose cost is at most remaining Energy + [blue]1[/blue]; otherwise draw and play the first valid draw-pile Attack that costs [blue]1[/blue] or less, then have it leave your hand normally.",
   "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_OMEN_POWER_BASE.title": "Omen",
   "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_OMEN_POWER_BASE.description": "[gold]Omen[/gold] [blue]{Turns}[/blue]\nEffect: [gold]{Effect}[/gold]",
-  "RE_ASTRAL_PARTY_MOD_POWER_ETHERIUM_SWORD_RECALL_OMEN_POWER.effect": "Add [gold]Etherium Greatsword Sweep[/gold] to your hand"
+  "RE_ASTRAL_PARTY_MOD_POWER_ETHERIUM_SWORD_RECALL_OMEN_POWER.effect": "Add [gold]Etherium Greatsword Sweep[/gold] to your hand",
+  "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_ACKNOWLEDGMENT_OMEN_POWER.effect": "Add [gold]The Acknowledgment[/gold] to your hand",
+  "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_TWIST_OMEN_POWER.effect": "Add [gold]The Twist[/gold] to your hand",
+  "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_INFINITUM_OMEN_POWER.effect": "Add [gold]The Infinitum[/gold] to your hand"
 }

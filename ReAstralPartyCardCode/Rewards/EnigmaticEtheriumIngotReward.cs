@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Combat.Rewards;
@@ -737,12 +738,16 @@ internal static class EnigmaticRewardRegistry
 public sealed class EnigmaticUniqueMaterialReward : ModCustomReward
 {
     private readonly EnigmaticUniqueMaterialConfig _config;
+    private bool _wasTaken;
 
     public EnigmaticUniqueMaterialKind Kind { get; }
     public int Amount { get; }
 
     public EnigmaticUniqueMaterialReward(Player player, EnigmaticUniqueMaterialKind kind, int amount) : base(player)
     {
+        // Custom reward side effects are not auto-synced by vanilla/RitsuLib, so register the narrow handler
+        // as soon as this reward exists on a client.
+        EnigmaticUniqueMaterialRewardSync.Register();
         Kind = kind;
         _config = EnigmaticRewardRegistry.GetConfig(kind);
         Amount = Math.Clamp(amount, _config.MinRewardAmount, _config.MaxRewardAmount);
@@ -784,6 +789,20 @@ public sealed class EnigmaticUniqueMaterialReward : ModCustomReward
             return false;
 
         await _config.GrantRewardAsync(Player, Amount);
+        _wasTaken = true;
+        EnigmaticUniqueMaterialRewardSync.SyncClaim(Player, Kind, Amount);
+        MainFile.Logger.Info(
+            $"[EnigmaticUniqueMaterialReward] unique material reward claimed | owner={Player.NetId} | kind={Kind} | amount={Amount}");
         return true;
+    }
+
+    public override void OnSkipped()
+    {
+        if (_wasTaken || Player == null)
+            return;
+
+        EnigmaticUniqueMaterialRewardSync.SyncSkip(Player, Kind, Amount);
+        MainFile.Logger.Info(
+            $"[EnigmaticUniqueMaterialReward] unique material reward skipped | owner={Player.NetId} | kind={Kind} | amount={Amount}");
     }
 }

@@ -84,39 +84,44 @@ internal static class EnigmaticAcknowledgmentDeckHelper
             return false;
 
         var deckCards = EventDeckCardHelper.GetRunDeckCards(owner);
-        if (deckCards.Any(IsTwistCard))
-        {
-            MainFile.Logger.Info(
-                $"[EnigmaticAcknowledgmentDeckHelper] twist_already_present | owner={owner.NetId}");
-            return false;
-        }
-
         var acknowledgment = deckCards.FirstOrDefault(IsAcknowledgmentCard);
-        if (acknowledgment == null)
+        if (acknowledgment != null)
         {
+            if (!EventDeckCardHelper.RemoveCardFromRunDeck(owner, acknowledgment))
+            {
+                MainFile.Logger.Warn(
+                    $"[EnigmaticAcknowledgmentDeckHelper] remove_acknowledgment_failed | owner={owner.NetId}");
+                return false;
+            }
+
+            var twist = CreateMutable<EnigmaticTheTwist>(owner, acknowledgment);
+            if (!TryAddCardToRunDeck(owner, twist))
+            {
+                MainFile.Logger.Warn(
+                    $"[EnigmaticAcknowledgmentDeckHelper] add_twist_failed | owner={owner.NetId}");
+                return false;
+            }
+
+            SaveManager.Instance?.MarkCardAsSeen(twist.CanonicalInstance ?? twist);
             MainFile.Logger.Info(
-                $"[EnigmaticAcknowledgmentDeckHelper] acknowledgment_missing_for_replace | owner={owner.NetId}");
-            return false;
+                $"[EnigmaticAcknowledgmentDeckHelper] replaced_acknowledgment_with_twist | owner={owner.NetId} | upgraded={twist.CurrentUpgradeLevel}");
+            return true;
         }
 
-        if (!EventDeckCardHelper.RemoveCardFromRunDeck(owner, acknowledgment))
-        {
-            MainFile.Logger.Warn(
-                $"[EnigmaticAcknowledgmentDeckHelper] remove_acknowledgment_failed | owner={owner.NetId}");
-            return false;
-        }
+        MainFile.Logger.Info(
+            $"[EnigmaticAcknowledgmentDeckHelper] acknowledgment_missing_for_replace | owner={owner.NetId} | fallback=add_twist");
 
-        var twist = CreateMutable<EnigmaticTheTwist>(owner, acknowledgment);
-        if (!TryAddCardToRunDeck(owner, twist))
+        var fallbackTwist = CreateMutable<EnigmaticTheTwist>(owner);
+        if (!TryAddCardToRunDeck(owner, fallbackTwist))
         {
             MainFile.Logger.Warn(
                 $"[EnigmaticAcknowledgmentDeckHelper] add_twist_failed | owner={owner.NetId}");
             return false;
         }
 
-        SaveManager.Instance?.MarkCardAsSeen(twist.CanonicalInstance ?? twist);
+        SaveManager.Instance?.MarkCardAsSeen(fallbackTwist.CanonicalInstance ?? fallbackTwist);
         MainFile.Logger.Info(
-            $"[EnigmaticAcknowledgmentDeckHelper] replaced_acknowledgment_with_twist | owner={owner.NetId} | upgraded={twist.CurrentUpgradeLevel}");
+            $"[EnigmaticAcknowledgmentDeckHelper] added_twist_fallback | owner={owner.NetId} | upgraded={fallbackTwist.CurrentUpgradeLevel}");
         return true;
     }
 
@@ -126,39 +131,44 @@ internal static class EnigmaticAcknowledgmentDeckHelper
             return false;
 
         var deckCards = EventDeckCardHelper.GetRunDeckCards(owner);
-        if (deckCards.Any(IsInfinitumCard))
-        {
-            MainFile.Logger.Info(
-                $"[EnigmaticAcknowledgmentDeckHelper] infinitum_already_present | owner={owner.NetId}");
-            return false;
-        }
-
         var twist = deckCards.FirstOrDefault(IsTwistCard);
-        if (twist == null)
+        if (twist != null)
         {
+            if (!EventDeckCardHelper.RemoveCardFromRunDeck(owner, twist))
+            {
+                MainFile.Logger.Warn(
+                    $"[EnigmaticAcknowledgmentDeckHelper] remove_twist_failed | owner={owner.NetId}");
+                return false;
+            }
+
+            var infinitum = CreateMutable<EnigmaticTheInfinitum>(owner, twist);
+            if (!TryAddCardToRunDeck(owner, infinitum))
+            {
+                MainFile.Logger.Warn(
+                    $"[EnigmaticAcknowledgmentDeckHelper] add_infinitum_failed | owner={owner.NetId}");
+                return false;
+            }
+
+            SaveManager.Instance?.MarkCardAsSeen(infinitum.CanonicalInstance ?? infinitum);
             MainFile.Logger.Info(
-                $"[EnigmaticAcknowledgmentDeckHelper] twist_missing_for_replace | owner={owner.NetId}");
-            return false;
+                $"[EnigmaticAcknowledgmentDeckHelper] replaced_twist_with_infinitum | owner={owner.NetId} | upgraded={infinitum.CurrentUpgradeLevel}");
+            return true;
         }
 
-        if (!EventDeckCardHelper.RemoveCardFromRunDeck(owner, twist))
-        {
-            MainFile.Logger.Warn(
-                $"[EnigmaticAcknowledgmentDeckHelper] remove_twist_failed | owner={owner.NetId}");
-            return false;
-        }
+        MainFile.Logger.Info(
+            $"[EnigmaticAcknowledgmentDeckHelper] twist_missing_for_replace | owner={owner.NetId} | fallback=add_infinitum");
 
-        var infinitum = CreateMutable<EnigmaticTheInfinitum>(owner, twist);
-        if (!TryAddCardToRunDeck(owner, infinitum))
+        var fallbackInfinitum = CreateMutable<EnigmaticTheInfinitum>(owner);
+        if (!TryAddCardToRunDeck(owner, fallbackInfinitum))
         {
             MainFile.Logger.Warn(
                 $"[EnigmaticAcknowledgmentDeckHelper] add_infinitum_failed | owner={owner.NetId}");
             return false;
         }
 
-        SaveManager.Instance?.MarkCardAsSeen(infinitum.CanonicalInstance ?? infinitum);
+        SaveManager.Instance?.MarkCardAsSeen(fallbackInfinitum.CanonicalInstance ?? fallbackInfinitum);
         MainFile.Logger.Info(
-            $"[EnigmaticAcknowledgmentDeckHelper] replaced_twist_with_infinitum | owner={owner.NetId} | upgraded={infinitum.CurrentUpgradeLevel}");
+            $"[EnigmaticAcknowledgmentDeckHelper] added_infinitum_fallback | owner={owner.NetId} | upgraded={fallbackInfinitum.CurrentUpgradeLevel}");
         return true;
     }
 

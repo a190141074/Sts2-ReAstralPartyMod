@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -26,5 +27,23 @@ public class EnigmaticTheInfinitum : AstralPartyCardModel
     protected override Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         return Task.CompletedTask;
+    }
+
+    public override async Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
+    {
+        await base.AfterCardChangedPiles(card, oldPileType, source);
+
+        if (card != this || Pile?.Type != PileType.Exhaust || oldPileType == PileType.Exhaust)
+            return;
+        if (Owner?.Creature?.CombatState == null)
+            return;
+
+        await PowerCmd.Apply(
+            ModelDb.Power<EnigmaticInfinitumOmenPower>().ToMutable(),
+            Owner.Creature,
+            1m,
+            Owner.Creature,
+            this,
+            false);
     }
 }

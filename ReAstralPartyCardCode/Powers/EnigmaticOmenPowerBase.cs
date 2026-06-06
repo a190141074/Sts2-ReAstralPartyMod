@@ -54,6 +54,11 @@ public abstract class EnigmaticOmenPowerBase : AstralPartyPowerModel
 
     protected abstract Task OnTriggered(PlayerChoiceContext choiceContext, Player player);
 
+    protected virtual int ResolveTriggerCount()
+    {
+        return 1;
+    }
+
     private int GetDisplayedTurnsForDescription()
     {
         return AstralParty_OmenRemainingTurns > 0
@@ -86,7 +91,10 @@ public abstract class EnigmaticOmenPowerBase : AstralPartyPowerModel
 
         if (AstralParty_OmenRemainingTurns <= 1)
         {
-            await OnTriggered(choiceContext, player);
+            var triggerCount = Math.Max(1, ResolveTriggerCount());
+            for (var i = 0; i < triggerCount; i++)
+                await OnTriggered(choiceContext, player);
+
             await PowerCmd.Remove(this);
             return;
         }

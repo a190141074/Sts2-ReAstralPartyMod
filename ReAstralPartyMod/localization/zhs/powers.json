@@ -287,5 +287,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_VIGIL_COUNTER_POWER.smartDescription": "优先自动打出手牌中剩余费用+[blue]1[/blue]且条件允许的攻击牌；否则抽取抽牌堆第一张费用不高于[blue]1[/blue]且条件允许的攻击牌并立即打出，结算后正常离手。",
   "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_OMEN_POWER_BASE.title": "预兆",
   "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_OMEN_POWER_BASE.description": "[gold]预兆[/gold][blue]{Turns}[/blue]\n效果：[gold]{Effect}[/gold]",
-  "RE_ASTRAL_PARTY_MOD_POWER_ETHERIUM_SWORD_RECALL_OMEN_POWER.effect": "将【以太阔剑·横扫】加入你手牌"
+  "RE_ASTRAL_PARTY_MOD_POWER_ETHERIUM_SWORD_RECALL_OMEN_POWER.effect": "将【以太阔剑·横扫】加入你手牌",
+  "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_ACKNOWLEDGMENT_OMEN_POWER.effect": "将【启示之证】加入你手牌",
+  "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_TWIST_OMEN_POWER.effect": "将【倒转之启】加入你手牌",
+  "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_INFINITUM_OMEN_POWER.effect": "将【无止之言】加入你手牌"
 }

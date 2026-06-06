@@ -295,14 +295,14 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
         return RingOfSevenCursesHelper.TryAppendHigherRarityRewardCard(player, rewardCards, options);
     }
 
-    public IReadOnlyList<Reward> CreateDiscoveryRewards(Player player)
+    internal IReadOnlyList<EnigmaticRestSiteMaterialReward> CreateDiscoveryRewardResults(Player player)
     {
         if (player != Owner || Owner?.RunState == null)
             return [];
 
-        var rewards = new List<Reward>
+        var rewards = new List<EnigmaticRestSiteMaterialReward>
         {
-            EnigmaticRewardRegistry.CreateUniqueMaterialReward(player, EnigmaticUniqueMaterialKind.EtheriumIngot, 2)
+            new(EnigmaticUniqueMaterialKind.EtheriumIngot, 2)
         };
         var rolledDiscoveryKinds = new HashSet<EnigmaticUniqueMaterialKind>();
 
@@ -338,7 +338,7 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
                 Owner.NetId,
                 sequence,
                 slotIndex);
-            rewards.Add(EnigmaticRewardRegistry.CreateUniqueMaterialReward(player, kind, amount));
+            rewards.Add(new EnigmaticRestSiteMaterialReward(kind, amount));
         }
 
         MainFile.Logger.Info($"[EnigmaticSevenBlessings] Created discovery rewards | owner={Owner.NetId} | sequence={sequence} | rewardCount={rewards.Count}");

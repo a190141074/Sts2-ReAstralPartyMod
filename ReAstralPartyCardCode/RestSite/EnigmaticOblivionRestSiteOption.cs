@@ -3,7 +3,6 @@ using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Localization;
-using MegaCrit.Sts2.Core.Rewards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Rewards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -59,15 +58,23 @@ public class EnigmaticOblivionRestSiteOption : AstralPartyRestSiteOptionModel
 
         var rewards = CreateRewards();
         if (rewards.Count > 0)
-            await RewardsCmd.OfferCustom(Owner, rewards);
+        {
+            var rewardScreenRewards = rewards
+                .Select(reward => EnigmaticRewardRegistry.CreateUniqueMaterialReward(Owner, reward.Kind, reward.Amount))
+                .ToList();
+
+            MainFile.Logger.Info(
+                $"[EnigmaticOblivionRestSiteOption] oblivion rewards resolved for rest-site reward screen | owner={Owner.NetId} | rewardCount={rewardScreenRewards.Count}");
+            await RewardsCmd.OfferCustom(Owner, rewardScreenRewards);
+        }
 
         RefreshEnabled();
         return true;
     }
 
-    private List<Reward> CreateRewards()
+    private List<EnigmaticRestSiteMaterialReward> CreateRewards()
     {
-        var rewards = new List<Reward>();
+        var rewards = new List<EnigmaticRestSiteMaterialReward>();
         var rolledKinds = new HashSet<EnigmaticUniqueMaterialKind>();
         for (var slotIndex = 0; slotIndex < 2; slotIndex++)
         {
@@ -97,7 +104,7 @@ public class EnigmaticOblivionRestSiteOption : AstralPartyRestSiteOptionModel
                 Owner.RunState?.TotalFloor ?? 0,
                 Owner.NetId,
                 slotIndex);
-            rewards.Add(EnigmaticRewardRegistry.CreateUniqueMaterialReward(Owner, kind, amount));
+            rewards.Add(new EnigmaticRestSiteMaterialReward(kind, amount));
         }
 
         return rewards;
