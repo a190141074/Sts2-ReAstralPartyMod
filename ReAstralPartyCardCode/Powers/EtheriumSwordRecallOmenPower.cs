@@ -11,6 +11,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 public class EtheriumSwordRecallOmenPower : EnigmaticOmenPowerBase
 {
+    protected override int DefaultTurns => 2;
+
     protected override string EffectDescriptionLocKey =>
         "RE_ASTRAL_PARTY_MOD_POWER_ETHERIUM_SWORD_RECALL_OMEN_POWER.effect";
 

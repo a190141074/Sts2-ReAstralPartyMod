@@ -212,7 +212,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SCYTHE.title": "エーテリウムサイズ・薙ぎ払い",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SCYTHE.description": "[sly]奇巧[/sly]\nすべての敵に{Damage:diff()}ダメージを[blue]2[/blue]回与える。",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SWORD.title": "エーテリウム大剣・薙ぎ払い",
-  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SWORD.description": "[exhaust]消耗[/exhaust]\nすべての敵に{Damage:diff()}ダメージを与える。\n予兆[blue]2[/blue]： [gold]エーテリウム大剣・薙ぎ払い[/gold]を手札に加える。",
+  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SWORD.description": "[exhaust]消耗[/exhaust]\n対象に{Damage:diff()}ダメージを与える。他の敵はこのダメージの50%を受ける。\n予兆[blue]2[/blue]： [gold]エーテリウム大剣・薙ぎ払い[/gold]を手札に加える。",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_AXE.title": "エーテリウム斧・重劈",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_AXE.description": "引くたびに、このカードのコストは[blue]2[/blue]減る。\n[blue]0[/blue]コストで使用したなら、代わりに2倍のダメージを与える。\n対象に{Damage:diff()}ダメージを与える。"
 }

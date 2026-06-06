@@ -251,12 +251,9 @@ internal static class RingOfSevenCursesHelper
         if (unlockState == null)
             return [];
 
-        var characterPoolIds = ModelDb.AllCharacterPotionPools
-            .Select(pool => pool.Id)
-            .ToHashSet();
         return ModelDb.AllPotionPools
-            .Where(pool => !characterPoolIds.Contains(pool.Id))
             .SelectMany(pool => pool.GetUnlockedPotions(unlockState))
+            .Where(IsBaseGamePotion)
             .Where(potion => potion.Rarity == rarity)
             .GroupBy(potion => potion.CanonicalInstance?.Id ?? potion.Id)
             .Select(group => group.First())
@@ -325,6 +322,11 @@ internal static class RingOfSevenCursesHelper
     private static bool IsBaseGameCard(CardModel card)
     {
         return card.GetType().Assembly == typeof(CardModel).Assembly;
+    }
+
+    private static bool IsBaseGamePotion(PotionModel potion)
+    {
+        return potion.GetType().Assembly == typeof(PotionModel).Assembly;
     }
 
     private static int GetRewardRarityRank(CardRarity rarity)

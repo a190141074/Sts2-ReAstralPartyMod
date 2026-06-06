@@ -40,17 +40,26 @@ public abstract class EnigmaticOmenPowerBase : AstralPartyPowerModel
             var description = new LocString(
                 "powers",
                 "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_OMEN_POWER_BASE.description");
-            description.Add("Turns", DisplayAmount);
+            description.Add("Turns", GetDisplayedTurnsForDescription());
             description.Add("Effect", new LocString("powers", EffectDescriptionLocKey));
             return description;
         }
     }
+
+    protected abstract int DefaultTurns { get; }
 
     protected abstract string EffectDescriptionLocKey { get; }
 
     protected virtual IEnumerable<IHoverTip> EffectHoverTips => [];
 
     protected abstract Task OnTriggered(PlayerChoiceContext choiceContext, Player player);
+
+    private int GetDisplayedTurnsForDescription()
+    {
+        return AstralParty_OmenRemainingTurns > 0
+            ? AstralParty_OmenRemainingTurns
+            : Math.Max(1, DefaultTurns);
+    }
 
     public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
     {

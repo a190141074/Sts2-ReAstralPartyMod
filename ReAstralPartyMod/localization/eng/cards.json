@@ -219,7 +219,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SCYTHE.title": "Etherium Scythe Sweep",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SCYTHE.description": "[sly]Sly[/sly]\nDeal {Damage:diff()} damage to all enemies [blue]2[/blue] times.",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SWORD.title": "Etherium Greatsword Sweep",
-  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SWORD.description": "[exhaust]Exhaust[/exhaust]\nDeal {Damage:diff()} damage to all enemies.\nOmen [blue]2[/blue]: Add [gold]Etherium Greatsword Sweep[/gold] to your hand.",
+  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SWORD.description": "[exhaust]Exhaust[/exhaust]\nDeal {Damage:diff()} damage to target enemy. All other enemies take 50% of this damage.\nOmen [blue]2[/blue]: Add [gold]Etherium Greatsword Sweep[/gold] to your hand.",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_AXE.title": "Etherium Axe Cleave",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_AXE.description": "Whenever drawn, this card costs [blue]2[/blue] less.\nIf played at [blue]0[/blue] cost, deal double damage.\nDeal {Damage:diff()} damage."
 }

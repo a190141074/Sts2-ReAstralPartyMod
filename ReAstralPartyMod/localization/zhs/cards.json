@@ -218,7 +218,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SCYTHE.title": "以太镰刀·横扫",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SCYTHE.description": "对所有敌人造成[blue]2[/blue]次{Damage:diff()}点伤害。",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SWORD.title": "以太阔剑·横扫",
-  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SWORD.description": "对所有敌人造成{Damage:diff()}点伤害。\n[gold]预兆[/gold][blue]2[/blue]：将[gold]以太阔剑·横扫[/gold]加入你手牌。",
+  "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_SWORD.description": "对目标造成{Damage:diff()}点伤害，其余敌人受到此次伤害的50%。\n[gold]预兆[/gold][blue]2[/blue]：将[gold]以太阔剑·横扫[/gold]加入你手牌。",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_AXE.title": "以太斧·重劈",
   "RE_ASTRAL_PARTY_MOD_CARD_ENIGMATIC_STRIKES_ETHERIUM_AXE.description": "每次抽到手中，费用-[blue]2[/blue]。\n若以[blue]0[/blue]费打出，则改为造成双倍伤害。\n对目标造成{Damage:diff()}点伤害。"
 }
