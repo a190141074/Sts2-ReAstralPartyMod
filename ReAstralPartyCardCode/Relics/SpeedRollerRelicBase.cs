@@ -22,6 +22,10 @@ public abstract class SpeedRollerRelicBase : AstralPartyRelicModel
 
     public override bool ShouldReceiveCombatHooks => true;
 
+    public override bool ShowCounter => true;
+
+    public override int DisplayAmount => GetRemainingFloorsUntilFlight();
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<DexterityPower>()
@@ -31,6 +35,7 @@ public abstract class SpeedRollerRelicBase : AstralPartyRelicModel
     {
         AstralParty_SpeedRollerFloorProgress = 0;
         AstralParty_SpeedRollerFlightCharges = 0;
+        InvokeDisplayAmountChanged();
         return Task.CompletedTask;
     }
 
@@ -41,10 +46,14 @@ public abstract class SpeedRollerRelicBase : AstralPartyRelicModel
 
         AstralParty_SpeedRollerFloorProgress++;
         if (AstralParty_SpeedRollerFloorProgress < FloorsPerFlight)
+        {
+            InvokeDisplayAmountChanged();
             return Task.CompletedTask;
+        }
 
         AstralParty_SpeedRollerFloorProgress %= FloorsPerFlight;
         AstralParty_SpeedRollerFlightCharges++;
+        InvokeDisplayAmountChanged();
         Flash();
         return Task.CompletedTask;
     }
@@ -75,6 +84,18 @@ public abstract class SpeedRollerRelicBase : AstralPartyRelicModel
 
         AstralParty_SpeedRollerFlightCharges--;
         return true;
+    }
+
+    private int GetRemainingFloorsUntilFlight()
+    {
+        if (FloorsPerFlight <= 0)
+            return 0;
+
+        var normalizedProgress = AstralParty_SpeedRollerFloorProgress % FloorsPerFlight;
+        if (normalizedProgress < 0)
+            normalizedProgress += FloorsPerFlight;
+
+        return FloorsPerFlight - normalizedProgress;
     }
 
     public static bool IsFlightDestination(ActMap map, IReadOnlyList<MapCoord> visitedMapCoords, MapCoord destination)

@@ -48,6 +48,23 @@ internal static class CharacterSelectGameplayPreviewPatchRegistrar
                 description: "UI patch: clear lobby gameplay-settings state when character select closes",
                 patchId: "character_select_gameplay_preview_exit");
         }
+
+        var loadGameScreenType = AccessTools.TypeByName("MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NMultiplayerLoadGameScreen");
+        if (loadGameScreenType != null)
+        {
+            var processMethod = AccessTools.DeclaredMethod(loadGameScreenType, "_Process", [typeof(double)]);
+            if (processMethod != null)
+            {
+                builder.Add(
+                    processMethod,
+                    prefix: DynamicPatchBuilder.FromMethod(
+                        typeof(CharacterSelectGameplayPreviewLoadGameRegistrationPatch),
+                        nameof(CharacterSelectGameplayPreviewLoadGameRegistrationPatch.Prefix)),
+                    isCritical: false,
+                    description: "UI patch: register lobby gameplay-settings handlers before load-game screen inbound lobby packets are processed",
+                    patchId: "character_select_gameplay_preview_load_game_register");
+            }
+        }
     }
 }
 
@@ -79,6 +96,19 @@ internal static class CharacterSelectGameplayPreviewExitPatch
     {
         LobbyGameplaySettingsSync.Unregister();
         LobbyGameplaySettingsSync.ClearIfLobbyClosedWithoutRunStart();
+    }
+}
+
+internal static class CharacterSelectGameplayPreviewLoadGameRegistrationPatch
+{
+    public static void Prefix()
+    {
+        // Loaded-run join can receive the host's lobby snapshot before the character-select
+        // preview timer notices NetService readiness, so register handlers on the screen's
+        // frame loop as soon as a NetService exists.
+        var netService = RunManager.Instance?.NetService;
+        if (netService != null)
+            LobbyGameplaySettingsSync.Register(netService);
     }
 }
 
