@@ -397,7 +397,7 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CROSSED_TWIN_CARP.description": "各ラウンドの開始時に、[gold]強化・交錯ダブルカープ[/gold] を獲得します。\n[gold]強化・交錯ダブルカープ[/gold] を持っていない場合は、[gold]Vitality[/gold] を入手したときに入手してください。\n[gold]【シリーズ・竜宮城遊園地】[/gold] の効果があります。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CROSSED_TWIN_CARP.flavor": "それは絡み合うことではなく、より速く進むためにお互いを促すことです。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.title": "【キャンディ会員カード】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.description": "各ラウンドの開始時に、手札に [gold]奇妙なキャンディーマシン[/gold] がない場合は、[blue]1[/blue] 個の [gold]奇妙なキャンディーマシン[/gold] を手札に加えます。\n[gold]【シリーズ・幽霊横丁】[/gold] の効果があります。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.description": "[blue]2[/blue]ターンごとに、この遺物を右クリックして [blue]1[/blue] 枚の [gold]奇妙なキャンディーマシン[/gold] を獲得できます。\n[gold]【シリーズ・幽霊横丁】[/gold] の効果があります。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.flavor": "会員カードは本物で、キャンディマシンも本物です。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_TIMER.title": "【タイマー】",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_TIMER.description": "[gold]変換[/gold] を取得すると、追加の [blue]1[/blue] レベルが取得されます。 [gold]変換[/gold] の [blue]2[/blue] レイヤーごとに、[blue]1[/blue] ポイントの [green]strength[/green] を獲得します。\n[gold]【シリーズ・幽霊横丁】[/gold] の効果があります。",

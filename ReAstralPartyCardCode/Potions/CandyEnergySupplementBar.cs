@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -26,11 +26,9 @@ public class CandyEnergySupplementBar : AstralPartyPotionModel
 
     public override PotionUsage Usage => PotionUsage.CombatOnly;
 
-    public override TargetType TargetType => TargetType.AnyPlayer;
+    public override TargetType TargetType => CandyPotionTargetingHelper.AnyModifiedPlayer;
 
-    public override bool PassesCustomUsabilityCheck =>
-        Owner?.Creature?.CombatState?.Players.Any(player =>
-            player.Creature?.GetPowerAmount<ModificationPower>() > 0m) == true;
+    public override bool PassesCustomUsabilityCheck => CandyPotionTargetingHelper.AnyModifiedPlayersInCombat(Owner);
 
     public override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
@@ -41,11 +39,12 @@ public class CandyEnergySupplementBar : AstralPartyPotionModel
 
     protected override async Task OnUse(PlayerChoiceContext choiceContext, Creature? target)
     {
-        if (target == null || target.GetPowerAmount<ModificationPower>() <= 0m)
+        if (!CandyPotionTargetingHelper.IsModifiedPlayer(target))
             return;
 
-        await PowerCmd.Apply<ModificationPower>(target, ModificationAmount, Owner?.Creature, null, false);
-        await PowerCmd.Apply<DoomPower>(target, DoomAmount, Owner?.Creature, null, false);
-        await CandyEnergySupplementBarPower.Apply(target, 1m, Owner?.Creature, null);
+        var actualTarget = target!;
+        await PowerCmd.Apply<ModificationPower>(actualTarget, ModificationAmount, Owner?.Creature, null, false);
+        await PowerCmd.Apply<DoomPower>(actualTarget, DoomAmount, Owner?.Creature, null, false);
+        await CandyEnergySupplementBarPower.Apply(actualTarget, 1m, Owner?.Creature, null);
     }
 }

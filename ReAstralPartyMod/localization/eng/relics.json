@@ -408,7 +408,7 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CROSSED_TWIN_CARP.description": "At the start of each turn, gain [gold]Empowered Crossed Twin Carp[/gold].\nWhenever you gain [gold]Vigor[/gold], if you do not already have [gold]Empowered Crossed Twin Carp[/gold], gain it.\nThis relic also grants the [gold]Series: Dragon Palace[/gold] note.",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CROSSED_TWIN_CARP.flavor": "They do not cross paths. They accelerate each other.",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.title": "Candy Membership Card",
-  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.description": "At the start of each turn, if your hand does not contain [gold]Curious Candy Machine[/gold], add [blue]1[/blue] [gold]Curious Candy Machine[/gold] to your hand.\nThis relic also grants the [gold]Ghost Alley Series[/gold] note.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.description": "Once every [blue]2[/blue] turns, you may right-click this relic to gain [blue]1[/blue] [gold]Curious Candy Machine[/gold].\nThis relic also grants the [gold]Ghost Alley Series[/gold] note.",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_CANDY_MEMBERSHIP_CARD.flavor": "The card proves the machine is always open for business.",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_TIMER.title": "Timer",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_EXCLUSIVE_TIMER.description": "Whenever you gain [gold]Modification[/gold], gain [blue]1[/blue] extra stack. For every [blue]2[/blue] stacks of [gold]Modification[/gold] you have, gain [blue]1[/blue] [red]Strength[/red].\nThis relic also grants the [gold]Ghost Alley Series[/gold] effect.",

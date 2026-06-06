@@ -25,6 +25,14 @@ public static class CandyMachineHelper
         if (HasCuriousCandyMachineInHand(owner))
             return;
 
+        await CreateCuriousCandyMachineInHand(owner);
+    }
+
+    public static async Task CreateCuriousCandyMachineInHand(Player owner)
+    {
+        if (owner.Creature?.CombatState == null)
+            return;
+
         var card = owner.Creature.CombatState.CreateCard(ModelDb.Card<CuriousCandyMachine>(), owner);
         await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
