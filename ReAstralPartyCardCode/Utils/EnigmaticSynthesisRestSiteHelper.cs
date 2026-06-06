@@ -16,6 +16,27 @@ internal static class EnigmaticSynthesisRestSiteHelper
     private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
     [
         new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumScythe>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.EtheriumIngot, 2),
+                new(EnigmaticUniqueMaterialKind.EnderRod, 2)
+            ]),
+        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumSword>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.EtheriumIngot, 4),
+                new(EnigmaticUniqueMaterialKind.EnderRod, 1)
+            ]),
+        new(
+            EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumAxe>()),
+            false,
+            [
+                new(EnigmaticUniqueMaterialKind.EtheriumIngot, 4),
+                new(EnigmaticUniqueMaterialKind.EnderRod, 2)
+            ]),
+        new(
             EnigmaticSynthesisRecipeResult.ForRelic(ModelDb.Relic<EnigmaticSynthesisEtheriumHelmet>()),
             false,
             [new(EnigmaticUniqueMaterialKind.EtheriumIngot, 5)]),
@@ -158,7 +179,7 @@ internal static class EnigmaticSynthesisRestSiteHelper
                 new(EnigmaticUniqueMaterialKind.AbyssalHeart, 1)
             ]),
         new(
-            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EnderRod, 1),
+            EnigmaticSynthesisRecipeResult.ForMaterial(EnigmaticUniqueMaterialKind.EnderRod, 2),
             true,
             [
                 new(EnigmaticUniqueMaterialKind.BlazeRod, 2),
@@ -168,7 +189,8 @@ internal static class EnigmaticSynthesisRestSiteHelper
     ];
 
     public static IReadOnlyList<EnigmaticSynthesisRecipeView> AllRecipes { get; } = Recipes
-        .Select(static recipe => new EnigmaticSynthesisRecipeView(
+        .Select(static (recipe, index) => new EnigmaticSynthesisRecipeView(
+            index,
             recipe.Result,
             recipe.AllowDuplicateResult,
             recipe.Costs.Select(static cost => new EnigmaticMaterialCostView(cost.Kind, cost.Amount)).ToList()))
@@ -179,11 +201,10 @@ internal static class EnigmaticSynthesisRestSiteHelper
         return owner != null && GetEligibleRecipes(owner).Count > 0;
     }
 
-    public static IReadOnlyList<RelicModel> GetEligibleRelics(Player? owner)
+    public static IReadOnlyList<EnigmaticSynthesisRecipeView> GetEligibleRecipesForSelection(Player? owner)
     {
         return GetEligibleRecipes(owner)
-            .Where(static recipe => recipe.Result.ResultRelic != null)
-            .Select(static recipe => recipe.Result.ResultRelic!)
+            .Select(ToRecipeView)
             .ToList();
     }
 
@@ -192,6 +213,31 @@ internal static class EnigmaticSynthesisRestSiteHelper
         if (owner == null || selectedRelic == null)
             return false;
         if (!TryGetRecipe(selectedRelic, out var recipe))
+            return false;
+        if (!HasRequiredMaterials(owner, recipe))
+            return false;
+        if (recipe.Result.ResultRelic != null
+            && !recipe.AllowDuplicateResult
+            && owner.Relics.Any(owned => !owned.IsMelted && GetCanonicalId(owned) == GetCanonicalId(recipe.Result.ResultRelic)))
+            return false;
+        if (recipe.Result.ResultRelic != null
+            && PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
+            return false;
+
+        var consumptionPlan = BuildConsumptionPlan(owner, recipe.Costs);
+        if (consumptionPlan == null)
+            return false;
+
+        await ConsumeMaterialsAsync(consumptionPlan);
+        await GrantCraftResultAsync(owner, recipe.Result);
+        return true;
+    }
+
+    public static async Task<bool> TryCraftAsync(Player? owner, EnigmaticSynthesisRecipeView? selectedRecipe)
+    {
+        if (owner == null || selectedRecipe == null)
+            return false;
+        if (!TryGetRecipe(selectedRecipe, out var recipe))
             return false;
         if (!HasRequiredMaterials(owner, recipe))
             return false;
@@ -222,13 +268,16 @@ internal static class EnigmaticSynthesisRestSiteHelper
         if (owner == null)
             return false;
 
-        return recipe.Costs.All(cost => GetOwnedMaterialStacks(owner, cost.Kind) >= cost.Amount)
-               && (recipe.Result.ResultRelic == null
-                   || recipe.AllowDuplicateResult
+        if (!TryGetRecipe(recipe, out var internalRecipe))
+            return false;
+
+        return HasRequiredMaterials(owner, internalRecipe)
+               && (internalRecipe.Result.ResultRelic == null
+                   || internalRecipe.AllowDuplicateResult
                    || owner.Relics.All(owned =>
-                       owned.IsMelted || GetCanonicalId(owned) != GetCanonicalId(recipe.Result.ResultRelic)))
-               && (recipe.Result.ResultRelic == null
-                   || !PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic));
+                       owned.IsMelted || GetCanonicalId(owned) != GetCanonicalId(internalRecipe.Result.ResultRelic)))
+               && (internalRecipe.Result.ResultRelic == null
+                   || !PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, internalRecipe.Result.ResultRelic));
     }
 
     private static IReadOnlyList<EnigmaticSynthesisRecipe> GetEligibleRecipes(Player? owner)
@@ -251,6 +300,18 @@ internal static class EnigmaticSynthesisRestSiteHelper
         var canonicalId = GetCanonicalId(relic);
         recipe = Recipes.FirstOrDefault(candidate => candidate.Result.ResultRelic != null && GetCanonicalId(candidate.Result.ResultRelic) == canonicalId);
         return recipe.Result.ResultRelic != null;
+    }
+
+    private static bool TryGetRecipe(EnigmaticSynthesisRecipeView recipeView, out EnigmaticSynthesisRecipe recipe)
+    {
+        if (recipeView.Index < 0 || recipeView.Index >= Recipes.Count)
+        {
+            recipe = default;
+            return false;
+        }
+
+        recipe = Recipes[recipeView.Index];
+        return true;
     }
 
     private static bool HasRequiredMaterials(Player owner, EnigmaticSynthesisRecipe recipe)
@@ -328,6 +389,24 @@ internal static class EnigmaticSynthesisRestSiteHelper
         return (relic.CanonicalInstance ?? relic).Id;
     }
 
+    private static EnigmaticSynthesisRecipeView ToRecipeView(EnigmaticSynthesisRecipe recipe)
+    {
+        var index = -1;
+        for (var i = 0; i < Recipes.Count; i++)
+        {
+            if (Recipes[i].Equals(recipe))
+            {
+                index = i;
+                break;
+            }
+        }
+
+        if (index < 0)
+            throw new InvalidOperationException("Failed to resolve enigmatic synthesis recipe index.");
+
+        return AllRecipes[index];
+    }
+
     private readonly record struct EnigmaticMaterialCost(EnigmaticUniqueMaterialKind Kind, int Amount);
 
     private readonly record struct EnigmaticSynthesisRecipe(
@@ -341,6 +420,7 @@ internal sealed record EnigmaticMaterialCostView(
     int Amount);
 
 internal sealed record EnigmaticSynthesisRecipeView(
+    int Index,
     EnigmaticSynthesisRecipeResult Result,
     bool AllowDuplicateResult,
     IReadOnlyList<EnigmaticMaterialCostView> Costs);

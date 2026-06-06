@@ -126,6 +126,7 @@ public class EnigmaticSynthesisEnchanterPearl : EnigmaticNonStackableUniqueMater
             list.Add(card);
             SyncPlayerDeck(owner, card);
             EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
+            EtheriumWeaponStrikeReplacementHelper.TryResolveAddedCard(owner, card);
             return true;
         }
 
@@ -163,6 +164,7 @@ public class EnigmaticSynthesisEnchanterPearl : EnigmaticNonStackableUniqueMater
 
         deck.AddInternal(card);
         EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
+        EtheriumWeaponStrikeReplacementHelper.TryResolveAddedCard(owner, card);
         return deck.Cards.Contains(card);
     }
 

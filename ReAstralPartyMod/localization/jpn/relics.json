@@ -530,6 +530,9 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESISENDER_EYE.title": "エンダーアイ",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESISENDER_EYE.description": "[gold]神秘合成[/gold]に使う[gold]独特素材[/gold]。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESISENDER_EYE.flavor": "前だけでなく、見るべきでなかった道まで見ている。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_EYE.title": "エンダーアイ",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_EYE.description": "[gold]神秘合成[/gold]に使う[gold]独特素材[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_EYE.flavor": "前だけでなく、見るべきでなかった道まで見ている。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_ROD.title": "エンダーロッド",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_ROD.description": "[gold]神秘合成[/gold]に使う[gold]独特素材[/gold]。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_ROD.flavor": "星の軌跡と転位をねじって固めた一本。", 
@@ -575,5 +578,14 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_XP_SCROLL.flavor": "何かを急いで教える代わりに、使われなかった鍛造の機会だけを丁寧に書き留めていく。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.title": "虚無心石",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.description": "[gold]神秘合成[/gold]に使う[gold]独特素材[/gold]。\n休憩地で[gold]湮滅[/gold]を行える。\n湮滅したカードは記録され、以後同じカードがランデッキに加わると即座に取り除かれる。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.flavor": "何を呑み込むかではなく、何が二度と残れないかだけを覚えている。"
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_VOID_STONE.flavor": "何を呑み込むかではなく、何が二度と残れないかだけを覚えている。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_SCYTHE.title": "エーテリウムサイズ",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_SCYTHE.description": "· あなたの基本打撃は[gold]エーテリウムサイズ・薙ぎ払い[/gold]に置き換わる。\n· [gold]エーテリウムサイズ・薙ぎ払い[/gold]は[blue]2[/blue]コストの攻撃カードで、[gold]奇巧[/gold]を持ち、すべての敵に[blue]2[/blue]回の範囲ダメージを与える。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_SCYTHE.flavor": "武器というより、薄く打ち延ばされてもなお切り続ける潮だ。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_AXE.title": "エーテリウム斧",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_AXE.description": "· あなたの基本打撃は[gold]エーテリウム斧・重劈[/gold]に置き換わる。\n· [gold]エーテリウム斧・重劈[/gold]は引くたびにコストが[blue]2[/blue]下がり、[blue]0[/blue]コストで使うとダメージが2倍になる。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_AXE.flavor": "その重みはまずコストに落ち、それから標的に落ちる。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_SWORD.title": "エーテリウム大剣",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_SWORD.description": "· あなたの基本打撃は[gold]エーテリウム大剣・薙ぎ払い[/gold]に置き換わる。\n· [gold]エーテリウム大剣・薙ぎ払い[/gold]は[blue]1[/blue]コストの全体攻撃カードで、使用後に消耗する。\n· 予兆[blue]2[/blue]： [gold]エーテリウム大剣・薙ぎ払い[/gold]を手札に加える。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ETHERIUM_SWORD.flavor": "振ったあとすぐには戻らず、二ターン後にまた手の中へ立ち戻る。"
 }

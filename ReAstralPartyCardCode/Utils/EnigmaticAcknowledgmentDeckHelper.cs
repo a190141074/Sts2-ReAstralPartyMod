@@ -266,6 +266,7 @@ internal static class EnigmaticAcknowledgmentDeckHelper
             list.Add(card);
             SyncPlayerDeck(owner, card);
             EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
+            EtheriumWeaponStrikeReplacementHelper.TryResolveAddedCard(owner, card);
             MainFile.Logger.Info(
                 $"[EnigmaticAcknowledgmentDeckHelper] Added card to run deck | owner={owner.NetId} | member={memberName} | runDeckCount={list.Count} | playerDeckCount={owner.Deck?.Cards.Count ?? 0}");
             return true;
@@ -317,6 +318,7 @@ internal static class EnigmaticAcknowledgmentDeckHelper
 
         deck.AddInternal(card);
         EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
+        EtheriumWeaponStrikeReplacementHelper.TryResolveAddedCard(owner, card);
         return deck.Cards.Contains(card);
     }
 

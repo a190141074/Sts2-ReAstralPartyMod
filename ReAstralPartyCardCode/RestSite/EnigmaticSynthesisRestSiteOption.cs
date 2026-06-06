@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.Localization;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+using System.Linq;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.RestSite;
 
@@ -23,14 +24,16 @@ public class EnigmaticSynthesisRestSiteOption : AstralPartyRestSiteOptionModel
         if (!IsEnabled)
             return false;
 
-        var rewardOptions = EnigmaticSynthesisRestSiteHelper.GetEligibleRelics(Owner);
-        if (rewardOptions.Count == 0)
+        var recipeOptions = EnigmaticSynthesisRestSiteHelper.GetEligibleRecipesForSelection(Owner);
+        if (recipeOptions.Count == 0)
         {
             RefreshEnabled();
             return false;
         }
 
-        var selectionTitle = RestSiteUiLoc("selection_header").GetRawText();
+        var rewardOptions = recipeOptions
+            .Select(static recipe => recipe.Result.DisplayRelic)
+            .ToList();
         var selectedRelic = await DeterministicMultiplayerChoiceHelper.SelectRelicForPlayer(
             Owner,
             rewardOptions,
@@ -41,7 +44,15 @@ public class EnigmaticSynthesisRestSiteOption : AstralPartyRestSiteOptionModel
             return false;
         }
 
-        var didCraft = await EnigmaticSynthesisRestSiteHelper.TryCraftAsync(Owner, selectedRelic);
+        var selectedIndex = rewardOptions.FindIndex(relic =>
+            (relic.CanonicalInstance ?? relic).Id == (selectedRelic.CanonicalInstance ?? selectedRelic).Id);
+        if (selectedIndex < 0 || selectedIndex >= recipeOptions.Count)
+        {
+            RefreshEnabled();
+            return false;
+        }
+
+        var didCraft = await EnigmaticSynthesisRestSiteHelper.TryCraftAsync(Owner, recipeOptions[selectedIndex]);
         if (didCraft)
             Owner.GetRelic<EnigmaticSevenBlessings>()?.Flash();
 
