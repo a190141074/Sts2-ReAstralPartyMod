@@ -10,23 +10,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class SnakebiterDeckReplacementHelper
 {
-    private static readonly HashSet<string> BaseStrikeEntries =
-    [
-        "STRIKE_DEFECT",
-        "STRIKE_IRONCLAD",
-        "STRIKE_NECROBINDER",
-        "STRIKE_REGENT",
-        "STRIKE_SILENT"
-    ];
-
-    private static readonly HashSet<string> BaseDefendEntries =
-    [
-        "DEFEND_DEFECT",
-        "DEFEND_IRONCLAD",
-        "DEFEND_NECROBINDER",
-        "DEFEND_REGENT",
-        "DEFEND_SILENT"
-    ];
+    private const string BaseStrikePrefix = "STRIKE_";
+    private const string BaseDefendPrefix = "DEFEND_";
 
     private static readonly string[] CardCollectionMemberNames =
     [
@@ -65,13 +50,13 @@ internal static class SnakebiterDeckReplacementHelper
     public static bool IsBaseStrike(CardModel? card)
     {
         var entry = (card?.CanonicalInstance ?? card)?.Id.Entry ?? string.Empty;
-        return BaseStrikeEntries.Contains(entry);
+        return entry.StartsWith(BaseStrikePrefix, StringComparison.Ordinal);
     }
 
     public static bool IsBaseDefend(CardModel? card)
     {
         var entry = (card?.CanonicalInstance ?? card)?.Id.Entry ?? string.Empty;
-        return BaseDefendEntries.Contains(entry);
+        return entry.StartsWith(BaseDefendPrefix, StringComparison.Ordinal);
     }
 
     private static ModelId GetReplacementCardId(CardModel? card)

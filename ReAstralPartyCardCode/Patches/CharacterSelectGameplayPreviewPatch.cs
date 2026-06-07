@@ -249,6 +249,21 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         HandleBodyInput(@event);
     }
 
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if (!IsVisibleInTree())
+            return;
+
+        if (@event is not InputEventKey keyEvent
+            || !keyEvent.Pressed
+            || keyEvent.Echo
+            || keyEvent.Keycode != Key.Tab)
+            return;
+
+        ToggleCollapsed();
+        GetViewport().SetInputAsHandled();
+    }
+
     private void BuildUi()
     {
         var shadow = new ColorRect
