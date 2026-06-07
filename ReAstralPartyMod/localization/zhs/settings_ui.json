@@ -120,6 +120,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry_notifications.description": "显示匿名数据推送成功、警告和错误提示。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.label": "开启联机通知",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.description": "显示重要的联机选择与同步异常提示。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_console_command_notifications.label": "开启控制台指令通知",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_console_command_notifications.description": "有玩家使用控制台打出有效指令时，显示玩家、角色和生效指令。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.label": "开启人格遗物诊断提示",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.description": "显示星引擎人格、异格人格和人格衍生遗物的编号诊断提示。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_relic_notifications.label": "开启筹码遗物诊断提示",

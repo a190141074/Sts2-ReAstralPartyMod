@@ -115,6 +115,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry_notifications.description": "Show anonymous telemetry success, warning, and error notifications.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.label": "Enable Multiplayer Notifications",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.description": "Show important multiplayer selection and synchronization problem notifications.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_console_command_notifications.label": "Enable Console Command Notifications",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_console_command_notifications.description": "Show the player, character, and effective command when someone executes a successful console command.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.label": "Enable Persona Relic Diagnostics",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.description": "Show numbered diagnostic notifications for Astral persona, variant persona, and derivative relic issues.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_relic_notifications.label": "Enable Token Relic Diagnostics",

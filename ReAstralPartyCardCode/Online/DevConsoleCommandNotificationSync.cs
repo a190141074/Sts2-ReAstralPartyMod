@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Multiplayer.Serialization;
 using MegaCrit.Sts2.Core.Multiplayer.Transport;
 using MegaCrit.Sts2.Core.Platform;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
@@ -97,6 +98,9 @@ internal static class DevConsoleCommandNotificationSync
 
     private static void ShowNotification(ulong playerNetId, string? characterId, string commandText)
     {
+        if (!ReAstralPartyModSettingsManager.EnableConsoleCommandNotifications)
+            return;
+
         var title = new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.title")
             .GetRawText();
         var body = new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.body");

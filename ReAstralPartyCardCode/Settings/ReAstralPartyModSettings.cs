@@ -105,6 +105,8 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableMultiplayerNotifications { get; set; } = true;
 
+    public bool EnableConsoleCommandNotifications { get; set; } = true;
+
     public bool EnablePersonaRelicNotifications { get; set; } = true;
 
     public bool EnableTokenRelicNotifications { get; set; } = true;
@@ -186,6 +188,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool EnableMultiplayerNotifications =>
         ReadRuntime(settings => settings.EnableMultiplayerNotifications);
+
+    public static bool EnableConsoleCommandNotifications =>
+        ReadRuntime(settings => settings.EnableConsoleCommandNotifications);
 
     public static bool EnablePersonaRelicNotifications =>
         ReadRuntime(settings => settings.EnablePersonaRelicNotifications);
@@ -845,6 +850,19 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableConsoleCommandNotifications = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableConsoleCommandNotifications,
+            (settings, value) =>
+            {
+                settings.EnableConsoleCommandNotifications = value;
+                ApplyRuntimeSettings(settings, "enable_console_command_notifications");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_console_command_notifications.label",
+                    value);
+            });
+
         var enablePersonaRelicNotifications = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -1092,6 +1110,13 @@ public static partial class ReAstralPartyModSettingsManager
                     enableMultiplayerNotifications,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.description",
                         "Show important multiplayer selection and synchronization problem notifications."))
+                .AddToggle(
+                    "enable_console_command_notifications",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_console_command_notifications.label",
+                        "Enable Console Command Notifications"),
+                    enableConsoleCommandNotifications,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_console_command_notifications.description",
+                        "Show a multiplayer toast when a player executes a successful console command."))
                 .AddToggle(
                     "enable_persona_relic_notifications",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.label",
@@ -1633,6 +1658,8 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableMultiplayerNotifications { get; init; } = true;
 
+        public bool EnableConsoleCommandNotifications { get; init; } = true;
+
         public bool EnablePersonaRelicNotifications { get; init; } = true;
 
         public bool EnableTokenRelicNotifications { get; init; } = true;
@@ -1668,6 +1695,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableSettingsNotifications = settings.EnableSettingsNotifications,
                 EnableTelemetryNotifications = settings.EnableTelemetryNotifications,
                 EnableMultiplayerNotifications = settings.EnableMultiplayerNotifications,
+                EnableConsoleCommandNotifications = settings.EnableConsoleCommandNotifications,
                 EnablePersonaRelicNotifications = settings.EnablePersonaRelicNotifications,
                 EnableTokenRelicNotifications = settings.EnableTokenRelicNotifications,
                 EnableNeowDiagnosticsNotifications = settings.EnableNeowDiagnosticsNotifications,

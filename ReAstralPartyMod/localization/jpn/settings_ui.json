@@ -114,6 +114,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry_notifications.description": "匿名データのプッシュの成功、警告、およびエラーのプロンプトを表示します。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.label": "オンラインで開く通知する",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_multiplayer_notifications.description": "重要なオンライン選択および同期例外プロンプトを表示します。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_console_command_notifications.label": "コンソールコマンド通知をオンにする",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_console_command_notifications.description": "誰かが有効なコンソールコマンドを実行したとき、プレイヤー、キャラクター、適用されたコマンドを表示します。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.label": "性格遺物診断プロンプトをオンにする",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_persona_relic_notifications.description": "スター エンジンのパーソナリティ、エイリアンのパーソナリティ、およびパーソナリティ由来の遺物に関する番号付きの診断プロンプトを表示します。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_token_relic_notifications.label": "チップレリック診断プロンプトをオンにする",
