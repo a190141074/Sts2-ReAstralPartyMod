@@ -18,7 +18,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 internal static class RingOfSevenCursesHelper
 {
     public const string SeriesId = "ring_of_seven_curses";
-    private const int ExtraRewardCardOptionCount = 4;
     private const int BonusPersonaChestPermille = 70;
     private static readonly PotionRarity[] SevenBlessingsPotionRarityPattern =
     [
@@ -201,9 +200,6 @@ internal static class RingOfSevenCursesHelper
         List<CardCreationResult> rewardCards,
         CardCreationOptions options)
     {
-        if (rewardCards.Count >= ExtraRewardCardOptionCount)
-            return false;
-
         var highestRarity = rewardCards
             .Select(result => result.Card.Rarity)
             .OrderByDescending(GetRewardRarityRank)
