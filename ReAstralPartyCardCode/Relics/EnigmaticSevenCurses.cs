@@ -76,7 +76,7 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         CursedScrollGrabBagHelper.NormalizeForOwner(Owner);
         if (Owner != null)
         {
-            EnigmaticAcknowledgmentDeckHelper.EnsureInRunDeck(Owner);
+            await EnigmaticAcknowledgmentDeckHelper.EnsureInRunDeck(Owner);
             EnigmaticSynthesisCursedScroll.RefreshCounterForOwner(Owner);
         }
     }

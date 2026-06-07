@@ -16,7 +16,7 @@ public class EnigmaticSynthesisTheTwist : EnigmaticNonStackableUniqueMaterialRel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        EnigmaticAcknowledgmentDeckHelper.ReplaceAcknowledgmentWithTwist(Owner);
+        await EnigmaticAcknowledgmentDeckHelper.ReplaceAcknowledgmentWithTwist(Owner);
     }
 
     public static Task<IReadOnlyList<EnigmaticSynthesisTheTwist>> GrantCopies(Player owner, int amount)

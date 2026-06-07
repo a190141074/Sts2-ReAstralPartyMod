@@ -1,8 +1,11 @@
 using System.Collections;
 using System.Reflection;
+using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Helpers;
+using MegaCrit.Sts2.Core.Saves;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -44,21 +47,92 @@ internal static class EventDeckCardHelper
             .ToList();
     }
 
-    public static bool RemoveCardFromRunDeck(Player owner, CardModel card)
+    public static async Task<bool> AddCardToRunDeckAsync(
+        Player owner,
+        CardModel card,
+        bool showPreview = true,
+        float previewTime = 2f)
+    {
+        ArgumentNullException.ThrowIfNull(owner);
+        ArgumentNullException.ThrowIfNull(card);
+
+        if (owner.RunState == null)
+        {
+            MainFile.Logger.Warn(
+                $"[EventDeckCardHelper] Failed to add card '{card.Id.Entry}' to run deck for owner {owner.NetId}: no RunState.");
+            return false;
+        }
+
+        if (card.Owner != null && !ReferenceEquals(card.Owner, owner))
+        {
+            MainFile.Logger.Warn(
+                $"[EventDeckCardHelper] Refused to add card '{card.Id.Entry}' to owner {owner.NetId}: it already belongs to another owner.");
+            return false;
+        }
+
+        if (!owner.RunState.ContainsCard(card))
+            owner.RunState.AddCard(card, owner);
+
+        var result = await CardPileCmd.Add(card, PileType.Deck);
+        if (!result.success)
+        {
+            MainFile.Logger.Warn(
+                $"[EventDeckCardHelper] CardPileCmd.Add failed for '{card.Id.Entry}' owner {owner.NetId}.");
+            return false;
+        }
+
+        if (showPreview)
+            CardCmd.PreviewCardPileAdd(result, previewTime);
+
+        SaveManager.Instance?.MarkCardAsSeen(card.CanonicalInstance ?? card);
+        MainFile.Logger.Info(
+            $"[EventDeckCardHelper] Added card '{card.Id.Entry}' to run deck for owner {owner.NetId} | deckCount={owner.Deck?.Cards.Count ?? -1}.");
+        return true;
+    }
+
+    public static void AddCardToRunDeckSafely(
+        Player owner,
+        CardModel card,
+        bool showPreview = true,
+        float previewTime = 2f)
+    {
+        TaskHelper.RunSafely(AddCardToRunDeckAsync(owner, card, showPreview, previewTime));
+    }
+
+    public static async Task<bool> RemoveCardFromRunDeck(Player owner, CardModel card, bool showPreview = true)
     {
         ArgumentNullException.ThrowIfNull(owner);
         ArgumentNullException.ThrowIfNull(card);
 
         var beforeDeckCount = owner.Deck?.Cards.Count ?? -1;
-        var removedFromPlayerDeck = TryRemoveCardFromPlayerDeck(owner, card);
-        var removedFromRunState = TryRemoveCardFromRunState(owner, card);
+        var removed = false;
+        if (card.Pile?.Type == PileType.Deck)
+        {
+            try
+            {
+                await CardPileCmd.RemoveFromDeck(card, showPreview);
+                removed = true;
+            }
+            catch (Exception ex)
+            {
+                MainFile.Logger.Warn(
+                    $"[EventDeckCardHelper] CardPileCmd.RemoveFromDeck failed for '{card.Id.Entry}' owner {owner.NetId}: {ex.Message}");
+            }
+        }
+
+        if (!removed)
+        {
+            var removedFromPlayerDeck = TryRemoveCardFromPlayerDeck(owner, card);
+            var removedFromRunState = TryRemoveCardFromRunState(owner, card);
+            removed = removedFromPlayerDeck || removedFromRunState;
+        }
+
         var afterDeckCount = owner.Deck?.Cards.Count ?? -1;
-        var removed = removedFromPlayerDeck || removedFromRunState;
 
         if (removed)
         {
             MainFile.Logger.Info(
-                $"[EventDeckCardHelper] Removed card '{card.Id.Entry}' from run deck for owner {owner.NetId} | playerDeck={removedFromPlayerDeck} | runState={removedFromRunState} | deckCount={beforeDeckCount}->{afterDeckCount}.");
+                $"[EventDeckCardHelper] Removed card '{card.Id.Entry}' from run deck for owner {owner.NetId} | deckCount={beforeDeckCount}->{afterDeckCount}.");
         }
         else
         {
@@ -67,6 +141,11 @@ internal static class EventDeckCardHelper
         }
 
         return removed;
+    }
+
+    public static void RemoveCardFromRunDeckSafely(Player owner, CardModel card, bool showPreview = true)
+    {
+        TaskHelper.RunSafely(RemoveCardFromRunDeck(owner, card, showPreview));
     }
 
     private static object? ReadMemberValue(object source, MemberInfo member)

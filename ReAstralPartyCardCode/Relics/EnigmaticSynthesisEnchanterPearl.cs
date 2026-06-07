@@ -1,8 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
@@ -17,24 +16,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public class EnigmaticSynthesisEnchanterPearl : EnigmaticNonStackableUniqueMaterialRelicBase
 {
-    private static readonly string[] CardCollectionMemberNames =
-    [
-        "Cards",
-        "_cards",
-        "CardModels",
-        "MasterDeck",
-        "StartingDeck"
-    ];
-
-    private static readonly string[] RunDeckMemberNames =
-    [
-        "Deck",
-        "Cards",
-        "CardModels",
-        "MasterDeck",
-        "StartingDeck"
-    ];
-
     [SavedProperty] public int AstralParty_EnigmaticSynthesisEnchanterPearlCurseRollSequence { get; set; }
 
     protected override string RelicId => "enigmatic_synthesis_enchanter_pearl";
@@ -59,13 +40,20 @@ public class EnigmaticSynthesisEnchanterPearl : EnigmaticNonStackableUniqueMater
         if (!usedSmith || Owner == null || !HasSevenCurses())
             return;
 
+        TaskHelper.RunSafely(OnRestSiteOptionResolvedAsync());
+    }
+
+    private async Task OnRestSiteOptionResolvedAsync()
+    {
+        if (Owner == null)
+            return;
+
         var curseCard = CreateRandomCurseCard();
         if (curseCard == null)
             return;
 
-        curseCard.Owner = Owner;
         curseCard.FloorAddedToDeck = Math.Max(Owner.RunState?.TotalFloor ?? 1, 1);
-        if (!TryAddCardToRunDeck(Owner, curseCard))
+        if (!await EventDeckCardHelper.AddCardToRunDeckAsync(Owner, curseCard))
             return;
 
         Flash();
@@ -107,86 +95,4 @@ public class EnigmaticSynthesisEnchanterPearl : EnigmaticNonStackableUniqueMater
         return candidates[selectedIndex].ToMutable();
     }
 
-    private static bool TryAddCardToRunDeck(Player owner, CardModel card)
-    {
-        if (owner.RunState == null)
-            return TryAddCardToPlayerDeckCompatibility(owner, card);
-
-        var runStateType = owner.RunState.GetType();
-        foreach (var memberName in RunDeckMemberNames)
-        {
-            var member = runStateType.GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .FirstOrDefault();
-            if (member == null)
-                continue;
-
-            if (ReadMemberValue(owner.RunState, member) is not IList list)
-                continue;
-
-            list.Add(card);
-            SyncPlayerDeck(owner, card);
-            EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
-            EtheriumWeaponStrikeReplacementHelper.TryResolveAddedCard(owner, card);
-            return true;
-        }
-
-        return TryAddCardToPlayerDeckCompatibility(owner, card);
-    }
-
-    private static void SyncPlayerDeck(Player owner, CardModel card)
-    {
-        if (owner.Deck?.Cards == null || owner.Deck.Cards.Contains(card))
-            return;
-
-        owner.Deck.AddInternal(card);
-    }
-
-    private static bool TryAddCardToPlayerDeckCompatibility(Player owner, CardModel card)
-    {
-        var deck = owner.Deck;
-        if (deck == null)
-            return false;
-
-        if (TryAddCardToList(deck.Cards, card))
-            return true;
-
-        foreach (var memberName in CardCollectionMemberNames)
-        {
-            var member = typeof(CardPile)
-                .GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .FirstOrDefault();
-            if (member == null)
-                continue;
-
-            if (TryAddCardToList(ReadMemberValue(deck, member), card))
-                return true;
-        }
-
-        deck.AddInternal(card);
-        EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
-        EtheriumWeaponStrikeReplacementHelper.TryResolveAddedCard(owner, card);
-        return deck.Cards.Contains(card);
-    }
-
-    private static bool TryAddCardToList(object? source, CardModel card)
-    {
-        if (source is not IList list)
-            return false;
-
-        if (list.Contains(card))
-            return true;
-
-        list.Add(card);
-        return list.Contains(card);
-    }
-
-    private static object? ReadMemberValue(object instance, MemberInfo member)
-    {
-        return member switch
-        {
-            FieldInfo field => field.GetValue(instance),
-            PropertyInfo property => property.GetValue(instance),
-            _ => null
-        };
-    }
 }

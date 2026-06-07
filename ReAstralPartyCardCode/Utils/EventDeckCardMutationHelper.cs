@@ -102,7 +102,7 @@ internal static class EventDeckCardMutationHelper
     {
         var cardsToMutate = await SynchronizeDeckCards(owner, selectedCards, DeckMutationKind.Remove, context);
         foreach (var card in cardsToMutate)
-            EventDeckCardHelper.RemoveCardFromRunDeck(owner, card);
+            await EventDeckCardHelper.RemoveCardFromRunDeck(owner, card);
     }
 
     private static async Task<IReadOnlyList<CardModel>> SynchronizeDeckCards(

@@ -45,7 +45,8 @@ internal static class EnigmaticOblivionDeckHelper
         if (!ShouldObliviate(owner, addedCard) || addedCard == null)
             return false;
 
-        return EventDeckCardHelper.RemoveCardFromRunDeck(owner, addedCard);
+        EventDeckCardHelper.RemoveCardFromRunDeckSafely(owner, addedCard);
+        return true;
     }
 
     public static string GetCanonicalCardEntry(CardModel? card)

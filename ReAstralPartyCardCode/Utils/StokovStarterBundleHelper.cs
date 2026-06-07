@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Reflection;
 using System.Text.Json;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -25,24 +23,6 @@ internal static class StokovStarterBundleHelper
     private sealed record StarterCardTransformMapping(Type OriginalType, Type UpgradedType);
 
     private sealed record StarterRelicRefinementMapping(Type OriginalType, Type UpgradedType);
-
-    private static readonly string[] CardCollectionMemberNames =
-    [
-        "Cards",
-        "_cards",
-        "CardModels",
-        "MasterDeck",
-        "StartingDeck"
-    ];
-
-    private static readonly string[] RunDeckMemberNames =
-    [
-        "Deck",
-        "Cards",
-        "CardModels",
-        "MasterDeck",
-        "StartingDeck"
-    ];
 
     private static readonly CharacterStarterBundle[] StarterBundles =
     [
@@ -141,10 +121,8 @@ internal static class StokovStarterBundleHelper
 
             var canonicalCard = ModelDb.GetById<CardModel>(ModelDb.GetId(bundle.UpgradeableStarterCardType));
             var mutableCard = canonicalCard.ToMutable();
-            mutableCard.Owner = owner;
             mutableCard.FloorAddedToDeck = floorAddedToDeck;
-            TryAddCardToRunDeck(owner, mutableCard);
-            SaveManager.Instance?.MarkCardAsSeen(mutableCard.CanonicalInstance ?? mutableCard);
+            await EventDeckCardHelper.AddCardToRunDeckAsync(owner, mutableCard);
             trackedUpgradeableStarterCardIds.Add(ModelDb.GetId(bundle.UpgradeableStarterCardType).ToString());
         }
 
@@ -257,79 +235,6 @@ internal static class StokovStarterBundleHelper
         }
     }
 
-    private static bool TryAddCardToRunDeck(Player owner, CardModel card)
-    {
-        if (owner.RunState == null)
-            return TryAddCardToPlayerDeckCompatibility(owner, card);
-
-        var runStateType = owner.RunState.GetType();
-        foreach (var memberName in RunDeckMemberNames)
-        {
-            var member = runStateType.GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .FirstOrDefault();
-            if (member == null)
-                continue;
-
-            if (ReadMemberValue(owner.RunState, member) is not IList list)
-                continue;
-
-            list.Add(card);
-            SyncPlayerDeck(owner, card);
-            EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
-            EtheriumWeaponStrikeReplacementHelper.TryResolveAddedCard(owner, card);
-            return true;
-        }
-
-        return TryAddCardToPlayerDeckCompatibility(owner, card);
-    }
-
-    private static void SyncPlayerDeck(Player owner, CardModel card)
-    {
-        if (owner.Deck?.Cards == null || owner.Deck.Cards.Contains(card))
-            return;
-
-        owner.Deck.AddInternal(card);
-    }
-
-    private static bool TryAddCardToPlayerDeckCompatibility(Player owner, CardModel card)
-    {
-        var deck = owner.Deck;
-        if (deck == null)
-            return false;
-
-        if (TryAddCardToList(deck.Cards, card))
-            return true;
-
-        foreach (var memberName in CardCollectionMemberNames)
-        {
-            var member = typeof(CardPile)
-                .GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .FirstOrDefault();
-            if (member == null)
-                continue;
-
-            if (TryAddCardToList(ReadMemberValue(deck, member), card))
-                return true;
-        }
-
-        deck.AddInternal(card);
-        EnigmaticOblivionDeckHelper.TryResolveAddedCard(owner, card);
-        EtheriumWeaponStrikeReplacementHelper.TryResolveAddedCard(owner, card);
-        return deck.Cards.Contains(card);
-    }
-
-    private static bool TryAddCardToList(object? source, CardModel card)
-    {
-        if (source is not IList list)
-            return false;
-
-        if (list.Contains(card))
-            return true;
-
-        list.Add(card);
-        return list.Contains(card);
-    }
-
     private static bool TryDeserializeModelId(string serialized, out ModelId modelId)
     {
         try
@@ -374,13 +279,4 @@ internal static class StokovStarterBundleHelper
         return false;
     }
 
-    private static object? ReadMemberValue(object source, MemberInfo member)
-    {
-        return member switch
-        {
-            PropertyInfo propertyInfo => propertyInfo.GetValue(source),
-            FieldInfo fieldInfo => fieldInfo.GetValue(source),
-            _ => null
-        };
-    }
 }

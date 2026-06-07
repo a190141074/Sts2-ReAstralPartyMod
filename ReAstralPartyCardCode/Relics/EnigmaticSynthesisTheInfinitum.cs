@@ -14,6 +14,6 @@ public class EnigmaticSynthesisTheInfinitum : AstralPartyRelicModel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        EnigmaticAcknowledgmentDeckHelper.ReplaceTwistWithInfinitum(Owner);
+        await EnigmaticAcknowledgmentDeckHelper.ReplaceTwistWithInfinitum(Owner);
     }
 }
