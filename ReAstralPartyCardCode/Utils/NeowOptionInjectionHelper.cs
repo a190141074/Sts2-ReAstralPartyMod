@@ -25,10 +25,14 @@ internal static class NeowOptionInjectionHelper
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_FACE_THE_SHADOW";
     private const string RingOfSevenCursesTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.RING_OF_SEVEN_CURSES";
+    private const string AbsoluteFormTextKey =
+        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.ABSOLUTE_FORM";
     private const string DreamFaceTheShadowIconPath =
         "res://ReAstralPartyMod/images/ancient/dream_face_the_shadow.png";
     private const string RingOfSevenCursesIconPath =
         "res://ReAstralPartyMod/images/relic/enigmatic_seven_curses.png";
+    private const string AbsoluteFormIconPath =
+        "res://ReAstralPartyMod/images/powers/absolute_form_power.png";
     private static readonly string[] CardCollectionMemberNames =
     [
         "Cards",
@@ -63,7 +67,13 @@ internal static class NeowOptionInjectionHelper
             RingOfSevenCursesTextKey,
             RingOfSevenCursesIconPath,
             CreateRingOfSevenCursesHoverTips,
-            ChooseRingOfSevenCurses)
+            ChooseRingOfSevenCurses),
+        new(
+            "absolute_form",
+            AbsoluteFormTextKey,
+            AbsoluteFormIconPath,
+            CreateAbsoluteFormHoverTips,
+            ChooseAbsoluteForm)
     ];
     private static readonly Dictionary<string, string> SelectedCandidateKeysByRun = [];
 
@@ -215,6 +225,16 @@ internal static class NeowOptionInjectionHelper
         CompleteAncient(ancient);
     }
 
+    private static async Task ChooseAbsoluteForm(AncientEventModel ancient)
+    {
+        var owner = ancient.Owner
+                    ?? throw new InvalidOperationException(
+                        "Neow had no owner when Absolute Form was chosen.");
+
+        await AddAbsoluteFormCardToDeck(owner);
+        CompleteAncient(ancient);
+    }
+
     private static Task AddDreamFaceTheShadowCardToDeck(Player owner)
     {
         return CardGainAttribution.RunWithSource(
@@ -227,6 +247,25 @@ internal static class NeowOptionInjectionHelper
                 if (!TryAddCardToRunDeck(owner, mutableCard))
                     throw new InvalidOperationException(
                         $"Failed to add Forgotten Roar to run deck for player {owner.NetId}.");
+
+                SaveManager.Instance?.MarkCardAsSeen(mutableCard.CanonicalInstance ?? mutableCard);
+
+                return Task.CompletedTask;
+            });
+    }
+
+    private static Task AddAbsoluteFormCardToDeck(Player owner)
+    {
+        return CardGainAttribution.RunWithSource(
+            null,
+            () =>
+            {
+                var mutableCard = ModelDb.Card<UltimateSkillAbsoluteForm>().ToMutable();
+                mutableCard.Owner = owner;
+                mutableCard.FloorAddedToDeck = 1;
+                if (!TryAddCardToRunDeck(owner, mutableCard))
+                    throw new InvalidOperationException(
+                        $"Failed to add Absolute Form to run deck for player {owner.NetId}.");
 
                 SaveManager.Instance?.MarkCardAsSeen(mutableCard.CanonicalInstance ?? mutableCard);
 
@@ -352,6 +391,11 @@ internal static class NeowOptionInjectionHelper
     private static IReadOnlyList<IHoverTip> CreateRingOfSevenCursesHoverTips()
     {
         return [.. HoverTipFactory.FromRelic<EnigmaticSevenCurses>()];
+    }
+
+    private static IReadOnlyList<IHoverTip> CreateAbsoluteFormHoverTips()
+    {
+        return [HoverTipFactory.FromCard<UltimateSkillAbsoluteForm>()];
     }
 
     private sealed record NeowOptionCandidateDefinition(

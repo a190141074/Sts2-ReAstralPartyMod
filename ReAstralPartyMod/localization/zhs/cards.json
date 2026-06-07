@@ -121,6 +121,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_PUNITIVE_JUDGMENT.description": "对目标造成[blue]21[/blue]点伤害，并施加[blue]1[/blue]层[gold]灼烧[/gold]。\n额外追加目标最大生命值[blue]11%[/blue]的[gold]无视格挡[/gold]伤害，该伤害不超过你最大生命值的[blue]140%[/blue]。",
   "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_FORGOTTEN_ROAR.title": "遗忘咆哮",
   "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_FORGOTTEN_ROAR.description": "[gold][b]终极[/b][/gold]\n结束回合；伤害免疫；击晕所有敌人，并对每个敌人造成{Repeat:diff()}次{Damage:diff()}点伤害。\n当前充能：[blue]{UltimateCharge:diff()}%[/blue]",
+  "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_ABSOLUTE_FORM.title": "终极形态",
+  "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_ABSOLUTE_FORM.description": "[gold][b]终极[/b][/gold]\n替所有玩家随机打出1张[gold]随机形态[/gold]。\n[gold]结束玩家回合[/gold]，每回合开始时向所有玩家[gold]弃牌堆[/gold]添加一张[gold]诅咒[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS.title": "弱点解析",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS.description": "若目标没有[gold]破绽[/gold]，则随机施加[blue]1[/blue]到[blue]6-当前【弱点识破】层数[/blue]层的[gold]破绽[/gold]。\n然后选择进入[gold]防御[/gold]或[gold]闪避[/gold]姿态。\n此牌每回合可使用次数等于当前敌方单位数量，并返回你的手牌。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS_CHOOSE_DEFENSE.title": "防御",

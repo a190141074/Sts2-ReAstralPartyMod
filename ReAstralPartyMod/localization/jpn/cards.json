@@ -119,6 +119,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_PUNITIVE_JUDGMENT.description": "ターゲットに[blue]21[/blue]ダメージを与え、[blue]1[/blue][power]ブレイジング・ソーラー・バーン[/power]を適用します。\nその後、ターゲットの最大 HP の [blue]11%[/blue]、最大で最大 HP の [blue]140%[/blue] に等しい追加のブロック不能ダメージを与えます。\nこのカードの最終ダメージは、ターゲット上の[power]ブレイジング・ソーラー・バーン[/power]のスタックごとに[blue]3%[/blue]増加します。",
   "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_FORGOTTEN_ROAR.title": "遗忘咆哮",
   "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_FORGOTTEN_ROAR.description": "このカードの現在のチャージ: [blue]{UltimateCharge:diff()}%[/blue]\n[gold]アルティメットスキル[/gold]\n下回合 の開始までダメージ耐性を獲得し、所有敌人 をスタンさせ、その後各敵に {Repeat:diff()} ヒット、{Damage:diff()} ダメージを与えます。\n回合 を直ちに終了します。\nアップグレード: 获得 [retain]保持[/retain]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_ABSOLUTE_FORM.title": "終極形態",
+  "RE_ASTRAL_PARTY_MOD_CARD_ULTIMATE_SKILL_ABSOLUTE_FORM.description": "[gold][b]アルティメットスキル[/b][/gold]\nすべてのプレイヤーに対して、ランダムな形態を1枚ずつ自動でプレイします。\n現在のプレイヤーのターンを終了します。\n[gold]終極形態[/gold]を得ます。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS.title": "弱点解析",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS.description": "ターゲットがまだ[power]露出した欠陥[/power]を持っていない場合、ランダムな[blue]1[/blue]を[blue]6に適用します。現在の弱点の洞察は[power]露出した欠陥[/power]の[/blue]をスタックし、より低い値に重み付けされます。\n次に、[power]ディフェンス スタンス[/power]または[power]ドッジ スタンス[/power]を選択します。\nこのカードは現在の敵の数まで回合ごとに使用でき、回合手札に戻ります。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS_CHOOSE_DEFENSE.title": "防御",
