@@ -21,6 +21,7 @@ public class VariantPersonSnakebiter : PersonaRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<PoisonedStab>(),
+        HoverTipFactory.FromCard<DodgeAndRoll>(),
         HoverTipFactory.FromCard<Snakebite>()
     ];
 

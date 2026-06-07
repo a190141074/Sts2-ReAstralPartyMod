@@ -66,7 +66,7 @@ internal static class SnakebiterDeckReplacementHelper
         if (IsBaseStrike(card))
             return ModelDb.GetId<PoisonedStab>();
         if (IsBaseDefend(card))
-            return ModelId.none;
+            return ModelDb.GetId<DodgeAndRoll>();
 
         return ModelDb.GetId<Snakebite>();
     }
