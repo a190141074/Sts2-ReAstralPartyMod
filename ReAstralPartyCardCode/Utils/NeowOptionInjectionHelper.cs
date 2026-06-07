@@ -81,6 +81,28 @@ internal static class NeowOptionInjectionHelper
         }
     }
 
+    internal static IReadOnlyList<EventOption> EnsureSelectedCustomOptionPresent(
+        AncientEventModel ancient,
+        IEnumerable<EventOption>? currentOptions,
+        string sourceTag)
+    {
+        var options = currentOptions?.ToList() ?? [];
+        var selectedCandidate = ResolveSelectedCandidateDefinition(ancient);
+        if (selectedCandidate == null)
+            return options;
+
+        if (options.Any(option =>
+                string.Equals(option.TextKey, selectedCandidate.TextKey, StringComparison.OrdinalIgnoreCase)))
+            return options;
+
+        // Ready-page injection can snapshot Neow before RitsuLib's ancient-option list is fully materialized.
+        // Re-append the already-selected custom option so restoring the original page doesn't drop it.
+        options.Add(selectedCandidate.CreateOption(ancient));
+        MainFile.Logger.Info(
+            $"[NeowOptionInjectionHelper] Re-appended selected custom Neow option | runKey={GetRunKey(ancient.Owner?.RunState as RunState, ancient.Owner)} | source={sourceTag} | key={selectedCandidate.StableKey} | optionCount={options.Count}.");
+        return options;
+    }
+
     public static string? ResolveCustomNeowOptionIconPath(string? textKey)
     {
         foreach (var candidate in CandidateDefinitions)
@@ -95,6 +117,16 @@ internal static class NeowOptionInjectionHelper
     private static bool IsCandidateSelected(AncientEventModel ancient, string stableKey)
     {
         return string.Equals(ResolveSelectedCandidateKey(ancient), stableKey, StringComparison.Ordinal);
+    }
+
+    private static NeowOptionCandidateDefinition? ResolveSelectedCandidateDefinition(AncientEventModel ancient)
+    {
+        var selectedKey = ResolveSelectedCandidateKey(ancient);
+        if (string.IsNullOrWhiteSpace(selectedKey))
+            return null;
+
+        return CandidateDefinitions.FirstOrDefault(candidate =>
+            string.Equals(candidate.StableKey, selectedKey, StringComparison.Ordinal));
     }
 
     private static string? ResolveSelectedCandidateKey(AncientEventModel ancient)

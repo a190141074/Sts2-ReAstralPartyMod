@@ -75,10 +75,14 @@ internal static class StartingPersonaNeowReadyFlow
                 return;
 
             var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
+            var originalOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
+                neow,
+                neow.CurrentOptions,
+                "ready_page_cache");
             ReadyPages[neow] = new ReadyPageState(
                 runKey,
                 runState,
-                neow.CurrentOptions.ToList(),
+                originalOptions,
                 neow.Description ?? neow.InitialDescription);
         }
 
@@ -336,7 +340,11 @@ internal static class StartingPersonaNeowReadyFlow
                 return;
         }
 
-        if (state.OriginalOptions.Count == 0)
+        var restoredOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
+            neow,
+            state.OriginalOptions,
+            "ready_page_restore");
+        if (restoredOptions.Count == 0)
         {
             neow.StartPreFinished();
             MainFile.Logger.Info(
@@ -347,9 +355,9 @@ internal static class StartingPersonaNeowReadyFlow
         if (SetEventStateMethod == null)
             throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
 
-        SetEventStateMethod.Invoke(neow, [state.OriginalDescription, state.OriginalOptions]);
+        SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={state.OriginalOptions.Count}.");
+            $"[StartingPersonaNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
     }
 
     private static async Task RefreshRestoredNeowUiAsync(RunState runState, string runKey, string stage)
