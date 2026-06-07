@@ -295,6 +295,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
         patcher.RegisterPatch<CreatureHealEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
+        patcher.RegisterPatch<DevConsoleCommandNotificationPatch>();
         patcher.RegisterPatch<DevConsoleUltimateChargeCommandPatch>();
         patcher.RegisterPatch<EtheriumWeaponStrikeDeckEntryPatch>();
         patcher.RegisterPatch<EnigmaticOblivionDeckEntryPatch>();

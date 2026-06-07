@@ -10,6 +10,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description": "開始時に、すべてのプレイヤーは自動的に 【原点】 を受け取り、各プレイヤーは金貨 1 枚を失います。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label": "性格選択をオンにする",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description": "終了後、ゲームは開始人格の選択を完全にスキップし、すべてのプレイヤーは開始時に人格レリックを受け取りません。",
+  "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.title": "コンソールコマンド適用",
+  "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.body": "プレイヤー: {PlayerName}\nキャラクター: {Character}\nコマンド: {Command}",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.ban.title": "禁止",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.ban.description": "関連する候補者プールから削除されるコンテンツを個別に管理します。変更は新たに開始する場合にのみ有効になります。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.other.title": "他の",

@@ -28,6 +28,7 @@ public sealed class ReAstralPartyRunSettingsLoadPatch : IPatchMethod
         if (!AstralNetPhaseGuard.Guard(AstralNetPhase.MapOrRoom, "run settings load sync"))
             return;
 
+        DevConsoleCommandNotificationSync.Register();
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
     }
 }

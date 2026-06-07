@@ -16,6 +16,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.description": "控制 Enigmatic 开头的星引擎内容，以及对应涅奥分支是否会在本局启用。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label": "开启【涅奥】额外选项",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description": "控制涅奥阶段的第 4 个随机星引擎额外选项是否会出现。",
+  "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.title": "控制台指令生效",
+  "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.body": "玩家：{PlayerName}\n角色：{Character}\n指令：{Command}",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.ban.title": "BAN",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.ban.description": "单独管理会从相关候选池中移除的内容。修改仅对新开局生效。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.other.title": "其他",
