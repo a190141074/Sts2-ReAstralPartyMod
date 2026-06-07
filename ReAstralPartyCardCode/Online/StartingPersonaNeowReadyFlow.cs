@@ -38,6 +38,10 @@ internal static class StartingPersonaNeowReadyFlow
         typeof(EventModel),
         "SetEventState",
         [typeof(LocString), typeof(IEnumerable<EventOption>)]);
+    private static readonly MethodInfo? SetInitialEventStateMethod = AccessTools.Method(
+        typeof(AncientEventModel),
+        "SetInitialEventState",
+        [typeof(bool)]);
     private static readonly MethodInfo? EventRoomSetupLayoutMethod =
         AccessTools.Method(typeof(NEventRoom), "SetupLayout");
     private static readonly MethodInfo? EventRoomRefreshEventStateMethod =
@@ -262,10 +266,20 @@ internal static class StartingPersonaNeowReadyFlow
     {
         try
         {
-            RestoreOriginalOptionsForRun(runKey, "ready_launch");
-            MainFile.Logger.Info(
-                $"[StartingPersonaNeowReadyFlow] Ready page restored before persona overlay | runKey={runKey} source={sourceTag}.");
             var opened = await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(runState, $"neow_ready_launch:{sourceTag}");
+            if (opened)
+            {
+                RebuildInitialOptionsForRun(runKey, "post_selection_rebuild");
+                MainFile.Logger.Info(
+                    $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial page after persona overlay | runKey={runKey} source={sourceTag}.");
+            }
+            else
+            {
+                RestoreOriginalOptionsForRun(runKey, "ready_launch_overlay_not_opened");
+                MainFile.Logger.Info(
+                    $"[StartingPersonaNeowReadyFlow] Restored cached Neow options because persona overlay did not open | runKey={runKey} source={sourceTag}.");
+            }
+
             await RefreshRestoredNeowUiAfterOverlayClosedAsync(runState, runKey, "post_overlay_verify");
             return opened;
         }
@@ -331,6 +345,21 @@ internal static class StartingPersonaNeowReadyFlow
             RestoreOriginalOptionsOrFinish(neow, reason);
     }
 
+    private static void RebuildInitialOptionsForRun(string runKey, string reason)
+    {
+        List<Neow> neowsToRebuild;
+        lock (SyncLock)
+        {
+            neowsToRebuild = ReadyPages
+                .Where(pair => pair.Value.RunKey == runKey)
+                .Select(static pair => pair.Key)
+                .ToList();
+        }
+
+        foreach (var neow in neowsToRebuild)
+            RebuildInitialOptionsOrFallback(neow, reason);
+    }
+
     private static void RestoreOriginalOptionsOrFinish(Neow neow, string reason)
     {
         ReadyPageState? state;
@@ -358,6 +387,57 @@ internal static class StartingPersonaNeowReadyFlow
         SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
         MainFile.Logger.Info(
             $"[StartingPersonaNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
+    }
+
+    private static void RebuildInitialOptionsOrFallback(Neow neow, string reason)
+    {
+        ReadyPageState? state;
+        lock (SyncLock)
+        {
+            if (!ReadyPages.Remove(neow, out state))
+                return;
+        }
+
+        if (SetInitialEventStateMethod == null)
+        {
+            RestoreCachedStateOrFinish(neow, state, $"{reason}:missing_set_initial_event_state");
+            return;
+        }
+
+        try
+        {
+            SetInitialEventStateMethod.Invoke(neow, [false]);
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial option page from source event state | runKey={state.RunKey} reason={reason}.");
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn(
+                $"[StartingPersonaNeowReadyFlow] Failed to rebuild Neow initial option page; falling back to cached options | runKey={state.RunKey} reason={reason}: {ex}");
+            RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached");
+        }
+    }
+
+    private static void RestoreCachedStateOrFinish(Neow neow, ReadyPageState state, string reason)
+    {
+        var restoredOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
+            neow,
+            state.OriginalOptions,
+            "ready_page_restore");
+        if (restoredOptions.Count == 0)
+        {
+            neow.StartPreFinished();
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Ready page restored by finishing Neow immediately because the cached option page was empty | runKey={state.RunKey} reason={reason}.");
+            return;
+        }
+
+        if (SetEventStateMethod == null)
+            throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
+
+        SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Restored cached Neow option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
     }
 
     private static async Task RefreshRestoredNeowUiAsync(RunState runState, string runKey, string stage)
