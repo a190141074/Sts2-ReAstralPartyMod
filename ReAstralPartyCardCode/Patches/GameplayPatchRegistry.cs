@@ -293,8 +293,12 @@ internal static class GameplayStaticPatchCatalog
 
         patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
+        patcher.RegisterPatch<CreatureHealMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureHealEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
+        patcher.RegisterPatch<CreatureSetCurrentHpMoonPropShapedGlassPatch>();
+        patcher.RegisterPatch<CreatureGainMaxHpMoonPropShapedGlassPatch>();
+        patcher.RegisterPatch<CreatureLoseMaxHpMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CardRewardAlternativeStokovPaelsWingCompatPatch>();
         patcher.RegisterPatch<DevConsoleCommandNotificationPatch>();
         patcher.RegisterPatch<DevConsoleUltimateChargeCommandPatch>();
