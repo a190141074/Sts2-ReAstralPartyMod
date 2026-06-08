@@ -15,6 +15,7 @@ using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
+using ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -64,6 +65,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         LogInfo("P005", "Starting persona relic selection waiting for run settings sync.");
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         LogInfo("P006", "Starting persona relic selection finished run settings sync.");
+        LucidDreamMaliceModifierInstaller.EnsureInstalledForNewRun(runState);
         await GrantStartingInitialPointIfEnabledAsync(runState);
         LogInfo("P007", "Starting persona relic selection run bootstrap completed; Neow ready-page flow will handle the actual persona selection entry.");
     }

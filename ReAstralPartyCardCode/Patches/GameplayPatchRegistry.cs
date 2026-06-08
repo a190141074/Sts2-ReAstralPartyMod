@@ -125,6 +125,14 @@ internal static class GameplayStaticPatchCatalog
                 "UI patch: move the enigmatic synthesis formula button to the left of the map button",
                 [typeof(IRunState)]),
             new ModPatchInfo(
+                "top_bar_portrait_tip_lucid_dream_malice_patch",
+                typeof(MegaCrit.sts2.Core.Nodes.TopBar.NTopBarPortraitTip),
+                "OnFocus",
+                typeof(NTopBarPortraitTipLucidDreamMalicePatch),
+                false,
+                "UI patch: append enabled lucid dream malice entries to the in-run ascension portrait hover tip",
+                []),
+            new ModPatchInfo(
                 "event_option_locked_hover_focus_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
                 "OnFocus",

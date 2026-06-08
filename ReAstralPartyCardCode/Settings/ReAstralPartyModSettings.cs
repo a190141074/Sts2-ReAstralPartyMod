@@ -19,6 +19,14 @@ public enum TokenSeriesMode
     Disabled = 2
 }
 
+public enum NeowExtraOptionSelectionMode
+{
+    DefaultRandom = 0,
+    DreamFaceTheShadow = 1,
+    RingOfSevenCurses = 2,
+    AbsoluteForm = 3
+}
+
 public enum StartingPersonaDisplayMode
 {
     Manual = 0,
@@ -72,6 +80,9 @@ public sealed class ReAstralPartyModSettings
     public bool EnableEnigmaticSeriesEvents { get; set; } = true;
 
     public bool EnableNeowExtraOption { get; set; } = true;
+
+    public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; } =
+        NeowExtraOptionSelectionMode.DefaultRandom;
 
     public bool EnableAllPersonas { get; set; }
 
@@ -152,6 +163,9 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableEnigmaticSeriesEvents => ReadRuntime(settings => settings.EnableEnigmaticSeriesEvents);
 
     public static bool EnableNeowExtraOption => ReadRuntime(settings => settings.EnableNeowExtraOption);
+
+    public static NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode =>
+        ReadRuntime(settings => settings.NeowExtraOptionSelectionMode);
 
     public static StartingPersonaMode ConfiguredStartingPersonaMode =>
         ReadRuntime(settings => settings.StartingPersonaMode);
@@ -306,6 +320,23 @@ public static partial class ReAstralPartyModSettingsManager
         return EnableNeowExtraOption;
     }
 
+    public static NeowExtraOptionSelectionMode GetNeowExtraOptionSelectionMode(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.NeowExtraOptionSelectionMode;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.NeowExtraOptionSelectionMode;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.NeowExtraOptionSelectionMode;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return NeowExtraOptionSelectionMode.DefaultRandom;
+
+        return NeowExtraOptionSelectionMode;
+    }
+
     public static bool GetEnableStartingInitialPoint(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
@@ -372,6 +403,166 @@ public static partial class ReAstralPartyModSettingsManager
             return false;
 
         return EnableExtremeMode;
+    }
+
+    public static bool GetEnableLucidDreamFishScalesMalice(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamFishScalesMalice;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamFishScalesMalice;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamFishScalesMalice;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamSevereWoundOneMalice(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamSevereWoundOneMalice;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamSevereWoundOneMalice;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamSevereWoundOneMalice;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamSevereWoundTwoMalice(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamSevereWoundTwoMalice;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamSevereWoundTwoMalice;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamSevereWoundTwoMalice;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamMadLifeMalice(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamMadLifeMalice;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamMadLifeMalice;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamMadLifeMalice;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamSwampOfFateMalice(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamSwampOfFateMalice;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamSwampOfFateMalice;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamSwampOfFateMalice;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamOverpopulationMalice(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamOverpopulationMalice;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamOverpopulationMalice;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamOverpopulationMalice;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamCautiousJellyfishMalice(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamCautiousJellyfishMalice;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamCautiousJellyfishMalice;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamCautiousJellyfishMalice;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool HasAnyLucidDreamMaliceEnabled(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+        {
+            return snapshot.EnableLucidDreamFishScalesMalice
+                   || snapshot.EnableLucidDreamSevereWoundOneMalice
+                   || snapshot.EnableLucidDreamSevereWoundTwoMalice
+                   || snapshot.EnableLucidDreamMadLifeMalice
+                   || snapshot.EnableLucidDreamSwampOfFateMalice
+                   || snapshot.EnableLucidDreamOverpopulationMalice
+                   || snapshot.EnableLucidDreamCautiousJellyfishMalice;
+        }
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+        {
+            return lobbySnapshot.EnableLucidDreamFishScalesMalice
+                   || lobbySnapshot.EnableLucidDreamSevereWoundOneMalice
+                   || lobbySnapshot.EnableLucidDreamSevereWoundTwoMalice
+                   || lobbySnapshot.EnableLucidDreamMadLifeMalice
+                   || lobbySnapshot.EnableLucidDreamSwampOfFateMalice
+                   || lobbySnapshot.EnableLucidDreamOverpopulationMalice
+                   || lobbySnapshot.EnableLucidDreamCautiousJellyfishMalice;
+        }
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+        {
+            return localFallback.EnableLucidDreamFishScalesMalice
+                   || localFallback.EnableLucidDreamSevereWoundOneMalice
+                   || localFallback.EnableLucidDreamSevereWoundTwoMalice
+                   || localFallback.EnableLucidDreamMadLifeMalice
+                   || localFallback.EnableLucidDreamSwampOfFateMalice
+                   || localFallback.EnableLucidDreamOverpopulationMalice
+                   || localFallback.EnableLucidDreamCautiousJellyfishMalice;
+        }
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
     }
 
     public static bool GetEnableDuplicatePersonas(IRunState? runState)
@@ -666,6 +857,17 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var neowExtraOptionSelectionMode = ModSettingsBindings.Global<ReAstralPartyModSettings, NeowExtraOptionSelectionMode>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.NeowExtraOptionSelectionMode,
+            (settings, value) =>
+            {
+                settings.NeowExtraOptionSelectionMode = value;
+                ApplyRuntimeSettings(settings, "neow_extra_option_selection_mode");
+                ShowNeowExtraOptionSelectionModeToast(value);
+            });
+
         var enableExtremeMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -941,6 +1143,30 @@ public static partial class ReAstralPartyModSettingsManager
                     enableNeowExtraOption,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description",
                         "Enable Astral's extra randomized fourth Neow option at run start."))
+                .AddEnumChoice(
+                    "neow_extra_option_selection_mode",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label",
+                        "Forced Neow Extra Option"),
+                    neowExtraOptionSelectionMode,
+                    value => value switch
+                    {
+                        NeowExtraOptionSelectionMode.DefaultRandom => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random",
+                            "Default"),
+                        NeowExtraOptionSelectionMode.DreamFaceTheShadow => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_face_the_shadow",
+                            "Face the Shadow"),
+                        NeowExtraOptionSelectionMode.RingOfSevenCurses => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses",
+                            "Seven Curses"),
+                        NeowExtraOptionSelectionMode.AbsoluteForm => T(
+                            "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form",
+                            "Absolute Form"),
+                        _ => ModSettingsText.Literal(value.ToString())
+                    },
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.description",
+                        "Choose the extra Neow option for this room, or keep the existing deterministic random behavior."),
+                    ModSettingsChoicePresentation.Dropdown)
                 .AddToggle(
                     "enable_all_personas",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label", "Enable All Personas"),
@@ -1331,6 +1557,26 @@ public static partial class ReAstralPartyModSettingsManager
         AstralNotificationService.ShowInfo(AstralNotificationModule.Settings, body, title);
     }
 
+    private static void ShowNeowExtraOptionSelectionModeToast(NeowExtraOptionSelectionMode mode)
+    {
+        var title = new LocString("settings_ui",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label").GetRawText();
+        var bodyKey = mode switch
+        {
+            NeowExtraOptionSelectionMode.DefaultRandom =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random",
+            NeowExtraOptionSelectionMode.DreamFaceTheShadow =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_face_the_shadow",
+            NeowExtraOptionSelectionMode.RingOfSevenCurses =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses",
+            NeowExtraOptionSelectionMode.AbsoluteForm =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form",
+            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied"
+        };
+        var body = new LocString("settings_ui", bodyKey).GetRawText();
+        AstralNotificationService.ShowInfo(AstralNotificationModule.Settings, body, title);
+    }
+
     private static void UpdatePersistentSettings(Action<ReAstralPartyModSettings> mutator, string reason)
     {
         try
@@ -1356,7 +1602,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -1466,6 +1712,40 @@ public static partial class ReAstralPartyModSettingsManager
             TokenSeriesMode.All => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all.description",
             TokenSeriesMode.Disabled => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled.description",
             _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_random_two.description"
+        };
+        return new LocString("settings_ui", key).GetRawText();
+    }
+
+    internal static string GetNeowExtraOptionSelectionModeTitle(NeowExtraOptionSelectionMode mode)
+    {
+        var key = mode switch
+        {
+            NeowExtraOptionSelectionMode.DefaultRandom =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random",
+            NeowExtraOptionSelectionMode.DreamFaceTheShadow =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_face_the_shadow",
+            NeowExtraOptionSelectionMode.RingOfSevenCurses =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses",
+            NeowExtraOptionSelectionMode.AbsoluteForm =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form",
+            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random"
+        };
+        return new LocString("settings_ui", key).GetRawText();
+    }
+
+    internal static string GetNeowExtraOptionSelectionModeDescription(NeowExtraOptionSelectionMode mode)
+    {
+        var key = mode switch
+        {
+            NeowExtraOptionSelectionMode.DefaultRandom =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random.description",
+            NeowExtraOptionSelectionMode.DreamFaceTheShadow =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_face_the_shadow.description",
+            NeowExtraOptionSelectionMode.RingOfSevenCurses =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses.description",
+            NeowExtraOptionSelectionMode.AbsoluteForm =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form.description",
+            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random.description"
         };
         return new LocString("settings_ui", key).GetRawText();
     }
@@ -1634,6 +1914,9 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableNeowExtraOption { get; init; } = true;
 
+        public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; init; } =
+            NeowExtraOptionSelectionMode.DefaultRandom;
+
         public bool EnableAllPersonas { get; init; }
 
         public bool EnableAllVariantPersonas { get; init; }
@@ -1670,6 +1953,20 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnablePureAngelMode { get; init; } = true;
 
+        public bool EnableLucidDreamFishScalesMalice { get; init; }
+
+        public bool EnableLucidDreamSevereWoundOneMalice { get; init; }
+
+        public bool EnableLucidDreamSevereWoundTwoMalice { get; init; }
+
+        public bool EnableLucidDreamMadLifeMalice { get; init; }
+
+        public bool EnableLucidDreamSwampOfFateMalice { get; init; }
+
+        public bool EnableLucidDreamOverpopulationMalice { get; init; }
+
+        public bool EnableLucidDreamCautiousJellyfishMalice { get; init; }
+
         public LobbyPanelStateSnapshot LobbyPanelState { get; init; } = new();
 
         public static LocalRuntimeSettings FromPersistent(ReAstralPartyModSettings settings)
@@ -1683,6 +1980,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
                 EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
                 EnableNeowExtraOption = settings.EnableNeowExtraOption,
+                NeowExtraOptionSelectionMode = settings.NeowExtraOptionSelectionMode,
                 EnableAllPersonas = settings.EnableAllPersonas,
                 EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
                 StartingPersonaMode = ResolveStartingPersonaMode(settings),
@@ -1701,6 +1999,13 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableNeowDiagnosticsNotifications = settings.EnableNeowDiagnosticsNotifications,
                 TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
                 EnablePureAngelMode = settings.EnablePureAngelMode,
+                EnableLucidDreamFishScalesMalice = false,
+                EnableLucidDreamSevereWoundOneMalice = false,
+                EnableLucidDreamSevereWoundTwoMalice = false,
+                EnableLucidDreamMadLifeMalice = false,
+                EnableLucidDreamSwampOfFateMalice = false,
+                EnableLucidDreamOverpopulationMalice = false,
+                EnableLucidDreamCautiousJellyfishMalice = false,
                 LobbyPanelState = new LobbyPanelStateSnapshot
                 {
                     IsCollapsed = settings.LobbyPanelState?.IsCollapsed ?? false,

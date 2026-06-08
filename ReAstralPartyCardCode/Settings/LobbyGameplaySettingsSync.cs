@@ -95,6 +95,9 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public bool EnableNeowExtraOption { get; set; } = true;
 
+    public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; } =
+        NeowExtraOptionSelectionMode.DefaultRandom;
+
     public bool EnableAllPersonas { get; set; }
 
     public bool EnableAllVariantPersonas { get; set; }
@@ -105,6 +108,20 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
 
+    public bool EnableLucidDreamFishScalesMalice { get; set; }
+
+    public bool EnableLucidDreamSevereWoundOneMalice { get; set; }
+
+    public bool EnableLucidDreamSevereWoundTwoMalice { get; set; }
+
+    public bool EnableLucidDreamMadLifeMalice { get; set; }
+
+    public bool EnableLucidDreamSwampOfFateMalice { get; set; }
+
+    public bool EnableLucidDreamOverpopulationMalice { get; set; }
+
+    public bool EnableLucidDreamCautiousJellyfishMalice { get; set; }
+
     public LobbyGameplaySettingsSnapshot Clone()
     {
         return new LobbyGameplaySettingsSnapshot
@@ -114,11 +131,19 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableNeowExtraOption = EnableNeowExtraOption,
+            NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode,
             EnableAllPersonas = EnableAllPersonas,
             EnableAllVariantPersonas = EnableAllVariantPersonas,
             EnableExtremeMode = EnableExtremeMode,
             StartingPersonaMode = StartingPersonaMode,
-            TokenSeriesMode = TokenSeriesMode
+            TokenSeriesMode = TokenSeriesMode,
+            EnableLucidDreamFishScalesMalice = EnableLucidDreamFishScalesMalice,
+            EnableLucidDreamSevereWoundOneMalice = EnableLucidDreamSevereWoundOneMalice,
+            EnableLucidDreamSevereWoundTwoMalice = EnableLucidDreamSevereWoundTwoMalice,
+            EnableLucidDreamMadLifeMalice = EnableLucidDreamMadLifeMalice,
+            EnableLucidDreamSwampOfFateMalice = EnableLucidDreamSwampOfFateMalice,
+            EnableLucidDreamOverpopulationMalice = EnableLucidDreamOverpopulationMalice,
+            EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice
         };
     }
 
@@ -131,6 +156,7 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
             EnableNeowExtraOption = settings.EnableNeowExtraOption,
+            NeowExtraOptionSelectionMode = settings.NeowExtraOptionSelectionMode,
             EnableAllPersonas = settings.EnableAllPersonas,
             EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
             EnableExtremeMode = settings.EnableExtremeMode,
@@ -204,7 +230,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot updated: start_initial_point={updated.EnableStartingInitialPoint}, start_persona_selection={updated.EnableStartingPersonaSelection}, dream_series={updated.EnableDreamSeriesEvents}, enigmatic_series={updated.EnableEnigmaticSeriesEvents}, neow_extra_option={updated.EnableNeowExtraOption}, all_personas={updated.EnableAllPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot updated: start_initial_point={updated.EnableStartingInitialPoint}, start_persona_selection={updated.EnableStartingPersonaSelection}, dream_series={updated.EnableDreamSeriesEvents}, enigmatic_series={updated.EnableEnigmaticSeriesEvents}, neow_extra_option={updated.EnableNeowExtraOption}, neow_extra_selection={updated.NeowExtraOptionSelectionMode}, all_personas={updated.EnableAllPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
         SnapshotChanged?.Invoke(updated.Clone());
     }
 
@@ -223,7 +249,7 @@ internal static class LobbyGameplaySettingsSync
 
         netService.SendMessage(new AstralLobbyGameplaySettingsSnapshotMessage(snapshot));
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     public static void RequestSnapshotFromHost()
@@ -335,7 +361,7 @@ internal static class LobbyGameplaySettingsSync
         var snapshot = message.ToSnapshot();
         SetSnapshotInternal(snapshot, $"remote_snapshot_from_{senderId}", true);
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     private static void HandleRequestMessage(AstralLobbyGameplaySettingsRequestMessage message, ulong senderId)
@@ -363,7 +389,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
         if (invokeEvent)
             SnapshotChanged?.Invoke(snapshot.Clone());
     }
@@ -377,18 +403,26 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 3;
+    private const int SchemaVersion = 5;
 
     public bool EnableStartingInitialPoint { get; set; }
     public bool EnableStartingPersonaSelection { get; set; }
     public bool EnableDreamSeriesEvents { get; set; }
     public bool EnableEnigmaticSeriesEvents { get; set; }
     public bool EnableNeowExtraOption { get; set; }
+    public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; }
     public bool EnableAllPersonas { get; set; }
     public bool EnableAllVariantPersonas { get; set; }
     public bool EnableExtremeMode { get; set; }
     public StartingPersonaMode StartingPersonaMode { get; set; }
     public TokenSeriesMode TokenSeriesMode { get; set; }
+    public bool EnableLucidDreamFishScalesMalice { get; set; }
+    public bool EnableLucidDreamSevereWoundOneMalice { get; set; }
+    public bool EnableLucidDreamSevereWoundTwoMalice { get; set; }
+    public bool EnableLucidDreamMadLifeMalice { get; set; }
+    public bool EnableLucidDreamSwampOfFateMalice { get; set; }
+    public bool EnableLucidDreamOverpopulationMalice { get; set; }
+    public bool EnableLucidDreamCautiousJellyfishMalice { get; set; }
 
     public AstralLobbyGameplaySettingsSnapshotMessage(LobbyGameplaySettingsSnapshot snapshot)
     {
@@ -397,11 +431,19 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableDreamSeriesEvents = snapshot.EnableDreamSeriesEvents;
         EnableEnigmaticSeriesEvents = snapshot.EnableEnigmaticSeriesEvents;
         EnableNeowExtraOption = snapshot.EnableNeowExtraOption;
+        NeowExtraOptionSelectionMode = snapshot.NeowExtraOptionSelectionMode;
         EnableAllPersonas = snapshot.EnableAllPersonas;
         EnableAllVariantPersonas = snapshot.EnableAllVariantPersonas;
         EnableExtremeMode = snapshot.EnableExtremeMode;
         StartingPersonaMode = snapshot.StartingPersonaMode;
         TokenSeriesMode = snapshot.TokenSeriesMode;
+        EnableLucidDreamFishScalesMalice = snapshot.EnableLucidDreamFishScalesMalice;
+        EnableLucidDreamSevereWoundOneMalice = snapshot.EnableLucidDreamSevereWoundOneMalice;
+        EnableLucidDreamSevereWoundTwoMalice = snapshot.EnableLucidDreamSevereWoundTwoMalice;
+        EnableLucidDreamMadLifeMalice = snapshot.EnableLucidDreamMadLifeMalice;
+        EnableLucidDreamSwampOfFateMalice = snapshot.EnableLucidDreamSwampOfFateMalice;
+        EnableLucidDreamOverpopulationMalice = snapshot.EnableLucidDreamOverpopulationMalice;
+        EnableLucidDreamCautiousJellyfishMalice = snapshot.EnableLucidDreamCautiousJellyfishMalice;
     }
 
     public bool ShouldBroadcast => false;
@@ -416,11 +458,19 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteBool(EnableDreamSeriesEvents);
         writer.WriteBool(EnableEnigmaticSeriesEvents);
         writer.WriteBool(EnableNeowExtraOption);
+        writer.WriteEnum(NeowExtraOptionSelectionMode);
         writer.WriteBool(EnableAllPersonas);
         writer.WriteBool(EnableAllVariantPersonas);
         writer.WriteBool(EnableExtremeMode);
         writer.WriteEnum(StartingPersonaMode);
         writer.WriteEnum(TokenSeriesMode);
+        writer.WriteBool(EnableLucidDreamFishScalesMalice);
+        writer.WriteBool(EnableLucidDreamSevereWoundOneMalice);
+        writer.WriteBool(EnableLucidDreamSevereWoundTwoMalice);
+        writer.WriteBool(EnableLucidDreamMadLifeMalice);
+        writer.WriteBool(EnableLucidDreamSwampOfFateMalice);
+        writer.WriteBool(EnableLucidDreamOverpopulationMalice);
+        writer.WriteBool(EnableLucidDreamCautiousJellyfishMalice);
     }
 
     public void Deserialize(PacketReader reader)
@@ -450,11 +500,44 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableNeowExtraOption = true;
         }
 
+        if (schemaVersion >= 5)
+        {
+            var rawMode = reader.ReadEnum<NeowExtraOptionSelectionMode>();
+            NeowExtraOptionSelectionMode = Enum.IsDefined(typeof(NeowExtraOptionSelectionMode), rawMode)
+                ? rawMode
+                : NeowExtraOptionSelectionMode.DefaultRandom;
+        }
+        else
+        {
+            NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom;
+        }
+
         EnableAllPersonas = reader.ReadBool();
         EnableAllVariantPersonas = reader.ReadBool();
         EnableExtremeMode = reader.ReadBool();
         StartingPersonaMode = reader.ReadEnum<StartingPersonaMode>();
         TokenSeriesMode = reader.ReadEnum<TokenSeriesMode>();
+
+        if (schemaVersion >= 4)
+        {
+            EnableLucidDreamFishScalesMalice = reader.ReadBool();
+            EnableLucidDreamSevereWoundOneMalice = reader.ReadBool();
+            EnableLucidDreamSevereWoundTwoMalice = reader.ReadBool();
+            EnableLucidDreamMadLifeMalice = reader.ReadBool();
+            EnableLucidDreamSwampOfFateMalice = reader.ReadBool();
+            EnableLucidDreamOverpopulationMalice = reader.ReadBool();
+            EnableLucidDreamCautiousJellyfishMalice = reader.ReadBool();
+        }
+        else
+        {
+            EnableLucidDreamFishScalesMalice = false;
+            EnableLucidDreamSevereWoundOneMalice = false;
+            EnableLucidDreamSevereWoundTwoMalice = false;
+            EnableLucidDreamMadLifeMalice = false;
+            EnableLucidDreamSwampOfFateMalice = false;
+            EnableLucidDreamOverpopulationMalice = false;
+            EnableLucidDreamCautiousJellyfishMalice = false;
+        }
     }
 
     public LobbyGameplaySettingsSnapshot ToSnapshot()
@@ -466,11 +549,19 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableNeowExtraOption = EnableNeowExtraOption,
+            NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode,
             EnableAllPersonas = EnableAllPersonas,
             EnableAllVariantPersonas = EnableAllVariantPersonas,
             EnableExtremeMode = EnableExtremeMode,
             StartingPersonaMode = StartingPersonaMode,
-            TokenSeriesMode = TokenSeriesMode
+            TokenSeriesMode = TokenSeriesMode,
+            EnableLucidDreamFishScalesMalice = EnableLucidDreamFishScalesMalice,
+            EnableLucidDreamSevereWoundOneMalice = EnableLucidDreamSevereWoundOneMalice,
+            EnableLucidDreamSevereWoundTwoMalice = EnableLucidDreamSevereWoundTwoMalice,
+            EnableLucidDreamMadLifeMalice = EnableLucidDreamMadLifeMalice,
+            EnableLucidDreamSwampOfFateMalice = EnableLucidDreamSwampOfFateMalice,
+            EnableLucidDreamOverpopulationMalice = EnableLucidDreamOverpopulationMalice,
+            EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice
         };
     }
 }

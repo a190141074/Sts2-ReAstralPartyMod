@@ -141,6 +141,25 @@ internal static class NeowOptionInjectionHelper
     private static string? ResolveSelectedCandidateKey(AncientEventModel ancient)
     {
         var runState = ancient.Owner?.RunState as RunState;
+        var configuredSelectionMode = ReAstralPartyModSettingsManager.GetNeowExtraOptionSelectionMode(runState);
+        if (configuredSelectionMode != NeowExtraOptionSelectionMode.DefaultRandom)
+        {
+            var forcedKey = configuredSelectionMode switch
+            {
+                NeowExtraOptionSelectionMode.DreamFaceTheShadow => "dream_face_the_shadow",
+                NeowExtraOptionSelectionMode.RingOfSevenCurses => "ring_of_seven_curses",
+                NeowExtraOptionSelectionMode.AbsoluteForm => "absolute_form",
+                _ => null
+            };
+            if (!string.IsNullOrWhiteSpace(forcedKey))
+            {
+                var forcedRunKey = GetRunKey(runState, ancient.Owner);
+                lock (SyncLock)
+                    SelectedCandidateKeysByRun[forcedRunKey] = forcedKey;
+                return forcedKey;
+            }
+        }
+
         var eligibleCandidates = GetEligibleCandidates(runState);
         if (eligibleCandidates.Count == 0)
             return null;

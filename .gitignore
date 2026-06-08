@@ -22,6 +22,8 @@ obj/
 objtmp/
 _build_out/
 _deploy_test/
+_build_verify/
+_mod_output/
 __pycache__/
 *.py[cod]
 
