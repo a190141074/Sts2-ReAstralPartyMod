@@ -6,10 +6,8 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Nodes.HoverTips;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.sts2.Core.Nodes.TopBar;
-using ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
-using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
-namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 
 [HarmonyPatch(typeof(NTopBarPortraitTip), "OnFocus")]
 public static class NTopBarPortraitTipLucidDreamMalicePatch

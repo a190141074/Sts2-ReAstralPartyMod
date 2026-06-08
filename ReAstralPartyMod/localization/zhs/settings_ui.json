@@ -118,7 +118,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.overpopulation.title": "人口过剩",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.overpopulation.description": "除了 Boss 和精英房，额外增加一只随机低难怪物。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.title": "慎重水母",
-  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.description": "卡牌费用不会低于原始费用的 50%。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.description": "能量上限+4，耗能低于4的牌费用+1，耗能为X的牌的效果数值-2。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label": "开启纯真天使模式",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description": "预留开关，当前版本暂时没有实际作用。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_play_recommendation.label": "开启出牌推荐",

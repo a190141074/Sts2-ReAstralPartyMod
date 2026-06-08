@@ -118,7 +118,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.overpopulation.title": "明晰夢・人口過剰",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.overpopulation.description": "ボス部屋とエリート部屋以外で、低難度のランダムな敵を 1 体追加します。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.title": "明晰夢・慎重なクラゲ",
-  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.description": "カードコストは元のコストの 50% 未満にはなりません。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.description": "最大エナジーが4増加します。コスト4未満のX以外のカードのコストは1増加。Xコストカードの効果値は2減少します。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label": "ピュアエンジェルモードをオンにする",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.description": "このスイッチは予約されており、現在のバージョンでは実際的な効果はありません。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_play_recommendation.label": "カードの推奨をオンにする",

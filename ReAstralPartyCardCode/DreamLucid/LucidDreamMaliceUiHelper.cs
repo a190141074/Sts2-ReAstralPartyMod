@@ -2,7 +2,7 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
-namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 
 internal static class LucidDreamMaliceUiHelper
 {

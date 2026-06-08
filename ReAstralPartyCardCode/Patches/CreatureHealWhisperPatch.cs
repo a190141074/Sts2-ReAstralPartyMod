@@ -1,6 +1,8 @@
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -24,6 +26,7 @@ public sealed class CreatureHealWhisperPatch : IPatchMethod
             return true;
 
         amount = WhisperPower.AdjustHealAmount(creature, amount);
+        amount = LucidDreamMaliceRuntimeHelper.AdjustHealAmount(creature, amount);
         return true;
     }
 }

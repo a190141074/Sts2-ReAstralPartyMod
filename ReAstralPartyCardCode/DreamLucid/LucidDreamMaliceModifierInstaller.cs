@@ -3,7 +3,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
-namespace ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
+namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 
 public static class LucidDreamMaliceModifierInstaller
 {

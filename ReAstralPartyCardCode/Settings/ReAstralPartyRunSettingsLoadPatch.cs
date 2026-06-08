@@ -1,7 +1,7 @@
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
-using ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
+using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using STS2RitsuLib.Patching.Models;
 
