@@ -45,11 +45,18 @@ public class UltimateSkillAbsoluteForm : AstralPartyCardModel
         await PowerCmd.Apply<AbsoluteFormPower>(Owner.Creature, 1m, Owner.Creature, this, false);
 
         var alivePlayers = EventCombatTargetHelper.GetAlivePlayers(CombatState).ToList();
-        var effectIndex = 0;
-        foreach (var player in alivePlayers.Where(player => player != Owner))
-            await AbsoluteFormHelper.AutoPlayRandomFormForPlayer(choiceContext, player, effectIndex++);
+        if (AbsoluteFormHelper.HasFullFormSetAcrossAllRunDecks(CombatState))
+        {
+            await AbsoluteFormHelper.AutoPlayAllFormsForPlayer(choiceContext, Owner);
+        }
+        else
+        {
+            var effectIndex = 0;
+            foreach (var player in alivePlayers.Where(player => player != Owner))
+                await AbsoluteFormHelper.AutoPlayRandomFormForPlayer(choiceContext, player, effectIndex++);
 
-        await AbsoluteFormHelper.AutoPlayRandomFormForPlayer(choiceContext, Owner, effectIndex);
+            await AbsoluteFormHelper.AutoPlayRandomFormForPlayer(choiceContext, Owner, effectIndex);
+        }
 
         if (Owner.Creature.IsAlive)
             PlayerCmd.EndTurn(Owner, canBackOut: false);

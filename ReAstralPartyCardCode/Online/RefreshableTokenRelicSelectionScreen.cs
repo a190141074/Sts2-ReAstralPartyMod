@@ -30,6 +30,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private const string SelectionFontPath = "res://ReAstralPartyMod/fonts/荆南波波黑-Bold.ttf";
 
     private readonly TaskCompletionSource<RefreshableTokenRelicSelectionResult> _completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly RunState _runState;
     private readonly Player _owner;
     private readonly Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> _rerollFunc;
@@ -103,6 +104,11 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         return _completionSource.Task;
     }
 
+    public Task WaitUntilClosedAsync()
+    {
+        return _overlayClosedSource.Task;
+    }
+
     public void Close()
     {
         if (_closed)
@@ -122,6 +128,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     {
         EnsureCompletedOnForcedClose();
         _closed = true;
+        _overlayClosedSource.TrySetResult();
         QueueFree();
     }
 

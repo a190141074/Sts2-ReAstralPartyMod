@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -26,6 +27,31 @@ internal static class AbsoluteFormHelper
 
     private static readonly Lazy<IReadOnlyList<CardModel>> FormCards = new(ResolveFormCards);
     private static readonly Lazy<IReadOnlyList<CardModel>> BaseGameCurses = new(ResolveBaseGameCurses);
+
+    public static bool HasFullFormSetAcrossAllRunDecks(CombatState combatState)
+    {
+        var targetEntries = FormEntries.ToHashSet(StringComparer.Ordinal);
+        var discoveredEntries = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var player in EventCombatTargetHelper.GetAlivePlayers(combatState))
+        {
+            foreach (var card in EventDeckCardHelper.GetRunDeckCards(player))
+            {
+                var entry = (card.CanonicalInstance ?? card)?.Id.Entry;
+                if (string.IsNullOrWhiteSpace(entry))
+                    continue;
+
+                if (!targetEntries.Contains(entry))
+                    continue;
+
+                discoveredEntries.Add(entry);
+                if (discoveredEntries.Count == targetEntries.Count)
+                    return true;
+            }
+        }
+
+        return false;
+    }
 
     public static async Task AutoPlayRandomFormForPlayer(
         PlayerChoiceContext choiceContext,
@@ -54,6 +80,26 @@ internal static class AbsoluteFormHelper
         await CardCmd.AutoPlay(choiceContext, cardToPlay, player.Creature, AutoPlayType.Default, false, true);
     }
 
+    public static async Task AutoPlayAllFormsForPlayer(PlayerChoiceContext choiceContext, Player player)
+    {
+        if (player.Creature?.CombatState == null)
+            return;
+
+        var formsByEntry = FormCards.Value.ToDictionary(
+            card => (card.CanonicalInstance ?? card).Id.Entry,
+            card => card.CanonicalInstance ?? card,
+            StringComparer.Ordinal);
+
+        foreach (var entry in FormEntries)
+        {
+            if (!formsByEntry.TryGetValue(entry, out var form))
+                continue;
+
+            var cardToPlay = player.Creature.CombatState.CreateCard(form, player);
+            await CardCmd.AutoPlay(choiceContext, cardToPlay, player.Creature, AutoPlayType.Default, false, true);
+        }
+    }
+
     public static async Task AddRandomCurseToDiscard(Player player, AbstractModel source, int roundNumber)
     {
         if (player.Creature?.CombatState == null)
@@ -74,6 +120,7 @@ internal static class AbsoluteFormHelper
                 player.NetId)];
 
         var createdCard = player.Creature.CombatState.CreateCard(selected.CanonicalInstance ?? selected, player);
+        CardCmd.ApplyKeyword(createdCard, CardKeyword.Ethereal);
         await CardPileCmd.Add(createdCard, PileType.Discard, CardPilePosition.Bottom, source, false);
     }
 

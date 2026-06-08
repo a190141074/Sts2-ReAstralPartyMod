@@ -462,7 +462,11 @@ public static class DeterministicMultiplayerChoiceHelper
         var screen = RefreshableTokenRelicSelectionScreen.Create(player, options, rerollCount, title, subtitlePrefix,
             probabilityText, rerollFunc);
         overlayStack.Push(screen);
-        return await screen.WaitForResult();
+        var result = await screen.WaitForResult();
+        screen.Close();
+        await screen.WaitUntilClosedAsync();
+        await WaitForOverlaySettleFramesAsync(2);
+        return result;
     }
 
     private static async Task<NOverlayStack?> WaitForOverlayStackAsync()
@@ -479,6 +483,18 @@ public static class DeterministicMultiplayerChoiceHelper
         }
 
         return NOverlayStack.Instance;
+    }
+
+    // Rest-site callers are sensitive to overlays still being torn down when the selection result arrives.
+    private static async Task WaitForOverlaySettleFramesAsync(int frames)
+    {
+        for (var i = 0; i < frames; i++)
+        {
+            if (NGame.Instance?.IsInsideTree() == true)
+                await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
+            else
+                await Task.Yield();
+        }
     }
 
     private static RefreshableTokenRelicSelectionResult CreateForcedRefreshableFallbackResult(

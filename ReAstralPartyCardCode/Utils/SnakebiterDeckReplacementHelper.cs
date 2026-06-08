@@ -4,15 +4,14 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
+using MegaCrit.Sts2.Core.Models.Characters;
 using MegaCrit.Sts2.Core.Saves;
+using MegaCrit.Sts2.Core.TestSupport;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class SnakebiterDeckReplacementHelper
 {
-    private const string BaseStrikePrefix = "STRIKE_";
-    private const string BaseDefendPrefix = "DEFEND_";
-
     private static readonly string[] CardCollectionMemberNames =
     [
         "Cards",
@@ -39,7 +38,7 @@ internal static class SnakebiterDeckReplacementHelper
         var cards = EventDeckCardHelper.GetRunDeckCards(owner).ToList();
         foreach (var card in cards)
         {
-            var replacementId = GetReplacementCardId(card);
+            var replacementId = GetReplacementCardId(owner, card);
             if (replacementId == ModelId.none)
                 continue;
 
@@ -47,25 +46,23 @@ internal static class SnakebiterDeckReplacementHelper
         }
     }
 
-    public static bool IsBaseStrike(CardModel? card)
+    public static bool IsBaseStrike(Player? owner, CardModel? card)
     {
-        var entry = (card?.CanonicalInstance ?? card)?.Id.Entry ?? string.Empty;
-        return entry.StartsWith(BaseStrikePrefix, StringComparison.Ordinal);
+        return card != null && GetCanonicalCardId(card) == GetBaseStrikeId(owner);
     }
 
-    public static bool IsBaseDefend(CardModel? card)
+    public static bool IsBaseDefend(Player? owner, CardModel? card)
     {
-        var entry = (card?.CanonicalInstance ?? card)?.Id.Entry ?? string.Empty;
-        return entry.StartsWith(BaseDefendPrefix, StringComparison.Ordinal);
+        return card != null && GetCanonicalCardId(card) == GetBaseDefendId(owner);
     }
 
-    private static ModelId GetReplacementCardId(CardModel? card)
+    private static ModelId GetReplacementCardId(Player? owner, CardModel? card)
     {
         if (card == null)
             return ModelId.none;
-        if (IsBaseStrike(card))
+        if (IsBaseStrike(owner, card))
             return ModelDb.GetId<PoisonedStab>();
-        if (IsBaseDefend(card))
+        if (IsBaseDefend(owner, card))
             return ModelDb.GetId<DodgeAndRoll>();
 
         return ModelDb.GetId<Snakebite>();
@@ -164,6 +161,37 @@ internal static class SnakebiterDeckReplacementHelper
             replacement.UpgradeInternal();
             replacement.FinalizeUpgradeInternal();
         }
+    }
+
+    private static ModelId GetBaseStrikeId(Player? owner)
+    {
+        var character = owner?.Character;
+        if (character == null)
+            return ModelId.none;
+        if (TestMode.IsOn && character is Deprived)
+            return ModelDb.GetId<StrikeIronclad>();
+
+        var baseStrike = character.CardPool.AllCards.FirstOrDefault(static card =>
+            card.Rarity == CardRarity.Basic && card.Tags.Contains(CardTag.Strike));
+        return baseStrike?.Id ?? ModelId.none;
+    }
+
+    private static ModelId GetBaseDefendId(Player? owner)
+    {
+        var character = owner?.Character;
+        if (character == null)
+            return ModelId.none;
+        if (TestMode.IsOn && character is Deprived)
+            return ModelDb.GetId<DefendIronclad>();
+
+        var baseDefend = character.CardPool.AllCards.FirstOrDefault(static card =>
+            card.Rarity == CardRarity.Basic && card.Tags.Contains(CardTag.Defend));
+        return baseDefend?.Id ?? ModelId.none;
+    }
+
+    private static ModelId GetCanonicalCardId(CardModel card)
+    {
+        return card.CanonicalInstance?.Id ?? card.Id;
     }
 
     private static object? ReadMemberValue(object source, MemberInfo member)
