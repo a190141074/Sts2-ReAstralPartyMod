@@ -137,6 +137,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private const float PanelMinWidth = 360f;
     private const float PanelCollapsedHeight = 88f;
     private const float TitleBarHeight = 56f;
+    private const float BodyMinVisibleHeight = 180f;
     private const float PanelAspectRatio = DefaultPanelWidth / DefaultPanelHeight;
 
     private static readonly StartingPersonaMode[] StartingPersonaModes =
@@ -168,11 +169,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private OptionButton? _startingPersonaModeOption;
     private OptionButton? _tokenSeriesModeOption;
     private PanelContainer? _shell;
+    private ScrollContainer? _bodyScroll;
     private VBoxContainer? _body;
     private Button? _collapseButton;
     private Label? _footerLabel;
     private Label? _stateLabel;
     private Godot.Timer? _refreshTimer;
+    private Vector2 _displayedExpandedSize = new(DefaultPanelWidth, DefaultPanelHeight);
+    private Vector2 _lastViewportSize = Vector2.Zero;
     private PanelInteractionMode _interactionMode;
     private Vector2 _interactionMouseStart;
     private Vector2 _interactionPositionStart;
@@ -228,6 +232,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     public override void _Process(double delta)
     {
+        HandleViewportSizeChange();
+
         if (_interactionMode != PanelInteractionMode.None)
         {
             if (Input.IsMouseButtonPressed(MouseButton.Left))
@@ -301,6 +307,18 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
         root.AddChild(BuildTitleBar());
 
+        var bodyScroll = new ScrollContainer
+        {
+            Name = "BodyScroll",
+            MouseFilter = MouseFilterEnum.Pass,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill,
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
+            VerticalScrollMode = ScrollContainer.ScrollMode.Auto
+        };
+        root.AddChild(bodyScroll);
+        _bodyScroll = bodyScroll;
+
         var body = new VBoxContainer
         {
             Name = "Body",
@@ -309,7 +327,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             SizeFlagsVertical = SizeFlags.ExpandFill
         };
         body.AddThemeConstantOverride("separation", 10);
-        root.AddChild(body);
+        bodyScroll.AddChild(body);
         _body = body;
 
         body.AddChild(BuildIntroLabel());
@@ -1066,6 +1084,16 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         RefreshLobbySyncState();
     }
 
+    private void HandleViewportSizeChange()
+    {
+        var viewportSize = GetViewportRect().Size;
+        if (viewportSize.IsEqualApprox(_lastViewportSize))
+            return;
+
+        _lastViewportSize = viewportSize;
+        RefreshDisplayedPanelRect();
+    }
+
     private void HandleBodyInput(InputEvent @event)
     {
         switch (@event)
@@ -1190,6 +1218,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
         _interactionMode = PanelInteractionMode.None;
         UpdateCursorShape();
+        RefreshDisplayedPanelRect();
         if (persist)
             PersistPanelState();
     }
@@ -1197,7 +1226,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private void ToggleCollapsed()
     {
         if (!_isCollapsed)
-            _expandedSize = SanitizeExpandedSize(Size);
+            _expandedSize = SanitizeExpandedSize(_displayedExpandedSize);
 
         _isCollapsed = !_isCollapsed;
         ApplyCollapsedState();
@@ -1206,17 +1235,18 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void ApplyCollapsedState()
     {
-        if (_body != null)
-            _body.Visible = !_isCollapsed;
+        if (_bodyScroll != null)
+            _bodyScroll.Visible = !_isCollapsed;
 
         if (_isCollapsed)
         {
             Size = new Vector2(_expandedSize.X, PanelCollapsedHeight);
             GlobalPosition = ClampPositionToViewport(GlobalPosition, Size);
+            _displayedExpandedSize = BuildDisplayedExpandedSize(_expandedSize);
         }
         else
         {
-            ApplyExpandedRect(GlobalPosition, _expandedSize);
+            RefreshDisplayedPanelRect();
         }
 
         RefreshCollapseButtonText();
@@ -1240,7 +1270,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         var state = ReAstralPartyModSettingsManager.LobbyPanelState;
         _isCollapsed = state.IsCollapsed;
         _expandedSize = SanitizeExpandedSize(new Vector2(state.Width, state.Height));
-        var visibleSize = _isCollapsed ? new Vector2(_expandedSize.X, PanelCollapsedHeight) : _expandedSize;
+        _lastViewportSize = GetViewportRect().Size;
+        var visibleSize = _isCollapsed
+            ? new Vector2(_expandedSize.X, PanelCollapsedHeight)
+            : BuildDisplayedExpandedSize(_expandedSize);
+        _displayedExpandedSize = visibleSize;
         GlobalPosition = ClampPositionToViewport(new Vector2(state.PositionX, state.PositionY), visibleSize);
         Size = visibleSize;
         ApplyCollapsedState();
@@ -1248,20 +1282,22 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void PersistPanelState()
     {
-        var persistedSize = _isCollapsed ? _expandedSize : SanitizeExpandedSize(Size);
+        var persistedSize = _expandedSize;
         ReAstralPartyModSettingsManager.UpdateLobbyPanelState(_isCollapsed, GlobalPosition, persistedSize);
     }
 
     private void ApplyExpandedRect(Vector2 position, Vector2 size)
     {
         _expandedSize = SanitizeExpandedSize(size);
-        Size = _expandedSize;
+        _displayedExpandedSize = BuildDisplayedExpandedSize(_expandedSize);
+        Size = _displayedExpandedSize;
         GlobalPosition = ClampPositionToViewport(position, Size);
+        RefreshBodyScrollLayout();
     }
 
     private Vector2 SanitizeExpandedSize(Vector2 size)
     {
-        var minHeight = PanelMinWidth / PanelAspectRatio;
+        var minHeight = Math.Max(PanelMinWidth / PanelAspectRatio, PanelCollapsedHeight + BodyMinVisibleHeight);
         var maxWidth = GetMaxExpandedWidthForCurrentViewport(PanelInteractionMode.None);
         var width = Mathf.Clamp(size.X, PanelMinWidth, Math.Max(PanelMinWidth, maxWidth));
         var height = width / PanelAspectRatio;
@@ -1272,6 +1308,44 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         }
 
         return new Vector2(width, height);
+    }
+
+    private void RefreshDisplayedPanelRect()
+    {
+        if (_isCollapsed)
+        {
+            Size = new Vector2(_expandedSize.X, PanelCollapsedHeight);
+            GlobalPosition = ClampPositionToViewport(GlobalPosition, Size);
+            return;
+        }
+
+        var displayedSize = BuildDisplayedExpandedSize(_expandedSize);
+        _displayedExpandedSize = displayedSize;
+        Size = displayedSize;
+        GlobalPosition = ClampPositionToViewport(GlobalPosition, Size);
+        RefreshBodyScrollLayout();
+    }
+
+    private Vector2 BuildDisplayedExpandedSize(Vector2 persistedExpandedSize)
+    {
+        var sanitizedExpanded = SanitizeExpandedSize(persistedExpandedSize);
+        var viewportHeight = GetViewportRect().Size.Y;
+        var maxVisibleHeight = Math.Max(
+            PanelCollapsedHeight,
+            viewportHeight - (PanelViewportMargin * 2f));
+        var displayedHeight = Math.Min(sanitizedExpanded.Y, maxVisibleHeight);
+        return new Vector2(sanitizedExpanded.X, displayedHeight);
+    }
+
+    private void RefreshBodyScrollLayout()
+    {
+        if (_bodyScroll == null)
+            return;
+
+        var shellContentHeight = Math.Max(0f, Size.Y - 32f);
+        var bodyHeight = Math.Max(0f, shellContentHeight - TitleBarHeight - 12f);
+        _bodyScroll.CustomMinimumSize = new Vector2(0f, Math.Max(0f, bodyHeight));
+        _bodyScroll.SizeFlagsVertical = SizeFlags.ExpandFill;
     }
 
     private float GetMaxExpandedWidthForCurrentViewport(PanelInteractionMode mode)
