@@ -407,8 +407,18 @@ internal static class StartingPersonaNeowReadyFlow
         try
         {
             SetInitialEventStateMethod.Invoke(neow, [false]);
+            var rebuiltOptionCount = neow.CurrentOptions?.Count ?? 0;
+            var cachedOptionCount = state.OriginalOptions.Count;
+            if (rebuiltOptionCount < cachedOptionCount)
+            {
+                MainFile.Logger.Warn(
+                    $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial option page produced fewer options than the cached page; falling back to cached options | runKey={state.RunKey} reason={reason} rebuilt={rebuiltOptionCount} cached={cachedOptionCount}.");
+                RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached_after_short_rebuild");
+                return;
+            }
+
             MainFile.Logger.Info(
-                $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial option page from source event state | runKey={state.RunKey} reason={reason}.");
+                $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial option page from source event state | runKey={state.RunKey} reason={reason} optionCount={rebuiltOptionCount}.");
         }
         catch (Exception ex)
         {
