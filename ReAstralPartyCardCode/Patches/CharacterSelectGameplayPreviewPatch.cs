@@ -179,6 +179,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private readonly Dictionary<Control, IReadOnlyList<IHoverTip>> _hoverTipsByControl = [];
     private CheckButton? _startingInitialPointToggle;
     private CheckButton? _startingPersonaSelectionToggle;
+    private CheckButton? _dreamModeToggle;
     private CheckButton? _dreamSeriesEventsToggle;
     private CheckButton? _enigmaticSeriesEventsToggle;
     private CheckButton? _neowExtraOptionToggle;
@@ -361,6 +362,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description"),
             out _startingPersonaSelectionToggle,
             OnEnableStartingPersonaSelectionToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_mode.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_mode.description"),
+            out _dreamModeToggle,
+            OnEnableDreamModeToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.description"),
@@ -824,6 +830,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _startingPersonaSelectionToggle.Text = snapshot.EnableStartingPersonaSelection ? "ON" : "OFF";
             }
 
+            if (_dreamModeToggle != null)
+            {
+                // Dream Mode is intentionally locked off because revisit / room restore is not stable yet.
+                _dreamModeToggle.ButtonPressed = false;
+                _dreamModeToggle.Disabled = true;
+                _dreamModeToggle.Text = "OFF";
+            }
+
             if (_dreamSeriesEventsToggle != null)
             {
                 _dreamSeriesEventsToggle.ButtonPressed = snapshot.EnableDreamSeriesEvents;
@@ -963,7 +977,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         _syncErrorShown = false;
         _hasReceivedSnapshotForCurrentSession = true;
         CallDeferred(nameof(ApplySnapshotDeferred), Variant.From(snapshot.EnableStartingInitialPoint),
-            Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableDreamSeriesEvents),
+            Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableDreamMode), Variant.From(snapshot.EnableDreamSeriesEvents),
             Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableNeowExtraOption),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
             Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
@@ -971,6 +985,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     }
 
     private void ApplySnapshotDeferred(bool enableStartingInitialPoint, bool enableStartingPersonaSelection,
+        bool enableDreamMode,
         bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableNeowExtraOption,
         int neowExtraOptionSelectionMode,
         bool enableAllPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
@@ -979,6 +994,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         {
             EnableStartingInitialPoint = enableStartingInitialPoint,
             EnableStartingPersonaSelection = enableStartingPersonaSelection,
+            EnableDreamMode = enableDreamMode,
             EnableDreamSeriesEvents = enableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = enableEnigmaticSeriesEvents,
             EnableNeowExtraOption = enableNeowExtraOption,
@@ -1030,6 +1046,16 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableDreamSeriesEvents = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableDreamModeToggled(bool value)
+    {
+        if (_suppressUiEvents)
+            return;
+
+        // Dream Mode is locked and must stay disabled even if an old UI state tries to toggle it.
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableDreamMode = false);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

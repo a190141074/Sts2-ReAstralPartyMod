@@ -34,5 +34,6 @@ public sealed class EnigmaticSynthesisXpScrollRestSitePatch : IPatchMethod
         player?.GetRelic<EnigmaticSynthesisXpScroll>()?.OnRestSiteOptionResolved(option);
         player?.GetRelic<EnigmaticSynthesisHeavenScroll>()?.OnRestSiteOptionResolved(option is SmithRestSiteOption);
         player?.GetRelic<EnigmaticSynthesisEnchanterPearl>()?.OnRestSiteOptionResolved(option is SmithRestSiteOption);
+        player?.GetRelic<MoonPropFocusedConvergence>()?.OnRestSiteOptionResolved(option is SmithRestSiteOption);
     }
 }

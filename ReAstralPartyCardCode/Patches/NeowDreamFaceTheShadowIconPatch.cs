@@ -1,5 +1,6 @@
 using Godot;
 using MegaCrit.Sts2.Core.Nodes.Events;
+using ReAstralPartyMod.ReAstralPartyCardCode.Ancient;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;

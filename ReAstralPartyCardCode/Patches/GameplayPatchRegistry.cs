@@ -30,6 +30,7 @@ using STS2RitsuLib.Combat.HandSize;
 using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Models;
+using ReAstralPartyMod.ReAstralPartyCardCode.DreamMap;
 using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -297,11 +298,20 @@ internal static class GameplayStaticPatchCatalog
                 typeof(RelicGrabBagPopulateSeriesFilterPatch),
                 false,
                 "Gameplay patch: remove unopened special token series relics from random relic grab bags at run setup",
-                [typeof(Player), typeof(MegaCrit.Sts2.Core.Random.Rng)])
+                [typeof(Player), typeof(MegaCrit.Sts2.Core.Random.Rng)]),
+            new ModPatchInfo(
+                "run_history_lucid_dream_modifier_filter_patch",
+                typeof(RunHistoryUtilities),
+                nameof(RunHistoryUtilities.CreateRunHistoryEntry),
+                typeof(RunHistoryLucidDreamModifierFilterPatch),
+                false,
+                "Gameplay patch: keep Lucid Dream runtime modifiers out of run-history modifier displays",
+                [typeof(SerializableRun), typeof(bool), typeof(bool), typeof(MegaCrit.Sts2.Core.Platform.PlatformType)])
         ]);
 
         patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
+        patcher.RegisterPatch<CreatureHealMoonPropCorpsebloomPatch>();
         patcher.RegisterPatch<CreatureHealMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureHealEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
@@ -317,8 +327,15 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<EnigmaticSynthesisXpScrollRestSitePatch>();
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
         patcher.RegisterPatch<PlayerGainGoldEnigmaticSynthesisCursedScrollPatch>();
+        patcher.RegisterPatch<MoonPropShopCreateInventoryPatch>();
+        patcher.RegisterPatch<MoonPropShopInitializeInventoryPatch>();
+        patcher.RegisterPatch<MoonPropShopStackPurchasePatch>();
         patcher.RegisterPatch<PunitiveJudgmentHandEntryPatch>();
         patcher.RegisterPatch<StokovStarterRelicUpgradePatch>();
+        patcher.RegisterPatch<DreamModeTravelabilityPatch>();
+        patcher.RegisterPatch<DreamModeTravelPathPatch>();
+        patcher.RegisterPatch<DreamModeDuplicateVisitedMapCoordPatch>();
+        patcher.RegisterPatch<DreamModeEnterMapCoordPatch>();
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)

@@ -35,9 +35,10 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
         CautiousJellyfish = 8,
         FaceDeathWithComposure = 9,
         Wildness = 10,
-        PitchBlackImpulse = 11,
-        BubblePotionOfDreams = 12,
-        HarmlessWhisper = 13
+        WildnessPhantom = 11,
+        PitchBlackImpulse = 12,
+        BubblePotionOfDreams = 13,
+        HarmlessWhisper = 14
     }
 
     private sealed record LucidDreamEntry(
@@ -56,7 +57,7 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
     private sealed class LucidDreamToggleView
     {
         public required Button Button { get; init; }
-        public required Label CheckLabel { get; init; }
+        public required TextureRect CheckOverlay { get; init; }
         public required LucidDreamEntry Entry { get; init; }
     }
 
@@ -66,14 +67,14 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
     private const float BasePanelViewportMargin = 36f;
     private const float BaseIconSize = 51f;
     private const float BaseIconButtonWidth = 60f;
-    private const float BaseIconButtonHeight = 82f;
+    private const float BaseIconButtonHeight = 60f;
     private const float BasePanelSpacing = 10f;
     private const float BaseTitleRowSpacing = 8f;
     private const float BaseGroupContentSpacing = 8f;
     private const float BaseIconRowSpacing = 10f;
     private const float BaseIconContentSpacing = 2f;
-    private const float BaseShellMarginHorizontal = 18f;
-    private const float BaseShellMarginVertical = 10f;
+    private const float BaseShellMarginHorizontal = 6f;
+    private const float BaseShellMarginVertical = 6f;
     private const float BaseShadowOffsetX = 8f;
     private const float BaseShadowOffsetY = 10f;
     private const float BaseIconButtonContentMargin = 2f;
@@ -96,6 +97,8 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
     private const float PanelLeftShift = (IconButtonWidth + IconRowSpacing) * 2f;
     private const float TitleFontSize = 18f;
     private const float UnfinishedFontSize = 15f;
+    private const string ChoiceOverlayTexturePath =
+        "res://ReAstralPartyMod/images/ui/dream_lucid/dream_lucid_choice.png";
 
     private static readonly LucidDreamEntry[] BenevolenceEntries =
     [
@@ -173,6 +176,12 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
             "res://ReAstralPartyMod/images/ui/dream_lucid/dream_lucid_wildness.jpg",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.title",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.description"),
+        new(
+            LucidDreamPanelGroup.Chaos,
+            LucidDreamSettingKey.WildnessPhantom,
+            "res://ReAstralPartyMod/images/ui/dream_lucid/dream_lucid_wildness.jpg",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness_phantom.title",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness_phantom.description"),
         new(
             LucidDreamPanelGroup.Chaos,
             LucidDreamSettingKey.PitchBlackImpulse,
@@ -391,6 +400,14 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
         button.AddThemeStyleboxOverride("pressed", CreateIconButtonStyle(true));
         button.AddThemeStyleboxOverride("disabled", CreateIconButtonStyle(false));
 
+        var overlayContainer = new Control
+        {
+            MouseFilter = MouseFilterEnum.Ignore,
+            SizeFlagsHorizontal = SizeFlags.ExpandFill,
+            SizeFlagsVertical = SizeFlags.ExpandFill
+        };
+        button.AddChild(overlayContainer);
+
         var content = new VBoxContainer
         {
             MouseFilter = MouseFilterEnum.Ignore,
@@ -399,18 +416,20 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
             SizeFlagsVertical = SizeFlags.ExpandFill
         };
         content.AddThemeConstantOverride("separation", (int)MathF.Round(IconContentSpacing));
-        button.AddChild(content);
+        overlayContainer.AddChild(content);
 
-        var checkLabel = new Label
+        var checkOverlay = new TextureRect
         {
-            Text = "✓",
-            HorizontalAlignment = HorizontalAlignment.Center,
+            Texture = ResourceLoader.Load<Texture2D>(ChoiceOverlayTexturePath),
+            CustomMinimumSize = new Vector2(IconSize, IconSize),
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
             MouseFilter = MouseFilterEnum.Ignore,
-            Visible = false
+            Visible = false,
+            Position = new Vector2((IconButtonWidth - IconSize) * 0.5f, (IconButtonHeight - IconSize) * 0.5f),
+            Size = new Vector2(IconSize, IconSize)
         };
-        checkLabel.AddThemeColorOverride("font_color", new Color(0.35f, 0.98f, 0.58f, 1f));
-        checkLabel.AddThemeFontSizeOverride("font_size", 18);
-        content.AddChild(checkLabel);
+        overlayContainer.AddChild(checkOverlay);
 
         var iconTexture = new TextureRect
         {
@@ -425,7 +444,7 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
         var view = new LucidDreamToggleView
         {
             Button = button,
-            CheckLabel = checkLabel,
+            CheckOverlay = checkOverlay,
             Entry = entry
         };
         _toggleViews.Add(view);
@@ -487,7 +506,7 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
         foreach (var toggleView in _toggleViews)
         {
             var isEnabled = GetSettingValue(snapshot, toggleView.Entry.Key);
-            toggleView.CheckLabel.Visible = isEnabled;
+            toggleView.CheckOverlay.Visible = isEnabled;
             toggleView.Button.Modulate = isEditable
                 ? Colors.White
                 : new Color(1f, 1f, 1f, 0.85f);
@@ -640,6 +659,7 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
             LucidDreamSettingKey.CautiousJellyfish => snapshot.EnableLucidDreamCautiousJellyfishMalice,
             LucidDreamSettingKey.FaceDeathWithComposure => snapshot.EnableLucidDreamFaceDeathWithComposure,
             LucidDreamSettingKey.Wildness => snapshot.EnableLucidDreamWildness,
+            LucidDreamSettingKey.WildnessPhantom => snapshot.EnableLucidDreamWildnessPhantom,
             LucidDreamSettingKey.PitchBlackImpulse => snapshot.EnableLucidDreamPitchBlackImpulse,
             LucidDreamSettingKey.BubblePotionOfDreams => snapshot.EnableLucidDreamBubblePotionOfDreams,
             LucidDreamSettingKey.HarmlessWhisper => snapshot.EnableLucidDreamHarmlessWhisper,
@@ -684,6 +704,9 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
             case LucidDreamSettingKey.Wildness:
                 snapshot.EnableLucidDreamWildness = value;
                 break;
+            case LucidDreamSettingKey.WildnessPhantom:
+                snapshot.EnableLucidDreamWildnessPhantom = value;
+                break;
             case LucidDreamSettingKey.PitchBlackImpulse:
                 snapshot.EnableLucidDreamPitchBlackImpulse = value;
                 break;
@@ -705,16 +728,16 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
     {
         return new StyleBoxFlat
         {
-            BgColor = new Color(0.06f, 0.09f, 0.12f, 0.95f),
-            BorderColor = new Color(0.4f, 0.67f, 0.94f, 0.78f),
+            BgColor = new Color(27f / 255f, 33f / 255f, 33f / 255f, 0.95f),
+            BorderColor = new Color(76f / 255f, 95f / 255f, 130f / 255f, 0.78f),
             BorderWidthLeft = 2,
             BorderWidthTop = 2,
             BorderWidthRight = 2,
             BorderWidthBottom = 2,
-            CornerRadiusTopLeft = 6,
-            CornerRadiusTopRight = 6,
-            CornerRadiusBottomLeft = 6,
-            CornerRadiusBottomRight = 6,
+            CornerRadiusTopLeft = 0,
+            CornerRadiusTopRight = 0,
+            CornerRadiusBottomLeft = 0,
+            CornerRadiusBottomRight = 0,
             ContentMarginLeft = ShellMarginHorizontal,
             ContentMarginTop = ShellMarginVertical,
             ContentMarginRight = ShellMarginHorizontal,

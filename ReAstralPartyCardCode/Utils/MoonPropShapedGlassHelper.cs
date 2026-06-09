@@ -9,7 +9,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class MoonPropShapedGlassHelper
 {
-    private const decimal CurrentHpCapRatio = 0.5m;
+    private const decimal BaseCurrentHpCapRatio = 0.5m;
     private static readonly AsyncLocal<int> ClampDepth = new();
 
     public static bool HasActiveCap(Creature? creature)
@@ -17,9 +17,21 @@ internal static class MoonPropShapedGlassHelper
         return creature?.Player?.GetRelic<MoonPropShapedGlass>() != null;
     }
 
+    public static decimal GetCurrentHpCapRatio(MoonPropShapedGlass? relic)
+    {
+        var stacks = Math.Max(relic?.GetStacks() ?? 1, 1);
+        return BaseCurrentHpCapRatio * MoonPropFormulaHelper.GetHalfDecayRatio(Math.Max(stacks - 1, 0));
+    }
+
+    public static decimal GetDamageBonusMultiplier(MoonPropShapedGlass? relic)
+    {
+        var stacks = Math.Max(relic?.GetStacks() ?? 1, 1);
+        return MoonPropFormulaHelper.GetRepeatedMultiplier(2m, Math.Max(stacks - 1, 0));
+    }
+
     public static decimal GetCurrentHpCap(Creature creature)
     {
-        return creature.MaxHp * CurrentHpCapRatio;
+        return creature.MaxHp * GetCurrentHpCapRatio(creature.Player?.GetRelic<MoonPropShapedGlass>());
     }
 
     public static async Task TryClampCurrentHpAsync(Creature? creature)

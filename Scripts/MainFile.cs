@@ -2,7 +2,9 @@ using System.Reflection;
 using System.Security.Cryptography;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
+using ReAstralPartyMod.ReAstralPartyCardCode.Ancient;
 using ReAstralPartyMod.ReAstralPartyCardCode.Events;
+using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -49,6 +51,7 @@ public class MainFile
         NeowOptionInjectionHelper.Register();
         GameplayPatchRegistry.RegisterAndApply();
         AstralTelemetry.Initialize();
+        LucidDreamMaliceModifierInstaller.RegisterLifecycleBridgeIfNeeded();
         AstralChoiceProtocol.LogStartupDiagnostics();
         AstralNetPhaseGuard.LogStartupDiagnostics();
         RewardContextPolicy.LogStartupDiagnostics();

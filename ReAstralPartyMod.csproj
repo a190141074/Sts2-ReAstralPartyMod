@@ -529,10 +529,15 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_tasty_candy.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_fragile_crown.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_fragile_crown.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\moon_prop_corpsebloom.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_hellfire_tincture.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_hellfire_tincture.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\moon_prop_focused_convergence.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\moon_prop_light_flux_pauldron.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\moon_prop_mercurial_rachis.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_shaped_glass.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_shaped_glass.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\moon_prop_stone_flux_pauldron.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_living_folio.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_z3000_weapon_frame.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_kawaii_angel.png"/>
@@ -547,6 +552,8 @@
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\enigmatic_synthesis_formula.png"/>
+		<Content Include="ReAstralPartyMod\images\ui\dream_lucid\dream_lucid_choice.png"/>
+		<Content Include="ReAstralPartyMod\images\ui\dream_lucid\dream_lucid_choice.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png.import"/>
 		<Content Include="ReAstralPartyMod\localization\eng\ancients.json" />

@@ -75,6 +75,8 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableStartingPersonaSelection { get; set; } = true;
 
+    public bool EnableDreamMode { get; set; }
+
     public bool EnableDreamSeriesEvents { get; set; } = true;
 
     public bool EnableEnigmaticSeriesEvents { get; set; } = true;
@@ -157,6 +159,8 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableStartingInitialPoint => ReadRuntime(settings => settings.EnableStartingInitialPoint);
 
     public static bool EnableStartingPersonaSelection => ReadRuntime(settings => settings.EnableStartingPersonaSelection);
+
+    public static bool EnableDreamMode => ReadRuntime(settings => settings.EnableDreamMode);
 
     public static bool EnableDreamSeriesEvents => ReadRuntime(settings => settings.EnableDreamSeriesEvents);
 
@@ -301,6 +305,14 @@ public static partial class ReAstralPartyModSettingsManager
             return true;
 
         return EnableEnigmaticSeriesEvents;
+    }
+
+    public static bool GetEnableDreamMode(IRunState? runState)
+    {
+        // Dream Mode is intentionally locked off for now.
+        // Room revisit / restore semantics are still unstable and can lead to black screens,
+        // so every runtime read is forced to false until the feature is reworked safely.
+        return false;
     }
 
     public static bool GetEnableNeowExtraOption(IRunState? runState)
@@ -592,6 +604,23 @@ public static partial class ReAstralPartyModSettingsManager
         return false;
     }
 
+    public static bool GetEnableLucidDreamWildnessPhantom(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamWildnessPhantom;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamWildnessPhantom;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamWildnessPhantom;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
     public static bool GetEnableLucidDreamPitchBlackImpulse(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
@@ -710,6 +739,7 @@ public static partial class ReAstralPartyModSettingsManager
         {
             return snapshot.EnableLucidDreamFaceDeathWithComposure
                    || snapshot.EnableLucidDreamWildness
+                   || snapshot.EnableLucidDreamWildnessPhantom
                    || snapshot.EnableLucidDreamPitchBlackImpulse
                    || snapshot.EnableLucidDreamBubblePotionOfDreams
                    || snapshot.EnableLucidDreamHarmlessWhisper;
@@ -719,6 +749,7 @@ public static partial class ReAstralPartyModSettingsManager
         {
             return lobbySnapshot.EnableLucidDreamFaceDeathWithComposure
                    || lobbySnapshot.EnableLucidDreamWildness
+                   || lobbySnapshot.EnableLucidDreamWildnessPhantom
                    || lobbySnapshot.EnableLucidDreamPitchBlackImpulse
                    || lobbySnapshot.EnableLucidDreamBubblePotionOfDreams
                    || lobbySnapshot.EnableLucidDreamHarmlessWhisper;
@@ -728,6 +759,7 @@ public static partial class ReAstralPartyModSettingsManager
         {
             return localFallback.EnableLucidDreamFaceDeathWithComposure
                    || localFallback.EnableLucidDreamWildness
+                   || localFallback.EnableLucidDreamWildnessPhantom
                    || localFallback.EnableLucidDreamPitchBlackImpulse
                    || localFallback.EnableLucidDreamBubblePotionOfDreams
                    || localFallback.EnableLucidDreamHarmlessWhisper;
@@ -997,6 +1029,20 @@ public static partial class ReAstralPartyModSettingsManager
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label",
                     value);
+            });
+
+        var enableDreamMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => false,
+            (settings, value) =>
+            {
+                // Dream Mode is temporarily locked because the current revisit / restore flow is unstable.
+                settings.EnableDreamMode = false;
+                ApplyRuntimeSettings(settings, "enable_dream_mode");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_mode.label",
+                    false);
             });
 
         var enableDreamSeriesEvents = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
@@ -1306,6 +1352,12 @@ public static partial class ReAstralPartyModSettingsManager
                     enableStartingPersonaSelection,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description",
                         "If disabled, the run skips the starting persona selection entirely and no player starts with a persona relic."))
+                .AddToggle(
+                    "enable_dream_mode",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_mode.label", "Enable Dream Mode"),
+                    enableDreamMode,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_mode.description",
+                        "Rebuild the map into a revisit-friendly dream graph with bidirectional traversal and revisit semantics."))
                 .AddToggle(
                     "enable_dream_series_events",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label", "Enable Dream Series Events"),
@@ -1783,7 +1835,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_mode={snapshot.EnableDreamMode}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -2089,6 +2141,8 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableStartingPersonaSelection { get; init; } = true;
 
+        public bool EnableDreamMode { get; init; }
+
         public bool EnableDreamSeriesEvents { get; init; } = true;
 
         public bool EnableEnigmaticSeriesEvents { get; init; } = true;
@@ -2156,6 +2210,8 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableLucidDreamWildness { get; init; }
 
+        public bool EnableLucidDreamWildnessPhantom { get; init; }
+
         public bool EnableLucidDreamPitchBlackImpulse { get; init; }
 
         public bool EnableLucidDreamBubblePotionOfDreams { get; init; }
@@ -2172,6 +2228,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableExtremeMode = settings.EnableExtremeMode,
                 EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
                 EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
+                EnableDreamMode = settings.EnableDreamMode,
                 EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
                 EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
                 EnableNeowExtraOption = settings.EnableNeowExtraOption,
@@ -2205,6 +2262,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableLucidDreamCautiousJellyfishMalice = false,
                 EnableLucidDreamFaceDeathWithComposure = false,
                 EnableLucidDreamWildness = false,
+                EnableLucidDreamWildnessPhantom = false,
                 EnableLucidDreamPitchBlackImpulse = false,
                 EnableLucidDreamBubblePotionOfDreams = false,
                 EnableLucidDreamHarmlessWhisper = false,

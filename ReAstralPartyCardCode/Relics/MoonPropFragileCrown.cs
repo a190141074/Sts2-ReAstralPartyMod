@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Gold;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
@@ -17,21 +18,24 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(SharedRelicPool))]
-public class MoonPropFragileCrown : AstralPartyRelicModel
+public class MoonPropFragileCrown : MoonPropStackableRelicBase
 {
     private const int TriggerPermille = 300;
     private const decimal Act1StarLight = 2m;
     private const decimal Act2StarLight = 4m;
     private const decimal Act3PlusStarLight = 8m;
-    private const int DiscountedMerchantCost = 100;
 
     [SavedProperty] public int AstralParty_MoonPropFragileCrownRollCounter { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Shop;
 
-    public override int MerchantCost => DiscountedMerchantCost;
-
     public override bool ShouldReceiveCombatHooks => true;
+
+    protected override IEnumerable<DynamicVar> CanonicalVars =>
+    [
+        new StringVar("ActRewards", GetActRewardsText()),
+        new StringVar("GoldLossPercent", GetGoldLossPercentText())
+    ];
 
     public override async Task AfterDamageGiven(
         PlayerChoiceContext choiceContext,
@@ -62,7 +66,7 @@ public class MoonPropFragileCrown : AstralPartyRelicModel
         Flash();
         await PowerCmd.Apply<StarLightPower>(
             Owner.Creature,
-            GetStarLightAmountForCurrentAct(),
+            GetStarLightAmountForCurrentAct() * GetStacks(),
             Owner.Creature,
             cardSource,
             false);
@@ -86,7 +90,7 @@ public class MoonPropFragileCrown : AstralPartyRelicModel
         if (missingHpBeforeHit <= 0m || Owner.Gold <= 0)
             return;
 
-        var goldToLose = Math.Min(missingHpBeforeHit, (decimal)Owner.Gold);
+        var goldToLose = Math.Min(missingHpBeforeHit * GetStacks(), (decimal)Owner.Gold);
         if (goldToLose <= 0m)
             return;
 
@@ -114,5 +118,22 @@ public class MoonPropFragileCrown : AstralPartyRelicModel
             1 => Act2StarLight,
             _ => Act3PlusStarLight
         };
+    }
+
+    private string GetActRewardsText()
+    {
+        var stacks = GetStacks();
+        return $"{FormatValue(Act1StarLight * stacks)}/{FormatValue(Act2StarLight * stacks)}/{FormatValue(Act3PlusStarLight * stacks)}";
+    }
+
+    private string GetGoldLossPercentText()
+    {
+        return FormatPercent(GetStacks());
+    }
+
+    protected override void RefreshDynamicState()
+    {
+        SetDynamicString("ActRewards", GetActRewardsText());
+        SetDynamicString("GoldLossPercent", GetGoldLossPercentText());
     }
 }

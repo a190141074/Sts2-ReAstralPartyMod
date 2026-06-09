@@ -28,6 +28,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 internal static class LucidDreamMaliceRuntimeHelper
 {
     private sealed record WeakEncounterMonsterCandidate(MonsterModel Monster, string StableId);
+    private sealed record DreamModeVisitRecord(int Col, int Row, int Count);
     private sealed class PitchBlackImpulseSequenceState
     {
         public HashSet<ulong> HitTargetIds { get; } = [];
@@ -40,6 +41,7 @@ internal static class LucidDreamMaliceRuntimeHelper
     private static readonly ConditionalWeakTable<IRunState, Dictionary<string, PitchBlackImpulseSequenceState>>
         PitchBlackImpulseSequences = new();
     private static readonly ConcurrentDictionary<Player, decimal> BubblePotionSuppressedHealByPlayer = new();
+    private static readonly HashSet<(int FromCol, int FromRow, int ToCol, int ToRow)> DreamModeDirectedEdges = [];
     private static readonly AccessTools.FieldRef<NMapScreen, RunState?> MapScreenRunStateField =
         AccessTools.FieldRefAccess<NMapScreen, RunState?>("_runState");
     private static int _pitchBlackImpulseSyntheticDepth;
@@ -60,10 +62,218 @@ internal static class LucidDreamMaliceRuntimeHelper
             return amount;
 
         var modifier = GetModifier(target);
+        if (modifier?.EnableDreamMode == true && modifier.IsInDreamModeRevisitedRestSite)
+            return 0m;
+
         if (modifier?.EnableSevereWoundOneMalice != true)
             return amount;
 
         return Math.Max(0m, amount * 0.5m);
+    }
+
+    public static void InitializeDreamModeState(LucidDreamMaliceModifier modifier, RunState? runState)
+    {
+        if (!modifier.EnableDreamMode || runState == null)
+            return;
+
+        if (modifier.DreamPathCols.Count == 0 || modifier.DreamPathRows.Count == 0)
+        {
+            modifier.DreamPathCols = runState.VisitedMapCoords.Select(static coord => coord.col).ToList();
+            modifier.DreamPathRows = runState.VisitedMapCoords.Select(static coord => coord.row).ToList();
+        }
+
+        if (modifier.DreamVisitCols.Count == 0 || modifier.DreamVisitRows.Count == 0 || modifier.DreamVisitCounts.Count == 0)
+        {
+            var visits = runState.VisitedMapCoords
+                .GroupBy(static coord => (coord.col, coord.row))
+                .Select(static group => new DreamModeVisitRecord(group.Key.col, group.Key.row, group.Count()))
+                .OrderBy(static entry => entry.Row)
+                .ThenBy(static entry => entry.Col)
+                .ToList();
+            modifier.DreamVisitCols = visits.Select(static entry => entry.Col).ToList();
+            modifier.DreamVisitRows = visits.Select(static entry => entry.Row).ToList();
+            modifier.DreamVisitCounts = visits.Select(static entry => entry.Count).ToList();
+        }
+    }
+
+    public static bool IsDreamModeEnabled(IRunState? runState)
+    {
+        return ReAstralPartyModSettingsManager.GetEnableDreamMode(runState);
+    }
+
+    public static bool IsDreamModeEnabled(Creature? creature)
+    {
+        return IsDreamModeEnabled(creature?.CombatState?.RunState);
+    }
+
+    public static bool ApplyDreamModeToMap(RunState? runState, ActMap? map)
+    {
+        if (runState == null || map == null)
+            return false;
+
+        var modifier = GetModifier(runState);
+        if (modifier?.EnableDreamMode != true)
+            return false;
+
+        var points = map.GetAllMapPoints().ToList();
+        if (points.Count == 0)
+            return false;
+
+        DreamModeDirectedEdges.Clear();
+
+        var originalEdges = new List<(MapPoint From, MapPoint To)>();
+        foreach (var point in points)
+        {
+            foreach (var child in point.Children.ToList())
+                originalEdges.Add((point, child));
+        }
+
+        foreach (var point in points)
+        {
+            foreach (var child in point.Children.ToList())
+                point.RemoveChildPoint(child);
+        }
+
+        var allByCoord = points.ToDictionary(static point => (point.coord.col, point.coord.row));
+        var rewired = new HashSet<(MapPoint From, MapPoint To)>();
+
+        void AddEdge(MapPoint from, MapPoint to)
+        {
+            if (ReferenceEquals(from, to))
+                return;
+            if (!rewired.Add((from, to)))
+                return;
+
+            from.AddChildPoint(to);
+            DreamModeDirectedEdges.Add((from.coord.col, from.coord.row, to.coord.col, to.coord.row));
+        }
+
+        foreach (var point in points)
+        {
+            var candidates = points
+                .Where(other => !ReferenceEquals(other, point) && IsDreamModeLinkCandidate(point, other))
+                .OrderBy(other => GetDreamModeDistanceSquared(point, other))
+                .ThenBy(other => other.coord.row)
+                .ThenBy(other => other.coord.col)
+                .Take(3)
+                .ToList();
+
+            foreach (var candidate in PruneDreamModeCollinearEdges(point, candidates))
+            {
+                AddEdge(point, candidate);
+                AddEdge(candidate, point);
+            }
+        }
+
+        foreach (var (from, to) in originalEdges)
+        {
+            if (HasDreamModeUndirectedNeighbor(from, to))
+                continue;
+
+            AddEdge(from, to);
+            AddEdge(to, from);
+        }
+
+        if (map.StartingMapPoint != null)
+        {
+            foreach (var point in points.Where(point => point.coord.row == 0 && !ReferenceEquals(point, map.StartingMapPoint)))
+            {
+                AddEdge(map.StartingMapPoint, point);
+                AddEdge(point, map.StartingMapPoint);
+            }
+        }
+
+        if (map.BossMapPoint != null)
+        {
+            foreach (var point in points.Where(point => point.coord.row == map.GetRowCount() - 1 && !ReferenceEquals(point, map.BossMapPoint)))
+            {
+                AddEdge(point, map.BossMapPoint);
+                AddEdge(map.BossMapPoint, point);
+            }
+        }
+
+        RefreshMapScreenPointsIfNeeded(runState, map);
+        return true;
+    }
+
+    public static IEnumerable<MapPoint> GetDreamModeNeighbors(RunState? runState, MapPoint point)
+    {
+        if (runState == null || !IsDreamModeEnabled(runState))
+            return point.Children;
+
+        return point.parents.Concat(point.Children).Distinct();
+    }
+
+    public static bool HasVisitedCoord(LucidDreamMaliceModifier? modifier, MapCoord coord)
+    {
+        if (modifier == null)
+            return false;
+
+        for (var i = 0; i < modifier.DreamVisitCols.Count && i < modifier.DreamVisitRows.Count && i < modifier.DreamVisitCounts.Count; i++)
+        {
+            if (modifier.DreamVisitCols[i] == coord.col && modifier.DreamVisitRows[i] == coord.row && modifier.DreamVisitCounts[i] > 0)
+                return true;
+        }
+
+        return false;
+    }
+
+    public static int GetVisitCount(LucidDreamMaliceModifier? modifier, MapCoord coord)
+    {
+        if (modifier == null)
+            return 0;
+
+        for (var i = 0; i < modifier.DreamVisitCols.Count && i < modifier.DreamVisitRows.Count && i < modifier.DreamVisitCounts.Count; i++)
+        {
+            if (modifier.DreamVisitCols[i] == coord.col && modifier.DreamVisitRows[i] == coord.row)
+                return modifier.DreamVisitCounts[i];
+        }
+
+        return 0;
+    }
+
+    public static void RegisterDreamVisit(LucidDreamMaliceModifier modifier, MapCoord coord)
+    {
+        modifier.DreamPathCols.Add(coord.col);
+        modifier.DreamPathRows.Add(coord.row);
+
+        for (var i = 0; i < modifier.DreamVisitCols.Count && i < modifier.DreamVisitRows.Count && i < modifier.DreamVisitCounts.Count; i++)
+        {
+            if (modifier.DreamVisitCols[i] == coord.col && modifier.DreamVisitRows[i] == coord.row)
+            {
+                modifier.DreamVisitCounts[i]++;
+                return;
+            }
+        }
+
+        modifier.DreamVisitCols.Add(coord.col);
+        modifier.DreamVisitRows.Add(coord.row);
+        modifier.DreamVisitCounts.Add(1);
+    }
+
+    public static void SetDreamModeRevisitedRestSite(LucidDreamMaliceModifier? modifier, bool value)
+    {
+        if (modifier == null)
+            return;
+
+        modifier.IsInDreamModeRevisitedRestSite = value;
+    }
+
+    public static bool ShouldSkipRoomContentOnDreamModeRevisit(MapPoint? point)
+    {
+        return point != null && point.PointType is not (MapPointType.Shop or MapPointType.RestSite or MapPointType.Boss);
+    }
+
+    public static bool TryResolveTravelPathTicks(
+        IDictionary<(MapCoord, MapCoord), IReadOnlyList<Godot.TextureRect>> paths,
+        MapCoord from,
+        MapCoord to,
+        out IReadOnlyList<Godot.TextureRect>? ticks)
+    {
+        if (paths.TryGetValue((from, to), out ticks))
+            return true;
+
+        return paths.TryGetValue((to, from), out ticks);
     }
 
     public static decimal AdjustBlockGainAmount(Creature? target, decimal amount)
@@ -354,14 +564,6 @@ internal static class LucidDreamMaliceRuntimeHelper
             await CreatureCmd.GainMaxHp(creature, maxHpBonus);
     }
 
-    public static bool ShouldConvertBubblePotionOfDreamsRestHeal(Player? player)
-    {
-        if (player?.Creature == null)
-            return false;
-
-        return ReAstralPartyModSettingsManager.GetEnableLucidDreamBubblePotionOfDreams(player.RunState);
-    }
-
     public static decimal CaptureBubblePotionOfDreamsSuppressedHeal(Player player, decimal healAmount)
     {
         var normalizedHeal = Math.Max(0m, healAmount);
@@ -521,6 +723,74 @@ internal static class LucidDreamMaliceRuntimeHelper
         foreach (var point in map.GetAllMapPoints())
             if (mapPointDictionary.TryGetValue(point.coord, out var mapPoint))
                 mapPoint.RefreshVisualsInstantly();
+    }
+
+    private static bool IsDreamModeLinkCandidate(MapPoint from, MapPoint to)
+    {
+        var rowDelta = Math.Abs(from.coord.row - to.coord.row);
+        var colDelta = Math.Abs(from.coord.col - to.coord.col);
+        if (rowDelta == 0)
+            return colDelta <= 2;
+
+        return rowDelta <= 2 && colDelta <= 2;
+    }
+
+    private static int GetDreamModeDistanceSquared(MapPoint from, MapPoint to)
+    {
+        var dx = from.coord.col - to.coord.col;
+        var dy = from.coord.row - to.coord.row;
+        return (dx * dx) + (dy * dy);
+    }
+
+    private static IEnumerable<MapPoint> PruneDreamModeCollinearEdges(MapPoint origin, List<MapPoint> candidates)
+    {
+        if (candidates.Count <= 1)
+            return candidates;
+
+        var selected = new List<MapPoint>();
+        foreach (var candidate in candidates)
+        {
+            var shouldKeep = true;
+            for (var i = selected.Count - 1; i >= 0; i--)
+            {
+                var existing = selected[i];
+                if (GetDreamModeEdgeAngleDegrees(origin, existing, candidate) >= 20f)
+                    continue;
+
+                if (GetDreamModeDistanceSquared(origin, candidate) < GetDreamModeDistanceSquared(origin, existing))
+                    selected.RemoveAt(i);
+                else
+                    shouldKeep = false;
+            }
+
+            if (shouldKeep)
+                selected.Add(candidate);
+        }
+
+        return selected;
+    }
+
+    private static float GetDreamModeEdgeAngleDegrees(MapPoint origin, MapPoint first, MapPoint second)
+    {
+        var firstX = first.coord.col - origin.coord.col;
+        var firstY = first.coord.row - origin.coord.row;
+        var secondX = second.coord.col - origin.coord.col;
+        var secondY = second.coord.row - origin.coord.row;
+
+        var firstLength = Math.Sqrt((firstX * firstX) + (firstY * firstY));
+        var secondLength = Math.Sqrt((secondX * secondX) + (secondY * secondY));
+        if (firstLength <= double.Epsilon || secondLength <= double.Epsilon)
+            return 180f;
+
+        var dot = (firstX * secondX) + (firstY * secondY);
+        var cos = Math.Clamp(dot / (firstLength * secondLength), -1d, 1d);
+        return (float)(Math.Acos(cos) * 180d / Math.PI);
+    }
+
+    private static bool HasDreamModeUndirectedNeighbor(MapPoint first, MapPoint second)
+    {
+        return DreamModeDirectedEdges.Contains((first.coord.col, first.coord.row, second.coord.col, second.coord.row))
+               || DreamModeDirectedEdges.Contains((second.coord.col, second.coord.row, first.coord.col, first.coord.row));
     }
 
     private static bool IsPitchBlackImpulseSyntheticDamage()

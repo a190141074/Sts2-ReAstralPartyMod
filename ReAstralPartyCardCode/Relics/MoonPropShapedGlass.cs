@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
@@ -13,15 +14,17 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(SharedRelicPool))]
-public class MoonPropShapedGlass : AstralPartyRelicModel
+public class MoonPropShapedGlass : MoonPropStackableRelicBase
 {
-    private const int DiscountedMerchantCost = 100;
-
     public override RelicRarity Rarity => RelicRarity.Shop;
 
-    public override int MerchantCost => DiscountedMerchantCost;
-
     public override bool ShouldReceiveCombatHooks => true;
+
+    protected override IEnumerable<DynamicVar> CanonicalVars =>
+    [
+        new StringVar("DamageBonusPercent", GetDamageBonusPercentText()),
+        new StringVar("CurrentHpCapPercent", GetCurrentHpCapPercentText())
+    ];
 
     public override async Task AfterObtained()
     {
@@ -54,6 +57,30 @@ public class MoonPropShapedGlass : AstralPartyRelicModel
         if (dealer != Owner.Creature && !(dealer == null && cardSource?.Owner == Owner))
             return 0m;
 
-        return amount;
+        return amount * MoonPropShapedGlassHelper.GetDamageBonusMultiplier(this);
+    }
+
+    private string GetDamageBonusPercentText()
+    {
+        return FormatPercent(MoonPropShapedGlassHelper.GetDamageBonusMultiplier(this));
+    }
+
+    private string GetCurrentHpCapPercentText()
+    {
+        return FormatPercent(MoonPropShapedGlassHelper.GetCurrentHpCapRatio(this));
+    }
+
+    protected override void RefreshDynamicState()
+    {
+        SetDynamicString("DamageBonusPercent", GetDamageBonusPercentText());
+        SetDynamicString("CurrentHpCapPercent", GetCurrentHpCapPercentText());
+    }
+
+    protected override Task AfterStacksChangedAsync()
+    {
+        if (Owner?.Creature != null)
+            return MoonPropShapedGlassHelper.TryClampCurrentHpAsync(Owner.Creature);
+
+        return Task.CompletedTask;
     }
 }

@@ -7,7 +7,6 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
-using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -33,6 +32,9 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
 
     [SavedProperty]
     public bool EnableSmoothSailing { get; set; }
+
+    [SavedProperty]
+    public bool EnableDreamMode { get; set; }
 
     [SavedProperty]
     public bool EnableFishScalesMalice { get; set; }
@@ -62,6 +64,9 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     public bool EnableWildness { get; set; }
 
     [SavedProperty]
+    public bool EnableWildnessPhantom { get; set; }
+
+    [SavedProperty]
     public bool EnablePitchBlackImpulse { get; set; }
 
     [SavedProperty]
@@ -76,11 +81,30 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     [SavedProperty]
     public bool PendingOverpopulationSpawnThisCombat { get; set; }
 
+    [SavedProperty]
+    public List<int> DreamPathCols { get; set; } = [];
+
+    [SavedProperty]
+    public List<int> DreamPathRows { get; set; } = [];
+
+    [SavedProperty]
+    public List<int> DreamVisitCols { get; set; } = [];
+
+    [SavedProperty]
+    public List<int> DreamVisitRows { get; set; } = [];
+
+    [SavedProperty]
+    public List<int> DreamVisitCounts { get; set; } = [];
+
+    [SavedProperty]
+    public bool IsInDreamModeRevisitedRestSite { get; set; }
+
     public override bool ShouldReceiveCombatHooks => true;
 
     public bool HasAnyEnabled =>
         EnableFalseLifeline
         || EnableSmoothSailing
+        || EnableDreamMode
         ||
         EnableFishScalesMalice
         || EnableSevereWoundOneMalice
@@ -91,6 +115,7 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
         || EnableCautiousJellyfishMalice
         || EnableFaceDeathWithComposure
         || EnableWildness
+        || EnableWildnessPhantom
         || EnablePitchBlackImpulse
         || EnableBubblePotionOfDreams
         || EnableHarmlessWhisper;
@@ -99,6 +124,7 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     {
         EnableFalseLifeline = snapshot.EnableLucidDreamFalseLifeline;
         EnableSmoothSailing = snapshot.EnableLucidDreamSmoothSailing;
+        EnableDreamMode = snapshot.EnableDreamMode;
         EnableFishScalesMalice = snapshot.EnableLucidDreamFishScalesMalice;
         EnableSevereWoundOneMalice = snapshot.EnableLucidDreamSevereWoundOneMalice;
         EnableSevereWoundTwoMalice = snapshot.EnableLucidDreamSevereWoundTwoMalice;
@@ -108,6 +134,7 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
         EnableCautiousJellyfishMalice = snapshot.EnableLucidDreamCautiousJellyfishMalice;
         EnableFaceDeathWithComposure = snapshot.EnableLucidDreamFaceDeathWithComposure;
         EnableWildness = snapshot.EnableLucidDreamWildness;
+        EnableWildnessPhantom = snapshot.EnableLucidDreamWildnessPhantom;
         EnablePitchBlackImpulse = snapshot.EnableLucidDreamPitchBlackImpulse;
         EnableBubblePotionOfDreams = snapshot.EnableLucidDreamBubblePotionOfDreams;
         EnableHarmlessWhisper = snapshot.EnableLucidDreamHarmlessWhisper;
@@ -277,10 +304,13 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
 
     public override ActMap ModifyGeneratedMapLate(IRunState runState, ActMap map, int actIndex)
     {
-        if (!EnableSmoothSailing)
-            return map;
+        var changed = false;
+        if (EnableSmoothSailing && LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(map))
+            changed = true;
+        if (EnableDreamMode && LucidDreamMaliceRuntimeHelper.ApplyDreamModeToMap(RunState, map))
+            changed = true;
 
-        if (LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(map))
+        if (changed)
             LucidDreamMaliceRuntimeHelper.RefreshMapScreenPointsIfNeeded(RunState, map);
 
         return map;
@@ -327,8 +357,4 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
             $"[LucidDreamMalice] Overpopulation added extra enemy {selectedMonster.Id.Entry} into active combat for encounter {encounter.Id.Entry} | slot={(slot ?? "<auto-layout>")}.");
     }
 
-    public override bool TryModifyRestSiteOptions(Player player, ICollection<RestSiteOption> options)
-    {
-        return false;
-    }
 }

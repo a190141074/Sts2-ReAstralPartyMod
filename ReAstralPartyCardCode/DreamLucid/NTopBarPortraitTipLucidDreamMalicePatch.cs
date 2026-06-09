@@ -71,6 +71,7 @@ public static class NTopBarModifierLucidDreamMalicePatch
             modifier.EnableCautiousJellyfishMalice,
             modifier.EnableFaceDeathWithComposure,
             modifier.EnableWildness,
+            modifier.EnableWildnessPhantom,
             modifier.EnablePitchBlackImpulse,
             modifier.EnableBubblePotionOfDreams,
             modifier.EnableHarmlessWhisper);

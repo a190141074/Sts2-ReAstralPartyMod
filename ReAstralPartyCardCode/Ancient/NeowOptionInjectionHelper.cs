@@ -7,14 +7,16 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Ancient;
+using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
-using ReAstralPartyMod.ReAstralPartyCardCode.cards;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib;
 using STS2RitsuLib.Scaffolding.Ancients.Options;
 
-namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+namespace ReAstralPartyMod.ReAstralPartyCardCode.Ancient;
 
 internal static class NeowOptionInjectionHelper
 {

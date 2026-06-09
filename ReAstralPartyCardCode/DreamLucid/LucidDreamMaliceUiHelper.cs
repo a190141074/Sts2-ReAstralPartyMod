@@ -35,6 +35,8 @@ internal static class LucidDreamMaliceUiHelper
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.face_death_with_composure.title");
         AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamWildness(runState),
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.title");
+        AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamWildnessPhantom(runState),
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness_phantom.title");
         AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamPitchBlackImpulse(runState),
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.title");
         AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamBubblePotionOfDreams(runState),
@@ -57,6 +59,7 @@ internal static class LucidDreamMaliceUiHelper
         bool enableCautiousJellyfishMalice,
         bool enableFaceDeathWithComposure,
         bool enableWildness,
+        bool enableWildnessPhantom,
         bool enablePitchBlackImpulse,
         bool enableBubblePotionOfDreams,
         bool enableHarmlessWhisper)
@@ -85,6 +88,8 @@ internal static class LucidDreamMaliceUiHelper
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.face_death_with_composure.title");
         AddEnabledLine(lines, enableWildness,
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.title");
+        AddEnabledLine(lines, enableWildnessPhantom,
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness_phantom.title");
         AddEnabledLine(lines, enablePitchBlackImpulse,
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.title");
         AddEnabledLine(lines, enableBubblePotionOfDreams,

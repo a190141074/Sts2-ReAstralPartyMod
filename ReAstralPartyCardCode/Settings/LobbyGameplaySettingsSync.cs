@@ -89,6 +89,8 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public bool EnableStartingPersonaSelection { get; set; } = true;
 
+    public bool EnableDreamMode { get; set; }
+
     public bool EnableDreamSeriesEvents { get; set; } = true;
 
     public bool EnableEnigmaticSeriesEvents { get; set; } = true;
@@ -125,6 +127,7 @@ public sealed class LobbyGameplaySettingsSnapshot
     public bool EnableLucidDreamCautiousJellyfishMalice { get; set; }
     public bool EnableLucidDreamFaceDeathWithComposure { get; set; }
     public bool EnableLucidDreamWildness { get; set; }
+    public bool EnableLucidDreamWildnessPhantom { get; set; }
     public bool EnableLucidDreamPitchBlackImpulse { get; set; }
     public bool EnableLucidDreamBubblePotionOfDreams { get; set; }
     public bool EnableLucidDreamHarmlessWhisper { get; set; }
@@ -135,6 +138,7 @@ public sealed class LobbyGameplaySettingsSnapshot
         {
             EnableStartingInitialPoint = EnableStartingInitialPoint,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
+            EnableDreamMode = EnableDreamMode,
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableNeowExtraOption = EnableNeowExtraOption,
@@ -155,6 +159,7 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice,
             EnableLucidDreamFaceDeathWithComposure = EnableLucidDreamFaceDeathWithComposure,
             EnableLucidDreamWildness = EnableLucidDreamWildness,
+            EnableLucidDreamWildnessPhantom = EnableLucidDreamWildnessPhantom,
             EnableLucidDreamPitchBlackImpulse = EnableLucidDreamPitchBlackImpulse,
             EnableLucidDreamBubblePotionOfDreams = EnableLucidDreamBubblePotionOfDreams,
             EnableLucidDreamHarmlessWhisper = EnableLucidDreamHarmlessWhisper
@@ -167,6 +172,8 @@ public sealed class LobbyGameplaySettingsSnapshot
         {
             EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
             EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
+            // Dream Mode is temporarily locked and must not propagate from persisted settings.
+            EnableDreamMode = false,
             EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
             EnableNeowExtraOption = settings.EnableNeowExtraOption,
@@ -244,7 +251,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot updated: start_initial_point={updated.EnableStartingInitialPoint}, start_persona_selection={updated.EnableStartingPersonaSelection}, dream_series={updated.EnableDreamSeriesEvents}, enigmatic_series={updated.EnableEnigmaticSeriesEvents}, neow_extra_option={updated.EnableNeowExtraOption}, neow_extra_selection={updated.NeowExtraOptionSelectionMode}, all_personas={updated.EnableAllPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot updated: start_initial_point={updated.EnableStartingInitialPoint}, start_persona_selection={updated.EnableStartingPersonaSelection}, dream_mode={updated.EnableDreamMode}, dream_series={updated.EnableDreamSeriesEvents}, enigmatic_series={updated.EnableEnigmaticSeriesEvents}, neow_extra_option={updated.EnableNeowExtraOption}, neow_extra_selection={updated.NeowExtraOptionSelectionMode}, all_personas={updated.EnableAllPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
         SnapshotChanged?.Invoke(updated.Clone());
     }
 
@@ -263,7 +270,7 @@ internal static class LobbyGameplaySettingsSync
 
         netService.SendMessage(new AstralLobbyGameplaySettingsSnapshotMessage(snapshot));
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_mode={snapshot.EnableDreamMode}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     public static void RequestSnapshotFromHost()
@@ -375,7 +382,7 @@ internal static class LobbyGameplaySettingsSync
         var snapshot = message.ToSnapshot();
         SetSnapshotInternal(snapshot, $"remote_snapshot_from_{senderId}", true);
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_mode={snapshot.EnableDreamMode}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     private static void HandleRequestMessage(AstralLobbyGameplaySettingsRequestMessage message, ulong senderId)
@@ -403,7 +410,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_mode={snapshot.EnableDreamMode}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
         if (invokeEvent)
             SnapshotChanged?.Invoke(snapshot.Clone());
     }
@@ -417,10 +424,11 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 6;
+    private const int SchemaVersion = 8;
 
     public bool EnableStartingInitialPoint { get; set; }
     public bool EnableStartingPersonaSelection { get; set; }
+    public bool EnableDreamMode { get; set; }
     public bool EnableDreamSeriesEvents { get; set; }
     public bool EnableEnigmaticSeriesEvents { get; set; }
     public bool EnableNeowExtraOption { get; set; }
@@ -441,6 +449,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public bool EnableLucidDreamCautiousJellyfishMalice { get; set; }
     public bool EnableLucidDreamFaceDeathWithComposure { get; set; }
     public bool EnableLucidDreamWildness { get; set; }
+    public bool EnableLucidDreamWildnessPhantom { get; set; }
     public bool EnableLucidDreamPitchBlackImpulse { get; set; }
     public bool EnableLucidDreamBubblePotionOfDreams { get; set; }
     public bool EnableLucidDreamHarmlessWhisper { get; set; }
@@ -449,6 +458,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     {
         EnableStartingInitialPoint = snapshot.EnableStartingInitialPoint;
         EnableStartingPersonaSelection = snapshot.EnableStartingPersonaSelection;
+        EnableDreamMode = snapshot.EnableDreamMode;
         EnableDreamSeriesEvents = snapshot.EnableDreamSeriesEvents;
         EnableEnigmaticSeriesEvents = snapshot.EnableEnigmaticSeriesEvents;
         EnableNeowExtraOption = snapshot.EnableNeowExtraOption;
@@ -469,6 +479,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableLucidDreamCautiousJellyfishMalice = snapshot.EnableLucidDreamCautiousJellyfishMalice;
         EnableLucidDreamFaceDeathWithComposure = snapshot.EnableLucidDreamFaceDeathWithComposure;
         EnableLucidDreamWildness = snapshot.EnableLucidDreamWildness;
+        EnableLucidDreamWildnessPhantom = snapshot.EnableLucidDreamWildnessPhantom;
         EnableLucidDreamPitchBlackImpulse = snapshot.EnableLucidDreamPitchBlackImpulse;
         EnableLucidDreamBubblePotionOfDreams = snapshot.EnableLucidDreamBubblePotionOfDreams;
         EnableLucidDreamHarmlessWhisper = snapshot.EnableLucidDreamHarmlessWhisper;
@@ -483,6 +494,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteInt(SchemaVersion);
         writer.WriteBool(EnableStartingInitialPoint);
         writer.WriteBool(EnableStartingPersonaSelection);
+        writer.WriteBool(EnableDreamMode);
         writer.WriteBool(EnableDreamSeriesEvents);
         writer.WriteBool(EnableEnigmaticSeriesEvents);
         writer.WriteBool(EnableNeowExtraOption);
@@ -503,6 +515,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteBool(EnableLucidDreamCautiousJellyfishMalice);
         writer.WriteBool(EnableLucidDreamFaceDeathWithComposure);
         writer.WriteBool(EnableLucidDreamWildness);
+        writer.WriteBool(EnableLucidDreamWildnessPhantom);
         writer.WriteBool(EnableLucidDreamPitchBlackImpulse);
         writer.WriteBool(EnableLucidDreamBubblePotionOfDreams);
         writer.WriteBool(EnableLucidDreamHarmlessWhisper);
@@ -511,15 +524,23 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public void Deserialize(PacketReader reader)
     {
         var schemaVersion = reader.ReadInt();
-        if (schemaVersion >= 2)
+        if (schemaVersion >= 8)
         {
             EnableStartingInitialPoint = reader.ReadBool();
             EnableStartingPersonaSelection = reader.ReadBool();
+            EnableDreamMode = reader.ReadBool();
+        }
+        else if (schemaVersion >= 2)
+        {
+            EnableStartingInitialPoint = reader.ReadBool();
+            EnableStartingPersonaSelection = reader.ReadBool();
+            EnableDreamMode = false;
         }
         else
         {
             EnableStartingInitialPoint = false;
             EnableStartingPersonaSelection = true;
+            EnableDreamMode = false;
         }
 
         if (schemaVersion >= 3)
@@ -553,7 +574,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         StartingPersonaMode = reader.ReadEnum<StartingPersonaMode>();
         TokenSeriesMode = reader.ReadEnum<TokenSeriesMode>();
 
-        if (schemaVersion >= 6)
+        if (schemaVersion >= 7)
         {
             EnableLucidDreamFishScalesMalice = reader.ReadBool();
             EnableLucidDreamFalseLifeline = reader.ReadBool();
@@ -566,6 +587,25 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableLucidDreamCautiousJellyfishMalice = reader.ReadBool();
             EnableLucidDreamFaceDeathWithComposure = reader.ReadBool();
             EnableLucidDreamWildness = reader.ReadBool();
+            EnableLucidDreamWildnessPhantom = reader.ReadBool();
+            EnableLucidDreamPitchBlackImpulse = reader.ReadBool();
+            EnableLucidDreamBubblePotionOfDreams = reader.ReadBool();
+            EnableLucidDreamHarmlessWhisper = reader.ReadBool();
+        }
+        else if (schemaVersion >= 6)
+        {
+            EnableLucidDreamFishScalesMalice = reader.ReadBool();
+            EnableLucidDreamFalseLifeline = reader.ReadBool();
+            EnableLucidDreamSmoothSailing = reader.ReadBool();
+            EnableLucidDreamSevereWoundOneMalice = reader.ReadBool();
+            EnableLucidDreamSevereWoundTwoMalice = reader.ReadBool();
+            EnableLucidDreamMadLifeMalice = reader.ReadBool();
+            EnableLucidDreamSwampOfFateMalice = reader.ReadBool();
+            EnableLucidDreamOverpopulationMalice = reader.ReadBool();
+            EnableLucidDreamCautiousJellyfishMalice = reader.ReadBool();
+            EnableLucidDreamFaceDeathWithComposure = reader.ReadBool();
+            EnableLucidDreamWildness = reader.ReadBool();
+            EnableLucidDreamWildnessPhantom = false;
             EnableLucidDreamPitchBlackImpulse = reader.ReadBool();
             EnableLucidDreamBubblePotionOfDreams = reader.ReadBool();
             EnableLucidDreamHarmlessWhisper = reader.ReadBool();
@@ -583,6 +623,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableLucidDreamCautiousJellyfishMalice = reader.ReadBool();
             EnableLucidDreamFaceDeathWithComposure = false;
             EnableLucidDreamWildness = false;
+            EnableLucidDreamWildnessPhantom = false;
             EnableLucidDreamPitchBlackImpulse = false;
             EnableLucidDreamBubblePotionOfDreams = false;
             EnableLucidDreamHarmlessWhisper = false;
@@ -600,6 +641,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableLucidDreamCautiousJellyfishMalice = false;
             EnableLucidDreamFaceDeathWithComposure = false;
             EnableLucidDreamWildness = false;
+            EnableLucidDreamWildnessPhantom = false;
             EnableLucidDreamPitchBlackImpulse = false;
             EnableLucidDreamBubblePotionOfDreams = false;
             EnableLucidDreamHarmlessWhisper = false;
@@ -612,6 +654,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         {
             EnableStartingInitialPoint = EnableStartingInitialPoint,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
+            EnableDreamMode = EnableDreamMode,
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableNeowExtraOption = EnableNeowExtraOption,
@@ -632,6 +675,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice,
             EnableLucidDreamFaceDeathWithComposure = EnableLucidDreamFaceDeathWithComposure,
             EnableLucidDreamWildness = EnableLucidDreamWildness,
+            EnableLucidDreamWildnessPhantom = EnableLucidDreamWildnessPhantom,
             EnableLucidDreamPitchBlackImpulse = EnableLucidDreamPitchBlackImpulse,
             EnableLucidDreamBubblePotionOfDreams = EnableLucidDreamBubblePotionOfDreams,
             EnableLucidDreamHarmlessWhisper = EnableLucidDreamHarmlessWhisper
