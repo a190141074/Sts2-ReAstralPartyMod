@@ -8,11 +8,15 @@ internal static class LucidDreamMaliceUiHelper
 {
     public static HoverTip? BuildHoverTip(IRunState? runState)
     {
-        if (runState == null || !ReAstralPartyModSettingsManager.HasAnyLucidDreamMaliceEnabled(runState))
+        if (runState == null || !ReAstralPartyModSettingsManager.HasAnyLucidDreamEnabled(runState))
             return null;
 
         var lines = new List<string>();
 
+        AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamFalseLifeline(runState),
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_benevolence.false_lifeline.title");
+        AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamSmoothSailing(runState),
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_benevolence.smooth_sailing.title");
         AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamFishScalesMalice(runState),
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.fish_scales.title");
         AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamSevereWoundOneMalice(runState),
@@ -32,6 +36,8 @@ internal static class LucidDreamMaliceUiHelper
     }
 
     public static HoverTip? BuildHoverTip(
+        bool enableFalseLifeline,
+        bool enableSmoothSailing,
         bool enableFishScalesMalice,
         bool enableSevereWoundOneMalice,
         bool enableSevereWoundTwoMalice,
@@ -42,6 +48,10 @@ internal static class LucidDreamMaliceUiHelper
     {
         var lines = new List<string>();
 
+        AddEnabledLine(lines, enableFalseLifeline,
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_benevolence.false_lifeline.title");
+        AddEnabledLine(lines, enableSmoothSailing,
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_benevolence.smooth_sailing.title");
         AddEnabledLine(lines, enableFishScalesMalice,
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.fish_scales.title");
         AddEnabledLine(lines, enableSevereWoundOneMalice,
@@ -66,7 +76,7 @@ internal static class LucidDreamMaliceUiHelper
             return null;
 
         return new HoverTip(
-            new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.title"),
+            new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream.title"),
             string.Join("\n", lines));
     }
 

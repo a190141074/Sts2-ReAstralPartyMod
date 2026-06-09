@@ -58,6 +58,8 @@ public static class NTopBarModifierLucidDreamMalicePatch
             return;
 
         var hoverTip = LucidDreamMaliceUiHelper.BuildHoverTip(
+            modifier.EnableFalseLifeline,
+            modifier.EnableSmoothSailing,
             modifier.EnableFishScalesMalice,
             modifier.EnableSevereWoundOneMalice,
             modifier.EnableSevereWoundTwoMalice,

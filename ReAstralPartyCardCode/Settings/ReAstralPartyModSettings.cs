@@ -405,6 +405,40 @@ public static partial class ReAstralPartyModSettingsManager
         return EnableExtremeMode;
     }
 
+    public static bool GetEnableLucidDreamFalseLifeline(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamFalseLifeline;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamFalseLifeline;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamFalseLifeline;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamSmoothSailing(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamSmoothSailing;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamSmoothSailing;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamSmoothSailing;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
     public static bool GetEnableLucidDreamFishScalesMalice(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
@@ -524,6 +558,26 @@ public static partial class ReAstralPartyModSettingsManager
         return false;
     }
 
+    public static bool HasAnyLucidDreamBenevolenceEnabled(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamFalseLifeline
+                   || snapshot.EnableLucidDreamSmoothSailing;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamFalseLifeline
+                   || lobbySnapshot.EnableLucidDreamSmoothSailing;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamFalseLifeline
+                   || localFallback.EnableLucidDreamSmoothSailing;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
     public static bool HasAnyLucidDreamMaliceEnabled(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
@@ -563,6 +617,12 @@ public static partial class ReAstralPartyModSettingsManager
             return false;
 
         return false;
+    }
+
+    public static bool HasAnyLucidDreamEnabled(IRunState? runState)
+    {
+        return HasAnyLucidDreamBenevolenceEnabled(runState)
+               || HasAnyLucidDreamMaliceEnabled(runState);
     }
 
     public static bool GetEnableDuplicatePersonas(IRunState? runState)
@@ -1953,6 +2013,10 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnablePureAngelMode { get; init; } = true;
 
+        public bool EnableLucidDreamFalseLifeline { get; init; }
+
+        public bool EnableLucidDreamSmoothSailing { get; init; }
+
         public bool EnableLucidDreamFishScalesMalice { get; init; }
 
         public bool EnableLucidDreamSevereWoundOneMalice { get; init; }
@@ -1999,6 +2063,8 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableNeowDiagnosticsNotifications = settings.EnableNeowDiagnosticsNotifications,
                 TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
                 EnablePureAngelMode = settings.EnablePureAngelMode,
+                EnableLucidDreamFalseLifeline = false,
+                EnableLucidDreamSmoothSailing = false,
                 EnableLucidDreamFishScalesMalice = false,
                 EnableLucidDreamSevereWoundOneMalice = false,
                 EnableLucidDreamSevereWoundTwoMalice = false,

@@ -32,7 +32,7 @@ public static class LucidDreamMaliceModifierInstaller
             return;
 
         var existingModifier = LucidDreamMaliceModifier.Get(runState);
-        if (!ReAstralPartyModSettingsManager.HasAnyLucidDreamMaliceEnabled(runState))
+        if (!ReAstralPartyModSettingsManager.HasAnyLucidDreamEnabled(runState))
         {
             if (existingModifier == null)
                 return;
@@ -46,6 +46,11 @@ public static class LucidDreamMaliceModifierInstaller
         if (existingModifier != null)
         {
             existingModifier.ApplySnapshot(snapshot);
+            if (existingModifier.EnableSmoothSailing)
+            {
+                LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(runState.Map);
+                LucidDreamMaliceRuntimeHelper.RefreshMapScreenPointsIfNeeded(runState, runState.Map);
+            }
             MainFile.Logger.Info(
                 $"LucidDreamMalice modifier refreshed | loadedRun={loadedRun} | modifiers={runState.Modifiers.Count} | enabledFlags={CountEnabledFlags(existingModifier)}");
             return;
@@ -58,6 +63,11 @@ public static class LucidDreamMaliceModifierInstaller
         modifier.ApplySnapshot(snapshot);
         AddModifierDebugMethod.Invoke(runState, [modifier]);
         InitializeModifier(modifier, runState, loadedRun);
+        if (modifier.EnableSmoothSailing)
+        {
+            LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(runState.Map);
+            LucidDreamMaliceRuntimeHelper.RefreshMapScreenPointsIfNeeded(runState, runState.Map);
+        }
 
         MainFile.Logger.Info(
             $"LucidDreamMalice modifier installed | loadedRun={loadedRun} | modifiers={runState.Modifiers.Count} | enabledFlags={CountEnabledFlags(modifier)}");
@@ -88,6 +98,10 @@ public static class LucidDreamMaliceModifierInstaller
     private static int CountEnabledFlags(LucidDreamMaliceModifier modifier)
     {
         var count = 0;
+        if (modifier.EnableFalseLifeline)
+            count++;
+        if (modifier.EnableSmoothSailing)
+            count++;
         if (modifier.EnableFishScalesMalice)
             count++;
         if (modifier.EnableSevereWoundOneMalice)

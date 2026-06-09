@@ -109,6 +109,8 @@ public sealed class LobbyGameplaySettingsSnapshot
     public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
 
     public bool EnableLucidDreamFishScalesMalice { get; set; }
+    public bool EnableLucidDreamFalseLifeline { get; set; }
+    public bool EnableLucidDreamSmoothSailing { get; set; }
 
     public bool EnableLucidDreamSevereWoundOneMalice { get; set; }
 
@@ -121,6 +123,11 @@ public sealed class LobbyGameplaySettingsSnapshot
     public bool EnableLucidDreamOverpopulationMalice { get; set; }
 
     public bool EnableLucidDreamCautiousJellyfishMalice { get; set; }
+    public bool EnableLucidDreamFaceDeathWithComposure { get; set; }
+    public bool EnableLucidDreamWildness { get; set; }
+    public bool EnableLucidDreamPitchBlackImpulse { get; set; }
+    public bool EnableLucidDreamBubblePotionOfDreams { get; set; }
+    public bool EnableLucidDreamHarmlessWhisper { get; set; }
 
     public LobbyGameplaySettingsSnapshot Clone()
     {
@@ -138,12 +145,19 @@ public sealed class LobbyGameplaySettingsSnapshot
             StartingPersonaMode = StartingPersonaMode,
             TokenSeriesMode = TokenSeriesMode,
             EnableLucidDreamFishScalesMalice = EnableLucidDreamFishScalesMalice,
+            EnableLucidDreamFalseLifeline = EnableLucidDreamFalseLifeline,
+            EnableLucidDreamSmoothSailing = EnableLucidDreamSmoothSailing,
             EnableLucidDreamSevereWoundOneMalice = EnableLucidDreamSevereWoundOneMalice,
             EnableLucidDreamSevereWoundTwoMalice = EnableLucidDreamSevereWoundTwoMalice,
             EnableLucidDreamMadLifeMalice = EnableLucidDreamMadLifeMalice,
             EnableLucidDreamSwampOfFateMalice = EnableLucidDreamSwampOfFateMalice,
             EnableLucidDreamOverpopulationMalice = EnableLucidDreamOverpopulationMalice,
-            EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice
+            EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice,
+            EnableLucidDreamFaceDeathWithComposure = EnableLucidDreamFaceDeathWithComposure,
+            EnableLucidDreamWildness = EnableLucidDreamWildness,
+            EnableLucidDreamPitchBlackImpulse = EnableLucidDreamPitchBlackImpulse,
+            EnableLucidDreamBubblePotionOfDreams = EnableLucidDreamBubblePotionOfDreams,
+            EnableLucidDreamHarmlessWhisper = EnableLucidDreamHarmlessWhisper
         };
     }
 
@@ -403,7 +417,7 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 5;
+    private const int SchemaVersion = 6;
 
     public bool EnableStartingInitialPoint { get; set; }
     public bool EnableStartingPersonaSelection { get; set; }
@@ -417,12 +431,19 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public StartingPersonaMode StartingPersonaMode { get; set; }
     public TokenSeriesMode TokenSeriesMode { get; set; }
     public bool EnableLucidDreamFishScalesMalice { get; set; }
+    public bool EnableLucidDreamFalseLifeline { get; set; }
+    public bool EnableLucidDreamSmoothSailing { get; set; }
     public bool EnableLucidDreamSevereWoundOneMalice { get; set; }
     public bool EnableLucidDreamSevereWoundTwoMalice { get; set; }
     public bool EnableLucidDreamMadLifeMalice { get; set; }
     public bool EnableLucidDreamSwampOfFateMalice { get; set; }
     public bool EnableLucidDreamOverpopulationMalice { get; set; }
     public bool EnableLucidDreamCautiousJellyfishMalice { get; set; }
+    public bool EnableLucidDreamFaceDeathWithComposure { get; set; }
+    public bool EnableLucidDreamWildness { get; set; }
+    public bool EnableLucidDreamPitchBlackImpulse { get; set; }
+    public bool EnableLucidDreamBubblePotionOfDreams { get; set; }
+    public bool EnableLucidDreamHarmlessWhisper { get; set; }
 
     public AstralLobbyGameplaySettingsSnapshotMessage(LobbyGameplaySettingsSnapshot snapshot)
     {
@@ -438,12 +459,19 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         StartingPersonaMode = snapshot.StartingPersonaMode;
         TokenSeriesMode = snapshot.TokenSeriesMode;
         EnableLucidDreamFishScalesMalice = snapshot.EnableLucidDreamFishScalesMalice;
+        EnableLucidDreamFalseLifeline = snapshot.EnableLucidDreamFalseLifeline;
+        EnableLucidDreamSmoothSailing = snapshot.EnableLucidDreamSmoothSailing;
         EnableLucidDreamSevereWoundOneMalice = snapshot.EnableLucidDreamSevereWoundOneMalice;
         EnableLucidDreamSevereWoundTwoMalice = snapshot.EnableLucidDreamSevereWoundTwoMalice;
         EnableLucidDreamMadLifeMalice = snapshot.EnableLucidDreamMadLifeMalice;
         EnableLucidDreamSwampOfFateMalice = snapshot.EnableLucidDreamSwampOfFateMalice;
         EnableLucidDreamOverpopulationMalice = snapshot.EnableLucidDreamOverpopulationMalice;
         EnableLucidDreamCautiousJellyfishMalice = snapshot.EnableLucidDreamCautiousJellyfishMalice;
+        EnableLucidDreamFaceDeathWithComposure = snapshot.EnableLucidDreamFaceDeathWithComposure;
+        EnableLucidDreamWildness = snapshot.EnableLucidDreamWildness;
+        EnableLucidDreamPitchBlackImpulse = snapshot.EnableLucidDreamPitchBlackImpulse;
+        EnableLucidDreamBubblePotionOfDreams = snapshot.EnableLucidDreamBubblePotionOfDreams;
+        EnableLucidDreamHarmlessWhisper = snapshot.EnableLucidDreamHarmlessWhisper;
     }
 
     public bool ShouldBroadcast => false;
@@ -465,12 +493,19 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteEnum(StartingPersonaMode);
         writer.WriteEnum(TokenSeriesMode);
         writer.WriteBool(EnableLucidDreamFishScalesMalice);
+        writer.WriteBool(EnableLucidDreamFalseLifeline);
+        writer.WriteBool(EnableLucidDreamSmoothSailing);
         writer.WriteBool(EnableLucidDreamSevereWoundOneMalice);
         writer.WriteBool(EnableLucidDreamSevereWoundTwoMalice);
         writer.WriteBool(EnableLucidDreamMadLifeMalice);
         writer.WriteBool(EnableLucidDreamSwampOfFateMalice);
         writer.WriteBool(EnableLucidDreamOverpopulationMalice);
         writer.WriteBool(EnableLucidDreamCautiousJellyfishMalice);
+        writer.WriteBool(EnableLucidDreamFaceDeathWithComposure);
+        writer.WriteBool(EnableLucidDreamWildness);
+        writer.WriteBool(EnableLucidDreamPitchBlackImpulse);
+        writer.WriteBool(EnableLucidDreamBubblePotionOfDreams);
+        writer.WriteBool(EnableLucidDreamHarmlessWhisper);
     }
 
     public void Deserialize(PacketReader reader)
@@ -518,25 +553,56 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         StartingPersonaMode = reader.ReadEnum<StartingPersonaMode>();
         TokenSeriesMode = reader.ReadEnum<TokenSeriesMode>();
 
-        if (schemaVersion >= 4)
+        if (schemaVersion >= 6)
         {
             EnableLucidDreamFishScalesMalice = reader.ReadBool();
+            EnableLucidDreamFalseLifeline = reader.ReadBool();
+            EnableLucidDreamSmoothSailing = reader.ReadBool();
             EnableLucidDreamSevereWoundOneMalice = reader.ReadBool();
             EnableLucidDreamSevereWoundTwoMalice = reader.ReadBool();
             EnableLucidDreamMadLifeMalice = reader.ReadBool();
             EnableLucidDreamSwampOfFateMalice = reader.ReadBool();
             EnableLucidDreamOverpopulationMalice = reader.ReadBool();
             EnableLucidDreamCautiousJellyfishMalice = reader.ReadBool();
+            EnableLucidDreamFaceDeathWithComposure = reader.ReadBool();
+            EnableLucidDreamWildness = reader.ReadBool();
+            EnableLucidDreamPitchBlackImpulse = reader.ReadBool();
+            EnableLucidDreamBubblePotionOfDreams = reader.ReadBool();
+            EnableLucidDreamHarmlessWhisper = reader.ReadBool();
+        }
+        else if (schemaVersion >= 4)
+        {
+            EnableLucidDreamFishScalesMalice = reader.ReadBool();
+            EnableLucidDreamFalseLifeline = false;
+            EnableLucidDreamSmoothSailing = false;
+            EnableLucidDreamSevereWoundOneMalice = reader.ReadBool();
+            EnableLucidDreamSevereWoundTwoMalice = reader.ReadBool();
+            EnableLucidDreamMadLifeMalice = reader.ReadBool();
+            EnableLucidDreamSwampOfFateMalice = reader.ReadBool();
+            EnableLucidDreamOverpopulationMalice = reader.ReadBool();
+            EnableLucidDreamCautiousJellyfishMalice = reader.ReadBool();
+            EnableLucidDreamFaceDeathWithComposure = false;
+            EnableLucidDreamWildness = false;
+            EnableLucidDreamPitchBlackImpulse = false;
+            EnableLucidDreamBubblePotionOfDreams = false;
+            EnableLucidDreamHarmlessWhisper = false;
         }
         else
         {
             EnableLucidDreamFishScalesMalice = false;
+            EnableLucidDreamFalseLifeline = false;
+            EnableLucidDreamSmoothSailing = false;
             EnableLucidDreamSevereWoundOneMalice = false;
             EnableLucidDreamSevereWoundTwoMalice = false;
             EnableLucidDreamMadLifeMalice = false;
             EnableLucidDreamSwampOfFateMalice = false;
             EnableLucidDreamOverpopulationMalice = false;
             EnableLucidDreamCautiousJellyfishMalice = false;
+            EnableLucidDreamFaceDeathWithComposure = false;
+            EnableLucidDreamWildness = false;
+            EnableLucidDreamPitchBlackImpulse = false;
+            EnableLucidDreamBubblePotionOfDreams = false;
+            EnableLucidDreamHarmlessWhisper = false;
         }
     }
 
@@ -556,12 +622,19 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             StartingPersonaMode = StartingPersonaMode,
             TokenSeriesMode = TokenSeriesMode,
             EnableLucidDreamFishScalesMalice = EnableLucidDreamFishScalesMalice,
+            EnableLucidDreamFalseLifeline = EnableLucidDreamFalseLifeline,
+            EnableLucidDreamSmoothSailing = EnableLucidDreamSmoothSailing,
             EnableLucidDreamSevereWoundOneMalice = EnableLucidDreamSevereWoundOneMalice,
             EnableLucidDreamSevereWoundTwoMalice = EnableLucidDreamSevereWoundTwoMalice,
             EnableLucidDreamMadLifeMalice = EnableLucidDreamMadLifeMalice,
             EnableLucidDreamSwampOfFateMalice = EnableLucidDreamSwampOfFateMalice,
             EnableLucidDreamOverpopulationMalice = EnableLucidDreamOverpopulationMalice,
-            EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice
+            EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice,
+            EnableLucidDreamFaceDeathWithComposure = EnableLucidDreamFaceDeathWithComposure,
+            EnableLucidDreamWildness = EnableLucidDreamWildness,
+            EnableLucidDreamPitchBlackImpulse = EnableLucidDreamPitchBlackImpulse,
+            EnableLucidDreamBubblePotionOfDreams = EnableLucidDreamBubblePotionOfDreams,
+            EnableLucidDreamHarmlessWhisper = EnableLucidDreamHarmlessWhisper
         };
     }
 }

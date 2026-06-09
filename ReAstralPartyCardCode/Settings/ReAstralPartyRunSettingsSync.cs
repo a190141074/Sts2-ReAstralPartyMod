@@ -42,6 +42,10 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public bool EnablePureAngelMode { get; set; } = true;
 
+    public bool EnableLucidDreamFalseLifeline { get; set; }
+
+    public bool EnableLucidDreamSmoothSailing { get; set; }
+
     public bool EnableLucidDreamFishScalesMalice { get; set; }
 
     public bool EnableLucidDreamSevereWoundOneMalice { get; set; }
@@ -80,6 +84,8 @@ public sealed class ReAstralPartyRunSettingsSnapshot
             StartingPersonaMode = StartingPersonaMode,
             TokenSeriesMode = TokenSeriesMode,
             EnablePureAngelMode = EnablePureAngelMode,
+            EnableLucidDreamFalseLifeline = EnableLucidDreamFalseLifeline,
+            EnableLucidDreamSmoothSailing = EnableLucidDreamSmoothSailing,
             EnableLucidDreamFishScalesMalice = EnableLucidDreamFishScalesMalice,
             EnableLucidDreamSevereWoundOneMalice = EnableLucidDreamSevereWoundOneMalice,
             EnableLucidDreamSevereWoundTwoMalice = EnableLucidDreamSevereWoundTwoMalice,
@@ -166,6 +172,8 @@ internal static class ReAstralPartyRunSettingsSync
                               ?? ReAstralPartyModSettingsManager.ResolveTokenSeriesMode(settings),
             EnableExtremeMode = lobbySnapshot?.EnableExtremeMode ?? settings.EnableExtremeMode,
             EnablePureAngelMode = settings.EnablePureAngelMode,
+            EnableLucidDreamFalseLifeline = lobbySnapshot?.EnableLucidDreamFalseLifeline ?? false,
+            EnableLucidDreamSmoothSailing = lobbySnapshot?.EnableLucidDreamSmoothSailing ?? false,
             EnableLucidDreamFishScalesMalice = lobbySnapshot?.EnableLucidDreamFishScalesMalice ?? false,
             EnableLucidDreamSevereWoundOneMalice = lobbySnapshot?.EnableLucidDreamSevereWoundOneMalice ?? false,
             EnableLucidDreamSevereWoundTwoMalice = lobbySnapshot?.EnableLucidDreamSevereWoundTwoMalice ?? false,
@@ -198,6 +206,8 @@ internal static class ReAstralPartyRunSettingsSync
             StartingPersonaMode = StartingPersonaMode.Standard,
             TokenSeriesMode = TokenSeriesMode.RandomTwo,
             EnablePureAngelMode = false,
+            EnableLucidDreamFalseLifeline = false,
+            EnableLucidDreamSmoothSailing = false,
             EnableLucidDreamFishScalesMalice = false,
             EnableLucidDreamSevereWoundOneMalice = false,
             EnableLucidDreamSevereWoundTwoMalice = false,
@@ -244,6 +254,8 @@ internal static class ReAstralPartyRunSettingsSync
             (int)snapshot.StartingPersonaMode,
             (int)snapshot.TokenSeriesMode,
             snapshot.EnablePureAngelMode ? 1 : 0,
+            snapshot.EnableLucidDreamFalseLifeline ? 1 : 0,
+            snapshot.EnableLucidDreamSmoothSailing ? 1 : 0,
             snapshot.EnableLucidDreamFishScalesMalice ? 1 : 0,
             snapshot.EnableLucidDreamSevereWoundOneMalice ? 1 : 0,
             snapshot.EnableLucidDreamSevereWoundTwoMalice ? 1 : 0,
@@ -302,19 +314,24 @@ internal static class ReAstralPartyRunSettingsSync
         var isFullBannablePayloadV4 = payload.Count == bannableRelics.Count + 18;
         var isPersonaOnlyPayloadV5 = payload.Count == personaRelics.Count + 19;
         var isFullBannablePayloadV5 = payload.Count == bannableRelics.Count + 19;
+        var isPersonaOnlyPayloadV6 = payload.Count == personaRelics.Count + 21;
+        var isFullBannablePayloadV6 = payload.Count == bannableRelics.Count + 21;
         if (!isLegacyPayload && !isPersonaOnlyPayload && !isFullBannablePayload && !isPersonaOnlyPayloadV2 &&
             !isFullBannablePayloadV2 && !isPersonaOnlyPayloadV3 && !isFullBannablePayloadV3 &&
             !isPersonaOnlyPayloadV4 && !isFullBannablePayloadV4 &&
-            !isPersonaOnlyPayloadV5 && !isFullBannablePayloadV5)
+            !isPersonaOnlyPayloadV5 && !isFullBannablePayloadV5 &&
+            !isPersonaOnlyPayloadV6 && !isFullBannablePayloadV6)
             return false;
 
+        var isV6Payload = isPersonaOnlyPayloadV6 || isFullBannablePayloadV6;
         var isV5Payload = isPersonaOnlyPayloadV5 || isFullBannablePayloadV5;
         var isV4Payload = isPersonaOnlyPayloadV4 || isFullBannablePayloadV4;
         var isV3Payload = isPersonaOnlyPayloadV3 || isFullBannablePayloadV3;
         var isV2Payload = isPersonaOnlyPayloadV2 || isFullBannablePayloadV2;
-        var hasV3GameplayFields = isV5Payload || isV4Payload || isV3Payload;
-        var bannedStartIndex = isLegacyPayload ? 7 : isV5Payload ? 19 : isV4Payload ? 18 : isV3Payload ? 11 : isV2Payload ? 8 : 6;
-        var bannedRelicSource = isFullBannablePayload || isFullBannablePayloadV2 || isFullBannablePayloadV3 || isFullBannablePayloadV4 || isFullBannablePayloadV5
+        var hasV5GameplayLayout = isV6Payload || isV5Payload;
+        var hasV3GameplayFields = isV6Payload || isV5Payload || isV4Payload || isV3Payload;
+        var bannedStartIndex = isLegacyPayload ? 7 : isV6Payload ? 21 : isV5Payload ? 19 : isV4Payload ? 18 : isV3Payload ? 11 : isV2Payload ? 8 : 6;
+        var bannedRelicSource = isFullBannablePayload || isFullBannablePayloadV2 || isFullBannablePayloadV3 || isFullBannablePayloadV4 || isFullBannablePayloadV5 || isFullBannablePayloadV6
             ? bannableRelics
             : personaRelics;
         var bannedIds = new List<string>();
@@ -327,7 +344,7 @@ internal static class ReAstralPartyRunSettingsSync
         }
 
         var neowSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom;
-        if (isV5Payload)
+        if (isV6Payload || isV5Payload)
         {
             var rawNeowSelectionMode = payload[6];
             neowSelectionMode = Enum.IsDefined(typeof(NeowExtraOptionSelectionMode), rawNeowSelectionMode)
@@ -345,24 +362,26 @@ internal static class ReAstralPartyRunSettingsSync
             EnableEnigmaticSeriesEvents = hasV3GameplayFields ? payload[4] != 0 : true,
             EnableNeowExtraOption = hasV3GameplayFields ? payload[5] != 0 : true,
             NeowExtraOptionSelectionMode = neowSelectionMode,
-            EnableAllPersonas = payload[isV5Payload ? 7 : hasV3GameplayFields ? 6 : isV2Payload ? 3 : 1] != 0,
-            EnableAllVariantPersonas = payload[isV5Payload ? 8 : hasV3GameplayFields ? 7 : isV2Payload ? 4 : 2] != 0,
+            EnableAllPersonas = payload[hasV5GameplayLayout ? 7 : hasV3GameplayFields ? 6 : isV2Payload ? 3 : 1] != 0,
+            EnableAllVariantPersonas = payload[hasV5GameplayLayout ? 8 : hasV3GameplayFields ? 7 : isV2Payload ? 4 : 2] != 0,
             StartingPersonaMode = isLegacyPayload
                 ? StartingPersonaMode.Standard
-                : Enum.IsDefined(typeof(StartingPersonaMode), payload[isV5Payload ? 9 : hasV3GameplayFields ? 8 : isV2Payload ? 5 : 3])
-                    ? (StartingPersonaMode)payload[isV5Payload ? 9 : hasV3GameplayFields ? 8 : isV2Payload ? 5 : 3]
+                : Enum.IsDefined(typeof(StartingPersonaMode), payload[hasV5GameplayLayout ? 9 : hasV3GameplayFields ? 8 : isV2Payload ? 5 : 3])
+                    ? (StartingPersonaMode)payload[hasV5GameplayLayout ? 9 : hasV3GameplayFields ? 8 : isV2Payload ? 5 : 3]
                     : StartingPersonaMode.Standard,
-            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[isLegacyPayload ? 5 : isV5Payload ? 10 : hasV3GameplayFields ? 9 : isV2Payload ? 6 : 4])
-                ? (TokenSeriesMode)payload[isLegacyPayload ? 5 : isV5Payload ? 10 : hasV3GameplayFields ? 9 : isV2Payload ? 6 : 4]
+            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[isLegacyPayload ? 5 : hasV5GameplayLayout ? 10 : hasV3GameplayFields ? 9 : isV2Payload ? 6 : 4])
+                ? (TokenSeriesMode)payload[isLegacyPayload ? 5 : hasV5GameplayLayout ? 10 : hasV3GameplayFields ? 9 : isV2Payload ? 6 : 4]
                 : TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = payload[isLegacyPayload ? 6 : isV5Payload ? 11 : hasV3GameplayFields ? 10 : isV2Payload ? 7 : 5] != 0,
-            EnableLucidDreamFishScalesMalice = (isV5Payload && payload[12] != 0) || (isV4Payload && payload[11] != 0),
-            EnableLucidDreamSevereWoundOneMalice = (isV5Payload && payload[13] != 0) || (isV4Payload && payload[12] != 0),
-            EnableLucidDreamSevereWoundTwoMalice = (isV5Payload && payload[14] != 0) || (isV4Payload && payload[13] != 0),
-            EnableLucidDreamMadLifeMalice = (isV5Payload && payload[15] != 0) || (isV4Payload && payload[14] != 0),
-            EnableLucidDreamSwampOfFateMalice = (isV5Payload && payload[16] != 0) || (isV4Payload && payload[15] != 0),
-            EnableLucidDreamOverpopulationMalice = (isV5Payload && payload[17] != 0) || (isV4Payload && payload[16] != 0),
-            EnableLucidDreamCautiousJellyfishMalice = (isV5Payload && payload[18] != 0) || (isV4Payload && payload[17] != 0),
+            EnablePureAngelMode = payload[isLegacyPayload ? 6 : hasV5GameplayLayout ? 11 : hasV3GameplayFields ? 10 : isV2Payload ? 7 : 5] != 0,
+            EnableLucidDreamFalseLifeline = isV6Payload && payload[12] != 0,
+            EnableLucidDreamSmoothSailing = isV6Payload && payload[13] != 0,
+            EnableLucidDreamFishScalesMalice = (isV6Payload && payload[14] != 0) || (isV5Payload && payload[12] != 0) || (isV4Payload && payload[11] != 0),
+            EnableLucidDreamSevereWoundOneMalice = (isV6Payload && payload[15] != 0) || (isV5Payload && payload[13] != 0) || (isV4Payload && payload[12] != 0),
+            EnableLucidDreamSevereWoundTwoMalice = (isV6Payload && payload[16] != 0) || (isV5Payload && payload[14] != 0) || (isV4Payload && payload[13] != 0),
+            EnableLucidDreamMadLifeMalice = (isV6Payload && payload[17] != 0) || (isV5Payload && payload[15] != 0) || (isV4Payload && payload[14] != 0),
+            EnableLucidDreamSwampOfFateMalice = (isV6Payload && payload[18] != 0) || (isV5Payload && payload[16] != 0) || (isV4Payload && payload[15] != 0),
+            EnableLucidDreamOverpopulationMalice = (isV6Payload && payload[19] != 0) || (isV5Payload && payload[17] != 0) || (isV4Payload && payload[16] != 0),
+            EnableLucidDreamCautiousJellyfishMalice = (isV6Payload && payload[20] != 0) || (isV5Payload && payload[18] != 0) || (isV4Payload && payload[17] != 0),
             BannedRelicIdsSerialized = bannedIds
         };
         if (isLegacyPayload)
@@ -566,6 +585,10 @@ internal static class ReAstralPartyRunSettingsSync
     private static int CountEnabledLucidDreamMaliceFlags(ReAstralPartyRunSettingsSnapshot snapshot)
     {
         var count = 0;
+        if (snapshot.EnableLucidDreamFalseLifeline)
+            count++;
+        if (snapshot.EnableLucidDreamSmoothSailing)
+            count++;
         if (snapshot.EnableLucidDreamFishScalesMalice)
             count++;
         if (snapshot.EnableLucidDreamSevereWoundOneMalice)

@@ -2,9 +2,13 @@ using System;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
+using MegaCrit.Sts2.Core.Nodes.Screens.Map;
 using MegaCrit.Sts2.Core.Runs;
+using HarmonyLib;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 
@@ -12,6 +16,8 @@ internal static class LucidDreamMaliceRuntimeHelper
 {
     private sealed record WeakEncounterMonsterCandidate(MonsterModel Monster, string StableId);
     private static readonly HashSet<uint> OverpopulationSpawnCombatIds = [];
+    private static readonly AccessTools.FieldRef<NMapScreen, RunState?> MapScreenRunStateField =
+        AccessTools.FieldRefAccess<NMapScreen, RunState?>("_runState");
 
     public static LucidDreamMaliceModifier? GetModifier(IRunState? runState)
     {
@@ -210,5 +216,57 @@ internal static class LucidDreamMaliceRuntimeHelper
 
         candidates.Sort(static (left, right) => string.CompareOrdinal(left.StableId, right.StableId));
         return candidates;
+    }
+
+    public static decimal CalculateFalseLifelineHealAmount(Player? player)
+    {
+        var creature = player?.Creature;
+        if (creature == null)
+            return 0m;
+
+        var missingHp = Math.Max(0m, creature.MaxHp - creature.CurrentHp);
+        if (missingHp <= 0m)
+            return 0m;
+
+        return Math.Max(1m, Math.Ceiling(missingHp * 0.25m));
+    }
+
+    public static bool ApplySmoothSailingToMap(ActMap? map)
+    {
+        if (map == null)
+            return false;
+
+        var changed = false;
+        foreach (var point in map.GetAllMapPoints())
+        {
+            if (point.PointType != MapPointType.Elite)
+                continue;
+
+            point.PointType = MapPointType.Monster;
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    public static void RefreshMapScreenPointsIfNeeded(RunState? runState, ActMap? map)
+    {
+        if (runState == null || map == null)
+            return;
+
+        var screen = NMapScreen.Instance;
+        if (screen == null)
+            return;
+
+        if (MapScreenRunStateField(screen) != runState)
+            return;
+
+        var mapPointDictionaryField = AccessTools.Field(typeof(NMapScreen), "_mapPointDictionary");
+        if (mapPointDictionaryField?.GetValue(screen) is not IDictionary<MapCoord, NMapPoint> mapPointDictionary)
+            return;
+
+        foreach (var point in map.GetAllMapPoints())
+            if (mapPointDictionary.TryGetValue(point.coord, out var mapPoint))
+                mapPoint.RefreshVisualsInstantly();
     }
 }

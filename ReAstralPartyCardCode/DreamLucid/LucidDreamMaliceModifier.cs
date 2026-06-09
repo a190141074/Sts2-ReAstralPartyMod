@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.Hooks;
+using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
@@ -24,6 +25,12 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 [RegisterGoodModifier]
 public sealed class LucidDreamMaliceModifier : ModifierModel
 {
+    [SavedProperty]
+    public bool EnableFalseLifeline { get; set; }
+
+    [SavedProperty]
+    public bool EnableSmoothSailing { get; set; }
+
     [SavedProperty]
     public bool EnableFishScalesMalice { get; set; }
 
@@ -54,6 +61,9 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     public override bool ShouldReceiveCombatHooks => true;
 
     public bool HasAnyEnabled =>
+        EnableFalseLifeline
+        || EnableSmoothSailing
+        ||
         EnableFishScalesMalice
         || EnableSevereWoundOneMalice
         || EnableSevereWoundTwoMalice
@@ -64,6 +74,8 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
 
     public void ApplySnapshot(ReAstralPartyRunSettingsSnapshot snapshot)
     {
+        EnableFalseLifeline = snapshot.EnableLucidDreamFalseLifeline;
+        EnableSmoothSailing = snapshot.EnableLucidDreamSmoothSailing;
         EnableFishScalesMalice = snapshot.EnableLucidDreamFishScalesMalice;
         EnableSevereWoundOneMalice = snapshot.EnableLucidDreamSevereWoundOneMalice;
         EnableSevereWoundTwoMalice = snapshot.EnableLucidDreamSevereWoundTwoMalice;
@@ -151,6 +163,32 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
             && room is CombatRoom
             && room.RoomType is not (RoomType.Elite or RoomType.Boss);
         return Task.CompletedTask;
+    }
+
+    public override async Task AfterRoomEntered(AbstractRoom room)
+    {
+        if (!EnableFalseLifeline || room.RoomType is not (RoomType.RestSite or RoomType.Shop) || RunState == null)
+            return;
+
+        foreach (var player in RunState.Players.OrderBy(static player => player.NetId))
+        {
+            var healAmount = LucidDreamMaliceRuntimeHelper.CalculateFalseLifelineHealAmount(player);
+            if (healAmount <= 0m || player.Creature == null)
+                continue;
+
+            await CreatureCmd.Heal(player.Creature, healAmount, true);
+        }
+    }
+
+    public override ActMap ModifyGeneratedMapLate(IRunState runState, ActMap map, int actIndex)
+    {
+        if (!EnableSmoothSailing)
+            return map;
+
+        if (LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(map))
+            LucidDreamMaliceRuntimeHelper.RefreshMapScreenPointsIfNeeded(RunState, map);
+
+        return map;
     }
 
     public override async Task BeforeCombatStart()
