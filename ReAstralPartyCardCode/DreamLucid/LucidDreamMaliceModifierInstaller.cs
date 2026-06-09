@@ -1,4 +1,5 @@
 using System.Reflection;
+using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -51,6 +52,8 @@ public static class LucidDreamMaliceModifierInstaller
                 LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(runState.Map);
                 LucidDreamMaliceRuntimeHelper.RefreshMapScreenPointsIfNeeded(runState, runState.Map);
             }
+
+            TaskHelper.RunSafely(LucidDreamMaliceRuntimeHelper.EnsureWildnessAppliedToActiveCombatAsync(runState));
             MainFile.Logger.Info(
                 $"LucidDreamMalice modifier refreshed | loadedRun={loadedRun} | modifiers={runState.Modifiers.Count} | enabledFlags={CountEnabledFlags(existingModifier)}");
             return;
@@ -68,6 +71,8 @@ public static class LucidDreamMaliceModifierInstaller
             LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(runState.Map);
             LucidDreamMaliceRuntimeHelper.RefreshMapScreenPointsIfNeeded(runState, runState.Map);
         }
+
+        TaskHelper.RunSafely(LucidDreamMaliceRuntimeHelper.EnsureWildnessAppliedToActiveCombatAsync(runState));
 
         MainFile.Logger.Info(
             $"LucidDreamMalice modifier installed | loadedRun={loadedRun} | modifiers={runState.Modifiers.Count} | enabledFlags={CountEnabledFlags(modifier)}");
@@ -115,6 +120,16 @@ public static class LucidDreamMaliceModifierInstaller
         if (modifier.EnableOverpopulationMalice)
             count++;
         if (modifier.EnableCautiousJellyfishMalice)
+            count++;
+        if (modifier.EnableFaceDeathWithComposure)
+            count++;
+        if (modifier.EnableWildness)
+            count++;
+        if (modifier.EnablePitchBlackImpulse)
+            count++;
+        if (modifier.EnableBubblePotionOfDreams)
+            count++;
+        if (modifier.EnableHarmlessWhisper)
             count++;
         return count;
     }

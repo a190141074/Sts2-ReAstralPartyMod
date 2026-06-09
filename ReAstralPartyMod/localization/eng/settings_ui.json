@@ -127,7 +127,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.title": "Lucid Dream: Wildness",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.description": "All enemy units gain Hunterization, increasing damage, block gain, and HP by [blue](15 * map stage)%[/blue]. Unfinished; not implemented yet.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.title": "Lucid Dream: Pitch Black Impulse",
-  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.description": "Enemy attack damage also hits other enemies, and enemies gain 1 Strength whenever they kill any unit. Unfinished; not implemented yet.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.description": "Multi-target damage also deals [purple]50%[/purple] damage to other players. Explicit multi-hit damage retargets each hit to a [purple]random enemy or other player[/purple]. Killing any unit grants [purple]3 Strength[/purple].",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.bubble_potion_of_dreams.title": "Lucid Dream: Bubble Potion of Dreams",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.bubble_potion_of_dreams.description": "Resting no longer heals you and instead grants gold equal to the converted value multiplied by 3. Unfinished; not implemented yet.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.harmless_whisper.title": "Lucid Dream: Harmless Whisper",

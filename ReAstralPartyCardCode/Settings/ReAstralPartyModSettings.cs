@@ -558,6 +558,91 @@ public static partial class ReAstralPartyModSettingsManager
         return false;
     }
 
+    public static bool GetEnableLucidDreamFaceDeathWithComposure(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamFaceDeathWithComposure;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamFaceDeathWithComposure;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamFaceDeathWithComposure;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamWildness(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamWildness;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamWildness;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamWildness;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamPitchBlackImpulse(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamPitchBlackImpulse;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamPitchBlackImpulse;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamPitchBlackImpulse;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamBubblePotionOfDreams(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamBubblePotionOfDreams;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamBubblePotionOfDreams;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamBubblePotionOfDreams;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
+    public static bool GetEnableLucidDreamHarmlessWhisper(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableLucidDreamHarmlessWhisper;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableLucidDreamHarmlessWhisper;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableLucidDreamHarmlessWhisper;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
     public static bool HasAnyLucidDreamBenevolenceEnabled(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
@@ -619,10 +704,46 @@ public static partial class ReAstralPartyModSettingsManager
         return false;
     }
 
+    public static bool HasAnyLucidDreamChaosEnabled(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+        {
+            return snapshot.EnableLucidDreamFaceDeathWithComposure
+                   || snapshot.EnableLucidDreamWildness
+                   || snapshot.EnableLucidDreamPitchBlackImpulse
+                   || snapshot.EnableLucidDreamBubblePotionOfDreams
+                   || snapshot.EnableLucidDreamHarmlessWhisper;
+        }
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+        {
+            return lobbySnapshot.EnableLucidDreamFaceDeathWithComposure
+                   || lobbySnapshot.EnableLucidDreamWildness
+                   || lobbySnapshot.EnableLucidDreamPitchBlackImpulse
+                   || lobbySnapshot.EnableLucidDreamBubblePotionOfDreams
+                   || lobbySnapshot.EnableLucidDreamHarmlessWhisper;
+        }
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+        {
+            return localFallback.EnableLucidDreamFaceDeathWithComposure
+                   || localFallback.EnableLucidDreamWildness
+                   || localFallback.EnableLucidDreamPitchBlackImpulse
+                   || localFallback.EnableLucidDreamBubblePotionOfDreams
+                   || localFallback.EnableLucidDreamHarmlessWhisper;
+        }
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return false;
+    }
+
     public static bool HasAnyLucidDreamEnabled(IRunState? runState)
     {
         return HasAnyLucidDreamBenevolenceEnabled(runState)
-               || HasAnyLucidDreamMaliceEnabled(runState);
+               || HasAnyLucidDreamMaliceEnabled(runState)
+               || HasAnyLucidDreamChaosEnabled(runState);
     }
 
     public static bool GetEnableDuplicatePersonas(IRunState? runState)
@@ -2031,6 +2152,16 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableLucidDreamCautiousJellyfishMalice { get; init; }
 
+        public bool EnableLucidDreamFaceDeathWithComposure { get; init; }
+
+        public bool EnableLucidDreamWildness { get; init; }
+
+        public bool EnableLucidDreamPitchBlackImpulse { get; init; }
+
+        public bool EnableLucidDreamBubblePotionOfDreams { get; init; }
+
+        public bool EnableLucidDreamHarmlessWhisper { get; init; }
+
         public LobbyPanelStateSnapshot LobbyPanelState { get; init; } = new();
 
         public static LocalRuntimeSettings FromPersistent(ReAstralPartyModSettings settings)
@@ -2072,6 +2203,11 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableLucidDreamSwampOfFateMalice = false,
                 EnableLucidDreamOverpopulationMalice = false,
                 EnableLucidDreamCautiousJellyfishMalice = false,
+                EnableLucidDreamFaceDeathWithComposure = false,
+                EnableLucidDreamWildness = false,
+                EnableLucidDreamPitchBlackImpulse = false,
+                EnableLucidDreamBubblePotionOfDreams = false,
+                EnableLucidDreamHarmlessWhisper = false,
                 LobbyPanelState = new LobbyPanelStateSnapshot
                 {
                     IsCollapsed = settings.LobbyPanelState?.IsCollapsed ?? false,

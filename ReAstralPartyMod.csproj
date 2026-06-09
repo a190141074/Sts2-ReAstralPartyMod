@@ -529,6 +529,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_tasty_candy.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_fragile_crown.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_fragile_crown.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\moon_prop_hellfire_tincture.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\moon_prop_hellfire_tincture.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_shaped_glass.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_shaped_glass.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_living_folio.png"/>

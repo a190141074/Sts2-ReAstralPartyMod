@@ -132,7 +132,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.title": "明晰夢・野性",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.description": "すべての敵ユニットが狩人化を獲得し、ダメージ・ブロック獲得量・HPが[blue](15*マップ段階数)%[/blue]上昇します。未完成、まだ未実装です。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.title": "明晰夢・漆黒の衝動",
-  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.description": "敵の攻撃ダメージが他の敵にも当たり、敵が任意のユニットを倒すたびに1筋力を得ます。未完成、まだ未実装です。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.description": "範囲ダメージは他のプレイヤーにも[purple]50%[/purple]のダメージを与えます。明示的な多段ダメージは各ヒットごとに[purple]敵か他のプレイヤーへのランダム対象[/purple]へ振り直されます。任意のユニットを倒すと[purple]筋力3[/purple]を得ます。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.bubble_potion_of_dreams.title": "明晰夢・夢の気泡薬瓶",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.bubble_potion_of_dreams.description": "休憩でHPを回復しなくなり、代わりに変換値と等しい値の3倍のゴールドを得ます。未完成、まだ未実装です。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.harmless_whisper.title": "明晰夢・無害な囁き",

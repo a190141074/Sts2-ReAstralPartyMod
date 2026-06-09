@@ -596,5 +596,8 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_FRAGILE_CROWN.flavor": "富豪になるか、破産するか。その差は一瞬の判断に過ぎない。",
   "RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_SHAPED_GLASS.title": "【月球・塑形ガラス】",
   "RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_SHAPED_GLASS.description": "· 敵に与えるダメージは、その元の値と同じだけさらに増える。\n· 現在HPは最大HPの[blue]50%[/blue]を超えられない。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_SHAPED_GLASS.flavor": "時間は公平だ。ただ、まだ多すぎるだけだ。"
+  "RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_SHAPED_GLASS.flavor": "時間は公平だ。ただ、まだ多すぎるだけだ。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_HELLFIRE_TINCTURE.title": "【月球・地獄火チンキ】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_HELLFIRE_TINCTURE.description": "· あなたのターン開始時、すべてのユニットを点火する。\n· 自身は最大HPの[blue]2.5%[/blue]に等しい燃焼ダメージを受ける。\n· 他の味方はその[blue]25%[/blue]を受ける。\n· 敵はその[blue]12[/blue]倍を受ける。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_HELLFIRE_TINCTURE.flavor": "私は、燃えた。私の時間を測れ。"
 }

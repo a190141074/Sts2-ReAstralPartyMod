@@ -57,6 +57,8 @@ public static class NTopBarModifierLucidDreamMalicePatch
         if (modifierField?.GetValue(__instance) is not LucidDreamMaliceModifier modifier || hoverTipField == null)
             return;
 
+        __instance.Visible = false;
+
         var hoverTip = LucidDreamMaliceUiHelper.BuildHoverTip(
             modifier.EnableFalseLifeline,
             modifier.EnableSmoothSailing,
@@ -66,7 +68,12 @@ public static class NTopBarModifierLucidDreamMalicePatch
             modifier.EnableMadLifeMalice,
             modifier.EnableSwampOfFateMalice,
             modifier.EnableOverpopulationMalice,
-            modifier.EnableCautiousJellyfishMalice);
+            modifier.EnableCautiousJellyfishMalice,
+            modifier.EnableFaceDeathWithComposure,
+            modifier.EnableWildness,
+            modifier.EnablePitchBlackImpulse,
+            modifier.EnableBubblePotionOfDreams,
+            modifier.EnableHarmlessWhisper);
         if (hoverTip == null)
             return;
 

@@ -305,6 +305,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<CreatureHealMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureHealEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
+        patcher.RegisterPatch<CreatureDamageLucidDreamPitchBlackImpulsePatch>();
         patcher.RegisterPatch<CreatureSetCurrentHpMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureGainMaxHpMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureLoseMaxHpMoonPropShapedGlassPatch>();

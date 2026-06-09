@@ -208,7 +208,7 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
         new(
             LucidDreamPanelGroup.Chaos,
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.title",
-            true,
+            false,
             ChaosEntries)
     ];
 

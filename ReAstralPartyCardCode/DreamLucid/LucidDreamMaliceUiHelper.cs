@@ -31,6 +31,16 @@ internal static class LucidDreamMaliceUiHelper
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.overpopulation.title");
         AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamCautiousJellyfishMalice(runState),
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.title");
+        AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamFaceDeathWithComposure(runState),
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.face_death_with_composure.title");
+        AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamWildness(runState),
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.title");
+        AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamPitchBlackImpulse(runState),
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.title");
+        AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamBubblePotionOfDreams(runState),
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.bubble_potion_of_dreams.title");
+        AddEnabledLine(lines, ReAstralPartyModSettingsManager.GetEnableLucidDreamHarmlessWhisper(runState),
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.harmless_whisper.title");
 
         return BuildHoverTipFromEnabledTitles(lines);
     }
@@ -44,7 +54,12 @@ internal static class LucidDreamMaliceUiHelper
         bool enableMadLifeMalice,
         bool enableSwampOfFateMalice,
         bool enableOverpopulationMalice,
-        bool enableCautiousJellyfishMalice)
+        bool enableCautiousJellyfishMalice,
+        bool enableFaceDeathWithComposure,
+        bool enableWildness,
+        bool enablePitchBlackImpulse,
+        bool enableBubblePotionOfDreams,
+        bool enableHarmlessWhisper)
     {
         var lines = new List<string>();
 
@@ -66,6 +81,16 @@ internal static class LucidDreamMaliceUiHelper
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.overpopulation.title");
         AddEnabledLine(lines, enableCautiousJellyfishMalice,
             "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.title");
+        AddEnabledLine(lines, enableFaceDeathWithComposure,
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.face_death_with_composure.title");
+        AddEnabledLine(lines, enableWildness,
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.wildness.title");
+        AddEnabledLine(lines, enablePitchBlackImpulse,
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.pitch_black_impulse.title");
+        AddEnabledLine(lines, enableBubblePotionOfDreams,
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.bubble_potion_of_dreams.title");
+        AddEnabledLine(lines, enableHarmlessWhisper,
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.harmless_whisper.title");
 
         return BuildHoverTipFromEnabledTitles(lines);
     }
