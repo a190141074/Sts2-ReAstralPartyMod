@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -27,77 +28,215 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 [RegisterGoodModifier]
 public sealed class LucidDreamMaliceModifier : ModifierModel
 {
+    private const int MaxSavedDreamStateEntries = 512;
+
+    private List<int> _dreamPathCols = [];
+    private List<int> _dreamPathRows = [];
+    private List<int> _dreamVisitCols = [];
+    private List<int> _dreamVisitRows = [];
+    private List<int> _dreamVisitCounts = [];
+
+    // Keep public runtime names stable while SavedProperty only sees prefixed backing fields.
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableFalseLifeline { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableSmoothSailing { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableDreamMode { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableFishScalesMalice { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableSevereWoundOneMalice { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableSevereWoundTwoMalice { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableMadLifeMalice { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableSwampOfFateMalice { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableOverpopulationMalice { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableCautiousJellyfishMalice { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableFaceDeathWithComposure { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableWildness { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableWildnessPhantom { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnablePitchBlackImpulse { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableBubblePotionOfDreams { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableHarmlessWhisper { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceHasSpawnedOverpopulationEnemyThisRun { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMalicePendingOverpopulationSpawnThisCombat { get; set; }
+
+    public bool EnableFalseLifeline
+    {
+        get => AstralParty_LucidDreamMaliceEnableFalseLifeline;
+        set => AstralParty_LucidDreamMaliceEnableFalseLifeline = value;
+    }
+
+    public bool EnableSmoothSailing
+    {
+        get => AstralParty_LucidDreamMaliceEnableSmoothSailing;
+        set => AstralParty_LucidDreamMaliceEnableSmoothSailing = value;
+    }
+
+    public bool EnableDreamMode
+    {
+        get => AstralParty_LucidDreamMaliceEnableDreamMode;
+        set => AstralParty_LucidDreamMaliceEnableDreamMode = value;
+    }
+
+    public bool EnableFishScalesMalice
+    {
+        get => AstralParty_LucidDreamMaliceEnableFishScalesMalice;
+        set => AstralParty_LucidDreamMaliceEnableFishScalesMalice = value;
+    }
+
+    public bool EnableSevereWoundOneMalice
+    {
+        get => AstralParty_LucidDreamMaliceEnableSevereWoundOneMalice;
+        set => AstralParty_LucidDreamMaliceEnableSevereWoundOneMalice = value;
+    }
+
+    public bool EnableSevereWoundTwoMalice
+    {
+        get => AstralParty_LucidDreamMaliceEnableSevereWoundTwoMalice;
+        set => AstralParty_LucidDreamMaliceEnableSevereWoundTwoMalice = value;
+    }
+
+    public bool EnableMadLifeMalice
+    {
+        get => AstralParty_LucidDreamMaliceEnableMadLifeMalice;
+        set => AstralParty_LucidDreamMaliceEnableMadLifeMalice = value;
+    }
+
+    public bool EnableSwampOfFateMalice
+    {
+        get => AstralParty_LucidDreamMaliceEnableSwampOfFateMalice;
+        set => AstralParty_LucidDreamMaliceEnableSwampOfFateMalice = value;
+    }
+
+    public bool EnableOverpopulationMalice
+    {
+        get => AstralParty_LucidDreamMaliceEnableOverpopulationMalice;
+        set => AstralParty_LucidDreamMaliceEnableOverpopulationMalice = value;
+    }
+
+    public bool EnableCautiousJellyfishMalice
+    {
+        get => AstralParty_LucidDreamMaliceEnableCautiousJellyfishMalice;
+        set => AstralParty_LucidDreamMaliceEnableCautiousJellyfishMalice = value;
+    }
+
+    public bool EnableFaceDeathWithComposure
+    {
+        get => AstralParty_LucidDreamMaliceEnableFaceDeathWithComposure;
+        set => AstralParty_LucidDreamMaliceEnableFaceDeathWithComposure = value;
+    }
+
+    public bool EnableWildness
+    {
+        get => AstralParty_LucidDreamMaliceEnableWildness;
+        set => AstralParty_LucidDreamMaliceEnableWildness = value;
+    }
+
+    public bool EnableWildnessPhantom
+    {
+        get => AstralParty_LucidDreamMaliceEnableWildnessPhantom;
+        set => AstralParty_LucidDreamMaliceEnableWildnessPhantom = value;
+    }
+
+    public bool EnablePitchBlackImpulse
+    {
+        get => AstralParty_LucidDreamMaliceEnablePitchBlackImpulse;
+        set => AstralParty_LucidDreamMaliceEnablePitchBlackImpulse = value;
+    }
+
+    public bool EnableBubblePotionOfDreams
+    {
+        get => AstralParty_LucidDreamMaliceEnableBubblePotionOfDreams;
+        set => AstralParty_LucidDreamMaliceEnableBubblePotionOfDreams = value;
+    }
+
+    public bool EnableHarmlessWhisper
+    {
+        get => AstralParty_LucidDreamMaliceEnableHarmlessWhisper;
+        set => AstralParty_LucidDreamMaliceEnableHarmlessWhisper = value;
+    }
+
+    public bool HasSpawnedOverpopulationEnemyThisRun
+    {
+        get => AstralParty_LucidDreamMaliceHasSpawnedOverpopulationEnemyThisRun;
+        set => AstralParty_LucidDreamMaliceHasSpawnedOverpopulationEnemyThisRun = value;
+    }
+
+    public bool PendingOverpopulationSpawnThisCombat
+    {
+        get => AstralParty_LucidDreamMalicePendingOverpopulationSpawnThisCombat;
+        set => AstralParty_LucidDreamMalicePendingOverpopulationSpawnThisCombat = value;
+    }
+
+    // BaseLib [SavedProperty] does not support List<T>; keep lists runtime-only and save stable JSON strings.
     [SavedProperty]
-    public bool EnableFalseLifeline { get; set; }
+    private string AstralParty_LucidDreamMaliceDreamPathColsJson
+    {
+        get => SerializeIntList(_dreamPathCols);
+        set => _dreamPathCols = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamPathColsJson));
+    }
 
     [SavedProperty]
-    public bool EnableSmoothSailing { get; set; }
+    private string AstralParty_LucidDreamMaliceDreamPathRowsJson
+    {
+        get => SerializeIntList(_dreamPathRows);
+        set => _dreamPathRows = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamPathRowsJson));
+    }
 
     [SavedProperty]
-    public bool EnableDreamMode { get; set; }
+    private string AstralParty_LucidDreamMaliceDreamVisitColsJson
+    {
+        get => SerializeIntList(_dreamVisitCols);
+        set => _dreamVisitCols = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamVisitColsJson));
+    }
 
     [SavedProperty]
-    public bool EnableFishScalesMalice { get; set; }
+    private string AstralParty_LucidDreamMaliceDreamVisitRowsJson
+    {
+        get => SerializeIntList(_dreamVisitRows);
+        set => _dreamVisitRows = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamVisitRowsJson));
+    }
 
     [SavedProperty]
-    public bool EnableSevereWoundOneMalice { get; set; }
+    private string AstralParty_LucidDreamMaliceDreamVisitCountsJson
+    {
+        get => SerializeIntList(_dreamVisitCounts);
+        set => _dreamVisitCounts = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamVisitCountsJson));
+    }
 
-    [SavedProperty]
-    public bool EnableSevereWoundTwoMalice { get; set; }
+    public List<int> DreamPathCols
+    {
+        get => _dreamPathCols;
+        set => _dreamPathCols = value ?? [];
+    }
 
-    [SavedProperty]
-    public bool EnableMadLifeMalice { get; set; }
+    public List<int> DreamPathRows
+    {
+        get => _dreamPathRows;
+        set => _dreamPathRows = value ?? [];
+    }
 
-    [SavedProperty]
-    public bool EnableSwampOfFateMalice { get; set; }
+    public List<int> DreamVisitCols
+    {
+        get => _dreamVisitCols;
+        set => _dreamVisitCols = value ?? [];
+    }
 
-    [SavedProperty]
-    public bool EnableOverpopulationMalice { get; set; }
+    public List<int> DreamVisitRows
+    {
+        get => _dreamVisitRows;
+        set => _dreamVisitRows = value ?? [];
+    }
 
-    [SavedProperty]
-    public bool EnableCautiousJellyfishMalice { get; set; }
+    public List<int> DreamVisitCounts
+    {
+        get => _dreamVisitCounts;
+        set => _dreamVisitCounts = value ?? [];
+    }
 
-    [SavedProperty]
-    public bool EnableFaceDeathWithComposure { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceIsInDreamModeRevisitedRestSite { get; set; }
 
-    [SavedProperty]
-    public bool EnableWildness { get; set; }
-
-    [SavedProperty]
-    public bool EnableWildnessPhantom { get; set; }
-
-    [SavedProperty]
-    public bool EnablePitchBlackImpulse { get; set; }
-
-    [SavedProperty]
-    public bool EnableBubblePotionOfDreams { get; set; }
-
-    [SavedProperty]
-    public bool EnableHarmlessWhisper { get; set; }
-
-    [SavedProperty]
-    public bool HasSpawnedOverpopulationEnemyThisRun { get; set; }
-
-    [SavedProperty]
-    public bool PendingOverpopulationSpawnThisCombat { get; set; }
-
-    [SavedProperty]
-    public List<int> DreamPathCols { get; set; } = [];
-
-    [SavedProperty]
-    public List<int> DreamPathRows { get; set; } = [];
-
-    [SavedProperty]
-    public List<int> DreamVisitCols { get; set; } = [];
-
-    [SavedProperty]
-    public List<int> DreamVisitRows { get; set; } = [];
-
-    [SavedProperty]
-    public List<int> DreamVisitCounts { get; set; } = [];
-
-    [SavedProperty]
-    public bool IsInDreamModeRevisitedRestSite { get; set; }
+    public bool IsInDreamModeRevisitedRestSite
+    {
+        get => AstralParty_LucidDreamMaliceIsInDreamModeRevisitedRestSite;
+        set => AstralParty_LucidDreamMaliceIsInDreamModeRevisitedRestSite = value;
+    }
 
     public override bool ShouldReceiveCombatHooks => true;
 
@@ -143,6 +282,30 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     public static LucidDreamMaliceModifier? Get(RunState? runState)
     {
         return runState?.Modifiers.OfType<LucidDreamMaliceModifier>().FirstOrDefault();
+    }
+
+    private static string SerializeIntList(IReadOnlyList<int> values)
+    {
+        return JsonSerializer.Serialize(values.Take(MaxSavedDreamStateEntries).ToArray());
+    }
+
+    private static List<int> DeserializeIntList(string? value, string propertyName)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return [];
+
+        try
+        {
+            return (JsonSerializer.Deserialize<int[]>(value) ?? [])
+                .Take(MaxSavedDreamStateEntries)
+                .ToList();
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn(
+                $"[LucidDreamMalice] Failed to deserialize saved dream state '{propertyName}'; resetting that cache. {ex.GetType().Name}: {ex.Message}");
+            return [];
+        }
     }
 
     public override bool TryModifyPowerAmountReceived(

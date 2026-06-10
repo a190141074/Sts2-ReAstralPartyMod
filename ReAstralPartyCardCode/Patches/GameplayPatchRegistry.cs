@@ -327,9 +327,17 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<EnigmaticSynthesisXpScrollRestSitePatch>();
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
         patcher.RegisterPatch<PlayerGainGoldEnigmaticSynthesisCursedScrollPatch>();
+        patcher.RegisterPatch<MoonPropEulogyZeroObtainPatch>();
         patcher.RegisterPatch<MoonPropShopCreateInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopInitializeInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopStackPurchasePatch>();
+        patcher.RegisterPatch<MoonPropShopFreePurchaseCardPrefixPatch>();
+        patcher.RegisterPatch<MoonPropShopFreePurchasePotionPrefixPatch>();
+        patcher.RegisterPatch<MoonPropShopFreePurchaseRemovalPrefixPatch>();
+        patcher.RegisterPatch<MoonPropShopFreePurchaseRelicPatch>();
+        patcher.RegisterPatch<MoonPropShopFreePurchaseCardPatch>();
+        patcher.RegisterPatch<MoonPropShopFreePurchasePotionPatch>();
+        patcher.RegisterPatch<MoonPropShopFreePurchaseRemovalPatch>();
         patcher.RegisterPatch<PunitiveJudgmentHandEntryPatch>();
         patcher.RegisterPatch<StokovStarterRelicUpgradePatch>();
         patcher.RegisterPatch<DreamModeTravelabilityPatch>();

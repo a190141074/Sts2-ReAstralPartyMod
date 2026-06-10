@@ -5,6 +5,8 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.description": "【人格：绿油油】进入房间时获得的步数。其他、休息处、商店、宝箱房提供 [blue]2[/blue] 步；\n事件房间提供 [blue]3[/blue] 步；\n普通怪物房提供 [blue]5[/blue] 步；\n精英房间提供 [blue]8[/blue] 步；\nBoss 房间提供 [blue]12[/blue] 步；\n地图阶段提供 [blue]10[/blue] 步。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_TEMPORARY.title": "临时",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_TEMPORARY.description": "回合结束时自动弃置，进入弃牌堆后此关键词自动消除。",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MOON_PROP.title": "月球遗物",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MOON_PROP.description": "月球遗物可以多次购买，随着层数变化效果，会变化的数值将会用紫色标注。\n\n[gold][i]“——知道自己想要什么，一半在于知道得到前必须放弃什么。”[/i][/gold]",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ETERNAL_STARLIGHT_SET.title": "【套装·永恒星光】",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ETERNAL_STARLIGHT_SET.description": "进入商店时，根据永恒星光层数获得额外效果：\n· 如果永恒星光达到[blue]10[/blue]以上，进入商店获得[blue]5[/blue]金币\n· 如果永恒星光达到[blue]25[/blue]以上，进入商店获得[blue]15[/blue]金币\n· 如果永恒星光达到[blue]40[/blue]以上，进入商店获得[blue]25[/blue]金币\n· 如果永恒星光达到[blue]56[/blue]以上，进入商店获得[blue]25[/blue]金币；立即获得会员卡",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_DICE_SET.title": "【套装·骰子】",

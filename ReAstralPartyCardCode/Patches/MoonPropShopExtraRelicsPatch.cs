@@ -29,12 +29,50 @@ internal static class MoonPropShopExtraRelicsHelper
         static () => ModelDb.Relic<MoonPropFragileCrown>(),
         static () => ModelDb.Relic<MoonPropHellfireTincture>(),
         static () => ModelDb.Relic<MoonPropShapedGlass>(),
+        static () => ModelDb.Relic<MoonPropLongstandingSolitude>(),
         static () => ModelDb.Relic<MoonPropCorpsebloom>(),
         static () => ModelDb.Relic<MoonPropFocusedConvergence>(),
+        static () => ModelDb.Relic<MoonPropTranscendence>(),
+        static () => ModelDb.Relic<MoonPropEgocentrism>(),
+        static () => ModelDb.Relic<MoonPropEulogyZero>(),
         static () => ModelDb.Relic<MoonPropMercurialRachis>(),
         static () => ModelDb.Relic<MoonPropLightFluxPauldron>(),
-        static () => ModelDb.Relic<MoonPropStoneFluxPauldron>()
+        static () => ModelDb.Relic<MoonPropStoneFluxPauldron>(),
+        static () => ModelDb.Relic<MoonPropBeadsOfFealty>()
     ];
+
+    public static bool IsMoonPropRelic(RelicModel? relic)
+    {
+        return relic is MoonPropStackableRelicBase or MoonPropBeadsOfFealty;
+    }
+
+    public static RelicModel CreateDeterministicMoonPropRelic(Player player, string contextId, params object?[] extraContext)
+    {
+        return CreateDeterministicMoonPropRelicExcluding(player, contextId, null, extraContext);
+    }
+
+    public static RelicModel CreateDeterministicMoonPropRelicExcluding(
+        Player player,
+        string contextId,
+        IReadOnlyCollection<ModelId>? excludedRelicIds,
+        params object?[] extraContext)
+    {
+        var candidateFactories = GetAvailableMoonPropRelicFactories(player, excludedRelicIds);
+        if (candidateFactories.Count == 0)
+            throw new InvalidOperationException("No Moon Prop relic candidates are available for deterministic selection.");
+
+        var selectedIndex = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+            0,
+            candidateFactories.Count,
+            MainFile.ModId,
+            contextId,
+            player.RunState?.Rng.StringSeed ?? "<null_seed>",
+            player.RunState?.CurrentActIndex ?? -1,
+            player.RunState?.TotalFloor ?? -1,
+            player.NetId,
+            extraContext.Length == 0 ? "<none>" : string.Join("|", extraContext.Select(static part => part?.ToString() ?? "<null>")));
+        return candidateFactories[selectedIndex]().ToMutable();
+    }
 
     public static void EnsureMoonPropEntries(MerchantInventory? inventory, Player? player)
     {
@@ -88,17 +126,46 @@ internal static class MoonPropShopExtraRelicsHelper
 
     private static RelicModel CreateMoonPropRelicForSlot(Player player, int slotIndex)
     {
-        var selectedIndex = DeterministicMultiplayerChoiceHelper.RollDeterministically(
-            0,
-            MoonPropRelicFactories.Length,
-            MainFile.ModId,
-            ContextId,
-            player.RunState?.Rng.StringSeed ?? "<null_seed>",
-            player.RunState?.CurrentActIndex ?? -1,
-            player.RunState?.TotalFloor ?? -1,
-            player.NetId,
-            slotIndex);
-        return MoonPropRelicFactories[selectedIndex]().ToMutable();
+        return CreateDeterministicMoonPropRelic(player, ContextId, slotIndex);
+    }
+
+    private static List<Func<RelicModel>> GetAvailableMoonPropRelicFactories(
+        Player player,
+        IReadOnlyCollection<ModelId>? excludedRelicIds)
+    {
+        var excluded = excludedRelicIds ?? Array.Empty<ModelId>();
+        var hasOwnedBeadsOfFealty = HasEverOwnedRelic(player, ModelDb.Relic<MoonPropBeadsOfFealty>().Id);
+        return MoonPropRelicFactories
+            .Where(factory =>
+            {
+                var relic = factory();
+                var relicId = GetCanonicalRelicId(relic);
+                if (excluded.Contains(relicId))
+                    return false;
+                if (relic is MoonPropBeadsOfFealty && hasOwnedBeadsOfFealty)
+                    return false;
+                return true;
+            })
+            .ToList();
+    }
+
+    private static bool HasEverOwnedRelic(Player? player, ModelId relicId)
+    {
+        if (player == null)
+            return false;
+
+        if (player.Relics.Any(relic => GetCanonicalRelicId(relic) == relicId))
+            return true;
+
+        return player.RunState.MapPointHistory
+            .SelectMany(static actEntries => actEntries)
+            .Select(entry => entry.GetEntry(player.NetId))
+            .Any(playerEntry => playerEntry.BoughtRelics.Contains(relicId));
+    }
+
+    private static ModelId GetCanonicalRelicId(RelicModel relic)
+    {
+        return (relic.CanonicalInstance ?? relic).Id;
     }
 
     private static Vector2 GetExtraSlotPosition(
@@ -213,8 +280,13 @@ public sealed class MoonPropShopStackPurchasePatch : IPatchMethod
         MoonPropStackableRelicBase existing,
         bool ignoreCost)
     {
-        var spentGold = ignoreCost ? 0 : entry.Cost;
-        if (!ignoreCost)
+        var hasDiscountCount = !ignoreCost && MoonPropLongstandingSolitudeShopHelper.HasActiveDiscountCount(owner);
+        var spentGold = ignoreCost
+            ? 0
+            : hasDiscountCount
+                ? entry.Cost
+                : entry.Cost;
+        if (spentGold > 0)
             await PlayerCmd.LoseGold(spentGold, owner, GoldLossType.Spent);
 
         owner.RunState.CurrentMapPointHistoryEntry?.GetEntry(owner.NetId).BoughtRelics.Add(entry.Model!.Id);
@@ -223,5 +295,188 @@ public sealed class MoonPropShopStackPurchasePatch : IPatchMethod
         RunManager.Instance?.RewardSynchronizer?.SyncLocalGoldLost(spentGold);
         RunManager.Instance?.RewardSynchronizer?.SyncLocalObtainedRelic(entry.Model!);
         return (true, spentGold);
+    }
+}
+
+internal static class MoonPropShopFreePurchasePatchHelper
+{
+    public static bool TryForceIgnoreCost(Player? owner, MerchantEntry? entry, bool ignoreCost, ref bool __result)
+    {
+        if (ignoreCost)
+            return false;
+        if (!MoonPropLongstandingSolitudeShopHelper.ShouldTreatEntryAsFree(owner, entry))
+            return false;
+
+        __result = true;
+        return true;
+    }
+}
+
+public sealed class MoonPropShopFreePurchaseCardPrefixPatch : IPatchMethod
+{
+    public static string PatchId => "moon_prop_shop_free_purchase_card_prefix";
+
+    public static string Description => "Treat card purchases as free while Moon Prop free purchases remain";
+
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(MerchantCardEntry), "CanAfford", [typeof(Player), typeof(bool)])];
+    }
+
+    public static bool Prefix(MerchantCardEntry __instance, Player player, bool ignoreCost, ref bool __result)
+    {
+        return !MoonPropShopFreePurchasePatchHelper.TryForceIgnoreCost(player, __instance, ignoreCost, ref __result);
+    }
+}
+
+public sealed class MoonPropShopFreePurchasePotionPrefixPatch : IPatchMethod
+{
+    public static string PatchId => "moon_prop_shop_free_purchase_potion_prefix";
+
+    public static string Description => "Treat potion purchases as free while Moon Prop free purchases remain";
+
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(MerchantPotionEntry), "CanAfford", [typeof(Player), typeof(bool)])];
+    }
+
+    public static bool Prefix(MerchantPotionEntry __instance, Player player, bool ignoreCost, ref bool __result)
+    {
+        return !MoonPropShopFreePurchasePatchHelper.TryForceIgnoreCost(player, __instance, ignoreCost, ref __result);
+    }
+}
+
+public sealed class MoonPropShopFreePurchaseRemovalPrefixPatch : IPatchMethod
+{
+    public static string PatchId => "moon_prop_shop_free_purchase_removal_prefix";
+
+    public static string Description => "Treat card removal as free while Moon Prop free purchases remain";
+
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(MerchantCardRemovalEntry), "CanAfford", [typeof(Player), typeof(bool)])];
+    }
+
+    public static bool Prefix(MerchantCardRemovalEntry __instance, Player player, bool ignoreCost, ref bool __result)
+    {
+        return !MoonPropShopFreePurchasePatchHelper.TryForceIgnoreCost(player, __instance, ignoreCost, ref __result);
+    }
+}
+
+public sealed class MoonPropShopFreePurchaseRelicPatch : IPatchMethod
+{
+    public static string PatchId => "moon_prop_shop_free_purchase_relic";
+
+    public static string Description => "Consume Moon Prop free purchases after successful normal relic purchases";
+
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(MerchantRelicEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])];
+    }
+
+    public static async Task<(bool, int)> Postfix(
+        Task<(bool, int)> __result,
+        MerchantRelicEntry __instance,
+        MerchantInventory? inventory,
+        bool ignoreCost)
+    {
+        var result = await __result;
+        if (!result.Item1 || ignoreCost || inventory?.Player == null)
+            return result;
+
+        MoonPropLongstandingSolitudeShopHelper.TryConsumeFreePurchase(inventory.Player, __instance);
+        return result;
+    }
+}
+
+public sealed class MoonPropShopFreePurchaseCardPatch : IPatchMethod
+{
+    public static string PatchId => "moon_prop_shop_free_purchase_card";
+
+    public static string Description => "Consume Moon Prop free purchases after successful card purchases";
+
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(MerchantCardEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])];
+    }
+
+    public static async Task<(bool, int)> Postfix(
+        Task<(bool, int)> __result,
+        MerchantCardEntry __instance,
+        MerchantInventory? inventory,
+        bool ignoreCost)
+    {
+        var result = await __result;
+        if (!result.Item1 || ignoreCost || inventory?.Player == null)
+            return result;
+
+        MoonPropLongstandingSolitudeShopHelper.TryConsumeFreePurchase(inventory.Player, __instance);
+        return result;
+    }
+}
+
+public sealed class MoonPropShopFreePurchasePotionPatch : IPatchMethod
+{
+    public static string PatchId => "moon_prop_shop_free_purchase_potion";
+
+    public static string Description => "Consume Moon Prop free purchases after successful potion purchases";
+
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(MerchantPotionEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])];
+    }
+
+    public static async Task<(bool, int)> Postfix(
+        Task<(bool, int)> __result,
+        MerchantPotionEntry __instance,
+        MerchantInventory? inventory,
+        bool ignoreCost)
+    {
+        var result = await __result;
+        if (!result.Item1 || ignoreCost || inventory?.Player == null)
+            return result;
+
+        MoonPropLongstandingSolitudeShopHelper.TryConsumeFreePurchase(inventory.Player, __instance);
+        return result;
+    }
+}
+
+public sealed class MoonPropShopFreePurchaseRemovalPatch : IPatchMethod
+{
+    public static string PatchId => "moon_prop_shop_free_purchase_removal";
+
+    public static string Description => "Consume Moon Prop free purchases after successful card removal purchases";
+
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets()
+    {
+        return [new(typeof(MerchantCardRemovalEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])];
+    }
+
+    public static async Task<(bool, int)> Postfix(
+        Task<(bool, int)> __result,
+        MerchantCardRemovalEntry __instance,
+        MerchantInventory? inventory,
+        bool ignoreCost)
+    {
+        var result = await __result;
+        if (!result.Item1 || ignoreCost || inventory?.Player == null)
+            return result;
+
+        MoonPropLongstandingSolitudeShopHelper.TryConsumeFreePurchase(inventory.Player, __instance);
+        return result;
     }
 }

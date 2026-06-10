@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -45,10 +46,11 @@ public class MoonPropHellfireTincture : MoonPropStackableRelicBase
         var enemyDamage = baseDamage * GetEnemyDamageMultiplier(stacks);
 
         Flash();
+        var selfRecipient = ResolveHellfireRecipient(ownerCreature);
 
         await CreatureCmd.Damage(
             choiceContext,
-            ownerCreature,
+            selfRecipient,
             baseDamage,
             ValueProp.Unpowered,
             ownerCreature,
@@ -61,9 +63,11 @@ public class MoonPropHellfireTincture : MoonPropStackableRelicBase
             if (allyDamage <= 0m)
                 break;
 
+            var allyRecipient = ResolveHellfireRecipient(ally);
+
             await CreatureCmd.Damage(
                 choiceContext,
-                ally,
+                allyRecipient,
                 allyDamage,
                 ValueProp.Unpowered,
                 ownerCreature,
@@ -92,6 +96,12 @@ public class MoonPropHellfireTincture : MoonPropStackableRelicBase
     private static decimal GetEnemyDamageMultiplier(int stacks)
     {
         return EnemyMultiplier + Math.Max(0, stacks - 1);
+    }
+
+    private static Creature ResolveHellfireRecipient(Creature target)
+    {
+        var osty = target.Player?.Osty;
+        return osty is { IsAlive: true } ? osty : target;
     }
 
     private string GetSelfDamagePercentText()

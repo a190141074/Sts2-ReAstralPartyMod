@@ -13,6 +13,7 @@ public static class AstralKeywords
         AstralStepsStem,
         AstralTemporaryStem,
         AstralMixedStem,
+        AstralMoonPropStem,
         AstralEternalStarlightSetStem,
         SolarBombardmentStem,
         AstralOrbitalBombardmentMaterialStem,
@@ -41,6 +42,7 @@ public static class AstralKeywords
     public const string AstralStepsStem = "ASTRAL_STEPS";
     public const string AstralTemporaryStem = "ASTRAL_TEMPORARY";
     public const string AstralMixedStem = "ASTRAL_MIXED";
+    public const string AstralMoonPropStem = "ASTRAL_MOON_PROP";
     public const string AstralEternalStarlightSetStem = "ASTRAL_ETERNAL_STARLIGHT_SET";
     public const string SolarBombardmentStem = "SOLAR_BOMBARDMENT";
     public const string AstralOrbitalBombardmentMaterialStem = "ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL";
@@ -66,6 +68,7 @@ public static class AstralKeywords
     public static string AstralStepsId => GetId(AstralStepsStem);
     public static string AstralTemporaryId => GetId(AstralTemporaryStem);
     public static string AstralMixedId => GetId(AstralMixedStem);
+    public static string AstralMoonPropId => GetId(AstralMoonPropStem);
     public static string AstralEternalStarlightSetId => GetId(AstralEternalStarlightSetStem);
     public static string SolarBombardmentId => GetId(SolarBombardmentStem);
     public static string AstralOrbitalBombardmentMaterialId => GetId(AstralOrbitalBombardmentMaterialStem);
@@ -91,6 +94,7 @@ public static class AstralKeywords
     public static CardKeyword AstralSteps => GetKeyword(AstralStepsStem);
     public static CardKeyword AstralTemporary => GetKeyword(AstralTemporaryStem);
     public static CardKeyword AstralMixed => GetKeyword(AstralMixedStem);
+    public static CardKeyword AstralMoonProp => GetKeyword(AstralMoonPropStem);
     public static CardKeyword AstralEternalStarlightSet => GetKeyword(AstralEternalStarlightSetStem);
     public static CardKeyword SolarBombardment => GetKeyword(SolarBombardmentStem);
     public static CardKeyword AstralOrbitalBombardmentMaterial => GetKeyword(AstralOrbitalBombardmentMaterialStem);

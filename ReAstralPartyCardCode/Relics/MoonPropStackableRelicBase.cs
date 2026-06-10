@@ -1,17 +1,24 @@
 using System.Globalization;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 public abstract class MoonPropStackableRelicBase : AstralPartyRelicModel
 {
     [SavedProperty] public int AstralParty_MoonPropStacks { get; set; } = 1;
+
+    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
+    [
+        AstralKeywords.CreateHoverTip(AstralKeywords.AstralMoonPropId)
+    ];
 
     public override bool IsStackable => true;
 

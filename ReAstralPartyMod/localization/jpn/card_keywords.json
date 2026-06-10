@@ -5,6 +5,8 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.description": "【性格：グリーン】 入室時の歩数が増加します。その他、休憩エリア、ショップ、宝箱の部屋には [blue]2[/blue] ステップがあります。\nイベント ルームには [blue]3[/blue] ステップが用意されています。\n通常のモンスター ルームには [blue]5[/blue] ステップがあります。\nエリート ルームには [blue]8[/blue] ステップがあります。\nボス部屋には [blue]12[/blue] のステップがあります。\nマップ フェーズでは、[blue]10[/blue] ステップが提供されます。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_TEMPORARY.title": "一時的",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_TEMPORARY.description": "ラウンド終了時に自動的に破棄されます。このキーワードは捨て札に入ると自動的に消去されます。",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MOON_PROP.title": "月球レリック",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MOON_PROP.description": "自分が何を求めるのかを知ることの半分は、それを得る前に何を手放す必要があるのかを知ることにある。月球レリックは複数回購入でき、層数に応じて効果が変化し、その変化する数値は紫色で表示される。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ETERNAL_STARLIGHT_SET.title": "【セット・エターナルスターライト】",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ETERNAL_STARLIGHT_SET.description": "ストアに入ると、エターナル スターライトのレイヤーに基づいた追加の効果が得られます。\n・エターナルスターライトが[blue]10[/blue]以上になると、ストアに入ると[blue]5[/blue]ゴールドを獲得できます\n・エターナルスターライトが[blue]25[/blue]以上になると、ストアに入ると[blue]15[/blue]ゴールドを獲得できます\n・エターナルスターライトが[blue]40[/blue]以上になると、ストアに入ると[blue]25[/blue]ゴールドを獲得できます\n· エターナルスターライトが [blue]56[/blue] 以上に達した場合、ストアに入って [blue]25[/blue]ゴールド を獲得します。すぐに会員カードを取得する",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_DICE_SET.title": "【セット・ダイス】",
