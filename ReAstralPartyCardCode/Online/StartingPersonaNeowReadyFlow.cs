@@ -12,6 +12,7 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Multiplayer.Messages.Game.Sync;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Events;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
@@ -65,6 +66,32 @@ internal static class StartingPersonaNeowReadyFlow
         bool Restored = false);
 
     internal static bool IsInternalNeowRefreshActive => InternalNeowRefreshDepth.Value > 0;
+
+    internal static bool TryRestoreCachedNeowOptionsBeforeRemoteChoice(uint optionIndex, ulong senderId)
+    {
+        if (RunManager.Instance?.NetService?.Type != NetGameType.Client)
+            return false;
+        if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is not Neow neow)
+            return false;
+
+        ReadyPageState? state;
+        lock (SyncLock)
+        {
+            if (!ReadyPages.TryGetValue(neow, out state))
+                return false;
+        }
+
+        var localOptionCount = neow.CurrentOptions?.Count ?? 0;
+        if (optionIndex < localOptionCount)
+            return false;
+
+        // EventSynchronizer validates the remote option index against CurrentOptions immediately,
+        // so restore the cached real Neow page first if the client is still on the 1-button ready page.
+        RestoreOriginalOptionsOrFinish(neow, "remote_choice_pre_restore");
+        MainFile.Logger.Warn(
+            $"[StartingPersonaNeowReadyFlow] Restored cached Neow option page before remote choice processing | runKey={state.RunKey} sender={senderId} optionIndex={optionIndex} localCount={localOptionCount} cachedCount={state.OriginalOptions.Count}.");
+        return true;
+    }
 
     internal static void TryReplaceInitialState(Neow neow)
     {
@@ -656,5 +683,18 @@ internal static class StartingPersonaNeowReadyEventRoomGuardPatch
     public static bool Prefix(NEventRoom __instance, EventOption option, int index)
     {
         return !StartingPersonaNeowReadyFlow.TrySwallowReadyOptionAtEventRoomEntry(__instance, option, index);
+    }
+}
+
+[HarmonyPatch(typeof(EventSynchronizer), "HandleEventOptionChosenMessage")]
+internal static class StartingPersonaNeowReadyRemoteChoiceRestorePatch
+{
+    [HarmonyPrefix]
+    public static void Prefix(OptionIndexChosenMessage message, ulong senderId)
+    {
+        if (message.type != OptionIndexType.Event)
+            return;
+
+        StartingPersonaNeowReadyFlow.TryRestoreCachedNeowOptionsBeforeRemoteChoice(message.optionIndex, senderId);
     }
 }

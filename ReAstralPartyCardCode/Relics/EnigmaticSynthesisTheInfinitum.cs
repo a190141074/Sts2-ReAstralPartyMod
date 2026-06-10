@@ -4,7 +4,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-[RegisterRelic(typeof(SharedRelicPool))]
+[RegisterRelic(typeof(EventRelicPool))]
 public class EnigmaticSynthesisTheInfinitum : AstralPartyRelicModel
 {
     protected override string RelicId => "enigmatic_synthesis_the_infinitum";
