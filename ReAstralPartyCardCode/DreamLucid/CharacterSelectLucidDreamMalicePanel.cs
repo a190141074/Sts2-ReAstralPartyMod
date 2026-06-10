@@ -9,7 +9,6 @@ using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Multiplayer.Game.Lobby;
 using MegaCrit.Sts2.Core.Nodes.HoverTips;
 using MegaCrit.Sts2.Core.Runs;
-using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
@@ -481,10 +480,7 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
             _lastObservedLobby = lobby;
 
         if (netServiceChanged)
-        {
             _lastObservedNetService = netService;
-            LucidDreamNotificationSync.Register(netService);
-        }
 
         if (roleChanged || lobbyChanged || netServiceChanged)
         {
@@ -539,10 +535,6 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
         var nextValue = !GetSettingValue(currentSnapshot, key);
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshotToMutate => SetSettingValue(snapshotToMutate, key, nextValue));
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
-
-        var entry = FindEntry(key);
-        if (entry != null)
-            LucidDreamNotificationSync.NotifyLocalToggle(_lastObservedLobby ?? GetCharacterSelectLobby(), GetText(entry.TitleKey), nextValue);
     }
 
     private void OnRefreshTimerTimeout()
@@ -725,20 +717,6 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
                 snapshot.EnableLucidDreamHarmlessWhisper = value;
                 break;
         }
-    }
-
-    private static LucidDreamEntry? FindEntry(LucidDreamSettingKey key)
-    {
-        foreach (var group in Groups)
-        {
-            foreach (var entry in group.Entries)
-            {
-                if (entry.Key == key)
-                    return entry;
-            }
-        }
-
-        return null;
     }
 
     private static string GetText(string key)

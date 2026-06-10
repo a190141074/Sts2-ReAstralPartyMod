@@ -134,7 +134,7 @@ internal static class MoonPropShopExtraRelicsHelper
         IReadOnlyCollection<ModelId>? excludedRelicIds)
     {
         var excluded = excludedRelicIds ?? Array.Empty<ModelId>();
-        var hasOwnedBeadsOfFealty = HasEverOwnedRelic(player, ModelDb.Relic<MoonPropBeadsOfFealty>().Id);
+        var hasOwnedBeadsOfFealty = RunHasEverOwnedRelic(player.RunState, ModelDb.Relic<MoonPropBeadsOfFealty>().Id);
         return MoonPropRelicFactories
             .Where(factory =>
             {
@@ -149,18 +149,17 @@ internal static class MoonPropShopExtraRelicsHelper
             .ToList();
     }
 
-    private static bool HasEverOwnedRelic(Player? player, ModelId relicId)
+    private static bool RunHasEverOwnedRelic(IRunState? runState, ModelId relicId)
     {
-        if (player == null)
+        if (runState == null)
             return false;
 
-        if (player.Relics.Any(relic => GetCanonicalRelicId(relic) == relicId))
+        if (runState.Players.Any(player => player.Relics.Any(relic => GetCanonicalRelicId(relic) == relicId)))
             return true;
 
-        return player.RunState.MapPointHistory
+        return runState.MapPointHistory
             .SelectMany(static actEntries => actEntries)
-            .Select(entry => entry.GetEntry(player.NetId))
-            .Any(playerEntry => playerEntry.BoughtRelics.Contains(relicId));
+            .Any(entry => runState.Players.Any(player => entry.GetEntry(player.NetId).BoughtRelics.Contains(relicId)));
     }
 
     private static ModelId GetCanonicalRelicId(RelicModel relic)

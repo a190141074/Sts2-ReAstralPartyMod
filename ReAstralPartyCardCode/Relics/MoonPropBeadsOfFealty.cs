@@ -5,17 +5,20 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Potions;
 using MegaCrit.Sts2.Core.Entities.Relics;
+using MegaCrit.Sts2.Core.Factories;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Monsters;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Odds;
 using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -30,6 +33,8 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
 
     [SavedProperty] public bool AstralParty_MoonPropBeadsOfFealtyPendingNextCombatEffect { get; set; }
     [SavedProperty] public bool AstralParty_MoonPropBeadsOfFealtyTriggeredThisCombat { get; set; }
+    [SavedProperty] public int AstralParty_MoonPropBeadsOfFealtyEliteMinGoldReward { get; set; }
+    [SavedProperty] public int AstralParty_MoonPropBeadsOfFealtyEliteMaxGoldReward { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Shop;
 
@@ -37,8 +42,7 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        AstralKeywords.CreateHoverTip(AstralKeywords.AstralMoonPropId),
-        ..HoverTipFactory.FromCardWithCardHoverTips<Greed>()
+        AstralKeywords.CreateHoverTip(AstralKeywords.AstralMoonPropId)
     ];
 
     public override async Task AfterObtained()
@@ -49,7 +53,6 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
 
         AstralParty_MoonPropBeadsOfFealtyPendingNextCombatEffect = true;
         AstralParty_MoonPropBeadsOfFealtyTriggeredThisCombat = false;
-        await CardPileCmd.AddCurseToDeck<Greed>(Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -82,6 +85,8 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
         var selectedEncounter = eliteCandidates[selectedIndex].ToMutable();
         selectedEncounter.GenerateMonstersWithSlots(runState);
 
+        AstralParty_MoonPropBeadsOfFealtyEliteMinGoldReward = selectedEncounter.MinGoldReward;
+        AstralParty_MoonPropBeadsOfFealtyEliteMaxGoldReward = selectedEncounter.MaxGoldReward;
         AstralParty_MoonPropBeadsOfFealtyTriggeredThisCombat = true;
         Flash();
         await AddEliteEncounterGroup(combatState, selectedEncounter);
@@ -92,25 +97,13 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
         if (!AstralParty_MoonPropBeadsOfFealtyTriggeredThisCombat || Owner == null)
             return;
 
-        room.AddExtraReward(Owner, new GoldReward(700, Owner, false));
-
-        var excludedRelicIds = new[] { ModelDb.Relic<MoonPropBeadsOfFealty>().Id };
-        foreach (var otherPlayer in Owner.RunState.Players
-                     .Where(player => player != Owner)
-                     .OrderBy(static player => player.NetId))
-        {
-            var rewardRelic = MoonPropShopExtraRelicsHelper.CreateDeterministicMoonPropRelicExcluding(
-                otherPlayer,
-                RewardRollContextId,
-                excludedRelicIds,
-                Owner.NetId,
-                otherPlayer.NetId,
-                room.CombatState?.Encounter?.Id.Entry ?? "<null_encounter>");
-            room.AddExtraReward(otherPlayer, new RelicReward(rewardRelic, otherPlayer));
-        }
+        AddStandardEliteRewards(room, Owner);
+        AddSharedBeadsRewards(room);
 
         AstralParty_MoonPropBeadsOfFealtyPendingNextCombatEffect = false;
         AstralParty_MoonPropBeadsOfFealtyTriggeredThisCombat = false;
+        AstralParty_MoonPropBeadsOfFealtyEliteMinGoldReward = 0;
+        AstralParty_MoonPropBeadsOfFealtyEliteMaxGoldReward = 0;
         await RelicCmd.Remove(this);
     }
 
@@ -152,5 +145,110 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
     {
         var slot = combatState.Encounter?.GetNextSlot(combatState);
         return string.IsNullOrWhiteSpace(slot) ? null : slot;
+    }
+
+    private void AddStandardEliteRewards(CombatRoom room, Player player)
+    {
+        room.AddExtraReward(player, new GoldReward(
+            AstralParty_MoonPropBeadsOfFealtyEliteMinGoldReward,
+            AstralParty_MoonPropBeadsOfFealtyEliteMaxGoldReward,
+            player));
+
+        if (RunManager.Instance?.AscensionManager is { } ascensionManager
+            && player.PlayerOdds.PotionReward.Roll(player, ascensionManager, RoomType.Elite))
+        {
+            room.AddExtraReward(player, new PotionReward(player));
+        }
+
+        room.AddExtraReward(player, new CardReward(CardCreationOptions.ForRoom(player, RoomType.Elite), 3, player));
+        room.AddExtraReward(player, new RelicReward(player));
+    }
+
+    private void AddSharedBeadsRewards(CombatRoom room)
+    {
+        if (Owner?.RunState?.Players == null)
+            return;
+
+        var excludedRelicIds = new[] { ModelDb.Relic<MoonPropBeadsOfFealty>().Id };
+        foreach (var player in Owner.RunState.Players.OrderBy(static player => player.NetId))
+        {
+            room.AddExtraReward(player, new CardReward(GetCardRewardOptionsForRoom(player, room.RoomType), 3, player));
+
+            if (TryCreateVanillaPotionReward(player, commonOnly: false) is { } nonCommonPotion)
+                room.AddExtraReward(player, new PotionReward(nonCommonPotion, player));
+
+            if (TryCreateVanillaPotionReward(player, commonOnly: true) is { } commonPotion)
+                room.AddExtraReward(player, new PotionReward(commonPotion, player));
+
+            if (TryCreateNonCommonNonMoonRelic(player) is { } rewardRelic)
+                room.AddExtraReward(player, new RelicReward(rewardRelic, player));
+
+            var moonRelic = MoonPropShopExtraRelicsHelper.CreateDeterministicMoonPropRelicExcluding(
+                player,
+                RewardRollContextId,
+                excludedRelicIds,
+                Owner.NetId,
+                player.NetId,
+                room.CombatState?.Encounter?.Id.Entry ?? "<null_encounter>");
+            room.AddExtraReward(player, new RelicReward(moonRelic, player));
+
+            var goldAmount = player == Owner ? 300 : 150;
+            room.AddExtraReward(player, new GoldReward(goldAmount, player, false));
+        }
+    }
+
+    private static CardCreationOptions GetCardRewardOptionsForRoom(Player player, RoomType roomType)
+    {
+        return roomType switch
+        {
+            RoomType.Monster or RoomType.Elite or RoomType.Boss => CardCreationOptions.ForRoom(player, roomType),
+            _ => CardCreationOptions.ForRoom(player, RoomType.Monster)
+        };
+    }
+
+    private static PotionModel? TryCreateVanillaPotionReward(Player player, bool commonOnly)
+    {
+        var candidates = PotionFactory.GetPotionOptions(player, [])
+            .Where(potion => IsVanillaPotion(potion)
+                             && (commonOnly
+                                 ? potion.Rarity == PotionRarity.Common
+                                 : potion.Rarity is not PotionRarity.Common))
+            .ToList();
+        if (candidates.Count == 0)
+            return null;
+
+        return player.PlayerRng.Rewards.NextItem(candidates).ToMutable();
+    }
+
+    private static RelicModel? TryCreateNonCommonNonMoonRelic(Player player)
+    {
+        var primaryRarity = player.PlayerRng.Rewards.NextFloat() < 0.66f
+            ? RelicRarity.Uncommon
+            : RelicRarity.Rare;
+        return TryPullRelic(player, primaryRarity)
+               ?? TryPullRelic(player, primaryRarity == RelicRarity.Uncommon ? RelicRarity.Rare : RelicRarity.Uncommon);
+    }
+
+    private static RelicModel? TryPullRelic(Player player, RelicRarity rarity)
+    {
+        if (player.RunState == null)
+            return null;
+
+        var relic = player.RelicGrabBag.PullFromFront(
+            rarity,
+            static candidate => candidate.Rarity is not RelicRarity.Common
+                                && !MoonPropShopExtraRelicsHelper.IsMoonPropRelic(candidate),
+            player.RunState);
+        if (relic == null)
+            return null;
+
+        player.RunState.SharedRelicGrabBag.Remove(relic);
+        return relic.ToMutable();
+    }
+
+    private static bool IsVanillaPotion(PotionModel potion)
+    {
+        return potion.GetType().Namespace == "MegaCrit.Sts2.Core.Models.Potions"
+               && potion.Rarity is PotionRarity.Common or PotionRarity.Uncommon or PotionRarity.Rare;
     }
 }

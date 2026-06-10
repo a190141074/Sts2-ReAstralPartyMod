@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Multiplayer.Messages.Game;
 using MegaCrit.Sts2.Core.Multiplayer.Serialization;
 using MegaCrit.Sts2.Core.Multiplayer.Transport;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
@@ -373,6 +374,7 @@ internal static class LobbyGameplaySettingsSync
             var hostNetId = LobbyGameplayNetRoleHelper.GetHostNetId(netService);
             if (hostNetId == 0UL || senderId != hostNetId)
             {
+                ReportLucidDreamSnapshotRejected(senderId, hostNetId, message);
                 MainFile.Logger.Warn(
                     $"{MainFile.ModId} lobby gameplay snapshot rejected from non-host sender {senderId} (expected_host={hostNetId}).");
                 return;
@@ -419,6 +421,41 @@ internal static class LobbyGameplaySettingsSync
     {
         netService.UnregisterMessageHandler<AstralLobbyGameplaySettingsSnapshotMessage>(HandleSnapshotMessage);
         netService.UnregisterMessageHandler<AstralLobbyGameplaySettingsRequestMessage>(HandleRequestMessage);
+    }
+
+    private static void ReportLucidDreamSnapshotRejected(
+        ulong senderId,
+        ulong expectedHostNetId,
+        AstralLobbyGameplaySettingsSnapshotMessage message)
+    {
+        if (!HasAnyLucidDreamFlags(message))
+            return;
+
+        AstralNotificationService.ShowDiagnosticWarning(
+            AstralNotificationModule.Multiplayer,
+            AstralNotificationArea.NeowDiagnostics,
+            211,
+            $"收到非房主来源的清醒梦房间设置同步，已拒绝应用。\n发送者：{senderId}\n预期房主：{expectedHostNetId}",
+            "清醒梦同步异常");
+    }
+
+    private static bool HasAnyLucidDreamFlags(AstralLobbyGameplaySettingsSnapshotMessage message)
+    {
+        return message.EnableLucidDreamFishScalesMalice
+               || message.EnableLucidDreamFalseLifeline
+               || message.EnableLucidDreamSmoothSailing
+               || message.EnableLucidDreamSevereWoundOneMalice
+               || message.EnableLucidDreamSevereWoundTwoMalice
+               || message.EnableLucidDreamMadLifeMalice
+               || message.EnableLucidDreamSwampOfFateMalice
+               || message.EnableLucidDreamOverpopulationMalice
+               || message.EnableLucidDreamCautiousJellyfishMalice
+               || message.EnableLucidDreamFaceDeathWithComposure
+               || message.EnableLucidDreamWildness
+               || message.EnableLucidDreamWildnessPhantom
+               || message.EnableLucidDreamPitchBlackImpulse
+               || message.EnableLucidDreamBubblePotionOfDreams
+               || message.EnableLucidDreamHarmlessWhisper;
     }
 }
 

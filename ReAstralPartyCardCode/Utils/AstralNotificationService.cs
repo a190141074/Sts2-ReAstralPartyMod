@@ -21,7 +21,6 @@ public enum AstralNotificationArea
     PersonaRelic,
     TokenRelic,
     NeowDiagnostics,
-    LucidDreamDiagnostics,
     Gameplay,
     Multiplayer
 }
@@ -126,7 +125,6 @@ internal static class AstralNotificationService
             AstralNotificationArea.PersonaRelic => "P",
             AstralNotificationArea.TokenRelic => "R",
             AstralNotificationArea.NeowDiagnostics => "N",
-            AstralNotificationArea.LucidDreamDiagnostics => "D",
             AstralNotificationArea.Gameplay => "G",
             AstralNotificationArea.Multiplayer => "M",
             _ => "X"
@@ -144,7 +142,6 @@ internal static class AstralNotificationService
             AstralNotificationArea.PersonaRelic => "人格遗物",
             AstralNotificationArea.TokenRelic => "筹码遗物",
             AstralNotificationArea.NeowDiagnostics => "联机诊断",
-            AstralNotificationArea.LucidDreamDiagnostics => "清醒梦诊断",
             AstralNotificationArea.Gameplay => "玩法",
             AstralNotificationArea.Multiplayer => "联机",
             _ => "通知"
@@ -158,7 +155,6 @@ internal static class AstralNotificationService
             AstralNotificationArea.PersonaRelic => ReAstralPartyModSettingsManager.EnablePersonaRelicNotifications,
             AstralNotificationArea.TokenRelic => ReAstralPartyModSettingsManager.EnableTokenRelicNotifications,
             AstralNotificationArea.NeowDiagnostics => ReAstralPartyModSettingsManager.EnableNeowDiagnosticsNotifications,
-            AstralNotificationArea.LucidDreamDiagnostics => ReAstralPartyModSettingsManager.EnableNeowDiagnosticsNotifications,
             _ => ReAstralPartyModSettingsManager.EnableMultiplayerNotifications
         };
     }
