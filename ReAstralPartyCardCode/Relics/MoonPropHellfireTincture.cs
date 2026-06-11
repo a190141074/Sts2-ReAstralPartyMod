@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -56,9 +57,7 @@ public class MoonPropHellfireTincture : MoonPropStackableRelicBase
             ownerCreature,
             null);
 
-        foreach (var ally in ownerCreature.CombatState
-                     .GetTeammatesOf(ownerCreature)
-                     .Where(static creature => creature.IsAlive))
+        foreach (var ally in CombatTargetSnapshotHelper.GetAliveTeammates(ownerCreature))
         {
             if (allyDamage <= 0m)
                 break;
@@ -74,9 +73,7 @@ public class MoonPropHellfireTincture : MoonPropStackableRelicBase
                 null);
         }
 
-        foreach (var enemy in ownerCreature.CombatState
-                     .GetOpponentsOf(ownerCreature)
-                     .Where(static creature => creature.IsAlive))
+        foreach (var enemy in CombatTargetSnapshotHelper.GetAliveOpponents(ownerCreature))
         {
             await CreatureCmd.Damage(
                 choiceContext,

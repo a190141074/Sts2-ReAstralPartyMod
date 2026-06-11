@@ -9,8 +9,8 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
-using MegaCrit.Sts2.Core.Combat;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+using MegaCrit.Sts2.Core.Combat;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -99,7 +99,7 @@ public class PvzRareDestructionNut : AstralPartyRelicModel
         AstralParty_PvzRareDestructionNutLastTriggeredRound = PvzNutRelicHelper.MarkTriggeredThisRound(currentRound);
         InvokeDisplayAmountChanged();
         Flash();
-        foreach (var enemy in ownerCreature.CombatState?.Creatures.Where(creature => creature.IsAlive && creature.Side != ownerCreature.Side) ?? [])
+        foreach (var enemy in CombatTargetSnapshotHelper.GetAliveNonAlliedCreatures(ownerCreature.CombatState!, ownerCreature))
             await CreatureCmd.Damage(choiceContext, enemy, DeathDamageAmount, ValueProp.Unpowered, ownerCreature, null);
 
         MainFile.Logger.Info(

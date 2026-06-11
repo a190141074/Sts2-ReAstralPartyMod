@@ -87,7 +87,7 @@ internal static class SinkouSetHelper
         if (owner.Creature?.CombatState == null)
             return;
 
-        foreach (var enemy in owner.Creature.CombatState.GetOpponentsOf(owner.Creature).Where(creature => creature.IsAlive))
+        foreach (var enemy in CombatTargetSnapshotHelper.GetAliveOpponents(owner.Creature))
         {
             var burn = enemy.GetPower<BlazingSolarBurnPower>();
             if (burn == null || burn.Amount <= 0m)
