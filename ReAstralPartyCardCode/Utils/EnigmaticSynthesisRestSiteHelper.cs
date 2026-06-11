@@ -356,7 +356,11 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
 
     private static int GetOwnedSynthesisAmount(Player owner, EnigmaticUniqueMaterialKind kind)
     {
-        return GetOwnedMaterials(owner, kind).Sum(static material => Math.Max(0, material.SynthesisAmount));
+        var total = GetOwnedMaterials(owner, kind).Sum(static material => Math.Max(0, material.SynthesisAmount));
+        if (EnigmaticTheOneBoxHelper.IsBoxedKind(kind))
+            total += EnigmaticTheOneBoxHelper.GetStoredAmount(owner, kind);
+
+        return total;
     }
 
     private static List<EnigmaticUniqueMaterialRelicBase> GetOwnedMaterials(Player owner,
@@ -371,11 +375,11 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
             .ToList();
     }
 
-    private static List<(EnigmaticUniqueMaterialRelicBase Material, int Amount)>? BuildConsumptionPlan(
+    private static List<EnigmaticMaterialConsumptionStep>? BuildConsumptionPlan(
         Player owner,
         IEnumerable<EnigmaticMaterialCost> costs)
     {
-        var plan = new List<(EnigmaticUniqueMaterialRelicBase Material, int Amount)>();
+        var plan = new List<EnigmaticMaterialConsumptionStep>();
         foreach (var cost in costs)
         {
             var remaining = Math.Max(0, cost.Amount);
@@ -389,8 +393,19 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
                 if (toConsume <= 0)
                     continue;
 
-                plan.Add((material, toConsume));
+                plan.Add(EnigmaticMaterialConsumptionStep.ForRelic(material, toConsume));
                 remaining -= toConsume;
+            }
+
+            if (remaining > 0 && EnigmaticTheOneBoxHelper.IsBoxedKind(cost.Kind))
+            {
+                var boxedAmount = EnigmaticTheOneBoxHelper.GetStoredAmount(owner, cost.Kind);
+                var toConsume = Math.Min(remaining, boxedAmount);
+                if (toConsume > 0)
+                {
+                    plan.Add(EnigmaticMaterialConsumptionStep.ForBox(owner, cost.Kind, toConsume));
+                    remaining -= toConsume;
+                }
             }
 
             if (remaining > 0)
@@ -401,10 +416,23 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
     }
 
     private static async Task ConsumeMaterialsAsync(
-        IEnumerable<(EnigmaticUniqueMaterialRelicBase Material, int Amount)> plan)
+        IEnumerable<EnigmaticMaterialConsumptionStep> plan)
     {
-        foreach (var (material, amount) in plan)
-            await material.ConsumeForSynthesisAsync(amount);
+        foreach (var step in plan)
+        {
+            if (step.Material != null)
+            {
+                await step.Material.ConsumeForSynthesisAsync(step.Amount);
+                continue;
+            }
+
+            if (step.BoxKind != null)
+            {
+                var box = EnigmaticTheOneBoxHelper.GetBox(step.Owner);
+                if (box != null)
+                    await box.ConsumeStoredMaterialAsync(step.BoxKind.Value, step.Amount);
+            }
+        }
     }
 
     private static async Task GrantCraftResultAsync(Player owner, EnigmaticSynthesisRecipeResult result)
@@ -445,6 +473,23 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
     }
 
     private readonly record struct EnigmaticMaterialCost(EnigmaticUniqueMaterialKind Kind, int Amount);
+
+    private readonly record struct EnigmaticMaterialConsumptionStep(
+        Player Owner,
+        EnigmaticUniqueMaterialRelicBase? Material,
+        EnigmaticUniqueMaterialKind? BoxKind,
+        int Amount)
+    {
+        public static EnigmaticMaterialConsumptionStep ForRelic(EnigmaticUniqueMaterialRelicBase material, int amount)
+        {
+            return new EnigmaticMaterialConsumptionStep(material.Owner!, material, null, amount);
+        }
+
+        public static EnigmaticMaterialConsumptionStep ForBox(Player owner, EnigmaticUniqueMaterialKind kind, int amount)
+        {
+            return new EnigmaticMaterialConsumptionStep(owner, null, kind, amount);
+        }
+    }
 
     private readonly record struct EnigmaticSynthesisRecipe(
         EnigmaticSynthesisRecipeResult Result,

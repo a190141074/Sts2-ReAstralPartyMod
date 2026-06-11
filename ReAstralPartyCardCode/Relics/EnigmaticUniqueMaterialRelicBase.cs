@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
+using ReAstralPartyMod.ReAstralPartyCardCode.Rewards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -35,6 +36,14 @@ public abstract class EnigmaticUniqueMaterialRelicBase : AstralPartyRelicModel
         await base.AfterObtained();
         if (!IsStackableForSynthesis)
             return;
+        if (Owner != null
+            && EnigmaticTheOneBoxHelper.GetBox(Owner) is { } box
+            && EnigmaticTheOneBoxHelper.TryGetBoxedKind(this, out var boxedKind))
+        {
+            box.AddStoredMaterial(boxedKind, Math.Max(StoredStacks, 1));
+            await RelicCmd.Remove(this);
+            return;
+        }
 
         var existing = Owner?.Relics
             .OfType<EnigmaticUniqueMaterialRelicBase>()
@@ -90,6 +99,13 @@ public abstract class EnigmaticUniqueMaterialRelicBase : AstralPartyRelicModel
     {
         if (amount <= 0)
             return owner.GetRelic<T>();
+
+        var canonicalRelic = ModelDb.Relic<T>();
+        if (EnigmaticTheOneBoxHelper.TryGetBoxedKind(canonicalRelic, out var boxedKind))
+        {
+            await EnigmaticTheOneBoxHelper.GrantBoxedMaterialAsync(owner, boxedKind, amount);
+            return null;
+        }
 
         var relic = owner.GetRelic<T>();
         if (relic != null)

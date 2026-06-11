@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Exceptions;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -41,14 +42,13 @@ public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
         get
         {
             var description =
-                new LocString("powers", "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.description");
+                new LocString("powers", GetDescriptionLocKey());
             description.Add("Amount", Amount);
             return description;
         }
     }
 
-    protected override string SmartDescriptionLocKey =>
-        "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.smartDescription";
+    protected override string SmartDescriptionLocKey => GetSmartDescriptionLocKey();
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
@@ -112,8 +112,34 @@ public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
 
     private bool IsAtFullHp()
     {
-        return Owner != null
-               && Owner.MaxHp > 0m
-               && Owner.CurrentHp >= Owner.MaxHp;
+        return ArtKnifeActivationHelper.IsActivationSatisfied(Owner);
+    }
+
+    private string GetDescriptionLocKey()
+    {
+        try
+        {
+            return ArtKnifeActivationHelper.HasLingYulinThreshold(Owner)
+                ? "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.description_ling_yu_lin"
+                : "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.description";
+        }
+        catch (CanonicalModelException)
+        {
+            return "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.description";
+        }
+    }
+
+    private string GetSmartDescriptionLocKey()
+    {
+        try
+        {
+            return ArtKnifeActivationHelper.HasLingYulinThreshold(Owner)
+                ? "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.smartDescription_ling_yu_lin"
+                : "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.smartDescription";
+        }
+        catch (CanonicalModelException)
+        {
+            return "RE_ASTRAL_PARTY_MOD_POWER_ART_KNIFE_FULL_HP_STRENGTH_POWER.smartDescription";
+        }
     }
 }

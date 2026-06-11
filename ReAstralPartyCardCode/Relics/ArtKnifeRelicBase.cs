@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -61,8 +62,6 @@ public abstract class ArtKnifeRelicBase : AstralPartyRelicModel
 
     private bool IsAtFullHp()
     {
-        return Owner?.Creature != null
-               && Owner.Creature.MaxHp > 0m
-               && Owner.Creature.CurrentHp >= Owner.Creature.MaxHp;
+        return ArtKnifeActivationHelper.IsActivationSatisfied(Owner?.Creature);
     }
 }

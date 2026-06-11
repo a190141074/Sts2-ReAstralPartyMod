@@ -173,6 +173,8 @@
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_royal_prerogative.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_save_me_mousy.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_save_me_mousy.png.import"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_summon_rain.png"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_summon_rain.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_shadow_fusion.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_shadow_fusion.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_solar_bombardment.png"/>
@@ -256,6 +258,10 @@
 		<Content Include="ReAstralPartyMod\images\powers\hunters_feast_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\investigation_target_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\investigation_target_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\rain_grace_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\rain_grace_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\water_wrap_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\water_wrap_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\iron_virgin_ward_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\iron_virgin_ward_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\ling_hun_lian_jie_power.png"/>
@@ -534,6 +540,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_beads_of_fealty.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_egocentrism.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_eulogy_zero.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\enigmatic_special_the_one_box.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\enigmatic_special_the_one_box.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_hellfire_tincture.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_hellfire_tincture.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_focused_convergence.png"/>
@@ -551,6 +559,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_needy_girl.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_snakebiter.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_snakebiter.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\variant_person_ling_yulin.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\variant_person_ling_yulin.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_weird_egg.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png.import"/>

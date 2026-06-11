@@ -179,6 +179,86 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 
 如果任务是继续开发这个仓库，优先复用它自己的组织方式，而不是强行改成 WineFox 的目录结构。
 
+## Repo Localization Stability Note
+
+当任务落在 `B:\Documents\re-astral-party-mod`，且症状是“UI 显示英文 / 显示原始 ID / 查看时报本地化错 / SmartDescription 格式炸裂”时，先按下面顺序取证，不要把所有现象都笼统归类成“本地化没写好”：
+
+1. 先看 `B:\Documents\re-astral-party-mod\logs\saves\mod_data\DevMode\instances\*\session.log`
+2. 再看 `B:\Documents\re-astral-party-mod\logs\godot*.log`
+3. 先分类，再修：
+   - `GetRawText: Key '...title/description/...' not found`
+     - 这是缺 key、ID 不匹配、写进了错误 table、或 locale 回退问题。
+     - 常见表现是 UI 显示英文、原始 ID、或直接回退到别的语言。
+   - `Localization formatting error`
+     - 这是文案 key 能找到，但格式字符串里的变量没有在当前调用链被注入。
+     - 常见表现是 hover、查看 UI、loadout overlay、战斗内详情页打开就报格式化异常。
+
+这两个问题在这个仓库里经常同时出现。先确定是“缺 key 回退”、还是“格式化变量炸裂”、还是两者并存，再决定修 key 还是修文案占位符。
+
+对 `PowerModel` 额外加一条硬规则：
+
+- `PowerModel.SmartDescription` 并不会像某些 `Description`/选择提示链那样自动补 `Amount` 或 `DynamicVars`。
+- 反编译代码的实际行为是：
+  - 没有 `smartDescription` 时，直接回退 `Description`
+  - 有 `smartDescription` 时，只执行 `new LocString("powers", SmartDescriptionLocKey)`
+- 因此 `smartDescription` 里凡是写 `{Amount}`、`{Threshold}`、`{Energy}`、`{OwnerName}` 或其他占位符，必须先确认该模型在这条 UI 调用链里显式注值；否则查看 UI 非常容易触发 `Localization formatting error`。
+- 不要把“`Description` 可正常显示动态值”直接类比成“`SmartDescription` 也安全”。
+
+对 `B:\Documents\re-astral-party-mod` 里的“新异格 / 新人格遗物”再加一条硬规则：
+
+- 不能只参考抽象基类如 `AstralPartyRelicModel`、`PersonaRelicBase`、`CooldownPersonaRelicBase` 就直接开写。
+- 必须先找仓库里至少 `1` 个已经正常工作的同类成品对照，优先看：
+  - 另一个 `VariantPerson*` 遗物
+  - 同样带技能卡/能力 hover 的人格遗物
+  - 已经进过起始人格选择链的遗物
+- 新增内容时，必须显式核对这 `4` 个面是否一致，而不是默认“基类会自动兜底”：
+  - `RegisterRelic(...)` 的 public entry / `StableEntryStem`
+  - 代码里的 `RelicId`
+  - 三语 `relics.json` 的实际 key
+  - 资源命名与 `IconBasePath`
+- 只要发现“代码 id 是一种写法，而现有同类运行时 public entry 是另一种写法”，必须优先锁 `StableEntryStem` 或补兼容 key，不能继续赌 RitsuLib 自动推导结果。
+- 尤其对手写分词 id（例如 `ling_yu_lin` 这类），不要凭肉眼假设运行时 public entry 一定保留同样分段；先对照一个现成 `VariantPerson*` 实例，或直接查运行日志 / 存档里的真实 entry。
+
+对 `B:\Documents\re-astral-party-mod` 里的“成套新增内容”（例如 `VariantPerson* + 人格技能牌 + 配套 Power`，或一组月球 relic / helper / power）再加一条硬规则：
+
+- 不能只检查其中一个主件，尤其不能只检查 relic 本体或只检查 `relics.json`。
+- 只要仓库里已经有同类成品，必须按“整套比对”执行，至少同时核对：
+  - relic
+  - 配套 card
+  - 配套 power
+  - 三语本地化
+  - `csproj` 资源项
+  - `.import` / 贴图命名
+- 任何一个子件只要走的是仓库公共默认命名链，就优先保持默认，不要手写覆盖。
+- 对这个仓库，下面这些显式覆盖默认都必须视为“高风险例外”，写之前先证明默认链真的不适用：
+  - `RelicId`
+  - `IconBasePath`
+  - `CardId`
+  - `PortraitBasePath`
+  - `FrameBasePath`
+  - `PowerId`
+  - `ResolveIconPath()`
+- 默认判断标准：
+  - `AstralPartyRelicModel` 已能按类名推导 relic id 与图标路径
+  - `AstralPartyCardModel` 已能按类名推导 card id 与 portrait 路径
+  - `AstralPartyPowerModel` 已能按 id / 类名推导 power 图标路径
+- 如果没有“共享旧资源”“运行时 public entry 不一致”“分阶段换图”“原生特殊图标链”这类明确理由，就不要新增这些 override。
+- 新增这类内容前，先搜索一次相关文件里的 `override string .*Path`、`RelicId`、`CardId`、`PowerId`；把每一条显式指定都当成需要解释的例外，而不是默认写法。
+
+对 inspect / hover 再补一条仓库级规则：
+
+- 只要某个 power 会被 `HoverTipFactory.FromPower<T>()` 引到 relic/card 查看链里，就必须把它当成“canonical 模型也会被访问”的对象处理。
+- `Description`、`SmartDescriptionLocKey`、`GetDescriptionLocKey()`、`GetSmartDescriptionLocKey()` 这些查看链函数里，默认禁止直接读取 `Owner`、`Owner.Player`、`CombatState` 等 mutable 状态，除非先做 canonical-safe 防护。
+- 若描述分支确实依赖持有者状态，优先：
+  - 使用不触发 `AssertMutable()` 的显式状态来源
+  - 或在描述选择函数里做 canonical-safe 兜底
+- 不要先假设“战斗里能读到 Owner，所以 hover 里也能读到”。
+
+这条规则的目标很明确：
+
+- 当仓库里已经有整套同类参照物时，后续新增同类内容默认先“照着已验证链路比对”，而不是只凭基类和命名习惯推断。
+- 如果不先比对同类成品，再去补本地化，极容易出现“json 文案都写了，但运行时实际拿的是另一条 public entry”这种重复错误。
+
 ## Repo Stability Note
 
 当前仓库已经有一条需要长期坚持的数值边界规则，处理 `decimal` 时必须优先遵守：

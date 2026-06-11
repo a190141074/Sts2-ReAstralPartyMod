@@ -71,6 +71,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.title": "Healing Slime",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.description": "Gain {HalfLifeHealPower:diff()} [power]Half Life Heal[/power].",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.smartDescription": "Gain {HalfLifeHealPower:diff()} [power]Half Life Heal[/power].",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUMMON_RAIN.title": "Summon Rain",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUMMON_RAIN.description": "All living allied player-side units gain [blue]1[/blue] [power]Rain Grace[/power] and [blue]10[/blue] [power]Water Wrap[/power].",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SAVE_ME_MOUSY.title": "Mousy Save Me",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SAVE_ME_MOUSY.description": "Target player draws 1 card and gains [power]Mouse Shield[/power] and [power]Counter[/power]. If that target is at 50% HP or less, you also gain [power]Mouse Shield[/power] and draw 1 card.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TRANSFER.title": "Transfer",

@@ -71,6 +71,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.title": "治愈黏液",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.description": "获得{HalfLifeHealPower:diff()}层[gold]治愈[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.smartDescription": "获得{HalfLifeHealPower:diff()}层[gold]治愈[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUMMON_RAIN.title": "唤雨",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUMMON_RAIN.description": "所有存活的玩家侧单位获得[blue]1[/blue]层[gold]雨泽[/gold]和[blue]10[/blue]层[gold]水缠[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SAVE_ME_MOUSY.title": "鼠鼠救我",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SAVE_ME_MOUSY.description": "选择一名玩家，其抽1张牌，并获得[gold]鼠鼠护盾[/gold]和[gold]反击[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TRANSFER.title": "转账",
