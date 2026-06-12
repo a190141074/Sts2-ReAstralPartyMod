@@ -1,4 +1,4 @@
 interface:
   display_name: "STS2 RitsuLib Modding"
-  short_description: "ÃæÏò RitsuLib Ç°ÖÃ STS2 Mod ¿ª·¢ÓëÇ¨ÒÆÅÅ´í"
+  short_description: "RitsuLib å‰ç½®çš„ STS2 Mod å¼€å‘ä¸æ’é”™"
   default_prompt: "Use $sts2-ritsulib-modding to build or debug a RitsuLib-based Slay the Spire 2 mod."

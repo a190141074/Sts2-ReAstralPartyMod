@@ -1,0 +1,4 @@
+interface:
+  display_name: "STS2 ReAstralParty Modding"
+  short_description: "re-astral-party-mod 的仓库专属 overlay"
+  default_prompt: "Use $sts2-ritsulib-modding and $sts2-reastralparty-modding together when working in B:\\Documents\\re-astral-party-mod."
