@@ -8,6 +8,8 @@
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_SYNTHESIS.description_enabled": "消耗[blue]独特素材[/blue]制作独特的[gold]神秘合成[/gold]遗物。此选项不消耗休息次数，且可重复使用。",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_SYNTHESIS.description_disabled": "消耗[blue]独特素材[/blue]制作独特的[gold]神秘合成[/gold]遗物。需要有足够的[blue]独特素材[/blue]，且存在条件允许的配方。此选项不消耗休息次数，且可重复使用。",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_SYNTHESIS.selection_header": "选择一个神秘合成遗物",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_PROPHECY_SOUL_DEVOUR_ANCIENT_RUINS.name": "远古遗迹",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_PROPHECY_SOUL_DEVOUR_ANCIENT_RUINS.description": "不再升级卡牌，改为进行[blue]1[/blue]次稀有品质的标准战斗卡牌奖励发现。会消耗本次锻造次数。",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.name": "神秘发现",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.description": "获得[blue]4[/blue]份[blue]独特素材[/blue]奖励，其中[blue]1[/blue]份必定为[blue]2[/blue]层[blue]【以太锭】[/blue]。其余随机素材位中，你未拥有的独特素材出现概率提高[blue]33%[/blue]，稀有独特素材出现概率提高[blue]33%[/blue]。此选项会消耗休息次数。",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_OBLIVION.name": "湮灭",

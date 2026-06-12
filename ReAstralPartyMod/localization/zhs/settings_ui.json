@@ -28,6 +28,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses.description": "强制指定所有玩家的额外捏奥选项为【七咒之戒】。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form": "绝对形态",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form.description": "强制指定所有玩家的额外捏奥选项为【绝对形态】。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_prophecy_soul_devour": "预言·灵魂吸食",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_prophecy_soul_devour.description": "强制指定所有玩家的额外捏奥选项为【预言·灵魂吸食】。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.disabled_hint": "由于已关闭额外捏奥选项，上面的指定设置本局仅保留数值，不会实际生效。",
   "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.title": "控制台指令生效",
   "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.body": "玩家：{PlayerName}\n角色：{Character}\n指令：{Command}",

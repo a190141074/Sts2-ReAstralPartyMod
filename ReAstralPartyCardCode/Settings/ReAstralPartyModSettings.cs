@@ -1,4 +1,5 @@
 using Godot;
+using System.Text.RegularExpressions;
 using MegaCrit.Sts2.Core.Localization;
 using STS2RitsuLib;
 using STS2RitsuLib.RunData;
@@ -24,7 +25,8 @@ public enum NeowExtraOptionSelectionMode
     DefaultRandom = 0,
     DreamFaceTheShadow = 1,
     RingOfSevenCurses = 2,
-    AbsoluteForm = 3
+    AbsoluteForm = 3,
+    ProphecySoulDevour = 4
 }
 
 public enum StartingPersonaDisplayMode
@@ -140,6 +142,7 @@ public static partial class ReAstralPartyModSettingsManager
 {
     public const string SettingsKey = "settings";
     private const string RunSettingsSnapshotKey = "gameplay_run_settings_snapshot";
+    private static readonly Regex CamelCaseRegex = new("([a-z0-9])([A-Z])", RegexOptions.Compiled);
 
     private static readonly object RuntimeSettingsGate = new();
     private static RunSavedData<ReAstralPartyRunSettingsSnapshot> _runSettingsSnapshots = null!;
@@ -1381,22 +1384,7 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label",
                         "Forced Neow Extra Option"),
                     neowExtraOptionSelectionMode,
-                    value => value switch
-                    {
-                        NeowExtraOptionSelectionMode.DefaultRandom => T(
-                            "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random",
-                            "Default"),
-                        NeowExtraOptionSelectionMode.DreamFaceTheShadow => T(
-                            "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_face_the_shadow",
-                            "Face the Shadow"),
-                        NeowExtraOptionSelectionMode.RingOfSevenCurses => T(
-                            "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses",
-                            "Seven Curses"),
-                        NeowExtraOptionSelectionMode.AbsoluteForm => T(
-                            "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form",
-                            "Absolute Form"),
-                        _ => ModSettingsText.Literal(value.ToString())
-                    },
+                    value => ModSettingsText.Literal(GetNeowExtraOptionSelectionModeTitle(value)),
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.description",
                         "Choose the extra Neow option for this room, or keep the existing deterministic random behavior."),
                     ModSettingsChoicePresentation.Dropdown)
@@ -1794,18 +1782,7 @@ public static partial class ReAstralPartyModSettingsManager
     {
         var title = new LocString("settings_ui",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label").GetRawText();
-        var bodyKey = mode switch
-        {
-            NeowExtraOptionSelectionMode.DefaultRandom =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random",
-            NeowExtraOptionSelectionMode.DreamFaceTheShadow =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_face_the_shadow",
-            NeowExtraOptionSelectionMode.RingOfSevenCurses =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses",
-            NeowExtraOptionSelectionMode.AbsoluteForm =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form",
-            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied"
-        };
+        var bodyKey = GetNeowExtraOptionSelectionModeLocKey(mode) ?? "RE_ASTRAL_PARTY_MOD_SETTINGS.toast_applied";
         var body = new LocString("settings_ui", bodyKey).GetRawText();
         AstralNotificationService.ShowInfo(AstralNotificationModule.Settings, body, title);
     }
@@ -1951,36 +1928,91 @@ public static partial class ReAstralPartyModSettingsManager
 
     internal static string GetNeowExtraOptionSelectionModeTitle(NeowExtraOptionSelectionMode mode)
     {
-        var key = mode switch
-        {
-            NeowExtraOptionSelectionMode.DefaultRandom =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random",
-            NeowExtraOptionSelectionMode.DreamFaceTheShadow =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_face_the_shadow",
-            NeowExtraOptionSelectionMode.RingOfSevenCurses =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses",
-            NeowExtraOptionSelectionMode.AbsoluteForm =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form",
-            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random"
-        };
-        return new LocString("settings_ui", key).GetRawText();
+        var key = GetNeowExtraOptionSelectionModeLocKey(mode)
+                  ?? "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random";
+        return TryGetSettingsUiText(key, GetNeowExtraOptionSelectionModeTitleFallback(mode));
     }
 
     internal static string GetNeowExtraOptionSelectionModeDescription(NeowExtraOptionSelectionMode mode)
     {
-        var key = mode switch
+        var key = GetNeowExtraOptionSelectionModeLocKey(mode, includeDescriptionSuffix: true)
+                  ?? "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random.description";
+        return TryGetSettingsUiText(key, GetNeowExtraOptionSelectionModeDescriptionFallback(mode));
+    }
+
+    internal static string? TryGetForcedNeowExtraOptionStableKey(NeowExtraOptionSelectionMode mode)
+    {
+        if (mode == NeowExtraOptionSelectionMode.DefaultRandom)
+            return null;
+
+        return CamelCaseRegex.Replace(mode.ToString(), "$1_$2").ToLowerInvariant();
+    }
+
+    private static string? GetNeowExtraOptionSelectionModeLocKey(
+        NeowExtraOptionSelectionMode mode,
+        bool includeDescriptionSuffix = false)
+    {
+        if (mode == NeowExtraOptionSelectionMode.DefaultRandom)
+        {
+            return includeDescriptionSuffix
+                ? "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random.description"
+                : "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random";
+        }
+
+        var stableKey = TryGetForcedNeowExtraOptionStableKey(mode);
+        if (string.IsNullOrWhiteSpace(stableKey))
+            return null;
+
+        return includeDescriptionSuffix
+            ? $"RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_{stableKey}.description"
+            : $"RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_{stableKey}";
+    }
+
+    private static string TryGetSettingsUiText(string key, string fallback)
+    {
+        try
+        {
+            var locString = new LocString("settings_ui", key);
+            return locString.GetRawText() ?? fallback;
+        }
+        catch (Exception exception)
+        {
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}] Failed to resolve settings_ui key '{key}', using fallback. {exception.GetType().Name}: {exception.Message}");
+            return fallback;
+        }
+    }
+
+    private static string GetNeowExtraOptionSelectionModeTitleFallback(NeowExtraOptionSelectionMode mode)
+    {
+        return mode switch
+        {
+            NeowExtraOptionSelectionMode.DefaultRandom => "Default",
+            NeowExtraOptionSelectionMode.DreamFaceTheShadow => "Face the Shadow",
+            NeowExtraOptionSelectionMode.RingOfSevenCurses => "Seven Curses",
+            NeowExtraOptionSelectionMode.AbsoluteForm => "Absolute Form",
+            NeowExtraOptionSelectionMode.ProphecySoulDevour => "Prophecy: Soul Devour",
+            _ => "Default"
+        };
+    }
+
+    private static string GetNeowExtraOptionSelectionModeDescriptionFallback(NeowExtraOptionSelectionMode mode)
+    {
+        return mode switch
         {
             NeowExtraOptionSelectionMode.DefaultRandom =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random.description",
+                "Use the current deterministic random selection from the available candidate pool.",
             NeowExtraOptionSelectionMode.DreamFaceTheShadow =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_face_the_shadow.description",
+                "Force every player's extra Neow option to be Face the Shadow.",
             NeowExtraOptionSelectionMode.RingOfSevenCurses =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses.description",
+                "Force every player's extra Neow option to be Ring of Seven Curses.",
             NeowExtraOptionSelectionMode.AbsoluteForm =>
-                "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form.description",
-            _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random.description"
+                "Force every player's extra Neow option to be Absolute Form.",
+            NeowExtraOptionSelectionMode.ProphecySoulDevour =>
+                "Force every player's extra Neow option to be Prophecy: Soul Devour.",
+            _ =>
+                "Use the current deterministic random selection from the available candidate pool."
         };
-        return new LocString("settings_ui", key).GetRawText();
     }
 
     private static Control BuildBannedRelicManagerControl(IModSettingsUiActionHost host, BannedRelicCategory category)

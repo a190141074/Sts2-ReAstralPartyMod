@@ -28,6 +28,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_ring_of_seven_curses.description": "Force every player's extra Neow option to be Ring of Seven Curses.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form": "Absolute Form",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_absolute_form.description": "Force every player's extra Neow option to be Absolute Form.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_prophecy_soul_devour": "Prophecy: Soul Devour",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_prophecy_soul_devour.description": "Force every player's extra Neow option to be Prophecy: Soul Devour.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.disabled_hint": "The extra Neow option is disabled, so the forced-selection setting above is preserved but does not take effect this run.",
   "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.title": "Console Command Applied",
   "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.body": "Player: {PlayerName}\nCharacter: {Character}\nCommand: {Command}",

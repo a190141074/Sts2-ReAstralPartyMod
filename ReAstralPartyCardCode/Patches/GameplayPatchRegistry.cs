@@ -328,6 +328,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
         patcher.RegisterPatch<PlayerGainGoldEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<MoonPropEulogyZeroObtainPatch>();
+        patcher.RegisterPatch<ProphecySoulDevourRunDeckRemovalPatch>();
         patcher.RegisterPatch<MoonPropShopCreateInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopInitializeInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopStackPurchasePatch>();

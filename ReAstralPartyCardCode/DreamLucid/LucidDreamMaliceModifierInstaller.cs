@@ -1,6 +1,8 @@
 using System.Reflection;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using STS2RitsuLib;
@@ -71,7 +73,7 @@ public static class LucidDreamMaliceModifierInstaller
             if (existingModifier.EnableDreamMode)
                 LucidDreamMaliceRuntimeHelper.ApplyDreamModeToMap(runState, runState.Map);
 
-            TaskHelper.RunSafely(LucidDreamMaliceRuntimeHelper.EnsureWildnessAppliedToActiveCombatAsync(runState));
+            TryRestoreWildnessForLoadedCombat(existingModifier, runState, loadedRun);
             MainFile.Logger.Info(
                 $"LucidDreamMalice modifier refreshed | loadedRun={loadedRun} | modifiers={runState.Modifiers.Count} | enabledFlags={CountEnabledFlags(existingModifier)}");
             return;
@@ -94,7 +96,7 @@ public static class LucidDreamMaliceModifierInstaller
         if (modifier.EnableDreamMode)
             LucidDreamMaliceRuntimeHelper.ApplyDreamModeToMap(runState, runState.Map);
 
-        TaskHelper.RunSafely(LucidDreamMaliceRuntimeHelper.EnsureWildnessAppliedToActiveCombatAsync(runState));
+        TryRestoreWildnessForLoadedCombat(modifier, runState, loadedRun);
 
         MainFile.Logger.Info(
             $"LucidDreamMalice modifier installed | loadedRun={loadedRun} | modifiers={runState.Modifiers.Count} | enabledFlags={CountEnabledFlags(modifier)}");
@@ -137,6 +139,22 @@ public static class LucidDreamMaliceModifierInstaller
             modifier.OnRunLoaded(runState);
         else
             modifier.OnRunCreated(runState);
+    }
+
+    // Only restore Wildness when resuming a run already inside combat.
+    // Refreshing the modifier during normal room/map flow must not asynchronously
+    // re-apply combat powers, or multiplayer power ordering can diverge.
+    private static void TryRestoreWildnessForLoadedCombat(
+        LucidDreamMaliceModifier modifier,
+        RunState runState,
+        bool loadedRun)
+    {
+        if (!loadedRun || !modifier.EnableWildness)
+            return;
+        if (runState.CurrentRoom is not CombatRoom)
+            return;
+
+        TaskHelper.RunSafely(LucidDreamMaliceRuntimeHelper.EnsureWildnessAppliedToActiveCombatAsync(runState));
     }
 
     private static int CountEnabledFlags(LucidDreamMaliceModifier modifier)

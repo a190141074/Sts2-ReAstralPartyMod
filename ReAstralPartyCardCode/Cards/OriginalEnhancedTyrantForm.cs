@@ -18,8 +18,6 @@ public class OriginalEnhancedTyrantForm : AstralPartyCardModel
     private const int BaseForge = 18;
     private const int BaseStarCostValue = 6;
 
-    protected override string CardId => "original_enhanced_tyrant_form";
-
     public override int CanonicalStarCost => BaseStarCostValue;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Ethereal];

@@ -12,8 +12,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(CurseCardPool), StableEntryStem = "enigmatic_the_acknowledgment")]
 public class EnigmaticTheAcknowledgment : AstralPartyCardModel
 {
-    protected override string CardId => "enigmatic_the_acknowledgment";
-
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Unplayable, CardKeyword.Eternal];
 
     public EnigmaticTheAcknowledgment()

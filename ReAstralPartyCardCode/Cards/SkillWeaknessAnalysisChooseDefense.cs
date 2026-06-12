@@ -11,8 +11,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(MosesChoiceCardPool))]
 public class SkillWeaknessAnalysisChooseDefense : AstralPartyCardModel
 {
-    protected override string CardId => "skill_weakness_analysis_choose_defense";
-
     public override IEnumerable<CardKeyword> CanonicalKeywords => [];
 
     public SkillWeaknessAnalysisChooseDefense() : base(

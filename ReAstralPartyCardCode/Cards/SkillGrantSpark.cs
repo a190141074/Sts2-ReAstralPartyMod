@@ -20,8 +20,6 @@ public class SkillGrantSpark : AstralPartyCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips => [];
 
-    protected override string CardId => "skill_grant_spark";
-
     public SkillGrantSpark() : base(1, CardType.Skill, CardRarity.Ancient, TargetType.Self, WindchaserCompat.IsLoaded())
     {
     }

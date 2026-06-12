@@ -10,8 +10,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(CurseCardPool), StableEntryStem = "enigmatic_the_twist")]
 public class EnigmaticTheTwist : AstralPartyCardModel
 {
-    protected override string CardId => "enigmatic_the_twist";
-
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Unplayable, CardKeyword.Eternal];
 
     public EnigmaticTheTwist()

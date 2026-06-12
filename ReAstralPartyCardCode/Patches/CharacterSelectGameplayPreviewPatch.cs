@@ -169,12 +169,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     ];
 
     private static readonly NeowExtraOptionSelectionMode[] NeowExtraOptionSelectionModes =
-    [
-        NeowExtraOptionSelectionMode.DefaultRandom,
-        NeowExtraOptionSelectionMode.DreamFaceTheShadow,
-        NeowExtraOptionSelectionMode.RingOfSevenCurses,
-        NeowExtraOptionSelectionMode.AbsoluteForm
-    ];
+        Enum.GetValues<NeowExtraOptionSelectionMode>();
 
     private readonly Dictionary<Control, IReadOnlyList<IHoverTip>> _hoverTipsByControl = [];
     private CheckButton? _startingInitialPointToggle;

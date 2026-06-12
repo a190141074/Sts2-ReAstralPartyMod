@@ -18,8 +18,6 @@ public class UltimateSkillForgottenRoar : UltimateSkillCardModel
     private const int HitCount = 13;
     private const int DamagePerHit = 6;
 
-    protected override string CardId => "ultimate_skill_forgotten_roar";
-
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
         .. base.CanonicalVars,

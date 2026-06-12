@@ -28,12 +28,16 @@ internal static class NeowOptionInjectionHelper
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.RING_OF_SEVEN_CURSES";
     private const string AbsoluteFormTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.ABSOLUTE_FORM";
+    private const string ProphecySoulDevourTextKey =
+        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_SOUL_DEVOUR";
     private const string DreamFaceTheShadowIconPath =
         "res://ReAstralPartyMod/images/ancient/dream_face_the_shadow.png";
     private const string RingOfSevenCursesIconPath =
         "res://ReAstralPartyMod/images/relic/enigmatic_seven_curses.png";
     private const string AbsoluteFormIconPath =
         "res://ReAstralPartyMod/images/powers/absolute_form_power.png";
+    private const string ProphecySoulDevourIconPath =
+        "res://ReAstralPartyMod/images/relic/prophecy_soul_devour.png";
     private static readonly string[] CardCollectionMemberNames =
     [
         "Cards",
@@ -74,7 +78,13 @@ internal static class NeowOptionInjectionHelper
             AbsoluteFormTextKey,
             AbsoluteFormIconPath,
             CreateAbsoluteFormHoverTips,
-            ChooseAbsoluteForm)
+            ChooseAbsoluteForm),
+        new(
+            "prophecy_soul_devour",
+            ProphecySoulDevourTextKey,
+            ProphecySoulDevourIconPath,
+            CreateProphecySoulDevourHoverTips,
+            ChooseProphecySoulDevour)
     ];
     private static readonly Dictionary<string, string> SelectedCandidateKeysByRun = [];
 
@@ -146,13 +156,7 @@ internal static class NeowOptionInjectionHelper
         var configuredSelectionMode = ReAstralPartyModSettingsManager.GetNeowExtraOptionSelectionMode(runState);
         if (configuredSelectionMode != NeowExtraOptionSelectionMode.DefaultRandom)
         {
-            var forcedKey = configuredSelectionMode switch
-            {
-                NeowExtraOptionSelectionMode.DreamFaceTheShadow => "dream_face_the_shadow",
-                NeowExtraOptionSelectionMode.RingOfSevenCurses => "ring_of_seven_curses",
-                NeowExtraOptionSelectionMode.AbsoluteForm => "absolute_form",
-                _ => null
-            };
+            var forcedKey = ReAstralPartyModSettingsManager.TryGetForcedNeowExtraOptionStableKey(configuredSelectionMode);
             if (!string.IsNullOrWhiteSpace(forcedKey))
             {
                 var forcedRunKey = GetRunKey(runState, ancient.Owner);
@@ -255,6 +259,16 @@ internal static class NeowOptionInjectionHelper
         CompleteAncient(ancient);
     }
 
+    private static async Task ChooseProphecySoulDevour(AncientEventModel ancient)
+    {
+        var owner = ancient.Owner
+                    ?? throw new InvalidOperationException(
+                        "Neow had no owner when Soul Devour was chosen.");
+
+        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<ProphecySoulDevour>());
+        CompleteAncient(ancient);
+    }
+
     private static Task AddDreamFaceTheShadowCardToDeck(Player owner)
     {
         return CardGainAttribution.RunWithSource(null, async () =>
@@ -300,6 +314,11 @@ internal static class NeowOptionInjectionHelper
     private static IReadOnlyList<IHoverTip> CreateAbsoluteFormHoverTips()
     {
         return [HoverTipFactory.FromCard<UltimateSkillAbsoluteForm>()];
+    }
+
+    private static IReadOnlyList<IHoverTip> CreateProphecySoulDevourHoverTips()
+    {
+        return [.. HoverTipFactory.FromRelic<ProphecySoulDevour>()];
     }
 
     private sealed record NeowOptionCandidateDefinition(

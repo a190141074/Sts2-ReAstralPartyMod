@@ -160,6 +160,77 @@ public static class DeterministicMultiplayerChoiceHelper
         }
     }
 
+    public static async Task<CardModel?> SelectCanonicalCardForPlayerGrid(
+        PlayerChoiceContext choiceContext,
+        Player player,
+        IReadOnlyList<CardModel> options,
+        CardSelectorPrefs prefs,
+        string context)
+    {
+        ArgumentNullException.ThrowIfNull(choiceContext);
+        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(options);
+
+        if (options.Count == 0)
+            return null;
+
+        var runManager = RunManager.Instance;
+        var gameType = runManager.NetService.Type;
+        if (gameType is NetGameType.Singleplayer or NetGameType.None)
+            return await ShowLocalCanonicalCardGridSelection(choiceContext, player, options, prefs);
+
+        var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
+        if (synchronizer == null)
+            return await ShowLocalCanonicalCardGridSelection(choiceContext, player, options, prefs);
+
+        var sessionKey = BuildSessionKey(AstralChoiceKind.CanonicalCardSelection, player, context);
+        var choiceId = synchronizer.ReserveChoiceId(player);
+        await choiceContext.SignalPlayerChoiceBegun(PlayerChoiceOptions.None);
+        try
+        {
+            if (IsLocalPlayer(runManager, player))
+            {
+                var selectedCard = await ShowLocalCanonicalCardGridSelection(choiceContext, player, options, prefs);
+                var canonicalChoice = selectedCard?.CanonicalInstance ?? selectedCard;
+                var selectedIndex = canonicalChoice == null ? -1 : IndexOfCard(options, canonicalChoice);
+                synchronizer.SyncLocalChoice(
+                    player,
+                    choiceId,
+                    AstralChoiceProtocol.CreateIndexedEnvelope(
+                        AstralChoiceKind.CanonicalCardSelection,
+                        (RunState?)player.RunState,
+                        sessionKey,
+                        0,
+                        [selectedIndex]));
+                Log.Info(
+                    $"[{MainFile.ModId}] Synced local grid card choice: context={context} player={player.NetId} choiceId={choiceId} card={canonicalChoice?.Id.Entry ?? "<null>"}");
+                return canonicalChoice;
+            }
+
+            var remoteChoice = await WaitForRemoteIndexedEnvelope(
+                synchronizer,
+                player,
+                choiceId,
+                AstralChoiceKind.CanonicalCardSelection,
+                (RunState?)player.RunState,
+                sessionKey,
+                context);
+            var remotePayload = remoteChoice?.Payload ?? [];
+
+            var remoteIndex = remotePayload.Count > 0 ? remotePayload[0] : -1;
+            var remoteCard = remoteIndex >= 0 && remoteIndex < options.Count
+                ? options[remoteIndex].CanonicalInstance ?? options[remoteIndex]
+                : null;
+            Log.Info(
+                $"[{MainFile.ModId}] Received remote grid card choice: context={context} player={player.NetId} choiceId={choiceId} card={remoteCard?.Id.Entry ?? "<null>"}");
+            return remoteCard;
+        }
+        finally
+        {
+            await choiceContext.SignalPlayerChoiceEnded();
+        }
+    }
+
     public static async Task<IReadOnlyList<CardModel>> SelectHandCardsForPlayer(
         PlayerChoiceContext choiceContext,
         Player player,
@@ -529,6 +600,23 @@ public static class DeterministicMultiplayerChoiceHelper
                 SaveManager.Instance?.MarkCardAsSeen(card.CanonicalInstance ?? card);
 
         var selectedCards = await screen.CardsSelected() ?? [];
+        var selectedCard = selectedCards.FirstOrDefault();
+        return selectedCard?.CanonicalInstance ?? selectedCard;
+    }
+
+    private static async Task<CardModel?> ShowLocalCanonicalCardGridSelection(
+        PlayerChoiceContext choiceContext,
+        Player player,
+        IReadOnlyList<CardModel> options,
+        CardSelectorPrefs prefs)
+    {
+        NPlayerHand.Instance?.CancelAllCardPlay();
+        var displayOptions = CreateDisplayCardOptions(player, options);
+        if (LocalContext.IsMe(player))
+            foreach (var card in options)
+                SaveManager.Instance?.MarkCardAsSeen(card.CanonicalInstance ?? card);
+
+        var selectedCards = await CardSelectCmd.FromSimpleGrid(choiceContext, displayOptions, player, prefs);
         var selectedCard = selectedCards.FirstOrDefault();
         return selectedCard?.CanonicalInstance ?? selectedCard;
     }
