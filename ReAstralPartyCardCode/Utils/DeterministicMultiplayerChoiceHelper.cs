@@ -89,6 +89,71 @@ public static class DeterministicMultiplayerChoiceHelper
         return remoteRelic;
     }
 
+    public static async Task<RelicModel?> SelectGroupedRelicForPlayer(
+        Player player,
+        IReadOnlyList<RelicModel> options,
+        IReadOnlyList<AncientRelicGroupOption> groups,
+        string title,
+        string subtitle,
+        string groupTitle,
+        string groupSubtitle,
+        string relicTitle,
+        string relicSubtitle,
+        string skipText,
+        string context,
+        bool allowSkip)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(options);
+        ArgumentNullException.ThrowIfNull(groups);
+
+        var runManager = RunManager.Instance;
+        var gameType = runManager.NetService.Type;
+        if (gameType is NetGameType.Singleplayer or NetGameType.None)
+            return await ShowLocalGroupedRelicSelection(player, options, groups, title, subtitle, groupTitle, groupSubtitle, relicTitle, relicSubtitle, skipText, allowSkip);
+
+        var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
+        if (synchronizer == null)
+            return await ShowLocalGroupedRelicSelection(player, options, groups, title, subtitle, groupTitle, groupSubtitle, relicTitle, relicSubtitle, skipText, allowSkip);
+
+        var sessionKey = BuildSessionKey(AstralChoiceKind.RelicSelection, player, context);
+        var choiceId = synchronizer.ReserveChoiceId(player);
+        if (IsLocalPlayer(runManager, player))
+        {
+            var selectedRelic = await ShowLocalGroupedRelicSelection(player, options, groups, title, subtitle, groupTitle, groupSubtitle, relicTitle, relicSubtitle, skipText, allowSkip);
+            var selectedIndex = selectedRelic == null ? -1 : IndexOfRelic(options, selectedRelic);
+            synchronizer.SyncLocalChoice(
+                player,
+                choiceId,
+                AstralChoiceProtocol.CreateIndexedEnvelope(
+                    AstralChoiceKind.RelicSelection,
+                    (RunState?)player.RunState,
+                    sessionKey,
+                    0,
+                    [selectedIndex]));
+            AstralTelemetry.RecordTokenChoice(player, context, options, selectedRelic, 0);
+            Log.Info(
+                $"[{MainFile.ModId}] Synced local grouped relic choice: context={context} player={player.NetId} choiceId={choiceId} index={selectedIndex}");
+            return selectedRelic;
+        }
+
+        var remoteChoice = await WaitForRemoteIndexedEnvelope(
+            synchronizer,
+            player,
+            choiceId,
+            AstralChoiceKind.RelicSelection,
+            (RunState?)player.RunState,
+            sessionKey,
+            context);
+        var remotePayload = remoteChoice?.Payload ?? [];
+        var remoteIndex = remotePayload.Count > 0 ? remotePayload[0] : -1;
+        var remoteRelic = remoteIndex >= 0 && remoteIndex < options.Count ? options[remoteIndex] : null;
+        AstralTelemetry.RecordTokenChoice(player, context, options, remoteRelic, 0);
+        Log.Info(
+            $"[{MainFile.ModId}] Received remote grouped relic choice: context={context} player={player.NetId} choiceId={choiceId} index={remoteIndex}");
+        return remoteRelic;
+    }
+
     public static async Task<CardModel?> SelectCanonicalCardForPlayer(
         PlayerChoiceContext choiceContext,
         Player player,
@@ -511,6 +576,47 @@ public static class DeterministicMultiplayerChoiceHelper
 
         var selectedRelics = await screen.RelicsSelected() ?? [];
         return selectedRelics.FirstOrDefault();
+    }
+
+    private static async Task<RelicModel?> ShowLocalGroupedRelicSelection(
+        Player player,
+        IReadOnlyList<RelicModel> options,
+        IReadOnlyList<AncientRelicGroupOption> groups,
+        string title,
+        string subtitle,
+        string groupTitle,
+        string groupSubtitle,
+        string relicTitle,
+        string relicSubtitle,
+        string skipText,
+        bool allowSkip)
+    {
+        var overlayStack = await WaitForOverlayStackAsync();
+        if (overlayStack == null)
+            return options.FirstOrDefault();
+
+        if (LocalContext.IsMe(player))
+            foreach (var relic in options)
+                SaveManager.Instance?.MarkRelicAsSeen(relic);
+
+        var screen = GroupedRelicSelectionScreen.Create(
+            player,
+            options,
+            groups,
+            title,
+            subtitle,
+            groupTitle,
+            groupSubtitle,
+            relicTitle,
+            relicSubtitle,
+            skipText,
+            allowSkip);
+        overlayStack.Push(screen);
+        var result = await screen.WaitForResult();
+        screen.Close();
+        await screen.WaitUntilClosedAsync();
+        await WaitForOverlaySettleFramesAsync(2);
+        return result;
     }
 
     private static async Task<RefreshableTokenRelicSelectionResult> ShowLocalRefreshableRelicSelection(

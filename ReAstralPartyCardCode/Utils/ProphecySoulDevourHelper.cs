@@ -617,12 +617,20 @@ internal static class ProphecySoulDevourHelper
         if (options.Count == 0)
             return;
 
-        using var _ = RelicSelectionHeaderContext.Push(
-            ProphecySoulDevourRegistry.Get(ProphecySoulDevourKind.HiddenStrikeRelic).TitleLocString.GetRawText());
-        var selected = await DeterministicMultiplayerChoiceHelper.SelectRelicForPlayer(
+        var groupOptions = AncientRelicGroupRegistry.BuildOptions(options);
+        var selected = await DeterministicMultiplayerChoiceHelper.SelectGroupedRelicForPlayer(
             owner,
             options,
-            $"{relic.Id.Entry}.hidden_strike_relic.{relic.AstralParty_ProphecySoulDevourHiddenRelicSelectionSequenceCounter++}");
+            groupOptions,
+            ProphecySoulDevourRegistry.Get(ProphecySoulDevourKind.HiddenStrikeRelic).TitleLocString.GetRawText(),
+            ProphecySoulDevourRegistry.SelectionSubtitle.GetRawText(),
+            ProphecySoulDevourRegistry.HiddenStrikeRelicGroupTitle.GetRawText(),
+            ProphecySoulDevourRegistry.HiddenStrikeRelicGroupSubtitle.GetRawText(),
+            ProphecySoulDevourRegistry.HiddenStrikeRelicRelicTitle.GetRawText(),
+            ProphecySoulDevourRegistry.HiddenStrikeRelicRelicSubtitle.GetRawText(),
+            ProphecySoulDevourRegistry.HiddenStrikeRelicSkip.GetRawText(),
+            $"{relic.Id.Entry}.hidden_strike_relic.{relic.AstralParty_ProphecySoulDevourHiddenRelicSelectionSequenceCounter++}",
+            true);
         if (selected == null)
             return;
 
