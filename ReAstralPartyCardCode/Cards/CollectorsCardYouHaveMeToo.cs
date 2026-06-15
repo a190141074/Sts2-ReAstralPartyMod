@@ -30,16 +30,6 @@ public class CollectorsCardYouHaveMeToo : AstralPartyCardModel
         var targetPlayer = cardPlay.Target!.Player!;
         await BaseAbilityHelper.GrantDeterministicBaseAbilityToHand(
             Owner,
-            Owner,
-            this,
-            MainFile.ModId,
-            Id.Entry,
-            "self",
-            Owner.RunState.Rng.StringSeed,
-            Owner.NetId,
-            Owner.Creature!.CombatState!.RoundNumber);
-        await BaseAbilityHelper.GrantDeterministicBaseAbilityToHand(
-            Owner,
             targetPlayer,
             this,
             MainFile.ModId,

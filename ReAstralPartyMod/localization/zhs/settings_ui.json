@@ -8,6 +8,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.description": "以下设置对所有档位全局生效：自带【初始点】默认关闭，人格选择默认开启。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label": "开启自带【初始点】",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description": "开局时所有玩家自动获得【初始点】，并各自失去 1 金币。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label": "开启自带【七咒之戒】",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.description": "开局时所有玩家自动获得【七咒之戒】。开启后，额外捏奥默认随机不再出现【七咒之戒】。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label": "开启人格选择",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description": "关闭后，本局会完全跳过开局人格选择，所有玩家开局都不会获得人格遗物。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_mode.label": "开启【梦境模式】",

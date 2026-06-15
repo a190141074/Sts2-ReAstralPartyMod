@@ -21,7 +21,6 @@ using MegaCrit.Sts2.Core.Rewards;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
-using ReAstralPartyMod.ReAstralPartyCardCode.RestSite;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Runs.History;
@@ -154,11 +153,12 @@ public class ProphecySoulDevour : AstralPartyRelicModel
         await TryResolvePendingDiscoveriesAsync("after_obtained");
     }
 
-    public override Task AfterCombatEnd(CombatRoom room)
+    public override async Task AfterCombatEnd(CombatRoom room)
     {
         ProphecySoulDevourHelper.AdvanceAfterCombat(this);
         InvokeDisplayAmountChanged();
-        return TryResolvePendingDiscoveriesAsync("after_combat_end");
+        await ResolveReadyDelayedGrantsAsync();
+        await TryResolvePendingDiscoveriesAsync("after_combat_end");
     }
 
     public override async Task AfterRoomEntered(AbstractRoom room)
@@ -179,7 +179,9 @@ public class ProphecySoulDevour : AstralPartyRelicModel
             }
         }
 
-        await ResolveReadyDelayedGrantsAsync();
+        if (room is not CombatRoom)
+            await ResolveReadyDelayedGrantsAsync();
+
         await TryResolvePendingDiscoveriesAsync("after_room_entered");
     }
 
@@ -200,11 +202,7 @@ public class ProphecySoulDevour : AstralPartyRelicModel
             modified |= RemoveSmithOptions(options);
             AstralParty_ProphecySoulDevourDisableNextSmithPending = false;
         }
-        else if (AstralParty_ProphecySoulDevourAncientRuinsPermanent)
-        {
-            modified |= ReplaceSmithWithAncientRuinsOption(options);
-        }
-        else if (AstralParty_ProphecySoulDevourPendingSmithBonusCounter > 0)
+        else if (!AstralParty_ProphecySoulDevourAncientRuinsPermanent && AstralParty_ProphecySoulDevourPendingSmithBonusCounter > 0)
         {
             var smithOption = options.OfType<SmithRestSiteOption>().FirstOrDefault();
             if (smithOption != null)
@@ -215,6 +213,11 @@ public class ProphecySoulDevour : AstralPartyRelicModel
         }
 
         return modified;
+    }
+
+    internal bool ShouldInterceptSmithRestSiteOption()
+    {
+        return AstralParty_ProphecySoulDevourAncientRuinsPermanent && Owner != null;
     }
 
     public override decimal ModifyMerchantPrice(Player player, MerchantEntry entry, decimal originalPrice)
@@ -444,21 +447,9 @@ public class ProphecySoulDevour : AstralPartyRelicModel
         return true;
     }
 
-    private bool ReplaceSmithWithAncientRuinsOption(ICollection<RestSiteOption> options)
-    {
-        var removedSmith = RemoveSmithOptions(options);
-        if (options.All(static option => option is not ProphecySoulDevourAncientRuinsRestSiteOption))
-        {
-            options.Add(new ProphecySoulDevourAncientRuinsRestSiteOption(Owner!));
-            return true;
-        }
-
-        return removedSmith;
-    }
-
     internal void OnRestSiteOptionResolved(RestSiteOption option)
     {
-        if (option is SmithRestSiteOption or ProphecySoulDevourAncientRuinsRestSiteOption)
+        if (option is SmithRestSiteOption)
             AstralParty_ProphecySoulDevourPendingSmithBonusCounter = 0;
     }
 }

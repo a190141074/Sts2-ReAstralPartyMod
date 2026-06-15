@@ -319,6 +319,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<CreatureSetCurrentHpMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureGainMaxHpMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureLoseMaxHpMoonPropShapedGlassPatch>();
+        patcher.RegisterPatch<AstralPartyRestSiteOptionSuccessUiCompatPatch>();
         patcher.RegisterPatch<CardRewardAlternativeStokovPaelsWingCompatPatch>();
         patcher.RegisterPatch<DevConsoleCommandNotificationPatch>();
         patcher.RegisterPatch<DevConsoleUltimateChargeCommandPatch>();
@@ -329,6 +330,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<PlayerGainGoldEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<MoonPropEulogyZeroObtainPatch>();
         patcher.RegisterPatch<ProphecySoulDevourRunDeckRemovalPatch>();
+        patcher.RegisterPatch<ProphecySoulDevourSmithRestSitePatch>();
         patcher.RegisterPatch<MoonPropShopCreateInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopInitializeInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopStackPurchasePatch>();

@@ -173,6 +173,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private readonly Dictionary<Control, IReadOnlyList<IHoverTip>> _hoverTipsByControl = [];
     private CheckButton? _startingInitialPointToggle;
+    private CheckButton? _startingRingOfSevenCursesToggle;
     private CheckButton? _startingPersonaSelectionToggle;
     private CheckButton? _dreamModeToggle;
     private CheckButton? _dreamSeriesEventsToggle;
@@ -352,6 +353,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description"),
             out _startingInitialPointToggle,
             OnEnableStartingInitialPointToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.description"),
+            out _startingRingOfSevenCursesToggle,
+            OnEnableStartingRingOfSevenCursesToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description"),
@@ -818,6 +824,13 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _startingInitialPointToggle.Text = snapshot.EnableStartingInitialPoint ? "ON" : "OFF";
             }
 
+            if (_startingRingOfSevenCursesToggle != null)
+            {
+                _startingRingOfSevenCursesToggle.ButtonPressed = snapshot.EnableStartingRingOfSevenCurses;
+                _startingRingOfSevenCursesToggle.Disabled = !isEditable;
+                _startingRingOfSevenCursesToggle.Text = snapshot.EnableStartingRingOfSevenCurses ? "ON" : "OFF";
+            }
+
             if (_startingPersonaSelectionToggle != null)
             {
                 _startingPersonaSelectionToggle.ButtonPressed = snapshot.EnableStartingPersonaSelection;
@@ -972,6 +985,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         _syncErrorShown = false;
         _hasReceivedSnapshotForCurrentSession = true;
         CallDeferred(nameof(ApplySnapshotDeferred), Variant.From(snapshot.EnableStartingInitialPoint),
+            Variant.From(snapshot.EnableStartingRingOfSevenCurses),
             Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableDreamMode), Variant.From(snapshot.EnableDreamSeriesEvents),
             Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableNeowExtraOption),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
@@ -979,7 +993,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
     }
 
-    private void ApplySnapshotDeferred(bool enableStartingInitialPoint, bool enableStartingPersonaSelection,
+    private void ApplySnapshotDeferred(bool enableStartingInitialPoint, bool enableStartingRingOfSevenCurses, bool enableStartingPersonaSelection,
         bool enableDreamMode,
         bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableNeowExtraOption,
         int neowExtraOptionSelectionMode,
@@ -988,6 +1002,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         ApplySnapshotToUi(new LobbyGameplaySettingsSnapshot
         {
             EnableStartingInitialPoint = enableStartingInitialPoint,
+            EnableStartingRingOfSevenCurses = enableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = enableStartingPersonaSelection,
             EnableDreamMode = enableDreamMode,
             EnableDreamSeriesEvents = enableDreamSeriesEvents,
@@ -1023,6 +1038,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingInitialPoint = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableStartingRingOfSevenCursesToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingRingOfSevenCurses = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

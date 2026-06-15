@@ -212,7 +212,8 @@ internal static class NeowOptionInjectionHelper
                 continue;
 
             if (string.Equals(candidate.StableKey, "ring_of_seven_curses", StringComparison.Ordinal)
-                && !ReAstralPartyModSettingsManager.GetEnableEnigmaticSeriesEvents(runState))
+                && (!ReAstralPartyModSettingsManager.GetEnableEnigmaticSeriesEvents(runState)
+                    || ReAstralPartyModSettingsManager.GetEnableStartingRingOfSevenCurses(runState)))
                 continue;
 
             eligible.Add(candidate);

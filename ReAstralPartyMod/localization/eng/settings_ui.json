@@ -8,6 +8,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.description": "These options apply globally across all profiles: Starting Initial Point defaults to off, while starting persona selection defaults to on.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label": "Enable Starting Initial Point",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description": "At run start, every player automatically obtains Initial Point and loses 1 Gold.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label": "Enable Starting Ring of Seven Curses",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.description": "At run start, every player automatically obtains Ring of Seven Curses. When enabled, the default random extra Neow pool no longer includes Ring of Seven Curses.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label": "Enable Starting Persona Selection",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description": "If disabled, the run fully skips the starting persona selection and no player starts with a persona relic.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_mode.label": "Enable Dream Mode",

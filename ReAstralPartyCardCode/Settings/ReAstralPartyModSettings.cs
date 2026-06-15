@@ -75,6 +75,8 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableStartingInitialPoint { get; set; }
 
+    public bool EnableStartingRingOfSevenCurses { get; set; }
+
     public bool EnableStartingPersonaSelection { get; set; } = true;
 
     public bool EnableDreamMode { get; set; }
@@ -160,6 +162,8 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableExtremeMode => ReadRuntime(settings => settings.EnableExtremeMode);
 
     public static bool EnableStartingInitialPoint => ReadRuntime(settings => settings.EnableStartingInitialPoint);
+
+    public static bool EnableStartingRingOfSevenCurses => ReadRuntime(settings => settings.EnableStartingRingOfSevenCurses);
 
     public static bool EnableStartingPersonaSelection => ReadRuntime(settings => settings.EnableStartingPersonaSelection);
 
@@ -367,6 +371,23 @@ public static partial class ReAstralPartyModSettingsManager
             return false;
 
         return EnableStartingInitialPoint;
+    }
+
+    public static bool GetEnableStartingRingOfSevenCurses(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableStartingRingOfSevenCurses;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableStartingRingOfSevenCurses;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableStartingRingOfSevenCurses;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return EnableStartingRingOfSevenCurses;
     }
 
     public static bool GetEnableStartingPersonaSelection(IRunState? runState)
@@ -1164,6 +1185,19 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableStartingRingOfSevenCurses = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableStartingRingOfSevenCurses,
+            (settings, value) =>
+            {
+                settings.EnableStartingRingOfSevenCurses = value;
+                ApplyRuntimeSettings(settings, "enable_starting_ring_of_seven_curses");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label",
+                    value);
+            });
+
         var enablePlayRecommendation = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -1471,6 +1505,13 @@ public static partial class ReAstralPartyModSettingsManager
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.other.title", "Other"))
                 .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.other.description",
                     "Additional reserved toggles and experimental options."))
+                .AddToggle(
+                    "enable_starting_ring_of_seven_curses",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label",
+                        "Enable Starting Ring of Seven Curses"),
+                    enableStartingRingOfSevenCurses,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.description",
+                        "At run start, every player automatically obtains Ring of Seven Curses."))
                 .AddToggle(
                     "enable_pure_angel_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label", "Enable Pure Angel Mode"),
@@ -2171,6 +2212,8 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableStartingInitialPoint { get; init; }
 
+        public bool EnableStartingRingOfSevenCurses { get; init; }
+
         public bool EnableStartingPersonaSelection { get; init; } = true;
 
         public bool EnableDreamMode { get; init; }
@@ -2259,6 +2302,7 @@ public static partial class ReAstralPartyModSettingsManager
                 BannedRelicIds = DeserializeModelIdSet(ResolveBannedRelicIds(settings)),
                 EnableExtremeMode = settings.EnableExtremeMode,
                 EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
+                EnableStartingRingOfSevenCurses = settings.EnableStartingRingOfSevenCurses,
                 EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
                 EnableDreamMode = settings.EnableDreamMode,
                 EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
