@@ -12,5 +12,11 @@
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.ABSOLUTE_FORM.title": "Absolute Form",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.ABSOLUTE_FORM.description": "Add [card]Absolute Form[/card] to your deck.",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_SOUL_DEVOUR.title": "Mid Prophecy - Soul Devour",
-  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_SOUL_DEVOUR.description": "Gain [gold]Prophecy - Soul Devour[/gold]."
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_SOUL_DEVOUR.description": "Gain [gold]Prophecy - Soul Devour[/gold].",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_REPLICANT_GROUP.title": "Mid Prophecy - Endless Cloning",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_REPLICANT_GROUP.description": "Gain [gold]Prophecy - Replicant Group[/gold] with [blue]8-16[/blue] initial stacks.",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_COIN_EXPLOSION.title": "Dream - Coin Explosion",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_COIN_EXPLOSION.description": "Gain [gold]Dream - Coin Explosion[/gold]. Attack cards first spend [blue]1%[/blue] of your current gold, then flip a coin for bonus damage.",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_DISINTEGRATION_CLAW.title": "Dream - Disintegration Claw",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_DISINTEGRATION_CLAW.description": "Gain [gold]Dream - Disintegration Claw[/gold]. Your Strike cards deal bonus damage and heal based on the current act, doubled against Boss targets."
 }

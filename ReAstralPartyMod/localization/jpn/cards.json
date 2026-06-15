@@ -131,6 +131,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS_CHOOSE_DODGE.description": "[power]回避スタンス[/power]を入力してください。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.title": "授予火花",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.description": "[gold]ウィンドチェイサーの魔法書[/gold]から[blue]3[/blue][gold]アップグレードされた[/gold]カードから[blue]1[/blue]を選択し、手札に加えます。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NOT_YET_ACTIVATED.title": "それはまだ起動していないからだ",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NOT_YET_ACTIVATED.description": "[gold]Creative AI[/gold]と[gold]Subroutine[/gold]をそれぞれ[blue]1[/blue]枚手札に加える。それらのコストは[blue]1[/blue]少なくなる。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_VAMPIRE_BITE.title": "嘬你一口",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_VAMPIRE_BITE.description": "あなたの HP が現在の最大 HP の [blue]50[/blue]% を超えている場合、[blue]6[/blue] のダメージを受けます。\n[blue]1[/blue][power]血の渇き[/power]を獲得します。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_IRON_VIRGIN.title": "铁处女",

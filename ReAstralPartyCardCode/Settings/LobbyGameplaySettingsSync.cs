@@ -182,7 +182,9 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
             EnableNeowExtraOption = settings.EnableNeowExtraOption,
-            NeowExtraOptionSelectionMode = settings.NeowExtraOptionSelectionMode,
+            NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+                settings.EnableStartingRingOfSevenCurses,
+                settings.NeowExtraOptionSelectionMode),
             EnableAllPersonas = settings.EnableAllPersonas,
             EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
             EnableExtremeMode = settings.EnableExtremeMode,
@@ -252,6 +254,9 @@ internal static class LobbyGameplaySettingsSync
         {
             updated = (_currentSnapshot ?? BuildFallbackSnapshot()).Clone();
             mutator(updated);
+            updated.NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+                updated.EnableStartingRingOfSevenCurses,
+                updated.NeowExtraOptionSelectionMode);
             _currentSnapshot = updated.Clone();
         }
 

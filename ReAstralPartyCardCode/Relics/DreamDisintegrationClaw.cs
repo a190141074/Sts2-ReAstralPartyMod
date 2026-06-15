@@ -1,0 +1,113 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Relics;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.RelicPools;
+using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+
+namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+
+[RegisterRelic(typeof(EventRelicPool))]
+public sealed class DreamDisintegrationClaw : AstralPartyRelicModel
+{
+    private const decimal BaseBonusDamagePercent = 0.68m;
+    private const decimal BonusDamagePercentPerAct = 0.20m;
+    private const decimal BaseHealPercent = 0.16m;
+    private const decimal HealPercentPerAct = 0.04m;
+    private const decimal BossMultiplier = 2m;
+
+    public override RelicRarity Rarity => RelicRarity.Ancient;
+
+    public override bool ShouldReceiveCombatHooks => true;
+
+    protected override IEnumerable<IHoverTip> ExtraHoverTips => [];
+
+    public override decimal ModifyDamageAdditive(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (!IsQualifiedStrikeHit(target, amount, dealer, cardSource))
+            return 0m;
+
+        return StableNumericStateHelper.ClampCeilingToInt(
+            amount * GetScaledPercent(BaseBonusDamagePercent, BonusDamagePercentPerAct, target),
+            0m,
+            int.MaxValue);
+    }
+
+    public override async Task AfterDamageGiven(
+        PlayerChoiceContext choiceContext,
+        Creature? dealer,
+        DamageResult result,
+        ValueProp props,
+        Creature target,
+        CardModel? cardSource)
+    {
+        if (!IsQualifiedStrikeResult(target, result, dealer, cardSource))
+            return;
+        if (Owner?.Creature == null)
+            return;
+
+        var healAmount = StableNumericStateHelper.ClampCeilingToInt(
+            result.UnblockedDamage * GetScaledPercent(BaseHealPercent, HealPercentPerAct, target),
+            0m,
+            int.MaxValue);
+        if (healAmount <= 0)
+            return;
+
+        Flash();
+        await CreatureCmd.Heal(Owner.Creature, healAmount, true);
+    }
+
+    private bool IsQualifiedStrikeHit(
+        Creature? target,
+        decimal amount,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (Owner?.Creature == null)
+            return false;
+        if (dealer != Owner.Creature)
+            return false;
+        if (target == null || target.Side == Owner.Creature.Side)
+            return false;
+        if (amount <= 0m)
+            return false;
+        if (cardSource?.Owner != Owner || cardSource.Type != CardType.Attack)
+            return false;
+
+        return cardSource.Tags.Contains(CardTag.Strike);
+    }
+
+    private bool IsQualifiedStrikeResult(
+        Creature target,
+        DamageResult result,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (!IsQualifiedStrikeHit(target, result.TotalDamage, dealer, cardSource))
+            return false;
+
+        return result.UnblockedDamage > 0m;
+    }
+
+    private decimal GetScaledPercent(decimal basePercent, decimal percentPerAct, Creature? target)
+    {
+        var actNumber = Math.Max((Owner?.RunState?.CurrentActIndex ?? 0) + 1, 1);
+        var percent = basePercent + percentPerAct * (actNumber - 1);
+        if (target?.CombatState?.Encounter?.RoomType == RoomType.Boss)
+            percent *= BossMultiplier;
+
+        return percent;
+    }
+}

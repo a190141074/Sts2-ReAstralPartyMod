@@ -26,7 +26,10 @@ public enum NeowExtraOptionSelectionMode
     DreamFaceTheShadow = 1,
     RingOfSevenCurses = 2,
     AbsoluteForm = 3,
-    ProphecySoulDevour = 4
+    ProphecySoulDevour = 4,
+    ProphecyReplicantGroup = 5,
+    DreamCoinExplosion = 6,
+    DreamDisintegrationClaw = 7
 }
 
 public enum StartingPersonaDisplayMode
@@ -342,18 +345,26 @@ public static partial class ReAstralPartyModSettingsManager
     public static NeowExtraOptionSelectionMode GetNeowExtraOptionSelectionMode(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.NeowExtraOptionSelectionMode;
+            return NormalizeNeowExtraOptionSelectionMode(
+                snapshot.EnableStartingRingOfSevenCurses,
+                snapshot.NeowExtraOptionSelectionMode);
 
         if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.NeowExtraOptionSelectionMode;
+            return NormalizeNeowExtraOptionSelectionMode(
+                lobbySnapshot.EnableStartingRingOfSevenCurses,
+                lobbySnapshot.NeowExtraOptionSelectionMode);
 
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.NeowExtraOptionSelectionMode;
+            return NormalizeNeowExtraOptionSelectionMode(
+                localFallback.EnableStartingRingOfSevenCurses,
+                localFallback.NeowExtraOptionSelectionMode);
 
         if (ShouldUseSafeGameplayFallback(runState))
             return NeowExtraOptionSelectionMode.DefaultRandom;
 
-        return NeowExtraOptionSelectionMode;
+        return NormalizeNeowExtraOptionSelectionMode(
+            EnableStartingRingOfSevenCurses,
+            NeowExtraOptionSelectionMode);
     }
 
     public static bool GetEnableStartingInitialPoint(IRunState? runState)
@@ -1111,12 +1122,17 @@ public static partial class ReAstralPartyModSettingsManager
         var neowExtraOptionSelectionMode = ModSettingsBindings.Global<ReAstralPartyModSettings, NeowExtraOptionSelectionMode>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.NeowExtraOptionSelectionMode,
+            settings => NormalizeNeowExtraOptionSelectionMode(
+                settings.EnableStartingRingOfSevenCurses,
+                settings.NeowExtraOptionSelectionMode),
             (settings, value) =>
             {
-                settings.NeowExtraOptionSelectionMode = value;
+                var normalizedValue = NormalizeNeowExtraOptionSelectionMode(
+                    settings.EnableStartingRingOfSevenCurses,
+                    value);
+                settings.NeowExtraOptionSelectionMode = normalizedValue;
                 ApplyRuntimeSettings(settings, "neow_extra_option_selection_mode");
-                ShowNeowExtraOptionSelectionModeToast(value);
+                ShowNeowExtraOptionSelectionModeToast(normalizedValue);
             });
 
         var enableExtremeMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
@@ -1192,6 +1208,9 @@ public static partial class ReAstralPartyModSettingsManager
             (settings, value) =>
             {
                 settings.EnableStartingRingOfSevenCurses = value;
+                settings.NeowExtraOptionSelectionMode = NormalizeNeowExtraOptionSelectionMode(
+                    settings.EnableStartingRingOfSevenCurses,
+                    settings.NeowExtraOptionSelectionMode);
                 ApplyRuntimeSettings(settings, "enable_starting_ring_of_seven_curses");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label",
@@ -1981,6 +2000,15 @@ public static partial class ReAstralPartyModSettingsManager
         return TryGetSettingsUiText(key, GetNeowExtraOptionSelectionModeDescriptionFallback(mode));
     }
 
+    internal static NeowExtraOptionSelectionMode NormalizeNeowExtraOptionSelectionMode(
+        bool enableStartingRingOfSevenCurses,
+        NeowExtraOptionSelectionMode mode)
+    {
+        return enableStartingRingOfSevenCurses && mode == NeowExtraOptionSelectionMode.RingOfSevenCurses
+            ? NeowExtraOptionSelectionMode.DefaultRandom
+            : mode;
+    }
+
     internal static string? TryGetForcedNeowExtraOptionStableKey(NeowExtraOptionSelectionMode mode)
     {
         if (mode == NeowExtraOptionSelectionMode.DefaultRandom)
@@ -2030,9 +2058,12 @@ public static partial class ReAstralPartyModSettingsManager
         {
             NeowExtraOptionSelectionMode.DefaultRandom => "Default",
             NeowExtraOptionSelectionMode.DreamFaceTheShadow => "Face the Shadow",
-            NeowExtraOptionSelectionMode.RingOfSevenCurses => "Seven Curses",
+            NeowExtraOptionSelectionMode.RingOfSevenCurses => "Ring of Seven Curses",
             NeowExtraOptionSelectionMode.AbsoluteForm => "Absolute Form",
             NeowExtraOptionSelectionMode.ProphecySoulDevour => "Prophecy: Soul Devour",
+            NeowExtraOptionSelectionMode.ProphecyReplicantGroup => "Mid Prophecy: Endless Cloning",
+            NeowExtraOptionSelectionMode.DreamCoinExplosion => "Dream: Coin Explosion",
+            NeowExtraOptionSelectionMode.DreamDisintegrationClaw => "Dream: Disintegration Claw",
             _ => "Default"
         };
     }
@@ -2051,6 +2082,12 @@ public static partial class ReAstralPartyModSettingsManager
                 "Force every player's extra Neow option to be Absolute Form.",
             NeowExtraOptionSelectionMode.ProphecySoulDevour =>
                 "Force every player's extra Neow option to be Prophecy: Soul Devour.",
+            NeowExtraOptionSelectionMode.ProphecyReplicantGroup =>
+                "Force every player's extra Neow option to be Mid Prophecy: Endless Cloning.",
+            NeowExtraOptionSelectionMode.DreamCoinExplosion =>
+                "Force every player's extra Neow option to be Dream: Coin Explosion.",
+            NeowExtraOptionSelectionMode.DreamDisintegrationClaw =>
+                "Force every player's extra Neow option to be Dream: Disintegration Claw.",
             _ =>
                 "Use the current deterministic random selection from the available candidate pool."
         };

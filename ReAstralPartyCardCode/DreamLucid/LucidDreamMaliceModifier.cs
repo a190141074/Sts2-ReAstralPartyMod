@@ -55,6 +55,11 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableHarmlessWhisper { get; set; }
     [SavedProperty] private bool AstralParty_LucidDreamMaliceHasSpawnedOverpopulationEnemyThisRun { get; set; }
     [SavedProperty] private bool AstralParty_LucidDreamMalicePendingOverpopulationSpawnThisCombat { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceIsInDreamModeEmptyRevisitCombatRoom { get; set; }
+    [SavedProperty] private bool AstralParty_LucidDreamMaliceHasDreamModePendingRevisit { get; set; }
+    [SavedProperty] private int AstralParty_LucidDreamMaliceDreamModePendingRevisitCol { get; set; }
+    [SavedProperty] private int AstralParty_LucidDreamMaliceDreamModePendingRevisitRow { get; set; }
+    [SavedProperty] private int AstralParty_LucidDreamMaliceDreamModePendingRevisitPointTypeRaw { get; set; }
 
     public bool EnableFalseLifeline
     {
@@ -162,6 +167,36 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     {
         get => AstralParty_LucidDreamMalicePendingOverpopulationSpawnThisCombat;
         set => AstralParty_LucidDreamMalicePendingOverpopulationSpawnThisCombat = value;
+    }
+
+    public bool IsInDreamModeEmptyRevisitCombatRoom
+    {
+        get => AstralParty_LucidDreamMaliceIsInDreamModeEmptyRevisitCombatRoom;
+        set => AstralParty_LucidDreamMaliceIsInDreamModeEmptyRevisitCombatRoom = value;
+    }
+
+    public bool HasDreamModePendingRevisit
+    {
+        get => AstralParty_LucidDreamMaliceHasDreamModePendingRevisit;
+        set => AstralParty_LucidDreamMaliceHasDreamModePendingRevisit = value;
+    }
+
+    public int DreamModePendingRevisitCol
+    {
+        get => AstralParty_LucidDreamMaliceDreamModePendingRevisitCol;
+        set => AstralParty_LucidDreamMaliceDreamModePendingRevisitCol = value;
+    }
+
+    public int DreamModePendingRevisitRow
+    {
+        get => AstralParty_LucidDreamMaliceDreamModePendingRevisitRow;
+        set => AstralParty_LucidDreamMaliceDreamModePendingRevisitRow = value;
+    }
+
+    public int DreamModePendingRevisitPointTypeRaw
+    {
+        get => AstralParty_LucidDreamMaliceDreamModePendingRevisitPointTypeRaw;
+        set => AstralParty_LucidDreamMaliceDreamModePendingRevisitPointTypeRaw = value;
     }
 
     // BaseLib [SavedProperty] does not support List<T>; keep lists runtime-only and save stable JSON strings.
@@ -452,6 +487,9 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
 
     public override async Task AfterRoomEntered(AbstractRoom room)
     {
+        if (room is not CombatRoom)
+            IsInDreamModeEmptyRevisitCombatRoom = false;
+
         if (!EnableFalseLifeline || RunState == null)
             return;
 

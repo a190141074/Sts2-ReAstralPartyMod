@@ -53,26 +53,9 @@ public sealed class DreamModeDuplicateVisitedMapCoordPatch : IPatchMethod
 
 public sealed class DreamModeEnterMapCoordPatch : IPatchMethod
 {
-    private static readonly PropertyInfo? RunManagerStateProperty =
-        AccessTools.Property(typeof(RunManager), "State");
-
-    private static readonly MethodInfo? EnterMapCoordInternalMethod =
-        AccessTools.Method(
-            typeof(RunManager),
-            "EnterMapCoordInternal",
-            [typeof(MapCoord), typeof(AbstractRoom), typeof(bool)]);
-    private static readonly MethodInfo? LoadIntoLatestMapCoordMethod =
-        AccessTools.Method(typeof(RunManager), "LoadIntoLatestMapCoord", [typeof(AbstractRoom)]);
-
-    private static readonly MethodInfo? CombatRoomMarkPreFinishedMethod =
-        AccessTools.Method(typeof(CombatRoom), "MarkPreFinished");
-
-    private static readonly FieldInfo? EncounterShouldGiveRewardsField =
-        AccessTools.Field(typeof(EncounterModel), "<ShouldGiveRewards>k__BackingField");
-
     public static string PatchId => "dream_mode_enter_map_coord";
 
-    public static string Description => "Route dream-mode revisits through custom room semantics";
+    public static string Description => "Only keep dream-mode revisit bookkeeping when entering a map coord";
 
     public static bool IsCritical => false;
 
@@ -81,139 +64,69 @@ public sealed class DreamModeEnterMapCoordPatch : IPatchMethod
         return [new(typeof(RunManager), nameof(RunManager.EnterMapCoord), [typeof(MapCoord)])];
     }
 
-    public static bool Prefix(RunManager __instance, MapCoord coord, ref Task __result)
+    public static bool Prefix(RunManager __instance, MapCoord coord)
     {
-        if (RunManagerStateProperty?.GetValue(__instance) is not RunState runState)
+        if (AccessTools.Property(typeof(RunManager), "State")?.GetValue(__instance) is not RunState runState)
             return true;
         var modifier = LucidDreamMaliceModifier.Get(runState);
         if (modifier?.EnableDreamMode != true)
             return true;
 
-        var visitCountBeforeMove = LucidDreamMaliceRuntimeHelper.GetVisitCount(modifier, coord);
-        var currentPoint = runState.Map?.GetPoint(coord);
-        if (visitCountBeforeMove <= 0 || currentPoint == null)
-        {
-            LucidDreamMaliceRuntimeHelper.SetDreamModeRevisitedRestSite(modifier, false);
+        var point = runState.Map?.GetPoint(coord);
+        if (point == null)
             return true;
-        }
 
+        LucidDreamMaliceRuntimeHelper.SetDreamModePendingRevisit(modifier, coord, point.PointType);
         MainFile.Logger.Info(
-            $"[DreamMode] Revisit requested | coord=({coord.col},{coord.row}) | pointType={currentPoint.PointType} | priorVisits={visitCountBeforeMove}.");
-        __result = HandleDreamModeRevisitAsync(__instance, runState, modifier, coord, currentPoint);
-        return false;
-    }
-
-    private static async Task HandleDreamModeRevisitAsync(
-        RunManager runManager,
-        RunState runState,
-        LucidDreamMaliceModifier modifier,
-        MapCoord coord,
-        MapPoint point)
-    {
-        runState.AddVisitedMapCoord(coord);
-        MainFile.Logger.Info(
-            $"[DreamMode] Handling revisit | coord=({coord.col},{coord.row}) | currentMapCoord=({runState.CurrentMapCoord?.col},{runState.CurrentMapCoord?.row}) | pointType={point.PointType}.");
-
-        switch (point.PointType)
-        {
-            case MapPointType.Shop:
-                LucidDreamMaliceRuntimeHelper.SetDreamModeRevisitedRestSite(modifier, false);
-                MainFile.Logger.Info($"[DreamMode] Reopening revisited shop at coord=({coord.col},{coord.row}).");
-                await InvokeLoadIntoLatestMapCoordAsync(runManager, new MerchantRoom());
-                return;
-            case MapPointType.RestSite:
-                LucidDreamMaliceRuntimeHelper.SetDreamModeRevisitedRestSite(modifier, true);
-                MainFile.Logger.Info($"[DreamMode] Reopening revisited rest site at coord=({coord.col},{coord.row}) with healing suppression.");
-                await InvokeLoadIntoLatestMapCoordAsync(runManager, new RestSiteRoom());
-                return;
-            case MapPointType.Monster:
-            case MapPointType.Elite:
-            case MapPointType.Boss:
-                LucidDreamMaliceRuntimeHelper.SetDreamModeRevisitedRestSite(modifier, false);
-                if (TryCreatePreFinishedCombatRoom(runState, coord, point, out var combatRoom))
-                {
-                    MainFile.Logger.Info(
-                        $"[DreamMode] Reopening cleared combat room at coord=({coord.col},{coord.row}) | pointType={point.PointType} | encounter={combatRoom.ModelId}.");
-                    await InvokeLoadIntoLatestMapCoordAsync(runManager, combatRoom);
-                    return;
-                }
-
-                MainFile.Logger.Warn(
-                    $"[DreamMode] Combat revisit fallback triggered at coord=({coord.col},{coord.row}) because pre-finished room reconstruction failed. Loading map room instead.");
-                await InvokeLoadIntoLatestMapCoordAsync(runManager, new MapRoom());
-                return;
-            default:
-                LucidDreamMaliceRuntimeHelper.SetDreamModeRevisitedRestSite(modifier, false);
-                MainFile.Logger.Info(
-                    $"[DreamMode] Revisit for pointType={point.PointType} at coord=({coord.col},{coord.row}) will load an empty map room.");
-                await InvokeLoadIntoLatestMapCoordAsync(runManager, new MapRoom());
-                return;
-        }
-    }
-
-    private static bool TryCreatePreFinishedCombatRoom(
-        RunState runState,
-        MapCoord coord,
-        MapPoint point,
-        out CombatRoom combatRoom)
-    {
-        combatRoom = null!;
-
-        var historyEntry = runState.GetHistoryEntryFor(new MapLocation(coord, runState.CurrentActIndex));
-        var expectedRoomType = point.PointType switch
-        {
-            MapPointType.Elite => RoomType.Elite,
-            MapPointType.Boss => RoomType.Boss,
-            _ => RoomType.Monster
-        };
-
-        var roomHistory = historyEntry?.Rooms.FirstOrDefault(room => room.RoomType == expectedRoomType)
-                          ?? historyEntry?.Rooms.FirstOrDefault(room =>
-                              room.RoomType is RoomType.Monster or RoomType.Elite or RoomType.Boss);
-        if (roomHistory == null || roomHistory.ModelId == ModelId.none)
-        {
-            MainFile.Logger.Warn(
-                $"[DreamMode] Failed to rebuild pre-finished combat room for coord=({coord.col},{coord.row}) because no combat history entry was found.");
-            return false;
-        }
-
-        var canonicalEncounter = ModelDb.GetById<EncounterModel>(roomHistory.ModelId);
-        if (canonicalEncounter == null)
-        {
-            MainFile.Logger.Warn(
-                $"[DreamMode] Failed to rebuild pre-finished combat room for coord=({coord.col},{coord.row}) because encounter '{roomHistory.ModelId}' was missing.");
-            return false;
-        }
-
-        var mutableEncounter = (canonicalEncounter.CanonicalInstance ?? canonicalEncounter).ToMutable();
-        EncounterShouldGiveRewardsField?.SetValue(mutableEncounter, false);
-
-        combatRoom = new CombatRoom(mutableEncounter, runState);
-        CombatRoomMarkPreFinishedMethod?.Invoke(combatRoom, []);
-        MainFile.Logger.Info(
-            $"[DreamMode] Rebuilt pre-finished combat room | coord=({coord.col},{coord.row}) | expectedRoomType={expectedRoomType} | encounter={roomHistory.ModelId}.");
+            $"[DreamMode] EnterMapCoord bookkeeping | coord=({coord.col},{coord.row}) | pointType={point.PointType} | priorVisits={LucidDreamMaliceRuntimeHelper.GetVisitCount(modifier, coord)}.");
         return true;
     }
+}
 
-    private static Task InvokeLoadIntoLatestMapCoordAsync(
-        RunManager runManager,
-        AbstractRoom? preFinishedRoom)
+public sealed class DreamModeCreateRoomPatch : IPatchMethod
+{
+    private static readonly PropertyInfo? RunManagerStateProperty =
+        AccessTools.Property(typeof(RunManager), "State");
+
+    public static string PatchId => "dream_mode_create_room";
+
+    public static string Description => "Route dream-mode revisits through CreateRoom instead of EnterMapCoord";
+
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets()
     {
-        if (LoadIntoLatestMapCoordMethod?.Invoke(runManager, [preFinishedRoom]) is Task task)
-            return task;
-
-        return Task.CompletedTask;
+        return [new(typeof(RunManager), "CreateRoom", [typeof(RoomType), typeof(MapPointType), typeof(AbstractModel)])];
     }
 
-    private static Task InvokeEnterMapCoordInternalAsync(
-        RunManager runManager,
-        MapCoord coord,
-        AbstractRoom? preFinishedRoom,
-        bool saveGame)
+    public static bool Prefix(
+        RunManager __instance,
+        RoomType roomType,
+        MapPointType mapPointType,
+        AbstractModel? model,
+        ref AbstractRoom __result)
     {
-        if (EnterMapCoordInternalMethod?.Invoke(runManager, [coord, preFinishedRoom, saveGame]) is Task task)
-            return task;
+        if (RunManagerStateProperty?.GetValue(__instance) is not RunState runState)
+            return true;
 
-        return Task.CompletedTask;
+        var modifier = LucidDreamMaliceModifier.Get(runState);
+        if (modifier?.EnableDreamMode != true)
+            return true;
+        if (runState.CurrentMapCoord is not MapCoord coord)
+            return true;
+
+        if (!LucidDreamMaliceRuntimeHelper.TryResolveDreamModeRoomType(
+                runState,
+                coord,
+                roomType,
+                mapPointType,
+                model,
+                out var resolvedRoom))
+            return true;
+
+        __result = resolvedRoom;
+        MainFile.Logger.Info(
+            $"[DreamMode] CreateRoom routed coord=({coord.col},{coord.row}) roomType={roomType} mapPointType={mapPointType} resolvedRoom={resolvedRoom.GetType().Name}.");
+        return false;
     }
 }

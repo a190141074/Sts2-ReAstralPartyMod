@@ -133,6 +133,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS_CHOOSE_DODGE.description": "Enter [power]Dodge Stance[/power].",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.title": "Grant Spark",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.description": "Choose [blue]1[/blue] of [blue]3[/blue] [gold]upgraded[/gold] cards from the [gold]Windchaser Spellbook[/gold] and add it to your hand.",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NOT_YET_ACTIVATED.title": "That's Because I Haven't Activated Yet",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NOT_YET_ACTIVATED.description": "Add [blue]1[/blue] [gold]Creative AI[/gold] and [blue]1[/blue] [gold]Subroutine[/gold] to your hand. They cost [blue]1[/blue] less.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_VAMPIRE_BITE.title": "One Little Sip",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_VAMPIRE_BITE.description": "If your HP is above [blue]50[/blue]% of your current Max HP, take [blue]6[/blue] damage.\nGain [blue]1[/blue] [power]Bloodthirst[/power].",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_IRON_VIRGIN.title": "Iron Virgin",

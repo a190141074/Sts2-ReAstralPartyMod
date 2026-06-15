@@ -57,6 +57,7 @@
 
 	<ItemGroup>
 		<Compile Remove="doc\**\*.cs"/>
+		<Compile Remove="_build_verify\**\*.cs"/>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -538,6 +539,12 @@
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_corpsebloom.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_beads_of_fealty.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_beads_of_fealty.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\prophecy_replicant_group.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\prophecy_replicant_group.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\dream_coin_explosion.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\dream_coin_explosion.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\dream_disintegration_claw.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\dream_disintegration_claw.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_egocentrism.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_eulogy_zero.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\enigmatic_special_the_one_box.png"/>
@@ -562,6 +569,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_ling_yulin.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_ling_yulin.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_weird_egg.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\variant_person_defect_baby.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\variant_person_defect_baby.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_big.png"/>

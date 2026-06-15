@@ -190,7 +190,9 @@ internal static class ReAstralPartyRunSettingsSync
             EnableDreamSeriesEvents = lobbySnapshot?.EnableDreamSeriesEvents ?? settings.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = lobbySnapshot?.EnableEnigmaticSeriesEvents ?? settings.EnableEnigmaticSeriesEvents,
             EnableNeowExtraOption = lobbySnapshot?.EnableNeowExtraOption ?? settings.EnableNeowExtraOption,
-            NeowExtraOptionSelectionMode = lobbySnapshot?.NeowExtraOptionSelectionMode ?? settings.NeowExtraOptionSelectionMode,
+            NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+                lobbySnapshot?.EnableStartingRingOfSevenCurses ?? settings.EnableStartingRingOfSevenCurses,
+                lobbySnapshot?.NeowExtraOptionSelectionMode ?? settings.NeowExtraOptionSelectionMode),
             EnableAllPersonas = lobbySnapshot?.EnableAllPersonas ?? settings.EnableAllPersonas,
             EnableAllVariantPersonas = lobbySnapshot?.EnableAllVariantPersonas ?? settings.EnableAllVariantPersonas,
             StartingPersonaMode = lobbySnapshot?.StartingPersonaMode
@@ -453,6 +455,9 @@ internal static class ReAstralPartyRunSettingsSync
             EnableLucidDreamHarmlessWhisper = (isV9Payload && payload[28] != 0) || (isV8Payload && payload[27] != 0) || (isV7Payload && payload[26] != 0),
             BannedRelicIdsSerialized = bannedIds
         };
+        snapshot.NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+            snapshot.EnableStartingRingOfSevenCurses,
+            snapshot.NeowExtraOptionSelectionMode);
         if (isLegacyPayload)
         {
             MainFile.Logger.Info(

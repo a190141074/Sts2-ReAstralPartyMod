@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Merchant;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Map;
@@ -29,6 +30,16 @@ internal static class LucidDreamMaliceRuntimeHelper
 {
     private sealed record WeakEncounterMonsterCandidate(MonsterModel Monster, string StableId);
     private sealed record DreamModeVisitRecord(int Col, int Row, int Count);
+    internal sealed record DreamModeResolvedNodeRoom(RoomType RoomType, string? ModelId);
+    internal sealed record DreamModeSavedShopEntry(
+        string Type,
+        string? ModelId,
+        int Cost,
+        bool IsStocked,
+        bool IsOnSale,
+        int CardTypeRaw,
+        int CardRarityRaw);
+    internal sealed record DreamModeSavedShopInventory(IReadOnlyList<DreamModeSavedShopEntry> Entries);
     private sealed class PitchBlackImpulseSequenceState
     {
         public HashSet<ulong> HitTargetIds { get; } = [];
@@ -40,8 +51,14 @@ internal static class LucidDreamMaliceRuntimeHelper
     private static readonly HashSet<uint> OverpopulationSpawnCombatIds = [];
     private static readonly ConditionalWeakTable<IRunState, Dictionary<string, PitchBlackImpulseSequenceState>>
         PitchBlackImpulseSequences = new();
+    private static readonly ConditionalWeakTable<IRunState, EncounterModel> DreamModeEmptyCombatRoomTemplates = new();
+    private static readonly ConditionalWeakTable<IRunState, Dictionary<string, EncounterModel>>
+        DreamModeCachedCombatTemplatesByCoord = new();
+    private static readonly ConditionalWeakTable<IRunState, Dictionary<string, DreamModeResolvedNodeRoom>>
+        DreamModeResolvedRoomsByCoord = new();
     private static readonly ConcurrentDictionary<Player, decimal> BubblePotionSuppressedHealByPlayer = new();
     private static readonly HashSet<(int FromCol, int FromRow, int ToCol, int ToRow)> DreamModeDirectedEdges = [];
+    private static readonly Dictionary<string, DreamModeSavedShopInventory> DreamModeSavedShopInventories = [];
     private static readonly AccessTools.FieldRef<NMapScreen, RunState?> MapScreenRunStateField =
         AccessTools.FieldRefAccess<NMapScreen, RunState?>("_runState");
     private static int _pitchBlackImpulseSyntheticDepth;
@@ -98,6 +115,10 @@ internal static class LucidDreamMaliceRuntimeHelper
 
     public static bool IsDreamModeEnabled(IRunState? runState)
     {
+        var modifier = GetModifier(runState);
+        if (modifier?.EnableDreamMode == true)
+            return true;
+
         return ReAstralPartyModSettingsManager.GetEnableDreamMode(runState);
     }
 
@@ -257,6 +278,260 @@ internal static class LucidDreamMaliceRuntimeHelper
             return;
 
         modifier.IsInDreamModeRevisitedRestSite = value;
+    }
+
+    public static void SetDreamModeEmptyRevisitCombatRoom(LucidDreamMaliceModifier? modifier, bool value)
+    {
+        if (modifier == null)
+            return;
+
+        modifier.IsInDreamModeEmptyRevisitCombatRoom = value;
+    }
+
+    public static void SetDreamModePendingRevisit(
+        LucidDreamMaliceModifier? modifier,
+        MapCoord coord,
+        MapPointType pointType)
+    {
+        if (modifier == null)
+            return;
+
+        var priorVisits = GetVisitCount(modifier, coord);
+        modifier.HasDreamModePendingRevisit = priorVisits > 0;
+        modifier.DreamModePendingRevisitCol = coord.col;
+        modifier.DreamModePendingRevisitRow = coord.row;
+        modifier.DreamModePendingRevisitPointTypeRaw = (int)pointType;
+
+        if (priorVisits <= 0)
+        {
+            modifier.IsInDreamModeRevisitedRestSite = false;
+            modifier.IsInDreamModeEmptyRevisitCombatRoom = false;
+        }
+    }
+
+    public static bool TryResolveDreamModeRoomType(
+        RunState runState,
+        MapCoord coord,
+        RoomType roomType,
+        MapPointType mapPointType,
+        AbstractModel? model,
+        out AbstractRoom room)
+    {
+        room = null!;
+        var modifier = GetModifier(runState);
+        if (modifier?.EnableDreamMode != true)
+            return false;
+        if (!modifier.HasDreamModePendingRevisit)
+            return false;
+        if (modifier.DreamModePendingRevisitCol != coord.col || modifier.DreamModePendingRevisitRow != coord.row)
+            return false;
+
+        modifier.HasDreamModePendingRevisit = false;
+
+        var revisitPointType = Enum.IsDefined(typeof(MapPointType), modifier.DreamModePendingRevisitPointTypeRaw)
+            ? (MapPointType)modifier.DreamModePendingRevisitPointTypeRaw
+            : mapPointType;
+        var priorVisits = GetVisitCount(modifier, coord);
+        if (priorVisits <= 1)
+        {
+            modifier.IsInDreamModeRevisitedRestSite = false;
+            modifier.IsInDreamModeEmptyRevisitCombatRoom = false;
+            return false;
+        }
+
+        if (TryGetDreamModeResolvedRoom(runState, coord, out var resolvedRoom))
+        {
+            switch (resolvedRoom.RoomType)
+            {
+                case RoomType.Shop:
+                    modifier.IsInDreamModeRevisitedRestSite = false;
+                    modifier.IsInDreamModeEmptyRevisitCombatRoom = false;
+                    room = new MerchantRoom();
+                    return true;
+                case RoomType.RestSite:
+                    modifier.IsInDreamModeRevisitedRestSite = true;
+                    modifier.IsInDreamModeEmptyRevisitCombatRoom = false;
+                    room = new RestSiteRoom();
+                    return true;
+                case RoomType.Event:
+                    if (!string.IsNullOrWhiteSpace(resolvedRoom.ModelId))
+                    {
+                        var eventRoom = new EventRoom(ModelDb.GetById<EventModel>(ModelId.Deserialize(resolvedRoom.ModelId)));
+                        eventRoom.MarkPreFinished();
+                        modifier.IsInDreamModeRevisitedRestSite = false;
+                        modifier.IsInDreamModeEmptyRevisitCombatRoom = false;
+                        room = eventRoom;
+                        return true;
+                    }
+
+                    break;
+                case RoomType.Monster:
+                case RoomType.Elite:
+                case RoomType.Boss:
+                    modifier.IsInDreamModeRevisitedRestSite = false;
+                    modifier.IsInDreamModeEmptyRevisitCombatRoom = true;
+                    room = CreateDreamModeEmptyCombatRoom(runState);
+                    return true;
+            }
+        }
+
+        switch (revisitPointType)
+        {
+            case MapPointType.Shop:
+                modifier.IsInDreamModeRevisitedRestSite = false;
+                modifier.IsInDreamModeEmptyRevisitCombatRoom = false;
+                room = new MerchantRoom();
+                return true;
+            case MapPointType.RestSite:
+                modifier.IsInDreamModeRevisitedRestSite = true;
+                modifier.IsInDreamModeEmptyRevisitCombatRoom = false;
+                room = new RestSiteRoom();
+                return true;
+            case MapPointType.Monster:
+            case MapPointType.Elite:
+                modifier.IsInDreamModeRevisitedRestSite = false;
+                modifier.IsInDreamModeEmptyRevisitCombatRoom = true;
+                room = CreateDreamModeEmptyCombatRoom(runState);
+                return true;
+            case MapPointType.Unknown:
+            case MapPointType.Treasure:
+            case MapPointType.Ancient:
+            case MapPointType.Unassigned:
+            default:
+                modifier.IsInDreamModeRevisitedRestSite = false;
+                modifier.IsInDreamModeEmptyRevisitCombatRoom = true;
+                room = CreateDreamModeEmptyCombatRoom(runState);
+                return true;
+        }
+    }
+
+    public static CombatRoom CreateDreamModeEmptyCombatRoom(RunState runState)
+    {
+        var template = TryGetCachedDreamModeCombatTemplateForCurrentCoord(runState)
+                       ?? DreamModeEmptyCombatRoomTemplates.GetValue(
+                           runState,
+                           static state => state.Act.PullNextEncounter(RoomType.Monster) as EncounterModel
+                                           ?? throw new InvalidOperationException(
+                                               "Dream Mode could not cache an EncounterModel template for empty revisit combat rooms."));
+
+        var encounter = template.MutableClone() as EncounterModel
+                        ?? throw new InvalidOperationException(
+                            "Dream Mode failed to clone an EncounterModel template for empty revisit combat rooms.");
+        var room = new CombatRoom(encounter, runState);
+        room.MarkPreFinished();
+        return room;
+    }
+
+    public static void CacheDreamModeResolvedRoom(RunState? runState, AbstractRoom? room)
+    {
+        if (runState == null || room == null || !runState.CurrentMapCoord.HasValue)
+            return;
+        if (!IsDreamModeEnabled(runState))
+            return;
+
+        var modifier = GetModifier(runState);
+        if (modifier == null)
+            return;
+        if (GetVisitCount(modifier, runState.CurrentMapCoord.Value) != 1)
+            return;
+
+        DreamModeResolvedRoomsByCoord
+            .GetValue(runState, static _ => [])
+            [BuildDreamModeCoordKey(runState.CurrentMapCoord.Value)] = new DreamModeResolvedNodeRoom(
+            room.RoomType,
+            room.ModelId?.ToString());
+    }
+
+    public static void CacheDreamModeCombatTemplate(RunState? runState, CombatRoom? room)
+    {
+        if (runState == null || room == null || !runState.CurrentMapCoord.HasValue)
+            return;
+        if (!IsDreamModeEnabled(runState))
+            return;
+
+        var coordKey = BuildDreamModeCoordKey(runState.CurrentMapCoord.Value);
+        var template = room.Encounter.CanonicalInstance?.ToMutable() as EncounterModel
+                       ?? room.Encounter.MutableClone() as EncounterModel;
+        if (template == null)
+            return;
+
+        DreamModeCachedCombatTemplatesByCoord
+            .GetValue(runState, static _ => [])
+            [coordKey] = template;
+    }
+
+    public static bool IsDreamModeEmptyRevisitCombatRoom(RunState? runState)
+    {
+        return GetModifier(runState)?.IsInDreamModeEmptyRevisitCombatRoom == true;
+    }
+
+    public static string? TryBuildDreamModeShopCacheKey(RunState? runState)
+    {
+        if (runState == null || !IsDreamModeEnabled(runState))
+            return null;
+        if (!runState.CurrentMapCoord.HasValue)
+            return null;
+
+        var coord = runState.CurrentMapCoord.Value;
+        return $"{runState.Rng.StringSeed}|{runState.CurrentActIndex}|{coord.col}|{coord.row}";
+    }
+
+    public static void SaveDreamModeShopInventory(RunState? runState, MerchantInventory? inventory)
+    {
+        var cacheKey = TryBuildDreamModeShopCacheKey(runState);
+        if (cacheKey == null || inventory == null)
+            return;
+
+        DreamModeSavedShopInventories[cacheKey] = new DreamModeSavedShopInventory(BuildDreamModeSavedShopEntries(inventory));
+    }
+
+    public static bool TryGetDreamModeShopInventory(RunState? runState, out DreamModeSavedShopInventory inventory)
+    {
+        inventory = null!;
+        var cacheKey = TryBuildDreamModeShopCacheKey(runState);
+        if (cacheKey == null)
+            return false;
+
+        return DreamModeSavedShopInventories.TryGetValue(cacheKey, out inventory);
+    }
+
+    public static void ResetDreamModeShopCacheIfRunChanged(RunState? runState)
+    {
+        if (runState == null)
+            return;
+
+        var activeSeed = runState.Rng.StringSeed;
+        foreach (var key in DreamModeSavedShopInventories.Keys.Where(key => !key.StartsWith(activeSeed, StringComparison.Ordinal)).ToList())
+            DreamModeSavedShopInventories.Remove(key);
+    }
+
+    private static EncounterModel? TryGetCachedDreamModeCombatTemplateForCurrentCoord(RunState runState)
+    {
+        if (!runState.CurrentMapCoord.HasValue)
+            return null;
+
+        if (!DreamModeCachedCombatTemplatesByCoord.TryGetValue(runState, out var cachedTemplates))
+            return null;
+
+        cachedTemplates.TryGetValue(BuildDreamModeCoordKey(runState.CurrentMapCoord.Value), out var template);
+        return template;
+    }
+
+    private static bool TryGetDreamModeResolvedRoom(
+        RunState runState,
+        MapCoord coord,
+        out DreamModeResolvedNodeRoom room)
+    {
+        room = null!;
+        if (!DreamModeResolvedRoomsByCoord.TryGetValue(runState, out var resolvedRooms))
+            return false;
+
+        return resolvedRooms.TryGetValue(BuildDreamModeCoordKey(coord), out room);
+    }
+
+    private static string BuildDreamModeCoordKey(MapCoord coord)
+    {
+        return $"{coord.col}:{coord.row}";
     }
 
     public static bool ShouldSkipRoomContentOnDreamModeRevisit(MapPoint? point)
@@ -791,6 +1066,72 @@ internal static class LucidDreamMaliceRuntimeHelper
     {
         return DreamModeDirectedEdges.Contains((first.coord.col, first.coord.row, second.coord.col, second.coord.row))
                || DreamModeDirectedEdges.Contains((second.coord.col, second.coord.row, first.coord.col, first.coord.row));
+    }
+
+    private static IReadOnlyList<DreamModeSavedShopEntry> BuildDreamModeSavedShopEntries(MerchantInventory inventory)
+    {
+        var entries = new List<DreamModeSavedShopEntry>();
+        foreach (var entry in inventory.CharacterCardEntries)
+        {
+            entries.Add(new DreamModeSavedShopEntry(
+                "CharacterCard",
+                entry.CreationResult?.Card.CanonicalInstance?.Id.ToString(),
+                entry.Cost,
+                entry.IsStocked,
+                entry.IsOnSale,
+                (int)(entry.CreationResult?.Card.Type ?? CardType.Skill),
+                (int)(entry.CreationResult?.Card.Rarity ?? CardRarity.Common)));
+        }
+
+        foreach (var entry in inventory.ColorlessCardEntries)
+        {
+            entries.Add(new DreamModeSavedShopEntry(
+                "ColorlessCard",
+                entry.CreationResult?.Card.CanonicalInstance?.Id.ToString(),
+                entry.Cost,
+                entry.IsStocked,
+                entry.IsOnSale,
+                (int)(entry.CreationResult?.Card.Type ?? CardType.Skill),
+                (int)(entry.CreationResult?.Card.Rarity ?? CardRarity.Uncommon)));
+        }
+
+        foreach (var entry in inventory.RelicEntries)
+        {
+            entries.Add(new DreamModeSavedShopEntry(
+                "Relic",
+                entry.Model?.CanonicalInstance?.Id.ToString(),
+                entry.Cost,
+                entry.IsStocked,
+                false,
+                0,
+                0));
+        }
+
+        foreach (var entry in inventory.PotionEntries)
+        {
+            entries.Add(new DreamModeSavedShopEntry(
+                "Potion",
+                entry.Model?.CanonicalInstance?.Id.ToString(),
+                entry.Cost,
+                entry.IsStocked,
+                false,
+                0,
+                0));
+        }
+
+        if (inventory.CardRemovalEntry != null)
+        {
+            entries.Add(new DreamModeSavedShopEntry(
+                "CardRemoval",
+                null,
+                inventory.CardRemovalEntry.Cost,
+                inventory.CardRemovalEntry.IsStocked,
+                false,
+                0,
+                0));
+        }
+
+        return entries;
     }
 
     private static bool IsPitchBlackImpulseSyntheticDamage()

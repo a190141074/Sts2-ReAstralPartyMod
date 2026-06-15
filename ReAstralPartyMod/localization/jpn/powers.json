@@ -278,3 +278,9 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_TWIST_OMEN_POWER.effect": "【倒転の啓】を手札に加える",
   "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_INFINITUM_OMEN_POWER.effect": "【無止の言】を手札に加える"
 }
+  "RE_ASTRAL_PARTY_MOD_POWER_COIN_FRONT_POWER.title": "コイン・表",
+  "RE_ASTRAL_PARTY_MOD_POWER_COIN_FRONT_POWER.description": "この戦闘中に累積した[gold]表[/gold]の層数を表示します。",
+  "RE_ASTRAL_PARTY_MOD_POWER_COIN_FRONT_POWER.smartDescription": "この戦闘中に累積した[gold]表[/gold]の層数を表示します。",
+  "RE_ASTRAL_PARTY_MOD_POWER_COIN_BACK_POWER.title": "コイン・裏",
+  "RE_ASTRAL_PARTY_MOD_POWER_COIN_BACK_POWER.description": "この戦闘中に累積した[gold]裏[/gold]の層数を表示します。",
+  "RE_ASTRAL_PARTY_MOD_POWER_COIN_BACK_POWER.smartDescription": "この戦闘中に累積した[gold]裏[/gold]の層数を表示します。",

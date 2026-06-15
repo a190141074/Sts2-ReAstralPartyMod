@@ -30,6 +30,12 @@ internal static class NeowOptionInjectionHelper
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.ABSOLUTE_FORM";
     private const string ProphecySoulDevourTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_SOUL_DEVOUR";
+    private const string ProphecyReplicantGroupTextKey =
+        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_REPLICANT_GROUP";
+    private const string DreamCoinExplosionTextKey =
+        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_COIN_EXPLOSION";
+    private const string DreamDisintegrationClawTextKey =
+        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_DISINTEGRATION_CLAW";
     private const string DreamFaceTheShadowIconPath =
         "res://ReAstralPartyMod/images/ancient/dream_face_the_shadow.png";
     private const string RingOfSevenCursesIconPath =
@@ -38,6 +44,12 @@ internal static class NeowOptionInjectionHelper
         "res://ReAstralPartyMod/images/powers/absolute_form_power.png";
     private const string ProphecySoulDevourIconPath =
         "res://ReAstralPartyMod/images/relic/prophecy_soul_devour.png";
+    private const string ProphecyReplicantGroupIconPath =
+        "res://ReAstralPartyMod/images/relic/prophecy_replicant_group.png";
+    private const string DreamCoinExplosionIconPath =
+        "res://ReAstralPartyMod/images/relic/dream_coin_explosion.png";
+    private const string DreamDisintegrationClawIconPath =
+        "res://ReAstralPartyMod/images/relic/dream_disintegration_claw.png";
     private static readonly string[] CardCollectionMemberNames =
     [
         "Cards",
@@ -84,7 +96,25 @@ internal static class NeowOptionInjectionHelper
             ProphecySoulDevourTextKey,
             ProphecySoulDevourIconPath,
             CreateProphecySoulDevourHoverTips,
-            ChooseProphecySoulDevour)
+            ChooseProphecySoulDevour),
+        new(
+            "prophecy_replicant_group",
+            ProphecyReplicantGroupTextKey,
+            ProphecyReplicantGroupIconPath,
+            CreateProphecyReplicantGroupHoverTips,
+            ChooseProphecyReplicantGroup),
+        new(
+            "dream_coin_explosion",
+            DreamCoinExplosionTextKey,
+            DreamCoinExplosionIconPath,
+            CreateDreamCoinExplosionHoverTips,
+            ChooseDreamCoinExplosion),
+        new(
+            "dream_disintegration_claw",
+            DreamDisintegrationClawTextKey,
+            DreamDisintegrationClawIconPath,
+            CreateDreamDisintegrationClawHoverTips,
+            ChooseDreamDisintegrationClaw)
     ];
     private static readonly Dictionary<string, string> SelectedCandidateKeysByRun = [];
 
@@ -211,6 +241,14 @@ internal static class NeowOptionInjectionHelper
                 && !ReAstralPartyModSettingsManager.GetEnableDreamSeriesEvents(runState))
                 continue;
 
+            if (string.Equals(candidate.StableKey, "dream_coin_explosion", StringComparison.Ordinal)
+                && !ReAstralPartyModSettingsManager.GetEnableDreamSeriesEvents(runState))
+                continue;
+
+            if (string.Equals(candidate.StableKey, "dream_disintegration_claw", StringComparison.Ordinal)
+                && !ReAstralPartyModSettingsManager.GetEnableDreamSeriesEvents(runState))
+                continue;
+
             if (string.Equals(candidate.StableKey, "ring_of_seven_curses", StringComparison.Ordinal)
                 && (!ReAstralPartyModSettingsManager.GetEnableEnigmaticSeriesEvents(runState)
                     || ReAstralPartyModSettingsManager.GetEnableStartingRingOfSevenCurses(runState)))
@@ -270,6 +308,52 @@ internal static class NeowOptionInjectionHelper
         CompleteAncient(ancient);
     }
 
+    private static async Task ChooseProphecyReplicantGroup(AncientEventModel ancient)
+    {
+        var owner = ancient.Owner
+                    ?? throw new InvalidOperationException(
+                        "Neow had no owner when Prophecy Replicant Group was chosen.");
+
+        var obtained = await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(
+            owner,
+            ModelDb.Relic<ProphecyReplicantGroup>());
+        if (obtained is ProphecyReplicantGroup relic)
+        {
+            var initialStacks = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+                8,
+                17,
+                MainFile.ModId,
+                nameof(Neow),
+                "prophecy_replicant_group_initial_stacks",
+                owner.RunState?.Rng.StringSeed ?? "<null_seed>",
+                owner.RunState?.CurrentActIndex ?? -1,
+                owner.NetId.ToString());
+            relic.InitializeStacks(initialStacks);
+        }
+
+        CompleteAncient(ancient);
+    }
+
+    private static async Task ChooseDreamCoinExplosion(AncientEventModel ancient)
+    {
+        var owner = ancient.Owner
+                    ?? throw new InvalidOperationException(
+                        "Neow had no owner when Dream Coin Explosion was chosen.");
+
+        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<DreamCoinExplosion>());
+        CompleteAncient(ancient);
+    }
+
+    private static async Task ChooseDreamDisintegrationClaw(AncientEventModel ancient)
+    {
+        var owner = ancient.Owner
+                    ?? throw new InvalidOperationException(
+                        "Neow had no owner when Dream Disintegration Claw was chosen.");
+
+        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<DreamDisintegrationClaw>());
+        CompleteAncient(ancient);
+    }
+
     private static Task AddDreamFaceTheShadowCardToDeck(Player owner)
     {
         return CardGainAttribution.RunWithSource(null, async () =>
@@ -320,6 +404,21 @@ internal static class NeowOptionInjectionHelper
     private static IReadOnlyList<IHoverTip> CreateProphecySoulDevourHoverTips()
     {
         return [.. HoverTipFactory.FromRelic<ProphecySoulDevour>()];
+    }
+
+    private static IReadOnlyList<IHoverTip> CreateProphecyReplicantGroupHoverTips()
+    {
+        return [.. HoverTipFactory.FromRelic<ProphecyReplicantGroup>()];
+    }
+
+    private static IReadOnlyList<IHoverTip> CreateDreamCoinExplosionHoverTips()
+    {
+        return [.. HoverTipFactory.FromRelic<DreamCoinExplosion>()];
+    }
+
+    private static IReadOnlyList<IHoverTip> CreateDreamDisintegrationClawHoverTips()
+    {
+        return [.. HoverTipFactory.FromRelic<DreamDisintegrationClaw>()];
     }
 
     private sealed record NeowOptionCandidateDefinition(

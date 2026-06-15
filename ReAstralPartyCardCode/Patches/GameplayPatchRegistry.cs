@@ -346,7 +346,19 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<DreamModeTravelabilityPatch>();
         patcher.RegisterPatch<DreamModeTravelPathPatch>();
         patcher.RegisterPatch<DreamModeDuplicateVisitedMapCoordPatch>();
+        patcher.RegisterPatch<DreamModeMapScreenProcessMousePatch>();
+        patcher.RegisterPatch<DreamModeMapScreenProcessScrollPatch>();
+        patcher.RegisterPatch<DreamModeMapScreenUpdateScrollPatch>();
+        patcher.RegisterPatch<DreamModeMapScreenSetMapPatch>();
+        patcher.RegisterPatch<DreamModeMapScreenOpenPatch>();
+        patcher.RegisterPatch<DreamModeMerchantRoomEnterPatch>();
+        patcher.RegisterPatch<DreamModeMerchantRoomExitPatch>();
         patcher.RegisterPatch<DreamModeEnterMapCoordPatch>();
+        patcher.RegisterPatch<DreamModeCreateRoomPatch>();
+        patcher.RegisterPatch<DreamModeCombatRoomEnterCachePatch>();
+        patcher.RegisterPatch<DreamModeEmptyRevisitGenerateMonstersPatch>();
+        patcher.RegisterPatch<DreamModeEmptyRevisitRewardsPatch>();
+        patcher.RegisterPatch<DreamModeEmptyRevisitCombatRoomExitPatch>();
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)

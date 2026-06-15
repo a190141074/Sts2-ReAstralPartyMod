@@ -12,5 +12,11 @@
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.ABSOLUTE_FORM.title": "終極形態",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.ABSOLUTE_FORM.description": "[gold]終極形態[/gold]を[gold]デッキ[/gold]に追加します。",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_SOUL_DEVOUR.title": "中級予言・魂喰い",
-  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_SOUL_DEVOUR.description": "[gold]予言・魂喰い[/gold]を獲得します。"
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_SOUL_DEVOUR.description": "[gold]予言・魂喰い[/gold]を獲得します。",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_REPLICANT_GROUP.title": "中級予言・無限複製",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_REPLICANT_GROUP.description": "[blue]8-16[/blue]層の[gold]予言・複製群[/gold]を獲得します。",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_COIN_EXPLOSION.title": "ドリームランド・コイン・エクスプロージョン",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_COIN_EXPLOSION.description": "[gold]夢境・コイン爆発[/gold]を獲得します。攻撃カードは現在の所持金の[blue]1%[/blue]を先に消費し、その後コイン判定で追加ダメージを与えます。",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_DISINTEGRATION_CLAW.title": "夢境・分解の爪",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_DISINTEGRATION_CLAW.description": "[gold]夢境・分解の爪[/gold]を獲得します。Strike カードは現在の Act に応じて追加ダメージと回復を得て、Boss への命中時は倍化します。"
 }

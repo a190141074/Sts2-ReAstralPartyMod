@@ -211,6 +211,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private bool _initialRoleSyncPerformed;
     private bool _syncErrorShown;
     private bool _hasReceivedSnapshotForCurrentSession;
+    private readonly List<NeowExtraOptionSelectionMode> _visibleNeowExtraOptionSelectionModes = [];
 
     public CharacterSelectGameplayPreviewPanel()
     {
@@ -817,6 +818,9 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             var role = GetCurrentRoleForUi();
             var isEditable = IsEditableByLocalPlayer(role);
             var personaSelectionEnabled = snapshot.EnableStartingPersonaSelection;
+            var normalizedNeowSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+                snapshot.EnableStartingRingOfSevenCurses,
+                snapshot.NeowExtraOptionSelectionMode);
             if (_startingInitialPointToggle != null)
             {
                 _startingInitialPointToggle.ButtonPressed = snapshot.EnableStartingInitialPoint;
@@ -869,8 +873,9 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
             if (_neowExtraOptionSelectionModeOption != null)
             {
+                RebuildNeowExtraOptionSelectionModeItems(snapshot.EnableStartingRingOfSevenCurses);
                 _neowExtraOptionSelectionModeOption.Select(
-                    IndexOfNeowExtraOptionSelectionMode(snapshot.NeowExtraOptionSelectionMode));
+                    IndexOfVisibleNeowExtraOptionSelectionMode(normalizedNeowSelectionMode));
                 _neowExtraOptionSelectionModeOption.Disabled = !isEditable || !snapshot.EnableNeowExtraOption;
             }
 
@@ -1047,6 +1052,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingRingOfSevenCurses = value);
+        if (value)
+        {
+            LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot =>
+            {
+                if (snapshot.NeowExtraOptionSelectionMode == NeowExtraOptionSelectionMode.RingOfSevenCurses)
+                    snapshot.NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom;
+            });
+        }
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 
@@ -1104,7 +1117,13 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         if (selectedIndex < 0 || selectedIndex >= NeowExtraOptionSelectionModes.Length)
             return;
 
-        var selectedMode = NeowExtraOptionSelectionModes[selectedIndex];
+        if (selectedIndex >= _visibleNeowExtraOptionSelectionModes.Count)
+            return;
+
+        var selectedMode = _visibleNeowExtraOptionSelectionModes[(int)selectedIndex];
+        selectedMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+            LobbyGameplaySettingsSync.TryGetSnapshot(out var currentSnapshot) && currentSnapshot.EnableStartingRingOfSevenCurses,
+            selectedMode);
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(
             snapshot => snapshot.NeowExtraOptionSelectionMode = selectedMode);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
@@ -1181,6 +1200,45 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         for (var i = 0; i < NeowExtraOptionSelectionModes.Length; i++)
         {
             if (NeowExtraOptionSelectionModes[i] == mode)
+                return i;
+        }
+
+        return 0;
+    }
+
+    private void RebuildNeowExtraOptionSelectionModeItems(bool enableStartingRingOfSevenCurses)
+    {
+        if (_neowExtraOptionSelectionModeOption == null)
+            return;
+
+        _visibleNeowExtraOptionSelectionModes.Clear();
+        _neowExtraOptionSelectionModeOption.Clear();
+
+        foreach (var mode in NeowExtraOptionSelectionModes)
+        {
+            if (enableStartingRingOfSevenCurses && mode == NeowExtraOptionSelectionMode.RingOfSevenCurses)
+                continue;
+
+            _visibleNeowExtraOptionSelectionModes.Add(mode);
+            _neowExtraOptionSelectionModeOption.AddItem(
+                ReAstralPartyModSettingsManager.GetNeowExtraOptionSelectionModeTitle(mode),
+                _visibleNeowExtraOptionSelectionModes.Count - 1);
+        }
+
+        var popup = _neowExtraOptionSelectionModeOption.GetPopup();
+        for (var i = 0; i < _visibleNeowExtraOptionSelectionModes.Count; i++)
+        {
+            var mode = _visibleNeowExtraOptionSelectionModes[i];
+            popup.SetItemTooltip(i,
+                $"{ReAstralPartyModSettingsManager.GetNeowExtraOptionSelectionModeTitle(mode)}\n{ReAstralPartyModSettingsManager.GetNeowExtraOptionSelectionModeDescription(mode)}");
+        }
+    }
+
+    private int IndexOfVisibleNeowExtraOptionSelectionMode(NeowExtraOptionSelectionMode mode)
+    {
+        for (var i = 0; i < _visibleNeowExtraOptionSelectionModes.Count; i++)
+        {
+            if (_visibleNeowExtraOptionSelectionModes[i] == mode)
                 return i;
         }
 
