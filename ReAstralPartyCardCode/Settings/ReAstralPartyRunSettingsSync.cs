@@ -1,13 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MegaCrit.Sts2.Core.Entities.Multiplayer;
-using MegaCrit.Sts2.Core.Context;
-using MegaCrit.Sts2.Core.Entities.Players;
-using MegaCrit.Sts2.Core.GameActions;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
@@ -123,8 +116,6 @@ internal static class ReAstralPartyRunSettingsSync
 {
     private static readonly AttachedState<RunState, RunSettingsSyncState> RunStates = new(() =>
         new RunSettingsSyncState());
-    private const int MaxClientSnapshotAttempts = 64;
-    private const string SnapshotSessionKey = "run_settings_snapshot";
 
     public static Task EnsureSyncedAsync(RunState runState)
     {
@@ -256,168 +247,14 @@ internal static class ReAstralPartyRunSettingsSync
         };
     }
 
-    private static PlayerChoiceResult CreateSnapshotChoiceResult(RunState runState,
-        ReAstralPartyRunSettingsSnapshot snapshot)
-    {
-        var payload = CreateSnapshotPayload(snapshot);
-        return AstralChoiceProtocol.CreateIndexedEnvelope(
-            AstralChoiceKind.RunSettingsSnapshot,
-            runState,
-            SnapshotSessionKey,
-            sequence: 0,
-            payload);
-    }
-
-    private static List<int> CreateSnapshotPayload(ReAstralPartyRunSettingsSnapshot snapshot)
-    {
-        var bannableRelics = BannedRelicRegistry.GetCanonicalBannableRelics();
-        var bannedSet = snapshot.BannedRelicIdsSerialized
-            .Where(static id => !string.IsNullOrWhiteSpace(id))
-            .ToHashSet(StringComparer.Ordinal);
-        var bannedFlags = bannableRelics
-            .Select(relic => bannedSet.Contains((relic.CanonicalInstance?.Id ?? relic.Id).ToString()) ? 1 : 0);
-
-        return
-        [
-            snapshot.EnableExtremeMode ? 1 : 0,
-            snapshot.EnableStartingInitialPoint ? 1 : 0,
-            snapshot.EnableStartingRingOfSevenCurses ? 1 : 0,
-            snapshot.EnableStartingPersonaSelection ? 1 : 0,
-            snapshot.EnableDreamSeriesEvents ? 1 : 0,
-            snapshot.EnableEnigmaticSeriesEvents ? 1 : 0,
-            snapshot.EnableNeowExtraOption ? 1 : 0,
-            (int)snapshot.NeowExtraOptionSelectionMode,
-            snapshot.EnableAllPersonas ? 1 : 0,
-            snapshot.EnableAllVariantPersonas ? 1 : 0,
-            (int)snapshot.StartingPersonaMode,
-            (int)snapshot.TokenSeriesMode,
-            snapshot.EnablePureAngelMode ? 1 : 0,
-            snapshot.EnableLucidDreamFalseLifeline ? 1 : 0,
-            snapshot.EnableLucidDreamSmoothSailing ? 1 : 0,
-            snapshot.EnableLucidDreamFishScalesMalice ? 1 : 0,
-            snapshot.EnableLucidDreamSevereWoundOneMalice ? 1 : 0,
-            snapshot.EnableLucidDreamSevereWoundTwoMalice ? 1 : 0,
-            snapshot.EnableLucidDreamMadLifeMalice ? 1 : 0,
-            snapshot.EnableLucidDreamSwampOfFateMalice ? 1 : 0,
-            snapshot.EnableLucidDreamOverpopulationMalice ? 1 : 0,
-            snapshot.EnableLucidDreamCautiousJellyfishMalice ? 1 : 0,
-            snapshot.EnableLucidDreamFaceDeathWithComposure ? 1 : 0,
-            snapshot.EnableLucidDreamWildness ? 1 : 0,
-            snapshot.EnableLucidDreamWildnessPhantom ? 1 : 0,
-            snapshot.EnableLucidDreamPitchBlackImpulse ? 1 : 0,
-            snapshot.EnableLucidDreamBubblePotionOfDreams ? 1 : 0,
-            snapshot.EnableLucidDreamHarmlessWhisper ? 1 : 0,
-            .. bannedFlags
-        ];
-    }
-
-    private static bool TryDecodeSnapshotChoiceResult(RunState runState, PlayerChoiceResult result,
-        out ReAstralPartyRunSettingsSnapshot snapshot)
-    {
-        snapshot = null!;
-        if (AstralChoiceProtocol.TryDecodeIndexedEnvelope(
-                result,
-                AstralChoiceKind.RunSettingsSnapshot,
-                runState,
-                SnapshotSessionKey,
-                out _,
-                out var envelopedPayload))
-        {
-            return TryDecodeRawSnapshotPayload(envelopedPayload, out snapshot);
-        }
-
-        if (!TryGetIndexPayload(result, out var payload))
-            return false;
-
-        if (!TryDecodeRawSnapshotPayload(payload, out snapshot))
-            return false;
-
-        MainFile.Logger.Info(
-            $"{MainFile.ModId} settings sync accepted a legacy/raw snapshot payload because no protocol envelope was present.");
-        ShowSyncWarning(
-            211,
-            "协议兼容",
-            "本局联机玩法设置使用了旧版裸 payload 兼容读取。若主客机模组版本不一致，可能导致设置解释分叉。");
-        return true;
-    }
-
-    private static bool TryDecodeRawSnapshotPayload(IReadOnlyList<int> payload,
-        out ReAstralPartyRunSettingsSnapshot snapshot)
-    {
-        snapshot = null!;
-        var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
-        var bannableRelics = BannedRelicRegistry.GetCanonicalBannableRelics();
-        var expectedPersonaPayload = personaRelics.Count + 27;
-        var expectedBannablePayload = bannableRelics.Count + 27;
-        var isPersonaPayload = payload.Count == expectedPersonaPayload;
-        var isBannablePayload = payload.Count == expectedBannablePayload;
-        if (!isPersonaPayload && !isBannablePayload)
-            return false;
-        const int bannedStartIndex = 27;
-        var bannedRelicSource = isBannablePayload ? bannableRelics : personaRelics;
-        var bannedIds = new List<string>();
-        for (var i = 0; i < bannedRelicSource.Count && bannedStartIndex + i < payload.Count; i++)
-        {
-            if (payload[bannedStartIndex + i] == 0)
-                continue;
-
-            bannedIds.Add((bannedRelicSource[i].CanonicalInstance?.Id ?? bannedRelicSource[i].Id).ToString());
-        }
-
-        var neowSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom;
-        var rawNeowSelectionMode = payload[7];
-        neowSelectionMode = Enum.IsDefined(typeof(NeowExtraOptionSelectionMode), rawNeowSelectionMode)
-            ? (NeowExtraOptionSelectionMode)rawNeowSelectionMode
-            : NeowExtraOptionSelectionMode.DefaultRandom;
-        snapshot = new ReAstralPartyRunSettingsSnapshot
-        {
-            EnableExtremeMode = payload[0] != 0,
-            EnableStartingInitialPoint = payload[1] != 0,
-            EnableStartingRingOfSevenCurses = payload[2] != 0,
-            EnableStartingPersonaSelection = payload[3] != 0,
-            EnableDreamSeriesEvents = payload[4] != 0,
-            EnableEnigmaticSeriesEvents = payload[5] != 0,
-            EnableNeowExtraOption = payload[6] != 0,
-            NeowExtraOptionSelectionMode = neowSelectionMode,
-            EnableAllPersonas = payload[8] != 0,
-            EnableAllVariantPersonas = payload[9] != 0,
-            StartingPersonaMode = Enum.IsDefined(typeof(StartingPersonaMode), payload[10])
-                ? (StartingPersonaMode)payload[10]
-                : StartingPersonaMode.Standard,
-            TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), payload[11])
-                ? (TokenSeriesMode)payload[11]
-                : TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = payload[12] != 0,
-            EnableLucidDreamFalseLifeline = payload[13] != 0,
-            EnableLucidDreamSmoothSailing = payload[14] != 0,
-            EnableLucidDreamFishScalesMalice = payload[15] != 0,
-            EnableLucidDreamSevereWoundOneMalice = payload[16] != 0,
-            EnableLucidDreamSevereWoundTwoMalice = payload[17] != 0,
-            EnableLucidDreamMadLifeMalice = payload[18] != 0,
-            EnableLucidDreamSwampOfFateMalice = payload[19] != 0,
-            EnableLucidDreamOverpopulationMalice = payload[20] != 0,
-            EnableLucidDreamCautiousJellyfishMalice = payload[21] != 0,
-            EnableLucidDreamFaceDeathWithComposure = payload[22] != 0,
-            EnableLucidDreamWildness = payload[23] != 0,
-            EnableLucidDreamWildnessPhantom = payload[24] != 0,
-            EnableLucidDreamPitchBlackImpulse = payload[25] != 0,
-            EnableLucidDreamBubblePotionOfDreams = payload[26] != 0,
-            EnableLucidDreamHarmlessWhisper = payload[27] != 0,
-            BannedRelicIdsSerialized = bannedIds
-        };
-        snapshot.NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-            snapshot.EnableStartingRingOfSevenCurses,
-            snapshot.NeowExtraOptionSelectionMode);
-        return true;
-    }
-
-    private static async Task<ReAstralPartyRunSettingsSnapshot> SyncAsync(RunState runState, RunSettingsSyncState state)
+    private static Task<ReAstralPartyRunSettingsSnapshot> SyncAsync(RunState runState, RunSettingsSyncState state)
     {
         if (ReAstralPartyModSettingsManager.TryGetStoredRunSettingsSnapshot(runState, out var storedSnapshot))
         {
             state.SetSnapshot(runState, storedSnapshot);
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
-            return storedSnapshot;
+            LogSnapshotEstablished(runState, "stored_snapshot");
+            return Task.FromResult(storedSnapshot);
         }
 
         var runManager = RunManager.Instance;
@@ -431,7 +268,7 @@ internal static class ReAstralPartyRunSettingsSync
                 "同步前置",
                 "联机玩法设置同步时未拿到 RunManager，已退回安全默认值。");
             state.SetSnapshot(runState, safeSnapshot);
-            return safeSnapshot;
+            return Task.FromResult(safeSnapshot);
         }
 
         var netService = runManager.NetService;
@@ -440,151 +277,89 @@ internal static class ReAstralPartyRunSettingsSync
             var localSnapshot = CreateLocalSnapshot();
             state.SetSnapshot(runState, localSnapshot);
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
-            return localSnapshot;
+            LogSnapshotEstablished(runState, "local_singleplayer");
+            return Task.FromResult(localSnapshot);
         }
 
-        var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
-        if (synchronizer == null)
+        if (TryCreateRunSnapshotFromLobby(out var lobbySnapshot))
         {
-            var safeSnapshot = CreateSafeSnapshot();
-            MainFile.Logger.Warn(
-                $"{MainFile.ModId} settings sync skipped because PlayerChoiceSynchronizer was unavailable; using safe multiplayer defaults.");
-            ShowSyncWarning(
-                214,
-                "同步前置",
-                "联机玩法设置同步时未拿到 PlayerChoiceSynchronizer，已退回安全默认值。");
-            state.SetSnapshot(runState, safeSnapshot);
-            return safeSnapshot;
+            state.SetSnapshot(runState, lobbySnapshot);
+            LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
+            LogSnapshotEstablished(runState, "lobby_snapshot");
+            MainFile.Logger.Info(
+                $"{MainFile.ModId} settings sync established from lobby snapshot: start_initial_point={lobbySnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={lobbySnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={lobbySnapshot.EnableStartingPersonaSelection}, dream_series={lobbySnapshot.EnableDreamSeriesEvents}, enigmatic_series={lobbySnapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={lobbySnapshot.EnableNeowExtraOption}, neow_extra_selection={lobbySnapshot.NeowExtraOptionSelectionMode}, all_personas={lobbySnapshot.EnableAllPersonas}, all_variants={lobbySnapshot.EnableAllVariantPersonas}, persona_mode={lobbySnapshot.StartingPersonaMode}, token_series={lobbySnapshot.TokenSeriesMode}, pure_angel={lobbySnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(lobbySnapshot)}, banned_relics={lobbySnapshot.BannedRelicIdsSerialized.Count}");
+            return Task.FromResult(lobbySnapshot);
         }
 
-        var authorityNetId = ResolveAuthorityNetId(netService);
-        if (authorityNetId == 0UL)
-        {
-            var safeSnapshot = CreateSafeSnapshot();
-            MainFile.Logger.Warn(
-                $"{MainFile.ModId} settings sync skipped because authority net id was unavailable; using safe multiplayer defaults.");
-            ShowSyncWarning(
-                215,
-                "主机识别",
-                "联机玩法设置同步时未识别到房主 NetId，已退回安全默认值。");
-            state.SetSnapshot(runState, safeSnapshot);
-            return safeSnapshot;
-        }
-
-        var authorityPlayer = runState.Players.FirstOrDefault(player => player.NetId == authorityNetId);
-        if (authorityPlayer == null)
-        {
-            var safeSnapshot = CreateSafeSnapshot();
-            MainFile.Logger.Warn(
-                $"{MainFile.ModId} settings sync skipped because authority player {authorityNetId} was unavailable; using safe multiplayer defaults.");
-            ShowSyncWarning(
-                216,
-                "主机识别",
-                $"联机玩法设置同步时未找到房主玩家 {authorityNetId}，已退回安全默认值。");
-            state.SetSnapshot(runState, safeSnapshot);
-            return safeSnapshot;
-        }
-
-        var isHost = netService.Type == NetGameType.Host;
-        if (!isHost)
-        {
-            for (var attempt = 0; attempt < MaxClientSnapshotAttempts; attempt++)
-            {
-                var remoteChoiceId = synchronizer.ReserveChoiceId(authorityPlayer);
-                var remoteChoice = await synchronizer.WaitForRemoteChoice(authorityPlayer, remoteChoiceId);
-                if (!TryDecodeSnapshotChoiceResult(runState, remoteChoice, out var remoteSnapshot))
-                {
-                    MainFile.Logger.Warn(
-                        $"{MainFile.ModId} settings sync ignored foreign choice from authority player {authorityPlayer.NetId}: choiceId={remoteChoiceId} attempt={attempt + 1} result={remoteChoice}");
-                    continue;
-                }
-
-                state.SetSnapshot(runState, remoteSnapshot);
-                LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
-                MainFile.Logger.Info(
-                    $"{MainFile.ModId} settings sync received from host player {authorityPlayer.NetId}: extreme_mode={remoteSnapshot.EnableExtremeMode}, start_initial_point={remoteSnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={remoteSnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={remoteSnapshot.EnableStartingPersonaSelection}, dream_series={remoteSnapshot.EnableDreamSeriesEvents}, enigmatic_series={remoteSnapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={remoteSnapshot.EnableNeowExtraOption}, neow_extra_selection={remoteSnapshot.NeowExtraOptionSelectionMode}, all_personas={remoteSnapshot.EnableAllPersonas}, all_variants={remoteSnapshot.EnableAllVariantPersonas}, persona_mode={remoteSnapshot.StartingPersonaMode}, token_series={remoteSnapshot.TokenSeriesMode}, pure_angel={remoteSnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(remoteSnapshot)}, banned_relics={remoteSnapshot.BannedRelicIdsSerialized.Count}");
-                return remoteSnapshot;
-            }
-
-            MainFile.Logger.Warn(
-                $"{MainFile.ModId} settings sync did not receive a valid host snapshot after {MaxClientSnapshotAttempts} attempts; falling back to safe multiplayer defaults.");
-            ShowSyncWarning(
-                217,
-                "接收主机设置",
-                $"客户端在 {MaxClientSnapshotAttempts} 次尝试后仍未收到有效的房主玩法设置快照，已退回安全默认值。");
-        }
-
-        var choiceId = synchronizer.ReserveChoiceId(authorityPlayer);
-        MainFile.Logger.Info(
-            $"{MainFile.ModId} settings sync resolved netMode={netService.Type}, host={isHost}, authority={authorityPlayer.NetId}.");
-
-        if (isHost)
+        if (netService.Type == NetGameType.Host)
         {
             var localSnapshot = CreateLocalSnapshot();
             state.SetSnapshot(runState, localSnapshot);
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
-            synchronizer.SyncLocalChoice(authorityPlayer, choiceId, CreateSnapshotChoiceResult(runState, localSnapshot));
+            LogSnapshotEstablished(runState, "host_runtime_fallback");
             MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync broadcast by authority player {authorityPlayer.NetId}: extreme_mode={localSnapshot.EnableExtremeMode}, start_initial_point={localSnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={localSnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={localSnapshot.EnableStartingPersonaSelection}, dream_series={localSnapshot.EnableDreamSeriesEvents}, enigmatic_series={localSnapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={localSnapshot.EnableNeowExtraOption}, neow_extra_selection={localSnapshot.NeowExtraOptionSelectionMode}, all_personas={localSnapshot.EnableAllPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, persona_mode={localSnapshot.StartingPersonaMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(localSnapshot)}, banned_relics={localSnapshot.BannedRelicIdsSerialized.Count}");
-            return localSnapshot;
+                $"{MainFile.ModId} settings sync established from host runtime fallback without PlayerChoiceSynchronizer: start_initial_point={localSnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={localSnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={localSnapshot.EnableStartingPersonaSelection}, dream_series={localSnapshot.EnableDreamSeriesEvents}, enigmatic_series={localSnapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={localSnapshot.EnableNeowExtraOption}, neow_extra_selection={localSnapshot.NeowExtraOptionSelectionMode}, all_personas={localSnapshot.EnableAllPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, persona_mode={localSnapshot.StartingPersonaMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(localSnapshot)}, banned_relics={localSnapshot.BannedRelicIdsSerialized.Count}");
+            return Task.FromResult(localSnapshot);
         }
 
         var fallbackSnapshot = CreateSafeSnapshot();
         MainFile.Logger.Warn(
-            $"{MainFile.ModId} settings sync did not have a host authority path; using safe multiplayer defaults.");
+            $"{MainFile.ModId} settings sync did not find an established lobby snapshot on the client before run start; using safe multiplayer defaults.");
         ShowSyncWarning(
             218,
             "主机路径",
-            "联机玩法设置同步未进入有效的房主路径，已退回安全默认值。");
+            "客户端在开局时未拿到房间玩法设置快照，已退回安全默认值。请检查房间设置同步是否在开局前完成。");
         state.SetSnapshot(runState, fallbackSnapshot);
-        return fallbackSnapshot;
+        return Task.FromResult(fallbackSnapshot);
     }
 
-    private static ulong ResolveAuthorityNetId(INetGameService netService)
+    private static bool TryCreateRunSnapshotFromLobby(out ReAstralPartyRunSettingsSnapshot snapshot)
     {
-        if (netService.Type == NetGameType.Host)
-            return netService.NetId;
-
-        if (netService is INetClientGameService clientService)
-        {
-            var netClient = clientService.NetClient;
-            return netClient?.HostNetId ?? 0UL;
-        }
-
-        return 0UL;
-    }
-
-    private static async Task<PlayerChoiceSynchronizer?> WaitForPlayerChoiceSynchronizerAsync(RunManager runManager)
-    {
-        ArgumentNullException.ThrowIfNull(runManager);
-        const int maxSynchronizerWaitFrames = 600;
-        for (var i = 0; i < maxSynchronizerWaitFrames; i++)
-        {
-            if (runManager.PlayerChoiceSynchronizer != null)
-                return runManager.PlayerChoiceSynchronizer;
-
-            await Task.Yield();
-        }
-
-        return runManager.PlayerChoiceSynchronizer;
-    }
-
-    private static bool TryGetIndexPayload(PlayerChoiceResult result, out List<int> payload)
-    {
-        payload = [];
-        try
-        {
-            var indexes = result.AsIndexes();
-            if (indexes == null)
-                return false;
-
-            payload = indexes;
-            return true;
-        }
-        catch (InvalidOperationException)
-        {
+        snapshot = null!;
+        if (!LobbyGameplaySettingsSync.TryGetSnapshot(out var lobbySnapshot))
             return false;
-        }
+
+        var settings = ReAstralPartyModSettingsManager.ReadLocalSettings();
+        snapshot = new ReAstralPartyRunSettingsSnapshot
+        {
+            EnableExtremeMode = lobbySnapshot.EnableExtremeMode,
+            EnableStartingInitialPoint = lobbySnapshot.EnableStartingInitialPoint,
+            EnableStartingRingOfSevenCurses = lobbySnapshot.EnableStartingRingOfSevenCurses,
+            EnableStartingPersonaSelection = lobbySnapshot.EnableStartingPersonaSelection,
+            EnableDreamSeriesEvents = lobbySnapshot.EnableDreamSeriesEvents,
+            EnableEnigmaticSeriesEvents = lobbySnapshot.EnableEnigmaticSeriesEvents,
+            EnableNeowExtraOption = lobbySnapshot.EnableNeowExtraOption,
+            NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+                lobbySnapshot.EnableStartingRingOfSevenCurses,
+                lobbySnapshot.NeowExtraOptionSelectionMode),
+            EnableAllPersonas = lobbySnapshot.EnableAllPersonas,
+            EnableAllVariantPersonas = lobbySnapshot.EnableAllVariantPersonas,
+            StartingPersonaMode = lobbySnapshot.StartingPersonaMode,
+            TokenSeriesMode = lobbySnapshot.TokenSeriesMode,
+            EnablePureAngelMode = settings.EnablePureAngelMode,
+            EnableLucidDreamFalseLifeline = lobbySnapshot.EnableLucidDreamFalseLifeline,
+            EnableLucidDreamSmoothSailing = lobbySnapshot.EnableLucidDreamSmoothSailing,
+            EnableLucidDreamFishScalesMalice = lobbySnapshot.EnableLucidDreamFishScalesMalice,
+            EnableLucidDreamSevereWoundOneMalice = lobbySnapshot.EnableLucidDreamSevereWoundOneMalice,
+            EnableLucidDreamSevereWoundTwoMalice = lobbySnapshot.EnableLucidDreamSevereWoundTwoMalice,
+            EnableLucidDreamMadLifeMalice = lobbySnapshot.EnableLucidDreamMadLifeMalice,
+            EnableLucidDreamSwampOfFateMalice = lobbySnapshot.EnableLucidDreamSwampOfFateMalice,
+            EnableLucidDreamOverpopulationMalice = lobbySnapshot.EnableLucidDreamOverpopulationMalice,
+            EnableLucidDreamCautiousJellyfishMalice = lobbySnapshot.EnableLucidDreamCautiousJellyfishMalice,
+            EnableLucidDreamFaceDeathWithComposure = lobbySnapshot.EnableLucidDreamFaceDeathWithComposure,
+            EnableLucidDreamWildness = lobbySnapshot.EnableLucidDreamWildness,
+            EnableLucidDreamWildnessPhantom = lobbySnapshot.EnableLucidDreamWildnessPhantom,
+            EnableLucidDreamPitchBlackImpulse = lobbySnapshot.EnableLucidDreamPitchBlackImpulse,
+            EnableLucidDreamBubblePotionOfDreams = lobbySnapshot.EnableLucidDreamBubblePotionOfDreams,
+            EnableLucidDreamHarmlessWhisper = lobbySnapshot.EnableLucidDreamHarmlessWhisper,
+            BannedRelicIdsSerialized = [.. (settings.BannedRelicIds.Count > 0
+                ? settings.BannedRelicIds
+                : settings.BannedPersonaRelicIds ?? [])
+                .Where(static id => !string.IsNullOrWhiteSpace(id))
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(static id => id, StringComparer.Ordinal)]
+        };
+        return true;
     }
 
     private static int CountEnabledLucidDreamMaliceFlags(ReAstralPartyRunSettingsSnapshot snapshot)
@@ -621,6 +396,15 @@ internal static class ReAstralPartyRunSettingsSync
         if (snapshot.EnableLucidDreamHarmlessWhisper)
             count++;
         return count;
+    }
+
+    private static void LogSnapshotEstablished(RunState runState, string source)
+    {
+        var netMode = RunManager.Instance?.NetService?.Type.ToString() ?? "Unknown";
+        var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
+        var personaWindow = StartingPersonaRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out var reason);
+        MainFile.Logger.Info(
+            $"{MainFile.ModId} settings sync established before persona ready flow: source={source}, runKey={runKey}, netMode={netMode}, persona_window_open={personaWindow}, persona_gate_reason={reason}");
     }
 
     private static void ShowSyncWarning(int number, string stage, string body)

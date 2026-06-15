@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Godot;
 using HarmonyLib;
@@ -11,6 +12,7 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
+using MegaCrit.Sts2.Core.Multiplayer.Messages.Game.Sync;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Nodes.Events;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
@@ -38,11 +40,58 @@ internal static class StartingPersonaNeowReadyFlow
         typeof(EventModel),
         "SetEventState",
         [typeof(LocString), typeof(IEnumerable<EventOption>)]);
+    private static readonly MethodInfo? SetInitialEventStateMethod = AccessTools.Method(
+        typeof(AncientEventModel),
+        "SetInitialEventState",
+        [typeof(bool)]);
+    private static readonly MethodInfo? EventRoomSetupLayoutMethod =
+        AccessTools.Method(typeof(NEventRoom), "SetupLayout");
+    private static readonly MethodInfo? EventRoomRefreshEventStateMethod =
+        AccessTools.Method(typeof(NEventRoom), "RefreshEventState", [typeof(EventModel)]);
+    private static readonly MethodInfo? AncientLayoutInitializeVisualsMethod =
+        AccessTools.Method(typeof(NAncientEventLayout), "InitializeVisuals");
+    private static readonly MethodInfo? AncientLayoutUpdateBannerVisibilityMethod =
+        AccessTools.Method(typeof(NAncientEventLayout), "UpdateBannerVisibility");
+    private static readonly MethodInfo? AncientLayoutUpdateFakeNextButtonMethod =
+        AccessTools.Method(typeof(NAncientEventLayout), "UpdateFakeNextButton");
+    private static readonly MethodInfo? ControlUpdateMinimumSizeMethod =
+        AccessTools.Method(typeof(Control), "UpdateMinimumSize");
+    private static readonly AsyncLocal<int> InternalNeowRefreshDepth = new();
 
     private sealed record ReadyPageState(
         string RunKey,
         RunState RunState,
-        IReadOnlyList<EventOption> OriginalOptions);
+        IReadOnlyList<EventOption> OriginalOptions,
+        LocString OriginalDescription,
+        bool Restored = false);
+
+    internal static bool IsInternalNeowRefreshActive => InternalNeowRefreshDepth.Value > 0;
+
+    internal static bool TryRestoreCachedNeowOptionsBeforeRemoteChoice(uint optionIndex, ulong senderId)
+    {
+        if (RunManager.Instance?.NetService?.Type != NetGameType.Client)
+            return false;
+        if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is not Neow neow)
+            return false;
+
+        ReadyPageState? state;
+        lock (SyncLock)
+        {
+            if (!ReadyPages.TryGetValue(neow, out state))
+                return false;
+        }
+
+        var localOptionCount = neow.CurrentOptions?.Count ?? 0;
+        if (optionIndex < localOptionCount)
+            return false;
+
+        // EventSynchronizer validates the remote option index immediately against CurrentOptions.
+        // If the client is still on the 1-button ready page, restore the real Neow page first.
+        RestoreOriginalOptionsOrFinish(neow, "remote_choice_pre_restore");
+        MainFile.Logger.Warn(
+            $"[StartingPersonaNeowReadyFlow] Restored cached Neow option page before remote choice processing | runKey={state.RunKey} sender={senderId} optionIndex={optionIndex} localCount={localOptionCount} cachedCount={state.OriginalOptions.Count}.");
+        return true;
+    }
 
     internal static void TryReplaceInitialState(Neow neow)
     {
@@ -65,7 +114,8 @@ internal static class StartingPersonaNeowReadyFlow
             ReadyPages[neow] = new ReadyPageState(
                 runKey,
                 runState,
-                originalOptions);
+                originalOptions,
+                neow.Description ?? neow.InitialDescription);
         }
 
         var readyOptions = new[]
@@ -155,7 +205,7 @@ internal static class StartingPersonaNeowReadyFlow
         {
             MainFile.Logger.Warn(
                 $"[StartingPersonaNeowReadyFlow] Ready page selection flow failed: {ex}");
-            RestoreOriginalOptionsForRun(StartingPersonaRelicSelectionPatch.GetRunKey(runState), "ready_selection_failed");
+            RestoreOriginalOptionsOrFinish(neow, "ready_selection_failed");
         }
     }
 
@@ -247,9 +297,9 @@ internal static class StartingPersonaNeowReadyFlow
             var opened = await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(runState, $"neow_ready_launch:{sourceTag}");
             if (opened)
             {
-                RestoreOriginalOptionsForRun(runKey, "post_selection_restore");
+                RebuildInitialOptionsForRun(runKey, "post_selection_rebuild");
                 MainFile.Logger.Info(
-                    $"[StartingPersonaNeowReadyFlow] Restored cached Neow initial page after persona overlay | runKey={runKey} source={sourceTag}.");
+                    $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial page after persona overlay | runKey={runKey} source={sourceTag}.");
             }
             else
             {
@@ -257,6 +307,8 @@ internal static class StartingPersonaNeowReadyFlow
                 MainFile.Logger.Info(
                     $"[StartingPersonaNeowReadyFlow] Restored cached Neow options because persona overlay did not open | runKey={runKey} source={sourceTag}.");
             }
+
+            await RefreshRestoredNeowUiAfterOverlayClosedAsync(runState, runKey, "post_overlay_verify");
             return opened;
         }
         finally
@@ -308,39 +360,285 @@ internal static class StartingPersonaNeowReadyFlow
 
     private static void RestoreOriginalOptionsForRun(string runKey, string reason)
     {
-        List<KeyValuePair<Neow, ReadyPageState>> neowsToRestore;
+        List<Neow> neowsToRestore;
         lock (SyncLock)
         {
             neowsToRestore = ReadyPages
                 .Where(pair => pair.Value.RunKey == runKey)
+                .Select(static pair => pair.Key)
                 .ToList();
-
-            foreach (var pair in neowsToRestore)
-                ReadyPages.Remove(pair.Key);
         }
 
-        foreach (var pair in neowsToRestore)
+        foreach (var neow in neowsToRestore)
+            RestoreOriginalOptionsOrFinish(neow, reason);
+    }
+
+    private static void RebuildInitialOptionsForRun(string runKey, string reason)
+    {
+        List<Neow> neowsToRebuild;
+        lock (SyncLock)
         {
-            var neow = pair.Key;
-            var state = pair.Value;
-            var restoredOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
-                neow,
-                state.OriginalOptions,
-                "ready_page_restore");
-            if (restoredOptions.Count == 0)
+            neowsToRebuild = ReadyPages
+                .Where(pair => pair.Value.RunKey == runKey)
+                .Select(static pair => pair.Key)
+                .ToList();
+        }
+
+        foreach (var neow in neowsToRebuild)
+            RebuildInitialOptionsOrFallback(neow, reason);
+    }
+
+    private static void RestoreOriginalOptionsOrFinish(Neow neow, string reason)
+    {
+        ReadyPageState? state;
+        lock (SyncLock)
+        {
+            if (!ReadyPages.Remove(neow, out state))
+                return;
+        }
+
+        var restoredOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
+            neow,
+            state.OriginalOptions,
+            "ready_page_restore");
+        if (restoredOptions.Count == 0)
+        {
+            neow.StartPreFinished();
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Ready page restored by finishing Neow immediately because the original option page was empty | runKey={state.RunKey} reason={reason}.");
+            return;
+        }
+
+        if (SetEventStateMethod == null)
+            throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
+
+        SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
+    }
+
+    private static void RebuildInitialOptionsOrFallback(Neow neow, string reason)
+    {
+        ReadyPageState? state;
+        lock (SyncLock)
+        {
+            if (!ReadyPages.Remove(neow, out state))
+                return;
+        }
+
+        if (SetInitialEventStateMethod == null)
+        {
+            RestoreCachedStateOrFinish(neow, state, $"{reason}:missing_set_initial_event_state");
+            return;
+        }
+
+        try
+        {
+            SetInitialEventStateMethod.Invoke(neow, [false]);
+            var rebuiltOptionCount = neow.CurrentOptions?.Count ?? 0;
+            var cachedOptionCount = state.OriginalOptions.Count;
+            if (rebuiltOptionCount < cachedOptionCount)
             {
-                neow.StartPreFinished();
-                MainFile.Logger.Info(
-                    $"[StartingPersonaNeowReadyFlow] Ready page restored by finishing Neow immediately because the original option page was empty | runKey={state.RunKey} reason={reason}.");
-                continue;
+                MainFile.Logger.Warn(
+                    $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial option page produced fewer options than the cached page; falling back to cached options | runKey={state.RunKey} reason={reason} rebuilt={rebuiltOptionCount} cached={cachedOptionCount}.");
+                RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached_after_short_rebuild");
+                return;
             }
 
-            if (SetEventStateMethod == null)
-                throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
-
-            SetEventStateMethod.Invoke(neow, [neow.Description ?? neow.InitialDescription, restoredOptions]);
             MainFile.Logger.Info(
-                $"[StartingPersonaNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
+                $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial option page from source event state | runKey={state.RunKey} reason={reason} optionCount={rebuiltOptionCount}.");
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn(
+                $"[StartingPersonaNeowReadyFlow] Failed to rebuild Neow initial option page; falling back to cached options | runKey={state.RunKey} reason={reason}: {ex}");
+            RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached");
+        }
+    }
+
+    private static void RestoreCachedStateOrFinish(Neow neow, ReadyPageState state, string reason)
+    {
+        var restoredOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
+            neow,
+            state.OriginalOptions,
+            "ready_page_restore");
+        if (restoredOptions.Count == 0)
+        {
+            neow.StartPreFinished();
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Ready page restored by finishing Neow immediately because the cached option page was empty | runKey={state.RunKey} reason={reason}.");
+            return;
+        }
+
+        if (SetEventStateMethod == null)
+            throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
+
+        SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Restored cached Neow option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
+    }
+
+    private static async Task RefreshRestoredNeowUiAsync(RunState runState, string runKey, string stage)
+    {
+        if (NGame.Instance?.IsInsideTree() != true)
+            return;
+
+        await AwaitProcessFrameAsync();
+
+        var eventRoom = FindCurrentEventRoom();
+        var layoutNode = FindCurrentAncientLayout(eventRoom);
+        AstralNeowDiagnosticHelper.ReportReadyRestoreUiSnapshot(runState, layoutNode, $"{stage}:before_refresh");
+
+        var eventModel = TryResolveCurrentEventModel(runState);
+        if (eventRoom != null && eventModel != null)
+        {
+            try
+            {
+                if (EventRoomSetupLayoutMethod?.Invoke(eventRoom, null) is Task setupTask)
+                    await setupTask;
+
+                using var _ = BeginInternalNeowRefreshScope(runKey, stage);
+                EventRoomRefreshEventStateMethod?.Invoke(eventRoom, [eventModel]);
+            }
+            catch (Exception ex)
+            {
+                MainFile.Logger.Warn(
+                    $"[StartingPersonaNeowReadyFlow] Failed to rebuild Neow event room UI | runKey={runKey} stage={stage}: {ex}");
+            }
+        }
+
+        layoutNode = FindCurrentAncientLayout(eventRoom);
+        if (layoutNode != null)
+            ForceLayoutRefresh(layoutNode);
+
+        await AwaitProcessFrameAsync();
+        layoutNode = FindCurrentAncientLayout(eventRoom);
+        AstralNeowDiagnosticHelper.ReportReadyRestoreUiSnapshot(runState, layoutNode, $"{stage}:after_refresh");
+    }
+
+    private static async Task RefreshRestoredNeowUiAfterOverlayClosedAsync(RunState runState, string runKey, string stage)
+    {
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Neow restore frame barrier begin | runKey={runKey} stage={stage}.");
+        await AwaitFramesAsync(2);
+        await RefreshRestoredNeowUiAsync(runState, runKey, $"{stage}:post_close_before_refresh");
+        await AwaitFramesAsync(1);
+        await RefreshRestoredNeowUiAsync(runState, runKey, $"{stage}:post_close_after_refresh");
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Neow restore frame barrier end | runKey={runKey} stage={stage}.");
+    }
+
+    private static EventModel? TryResolveCurrentEventModel(RunState runState)
+    {
+        if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is EventModel localEvent)
+            return localEvent;
+
+        var room = runState.CurrentRoom;
+        return AccessTools.Property(room?.GetType(), "Event")?.GetValue(room) as EventModel
+               ?? AccessTools.Property(room?.GetType(), "CurrentEvent")?.GetValue(room) as EventModel
+               ?? AccessTools.Field(room?.GetType(), "_event")?.GetValue(room) as EventModel
+               ?? AccessTools.Field(room?.GetType(), "eventModel")?.GetValue(room) as EventModel;
+    }
+
+    private static NEventRoom? FindCurrentEventRoom()
+    {
+        var currentScene = NGame.Instance?.GetTree()?.CurrentScene;
+        if (currentScene == null)
+            return null;
+        if (currentScene is NEventRoom eventRoom)
+            return eventRoom;
+
+        return currentScene
+            .FindChildren("*", nameof(NEventRoom), true, false)
+            .OfType<NEventRoom>()
+            .FirstOrDefault();
+    }
+
+    private static Node? FindCurrentAncientLayout(NEventRoom? eventRoom)
+    {
+        if (eventRoom?.Layout is Node directLayout)
+            return directLayout;
+
+        return eventRoom?
+            .FindChildren("*", nameof(NAncientEventLayout), true, false)
+            .OfType<Node>()
+            .FirstOrDefault();
+    }
+
+    private static void ForceLayoutRefresh(Node layoutNode)
+    {
+        RefreshNodeLayout(layoutNode);
+        foreach (var nodePath in new[] { "%ContentContainer", "%Content", "%DialogueContainer", "%OptionsContainer" })
+        {
+            if (layoutNode.GetNodeOrNull<Node>(nodePath) is { } child)
+                RefreshNodeLayout(child);
+        }
+
+        if (layoutNode is NAncientEventLayout ancientLayout)
+        {
+            AncientLayoutInitializeVisualsMethod?.Invoke(ancientLayout, null);
+            AncientLayoutUpdateBannerVisibilityMethod?.Invoke(ancientLayout, null);
+            AncientLayoutUpdateFakeNextButtonMethod?.Invoke(ancientLayout, null);
+        }
+
+        Callable.From(() =>
+        {
+            if (!GodotObject.IsInstanceValid(layoutNode))
+                return;
+
+            RefreshNodeLayout(layoutNode);
+            foreach (var nodePath in new[] { "%ContentContainer", "%Content", "%DialogueContainer", "%OptionsContainer" })
+            {
+                if (layoutNode.GetNodeOrNull<Node>(nodePath) is { } child)
+                    RefreshNodeLayout(child);
+            }
+        }).CallDeferred();
+    }
+
+    private static void RefreshNodeLayout(Node node)
+    {
+        if (node is Control control)
+        {
+            ControlUpdateMinimumSizeMethod?.Invoke(control, null);
+            control.QueueRedraw();
+        }
+
+        if (node is Container container)
+            container.QueueSort();
+    }
+
+    private static async Task AwaitProcessFrameAsync()
+    {
+        if (NGame.Instance?.IsInsideTree() == true)
+        {
+            await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
+            return;
+        }
+
+        await Task.Yield();
+    }
+
+    private static async Task AwaitFramesAsync(int frameCount)
+    {
+        for (var frame = 0; frame < frameCount; frame++)
+            await AwaitProcessFrameAsync();
+    }
+
+    private static IDisposable BeginInternalNeowRefreshScope(string runKey, string stage)
+    {
+        InternalNeowRefreshDepth.Value++;
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Entered internal Neow refresh scope | runKey={runKey} stage={stage} depth={InternalNeowRefreshDepth.Value}.");
+        return new InternalNeowRefreshScope(runKey, stage);
+    }
+
+    private sealed class InternalNeowRefreshScope(string runKey, string stage) : IDisposable
+    {
+        public void Dispose()
+        {
+            InternalNeowRefreshDepth.Value = Math.Max(0, InternalNeowRefreshDepth.Value - 1);
+            MainFile.Logger.Info(
+                $"[StartingPersonaNeowReadyFlow] Exited internal Neow refresh scope | runKey={runKey} stage={stage} depth={InternalNeowRefreshDepth.Value}.");
         }
     }
 }
@@ -385,5 +683,18 @@ internal static class StartingPersonaNeowReadyEventRoomGuardPatch
     public static bool Prefix(NEventRoom __instance, EventOption option, int index)
     {
         return !StartingPersonaNeowReadyFlow.TrySwallowReadyOptionAtEventRoomEntry(__instance, option, index);
+    }
+}
+
+[HarmonyPatch(typeof(EventSynchronizer), "HandleEventOptionChosenMessage")]
+internal static class StartingPersonaNeowReadyRemoteChoiceRestorePatch
+{
+    [HarmonyPrefix]
+    public static void Prefix(OptionIndexChosenMessage message, ulong senderId)
+    {
+        if (message.type != OptionIndexType.Event)
+            return;
+
+        StartingPersonaNeowReadyFlow.TryRestoreCachedNeowOptionsBeforeRemoteChoice(message.optionIndex, senderId);
     }
 }

@@ -41,10 +41,8 @@ public sealed class DreamDisintegrationClaw : AstralPartyRelicModel
         if (!IsQualifiedStrikeHit(target, amount, dealer, cardSource))
             return 0m;
 
-        return StableNumericStateHelper.ClampCeilingToInt(
-            amount * GetScaledPercent(GetCurrentActBonusDamagePercent(), target),
-            0m,
-            int.MaxValue);
+        return StableNumericStateHelper.FloorToNonNegativeInt(
+            amount * GetScaledPercent(GetCurrentActBonusDamagePercent(), target));
     }
 
     public override async Task AfterDamageGiven(
@@ -60,10 +58,8 @@ public sealed class DreamDisintegrationClaw : AstralPartyRelicModel
         if (Owner?.Creature == null)
             return;
 
-        var healAmount = StableNumericStateHelper.ClampCeilingToInt(
-            result.UnblockedDamage * GetScaledPercent(GetCurrentActHealPercent(), target),
-            0m,
-            int.MaxValue);
+        var healAmount = StableNumericStateHelper.FloorToNonNegativeInt(
+            result.UnblockedDamage * GetScaledPercent(GetCurrentActHealPercent(), target));
         if (healAmount <= 0)
             return;
 
