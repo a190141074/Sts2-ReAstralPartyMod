@@ -17,10 +17,12 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public sealed class DreamDisintegrationClaw : AstralPartyRelicModel
 {
-    private const decimal BaseBonusDamagePercent = 0.68m;
-    private const decimal BonusDamagePercentPerAct = 0.20m;
-    private const decimal BaseHealPercent = 0.16m;
-    private const decimal HealPercentPerAct = 0.04m;
+    private const decimal ActOneBonusDamagePercent = 0.34m;
+    private const decimal ActTwoBonusDamagePercent = 0.44m;
+    private const decimal ActThreePlusBonusDamagePercent = 0.54m;
+    private const decimal ActOneHealPercent = 0.12m;
+    private const decimal ActTwoHealPercent = 0.15m;
+    private const decimal ActThreePlusHealPercent = 0.18m;
     private const decimal BossMultiplier = 2m;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
@@ -40,7 +42,7 @@ public sealed class DreamDisintegrationClaw : AstralPartyRelicModel
             return 0m;
 
         return StableNumericStateHelper.ClampCeilingToInt(
-            amount * GetScaledPercent(BaseBonusDamagePercent, BonusDamagePercentPerAct, target),
+            amount * GetScaledPercent(GetCurrentActBonusDamagePercent(), target),
             0m,
             int.MaxValue);
     }
@@ -59,7 +61,7 @@ public sealed class DreamDisintegrationClaw : AstralPartyRelicModel
             return;
 
         var healAmount = StableNumericStateHelper.ClampCeilingToInt(
-            result.UnblockedDamage * GetScaledPercent(BaseHealPercent, HealPercentPerAct, target),
+            result.UnblockedDamage * GetScaledPercent(GetCurrentActHealPercent(), target),
             0m,
             int.MaxValue);
         if (healAmount <= 0)
@@ -101,10 +103,30 @@ public sealed class DreamDisintegrationClaw : AstralPartyRelicModel
         return result.UnblockedDamage > 0m;
     }
 
-    private decimal GetScaledPercent(decimal basePercent, decimal percentPerAct, Creature? target)
+    private decimal GetCurrentActBonusDamagePercent()
     {
         var actNumber = Math.Max((Owner?.RunState?.CurrentActIndex ?? 0) + 1, 1);
-        var percent = basePercent + percentPerAct * (actNumber - 1);
+        return actNumber switch
+        {
+            <= 1 => ActOneBonusDamagePercent,
+            2 => ActTwoBonusDamagePercent,
+            _ => ActThreePlusBonusDamagePercent
+        };
+    }
+
+    private decimal GetCurrentActHealPercent()
+    {
+        var actNumber = Math.Max((Owner?.RunState?.CurrentActIndex ?? 0) + 1, 1);
+        return actNumber switch
+        {
+            <= 1 => ActOneHealPercent,
+            2 => ActTwoHealPercent,
+            _ => ActThreePlusHealPercent
+        };
+    }
+
+    private decimal GetScaledPercent(decimal percent, Creature? target)
+    {
         if (target?.CombatState?.Encounter?.RoomType == RoomType.Boss)
             percent *= BossMultiplier;
 
