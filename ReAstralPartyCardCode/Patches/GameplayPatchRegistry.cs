@@ -30,7 +30,6 @@ using STS2RitsuLib.Combat.HandSize;
 using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Models;
-using ReAstralPartyMod.ReAstralPartyCardCode.DreamMap;
 using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -343,22 +342,6 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<MoonPropShopFreePurchaseRemovalPatch>();
         patcher.RegisterPatch<PunitiveJudgmentHandEntryPatch>();
         patcher.RegisterPatch<StokovStarterRelicUpgradePatch>();
-        patcher.RegisterPatch<DreamModeTravelabilityPatch>();
-        patcher.RegisterPatch<DreamModeTravelPathPatch>();
-        patcher.RegisterPatch<DreamModeDuplicateVisitedMapCoordPatch>();
-        patcher.RegisterPatch<DreamModeMapScreenProcessMousePatch>();
-        patcher.RegisterPatch<DreamModeMapScreenProcessScrollPatch>();
-        patcher.RegisterPatch<DreamModeMapScreenUpdateScrollPatch>();
-        patcher.RegisterPatch<DreamModeMapScreenSetMapPatch>();
-        patcher.RegisterPatch<DreamModeMapScreenOpenPatch>();
-        patcher.RegisterPatch<DreamModeMerchantRoomEnterPatch>();
-        patcher.RegisterPatch<DreamModeMerchantRoomExitPatch>();
-        patcher.RegisterPatch<DreamModeEnterMapCoordPatch>();
-        patcher.RegisterPatch<DreamModeCreateRoomPatch>();
-        patcher.RegisterPatch<DreamModeCombatRoomEnterCachePatch>();
-        patcher.RegisterPatch<DreamModeEmptyRevisitGenerateMonstersPatch>();
-        patcher.RegisterPatch<DreamModeEmptyRevisitRewardsPatch>();
-        patcher.RegisterPatch<DreamModeEmptyRevisitCombatRoomExitPatch>();
     }
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)

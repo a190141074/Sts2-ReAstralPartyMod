@@ -63,15 +63,11 @@ public static class LucidDreamMaliceModifierInstaller
         if (existingModifier != null)
         {
             existingModifier.ApplySnapshot(snapshot);
-            LucidDreamMaliceRuntimeHelper.InitializeDreamModeState(existingModifier, runState);
             if (existingModifier.EnableSmoothSailing)
             {
                 LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(runState.Map);
                 LucidDreamMaliceRuntimeHelper.RefreshMapScreenPointsIfNeeded(runState, runState.Map);
             }
-
-            if (existingModifier.EnableDreamMode)
-                LucidDreamMaliceRuntimeHelper.ApplyDreamModeToMap(runState, runState.Map);
 
             TryRestoreWildnessForLoadedCombat(existingModifier, runState, loadedRun);
             MainFile.Logger.Info(
@@ -86,15 +82,11 @@ public static class LucidDreamMaliceModifierInstaller
         modifier.ApplySnapshot(snapshot);
         AddModifierDebugMethod.Invoke(runState, [modifier]);
         InitializeModifier(modifier, runState, loadedRun);
-        LucidDreamMaliceRuntimeHelper.InitializeDreamModeState(modifier, runState);
         if (modifier.EnableSmoothSailing)
         {
             LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(runState.Map);
             LucidDreamMaliceRuntimeHelper.RefreshMapScreenPointsIfNeeded(runState, runState.Map);
         }
-
-        if (modifier.EnableDreamMode)
-            LucidDreamMaliceRuntimeHelper.ApplyDreamModeToMap(runState, runState.Map);
 
         TryRestoreWildnessForLoadedCombat(modifier, runState, loadedRun);
 
@@ -163,8 +155,6 @@ public static class LucidDreamMaliceModifierInstaller
         if (modifier.EnableFalseLifeline)
             count++;
         if (modifier.EnableSmoothSailing)
-            count++;
-        if (modifier.EnableDreamMode)
             count++;
         if (modifier.EnableFishScalesMalice)
             count++;

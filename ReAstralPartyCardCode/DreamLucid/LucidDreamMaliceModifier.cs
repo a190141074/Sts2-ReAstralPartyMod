@@ -28,18 +28,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 [RegisterGoodModifier]
 public sealed class LucidDreamMaliceModifier : ModifierModel
 {
-    private const int MaxSavedDreamStateEntries = 512;
-
-    private List<int> _dreamPathCols = [];
-    private List<int> _dreamPathRows = [];
-    private List<int> _dreamVisitCols = [];
-    private List<int> _dreamVisitRows = [];
-    private List<int> _dreamVisitCounts = [];
-
-    // Keep public runtime names stable while SavedProperty only sees prefixed backing fields.
     [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableFalseLifeline { get; set; }
     [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableSmoothSailing { get; set; }
-    [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableDreamMode { get; set; }
     [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableFishScalesMalice { get; set; }
     [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableSevereWoundOneMalice { get; set; }
     [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableSevereWoundTwoMalice { get; set; }
@@ -55,11 +45,6 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     [SavedProperty] private bool AstralParty_LucidDreamMaliceEnableHarmlessWhisper { get; set; }
     [SavedProperty] private bool AstralParty_LucidDreamMaliceHasSpawnedOverpopulationEnemyThisRun { get; set; }
     [SavedProperty] private bool AstralParty_LucidDreamMalicePendingOverpopulationSpawnThisCombat { get; set; }
-    [SavedProperty] private bool AstralParty_LucidDreamMaliceIsInDreamModeEmptyRevisitCombatRoom { get; set; }
-    [SavedProperty] private bool AstralParty_LucidDreamMaliceHasDreamModePendingRevisit { get; set; }
-    [SavedProperty] private int AstralParty_LucidDreamMaliceDreamModePendingRevisitCol { get; set; }
-    [SavedProperty] private int AstralParty_LucidDreamMaliceDreamModePendingRevisitRow { get; set; }
-    [SavedProperty] private int AstralParty_LucidDreamMaliceDreamModePendingRevisitPointTypeRaw { get; set; }
 
     public bool EnableFalseLifeline
     {
@@ -71,12 +56,6 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     {
         get => AstralParty_LucidDreamMaliceEnableSmoothSailing;
         set => AstralParty_LucidDreamMaliceEnableSmoothSailing = value;
-    }
-
-    public bool EnableDreamMode
-    {
-        get => AstralParty_LucidDreamMaliceEnableDreamMode;
-        set => AstralParty_LucidDreamMaliceEnableDreamMode = value;
     }
 
     public bool EnableFishScalesMalice
@@ -169,118 +148,12 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
         set => AstralParty_LucidDreamMalicePendingOverpopulationSpawnThisCombat = value;
     }
 
-    public bool IsInDreamModeEmptyRevisitCombatRoom
-    {
-        get => AstralParty_LucidDreamMaliceIsInDreamModeEmptyRevisitCombatRoom;
-        set => AstralParty_LucidDreamMaliceIsInDreamModeEmptyRevisitCombatRoom = value;
-    }
-
-    public bool HasDreamModePendingRevisit
-    {
-        get => AstralParty_LucidDreamMaliceHasDreamModePendingRevisit;
-        set => AstralParty_LucidDreamMaliceHasDreamModePendingRevisit = value;
-    }
-
-    public int DreamModePendingRevisitCol
-    {
-        get => AstralParty_LucidDreamMaliceDreamModePendingRevisitCol;
-        set => AstralParty_LucidDreamMaliceDreamModePendingRevisitCol = value;
-    }
-
-    public int DreamModePendingRevisitRow
-    {
-        get => AstralParty_LucidDreamMaliceDreamModePendingRevisitRow;
-        set => AstralParty_LucidDreamMaliceDreamModePendingRevisitRow = value;
-    }
-
-    public int DreamModePendingRevisitPointTypeRaw
-    {
-        get => AstralParty_LucidDreamMaliceDreamModePendingRevisitPointTypeRaw;
-        set => AstralParty_LucidDreamMaliceDreamModePendingRevisitPointTypeRaw = value;
-    }
-
-    // BaseLib [SavedProperty] does not support List<T>; keep lists runtime-only and save stable JSON strings.
-    [SavedProperty]
-    private string AstralParty_LucidDreamMaliceDreamPathColsJson
-    {
-        get => SerializeIntList(_dreamPathCols);
-        set => _dreamPathCols = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamPathColsJson));
-    }
-
-    [SavedProperty]
-    private string AstralParty_LucidDreamMaliceDreamPathRowsJson
-    {
-        get => SerializeIntList(_dreamPathRows);
-        set => _dreamPathRows = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamPathRowsJson));
-    }
-
-    [SavedProperty]
-    private string AstralParty_LucidDreamMaliceDreamVisitColsJson
-    {
-        get => SerializeIntList(_dreamVisitCols);
-        set => _dreamVisitCols = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamVisitColsJson));
-    }
-
-    [SavedProperty]
-    private string AstralParty_LucidDreamMaliceDreamVisitRowsJson
-    {
-        get => SerializeIntList(_dreamVisitRows);
-        set => _dreamVisitRows = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamVisitRowsJson));
-    }
-
-    [SavedProperty]
-    private string AstralParty_LucidDreamMaliceDreamVisitCountsJson
-    {
-        get => SerializeIntList(_dreamVisitCounts);
-        set => _dreamVisitCounts = DeserializeIntList(value, nameof(AstralParty_LucidDreamMaliceDreamVisitCountsJson));
-    }
-
-    public List<int> DreamPathCols
-    {
-        get => _dreamPathCols;
-        set => _dreamPathCols = value ?? [];
-    }
-
-    public List<int> DreamPathRows
-    {
-        get => _dreamPathRows;
-        set => _dreamPathRows = value ?? [];
-    }
-
-    public List<int> DreamVisitCols
-    {
-        get => _dreamVisitCols;
-        set => _dreamVisitCols = value ?? [];
-    }
-
-    public List<int> DreamVisitRows
-    {
-        get => _dreamVisitRows;
-        set => _dreamVisitRows = value ?? [];
-    }
-
-    public List<int> DreamVisitCounts
-    {
-        get => _dreamVisitCounts;
-        set => _dreamVisitCounts = value ?? [];
-    }
-
-    [SavedProperty] private bool AstralParty_LucidDreamMaliceIsInDreamModeRevisitedRestSite { get; set; }
-
-    public bool IsInDreamModeRevisitedRestSite
-    {
-        get => AstralParty_LucidDreamMaliceIsInDreamModeRevisitedRestSite;
-        set => AstralParty_LucidDreamMaliceIsInDreamModeRevisitedRestSite = value;
-    }
-
     public override bool ShouldReceiveCombatHooks => true;
 
     public bool HasAnyEnabled =>
         EnableFalseLifeline
         || EnableSmoothSailing
-        || EnableDreamMode
-        ||
-        EnableFishScalesMalice
+        || EnableFishScalesMalice
         || EnableSevereWoundOneMalice
         || EnableSevereWoundTwoMalice
         || EnableMadLifeMalice
@@ -298,7 +171,6 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     {
         EnableFalseLifeline = snapshot.EnableLucidDreamFalseLifeline;
         EnableSmoothSailing = snapshot.EnableLucidDreamSmoothSailing;
-        EnableDreamMode = snapshot.EnableDreamMode;
         EnableFishScalesMalice = snapshot.EnableLucidDreamFishScalesMalice;
         EnableSevereWoundOneMalice = snapshot.EnableLucidDreamSevereWoundOneMalice;
         EnableSevereWoundTwoMalice = snapshot.EnableLucidDreamSevereWoundTwoMalice;
@@ -317,30 +189,6 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
     public static LucidDreamMaliceModifier? Get(RunState? runState)
     {
         return runState?.Modifiers.OfType<LucidDreamMaliceModifier>().FirstOrDefault();
-    }
-
-    private static string SerializeIntList(IReadOnlyList<int> values)
-    {
-        return JsonSerializer.Serialize(values.Take(MaxSavedDreamStateEntries).ToArray());
-    }
-
-    private static List<int> DeserializeIntList(string? value, string propertyName)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return [];
-
-        try
-        {
-            return (JsonSerializer.Deserialize<int[]>(value) ?? [])
-                .Take(MaxSavedDreamStateEntries)
-                .ToList();
-        }
-        catch (Exception ex)
-        {
-            MainFile.Logger.Warn(
-                $"[LucidDreamMalice] Failed to deserialize saved dream state '{propertyName}'; resetting that cache. {ex.GetType().Name}: {ex.Message}");
-            return [];
-        }
     }
 
     public override bool TryModifyPowerAmountReceived(
@@ -487,9 +335,6 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
 
     public override async Task AfterRoomEntered(AbstractRoom room)
     {
-        if (room is not CombatRoom)
-            IsInDreamModeEmptyRevisitCombatRoom = false;
-
         if (!EnableFalseLifeline || RunState == null)
             return;
 
@@ -508,9 +353,6 @@ public sealed class LucidDreamMaliceModifier : ModifierModel
         var changed = false;
         if (EnableSmoothSailing && LucidDreamMaliceRuntimeHelper.ApplySmoothSailingToMap(map))
             changed = true;
-        if (EnableDreamMode && LucidDreamMaliceRuntimeHelper.ApplyDreamModeToMap(RunState, map))
-            changed = true;
-
         if (changed)
             LucidDreamMaliceRuntimeHelper.RefreshMapScreenPointsIfNeeded(RunState, map);
 
