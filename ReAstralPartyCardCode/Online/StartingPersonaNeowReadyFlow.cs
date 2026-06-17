@@ -268,9 +268,13 @@ internal static class StartingPersonaNeowReadyFlow
         optionButton.Modulate = new Color(optionButton.Modulate, 0.85f);
     }
 
-    internal static Task HandleReadyLaunchAsync(string runKey, string sourceTag)
+    internal static Task HandleReadyLaunchAsync(
+        string runKey,
+        string sourceTag,
+        IReadOnlyList<string>? serializedRelicOptionIds = null)
     {
-        MainFile.Logger.Info($"[StartingPersonaNeowReadyFlow] Ready launch received | runKey={runKey} source={sourceTag}.");
+        MainFile.Logger.Info(
+            $"[StartingPersonaNeowReadyFlow] Ready launch received | runKey={runKey} source={sourceTag} optionPayloadCount={serializedRelicOptionIds?.Count ?? 0}.");
         lock (SyncLock)
         {
             if (SelectionTasksByRun.TryGetValue(runKey, out var existingTask))
@@ -284,17 +288,32 @@ internal static class StartingPersonaNeowReadyFlow
             }
 
             LaunchingRunKeys.Add(runKey);
-            var createdTask = RunSelectionTaskAsync(runState, runKey, sourceTag);
+            var createdTask = RunSelectionTaskAsync(runState, runKey, sourceTag, serializedRelicOptionIds);
             SelectionTasksByRun[runKey] = createdTask;
             return createdTask;
         }
     }
 
-    private static async Task<bool> RunSelectionTaskAsync(RunState runState, string runKey, string sourceTag)
+    private static async Task<bool> RunSelectionTaskAsync(
+        RunState runState,
+        string runKey,
+        string sourceTag,
+        IReadOnlyList<string>? serializedRelicOptionIds)
     {
         try
         {
-            var opened = await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(runState, $"neow_ready_launch:{sourceTag}");
+            var overrideRelicOptions =
+                StartingPersonaRelicSelectionPatch.ResolveRelicOptionsFromSerializedIds(serializedRelicOptionIds, sourceTag);
+            if (serializedRelicOptionIds != null && serializedRelicOptionIds.Count > 0 && overrideRelicOptions.Count == 0)
+            {
+                MainFile.Logger.Warn(
+                    $"[StartingPersonaNeowReadyFlow] Host persona option payload resolved to 0 options; falling back to local generation | runKey={runKey} source={sourceTag}.");
+            }
+
+            var opened = await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(
+                runState,
+                $"neow_ready_launch:{sourceTag}",
+                overrideRelicOptions.Count > 0 ? overrideRelicOptions : null);
             if (opened)
             {
                 RebuildInitialOptionsForRun(runKey, "post_selection_rebuild");

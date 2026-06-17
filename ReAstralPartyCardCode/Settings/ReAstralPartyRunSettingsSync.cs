@@ -22,6 +22,8 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public bool EnableEnigmaticSeriesEvents { get; set; } = true;
 
+    public bool EnableMoonPropShopSlots { get; set; } = true;
+
     public bool EnableNeowExtraOption { get; set; } = true;
 
     public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; } =
@@ -85,6 +87,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
+            EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableNeowExtraOption = EnableNeowExtraOption,
             NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode,
             EnableAllPersonas = EnableAllPersonas,
@@ -175,6 +178,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableStartingPersonaSelection = lobbySnapshot?.EnableStartingPersonaSelection ?? settings.EnableStartingPersonaSelection,
             EnableDreamSeriesEvents = lobbySnapshot?.EnableDreamSeriesEvents ?? settings.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = lobbySnapshot?.EnableEnigmaticSeriesEvents ?? settings.EnableEnigmaticSeriesEvents,
+            EnableMoonPropShopSlots = lobbySnapshot?.EnableMoonPropShopSlots ?? settings.EnableMoonPropShopSlots,
             EnableNeowExtraOption = lobbySnapshot?.EnableNeowExtraOption ?? settings.EnableNeowExtraOption,
             NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
                 lobbySnapshot?.EnableStartingRingOfSevenCurses ?? settings.EnableStartingRingOfSevenCurses,
@@ -221,6 +225,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableStartingPersonaSelection = true,
             EnableDreamSeriesEvents = true,
             EnableEnigmaticSeriesEvents = true,
+            EnableMoonPropShopSlots = true,
             EnableNeowExtraOption = true,
             NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom,
             EnableAllPersonas = false,
@@ -287,7 +292,7 @@ internal static class ReAstralPartyRunSettingsSync
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
             LogSnapshotEstablished(runState, "lobby_snapshot");
             MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync established from lobby snapshot: start_initial_point={lobbySnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={lobbySnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={lobbySnapshot.EnableStartingPersonaSelection}, dream_series={lobbySnapshot.EnableDreamSeriesEvents}, enigmatic_series={lobbySnapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={lobbySnapshot.EnableNeowExtraOption}, neow_extra_selection={lobbySnapshot.NeowExtraOptionSelectionMode}, all_personas={lobbySnapshot.EnableAllPersonas}, all_variants={lobbySnapshot.EnableAllVariantPersonas}, persona_mode={lobbySnapshot.StartingPersonaMode}, token_series={lobbySnapshot.TokenSeriesMode}, pure_angel={lobbySnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(lobbySnapshot)}, banned_relics={lobbySnapshot.BannedRelicIdsSerialized.Count}");
+                $"{MainFile.ModId} settings sync established from lobby snapshot: start_initial_point={lobbySnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={lobbySnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={lobbySnapshot.EnableStartingPersonaSelection}, dream_series={lobbySnapshot.EnableDreamSeriesEvents}, enigmatic_series={lobbySnapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={lobbySnapshot.EnableMoonPropShopSlots}, neow_extra_option={lobbySnapshot.EnableNeowExtraOption}, neow_extra_selection={lobbySnapshot.NeowExtraOptionSelectionMode}, all_personas={lobbySnapshot.EnableAllPersonas}, all_variants={lobbySnapshot.EnableAllVariantPersonas}, persona_mode={lobbySnapshot.StartingPersonaMode}, token_series={lobbySnapshot.TokenSeriesMode}, pure_angel={lobbySnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(lobbySnapshot)}, banned_relics={lobbySnapshot.BannedRelicIdsSerialized.Count}");
             return Task.FromResult(lobbySnapshot);
         }
 
@@ -298,7 +303,7 @@ internal static class ReAstralPartyRunSettingsSync
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
             LogSnapshotEstablished(runState, "host_runtime_fallback");
             MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync established from host runtime fallback without PlayerChoiceSynchronizer: start_initial_point={localSnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={localSnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={localSnapshot.EnableStartingPersonaSelection}, dream_series={localSnapshot.EnableDreamSeriesEvents}, enigmatic_series={localSnapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={localSnapshot.EnableNeowExtraOption}, neow_extra_selection={localSnapshot.NeowExtraOptionSelectionMode}, all_personas={localSnapshot.EnableAllPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, persona_mode={localSnapshot.StartingPersonaMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(localSnapshot)}, banned_relics={localSnapshot.BannedRelicIdsSerialized.Count}");
+                $"{MainFile.ModId} settings sync established from host runtime fallback without PlayerChoiceSynchronizer: start_initial_point={localSnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={localSnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={localSnapshot.EnableStartingPersonaSelection}, dream_series={localSnapshot.EnableDreamSeriesEvents}, enigmatic_series={localSnapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={localSnapshot.EnableMoonPropShopSlots}, neow_extra_option={localSnapshot.EnableNeowExtraOption}, neow_extra_selection={localSnapshot.NeowExtraOptionSelectionMode}, all_personas={localSnapshot.EnableAllPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, persona_mode={localSnapshot.StartingPersonaMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(localSnapshot)}, banned_relics={localSnapshot.BannedRelicIdsSerialized.Count}");
             return Task.FromResult(localSnapshot);
         }
 
@@ -328,6 +333,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableStartingPersonaSelection = lobbySnapshot.EnableStartingPersonaSelection,
             EnableDreamSeriesEvents = lobbySnapshot.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = lobbySnapshot.EnableEnigmaticSeriesEvents,
+            EnableMoonPropShopSlots = lobbySnapshot.EnableMoonPropShopSlots,
             EnableNeowExtraOption = lobbySnapshot.EnableNeowExtraOption,
             NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
                 lobbySnapshot.EnableStartingRingOfSevenCurses,

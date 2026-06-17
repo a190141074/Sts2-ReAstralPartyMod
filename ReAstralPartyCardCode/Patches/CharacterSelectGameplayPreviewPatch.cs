@@ -177,6 +177,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private CheckButton? _startingPersonaSelectionToggle;
     private CheckButton? _dreamSeriesEventsToggle;
     private CheckButton? _enigmaticSeriesEventsToggle;
+    private CheckButton? _moonPropShopSlotsToggle;
     private CheckButton? _neowExtraOptionToggle;
     private CheckButton? _allPersonasToggle;
     private CheckButton? _allVariantPersonasToggle;
@@ -373,6 +374,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.description"),
             out _enigmaticSeriesEventsToggle,
             OnEnableEnigmaticSeriesEventsToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description"),
+            out _moonPropShopSlotsToggle,
+            OnEnableMoonPropShopSlotsToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description"),
@@ -850,6 +856,13 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _enigmaticSeriesEventsToggle.Text = snapshot.EnableEnigmaticSeriesEvents ? "ON" : "OFF";
             }
 
+            if (_moonPropShopSlotsToggle != null)
+            {
+                _moonPropShopSlotsToggle.ButtonPressed = snapshot.EnableMoonPropShopSlots;
+                _moonPropShopSlotsToggle.Disabled = !isEditable;
+                _moonPropShopSlotsToggle.Text = snapshot.EnableMoonPropShopSlots ? "ON" : "OFF";
+            }
+
             if (_neowExtraOptionToggle != null)
             {
                 _neowExtraOptionToggle.ButtonPressed = snapshot.EnableNeowExtraOption;
@@ -978,14 +991,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         CallDeferred(nameof(ApplySnapshotDeferred), Variant.From(snapshot.EnableStartingInitialPoint),
             Variant.From(snapshot.EnableStartingRingOfSevenCurses),
             Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableDreamSeriesEvents),
-            Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableNeowExtraOption),
+            Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableMoonPropShopSlots), Variant.From(snapshot.EnableNeowExtraOption),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
             Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
             Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
     }
 
     private void ApplySnapshotDeferred(bool enableStartingInitialPoint, bool enableStartingRingOfSevenCurses, bool enableStartingPersonaSelection,
-        bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableNeowExtraOption,
+        bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableMoonPropShopSlots, bool enableNeowExtraOption,
         int neowExtraOptionSelectionMode,
         bool enableAllPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
     {
@@ -996,6 +1009,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             EnableStartingPersonaSelection = enableStartingPersonaSelection,
             EnableDreamSeriesEvents = enableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = enableEnigmaticSeriesEvents,
+            EnableMoonPropShopSlots = enableMoonPropShopSlots,
             EnableNeowExtraOption = enableNeowExtraOption,
             NeowExtraOptionSelectionMode = Enum.IsDefined(typeof(NeowExtraOptionSelectionMode), neowExtraOptionSelectionMode)
                 ? (NeowExtraOptionSelectionMode)neowExtraOptionSelectionMode
@@ -1071,6 +1085,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableEnigmaticSeriesEvents = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableMoonPropShopSlotsToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableMoonPropShopSlots = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

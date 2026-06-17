@@ -71,7 +71,10 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         LogInfo("P007", "Starting persona relic selection run bootstrap completed; Neow ready-page flow will handle the actual persona selection entry.");
     }
 
-    internal static async Task<bool> OpenSelectionOverlayAsync(RunState runState, string sourceTag)
+    internal static async Task<bool> OpenSelectionOverlayAsync(
+        RunState runState,
+        string sourceTag,
+        IReadOnlyList<RelicModel>? overrideRelicOptions = null)
     {
         if (!ShouldOpenStartingPersonaRelicSelection(runState, out var skipReason))
         {
@@ -104,9 +107,9 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
         var displayMode = ReAstralPartyModSettingsManager.GetStartingPersonaDisplayMode(runState);
         var assignmentMode = ReAstralPartyModSettingsManager.GetStartingPersonaAssignmentMode(runState);
-        var relicOptions = displayMode == StartingPersonaDisplayMode.Automatic
-            ? CreateAutomaticStartingPersonaRelicOptions(runState, runState.Players.Count)
-            : CreateStartingPersonaRelicOptions(runState);
+        var relicOptions = overrideRelicOptions?.Count > 0
+            ? overrideRelicOptions
+            : CreateOverlayRelicOptions(runState);
         if (relicOptions.Count == 0)
         {
             EndSelection(runKey, false);
@@ -273,6 +276,46 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
     private static bool IsOwnedPersonaRelic(RelicModel relic)
     {
         return PersonaRelicRegistry.IsPersonaRelic(relic.CanonicalInstance ?? relic);
+    }
+
+    internal static IReadOnlyList<RelicModel> CreateOverlayRelicOptions(RunState runState)
+    {
+        var displayMode = ReAstralPartyModSettingsManager.GetStartingPersonaDisplayMode(runState);
+        return displayMode == StartingPersonaDisplayMode.Automatic
+            ? CreateAutomaticStartingPersonaRelicOptions(runState, runState.Players.Count)
+            : CreateStartingPersonaRelicOptions(runState);
+    }
+
+    internal static IReadOnlyList<RelicModel> ResolveRelicOptionsFromSerializedIds(
+        IEnumerable<string>? serializedRelicIds,
+        string sourceTag)
+    {
+        if (serializedRelicIds == null)
+            return [];
+
+        var resolved = new List<RelicModel>();
+        var seenIds = new HashSet<ModelId>();
+        foreach (var serializedId in serializedRelicIds)
+        {
+            if (string.IsNullOrWhiteSpace(serializedId))
+                continue;
+
+            try
+            {
+                var relicId = ModelId.Deserialize(serializedId);
+                if (relicId == ModelId.none || !seenIds.Add(relicId))
+                    continue;
+
+                resolved.Add(ModelDb.GetById<RelicModel>(relicId));
+            }
+            catch (Exception ex)
+            {
+                LogWarn("P014A",
+                    $"Starting persona overlay skipped invalid serialized relic id from {sourceTag}: '{serializedId}'. {ex.Message}");
+            }
+        }
+
+        return resolved;
     }
 
     private static IReadOnlyList<RelicModel> CreateStartingPersonaRelicOptions(RunState runState)

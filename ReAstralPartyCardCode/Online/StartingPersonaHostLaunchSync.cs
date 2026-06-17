@@ -1,5 +1,6 @@
 using System;
 using MegaCrit.Sts2.Core.Logging;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Multiplayer.Messages.Game;
 using MegaCrit.Sts2.Core.Multiplayer.Serialization;
@@ -57,8 +58,12 @@ internal static class StartingPersonaHostLaunchSync
             return;
 
         var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
-        netService.SendMessage(new StartingPersonaHostLaunchMessage(runKey));
-        MainFile.Logger.Info($"[StartingPersonaHostLaunchSync] Host broadcast persona-selection launch | runKey={runKey}.");
+        var relicOptionIds = StartingPersonaRelicSelectionPatch.CreateOverlayRelicOptions(runState)
+            .Select(relic => (relic.CanonicalInstance?.Id ?? relic.Id).ToString())
+            .ToList();
+        netService.SendMessage(new StartingPersonaHostLaunchMessage(runKey, relicOptionIds));
+        MainFile.Logger.Info(
+            $"[StartingPersonaHostLaunchSync] Host broadcast persona-selection launch | runKey={runKey} options={relicOptionIds.Count}.");
     }
 
     private static void HandleLaunchMessage(StartingPersonaHostLaunchMessage message, ulong senderId)
@@ -81,19 +86,24 @@ internal static class StartingPersonaHostLaunchSync
 
         MainFile.Logger.Info(
             $"[StartingPersonaHostLaunchSync] Client received host-launch | runKey={message.RunKey} sender={senderId}.");
-        _ = StartingPersonaNeowReadyFlow.HandleReadyLaunchAsync(message.RunKey, "host_broadcast");
+        _ = StartingPersonaNeowReadyFlow.HandleReadyLaunchAsync(
+            message.RunKey,
+            "host_broadcast",
+            message.RelicOptionIds);
     }
 }
 
 public struct StartingPersonaHostLaunchMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 1;
+    private const int SchemaVersion = 2;
 
     public string RunKey { get; set; }
+    public List<string> RelicOptionIds { get; set; }
 
-    public StartingPersonaHostLaunchMessage(string runKey)
+    public StartingPersonaHostLaunchMessage(string runKey, List<string>? relicOptionIds = null)
     {
         RunKey = runKey;
+        RelicOptionIds = relicOptionIds ?? [];
     }
 
     public bool ShouldBroadcast => false;
@@ -104,11 +114,21 @@ public struct StartingPersonaHostLaunchMessage : INetMessage, IPacketSerializabl
     {
         writer.WriteInt(SchemaVersion);
         writer.WriteString(RunKey);
+        writer.WriteInt(RelicOptionIds.Count);
+        foreach (var relicOptionId in RelicOptionIds)
+            writer.WriteString(relicOptionId);
     }
 
     public void Deserialize(PacketReader reader)
     {
-        _ = reader.ReadInt();
+        var version = reader.ReadInt();
         RunKey = reader.ReadString();
+        RelicOptionIds = [];
+        if (version < 2)
+            return;
+
+        var count = reader.ReadInt();
+        for (var i = 0; i < count; i++)
+            RelicOptionIds.Add(reader.ReadString());
     }
 }

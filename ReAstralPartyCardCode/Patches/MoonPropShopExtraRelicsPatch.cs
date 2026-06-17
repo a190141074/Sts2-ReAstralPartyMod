@@ -12,6 +12,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Nodes.Screens.Shops;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -78,6 +79,8 @@ internal static class MoonPropShopExtraRelicsHelper
     {
         if (inventory == null || player == null)
             return;
+        if (!ReAstralPartyModSettingsManager.GetEnableMoonPropShopSlots(player.RunState))
+            return;
         if (PatchedInventories.TryGetValue(inventory, out _))
             return;
 
@@ -94,6 +97,8 @@ internal static class MoonPropShopExtraRelicsHelper
 
     public static void EnsureMoonPropRelicSlots(NMerchantInventory merchantInventory, MerchantInventory inventory)
     {
+        if (!ReAstralPartyModSettingsManager.GetEnableMoonPropShopSlots(inventory.Player?.RunState))
+            return;
         if (IsFakeMerchantInventory(merchantInventory))
             return;
         if (merchantInventory.GetNodeOrNull<Control>("%Relics") is not Control relicContainer)

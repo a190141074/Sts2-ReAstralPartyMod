@@ -86,6 +86,8 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableEnigmaticSeriesEvents { get; set; } = true;
 
+    public bool EnableMoonPropShopSlots { get; set; } = true;
+
     public bool EnableNeowExtraOption { get; set; } = true;
 
     public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; } =
@@ -171,6 +173,8 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableDreamSeriesEvents => ReadRuntime(settings => settings.EnableDreamSeriesEvents);
 
     public static bool EnableEnigmaticSeriesEvents => ReadRuntime(settings => settings.EnableEnigmaticSeriesEvents);
+
+    public static bool EnableMoonPropShopSlots => ReadRuntime(settings => settings.EnableMoonPropShopSlots);
 
     public static bool EnableNeowExtraOption => ReadRuntime(settings => settings.EnableNeowExtraOption);
 
@@ -311,6 +315,23 @@ public static partial class ReAstralPartyModSettingsManager
             return true;
 
         return EnableEnigmaticSeriesEvents;
+    }
+
+    public static bool GetEnableMoonPropShopSlots(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableMoonPropShopSlots;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableMoonPropShopSlots;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableMoonPropShopSlots;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableMoonPropShopSlots;
     }
 
     public static bool GetEnableNeowExtraOption(IRunState? runState)
@@ -1080,6 +1101,19 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableMoonPropShopSlots = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableMoonPropShopSlots,
+            (settings, value) =>
+            {
+                settings.EnableMoonPropShopSlots = value;
+                ApplyRuntimeSettings(settings, "enable_moon_prop_shop_slots");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label",
+                    value);
+            });
+
         var enableNeowExtraOption = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -1394,6 +1428,12 @@ public static partial class ReAstralPartyModSettingsManager
                     enableEnigmaticSeriesEvents,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.description",
                         "Enable Enigmatic-prefixed Astral content, including the corresponding Neow branch."))
+                .AddToggle(
+                    "enable_moon_prop_shop_slots",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label", "Enable Moon Shop Slots"),
+                    enableMoonPropShopSlots,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description",
+                        "Control whether shops always add three extra Moon relic slots below the normal inventory."))
                 .AddToggle(
                     "enable_neow_extra_option",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label", "Enable Neow Extra Option"),
@@ -1840,7 +1880,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -2225,6 +2265,8 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableEnigmaticSeriesEvents { get; init; } = true;
 
+        public bool EnableMoonPropShopSlots { get; init; } = true;
+
         public bool EnableNeowExtraOption { get; init; } = true;
 
         public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; init; } =
@@ -2309,6 +2351,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
                 EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
                 EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
+                EnableMoonPropShopSlots = settings.EnableMoonPropShopSlots,
                 EnableNeowExtraOption = settings.EnableNeowExtraOption,
                 NeowExtraOptionSelectionMode = settings.NeowExtraOptionSelectionMode,
                 EnableAllPersonas = settings.EnableAllPersonas,
