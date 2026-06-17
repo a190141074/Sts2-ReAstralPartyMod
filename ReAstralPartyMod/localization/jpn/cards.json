@@ -227,6 +227,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUNSET_GLOW.description": "[gold]元素・洪波[/gold]、[gold]元素・落日[/gold]、[gold]元素・雷息[/gold]のいずれかを選んで発動する。\nこのカードを手札に戻す。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SIX_DRAGONS_AZURE.title": "六龍の『碧』",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SIX_DRAGONS_AZURE.description": "山札の枚数が奇数なら、すべてのプレイヤーは[blue]1[/blue]層の[gold]緩衝[/gold]を得る。\n山札の枚数が偶数なら、【法力増幅+[blue]6[/blue]】点を[gold]召喚[/gold]・[gold]活力[/gold]・臨時[green]敏捷[/green]へランダムに配分し、その利益を得るのはあなただけとなる。\n法力増幅が[blue]18[/blue]以上なら、[gold]超越次元[/gold]を[blue]1[/blue]枚手札に加える。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FATE_FIREWOOD_STICK.title": "運命の焚き棒",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FATE_FIREWOOD_STICK.description": "他のプレイヤーを指定してノード勝負を行う。双方に[blue]1[/blue]から[blue]6[/blue]のランダムなノードを与え、あなたのノードが相手以上なら勝利となり、両者のノードを消す。\n勝利時、対象に全生存ユニットの[gold]魔女化[/gold]合計の[blue]50%[/blue]に等しいダメージを与える。あなたの[gold]魔女化[/gold]が[blue]40[/blue]以上なら、そのうち[blue]40[/blue]層を対象へ移し、このカードを[blue]1[/blue]枚再入手する。\n失敗時、場のランダム[blue]1[/blue]体に現在の[gold]魔女化[/gold]の[blue]10%[/blue]に等しいダメージを与える。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.title": "超越次元",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.description": "手札と捨て札を山札に戻して混ぜ、[blue]5[/blue]枚引き、{energyPrefix:energyIcons(5)}を得る。"
 }

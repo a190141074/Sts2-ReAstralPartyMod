@@ -33,7 +33,8 @@ public static class AstralKeywords
         AstralCooldownStem,
         AstralUltimateSkillStem,
         AstralInvestigationProgressStem,
-        AstralFusionClueStem
+        AstralFusionClueStem,
+        FateFirewoodStickDuelStem
     ];
 
     private static bool _registered;
@@ -63,6 +64,7 @@ public static class AstralKeywords
     public const string AstralUltimateSkillStem = "ASTRAL_ULTIMATE_SKILL";
     public const string AstralInvestigationProgressStem = "ASTRAL_INVESTIGATION_PROGRESS";
     public const string AstralFusionClueStem = "ASTRAL_FUSION_CLUE";
+    public const string FateFirewoodStickDuelStem = "FATE_FIREWOOD_STICK_DUEL";
 
     public static string AstralEventId => GetId(AstralEventStem);
     public static string AstralStepsId => GetId(AstralStepsStem);
@@ -89,6 +91,7 @@ public static class AstralKeywords
     public static string AstralUltimateSkillId => GetId(AstralUltimateSkillStem);
     public static string AstralInvestigationProgressId => GetId(AstralInvestigationProgressStem);
     public static string AstralFusionClueId => GetId(AstralFusionClueStem);
+    public static string FateFirewoodStickDuelId => GetId(FateFirewoodStickDuelStem);
 
     public static CardKeyword AstralEvent => GetKeyword(AstralEventStem);
     public static CardKeyword AstralSteps => GetKeyword(AstralStepsStem);
@@ -115,6 +118,7 @@ public static class AstralKeywords
     public static CardKeyword AstralUltimateSkill => GetKeyword(AstralUltimateSkillStem);
     public static CardKeyword AstralInvestigationProgress => GetKeyword(AstralInvestigationProgressStem);
     public static CardKeyword AstralFusionClue => GetKeyword(AstralFusionClueStem);
+    public static CardKeyword FateFirewoodStickDuel => GetKeyword(FateFirewoodStickDuelStem);
 
     public static void RegisterAll()
     {

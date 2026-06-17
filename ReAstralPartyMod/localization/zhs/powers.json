@@ -316,6 +316,12 @@
   "RE_ASTRAL_PARTY_MOD_POWER_THUNDERS_BREATH_POWER.title": "雷息",
   "RE_ASTRAL_PARTY_MOD_POWER_THUNDERS_BREATH_POWER.description": "当你打出耗能不低于[blue]1[/blue]的攻击牌时，若目标处于[gold]感电[/gold]状态，则有[blue]55%[/blue]概率追加[blue]26%[/blue]基础伤害与[gold]感电[/gold]层数×[blue]3[/blue]的额外伤害。",
   "RE_ASTRAL_PARTY_MOD_POWER_THUNDERS_BREATH_POWER.smartDescription": "打出耗能不低于[blue]1[/blue]的攻击牌时，若目标处于[gold]感电[/gold]状态，则有[blue]55%[/blue]概率追加[blue]26%[/blue]基础伤害与[gold]感电[/gold]层数×[blue]3[/blue]的额外伤害。",
+  "RE_ASTRAL_PARTY_MOD_POWER_WITH_POWER.title": "魔女化",
+  "RE_ASTRAL_PARTY_MOD_POWER_WITH_POWER.description": "造成的伤害随层数提高。[blue]100[/blue]层时获得【魔法】；[blue]200[/blue]层时，你打出技能牌或能力牌会失去[blue]1[/blue]点生命，并在回合结束时失去[blue]13[/blue]点生命；[blue]300[/blue]层时，你的技能牌获得消耗，打出时额外失去[blue]3[/blue]点生命，而你打出攻击牌时回复[blue]3[/blue]点生命。",
+  "RE_ASTRAL_PARTY_MOD_POWER_WITH_POWER.smartDescription": "伤害随层数提高。[blue]100[/blue]层时获得【魔法】；[blue]200[/blue]层时，打出技能牌或能力牌失去[blue]1[/blue]点生命并在回合结束失去[blue]13[/blue]点生命；[blue]300[/blue]层时，技能牌获得消耗并额外失去[blue]3[/blue]点生命，攻击牌则回复[blue]3[/blue]点生命。",
+  "RE_ASTRAL_PARTY_MOD_POWER_FATE_FIREWOOD_NODE_POWER.title": "节点",
+  "RE_ASTRAL_PARTY_MOD_POWER_FATE_FIREWOOD_NODE_POWER.description": "用于【命运的烧火棍·拼点】的数值。",
+  "RE_ASTRAL_PARTY_MOD_POWER_FATE_FIREWOOD_NODE_POWER.smartDescription": "用于【命运的烧火棍·拼点】的数值。",
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.title": "奥法天河",
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.description": "受到伤害提高[blue]16%[/blue]。\n持续[blue]3[/blue]回合。",
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.smartDescription": "受到伤害提高[blue]16%[/blue]。\n持续[blue]3[/blue]回合。"

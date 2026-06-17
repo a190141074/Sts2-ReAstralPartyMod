@@ -152,6 +152,8 @@
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_guidance.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_guidance.png.import"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_firewood_stick.png"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_firewood_stick.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_weak_mprint.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_weak_mprint.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_healing_slime.png"/>
@@ -249,7 +251,11 @@
 		<Content Include="ReAstralPartyMod\images\powers\exposure_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\fate_weak_imprint_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\fate_weak_imprint_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\fate_firewood_node_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\fate_firewood_node_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\foxfire_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\with_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\with_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\gathering_strength_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png.import"/>
@@ -569,6 +575,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_snakebiter.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_ling_yulin.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_ling_yulin.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\variant_person_manosaba_lin_hiro.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\variant_person_manosaba_lin_hiro.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_weird_egg.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_defect_baby.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\variant_person_defect_baby.png.import"/>
