@@ -137,7 +137,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.overpopulation.title": "人口过剩",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.overpopulation.description": "除了[gold]Boss[/gold]和[gold]精英房[/gold]，额外增加[red]1[/red]只[red]随机低难度怪物[/red]。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.title": "慎重水母",
-  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.description": "能量上限+[blue]4[/blue]，耗能低于4的牌费用+[red]1[/red]，耗能为X的牌的效果数值-[red]2[/red]。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_malice.cautious_jellyfish.description": "能量上限+[blue]4[/blue]，耗能低于[blue]4[/blue]的牌其耗能+[red]1[/red]，耗能为X的牌效果数值-[red]2[/red]。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.title": "【清醒梦·混沌】",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.face_death_with_composure.title": "视死如归",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lucid_dream_chaos.face_death_with_composure.description": "所有单位，[gold]无论敌我[/gold]，基础伤害+[purple]100%[/purple]。",

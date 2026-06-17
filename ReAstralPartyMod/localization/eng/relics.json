@@ -70,6 +70,9 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_DEFECT_BABY.title": "[Variant: Defect Baby]",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_DEFECT_BABY.description": "At combat start, add [blue]1[/blue] [card]That Is Because I Have Not Started Yet[/card] to your hand.",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_DEFECT_BABY.flavor": "Do not rush it. It simply has not started yet. Regret can wait until after the machine truly wakes up.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_LING_LING.title": "[Persona: Ling Ling]",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_LING_LING.description": "After winning a combat, at the start of the next combat gain [blue]1[/blue] [card]Reinforced Denial[/card] and [blue]2[/blue] temporary [green]Dexterity[/green].",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_LING_LING.flavor": "She writes denial into the opening move of the next fight.",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DIVINE_THRONE.title": "[Persona Derivative: Divine Throne]",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DIVINE_THRONE.description": "Displays your current [gold]Charge[/gold].",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DIVINE_THRONE.flavor": "To sit on the throne, first you must count what sustains it.",
@@ -802,5 +805,8 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_stage3_name": "Arcane River of Stars",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_tsunami_stage3_description": "First trigger [gold]Element: Tsunami[/gold], then randomly distribute a total of [blue]11[/blue] damage among all enemies. This damage grows with your run-wide Tsunami releases. Remove [blue]2[/blue] temporary [red]Strength[/red] and apply a [blue]3[/blue]-turn damage-taken increase.",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_setting_sun_stage3_description": "First trigger [gold]Element: Setting Sun[/gold], then randomly distribute a total of [blue]11[/blue] damage among all enemies. This damage grows with your run-wide Setting Sun releases. Remove [blue]2[/blue] temporary [red]Strength[/red] and apply a [blue]3[/blue]-turn damage-taken increase.",
-  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_thunders_breath_stage3_description": "First trigger [gold]Element: Thunder's Breath[/gold], then randomly distribute a total of [blue]11[/blue] damage among all enemies. This damage grows with your run-wide Thunder's Breath releases. Remove [blue]2[/blue] temporary [red]Strength[/red] and apply a [blue]3[/blue]-turn damage-taken increase."
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_thunders_breath_stage3_description": "First trigger [gold]Element: Thunder's Breath[/gold], then randomly distribute a total of [blue]11[/blue] damage among all enemies. This damage grows with your run-wide Thunder's Breath releases. Remove [blue]2[/blue] temporary [red]Strength[/red] and apply a [blue]3[/blue]-turn damage-taken increase.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_WAMDUS.title": "[Variant: Wamdus]",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_WAMDUS.description": "Every [blue]3[/blue] turns, add [blue]1[/blue] [card]Six Dragons \"Azure\"[/card] to your hand.\nWhenever you actually spend [blue]1[/blue] Energy on a Skill card in combat, gain [blue]1[/blue] Mana Amplification.\nAt combat end, gain [blue]1[/blue] Max HP for every [blue]10[/blue] Mana Amplification, then clear all Mana Amplification.",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_WAMDUS.flavor": "The tide raises mana, then sinks the price back into flesh."
 }
