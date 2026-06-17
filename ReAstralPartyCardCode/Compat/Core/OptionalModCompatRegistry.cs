@@ -1,4 +1,4 @@
-using MegaCrit.Sts2.Core.Modding;
+using STS2RitsuLib.Compat;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 
@@ -21,13 +21,12 @@ internal static class OptionalModCompatRegistry
 
         try
         {
-            return ModManager.GetLoadedMods().Any(mod =>
-                string.Equals(mod.manifest?.id, modId, StringComparison.OrdinalIgnoreCase));
+            return RitsuModManager.IsModLoaded(modId);
         }
         catch (Exception ex)
         {
             MainFile.Logger.Warn(
-                $"[{MainFile.ModId}] Optional mod compatibility load check failed for '{modId}': {ex.Message}");
+                $"[{MainFile.ModId}] RitsuModManager compatibility load check failed for '{modId}': {ex.Message}");
             return false;
         }
     }
