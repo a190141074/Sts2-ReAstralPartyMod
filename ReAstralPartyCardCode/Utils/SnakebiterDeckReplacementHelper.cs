@@ -4,9 +4,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
-using MegaCrit.Sts2.Core.Models.Characters;
 using MegaCrit.Sts2.Core.Saves;
-using MegaCrit.Sts2.Core.TestSupport;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -48,12 +46,12 @@ internal static class SnakebiterDeckReplacementHelper
 
     public static bool IsBaseStrike(Player? owner, CardModel? card)
     {
-        return card != null && GetCanonicalCardId(card) == GetBaseStrikeId(owner);
+        return BaseStarterCardReplacementHelper.IsBaseStrike(owner, card);
     }
 
     public static bool IsBaseDefend(Player? owner, CardModel? card)
     {
-        return card != null && GetCanonicalCardId(card) == GetBaseDefendId(owner);
+        return BaseStarterCardReplacementHelper.IsBaseDefend(owner, card);
     }
 
     private static ModelId GetReplacementCardId(Player? owner, CardModel? card)
@@ -161,37 +159,6 @@ internal static class SnakebiterDeckReplacementHelper
             replacement.UpgradeInternal();
             replacement.FinalizeUpgradeInternal();
         }
-    }
-
-    private static ModelId GetBaseStrikeId(Player? owner)
-    {
-        var character = owner?.Character;
-        if (character == null)
-            return ModelId.none;
-        if (TestMode.IsOn && character is Deprived)
-            return ModelDb.GetId<StrikeIronclad>();
-
-        var baseStrike = character.CardPool.AllCards.FirstOrDefault(static card =>
-            card.Rarity == CardRarity.Basic && card.Tags.Contains(CardTag.Strike));
-        return baseStrike?.Id ?? ModelId.none;
-    }
-
-    private static ModelId GetBaseDefendId(Player? owner)
-    {
-        var character = owner?.Character;
-        if (character == null)
-            return ModelId.none;
-        if (TestMode.IsOn && character is Deprived)
-            return ModelDb.GetId<DefendIronclad>();
-
-        var baseDefend = character.CardPool.AllCards.FirstOrDefault(static card =>
-            card.Rarity == CardRarity.Basic && card.Tags.Contains(CardTag.Defend));
-        return baseDefend?.Id ?? ModelId.none;
-    }
-
-    private static ModelId GetCanonicalCardId(CardModel card)
-    {
-        return card.CanonicalInstance?.Id ?? card.Id;
     }
 
     private static object? ReadMemberValue(object source, MemberInfo member)

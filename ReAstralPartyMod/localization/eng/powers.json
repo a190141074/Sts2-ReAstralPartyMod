@@ -303,5 +303,20 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ETHERIUM_SWORD_RECALL_OMEN_POWER.effect": "Add [gold]Etherium Greatsword Sweep[/gold] to your hand",
   "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_ACKNOWLEDGMENT_OMEN_POWER.effect": "Add [gold]The Acknowledgment[/gold] to your hand",
   "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_TWIST_OMEN_POWER.effect": "Add [gold]The Twist[/gold] to your hand",
-  "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_INFINITUM_OMEN_POWER.effect": "Add [gold]The Infinitum[/gold] to your hand"
+  "RE_ASTRAL_PARTY_MOD_POWER_ENIGMATIC_INFINITUM_OMEN_POWER.effect": "Add [gold]The Infinitum[/gold] to your hand",
+  "RE_ASTRAL_PARTY_MOD_POWER_TSUNAMI_POWER.title": "Tsunami",
+  "RE_ASTRAL_PARTY_MOD_POWER_TSUNAMI_POWER.description": "When attacked by an enemy with [power]Weak[/power], reduce that damage by [blue]16%[/blue].",
+  "RE_ASTRAL_PARTY_MOD_POWER_TSUNAMI_POWER.smartDescription": "When attacked by an enemy with [power]Weak[/power], reduce that damage by [blue]16%[/blue].",
+  "RE_ASTRAL_PARTY_MOD_POWER_SETTING_SUN_POWER.title": "Setting Sun",
+  "RE_ASTRAL_PARTY_MOD_POWER_SETTING_SUN_POWER.description": "Whenever Burn resolves on this target, it takes extra damage equal to [blue]50%[/blue] of that Burn damage.",
+  "RE_ASTRAL_PARTY_MOD_POWER_SETTING_SUN_POWER.smartDescription": "Burn resolution on this target deals [blue]50%[/blue] extra Burn damage.",
+  "RE_ASTRAL_PARTY_MOD_POWER_CONDUCTING_POWER.title": "Conducting",
+  "RE_ASTRAL_PARTY_MOD_POWER_CONDUCTING_POWER.description": "No direct effect. Used by [power]Thunder's Breath[/power] for counting and checks.",
+  "RE_ASTRAL_PARTY_MOD_POWER_CONDUCTING_POWER.smartDescription": "No direct effect. Used by [power]Thunder's Breath[/power] for counting and checks.",
+  "RE_ASTRAL_PARTY_MOD_POWER_THUNDERS_BREATH_POWER.title": "Thunder's Breath",
+  "RE_ASTRAL_PARTY_MOD_POWER_THUNDERS_BREATH_POWER.description": "When you play an Attack card that costs at least [blue]1[/blue], if its target has [power]Conducting[/power], it has a [blue]55%[/blue] chance to deal extra damage equal to [blue]26%[/blue] base damage plus [blue]3[/blue] per Conducting stack.",
+  "RE_ASTRAL_PARTY_MOD_POWER_THUNDERS_BREATH_POWER.smartDescription": "Playing an Attack costing at least [blue]1[/blue] against a [power]Conducting[/power] target has a [blue]55%[/blue] chance to deal [blue]26%[/blue] base damage plus [blue]3[/blue] per Conducting stack.",
+  "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.title": "Arcane River of Stars",
+  "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.description": "Take [blue]16%[/blue] more damage.\nLasts [blue]3[/blue] turns.",
+  "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.smartDescription": "Take [blue]16%[/blue] more damage for [blue]3[/blue] turns."
 }

@@ -19,15 +19,6 @@ internal enum EtheriumWeaponKind
 
 internal static class EtheriumWeaponStrikeReplacementHelper
 {
-    private static readonly HashSet<string> BaseStrikeEntries =
-    [
-        "STRIKE_DEFECT",
-        "STRIKE_IRONCLAD",
-        "STRIKE_NECROBINDER",
-        "STRIKE_REGENT",
-        "STRIKE_SILENT"
-    ];
-
     private static readonly string[] CardCollectionMemberNames =
     [
         "Cards",
@@ -78,7 +69,7 @@ internal static class EtheriumWeaponStrikeReplacementHelper
             return;
 
         var cards = EventDeckCardHelper.GetRunDeckCards(owner)
-            .Where(IsReplaceableStrike)
+            .Where(card => IsReplaceableStrike(owner, card))
             .ToList();
         foreach (var card in cards)
             TryReplaceDeckCard(owner, card, weapon);
@@ -92,21 +83,20 @@ internal static class EtheriumWeaponStrikeReplacementHelper
         var weapon = GetActiveWeapon(owner);
         if (weapon == EtheriumWeaponKind.None)
             return false;
-        if (!IsReplaceableStrike(addedCard))
+        if (!IsReplaceableStrike(owner, addedCard))
             return false;
 
         return TryReplaceDeckCard(owner, addedCard, weapon);
     }
 
-    public static bool IsReplaceableStrike(CardModel? card)
+    public static bool IsReplaceableStrike(Player? owner, CardModel? card)
     {
-        return IsBaseStrike(card) || IsEtheriumStrike(card);
+        return IsBaseStrike(owner, card) || IsEtheriumStrike(card);
     }
 
-    private static bool IsBaseStrike(CardModel? card)
+    private static bool IsBaseStrike(Player? owner, CardModel? card)
     {
-        var entry = (card?.CanonicalInstance ?? card)?.Id.Entry ?? string.Empty;
-        return BaseStrikeEntries.Contains(entry);
+        return BaseStarterCardReplacementHelper.IsBaseStrike(owner, card);
     }
 
     private static bool IsEtheriumStrike(CardModel? card)

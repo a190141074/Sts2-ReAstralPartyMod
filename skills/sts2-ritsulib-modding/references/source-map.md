@@ -37,6 +37,23 @@
   - API 与真实符号权威。
   - 用于确认注册器、AutoRegistration 特性、模板基类、内容包构建器、关键词注册、文档中提到的方法签名。
 
+### RitsuLib 运行时安装目录
+
+- `D:\Steam\steamapps\common\Slay the Spire 2\mods\RitsuLib`
+  - 当前本机实际加载的 RitsuLib 运行时目录。
+  - 优先用于确认 DLL / PDB / XML 文档是否齐全，以及当前开发参照是否和真实运行版本一致。
+  - 关键文件：
+    - `STS2-RitsuLib.dll`
+      - 运行时实际装载程序集。
+      - 用于确认 `csproj` 引用目标和游戏内真实 DLL 是否一致。
+    - `STS2-RitsuLib.pdb`
+      - 调试符号。
+      - 用于在需要时补充堆栈与符号定位，但不是日常首查入口。
+    - `STS2-RitsuLib.xml`
+      - C# 程序集 XML 文档索引。
+      - 用于快速确认 public 类型、成员签名、参数名、`summary`、`returns` 与可见接口面。
+      - 适合“概念知道了，但 exact public API 名称和参数还不确定”的场景。
+
 ### RitsuLib 实战案例
 
 - `D:\MOD\杀戮尖塔2mod制作\STS2_WineFox-main`
@@ -56,12 +73,6 @@
   - 原生类型、枚举、场景和行为权威。
   - 优先看 `src\Core` 下与目标系统对应的源码树。
   - 当 RitsuLib 文档没有覆盖、或需要确认底层原生行为时再看。
-
-### RitsuLib 运行时 DLL
-
-- `D:\Steam\steamapps\common\Slay the Spire 2\mods\RitsuLib`
-  - 当前本机安装的 RitsuLib DLL 所在位置。
-  - 用于确认 `csproj` 本地引用路径和实际加载环境。
 
 ## 章节路由
 
@@ -85,8 +96,9 @@
 
 1. 先读 `doc/AGENT.zh.md` 与 `doc/AGENT.md`。
 2. 先从 `RitsuLib-doc\RitsuLib` 找新版章节。
-3. 再去 `RitsuLib-code\Docs\zh` 核对真实 API、特性、模板与签名。
-4. 再看当前仓库是否已有接近实现。
-5. 需要实机验证/调试工具时看 `STS2-DevMode`。
-6. 需要完整结构样例时看 WineFox。
-7. 仍然不够时再看 `Slay-the-Spire-2-gdsdecomp` 下的 `src\Core`。
+3. 再查运行时 `STS2-RitsuLib.xml`，快速确认 public 接口名、参数名和注释摘要。
+4. 还需要 deeper source verification 时，再去 `RitsuLib-code\Docs\zh` 与源码核对模板、特性、实现细节。
+5. 再看当前仓库是否已有接近实现。
+6. 需要实机验证/调试工具时看 `STS2-DevMode`。
+7. 需要完整结构样例时看 WineFox。
+8. 仍然不够时再看 `Slay-the-Spire-2-gdsdecomp` 下的 `src\Core`。

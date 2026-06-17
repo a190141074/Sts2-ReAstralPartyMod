@@ -21,7 +21,7 @@ public class JewelryMiniatureMilen : AstralPartyRelicModel
 {
     [SavedProperty] public bool AstralParty_JewelryMiniatureMilenTriggeredThisTurn { get; set; }
 
-    public override RelicRarity Rarity => RelicRarity.Rare;
+    public override RelicRarity Rarity => RelicRarity.Shop;
 
     public override bool ShouldReceiveCombatHooks => true;
 

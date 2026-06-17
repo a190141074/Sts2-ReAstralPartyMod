@@ -21,7 +21,7 @@ public class JewelryNightSkin : AstralPartyRelicModel
     [SavedProperty] public int AstralParty_JewelryNightSkinTurnCounter { get; set; }
     [SavedProperty] public int AstralParty_JewelryNightSkinLastProcessedRound { get; set; }
 
-    public override RelicRarity Rarity => RelicRarity.Rare;
+    public override RelicRarity Rarity => RelicRarity.Shop;
 
     public override bool ShouldReceiveCombatHooks => true;
 

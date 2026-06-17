@@ -13,6 +13,7 @@ internal enum AstralChoiceKind
     DeckCardMutationSelection = 4,
     EventRandomResolution = 5,
     RefreshableProphecySelection = 6,
+    SunsetGlowElementSelection = 7,
     StartingPersonaSelectionUpdate = 100,
     StartingPersonaSelectionCommit = 101,
     RunSettingsSnapshot = 200

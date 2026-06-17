@@ -11,7 +11,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class JewelryEchoOfDivineLight : AstralPartyRelicModel
 {
-    public override RelicRarity Rarity => RelicRarity.Rare;
+    public override RelicRarity Rarity => RelicRarity.Shop;
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
         SinkouSetHelper.BuildSetDynamicVars(IsMutable ? Owner : null);

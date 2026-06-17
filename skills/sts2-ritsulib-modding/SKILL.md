@@ -17,6 +17,9 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
   - 新版教程主入口，优先看这里的 `01 - 添加基础内容`、`02 - 玩法基底`、`03 - 模组工具`。
 - `D:\MOD\杀戮尖塔2mod制作\RitsuLib-code`
   - 当前 RitsuLib 代码与 lifecycle patch 权威。
+- `D:\Steam\steamapps\common\Slay the Spire 2\mods\RitsuLib`
+  - 当前本机运行时 RitsuLib 安装目录。
+  - 其中 `STS2-RitsuLib.xml` 是程序集 XML 文档索引，可快速确认 public 类型、成员签名、参数名与 summary。
 - `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode`
   - 游戏内测试、作弊、脚本执行与 mod 调试工具箱。
 - `D:\MOD\杀戮尖塔2mod制作\Slay-the-Spire-2-gdsdecomp`
@@ -25,11 +28,12 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 默认按照这条优先级取证并落地方案：
 
 1. `RitsuLib-doc`
-2. `RitsuLib-code`
-3. 当前工作仓库
-4. `STS2-DevMode`
-5. `STS2_WineFox-main`
-6. 游戏反编译代码
+2. 运行时 `STS2-RitsuLib.xml`
+3. `RitsuLib-code`
+4. 当前工作仓库
+5. `STS2-DevMode`
+6. `STS2_WineFox-main`
+7. 游戏反编译代码
 
 ## Quick Start
 
@@ -48,6 +52,7 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - 只有在 RitsuLib 没覆盖目标行为，或者任务显式要求改原生流程时，才看 Harmony 或反编译代码。
 - 先确认“入口是否注册正确”，再写内容代码。很多“卡牌没出现”“遗物没加载”本质上是初始化或依赖问题。
 - 先做最小可运行切片：入口、依赖、1 个内容类型、本地化、图标或场景路径，然后再扩展复杂联动。
+- 当概念已明确，但 public 接口名、override 面、参数名、返回值语义还不确定时，先查运行时 `STS2-RitsuLib.xml`，再决定是否下钻 `RitsuLib-code`。
 - 遇到 hook/时机选择问题，不要凭感觉选最宽的入口；先看 `timing-map.md`，再决定是模型 override、RitsuLib lifecycle event，还是更窄的仓库 base/helper。
 - `STS2_WineFox-main` 是高价值 RitsuLib 实战案例，但不要无脑照抄。先抽取结构模式，再贴合当前仓库实现。
 - 如果仓库已经有自己的 working example、agent 文档、技能 overlay 或命名/资源约定，优先在仓库内找同类参照，不要强推通用模板。
@@ -67,6 +72,7 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 重点检查：
 
 - `STS2-RitsuLib` DLL 或 NuGet 引用是否存在
+- 运行时 `STS2-RitsuLib.dll` 与 `STS2-RitsuLib.xml` 是否存在且版本匹配
 - mod manifest `dependencies` 是否包含 `STS2-RitsuLib`
 - 入口是否包含 `RitsuLibFramework.EnsureGodotScriptsRegistered(...)`
 - 入口是否包含 `ModTypeDiscoveryHub.RegisterModAssembly(modId, assembly)`
@@ -84,8 +90,9 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 
 1. 先确认卡池类型和基类。
 2. 用 `[RegisterCard(typeof(...Pool))]` 而不是 BaseLib 的 `[Pool(...)]`。
-3. 用 `ModCardTemplate` 或项目自定义卡牌基类，而不是 `CustomCardModel`。
-4. 补齐图片、本地化、必要的 starter 或 token 约定。
+3. 如果接口名、virtual 面、构造参数或 helper 返回值不清楚，先查 `STS2-RitsuLib.xml`。
+4. 用 `ModCardTemplate` 或项目自定义卡牌基类，而不是 `CustomCardModel`。
+5. 补齐图片、本地化、必要的 starter 或 token 约定。
 
 ### 添加遗物
 
@@ -100,6 +107,7 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 
 - 是否使用 `[RegisterRelic(typeof(...Pool))]`
 - 是否继承 `ModRelicTemplate` 或项目自定义遗物模板
+- 如果 override 面或 helper 入口不清楚，先查 `STS2-RitsuLib.xml`
 - 是否补齐 `relics.json` 和图标路径
 - 是否需要 starter relic 或角色绑定
 
@@ -114,7 +122,7 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - 附魔: `13 - 添加新附魔`
 - 角色: `14 - 添加新人物`
 
-先看 RitsuLib 文档章节，再看 RitsuLib code 里的对应模板或注册属性，最后对照 WineFox 或当前仓库已有实现。
+先看 RitsuLib 文档章节；如果 public 接口面不清楚，先补查 `STS2-RitsuLib.xml`；再看 RitsuLib code 里的对应模板或注册属性，最后对照 WineFox 或当前仓库已有实现。
 
 ### BaseLib -> RitsuLib 迁移
 
@@ -142,10 +150,11 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 
 1. 先检查入口：`[ModInitializer]`、`EnsureGodotScriptsRegistered`、`RegisterModAssembly`
 2. 再检查 manifest：`dependencies`
-3. 再检查 `csproj`：RitsuLib、`sts2.dll`、`0Harmony.dll` 引用路径
-4. 再检查本地化、图片、场景路径
-5. 如果核心问题是“该挂哪一种时机”，回到 `timing-map.md`
-6. 最后才看 Harmony、反编译代码、运行时分支行为
+3. 再检查运行时 `STS2-RitsuLib.dll` 与 `STS2-RitsuLib.xml` 是否存在、是否和本地引用链一致
+4. 再检查 `csproj`：RitsuLib、`sts2.dll`、`0Harmony.dll` 引用路径
+5. 再检查本地化、图片、场景路径
+6. 如果核心问题是“该挂哪一种时机”，回到 `timing-map.md`
+7. 最后才看 Harmony、反编译代码、运行时分支行为
 
 如果任务已经进入“需要高频实机复现或快速验证”的阶段，再补看：
 

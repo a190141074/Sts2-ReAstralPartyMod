@@ -23,7 +23,7 @@ public class JewelrySolarCrown : AstralPartyRelicModel
     private readonly HashSet<Creature> _processedTargetsThisCard = [];
     private CardModel? _currentTrackedCard;
 
-    public override RelicRarity Rarity => RelicRarity.Rare;
+    public override RelicRarity Rarity => RelicRarity.Shop;
 
     public override bool ShouldReceiveCombatHooks => true;
 

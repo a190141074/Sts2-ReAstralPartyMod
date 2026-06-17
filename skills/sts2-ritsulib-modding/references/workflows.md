@@ -33,6 +33,8 @@
 要确认的事实：
 
 - `csproj` 是否引用 `STS2-RitsuLib`
+- 运行时 `D:\Steam\steamapps\common\Slay the Spire 2\mods\RitsuLib\STS2-RitsuLib.dll` 是否存在
+- 运行时 `D:\Steam\steamapps\common\Slay the Spire 2\mods\RitsuLib\STS2-RitsuLib.xml` 是否存在
 - manifest 是否声明 `dependencies: ["STS2-RitsuLib"]`
 - 是否有 `[ModInitializer(...)]`
 - 是否调用 `RitsuLibFramework.EnsureGodotScriptsRegistered(...)`
@@ -52,9 +54,10 @@
 
 1. 确认要挂在哪个 pool。
 2. 确认是普通卡、starter card、还是 token。
-3. 确认应继承 `ModCardTemplate` 还是项目自定义卡牌基类。
-4. 加 `[RegisterCard(typeof(...Pool))]`。
-5. 补图片、本地化、必要的 starter 绑定。
+3. 如果 exact public 接口名、override 面或 helper 参数不确定，先查运行时 `STS2-RitsuLib.xml`。
+4. 确认应继承 `ModCardTemplate` 还是项目自定义卡牌基类。
+5. 加 `[RegisterCard(typeof(...Pool))]`。
+6. 补图片、本地化、必要的 starter 绑定。
 
 ## 添加遗物
 
@@ -68,11 +71,12 @@
 默认执行顺序：
 
 1. 确认 relic pool 与 rarity。
-2. 确认模板基类。
-3. 先找当前仓库里至少 `1` 个同类已工作的遗物做参照，不要只看基类。
-4. 对照参照物，确认注册属性、稳定 entry、资源路径、本地化 key 是否一致。
-5. 再补注册属性、图标路径、本地化。
-6. 如果需要 starter relic，再看角色绑定或 starter 标记。
+2. 如果 exact public 接口名、override 面或 helper 参数不确定，先查运行时 `STS2-RitsuLib.xml`。
+3. 确认模板基类。
+4. 先找当前仓库里至少 `1` 个同类已工作的遗物做参照，不要只看基类。
+5. 对照参照物，确认注册属性、稳定 entry、资源路径、本地化 key 是否一致。
+6. 再补注册属性、图标路径、本地化。
+7. 如果需要 starter relic，再看角色绑定或 starter 标记。
 
 ## 添加能力
 
@@ -88,6 +92,7 @@
 - 图标路径
 - `powers.json`
 - 数值显示和动态描述
+- 如果 `Power` 的 public 接口名、hook 面或 helper 参数不清楚，先查运行时 `STS2-RitsuLib.xml`
 - 是否需要项目内统一 Power 基类
 
 ## 添加药水
@@ -140,12 +145,13 @@
 1. 入口函数有没有运行
 2. `RegisterModAssembly` 有没有调用
 3. `EnsureGodotScriptsRegistered` 有没有保留
-4. `dependencies` 是否缺 `STS2-RitsuLib`
-5. `csproj` 是否指向正确 DLL
-6. 特性/模板/ID 是否写错
-7. 本地化、图片、场景路径是否缺失
-8. 如果核心问题是时机选择，回到 `timing-map.md`
-9. 再看 Harmony 与底层原生代码
+4. 运行时 `STS2-RitsuLib.dll` 与 `STS2-RitsuLib.xml` 是否都在，且和本地 `csproj` / 参考代码版本没有明显漂移
+5. `dependencies` 是否缺 `STS2-RitsuLib`
+6. `csproj` 是否指向正确 DLL
+7. 特性/模板/ID 是否写错
+8. 本地化、图片、场景路径是否缺失
+9. 如果核心问题是时机选择，回到 `timing-map.md`
+10. 再看 Harmony 与底层原生代码
 
 如果已经需要“进游戏高频实机复现 / 快速发资源 / 快速推进流程 / 脚本化验证”，补看：
 
