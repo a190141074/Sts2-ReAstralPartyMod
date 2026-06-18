@@ -36,6 +36,8 @@ internal static class NeowOptionInjectionHelper
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_COIN_EXPLOSION";
     private const string DreamDisintegrationClawTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_DISINTEGRATION_CLAW";
+    private const string TetraWarforgeTextKey =
+        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.TETRA_WARFORGE";
     private const string DreamFaceTheShadowIconPath =
         "res://ReAstralPartyMod/images/ancient/dream_face_the_shadow.png";
     private const string RingOfSevenCursesIconPath =
@@ -50,6 +52,8 @@ internal static class NeowOptionInjectionHelper
         "res://ReAstralPartyMod/images/relic/dream_coin_explosion.png";
     private const string DreamDisintegrationClawIconPath =
         "res://ReAstralPartyMod/images/relic/dream_disintegration_claw.png";
+    private const string TetraWarforgeIconPath =
+        "res://ReAstralPartyMod/images/relic/tetra_holo_sphere.png";
     private static readonly string[] CardCollectionMemberNames =
     [
         "Cards",
@@ -114,7 +118,13 @@ internal static class NeowOptionInjectionHelper
             DreamDisintegrationClawTextKey,
             DreamDisintegrationClawIconPath,
             CreateDreamDisintegrationClawHoverTips,
-            ChooseDreamDisintegrationClaw)
+            ChooseDreamDisintegrationClaw),
+        new(
+            "tetra_warforge",
+            TetraWarforgeTextKey,
+            TetraWarforgeIconPath,
+            CreateTetraWarforgeHoverTips,
+            ChooseTetraHoloSphere)
     ];
     private static readonly Dictionary<string, string> SelectedCandidateKeysByRun = [];
 
@@ -354,6 +364,16 @@ internal static class NeowOptionInjectionHelper
         CompleteAncient(ancient);
     }
 
+    private static async Task ChooseTetraHoloSphere(AncientEventModel ancient)
+    {
+        var owner = ancient.Owner
+                    ?? throw new InvalidOperationException(
+                        "Neow had no owner when Tetra Warforge was chosen.");
+
+        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<TetraHoloSphere>());
+        CompleteAncient(ancient);
+    }
+
     private static Task AddDreamFaceTheShadowCardToDeck(Player owner)
     {
         return CardGainAttribution.RunWithSource(null, async () =>
@@ -419,6 +439,11 @@ internal static class NeowOptionInjectionHelper
     private static IReadOnlyList<IHoverTip> CreateDreamDisintegrationClawHoverTips()
     {
         return [.. HoverTipFactory.FromRelic<DreamDisintegrationClaw>()];
+    }
+
+    private static IReadOnlyList<IHoverTip> CreateTetraWarforgeHoverTips()
+    {
+        return [.. HoverTipFactory.FromRelic<TetraHoloSphere>()];
     }
 
     private sealed record NeowOptionCandidateDefinition(

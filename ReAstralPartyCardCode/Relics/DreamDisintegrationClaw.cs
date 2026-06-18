@@ -81,7 +81,7 @@ public sealed class DreamDisintegrationClaw : AstralPartyRelicModel
             return false;
         if (amount <= 0m)
             return false;
-        if (cardSource?.Owner != Owner || cardSource.Type != CardType.Attack)
+        if (cardSource?.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return false;
 
         return cardSource.Tags.Contains(CardTag.Strike);

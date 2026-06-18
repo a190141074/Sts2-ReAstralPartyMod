@@ -18,5 +18,7 @@
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_COIN_EXPLOSION.title": "梦境·硬币爆炸",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_COIN_EXPLOSION.description": "获得[gold]梦境·硬币爆炸[/gold]。攻击牌会先消耗当前金币的[blue]1%[/blue]，再抛掷硬币并按结果造成额外伤害。",
   "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_DISINTEGRATION_CLAW.title": "梦境·分解之爪",
-  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_DISINTEGRATION_CLAW.description": "获得[gold]梦境·分解之爪[/gold]。你的【打击】牌会按阶段公式追加伤害并回复生命，在 Boss 房战斗中效果翻倍。"
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.DREAM_DISINTEGRATION_CLAW.description": "获得[gold]梦境·分解之爪[/gold]。你的【打击】牌会按阶段公式追加伤害并回复生命，在 Boss 房战斗中效果翻倍。",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.TETRA_WARFORGE.title": "Tetra·战争铸造",
+  "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.TETRA_WARFORGE.description": "获得[gold]全息球[/gold]。拾起时，从你的牌组中选择至多[blue]3[/blue]张牌，附魔[gold]战争铸造[/gold]。"
 }

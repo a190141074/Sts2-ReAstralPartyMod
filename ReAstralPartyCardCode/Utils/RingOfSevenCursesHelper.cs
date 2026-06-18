@@ -229,6 +229,13 @@ internal static class RingOfSevenCursesHelper
         return false;
     }
 
+    public static bool ShouldAppendHigherRarityRewardCard(Player? player, CardCreationOptions options)
+    {
+        // Some relic/ancient card-pick flows enforce a strict candidate cap, so Seven Blessings only augments
+        // normal encounter card rewards.
+        return player != null && options.Source == CardCreationSource.Encounter;
+    }
+
     private static async Task ObtainRelicIgnoringBanAsync<TMissing>(Player owner)
         where TMissing : RelicModel
     {

@@ -29,7 +29,8 @@ public enum NeowExtraOptionSelectionMode
     ProphecySoulDevour = 4,
     ProphecyReplicantGroup = 5,
     DreamCoinExplosion = 6,
-    DreamDisintegrationClaw = 7
+    DreamDisintegrationClaw = 7,
+    TetraWarforge = 8
 }
 
 public enum StartingPersonaDisplayMode
@@ -2072,6 +2073,7 @@ public static partial class ReAstralPartyModSettingsManager
             NeowExtraOptionSelectionMode.ProphecyReplicantGroup => "Mid Prophecy: Endless Cloning",
             NeowExtraOptionSelectionMode.DreamCoinExplosion => "Dream: Coin Explosion",
             NeowExtraOptionSelectionMode.DreamDisintegrationClaw => "Dream: Disintegration Claw",
+            NeowExtraOptionSelectionMode.TetraWarforge => "Tetra: Warforge",
             _ => "Default"
         };
     }
@@ -2096,6 +2098,8 @@ public static partial class ReAstralPartyModSettingsManager
                 "Force every player's extra Neow option to be Dream: Coin Explosion.",
             NeowExtraOptionSelectionMode.DreamDisintegrationClaw =>
                 "Force every player's extra Neow option to be Dream: Disintegration Claw.",
+            NeowExtraOptionSelectionMode.TetraWarforge =>
+                "Force every player's extra Neow option to be Tetra: Warforge.",
             _ =>
                 "Use the current deterministic random selection from the available candidate pool."
         };

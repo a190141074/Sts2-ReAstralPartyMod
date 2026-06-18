@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -54,6 +55,6 @@ public class TokenGoldNinjaShuriken : AstralPartyRelicModel
         if (cardSource?.Owner != Owner)
             return false;
 
-        return cardSource.Type == CardType.Skill;
+        return WarforgeEnchantmentHelper.CountsAsSkill(cardSource);
     }
 }

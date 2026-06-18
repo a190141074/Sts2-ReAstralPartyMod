@@ -11,6 +11,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -77,7 +78,7 @@ public class PersonalityDerivativeZ3000WeaponFrame : AstralPartyRelicModel
             return;
         if (result.UnblockedDamage <= 0m)
             return;
-        if (cardSource?.Type != CardType.Attack)
+        if (!WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return;
 
         Flash();

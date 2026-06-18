@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -31,7 +32,7 @@ public class InnocentPureLightPower : AstralPartyPowerModel
     {
         if (Owner == null || dealer != Owner)
             return 0m;
-        if (cardSource?.Type != CardType.Attack)
+        if (!WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return 0m;
         if (target == null || target.Side == Owner.Side || amount <= 0m)
             return 0m;

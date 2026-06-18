@@ -67,7 +67,7 @@ public class VariantPersonSinkou : CooldownPersonaRelicBase
     {
         if (Owner?.Creature == null || dealer != Owner.Creature)
             return 0m;
-        if (cardSource?.Owner != Owner || cardSource.Type != CardType.Attack)
+        if (cardSource?.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return 0m;
         if (target == null || target.Side == Owner.Creature.Side)
             return 0m;

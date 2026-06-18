@@ -38,6 +38,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_coin_explosion.description": "Force every player's extra Neow option to be Dream: Coin Explosion.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_disintegration_claw": "Dream: Disintegration Claw",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_disintegration_claw.description": "Force every player's extra Neow option to be Dream: Disintegration Claw.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_tetra_warforge": "Tetra: Warforge",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_tetra_warforge.description": "Force every player's extra Neow option to be Tetra: Warforge.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.disabled_hint": "The extra Neow option is disabled, so the forced-selection setting above is preserved but does not take effect this run.",
   "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.title": "Console Command Applied",
   "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.body": "Player: {PlayerName}\nCharacter: {Character}\nCommand: {Command}",

@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -39,7 +40,7 @@ public class TokenExclusiveAncientWand : AstralPartyRelicModel
             return 0m;
         if (amount <= 0m)
             return 0m;
-        if (cardSource?.Owner != Owner || cardSource.Type != CardType.Skill)
+        if (cardSource?.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsSkill(cardSource))
             return 0m;
 
         return 3m;

@@ -38,6 +38,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_coin_explosion.description": "强制指定所有玩家的额外捏奥选项为【梦境·硬币爆炸】。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_disintegration_claw": "梦境·分解之爪",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_dream_disintegration_claw.description": "强制指定所有玩家的额外捏奥选项为【梦境·分解之爪】。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_tetra_warforge": "Tetra·战争铸造",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_tetra_warforge.description": "强制指定所有玩家的额外捏奥选项为【Tetra·战争铸造】。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.disabled_hint": "由于已关闭额外捏奥选项，上面的指定设置本局仅保留数值，不会实际生效。",
   "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.title": "控制台指令生效",
   "RE_ASTRAL_PARTY_MOD_NOTIFICATION.console_command.body": "玩家：{PlayerName}\n角色：{Character}\n指令：{Command}",

@@ -8,6 +8,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Nodes.Cards;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Enchantments;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using System.Reflection;
 
@@ -23,7 +24,8 @@ internal static class EventDeckCardMutationHelper
     {
         Upgrade = 1,
         Downgrade = 2,
-        Remove = 3
+        Remove = 3,
+        Enchant = 4
     }
 
     public static async Task Upgrade(Player owner, IReadOnlyList<CardModel> selectedCards, string context)
@@ -103,6 +105,34 @@ internal static class EventDeckCardMutationHelper
         var cardsToMutate = await SynchronizeDeckCards(owner, selectedCards, DeckMutationKind.Remove, context);
         foreach (var card in cardsToMutate)
             await EventDeckCardHelper.RemoveCardFromRunDeck(owner, card);
+    }
+
+    public static async Task Enchant<TEnchantment>(
+        Player owner,
+        IReadOnlyList<CardModel> selectedCards,
+        string context)
+        where TEnchantment : EnchantmentModel
+    {
+        var cardsToMutate = await SynchronizeDeckCards(owner, selectedCards, DeckMutationKind.Enchant, context);
+        var enchantment = ModelDb.Enchantment<TEnchantment>();
+        foreach (var card in cardsToMutate)
+        {
+            if (card.Enchantment != null)
+            {
+                Log.Warn(
+                    $"[{MainFile.ModId}] Deck enchant replay skipped because card already has an enchantment | owner={owner.NetId} | context={context} | card={card.Id.Entry} | enchantment={card.Enchantment.Id.Entry}");
+                continue;
+            }
+
+            if (!enchantment.CanEnchant(card))
+            {
+                Log.Warn(
+                    $"[{MainFile.ModId}] Deck enchant replay skipped because target is no longer legal | owner={owner.NetId} | context={context} | card={card.Id.Entry}");
+                continue;
+            }
+
+            CardCmd.Enchant<TEnchantment>(card, 1m);
+        }
     }
 
     private static async Task<IReadOnlyList<CardModel>> SynchronizeDeckCards(

@@ -105,7 +105,7 @@ public class PersonPoisonedApple : CooldownPersonaRelicBase
             return false;
         if (cardSource?.Owner != Owner)
             return false;
-        if (cardSource.Type != CardType.Attack)
+        if (!WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return false;
 
         return target.GetPowerAmount<MarkLockPower>() > 0m;

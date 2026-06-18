@@ -291,6 +291,8 @@ public class EnigmaticSevenBlessings : AstralPartyRelicModel
     {
         if (player != Owner)
             return false;
+        if (!RingOfSevenCursesHelper.ShouldAppendHigherRarityRewardCard(player, options))
+            return false;
 
         return RingOfSevenCursesHelper.TryAppendHigherRarityRewardCard(player, rewardCards, options);
     }
