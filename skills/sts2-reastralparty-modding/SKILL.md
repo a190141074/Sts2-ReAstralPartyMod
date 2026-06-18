@@ -64,6 +64,10 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 
 - 不能只看抽象基类就开写，必须先找至少一个仓库内已正常工作的同类成品。
 - 对 `VariantPerson*`、`Person*`、配套 skill card、配套 power，一律整套核对，不只检查 relic。
+- 对 `CooldownPersonaRelicBase` 这类冷却型人格，以及仓库内同口径的冷却型异格，默认把配套 skill card 配成：
+  - `ShouldAutoApplyCooldownEnchantment => true`
+  - `CanonicalKeywords` 包含 `AstralUnique`
+  - 除非用户明确要求关闭冷却附魔、移除唯一，或另行指定别的词缀组合。
 - 新增或排错时，至少一起搜索这些面：
   - `RelicId`
   - `IconBasePath`

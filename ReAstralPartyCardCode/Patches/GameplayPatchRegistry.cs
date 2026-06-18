@@ -327,6 +327,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<EnigmaticSynthesisXpScrollRestSitePatch>();
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
         patcher.RegisterPatch<PlayerGainGoldEnigmaticSynthesisCursedScrollPatch>();
+        patcher.RegisterPatch<RealmOfDeathDurationTickPatch>();
         patcher.RegisterPatch<MoonPropEulogyZeroObtainPatch>();
         patcher.RegisterPatch<ProphecySoulDevourRunDeckRemovalPatch>();
         patcher.RegisterPatch<ProphecySoulDevourSmithRestSitePatch>();

@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -16,6 +17,11 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(PersonaSkillCardPool))]
 public sealed class SkillSixDragonsAzure : AstralPartyCardModel
 {
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        [CardKeyword.Eternal, AstralKeywords.AstralUnique];
+
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<BufferPower>(),

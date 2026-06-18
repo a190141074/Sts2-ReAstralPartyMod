@@ -123,7 +123,7 @@ public sealed class VariantPersonManosabaLinHiro : PersonaRelicBase
             return;
 
         var existingFirewood = PileType.Hand.GetPile(Owner).Cards
-            .OfType<SkillFateFirewoodStick>()
+            .Where(FateFirewoodStickCombatHelper.IsFirewoodCard)
             .FirstOrDefault();
         if (existingFirewood != null)
         {
@@ -134,6 +134,8 @@ public sealed class VariantPersonManosabaLinHiro : PersonaRelicBase
         }
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFateFirewoodStick>(), Owner);
+        if (source is CardModel sourceCard && FateFirewoodStickCombatHelper.IsFirewoodCard(sourceCard))
+            SinkouSetHelper.AddReplayViaReflection(card, 1);
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, source);
         Flash();
     }
