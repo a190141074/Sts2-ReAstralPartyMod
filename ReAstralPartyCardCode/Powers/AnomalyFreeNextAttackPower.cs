@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -36,7 +37,7 @@ public class AnomalyFreeNextAttackPower : AstralPartyPowerModel
             return false;
         if (card.Pile?.Type != PileType.Hand)
             return false;
-        if (card.Type != CardType.Attack || card.EnergyCost.CostsX)
+        if (!WarforgeEnchantmentHelper.CountsAsAttack(card) || card.EnergyCost.CostsX)
             return false;
 
         modifiedCost = 0m;
@@ -49,7 +50,7 @@ public class AnomalyFreeNextAttackPower : AstralPartyPowerModel
             return;
         if (cardPlay.Card.Owner != Owner.Player)
             return;
-        if (cardPlay.Card.Type != CardType.Attack)
+        if (!WarforgeEnchantmentHelper.CountsAsAttack(cardPlay.Card))
             return;
 
         await PowerCmd.Remove(this);

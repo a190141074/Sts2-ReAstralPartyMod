@@ -52,7 +52,7 @@ public class SkillUnstoppable : AstralPartyCardModel
         await PowerCmd.Apply(readyToStrike, Owner.Creature, 1m, Owner.Creature, this, false);
 
         var attackCards = PileType.Hand.GetPile(Owner).Cards
-            .Where(card => card.Type == CardType.Attack)
+            .Where(WarforgeEnchantmentHelper.CountsAsAttack)
             .ToList();
         if (attackCards.Count > 0)
             await CardCmd.Discard(choiceContext, attackCards);

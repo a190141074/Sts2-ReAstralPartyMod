@@ -94,7 +94,7 @@ public class ReadyToStrikePower : AstralPartyPowerModel
             return Task.CompletedTask;
         if (command.ModelSource is not CardModel cardSource)
             return Task.CompletedTask;
-        if (cardSource.Owner != Owner.Player || cardSource.Type != CardType.Attack)
+        if (cardSource.Owner != Owner.Player || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return Task.CompletedTask;
 
         DamagePropsField?.SetValue(command, command.DamageProps | ValueProp.Unblockable);
@@ -137,7 +137,7 @@ public class ReadyToStrikePower : AstralPartyPowerModel
         try
         {
             Flash();
-            if (card.Type == CardType.Attack)
+            if (WarforgeEnchantmentHelper.CountsAsAttack(card))
             {
                 GetInternalData<Data>().DrawnAttackTemporaryStrength += DrawnAttackTemporaryStrengthAmount;
                 await SyncTemporaryStrength(Owner, card);
@@ -145,7 +145,7 @@ public class ReadyToStrikePower : AstralPartyPowerModel
                 return;
             }
 
-            if (card.Type != CardType.Skill)
+            if (!WarforgeEnchantmentHelper.CountsAsSkill(card))
                 await PowerCmd.Apply<VigorPower>(Owner, DrawnOtherCardTypeVigorAmount, Owner, card, false);
 
             UpdateStatusDisplay(GetDesiredTemporaryStrength(), GetCurrentVigorAmount());

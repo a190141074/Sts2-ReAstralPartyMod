@@ -40,7 +40,7 @@ public class SurveyFindsPower : AstralPartyPowerModel
             return 0m;
         if (target == null || target.Side == Owner.Side)
             return 0m;
-        if (cardSource == null || cardSource.Type != CardType.Skill)
+        if (cardSource == null || !WarforgeEnchantmentHelper.CountsAsSkill(cardSource))
             return 0m;
         if (amount <= 0m)
             return 0m;

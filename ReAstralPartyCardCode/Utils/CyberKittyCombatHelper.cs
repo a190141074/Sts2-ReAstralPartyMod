@@ -67,7 +67,7 @@ public static class CyberKittyCombatHelper
         var leftmostAttack = PileType.Hand
             .GetPile(owner)
             .Cards
-            .FirstOrDefault(card => card.Type == CardType.Attack);
+            .FirstOrDefault(WarforgeEnchantmentHelper.CountsAsAttack);
 
         if (leftmostAttack == null)
             return null;
@@ -85,7 +85,7 @@ public static class CyberKittyCombatHelper
 
         var selected = PersonaMultiplayerEffectHelper.SelectRandomUpgradeableCombatCard(
             owner,
-            card => card.Type == CardType.Attack,
+            WarforgeEnchantmentHelper.CountsAsAttack,
             owner.RunState.Rng.CombatCardSelection);
         var fallback = selected ?? PersonaMultiplayerEffectHelper.SelectRandomUpgradeableCombatCard(
             owner,
@@ -103,14 +103,14 @@ public static class CyberKittyCombatHelper
         var drawAttack = PileType.Draw
             .GetPile(owner)
             .Cards
-            .FirstOrDefault(card => card.Type == CardType.Attack);
+            .FirstOrDefault(WarforgeEnchantmentHelper.CountsAsAttack);
         if (drawAttack != null)
             return drawAttack;
 
         return PileType.Discard
             .GetPile(owner)
             .Cards
-            .FirstOrDefault(card => card.Type == CardType.Attack);
+            .FirstOrDefault(WarforgeEnchantmentHelper.CountsAsAttack);
     }
 
     private static decimal GetNodeDiscountAmount(CardModel card)

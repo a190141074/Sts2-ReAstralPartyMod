@@ -57,7 +57,7 @@ public static class ZhaoCombatHelper
         var drawPileAttacks = PileType.Draw
             .GetPile(owner)
             .Cards
-            .Where(card => card.Type == CardType.Attack)
+            .Where(WarforgeEnchantmentHelper.CountsAsAttack)
             .ToList();
         if (drawPileAttacks.Count > 0)
             return AstralStableRandom.Pick(
@@ -76,7 +76,7 @@ public static class ZhaoCombatHelper
         var discardPileAttacks = PileType.Discard
             .GetPile(owner)
             .Cards
-            .Where(card => card.Type == CardType.Attack)
+            .Where(WarforgeEnchantmentHelper.CountsAsAttack)
             .ToList();
         if (discardPileAttacks.Count > 0)
             return AstralStableRandom.Pick(

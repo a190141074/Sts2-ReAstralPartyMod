@@ -104,7 +104,7 @@ public class VariantPersonTwelveFlowersCup : CooldownPersonaRelicBase
 
     public override Task BeforeCardPlayed(CardPlay cardPlay)
     {
-        if (cardPlay.Card.Owner != Owner || cardPlay.Card.Type != CardType.Attack)
+        if (cardPlay.Card.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsAttack(cardPlay.Card))
             return Task.CompletedTask;
         if (VigilCounterAutoPlayHelper.IsCurrentlyAutoPlaying(cardPlay.Card))
             return Task.CompletedTask;
@@ -156,7 +156,7 @@ public class VariantPersonTwelveFlowersCup : CooldownPersonaRelicBase
     {
         if (Owner?.Creature == null || dealer != Owner.Creature)
             return 0m;
-        if (cardSource?.Owner != Owner || cardSource.Type != CardType.Attack)
+        if (cardSource?.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return 0m;
         if (target == null || target.Side == Owner.Creature.Side || amount <= 0m)
             return 0m;
@@ -242,7 +242,7 @@ public class VariantPersonTwelveFlowersCup : CooldownPersonaRelicBase
             return;
 
         var eligibleAttackCount = PileType.Hand.GetPile(Owner).Cards.Count(card =>
-            card.Type == CardType.Attack && !card.ShouldRetainThisTurn);
+            WarforgeEnchantmentHelper.CountsAsAttack(card) && !card.ShouldRetainThisTurn);
         if (eligibleAttackCount == 0)
             return;
 
@@ -255,7 +255,7 @@ public class VariantPersonTwelveFlowersCup : CooldownPersonaRelicBase
             choiceContext,
             Owner,
             prefs,
-            card => card.Type == CardType.Attack && !card.ShouldRetainThisTurn,
+            card => WarforgeEnchantmentHelper.CountsAsAttack(card) && !card.ShouldRetainThisTurn,
             this);
 
         foreach (var card in selectedCards)

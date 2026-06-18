@@ -17,7 +17,7 @@ public class SwordAuraPower : AstralPartyPowerModel
     {
         if (Owner == null || dealer != Owner) return 0m;
         if (target == null || target.Side == Owner.Side) return 0m;
-        if (cardSource?.Type != CardType.Attack) return 0m;
+        if (!WarforgeEnchantmentHelper.CountsAsAttack(cardSource)) return 0m;
 
         return Amount switch
         {

@@ -6,5 +6,8 @@
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ESSENCE_EYE_OF_SUN_ENCHANTMENT.title": "Eye of the Sun",
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ESSENCE_EYE_OF_SUN_ENCHANTMENT.description": "This card tracks plays per instance across the whole run. Every [blue]10th[/blue] play, apply [blue]9[/blue] [gold]Blazing Solar Burn[/gold] to all enemies. Each later trigger applies [blue]3[/blue] more than the previous one.",
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ESSENCE_SACRED_FAITH_ENCHANTMENT.title": "Sacred Faith",
-  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ESSENCE_SACRED_FAITH_ENCHANTMENT.description": "This card permanently grows per instance. Killing a normal enemy gives this card +[blue]1.5[/blue]% permanent damage. Killing an elite or boss gives +[blue]6[/blue]% permanent damage."
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ESSENCE_SACRED_FAITH_ENCHANTMENT.description": "This card permanently grows per instance. Killing a normal enemy gives this card +[blue]1.5[/blue]% permanent damage. Killing an elite or boss gives +[blue]6[/blue]% permanent damage.",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.title": "Warforge",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.description": "This card always satisfies both Attack and Skill requirements when type-based checks are performed.",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText": "This card counts as both an [gold]Attack[/gold] and a [gold]Skill[/gold]."
 }

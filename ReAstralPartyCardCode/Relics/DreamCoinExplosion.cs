@@ -68,7 +68,7 @@ public sealed class DreamCoinExplosion : AstralPartyRelicModel
             return;
         if (_isResolvingBonusDamage)
             return;
-        if (cardPlay.Card.Owner != Owner || cardPlay.Card.Type != CardType.Attack)
+        if (cardPlay.Card.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsAttack(cardPlay.Card))
             return;
 
         AstralParty_DreamCoinExplosionAttackSequenceThisCombat++;

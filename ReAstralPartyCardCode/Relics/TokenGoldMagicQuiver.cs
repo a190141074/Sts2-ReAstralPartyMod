@@ -84,7 +84,7 @@ public class TokenGoldMagicQuiver : AstralPartyRelicModel
             return Task.CompletedTask;
         if (cardPlay.Card.Owner != Owner)
             return Task.CompletedTask;
-        if (cardPlay.Card.Type != CardType.Skill)
+        if (!WarforgeEnchantmentHelper.CountsAsSkill(cardPlay.Card))
             return Task.CompletedTask;
 
         _trackedSkillCard = cardPlay.Card;
@@ -154,6 +154,6 @@ public class TokenGoldMagicQuiver : AstralPartyRelicModel
         if (cardSource == null || cardSource != _trackedSkillCard)
             return false;
 
-        return cardSource.Owner == Owner && cardSource.Type == CardType.Skill;
+        return cardSource.Owner == Owner && WarforgeEnchantmentHelper.CountsAsSkill(cardSource);
     }
 }

@@ -10,7 +10,8 @@ public static class PersonaRelicHelper
 {
     public static bool IsPersonaSkillCard(CardModel card)
     {
-        return card.Type == CardType.Skill && AstralPartyCardModel.ShouldAutoApplyCooldown(card);
+        return WarforgeEnchantmentHelper.CountsAsSkill(card)
+               && AstralPartyCardModel.ShouldAutoApplyCooldown(card);
     }
 
     public static void AdvanceCooldownRelics(Player owner, int amount)

@@ -350,7 +350,7 @@ public static class ConcealingInvestigationHelper
     private static CardModel? FindAttackCard(IEnumerable<CardModel> cards)
     {
         return cards
-            .Where(card => card.Type == CardType.Attack)
+            .Where(WarforgeEnchantmentHelper.CountsAsAttack)
             .OrderBy(GetPileIndex)
             .ThenBy(card => card.Id.Entry, StringComparer.Ordinal)
             .FirstOrDefault();

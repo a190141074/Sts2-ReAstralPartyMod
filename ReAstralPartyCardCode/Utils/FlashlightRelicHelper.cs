@@ -52,7 +52,7 @@ public static class FlashlightRelicHelper
             return false;
         if (cardSource?.Owner != owner)
             return false;
-        if (cardSource.Type != CardType.Attack)
+        if (!WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return false;
 
         return GetTrackedAttackCost(cardSource) >= minimumCost;

@@ -54,7 +54,7 @@ public abstract class ArtKnifeRelicBase : AstralPartyRelicModel
             return 0m;
         if (amount <= 0m)
             return 0m;
-        if (cardSource?.Type != DamageCardType)
+        if (!WarforgeEnchantmentHelper.MatchesCardType(cardSource, DamageCardType))
             return 0m;
 
         return Owner.Creature.GetPowerAmount<HalfLifeHealPower>() / HealDamageDivisor;

@@ -14,7 +14,7 @@ public static class UltimateSkillChargeHelper
     public static Task HandleAfterCardPlayed(CardPlay cardPlay)
     {
         var owner = cardPlay.Card.Owner;
-        if (owner == null || cardPlay.Card.Type != CardType.Attack)
+        if (owner == null || !WarforgeEnchantmentHelper.CountsAsAttack(cardPlay.Card))
             return Task.CompletedTask;
         if (AttackCardCostHelper.GetPlayedCost(cardPlay) < 1)
             return Task.CompletedTask;

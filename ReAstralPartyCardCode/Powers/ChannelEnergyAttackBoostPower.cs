@@ -29,7 +29,7 @@ public class ChannelEnergyAttackBoostPower : AstralPartyPowerModel
             return 0m;
         if (target == null || target.Side == Owner.Side)
             return 0m;
-        if (cardSource == null || cardSource.Type != CardType.Attack)
+        if (cardSource == null || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return 0m;
 
         return Amount;
