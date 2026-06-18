@@ -307,4 +307,10 @@
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.title": "奥法天河",
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.description": "受けるダメージが[blue]16%[/blue]増加する。\n[blue]3[/blue]ターン持続。",
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.smartDescription": "受けるダメージが[blue]16%[/blue]増加し、[blue]3[/blue]ターン持続する。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.title": "攻撃強化",
+  "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.description": "現在持っている安定した攻撃カード増幅の合計値を表示します。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.smartDescription": "現在持っている安定した攻撃カード増幅の合計値を表示します。",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.title": "スキル強化",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.description": "現在持っている安定したスキルカード増幅の合計値を表示します。",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "現在持っている安定したスキルカード増幅の合計値を表示します。"
 }

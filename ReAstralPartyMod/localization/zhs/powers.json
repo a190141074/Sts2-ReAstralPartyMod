@@ -327,5 +327,11 @@
   "RE_ASTRAL_PARTY_MOD_POWER_FATE_FIREWOOD_NODE_POWER.smartDescription": "用于【命运的烧火棍·拼点】的数值。",
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.title": "奥法天河",
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.description": "受到伤害提高[blue]16%[/blue]。\n持续[blue]3[/blue]回合。",
-  "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.smartDescription": "受到伤害提高[blue]16%[/blue]。\n持续[blue]3[/blue]回合。"
+  "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.smartDescription": "受到伤害提高[blue]16%[/blue]。\n持续[blue]3[/blue]回合。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.title": "攻击增幅",
+  "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.description": "显示你当前持有的稳定攻击牌增幅总值。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.smartDescription": "显示你当前持有的稳定攻击牌增幅总值。",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.title": "技能增幅",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.description": "显示你当前持有的稳定技能牌增幅总值。",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "显示你当前持有的稳定技能牌增幅总值。"
 }

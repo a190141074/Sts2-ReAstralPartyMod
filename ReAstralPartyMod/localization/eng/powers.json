@@ -327,5 +327,11 @@
   "RE_ASTRAL_PARTY_MOD_POWER_FATE_FIREWOOD_NODE_POWER.smartDescription": "Value used by [card]Fate Firewood Stick: Duel[/card].",
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.title": "Arcane River of Stars",
   "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.description": "Take [blue]16%[/blue] more damage.\nLasts [blue]3[/blue] turns.",
-  "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.smartDescription": "Take [blue]16%[/blue] more damage for [blue]3[/blue] turns."
+  "RE_ASTRAL_PARTY_MOD_POWER_SUNSET_GLOW_ARCANE_RIVER_DEBUFF_POWER.smartDescription": "Take [blue]16%[/blue] more damage for [blue]3[/blue] turns.",
+  "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.title": "Attack Amplification",
+  "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.description": "Displays your current total stable bonus damage for Attack cards.",
+  "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.smartDescription": "Displays your current total stable bonus damage for Attack cards.",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.title": "Skill Amplification",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.description": "Displays your current total stable bonus damage for Skill cards.",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "Displays your current total stable bonus damage for Skill cards."
 }

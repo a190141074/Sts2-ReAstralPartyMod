@@ -367,6 +367,14 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<CreatureSetCurrentHpMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureGainMaxHpMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureLoseMaxHpMoonPropShapedGlassPatch>();
+        patcher.RegisterPatch<UniversalAmplificationDisplayApplyPowerPatch>();
+        patcher.RegisterPatch<UniversalAmplificationDisplaySetPowerAmountPatch>();
+        patcher.RegisterPatch<UniversalAmplificationDisplayRemovePowerPatch>();
+        patcher.RegisterPatch<UniversalAmplificationDisplayObtainRelicPatch>();
+        patcher.RegisterPatch<UniversalAmplificationDisplayRemoveRelicPatch>();
+        patcher.RegisterPatch<UniversalAmplificationDisplayHealPatch>();
+        patcher.RegisterPatch<UniversalAmplificationDisplaySetCurrentHpPatch>();
+        patcher.RegisterPatch<UniversalAmplificationDisplayAfterTurnEndPatch>();
         patcher.RegisterPatch<AstralPartyRestSiteOptionSuccessUiCompatPatch>();
         patcher.RegisterPatch<CardRewardAlternativeStokovPaelsWingCompatPatch>();
         patcher.RegisterPatch<DevConsoleCommandNotificationPatch>();
