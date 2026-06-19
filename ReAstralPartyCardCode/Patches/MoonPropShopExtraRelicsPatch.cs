@@ -198,7 +198,7 @@ internal static class MoonPropShopExtraRelicsHelper
         return DefaultRowSpacing;
     }
 
-    private static bool IsFakeMerchantInventory(NMerchantInventory merchantInventory)
+    internal static bool IsFakeMerchantInventory(NMerchantInventory merchantInventory)
     {
         return string.Equals(merchantInventory.GetType().Name, "NFakeMerchantInventory", StringComparison.Ordinal);
     }
@@ -238,6 +238,9 @@ public sealed class MoonPropShopInitializeInventoryPatch : IPatchMethod
 
     public static void Prefix(NMerchantInventory __instance, MerchantInventory inventory)
     {
+        if (MoonPropShopExtraRelicsHelper.IsFakeMerchantInventory(__instance))
+            return;
+
         MoonPropShopExtraRelicsHelper.EnsureMoonPropEntries(inventory, inventory.Player);
         MoonPropShopExtraRelicsHelper.EnsureMoonPropRelicSlots(__instance, inventory);
     }
