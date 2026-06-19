@@ -9,7 +9,6 @@ internal static class ManosabaLinCompat
 {
     private const string ManosabaLinModId = "ManosabaLin";
     private const string HiroCharacterId = "Hiro";
-    private const string SaveCardEntry = "SAVE";
     private const string WithPowerEntry = "WITH_POWER";
 
     public static bool IsLoaded()
@@ -26,11 +25,6 @@ internal static class ManosabaLinCompat
         return string.Equals(characterEntry, HiroCharacterId, StringComparison.OrdinalIgnoreCase)
                || characterEntry.StartsWith($"{HiroCharacterId}_", StringComparison.OrdinalIgnoreCase)
                || characterEntry.Contains(HiroCharacterId, StringComparison.OrdinalIgnoreCase);
-    }
-
-    public static bool TryFindSaveCard(out CardModel card)
-    {
-        return OptionalModModelResolver.TryFindCardByEntry(SaveCardEntry, out card);
     }
 
     public static bool TryFindWithPower(out PowerModel power)

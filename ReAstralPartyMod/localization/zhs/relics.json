@@ -814,7 +814,7 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_WAMDUS.description": "· 每[blue]3[/blue]回合开始时，将[blue]1[/blue]张[gold]六龙之『碧』[/gold]加入手中。\n· 打出[gold]六龙之『碧』[/gold]时，若你的抽牌堆有奇数张牌，所有玩家获得[blue]1[/blue]层[gold]缓冲[/gold]。\n· 若你的抽牌堆有偶数张牌，将【法力增幅数+[blue]6[/blue]】的点数随机分配到：[gold]召唤[/gold]、[gold]活力[/gold]、临时[green]敏捷[/green]，且仅你获得这些收益。\n· 在战斗中每次你在技能牌上实际消耗[blue]1[/blue]点耗能，获得[blue]1[/blue]点法力增幅。\n· 战斗结束后，每有[blue]10[/blue]点法力增幅，获得[blue]1[/blue]点最大生命值，然后清空全部法力增幅。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_WAMDUS.flavor": "潮汐把法力抬高，再把代价沉回血肉里。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.title": "【异格：二阶堂希罗】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.description": "· 联动人格：仅在已加载[gold]《魔女审判》[/gold]时可用。\n· 你的回合开始时，将外部[gold]【拯救】[/gold]加入手中；若你手中已拥有它，则改为为其中[blue]1[/blue]张附加[blue]1[/blue]次[gold]重放[/gold]。\n· 你的外部[gold]魔女化[/gold]每跨过[blue]100[/blue]层，重复上述发牌效果[blue]1[/blue]次。\n· 当其他友方玩家受到伤害时，你获得[blue]10[/blue]层外部[gold]魔女化[/gold]。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.flavor": "联动系列 · 《魔女审判》"
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.description": "· 你的回合开始时，将[blue]1[/blue]张[gold]命运的烧火棍[/gold]加入手中；若你手中已拥有它，则改为为其中[blue]1[/blue]张附加[blue]1[/blue]次[gold]重放[/gold]。\n· 你的[gold]魔女化[/gold]每跨过[blue]100[/blue]层，重复上述发牌效果[blue]1[/blue]次。\n· 当其他友方玩家受到伤害时，你获得[blue]10[/blue]层[gold]魔女化[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.flavor": "我很讨厌你。你存在于这个世界上，本就是个错误。"
 
 }
