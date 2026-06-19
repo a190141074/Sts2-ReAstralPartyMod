@@ -466,7 +466,7 @@ ReAstralPartyMod/
 |------|------|
 | Slay the Spire 2 目录 | `D:\Steam\steamapps\common\Slay the Spire 2` |
 | 备用游戏目录 | `D:\SteamLibrary\steamapps\common\Slay the Spire 2` |
-| RitsuLib 引用 | `$(Sts2Dir)\mods\RitsuLib\STS2-RitsuLib.dll` |
+| RitsuLib 引用 | `D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1\STS2-RitsuLib.dll` |
 | Godot 编辑器 | `D:\MOD\杀戮尖塔2mod制作\megadot-4.5.1-m.8-windows-x86_64-llvm-editor-csharp\MegaDot_v4.5.1-stable_mono_win64.exe` |
 | 主输出目录 | `$(Sts2Dir)\mods\$(MSBuildProjectName)\` |
 | 备用输出目录 | `$(SecondarySts2Dir)\mods\$(MSBuildProjectName)\` |

@@ -29,14 +29,18 @@ public sealed class CardRewardAlternativeStokovPaelsWingCompatPatch : IPatchMeth
         {
             alternatives.Add(new CardRewardAlternative(
                 "Skip",
-                PostAlternateCardRewardAction.DismissScreenAndKeepReward));
+                PostAlternateCardRewardAction.EndSelectionAndDoNotCompleteReward));
         }
 
         if (cardReward.CanReroll)
         {
             alternatives.Add(new CardRewardAlternative(
                 "REROLL",
-                cardReward.Reroll,
+                () =>
+                {
+                    cardReward.Reroll();
+                    return Task.CompletedTask;
+                },
                 PostAlternateCardRewardAction.DoNothing));
         }
 

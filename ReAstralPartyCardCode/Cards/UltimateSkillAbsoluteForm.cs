@@ -44,7 +44,9 @@ public class UltimateSkillAbsoluteForm : AstralPartyCardModel
         await PowerCmd.Apply<AbsoluteFormPower>(Owner.Creature, 1m, Owner.Creature, this, false);
 
         var alivePlayers = EventCombatTargetHelper.GetAlivePlayers(CombatState).ToList();
-        if (AbsoluteFormHelper.HasFullFormSetAcrossAllRunDecks(CombatState))
+        if (AbsoluteFormHelper.HasFullFormSetAcrossAllRunDecks(CombatState as MegaCrit.Sts2.Core.Combat.CombatState
+            ?? Owner.Creature.CombatState as MegaCrit.Sts2.Core.Combat.CombatState
+            ?? throw new InvalidOperationException("Expected CombatState for AbsoluteFormHelper.")))
         {
             await AbsoluteFormHelper.AutoPlayAllFormsForPlayer(choiceContext, Owner);
         }

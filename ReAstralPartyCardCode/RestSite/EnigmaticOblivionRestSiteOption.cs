@@ -15,14 +15,14 @@ public class EnigmaticOblivionRestSiteOption : AstralPartyRestSiteOptionModel
 
     public EnigmaticOblivionRestSiteOption(Player owner) : base(owner)
     {
-        RefreshEnabled();
     }
+
+    public override bool IsEnabled => Owner.GetRelic<EnigmaticVoidStone>()?.CanUseOblivion(Owner) ?? false;
 
     public override LocString Description => RestSiteUiLoc("description");
 
     public override async Task<bool> OnSelect()
     {
-        RefreshEnabled();
         if (!IsEnabled)
             return false;
 
@@ -32,10 +32,7 @@ public class EnigmaticOblivionRestSiteOption : AstralPartyRestSiteOptionModel
 
         var deckCards = EventDeckCardHelper.GetRunDeckCards(Owner);
         if (deckCards.Count == 0)
-        {
-            RefreshEnabled();
             return false;
-        }
 
         var selectedCards = await CardSelectCmd.FromDeckGeneric(
             Owner,
@@ -47,10 +44,7 @@ public class EnigmaticOblivionRestSiteOption : AstralPartyRestSiteOptionModel
             static _ => true);
         var selectedDeckCard = selectedCards.FirstOrDefault();
         if (selectedDeckCard == null)
-        {
-            RefreshEnabled();
             return false;
-        }
 
         await EventDeckCardMutationHelper.Remove(Owner, [selectedDeckCard], $"{OptionKey}.remove");
         relic.RecordObliviatedCard(selectedDeckCard);
@@ -68,7 +62,6 @@ public class EnigmaticOblivionRestSiteOption : AstralPartyRestSiteOptionModel
             await RewardsCmd.OfferCustom(Owner, rewardScreenRewards);
         }
 
-        RefreshEnabled();
         return true;
     }
 
@@ -108,10 +101,5 @@ public class EnigmaticOblivionRestSiteOption : AstralPartyRestSiteOptionModel
         }
 
         return rewards;
-    }
-
-    private void RefreshEnabled()
-    {
-        IsEnabled = Owner.GetRelic<EnigmaticVoidStone>()?.CanUseOblivion(Owner) ?? false;
     }
 }

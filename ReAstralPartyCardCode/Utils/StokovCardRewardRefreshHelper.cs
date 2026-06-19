@@ -97,7 +97,7 @@ internal static class StokovCardRewardRefreshHelper
     {
         if (CardsField == null || HasBeenRerolledField == null)
         {
-            await reward.Reroll();
+            reward.Reroll();
             reward.CanReroll = true;
             return;
         }
@@ -110,7 +110,7 @@ internal static class StokovCardRewardRefreshHelper
             cardsList.Clear();
 
         reward.CanReroll = true;
-        await reward.Populate();
+        reward.Populate();
         reward.CanReroll = true;
     }
 

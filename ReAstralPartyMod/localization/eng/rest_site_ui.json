@@ -11,5 +11,8 @@
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.name": "Enigmatic Discovery",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.description": "Gain [blue]4[/blue] [blue]Unique Material[/blue] rewards. [blue]1[/blue] of them is guaranteed to be [blue]2[/blue] stacks of [blue][Etherium Ingot][/blue]. In the remaining random slots, unowned Unique Materials are [blue]33%[/blue] more likely and Rare Unique Materials are [blue]33%[/blue] more likely. This option consumes a rest-site action.",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_OBLIVION.name": "Oblivion",
-  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_OBLIVION.description": "Choose [blue]1[/blue] card in your run deck to remove, including [blue]Eternal[/blue], then gain [blue]2[/blue] random [blue]Unique Material[/blue] rewards. This option consumes a rest-site action."
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_OBLIVION.description": "Choose [blue]1[/blue] card in your run deck to remove, including [blue]Eternal[/blue], then gain [blue]2[/blue] random [blue]Unique Material[/blue] rewards. This option consumes a rest-site action.",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_TETRA_WARFORGE.name": "Warforge",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_TETRA_WARFORGE.description": "Choose [blue]1[/blue] Attack or Skill card to enchant with [gold]Warforge[/gold]. This option consumes a rest-site action.",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_TETRA_WARFORGE.selection_prompt": "Choose a card to enchant with Warforge"
 }

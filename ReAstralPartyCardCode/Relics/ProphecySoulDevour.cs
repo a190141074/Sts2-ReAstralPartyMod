@@ -283,7 +283,7 @@ public class ProphecySoulDevour : AstralPartyRelicModel
                     RunManager.Instance?.RewardSynchronizer?.SyncLocalSkippedCard(card);
                 }
             },
-            PostAlternateCardRewardAction.DismissScreenAndRemoveReward);
+            PostAlternateCardRewardAction.EndSelectionAndCompleteReward);
         return true;
     }
 

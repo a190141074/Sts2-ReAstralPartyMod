@@ -26,14 +26,14 @@ internal static class CardModelEssenceEnchantmentAfterCardPlayedPatch
     [HarmonyPostfix]
     public static void Postfix(
         AbstractModel __instance,
-        PlayerChoiceContext context,
+        PlayerChoiceContext choiceContext,
         CardPlay cardPlay,
         ref Task __result)
     {
         if (__instance is not CardModel card)
             return;
 
-        __result = ContinueAfterOriginal(__result, card, context, cardPlay);
+        __result = ContinueAfterOriginal(__result, card, choiceContext, cardPlay);
     }
 
     private static async Task ContinueAfterOriginal(

@@ -31,6 +31,13 @@ public abstract class ArtKnifeRelicBase : AstralPartyRelicModel
         if (Owner?.Creature == null)
             return;
 
+        var existingPower = Owner.Creature.GetPower<ArtKnifeFullHpStrengthPower>();
+        if (existingPower != null)
+            await PowerCmd.Remove(existingPower);
+
+        MainFile.Logger.Info(
+            $"[ArtKnife] art knife combat init | owner={Owner.NetId} | hp={Owner.Creature.CurrentHp} | maxHp={Owner.Creature.MaxHp} | active={ArtKnifeActivationHelper.IsActivationSatisfied(Owner.Creature)} | strengthBonus={StrengthBonus}");
+
         await PowerCmd.Apply<ArtKnifeFullHpStrengthPower>(
             Owner.Creature,
             StrengthBonus,

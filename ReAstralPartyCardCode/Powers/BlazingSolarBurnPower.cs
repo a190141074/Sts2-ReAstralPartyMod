@@ -3,7 +3,6 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -35,8 +34,22 @@ public class BlazingSolarBurnPower : AstralPartyPowerModel
             : NormalMaxHpDamageRatio;
         var capDamage = Math.Ceiling(Owner.MaxHp * maxHpRatio);
         var finalDamage = Math.Max(1m, Math.Min(baseDamage, capDamage));
+        var damageDealer = Applier ?? Owner;
+
+        // Force the 6-arg CreatureCmd.Damage overload; the 5-arg cardSource overload crashes on null in this runtime.
         using (SevenCursesDebuffProtectionHelper.EnterDebuffDamageContext())
-            await CreatureCmd.Damage(new ThrowingPlayerChoiceContext(), Owner, finalDamage, ValueProp.Move, null, null);
-        await PowerCmd.SetAmount<BlazingSolarBurnPower>(Owner, Math.Max(0m, Amount - 1m), null, null);
+            await CreatureCmd.Damage(
+                new ThrowingPlayerChoiceContext(),
+                Owner,
+                finalDamage,
+                ValueProp.Unblockable | ValueProp.Unpowered,
+                (Creature?)damageDealer,
+                (MegaCrit.Sts2.Core.Models.CardModel?)null
+            );
+
+        if (!Owner.IsAlive)
+            return;
+
+        await PowerCmd.Decrement(this);
     }
 }

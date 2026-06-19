@@ -36,7 +36,7 @@ public static class GeneratedCardObserver
         EnsureCleanupHooksRegistered();
         await CardGainAttribution.RunWithSource(source, async () =>
         {
-            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, animate, position);
+            await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, card.Owner, position);
             await NotifyCardAddedToHand(card, source);
         });
     }

@@ -304,72 +304,53 @@ public sealed class MoonPropShopStackPurchasePatch : IPatchMethod
 
 internal static class MoonPropShopFreePurchasePatchHelper
 {
-    public static bool TryForceIgnoreCost(Player? owner, MerchantEntry? entry, bool ignoreCost, ref bool __result)
+    public static bool TryForceIgnoreCost(Player? owner, MerchantEntry? entry, ref bool ignoreCost)
     {
         if (ignoreCost)
             return false;
         if (!MoonPropLongstandingSolitudeShopHelper.ShouldTreatEntryAsFree(owner, entry))
             return false;
 
-        __result = true;
+        ignoreCost = true;
         return true;
     }
 }
 
-public sealed class MoonPropShopFreePurchaseCardPrefixPatch : IPatchMethod
+public sealed class MoonPropShopFreePurchaseEntryWrapperPatch : IPatchMethod
 {
-    public static string PatchId => "moon_prop_shop_free_purchase_card_prefix";
+    public static string PatchId => "moon_prop_shop_free_purchase_entry_wrapper";
 
-    public static string Description => "Treat card purchases as free while Moon Prop free purchases remain";
+    public static string Description => "Treat merchant entry purchases as free while Moon Prop free purchases remain";
 
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(MerchantCardEntry), "CanAfford", [typeof(Player), typeof(bool)])];
+        return [new(typeof(MerchantEntry), nameof(MerchantEntry.OnTryPurchaseWrapper), [typeof(MerchantInventory), typeof(bool)])];
     }
 
-    public static bool Prefix(MerchantCardEntry __instance, Player player, bool ignoreCost, ref bool __result)
+    public static void Prefix(MerchantEntry __instance, MerchantInventory? inventory, ref bool ignoreCost)
     {
-        return !MoonPropShopFreePurchasePatchHelper.TryForceIgnoreCost(player, __instance, ignoreCost, ref __result);
+        MoonPropShopFreePurchasePatchHelper.TryForceIgnoreCost(inventory?.Player, __instance, ref ignoreCost);
     }
 }
 
-public sealed class MoonPropShopFreePurchasePotionPrefixPatch : IPatchMethod
+public sealed class MoonPropShopFreePurchaseRemovalWrapperPatch : IPatchMethod
 {
-    public static string PatchId => "moon_prop_shop_free_purchase_potion_prefix";
+    public static string PatchId => "moon_prop_shop_free_purchase_removal_wrapper";
 
-    public static string Description => "Treat potion purchases as free while Moon Prop free purchases remain";
+    public static string Description => "Treat card removal purchases as free while Moon Prop free purchases remain";
 
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(MerchantPotionEntry), "CanAfford", [typeof(Player), typeof(bool)])];
+        return [new(typeof(MerchantCardRemovalEntry), nameof(MerchantCardRemovalEntry.OnTryPurchaseWrapper), [typeof(MerchantInventory), typeof(bool), typeof(bool)])];
     }
 
-    public static bool Prefix(MerchantPotionEntry __instance, Player player, bool ignoreCost, ref bool __result)
+    public static void Prefix(MerchantCardRemovalEntry __instance, MerchantInventory? inventory, ref bool ignoreCost, bool cancelable)
     {
-        return !MoonPropShopFreePurchasePatchHelper.TryForceIgnoreCost(player, __instance, ignoreCost, ref __result);
-    }
-}
-
-public sealed class MoonPropShopFreePurchaseRemovalPrefixPatch : IPatchMethod
-{
-    public static string PatchId => "moon_prop_shop_free_purchase_removal_prefix";
-
-    public static string Description => "Treat card removal as free while Moon Prop free purchases remain";
-
-    public static bool IsCritical => false;
-
-    public static ModPatchTarget[] GetTargets()
-    {
-        return [new(typeof(MerchantCardRemovalEntry), "CanAfford", [typeof(Player), typeof(bool)])];
-    }
-
-    public static bool Prefix(MerchantCardRemovalEntry __instance, Player player, bool ignoreCost, ref bool __result)
-    {
-        return !MoonPropShopFreePurchasePatchHelper.TryForceIgnoreCost(player, __instance, ignoreCost, ref __result);
+        MoonPropShopFreePurchasePatchHelper.TryForceIgnoreCost(inventory?.Player, __instance, ref ignoreCost);
     }
 }
 

@@ -17,8 +17,9 @@ public class InitialPointRestSiteOption : AstralPartyRestSiteOptionModel
 
     public InitialPointRestSiteOption(Player owner) : base(owner)
     {
-        IsEnabled = ResolveRelic()?.IsRestSiteOptionEnabled(owner) ?? false;
     }
+
+    public override bool IsEnabled => ResolveRelic()?.IsRestSiteOptionEnabled(Owner) ?? false;
 
     public override IEnumerable<string> AssetPaths =>
         base.AssetPaths

@@ -20,7 +20,13 @@ public sealed class UniversalAmplificationDisplayApplyPowerPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(PowerCmd), nameof(PowerCmd.Apply))];
+        return
+        [
+            new(
+                typeof(PowerCmd),
+                nameof(PowerCmd.Apply),
+                [typeof(PowerModel), typeof(Creature), typeof(decimal), typeof(Creature), typeof(CardModel), typeof(bool)])
+        ];
     }
 
     public static void Postfix(Creature target, ref Task __result)
@@ -42,27 +48,34 @@ public sealed class UniversalAmplificationDisplayApplyPowerPatch : IPatchMethod
 public sealed class UniversalAmplificationDisplaySetPowerAmountPatch : IPatchMethod
 {
     public static string PatchId => "universal_amplification_display_set_power_amount_patch";
-    public static string Description => "Refresh universal amplification display powers after power amounts are set";
+    public static string Description => "Refresh universal amplification display powers after power amounts are modified";
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(PowerCmd), nameof(PowerCmd.SetAmount))];
+        return
+        [
+            new(
+                typeof(PowerCmd),
+                nameof(PowerCmd.ModifyAmount),
+                [typeof(PowerModel), typeof(decimal), typeof(Creature), typeof(CardModel), typeof(bool)])
+        ];
     }
 
-    public static void Postfix(Creature creature, ref Task __result)
+    public static void Postfix(PowerModel power, ref Task<int> __result)
     {
-        var player = creature.Player;
+        var player = power.Owner?.Player;
         if (player == null)
             return;
 
         __result = ContinueAfterOriginal(__result, player);
     }
 
-    private static async Task ContinueAfterOriginal(Task originalTask, Player player)
+    private static async Task<int> ContinueAfterOriginal(Task<int> originalTask, Player player)
     {
-        await originalTask;
+        var result = await originalTask;
         await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player);
+        return result;
     }
 }
 
@@ -74,7 +87,7 @@ public sealed class UniversalAmplificationDisplayRemovePowerPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(PowerCmd), nameof(PowerCmd.Remove))];
+        return [new(typeof(PowerCmd), nameof(PowerCmd.Remove), [typeof(PowerModel)])];
     }
 
     public static void Postfix(PowerModel power, ref Task __result)
@@ -207,15 +220,19 @@ public sealed class UniversalAmplificationDisplayAfterTurnEndPatch : IPatchMetho
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(Hook), nameof(Hook.AfterTurnEnd), [typeof(CombatState), typeof(CombatSide)])];
+        return
+        [
+            new(typeof(Hook), nameof(Hook.AfterTurnEnd),
+                [typeof(ICombatState), typeof(CombatSide), typeof(IEnumerable<Creature>)])
+        ];
     }
 
-    public static void Postfix(CombatState combatState, CombatSide side, ref Task __result)
+    public static void Postfix(ICombatState combatState, CombatSide side, ref Task __result)
     {
         __result = ContinueAfterOriginal(__result, combatState, side);
     }
 
-    private static async Task ContinueAfterOriginal(Task originalTask, CombatState combatState, CombatSide side)
+    private static async Task ContinueAfterOriginal(Task originalTask, ICombatState combatState, CombatSide side)
     {
         await originalTask;
         if (combatState?.RunState?.Players == null)

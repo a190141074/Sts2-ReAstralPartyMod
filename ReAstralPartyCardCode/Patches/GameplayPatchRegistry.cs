@@ -216,34 +216,18 @@ internal static class GameplayStaticPatchCatalog
                 "Gameplay patch: let Skill Potion include Warforge-enhanced Attack cards",
                 [typeof(MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext), typeof(MegaCrit.Sts2.Core.Entities.Creatures.Creature)]),
             new ModPatchInfo(
-                "free_attack_power_warforge_compat_patch",
-                typeof(MegaCrit.Sts2.Core.Models.Powers.FreeAttackPower),
-                nameof(MegaCrit.Sts2.Core.Models.Powers.FreeAttackPower.TryModifyEnergyCostInCombat),
-                typeof(FreeAttackPowerWarforgeCompatPatch),
-                false,
-                "Gameplay patch: let Free Attack Power recognize Warforge-enhanced Skill cards",
-                [typeof(CardModel), typeof(decimal), typeof(decimal).MakeByRefType()]),
-            new ModPatchInfo(
                 "free_attack_power_warforge_before_played_compat_patch",
                 typeof(MegaCrit.Sts2.Core.Models.Powers.FreeAttackPower),
                 nameof(MegaCrit.Sts2.Core.Models.Powers.FreeAttackPower.BeforeCardPlayed),
-                typeof(FreeAttackPowerWarforgeCompatPatch),
+                typeof(FreeAttackPowerWarforgeBeforePlayedCompatPatch),
                 false,
                 "Gameplay patch: let Free Attack Power consume on Warforge-enhanced Skill cards",
                 [typeof(CardPlay)]),
             new ModPatchInfo(
-                "free_skill_power_warforge_compat_patch",
-                typeof(MegaCrit.Sts2.Core.Models.Powers.FreeSkillPower),
-                nameof(MegaCrit.Sts2.Core.Models.Powers.FreeSkillPower.TryModifyEnergyCostInCombat),
-                typeof(FreeSkillPowerWarforgeCompatPatch),
-                false,
-                "Gameplay patch: let Free Skill Power recognize Warforge-enhanced Attack cards",
-                [typeof(CardModel), typeof(decimal), typeof(decimal).MakeByRefType()]),
-            new ModPatchInfo(
                 "free_skill_power_warforge_before_played_compat_patch",
                 typeof(MegaCrit.Sts2.Core.Models.Powers.FreeSkillPower),
                 nameof(MegaCrit.Sts2.Core.Models.Powers.FreeSkillPower.BeforeCardPlayed),
-                typeof(FreeSkillPowerWarforgeCompatPatch),
+                typeof(FreeSkillPowerWarforgeBeforePlayedCompatPatch),
                 false,
                 "Gameplay patch: let Free Skill Power consume on Warforge-enhanced Attack cards",
                 [typeof(CardPlay)]),
@@ -391,9 +375,8 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<MoonPropShopCreateInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopInitializeInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopStackPurchasePatch>();
-        patcher.RegisterPatch<MoonPropShopFreePurchaseCardPrefixPatch>();
-        patcher.RegisterPatch<MoonPropShopFreePurchasePotionPrefixPatch>();
-        patcher.RegisterPatch<MoonPropShopFreePurchaseRemovalPrefixPatch>();
+        patcher.RegisterPatch<MoonPropShopFreePurchaseEntryWrapperPatch>();
+        patcher.RegisterPatch<MoonPropShopFreePurchaseRemovalWrapperPatch>();
         patcher.RegisterPatch<MoonPropShopFreePurchaseRelicPatch>();
         patcher.RegisterPatch<MoonPropShopFreePurchaseCardPatch>();
         patcher.RegisterPatch<MoonPropShopFreePurchasePotionPatch>();

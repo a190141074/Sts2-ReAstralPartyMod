@@ -160,7 +160,11 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         CombatSide side,
         CombatState combatState)
     {
-        return ForwardAsync(relic => relic.BeforeSideTurnStart(choiceContext, side, combatState));
+        return ForwardAsync(relic => relic.BeforeSideTurnStart(
+            choiceContext,
+            side,
+            combatState.Creatures,
+            combatState));
     }
 
     public override Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -213,7 +217,7 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
 
     public override Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
-        return ForwardAsync(relic => relic.AfterTurnEnd(choiceContext, side));
+        return ForwardAsync(relic => relic.AfterSideTurnEnd(choiceContext, side, Owner?.CombatState?.Creatures ?? []));
     }
 
     public override Task AfterGoldGained(Player player)
@@ -227,7 +231,12 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         Creature? applier,
         CardModel? cardSource)
     {
-        return ForwardAsync(relic => relic.AfterPowerAmountChanged(power, amount, applier, cardSource));
+        return ForwardAsync(relic => relic.AfterPowerAmountChanged(
+            CreateImmediateHookContext(),
+            power,
+            amount,
+            applier,
+            cardSource));
     }
 
     public override Task BeforeAttack(AttackCommand command)
@@ -358,7 +367,7 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
 
         var choiceContext = CreateImmediateHookContext();
 
-        await relic.BeforeSideTurnStart(choiceContext, combatState.CurrentSide, combatState);
+        await relic.BeforeSideTurnStart(choiceContext, combatState.CurrentSide, combatState.Creatures, combatState);
         await relic.AfterPlayerTurnStart(choiceContext, ownerPlayer);
     }
 

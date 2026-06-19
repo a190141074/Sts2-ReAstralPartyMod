@@ -169,7 +169,7 @@ internal static class FateFirewoodStickCombatHelper
             await PowerCmd.Remove(nodePower);
     }
 
-    private static List<Creature> GetLivingCreaturesStable(CombatState? combatState)
+    private static List<Creature> GetLivingCreaturesStable(ICombatState? combatState)
     {
         if (combatState == null)
             return [];

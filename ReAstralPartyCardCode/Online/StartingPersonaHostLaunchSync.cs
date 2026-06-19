@@ -109,6 +109,7 @@ public struct StartingPersonaHostLaunchMessage : INetMessage, IPacketSerializabl
     public bool ShouldBroadcast => false;
     public NetTransferMode Mode => NetTransferMode.Reliable;
     public LogLevel LogLevel => LogLevel.Debug;
+    public bool ShouldBuffer => false;
 
     public void Serialize(PacketWriter writer)
     {

@@ -8,28 +8,28 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class EventCombatTargetHelper
 {
-    public static IReadOnlyList<Player> GetAlivePlayers(CombatState combatState)
+    public static IReadOnlyList<Player> GetAlivePlayers(ICombatState combatState)
     {
         return combatState.Players
             .Where(static player => player.Creature != null && player.Creature.IsAlive)
             .ToList();
     }
 
-    public static IReadOnlyList<Creature> GetAlivePlayerCreatures(CombatState combatState)
+    public static IReadOnlyList<Creature> GetAlivePlayerCreatures(ICombatState combatState)
     {
         return GetAlivePlayers(combatState)
             .Select(static player => player.Creature!)
             .ToList();
     }
 
-    public static IReadOnlyList<Creature> GetAliveCreaturesExcludingPlayerSummons(CombatState combatState)
+    public static IReadOnlyList<Creature> GetAliveCreaturesExcludingPlayerSummons(ICombatState combatState)
     {
         return combatState.Creatures
             .Where(static creature => creature.IsAlive && creature.PetOwner == null)
             .ToList();
     }
 
-    public static IReadOnlyList<Creature> GetAliveNonSummonEnemies(CombatState combatState, Creature ownerCreature)
+    public static IReadOnlyList<Creature> GetAliveNonSummonEnemies(ICombatState combatState, Creature ownerCreature)
     {
         return combatState.Creatures
             .Where(creature => creature.IsAlive

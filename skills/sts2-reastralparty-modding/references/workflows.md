@@ -90,6 +90,27 @@
 - `AfterCombatEnd(...)`
 - 遍历 `Players`、`Enemies`、`Relics`、`Powers` 时直接发命令
 
+## 新版兼容 / 启动红字
+
+固定顺序：
+
+1. 先看 `logs\godot*.log` 最早的 `[ERROR]`
+2. 先分是 loader / manifest 红字，还是 patch apply 红字
+3. 如果是 manifest：
+   - 先补 `min_game_version`
+   - 再把旧字符串 `dependencies` 改成当前分支对象写法，并补 `min_version`
+4. 如果是 patch apply：
+   - 先对照运行时 `sts2.xml` / `STS2-RitsuLib.xml`
+   - 再对照 `RitsuLib-code` 里对应 lifecycle patch 的 target 列表
+5. 最后才怀疑业务逻辑本身
+
+固定 checklist：
+
+1. `ReAstralPartyMod.json` 是否还停留在旧 manifest 口径
+2. `AbstractModel` / `Hook` 目标方法的参数类型和参数名是否和当前运行时一致
+3. 是否误用了旧版 `Hook.AfterTurnEnd(CombatState, CombatSide)` 这类 target
+4. optional patch 失败是否只是兼容漂移，还是已经打断主流程
+
 ## 起始人格 / Neow / 资源显示
 
 ### 起始人格 / Neow

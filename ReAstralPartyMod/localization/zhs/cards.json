@@ -234,7 +234,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUNSET_GLOW.title": "落日余晖",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUNSET_GLOW.description": "选择[gold]元素·洪波[/gold]、[gold]元素·落日[/gold]或[gold]元素·雷息[/gold]中的一项并触发。\n此牌返回你的手中。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SIX_DRAGONS_AZURE.title": "六龙之『碧』",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SIX_DRAGONS_AZURE.description": "若你的抽牌堆有奇数张牌，所有玩家获得[blue]1[/blue]层[gold]缓冲[/gold]。\n若你的抽牌堆有偶数张牌，将【法力增幅数+[blue]6[/blue]】的点数随机分配到：[gold]召唤[/gold]、[gold]活力[/gold]、临时[green]敏捷[/green]，且仅你获得这些收益。\n若你的法力增幅不低于[blue]18[/blue]点，将[blue]1[/blue]张[gold]超越次元[/gold]加入手中。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SIX_DRAGONS_AZURE.description": "你的法力增幅不低于[blue]18[/blue]点，将[blue]1[/blue]张[gold]超越次元[/gold]加入手中。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FATE_FIREWOOD_STICK.title": "命运的烧火棍",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FATE_FIREWOOD_STICK.description": "在【命运的烧火棍·仁】与【命运的烧火棍·义】中选择[blue]1[/blue]张加入手中。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FATE_FIREWOOD_STICK_REN.title": "命运的烧火棍·仁",

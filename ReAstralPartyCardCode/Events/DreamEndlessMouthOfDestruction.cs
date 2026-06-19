@@ -368,7 +368,7 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
         if (runManager == null
             || netService == null
             || netService.Type is NetGameType.None or NetGameType.Singleplayer
-            || runManager.IsSinglePlayerOrFakeMultiplayer)
+            || runManager.IsSingleplayerOrFakeMultiplayer)
             return ConsumeGameRollOrFallback(owner, attemptNumber, purpose, minInclusive, maxExclusive, fallbackRoll);
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);

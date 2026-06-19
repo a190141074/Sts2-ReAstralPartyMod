@@ -14,8 +14,9 @@ public class EnigmaticDiscoveryRestSiteOption : AstralPartyRestSiteOptionModel
 
     public EnigmaticDiscoveryRestSiteOption(Player owner) : base(owner)
     {
-        IsEnabled = true;
     }
+
+    public override bool IsEnabled => true;
 
     public override LocString Description => RestSiteUiLoc("description");
 

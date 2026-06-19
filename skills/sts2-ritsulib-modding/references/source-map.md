@@ -39,20 +39,37 @@
 
 ### RitsuLib 运行时安装目录
 
-- `D:\Steam\steamapps\common\Slay the Spire 2\mods\RitsuLib`
-  - 当前本机实际加载的 RitsuLib 运行时目录。
+- `D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1`
+  - 当前本机实际用于编译和 API 核对的 RitsuLib 运行时程序集目录。
   - 优先用于确认 DLL / PDB / XML 文档是否齐全，以及当前开发参照是否和真实运行版本一致。
   - 关键文件：
     - `STS2-RitsuLib.dll`
-      - 运行时实际装载程序集。
-      - 用于确认 `csproj` 引用目标和游戏内真实 DLL 是否一致。
+        - 当前版本实际内容程序集。
+        - 用于确认 `csproj` 引用目标和游戏内真实 DLL 是否一致。
     - `STS2-RitsuLib.pdb`
       - 调试符号。
       - 用于在需要时补充堆栈与符号定位，但不是日常首查入口。
     - `STS2-RitsuLib.xml`
-      - C# 程序集 XML 文档索引。
-      - 用于快速确认 public 类型、成员签名、参数名、`summary`、`returns` 与可见接口面。
-      - 适合“概念知道了，但 exact public API 名称和参数还不确定”的场景。
+        - C# 程序集 XML 文档索引。
+        - 用于快速确认 public 类型、成员签名、参数名、`summary`、`returns` 与可见接口面。
+        - 适合“概念知道了，但 exact public API 名称和参数还不确定”的场景。
+
+- `D:\Steam\steamapps\workshop\content\2868840\3747602295`
+  - Workshop 包根目录。
+  - 其中根部 `STS2-RitsuLib.dll` 是 loader，`ritsulib-variants.json` 是变体索引，不作为日常编译引用目标。
+
+### 游戏运行时程序集目录
+
+- `D:\Steam\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64`
+  - 当前本机实际加载的游戏本体程序集目录。
+  - 关键文件：
+    - `sts2.dll`
+      - 运行时游戏程序集。
+      - 用于确认 `csproj` 引用目标和游戏内真实 DLL 是否一致。
+    - `sts2.xml`
+      - 游戏本体 C# 程序集 XML 文档索引。
+      - 新版已为不少原生 public 类型、方法和参数补了注释；适合确认 Hook 目标、参数名、summary 与当前分支 public API。
+      - 当 Harmony patch 因 target 签名或形参名失败时，优先和 `STS2-RitsuLib.xml` 一起对照。
 
 ### RitsuLib 实战案例
 
@@ -96,9 +113,10 @@
 
 1. 先读 `doc/AGENT.zh.md` 与 `doc/AGENT.md`。
 2. 先从 `RitsuLib-doc\RitsuLib` 找新版章节。
-3. 再查运行时 `STS2-RitsuLib.xml`，快速确认 public 接口名、参数名和注释摘要。
-4. 还需要 deeper source verification 时，再去 `RitsuLib-code\Docs\zh` 与源码核对模板、特性、实现细节。
-5. 再看当前仓库是否已有接近实现。
-6. 需要实机验证/调试工具时看 `STS2-DevMode`。
-7. 需要完整结构样例时看 WineFox。
-8. 仍然不够时再看 `Slay-the-Spire-2-gdsdecomp` 下的 `src\Core`。
+3. 再查运行时 `STS2-RitsuLib.xml`，快速确认 RitsuLib public 接口名、参数名和注释摘要。
+4. 需要确认游戏本体 Hook / 原生方法签名时，再查运行时 `sts2.xml`。
+5. 还需要 deeper source verification 时，再去 `RitsuLib-code\Docs\zh` 与源码核对模板、特性、实现细节。
+6. 再看当前仓库是否已有接近实现。
+7. 需要实机验证/调试工具时看 `STS2-DevMode`。
+8. 需要完整结构样例时看 WineFox。
+9. 仍然不够时再看 `Slay-the-Spire-2-gdsdecomp` 下的 `src\Core`。

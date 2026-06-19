@@ -33,9 +33,13 @@
 要确认的事实：
 
 - `csproj` 是否引用 `STS2-RitsuLib`
-- 运行时 `D:\Steam\steamapps\common\Slay the Spire 2\mods\RitsuLib\STS2-RitsuLib.dll` 是否存在
-- 运行时 `D:\Steam\steamapps\common\Slay the Spire 2\mods\RitsuLib\STS2-RitsuLib.xml` 是否存在
-- manifest 是否声明 `dependencies: ["STS2-RitsuLib"]`
+- 运行时 `D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1\STS2-RitsuLib.dll` 是否存在
+- 运行时 `D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1\STS2-RitsuLib.xml` 是否存在
+- 运行时 `D:\Steam\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64\sts2.xml` 是否存在
+- manifest 是否声明 `min_game_version`
+- manifest 是否按当前分支声明依赖：
+  - 旧分支可用 `dependencies: ["STS2-RitsuLib"]`
+  - 当前 `0.105+` / 新版口径优先用对象写法并补 `min_version`
 - 是否有 `[ModInitializer(...)]`
 - 是否调用 `RitsuLibFramework.EnsureGodotScriptsRegistered(...)`
 - 是否调用 `ModTypeDiscoveryHub.RegisterModAssembly(...)`
@@ -145,13 +149,14 @@
 1. 入口函数有没有运行
 2. `RegisterModAssembly` 有没有调用
 3. `EnsureGodotScriptsRegistered` 有没有保留
-4. 运行时 `STS2-RitsuLib.dll` 与 `STS2-RitsuLib.xml` 是否都在，且和本地 `csproj` / 参考代码版本没有明显漂移
-5. `dependencies` 是否缺 `STS2-RitsuLib`
+4. manifest 是否缺 `min_game_version`，以及 `dependencies` / `min_version` 是否还停留在旧写法
+5. 运行时 `STS2-RitsuLib.dll` / `STS2-RitsuLib.xml` 与 `sts2.dll` / `sts2.xml` 是否都在，且和本地 `csproj` / 参考代码版本没有明显漂移
 6. `csproj` 是否指向正确 DLL
-7. 特性/模板/ID 是否写错
-8. 本地化、图片、场景路径是否缺失
-9. 如果核心问题是时机选择，回到 `timing-map.md`
-10. 再看 Harmony 与底层原生代码
+7. 如果是 patch apply 失败，先对照 `STS2-RitsuLib.xml` 与 `sts2.xml` 确认 target 签名、参数类型、参数名
+8. 特性/模板/ID 是否写错
+9. 本地化、图片、场景路径是否缺失
+10. 如果核心问题是时机选择，回到 `timing-map.md`
+11. 再看 Harmony 与底层原生代码
 
 如果已经需要“进游戏高频实机复现 / 快速发资源 / 快速推进流程 / 脚本化验证”，补看：
 

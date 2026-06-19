@@ -102,12 +102,16 @@ public class ArtKnifeFullHpStrengthPower : AstralPartyPowerModel
             return;
 
         var desiredStrengthBonus = IsAtFullHp() ? Amount : 0m;
-        var delta = desiredStrengthBonus - _appliedStrengthBonus;
+        var appliedBefore = _appliedStrengthBonus;
+        var delta = desiredStrengthBonus - appliedBefore;
         if (delta == 0m)
             return;
 
-        _appliedStrengthBonus = desiredStrengthBonus;
         await PowerCmd.Apply<StrengthPower>(Owner, delta, applier, cardSource, true);
+        _appliedStrengthBonus = desiredStrengthBonus;
+
+        MainFile.Logger.Info(
+            $"[ArtKnife] art knife strength sync | owner={Owner.Player?.NetId.ToString() ?? "<none>"} | desired={desiredStrengthBonus} | applied_before={appliedBefore} | delta={delta} | hp={Owner.CurrentHp} | maxHp={Owner.MaxHp} | active={desiredStrengthBonus > 0m}");
     }
 
     private bool IsAtFullHp()

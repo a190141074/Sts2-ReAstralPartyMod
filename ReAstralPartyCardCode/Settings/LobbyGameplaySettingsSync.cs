@@ -535,6 +535,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public bool ShouldBroadcast => false;
     public NetTransferMode Mode => NetTransferMode.Reliable;
     public LogLevel LogLevel => LogLevel.Debug;
+    public bool ShouldBuffer => false;
 
     public void Serialize(PacketWriter writer)
     {
@@ -740,6 +741,7 @@ public struct AstralLobbyGameplaySettingsRequestMessage : INetMessage, IPacketSe
     public bool ShouldBroadcast => false;
     public NetTransferMode Mode => NetTransferMode.Reliable;
     public LogLevel LogLevel => LogLevel.Debug;
+    public bool ShouldBuffer => false;
 
     public void Serialize(PacketWriter writer)
     {

@@ -1,11 +1,14 @@
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Entities.Relics;
+using MegaCrit.Sts2.Core.Entities.RestSite;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using ReAstralPartyMod.ReAstralPartyCardCode.Enchantments;
+using ReAstralPartyMod.ReAstralPartyCardCode.RestSite;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -17,6 +20,17 @@ public sealed class TetraHoloSphere : AstralPartyRelicModel
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.select_prompt");
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
+
+    public override bool TryModifyRestSiteOptions(Player player, ICollection<RestSiteOption> options)
+    {
+        if (Owner == null || player != Owner)
+            return false;
+        if (options.Any(static option => option is TetraWarforgeRestSiteOption))
+            return false;
+
+        options.Add(new TetraWarforgeRestSiteOption(player));
+        return true;
+    }
 
     public override async Task AfterObtained()
     {
@@ -54,5 +68,15 @@ public sealed class TetraHoloSphere : AstralPartyRelicModel
             owner,
             selectedList,
             "tetra_holo_sphere.after_obtained");
+    }
+
+    public bool CanUseWarforgeRestSiteOption(Player player)
+    {
+        if (Owner == null || player != Owner)
+            return false;
+
+        var enchantment = ModelDb.Enchantment<TetraWarforgeEnchantment>();
+        return EventDeckCardHelper.GetRunDeckCards(player)
+            .Any(card => card.Enchantment == null && enchantment.CanEnchant(card));
     }
 }

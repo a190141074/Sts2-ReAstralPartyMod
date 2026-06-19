@@ -121,8 +121,7 @@ public class SkillSolarBombardment : AstralPartyCardModel
                 await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable,
                     owner.Creature, sourceCard);
             else
-                await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable,
-                    owner.Creature);
+                await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable, owner.Creature);
         }
     }
 

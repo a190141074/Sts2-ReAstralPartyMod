@@ -623,7 +623,7 @@ internal static class LucidDreamMaliceRuntimeHelper
         IRunState runState,
         CardModel? cardSource,
         int hitIndex,
-        CombatState? combatState)
+        ICombatState? combatState)
     {
         if (combatState == null)
             return null;

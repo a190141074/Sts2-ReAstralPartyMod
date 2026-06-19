@@ -11,5 +11,8 @@
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.name": "神秘発見",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_DISCOVERY.description": "[blue]独特素材[/blue]報酬を[blue]4[/blue]個得る。そのうち[blue]1[/blue]個は必ず[blue]【以太インゴット】[/blue][blue]2[/blue]層になる。残りのランダム素材枠では、未所持の独特素材の出現確率が[blue]33%[/blue]上がり、レア独特素材の出現確率も[blue]33%[/blue]上がる。この選択肢は休憩回数を消費する。",
   "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_OBLIVION.name": "湮滅",
-  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_OBLIVION.description": "ランデッキから[blue]1[/blue]枚のカードを取り除く。[blue]Eternal[/blue]も対象にできる。その後、ランダムな[blue]独特素材[/blue]報酬を[blue]2[/blue]個得る。この選択肢は休憩回数を消費する。"
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_ENIGMATIC_OBLIVION.description": "ランデッキから[blue]1[/blue]枚のカードを取り除く。[blue]Eternal[/blue]も対象にできる。その後、ランダムな[blue]独特素材[/blue]報酬を[blue]2[/blue]個得る。この選択肢は休憩回数を消費する。",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_TETRA_WARFORGE.name": "戦争鋳造",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_TETRA_WARFORGE.description": "攻撃カードまたはスキルカードを[blue]1[/blue]枚選び、[gold]戦争鋳造[/gold]を付与する。この選択肢は休憩回数を消費する。",
+  "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_TETRA_WARFORGE.selection_prompt": "戦争鋳造を付与するカードを選択"
 }

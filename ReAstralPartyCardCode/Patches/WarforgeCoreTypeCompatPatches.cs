@@ -49,7 +49,7 @@ public sealed class AttackPotionWarforgeCompatPatch : IPatchMethod
             return;
 
         selected.SetToFreeThisTurn();
-        await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(selected, PileType.Hand, addedByPlayer: true);
+        await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(selected, PileType.Hand, potion.Owner, CardPilePosition.Top);
     }
 }
 
@@ -89,37 +89,22 @@ public sealed class SkillPotionWarforgeCompatPatch : IPatchMethod
             return;
 
         selected.SetToFreeThisTurn();
-        await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(selected, PileType.Hand, addedByPlayer: true);
+        await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(selected, PileType.Hand, potion.Owner, CardPilePosition.Top);
     }
 }
 
-public sealed class FreeAttackPowerWarforgeCompatPatch : IPatchMethod
+public sealed class FreeAttackPowerWarforgeBeforePlayedCompatPatch : IPatchMethod
 {
-    public static string PatchId => "free_attack_power_warforge_compat_patch";
-    public static string Description => "Gameplay patch: let Free Attack Power recognize Warforge-enhanted Skill cards";
+    public static string PatchId => "free_attack_power_warforge_before_played_compat_patch";
+    public static string Description => "Gameplay patch: let Free Attack Power consume on Warforge-enhanced Skill cards";
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
         return
         [
-            new(typeof(FreeAttackPower), nameof(FreeAttackPower.TryModifyEnergyCostInCombat),
-                [typeof(CardModel), typeof(decimal), typeof(decimal).MakeByRefType()]),
             new(typeof(FreeAttackPower), nameof(FreeAttackPower.BeforeCardPlayed), [typeof(CardPlay)])
         ];
-    }
-
-    public static void Postfix(FreeAttackPower __instance, CardModel card, decimal originalCost, ref decimal modifiedCost, ref bool __result)
-    {
-        if (__result)
-            return;
-        if (__instance.Owner == null || card.Owner?.Creature != __instance.Owner)
-            return;
-        if (!WarforgeEnchantmentHelper.CountsAsAttack(card) || card.Pile?.Type is not (PileType.Hand or PileType.Play))
-            return;
-
-        modifiedCost = 0m;
-        __result = true;
     }
 
     public static void Postfix(FreeAttackPower __instance, CardPlay cardPlay, ref Task __result)
@@ -143,33 +128,18 @@ public sealed class FreeAttackPowerWarforgeCompatPatch : IPatchMethod
     }
 }
 
-public sealed class FreeSkillPowerWarforgeCompatPatch : IPatchMethod
+public sealed class FreeSkillPowerWarforgeBeforePlayedCompatPatch : IPatchMethod
 {
-    public static string PatchId => "free_skill_power_warforge_compat_patch";
-    public static string Description => "Gameplay patch: let Free Skill Power recognize Warforge-enhanted Attack cards";
+    public static string PatchId => "free_skill_power_warforge_before_played_compat_patch";
+    public static string Description => "Gameplay patch: let Free Skill Power consume on Warforge-enhanced Attack cards";
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
         return
         [
-            new(typeof(FreeSkillPower), nameof(FreeSkillPower.TryModifyEnergyCostInCombat),
-                [typeof(CardModel), typeof(decimal), typeof(decimal).MakeByRefType()]),
             new(typeof(FreeSkillPower), nameof(FreeSkillPower.BeforeCardPlayed), [typeof(CardPlay)])
         ];
-    }
-
-    public static void Postfix(FreeSkillPower __instance, CardModel card, decimal originalCost, ref decimal modifiedCost, ref bool __result)
-    {
-        if (__result)
-            return;
-        if (__instance.Owner == null || card.Owner?.Creature != __instance.Owner)
-            return;
-        if (!WarforgeEnchantmentHelper.CountsAsSkill(card) || card.Pile?.Type is not (PileType.Hand or PileType.Play))
-            return;
-
-        modifiedCost = 0m;
-        __result = true;
     }
 
     public static void Postfix(FreeSkillPower __instance, CardPlay cardPlay, ref Task __result)

@@ -17,9 +17,12 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
   - 新版教程主入口，优先看这里的 `01 - 添加基础内容`、`02 - 玩法基底`、`03 - 模组工具`。
 - `D:\MOD\杀戮尖塔2mod制作\RitsuLib-code`
   - 当前 RitsuLib 代码与 lifecycle patch 权威。
-- `D:\Steam\steamapps\common\Slay the Spire 2\mods\RitsuLib`
-  - 当前本机运行时 RitsuLib 安装目录。
-  - 其中 `STS2-RitsuLib.xml` 是程序集 XML 文档索引，可快速确认 public 类型、成员签名、参数名与 summary。
+- `D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1`
+  - 当前本机运行时 RitsuLib 实际程序集目录。
+  - Workshop 根目录的 `STS2-RitsuLib.dll` 是 loader；日常编译、API 查询和签名核对优先用这里的 `STS2-RitsuLib.dll` / `STS2-RitsuLib.xml`。
+- `D:\Steam\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64`
+  - 当前本机运行时游戏程序集目录。
+  - 其中 `sts2.xml` 是游戏本体程序集 XML 文档索引；新版已为不少原生类型和方法补了注释，排查原生 Hook、参数名和 public API 时优先一起看。
 - `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode`
   - 游戏内测试、作弊、脚本执行与 mod 调试工具箱。
 - `D:\MOD\杀戮尖塔2mod制作\Slay-the-Spire-2-gdsdecomp`
@@ -53,6 +56,8 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - 先确认“入口是否注册正确”，再写内容代码。很多“卡牌没出现”“遗物没加载”本质上是初始化或依赖问题。
 - 先做最小可运行切片：入口、依赖、1 个内容类型、本地化、图标或场景路径，然后再扩展复杂联动。
 - 当概念已明确，但 public 接口名、override 面、参数名、返回值语义还不确定时，先查运行时 `STS2-RitsuLib.xml`，再决定是否下钻 `RitsuLib-code`。
+- 当前游戏 API `0.105+` 分支默认把 manifest 当成新版口径处理：`min_game_version` 必填；依赖优先写对象形态并补 `min_version`，不要继续沿用旧字符串依赖数组。
+- 对 Harmony / patcher 直连原生方法时，不要只按旧代码记忆写 patch 形参；参数名也要对照运行时 `sts2.xml` 或反编译确认，例如 `choiceContext` 不能随手写成 `context`。
 - 遇到 hook/时机选择问题，不要凭感觉选最宽的入口；先看 `timing-map.md`，再决定是模型 override、RitsuLib lifecycle event，还是更窄的仓库 base/helper。
 - `STS2_WineFox-main` 是高价值 RitsuLib 实战案例，但不要无脑照抄。先抽取结构模式，再贴合当前仓库实现。
 - 如果仓库已经有自己的 working example、agent 文档、技能 overlay 或命名/资源约定，优先在仓库内找同类参照，不要强推通用模板。
@@ -73,7 +78,9 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 
 - `STS2-RitsuLib` DLL 或 NuGet 引用是否存在
 - 运行时 `STS2-RitsuLib.dll` 与 `STS2-RitsuLib.xml` 是否存在且版本匹配
-- mod manifest `dependencies` 是否包含 `STS2-RitsuLib`
+- 运行时 `sts2.dll` 与 `sts2.xml` 是否存在，且和当前参考的 API 分支一致
+- mod manifest 是否声明 `min_game_version`
+- mod manifest `dependencies` 是否包含 `STS2-RitsuLib`，以及当前分支是否应改为对象写法并补 `min_version`
 - 入口是否包含 `RitsuLibFramework.EnsureGodotScriptsRegistered(...)`
 - 入口是否包含 `ModTypeDiscoveryHub.RegisterModAssembly(modId, assembly)`
 
@@ -149,12 +156,13 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 当用户说“没注册成功”“mod 没加载”“卡不出现”“Godot 脚本没绑定”“DLL 路径不对”时：
 
 1. 先检查入口：`[ModInitializer]`、`EnsureGodotScriptsRegistered`、`RegisterModAssembly`
-2. 再检查 manifest：`dependencies`
-3. 再检查运行时 `STS2-RitsuLib.dll` 与 `STS2-RitsuLib.xml` 是否存在、是否和本地引用链一致
+2. 再检查 manifest：`min_game_version`、`dependencies` 写法、依赖最低版本
+3. 再检查运行时 `STS2-RitsuLib.dll` / `STS2-RitsuLib.xml` 与 `sts2.dll` / `sts2.xml` 是否都在、是否和本地引用链一致
 4. 再检查 `csproj`：RitsuLib、`sts2.dll`、`0Harmony.dll` 引用路径
 5. 再检查本地化、图片、场景路径
-6. 如果核心问题是“该挂哪一种时机”，回到 `timing-map.md`
-7. 最后才看 Harmony、反编译代码、运行时分支行为
+6. 如果是 patch apply 失败，先对照运行时 XML / 反编译确认 target 签名与 patch 形参名，再怀疑逻辑本身
+7. 如果核心问题是“该挂哪一种时机”，回到 `timing-map.md`
+8. 最后才看更宽的 Harmony 重写或别的分支行为
 
 如果任务已经进入“需要高频实机复现或快速验证”的阶段，再补看：
 

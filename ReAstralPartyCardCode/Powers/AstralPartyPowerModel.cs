@@ -1,5 +1,12 @@
 using System.Text.RegularExpressions;
 using Godot;
+using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Powers;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Rooms;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -64,6 +71,80 @@ public abstract partial class AstralPartyPowerModel : ModPowerTemplate
     protected static PowerAssetProfile Icons(string iconPath, string? bigIconPath = null)
     {
         return new PowerAssetProfile(iconPath, bigIconPath ?? iconPath);
+    }
+
+    public virtual bool IsInstanced => false;
+
+    public override PowerInstanceType InstanceType => IsInstanced ? PowerInstanceType.Instanced : PowerInstanceType.None;
+
+    public virtual Task BeforeSideTurnStart(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        CombatState combatState)
+    {
+        return Task.CompletedTask;
+    }
+
+    public sealed override Task BeforeSideTurnStart(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        IReadOnlyList<Creature> participants,
+        ICombatState combatState)
+    {
+        return BeforeSideTurnStart(choiceContext, side, combatState as CombatState
+            ?? Owner?.CombatState as CombatState
+            ?? Owner?.Player?.Creature?.CombatState as CombatState
+            ?? Owner?.PetOwner?.Creature?.CombatState as CombatState
+            ?? throw new InvalidOperationException("Expected CombatState for legacy power hook bridge."));
+    }
+
+    public virtual Task AfterSideTurnStart(CombatSide side, CombatState combatState)
+    {
+        return Task.CompletedTask;
+    }
+
+    public sealed override Task AfterSideTurnStart(
+        CombatSide side,
+        IReadOnlyList<Creature> participants,
+        ICombatState combatState)
+    {
+        return AfterSideTurnStart(side, combatState as CombatState
+            ?? Owner?.CombatState as CombatState
+            ?? Owner?.Player?.Creature?.CombatState as CombatState
+            ?? Owner?.PetOwner?.Creature?.CombatState as CombatState
+            ?? throw new InvalidOperationException("Expected CombatState for legacy power hook bridge."));
+    }
+
+    public virtual Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    {
+        return Task.CompletedTask;
+    }
+
+    public sealed override Task AfterSideTurnEnd(
+        PlayerChoiceContext choiceContext,
+        CombatSide side,
+        IEnumerable<Creature> participants)
+    {
+        return AfterTurnEnd(choiceContext, side);
+    }
+
+    public virtual Task AfterPowerAmountChanged(
+        PowerModel power,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource)
+    {
+        return Task.CompletedTask;
+    }
+
+    public sealed override Task AfterPowerAmountChanged(
+        PlayerChoiceContext choiceContext,
+        PowerModel power,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource)
+    {
+        return AfterPowerAmountChanged(power, amount, applier, cardSource);
     }
 
     [GeneratedRegex(@"([a-z])([A-Z])", RegexOptions.Compiled)]

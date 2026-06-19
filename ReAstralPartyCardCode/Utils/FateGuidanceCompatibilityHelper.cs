@@ -67,7 +67,7 @@ public static class FateGuidanceCompatibilityHelper
     }
 
     private static SkillFateGuidance CreateFateGuidanceCard(
-        CombatState combatState,
+        ICombatState combatState,
         Player recipient,
         ulong sourceBlueWhalePlayerNetId)
     {

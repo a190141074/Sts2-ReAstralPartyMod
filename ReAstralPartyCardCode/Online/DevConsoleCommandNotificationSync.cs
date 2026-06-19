@@ -169,6 +169,8 @@ internal struct DevConsoleCommandNotificationMessage : INetMessage, IPacketSeria
 
     public LogLevel LogLevel => LogLevel.Debug;
 
+    public bool ShouldBuffer => false;
+
     public void Serialize(PacketWriter writer)
     {
         writer.WriteInt(SchemaVersion);

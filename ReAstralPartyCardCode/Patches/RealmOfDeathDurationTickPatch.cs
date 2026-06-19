@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Hooks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using STS2RitsuLib.Patching.Models;
@@ -19,15 +20,19 @@ public sealed class RealmOfDeathDurationTickPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(Hook), nameof(Hook.AfterTurnEnd), [typeof(CombatState), typeof(CombatSide)])];
+        return
+        [
+            new(typeof(Hook), nameof(Hook.AfterTurnEnd),
+                [typeof(ICombatState), typeof(CombatSide), typeof(IEnumerable<Creature>)])
+        ];
     }
 
-    public static void Postfix(CombatState combatState, CombatSide side, ref Task __result)
+    public static void Postfix(ICombatState combatState, CombatSide side, ref Task __result)
     {
         __result = RunAfterTurnEnd(__result, combatState, side);
     }
 
-    private static async Task RunAfterTurnEnd(Task originalTask, CombatState combatState, CombatSide side)
+    private static async Task RunAfterTurnEnd(Task originalTask, ICombatState combatState, CombatSide side)
     {
         await originalTask;
 

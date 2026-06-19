@@ -106,8 +106,8 @@ public class PersonSlimeLulu : CooldownPersonaRelicBase
         if (result.UnblockedDamage <= 0)
             return;
 
-        if (ownerCreature.CombatState != null)
-            await AdherentMucusPower.MarkUnblockedHitForBoundSlime(ownerCreature.CombatState, Owner.NetId);
+        if (ownerCreature.CombatState is MegaCrit.Sts2.Core.Combat.CombatState combatState)
+            await AdherentMucusPower.MarkUnblockedHitForBoundSlime(combatState, Owner.NetId);
 
         Flash();
 
@@ -149,7 +149,10 @@ public class PersonSlimeLulu : CooldownPersonaRelicBase
         if (Owner?.Creature?.CombatState == null || side == Owner.Creature.Side)
             return;
 
-        await AdherentMucusPower.ResetRoundHitFlagForBoundSlime(Owner.Creature.CombatState, Owner.NetId);
+        await AdherentMucusPower.ResetRoundHitFlagForBoundSlime(
+            Owner.Creature.CombatState as MegaCrit.Sts2.Core.Combat.CombatState
+            ?? throw new InvalidOperationException("Expected CombatState for AdherentMucusPower reset."),
+            Owner.NetId);
     }
 
     protected override async Task AfterAdvanceCounterOnTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
@@ -159,7 +162,10 @@ public class PersonSlimeLulu : CooldownPersonaRelicBase
         if (Owner?.Creature?.CombatState == null || side == Owner.Creature.Side)
             return;
 
-        await AdherentMucusPower.DecayAllForBoundSlimeIfMissed(Owner.Creature.CombatState, Owner.NetId);
+        await AdherentMucusPower.DecayAllForBoundSlimeIfMissed(
+            Owner.Creature.CombatState as MegaCrit.Sts2.Core.Combat.CombatState
+            ?? throw new InvalidOperationException("Expected CombatState for AdherentMucusPower decay."),
+            Owner.NetId);
     }
 
     protected override async Task GrantCooldownCard()

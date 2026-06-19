@@ -92,6 +92,18 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 战斗 hook 里只要遍历目标集合时可能造成击杀、移除、融化、power 移除、队列改写，就优先怀疑 live collection mutation。
 - 默认先快照再结算，不要边遍历边调用可能改集合的命令。
 
+### 新版兼容 / patch 漂移
+
+- 当前仓库做新版兼容时，先清 loader 级红字，再清 gameplay patch 红字；不要先被下游 UI 症状带跑。
+- 运行时若出现 `Detected old-style dependencies without min version specified` 或 `does not declare min game version`，先修 `ReAstralPartyMod.json`：
+  - 补 `min_game_version`
+  - 依赖改成对象写法并补 `min_version`
+- 对 Harmony / patcher 直连原生方法时，参数名也属于兼容面：
+  - 例如 `AbstractModel.AfterCardPlayed(...)` 当前运行时参数名是 `choiceContext`
+  - patch 形参随手写成 `context` 也会导致 apply 失败
+- `Hook.AfterTurnEnd` 这类原生 Hook 不要沿用旧的双参 target 记忆；当前分支先对照运行时 `sts2.xml` 或 RitsuLib lifecycle patch 的 target 列表确认。
+- 日志里 `[Optional] ... Failed` 也会把启动阶段刷红；先区分这些 optional patch 是否只是兼容漂移，还是已经影响主流程。
+
 ### 仓库特定系统面
 
 - 起始人格 / Neow restore 问题：

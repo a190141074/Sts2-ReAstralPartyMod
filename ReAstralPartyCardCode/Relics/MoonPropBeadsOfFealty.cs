@@ -89,7 +89,8 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
         AstralParty_MoonPropBeadsOfFealtyEliteMaxGoldReward = selectedEncounter.MaxGoldReward;
         AstralParty_MoonPropBeadsOfFealtyTriggeredThisCombat = true;
         Flash();
-        await AddEliteEncounterGroup(combatState, selectedEncounter);
+        await AddEliteEncounterGroup(combatState as MegaCrit.Sts2.Core.Combat.CombatState
+            ?? throw new InvalidOperationException("Expected CombatState for elite encounter injection."), selectedEncounter);
     }
 
     public override async Task AfterCombatEnd(CombatRoom room)

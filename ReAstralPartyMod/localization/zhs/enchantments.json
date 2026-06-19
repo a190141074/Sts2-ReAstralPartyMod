@@ -8,6 +8,6 @@
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ESSENCE_SACRED_FAITH_ENCHANTMENT.title": "神圣信仰",
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_ESSENCE_SACRED_FAITH_ENCHANTMENT.description": "这张牌按单卡实例永久成长。击杀普通敌人时，该牌永久伤害+[blue]1.5[/blue]%；击杀精英或Boss时，该牌永久伤害+[blue]6[/blue]%。",
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.title": "战争铸造",
-  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.description": "这张牌在[gold]战斗中[/gold]，以及本模组的事件与相关判定里，同时视为[gold]攻击牌[/gold]和[gold]技能牌[/gold]。",
-  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText": "在[gold]战斗中[/gold]，以及本模组的事件与相关判定里，这张牌同时视为[gold]攻击牌[/gold]和[gold]技能牌[/gold]。"
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.description": "在[gold]战斗中[/gold]及[gold]本模组[/gold]的相关判定中，同时视为[gold]攻击牌[/gold]/[gold]技能牌[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText": "这张牌同时视为[gold]攻击牌[/gold]/[gold]技能牌[/gold]。"
 }

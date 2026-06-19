@@ -39,9 +39,9 @@
 			<Private>true</Private>
 		</Reference>
 
-		<!-- 本地引用，注意路径是否正确 -->
+		<!-- 本地引用，当前运行时 RitsuLib 来自 Workshop 变体目录 -->
 		<Reference Include="STS2-RitsuLib">
-			<HintPath>$(Sts2Dir)/mods/RitsuLib/STS2-RitsuLib.dll</HintPath>
+			<HintPath>D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1\STS2-RitsuLib.dll</HintPath>
 			<Private>true</Private>
 		</Reference>
 

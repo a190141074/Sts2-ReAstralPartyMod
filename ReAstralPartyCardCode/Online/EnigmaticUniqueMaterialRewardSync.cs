@@ -151,6 +151,8 @@ internal struct EnigmaticUniqueMaterialRewardSyncMessage : INetMessage, IPacketS
 
     public LogLevel LogLevel => LogLevel.Debug;
 
+    public bool ShouldBuffer => false;
+
     public void Serialize(PacketWriter writer)
     {
         writer.WriteEnum(Kind);

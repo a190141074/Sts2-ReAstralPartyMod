@@ -249,13 +249,14 @@ public class EnigmaticSevenCurses : AstralPartyRelicModel
         _isApplyingShopSelfDamage = true;
         try
         {
+            // Force the 6-arg CreatureCmd.Damage overload; the 5-arg cardSource overload crashes on null in this runtime.
             await CreatureCmd.Damage(
                 new ThrowingPlayerChoiceContext(),
                 Owner.Creature,
                 damage,
                 ValueProp.Unblockable | ValueProp.Unpowered,
-                null,
-                null);
+                (Creature?)null,
+                (CardModel?)null);
         }
         finally
         {

@@ -41,6 +41,7 @@
 
 - 适合：回合结束收尾、衰减、计数推进、清理状态。
 - 风险：先分清是“持有者自己的回合结束”还是“某个 side 的回合结束”。
+- 如果是直接 patch `Hook.AfterTurnEnd`，不要想当然按旧的双参版本写；当前新版分支可能带额外结束单位参数，先对照 `sts2.xml` 或 RitsuLib lifecycle patch 的 target 列表确认。
 
 ### `AfterCardChangedPiles(...)`
 

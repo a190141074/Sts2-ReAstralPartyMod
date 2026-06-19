@@ -40,6 +40,7 @@
 
 - 适合：回合结束收尾、衰减、计数推进、清理状态。
 - 默认先分清这是玩家自己的结束，还是整个 side 的结束。
+- 如果是直接 patch `Hook.AfterTurnEnd`，当前新版分支不要默认按旧双参 target 写；先对照运行时 `sts2.xml` 或 RitsuLib lifecycle patch 已验证的 target 形状。
 
 ### `AfterCardChangedPiles(...)`
 

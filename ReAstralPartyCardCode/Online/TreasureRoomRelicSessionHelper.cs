@@ -108,7 +108,7 @@ internal static class TreasureRoomRelicSessionHelper
         List<TreasureRoomRelicSynchronizer.PlayerVote> votes,
         int relicCount)
     {
-        if (!RunManager.Instance.IsSinglePlayerOrFakeMultiplayer || playerCollection.Players.Count <= 1 ||
+        if (!RunManager.Instance.IsSingleplayerOrFakeMultiplayer || playerCollection.Players.Count <= 1 ||
             relicCount <= 0)
             return;
 
@@ -135,7 +135,7 @@ internal static class TreasureRoomRelicSessionHelper
         Player player,
         int optionCount)
     {
-        if (RunManager.Instance.IsSinglePlayerOrFakeMultiplayer
+        if (RunManager.Instance.IsSingleplayerOrFakeMultiplayer
             && runState.Players.Count > 1
             && player.NetId != RunManager.Instance.NetService.NetId
             && optionCount > 0)

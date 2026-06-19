@@ -49,7 +49,7 @@ public class SkillMudTruckCrash : AstralPartyCardModel
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
         ArgumentNullException.ThrowIfNull(Owner?.Creature);
 
-        await using var context = await AttackCommand.CreateContextAsync(CombatState!, this);
+        await using var context = await AttackCommand.CreateContextAsync(CombatState!, choiceContext, this);
         var primaryHits = (await CreatureCmd.Damage(
             choiceContext,
             cardPlay.Target,

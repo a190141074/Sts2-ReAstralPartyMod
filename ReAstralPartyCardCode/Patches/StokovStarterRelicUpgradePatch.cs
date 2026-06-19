@@ -16,18 +16,27 @@ public sealed class StokovStarterRelicUpgradePatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(RelicCmd), nameof(RelicCmd.Replace))];
+        return [new(typeof(RelicCmd), nameof(RelicCmd.Replace), [typeof(RelicModel), typeof(RelicModel)])];
     }
 
-    public static void Prefix(RelicModel original, out Player? __stateOwner, out ModelId __stateOriginalRelicId)
+    public sealed class ReplaceState
     {
-        __stateOwner = original.Owner;
-        __stateOriginalRelicId = original.CanonicalInstance?.Id ?? original.Id;
+        public Player? Owner { get; init; }
+        public required ModelId OriginalRelicId { get; init; }
     }
 
-    public static void Postfix(Player? __stateOwner, ModelId __stateOriginalRelicId, ref Task<RelicModel> __result)
+    public static void Prefix(RelicModel original, out ReplaceState __state)
     {
-        __result = RunAfterReplaceAsync(__result, __stateOwner, __stateOriginalRelicId);
+        __state = new ReplaceState
+        {
+            Owner = original.Owner,
+            OriginalRelicId = original.CanonicalInstance?.Id ?? original.Id
+        };
+    }
+
+    public static void Postfix(ReplaceState __state, ref Task<RelicModel> __result)
+    {
+        __result = RunAfterReplaceAsync(__result, __state.Owner, __state.OriginalRelicId);
     }
 
     private static async Task<RelicModel> RunAfterReplaceAsync(
