@@ -1529,6 +1529,12 @@ public static partial class ReAstralPartyModSettingsManager
                     enableNeowExtraOption,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description",
                         "Enable Astral's extra randomized fourth Neow option at run start."))
+                .AddToggle(
+                    "enable_lucid_dream",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label", "Enable Lucid Dream"),
+                    enableLucidDream,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.description",
+                        "Control whether the Lucid Dream panels are shown in the room and whether Lucid Dream effects are active for this run."))
                 .AddEnumChoice(
                     "neow_extra_option_selection_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label",

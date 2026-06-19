@@ -740,7 +740,7 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_tsunami_base_name": "元素・洪波",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_tsunami_base_description": "すべてのプレイヤーに[gold]洪波[/gold]を付与する。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_setting_sun_base_name": "元素・落日",
-  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_setting_sun_base_description": "すべての敵に[gold]落日[/gold]を付与する。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_setting_sun_base_description": "すべての敵に[gold]落日[/gold]を付与し、[blue]1[/blue]層の[gold]灼烧[/gold]を与える。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_thunders_breath_base_name": "元素・雷息",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_thunders_breath_base_description": "すべての敵に[gold]感电[/gold]を[blue]1[/blue]層付与し、すべてのプレイヤーに[gold]雷息[/gold]を付与する。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_tsunami_stage2_name": "渊流",

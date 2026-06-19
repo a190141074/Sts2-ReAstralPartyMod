@@ -443,7 +443,22 @@ internal static class NeowOptionInjectionHelper
 
     private static IReadOnlyList<IHoverTip> CreateTetraWarforgeHoverTips()
     {
-        return [.. HoverTipFactory.FromRelic<TetraHoloSphere>()];
+        return CreateSafeRelicHoverTips<TetraHoloSphere>("tetra_warforge");
+    }
+
+    private static IReadOnlyList<IHoverTip> CreateSafeRelicHoverTips<TRelic>(string candidateKey)
+        where TRelic : RelicModel
+    {
+        try
+        {
+            return [.. HoverTipFactory.FromRelic<TRelic>()];
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn(
+                $"[NeowOptionInjectionHelper] Failed to build relic hover tips for custom Neow option '{candidateKey}'; continuing without hover tips. {ex}");
+            return [];
+        }
     }
 
     private sealed record NeowOptionCandidateDefinition(
@@ -458,8 +473,22 @@ internal static class NeowOptionInjectionHelper
         {
             return new EventOption(ancient, () => OnChosen(ancient), TextKey)
             {
-                HoverTips = HoverTipFactory()
+                HoverTips = CreateHoverTipsSafely()
             };
+        }
+
+        private IReadOnlyList<IHoverTip> CreateHoverTipsSafely()
+        {
+            try
+            {
+                return HoverTipFactory();
+            }
+            catch (Exception ex)
+            {
+                MainFile.Logger.Warn(
+                    $"[NeowOptionInjectionHelper] Failed to build hover tips for custom Neow option '{StableKey}'; continuing without hover tips. {ex}");
+                return [];
+            }
         }
     }
 }

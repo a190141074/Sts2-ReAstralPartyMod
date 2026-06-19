@@ -328,7 +328,10 @@ public sealed class VariantPersonElena : PersonaRelicBase
                 break;
             case SunsetGlowElementSelectionHelper.SettingSunBranch:
                 foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature))
+                {
                     await PowerCmd.Apply<SettingSunPower>(enemy, 1m, Owner.Creature, sourceCard, false);
+                    await PowerCmd.Apply<BlazingSolarBurnPower>(enemy, 1m, Owner.Creature, sourceCard, false);
+                }
                 break;
             case SunsetGlowElementSelectionHelper.ThundersBreathBranch:
                 foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature))
