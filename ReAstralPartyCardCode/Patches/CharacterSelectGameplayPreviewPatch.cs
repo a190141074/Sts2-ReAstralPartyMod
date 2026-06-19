@@ -179,6 +179,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private CheckButton? _enigmaticSeriesEventsToggle;
     private CheckButton? _moonPropShopSlotsToggle;
     private CheckButton? _neowExtraOptionToggle;
+    private CheckButton? _lucidDreamToggle;
     private CheckButton? _allPersonasToggle;
     private CheckButton? _allVariantPersonasToggle;
     private CheckButton? _extremeModeToggle;
@@ -384,6 +385,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description"),
             out _neowExtraOptionToggle,
             OnEnableNeowExtraOptionToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.description"),
+            out _lucidDreamToggle,
+            OnEnableLucidDreamToggled));
         body.AddChild(BuildEnumRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.description"),
@@ -870,6 +876,13 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _neowExtraOptionToggle.Text = snapshot.EnableNeowExtraOption ? "ON" : "OFF";
             }
 
+            if (_lucidDreamToggle != null)
+            {
+                _lucidDreamToggle.ButtonPressed = snapshot.EnableLucidDream;
+                _lucidDreamToggle.Disabled = !isEditable;
+                _lucidDreamToggle.Text = snapshot.EnableLucidDream ? "ON" : "OFF";
+            }
+
             if (_neowExtraOptionSelectionModeOption != null)
             {
                 RebuildNeowExtraOptionSelectionModeItems(snapshot.EnableStartingRingOfSevenCurses);
@@ -992,6 +1005,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From(snapshot.EnableStartingRingOfSevenCurses),
             Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableDreamSeriesEvents),
             Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableMoonPropShopSlots), Variant.From(snapshot.EnableNeowExtraOption),
+            Variant.From(snapshot.EnableLucidDream),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
             Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
             Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
@@ -999,6 +1013,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void ApplySnapshotDeferred(bool enableStartingInitialPoint, bool enableStartingRingOfSevenCurses, bool enableStartingPersonaSelection,
         bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableMoonPropShopSlots, bool enableNeowExtraOption,
+        bool enableLucidDream,
         int neowExtraOptionSelectionMode,
         bool enableAllPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
     {
@@ -1011,6 +1026,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             EnableEnigmaticSeriesEvents = enableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = enableMoonPropShopSlots,
             EnableNeowExtraOption = enableNeowExtraOption,
+            EnableLucidDream = enableLucidDream,
             NeowExtraOptionSelectionMode = Enum.IsDefined(typeof(NeowExtraOptionSelectionMode), neowExtraOptionSelectionMode)
                 ? (NeowExtraOptionSelectionMode)neowExtraOptionSelectionMode
                 : NeowExtraOptionSelectionMode.DefaultRandom,
@@ -1067,6 +1083,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingPersonaSelection = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableLucidDreamToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableLucidDream = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

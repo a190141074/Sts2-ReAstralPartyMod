@@ -502,6 +502,10 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
 
     private void ApplySnapshot(LobbyGameplaySettingsSnapshot snapshot)
     {
+        Visible = snapshot.EnableLucidDream;
+        if (!snapshot.EnableLucidDream)
+            return;
+
         var isEditable = GetCurrentRoleForUi() == LobbyGameplayNetRole.Host;
         foreach (var toggleView in _toggleViews)
         {
