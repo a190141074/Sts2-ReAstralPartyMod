@@ -27,7 +27,7 @@ public class SkillMudTruckCrash : AstralPartyCardModel
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [
-        new DamageVar(11m, ValueProp.Move)
+        new DamageVar(7m, ValueProp.Move)
     ];
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
