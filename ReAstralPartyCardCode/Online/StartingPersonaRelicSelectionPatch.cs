@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.ManosabaLin;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
 using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -470,7 +471,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             }
         }
 
-        pool = AddForcedWindchaserVariantIfNeeded(runState, pool)
+        pool = AddForcedCompatVariantsIfNeeded(runState, pool)
             .ToList();
 
         return DeterministicMultiplayerChoiceHelper.OrderDeterministically(
@@ -488,7 +489,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         var weighted = new List<RelicModel>();
         foreach (var relic in source)
         {
-            var weight = IsWindchaserVariantRelic(relic) ? 1 : 6;
+            var weight = IsForcedCompatVariantRelic(relic) ? 1 : 6;
             for (var i = 0; i < weight; i++)
                 weighted.Add(relic);
         }
@@ -496,7 +497,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         return weighted;
     }
 
-    private static IReadOnlyList<RelicModel> AddForcedWindchaserVariantIfNeeded(
+    private static IReadOnlyList<RelicModel> AddForcedCompatVariantsIfNeeded(
         RunState runState,
         IReadOnlyList<RelicModel> source)
     {
@@ -504,18 +505,31 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
                 new CompatContentGate.RunStateLike(runState.Players)))
             return source;
 
-        var forcedRelic = PersonaRelicRegistry.GetCanonicalVariantPersonaRelics()
-            .Where(relic => !BannedRelicRegistry.IsBanned(
-                ReAstralPartyModSettingsManager.GetBannedRelicIds(runState),
-                relic))
-            .FirstOrDefault(IsWindchaserVariantRelic);
-        if (forcedRelic == null)
-            return source;
-        if (source.Any(relic => relic.Id == forcedRelic.Id))
-            return source;
-
         var result = source.ToList();
-        result.Add(forcedRelic);
+        var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
+        var forcedRelics = PersonaRelicRegistry.GetCanonicalVariantPersonaRelics()
+            .Where(relic => !BannedRelicRegistry.IsBanned(bannedRelicIds, relic))
+            .Where(IsForcedCompatVariantRelic)
+            .Where(relic =>
+            {
+                var canonical = relic.CanonicalInstance ?? relic;
+                if (canonical is VariantPersonWindchaserThePlaneswalker)
+                    return WindchaserCompat.IsLoaded() && runState.Players.Any(WindchaserCompat.IsCharacter);
+                if (canonical is VariantPersonManosabaLinHiro)
+                    return ManosabaLinCompat.IsLoaded() && runState.Players.Any(ManosabaLinCompat.IsCharacter);
+
+                return false;
+            })
+            .ToList();
+
+        foreach (var forcedRelic in forcedRelics)
+        {
+            if (result.Any(relic => relic.Id == forcedRelic.Id))
+                continue;
+
+            result.Add(forcedRelic);
+        }
+
         return result;
     }
 
@@ -523,7 +537,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         RunState runState,
         IReadOnlyList<RelicModel> source)
     {
-        var options = AddForcedWindchaserVariantIfNeeded(runState, source).ToList();
+        var options = AddForcedCompatVariantsIfNeeded(runState, source).ToList();
         if (ReAstralPartyModSettingsManager.GetEnableAllVariantPersonas(runState))
             return AddAllBuiltInVariantPersonas(runState, options);
 
@@ -620,9 +634,9 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         return roll < StartingVariantInjectionChancePercent;
     }
 
-    private static bool IsWindchaserVariantRelic(RelicModel relic)
+    private static bool IsForcedCompatVariantRelic(RelicModel relic)
     {
-        return (relic.CanonicalInstance ?? relic) is VariantPersonWindchaserThePlaneswalker;
+        return (relic.CanonicalInstance ?? relic) is VariantPersonWindchaserThePlaneswalker or VariantPersonManosabaLinHiro;
     }
 
     internal static string GetRunKey(RunState runState)

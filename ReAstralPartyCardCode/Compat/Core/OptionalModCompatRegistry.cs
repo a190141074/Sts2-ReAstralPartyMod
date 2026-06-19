@@ -6,7 +6,8 @@ internal static class OptionalModCompatRegistry
 {
     private static readonly IReadOnlyList<OptionalCompatModInfo> SupportedMods =
     [
-        new("《风行者》", "Windchaser", "https://www.bilibili.com/video/BV145RpBCEG4/")
+        new("Windchaser", "逐风者", "https://steamcommunity.com/sharedfiles/filedetails/?id=3747509821"),
+        new("ManosabaLin", "魔女审判", "https://steamcommunity.com/sharedfiles/filedetails/?id=3747637918")
     ];
 
     public static IReadOnlyList<OptionalCompatModInfo> GetSupportedMods()

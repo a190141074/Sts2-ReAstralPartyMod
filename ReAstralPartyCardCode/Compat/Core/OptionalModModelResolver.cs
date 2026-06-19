@@ -31,4 +31,32 @@ internal static class OptionalModModelResolver
             return false;
         }
     }
+
+    public static bool TryFindPowerByEntry(string entryId, out PowerModel power)
+    {
+        power = null!;
+        if (string.IsNullOrWhiteSpace(entryId))
+            return false;
+
+        var normalizedTarget = entryId.Trim();
+
+        try
+        {
+            power = ModelDb.AllPowers.FirstOrDefault(candidate =>
+            {
+                var entry = candidate.Id.Entry;
+                return string.Equals(entry, normalizedTarget, StringComparison.OrdinalIgnoreCase)
+                       || entry.EndsWith($"-{normalizedTarget}", StringComparison.OrdinalIgnoreCase)
+                       || entry.EndsWith($"_{normalizedTarget}", StringComparison.OrdinalIgnoreCase);
+            })!;
+
+            return power != null;
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}] Optional mod compatibility power resolve failed for '{entryId}': {ex.Message}");
+            return false;
+        }
+    }
 }

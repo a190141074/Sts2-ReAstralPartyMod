@@ -1,15 +1,12 @@
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Powers;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.ValueProps;
-using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
-using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
-using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -114,34 +111,6 @@ public sealed class WithPower : AstralPartyPowerModel
         Creature? applier,
         CardModel? cardSource)
     {
-        if (power != this || Owner?.Player == null || amount <= 0m || Amount < 100m)
-            return;
-        if (Owner.Player.GetRelic<VariantPersonManosabaLinHiro>() == null)
-            return;
-
-        await EnsureDeathRewindRewardAsync();
-    }
-
-    private async Task EnsureDeathRewindRewardAsync()
-    {
-        var ownerPlayer = Owner?.Player;
-        if (ownerPlayer?.RunState == null)
-            return;
-
-        var existingDeckCards = EventDeckCardHelper.GetRunDeckCards(ownerPlayer);
-        if (existingDeckCards.Any(card => card.CanonicalInstance?.Id == ModelDb.Card<DeathRewind>().Id || card.Id == ModelDb.Card<DeathRewind>().Id))
-            return;
-
-        var canonical = ModelDb.Card<DeathRewind>();
-        var runDeckCard = ownerPlayer.RunState.CreateCard(canonical, ownerPlayer);
-        var addedToDeck = await EventDeckCardHelper.AddCardToRunDeckAsync(ownerPlayer, runDeckCard, true);
-        if (!addedToDeck)
-            return;
-
-        if (ownerPlayer.Creature?.CombatState == null)
-            return;
-
-        var combatCard = ownerPlayer.Creature.CombatState.CreateCard(canonical, ownerPlayer);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(combatCard, true, CardPilePosition.Top, this);
+        await Task.CompletedTask;
     }
 }

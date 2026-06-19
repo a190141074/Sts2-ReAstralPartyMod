@@ -57,7 +57,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.page_description": "Star Engine で現在サポートされている リンケージ モジュールと、それらが現在ロードされているかどうかを表示します。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_title": "リンケージ モジュール",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_description": "このページには、Star Engine が現在認識してアクセスできる リンケージ モジュールのリストが表示されます。",
-  "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.intro": "次のコンテンツは、このモジュールに現在接続されている リンケージ モジュールのリストで、その名前、モジュール ID、および現在の読み込みステータスが表示されます。 [gold]モジュールのステータスをクリックすると、ステーション B への対応するリンクにジャンプします。 [/gold]",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.intro": "次の内容は、このモジュールが現在連携しているモジュールの一覧で、名称、モジュール ID、現在の読み込み状態を表示します。[gold]モジュールの状態をクリックすると、対応する連携ページへ移動します。[/gold]",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.column_name": "名前",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.column_id": "ID",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.column_status": "州",

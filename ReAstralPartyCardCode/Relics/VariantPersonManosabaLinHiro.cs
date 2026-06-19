@@ -13,17 +13,17 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.ManosabaLin;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
-using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
 public sealed class VariantPersonManosabaLinHiro : PersonaRelicBase
 {
-    private const int TransferAmount = 40;
-    private const int TeamDamageWithGain = 10;
+    private const int RewardBandSize = 100;
+    private const decimal TeamDamageWithGain = 10m;
 
     [SavedProperty] public int AstralParty_VariantPersonManosabaLinHiroLastRewardBand { get; set; }
 
@@ -31,27 +31,20 @@ public sealed class VariantPersonManosabaLinHiro : PersonaRelicBase
 
     public override bool ShouldReceiveCombatHooks => true;
 
-    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-    [
-        HoverTipFactory.FromCard<SkillFateFirewoodStick>(),
-        HoverTipFactory.FromPower<WithPower>(),
-        HoverTipFactory.FromPower<FateFirewoodNodePower>()
-    ];
+    protected override IEnumerable<IHoverTip> ExtraHoverTips => [];
 
     public override Task BeforeCombatStart()
     {
-        AstralParty_VariantPersonManosabaLinHiroLastRewardBand = StableNumericStateHelper.FloorDivisionToNonNegativeInt(
-            Owner?.Creature?.GetPowerAmount<WithPower>() ?? 0m,
-            100m);
+        AstralParty_VariantPersonManosabaLinHiroLastRewardBand = GetCurrentRewardBand();
         return Task.CompletedTask;
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
-        if (player != Owner || Owner?.Creature?.CombatState == null)
+        if (player != Owner || Owner?.Creature?.CombatState == null || !ManosabaLinCompat.IsLoaded())
             return;
 
-        await GrantFirewoodOrReplayExisting(this);
+        await GrantSaveOrReplayExisting(this);
     }
 
     public override async Task AfterDamageReceived(
@@ -71,8 +64,10 @@ public sealed class VariantPersonManosabaLinHiro : PersonaRelicBase
             return;
         if (result.TotalDamage <= 0m)
             return;
+        if (!ManosabaLinCompat.IsLoaded())
+            return;
 
-        await PowerCmd.Apply<WithPower>(ownerCreature, TeamDamageWithGain, ownerCreature, null, false);
+        await ApplyExternalWithPower(ownerCreature, TeamDamageWithGain, null);
     }
 
     public override async Task AfterPowerAmountChanged(
@@ -81,60 +76,76 @@ public sealed class VariantPersonManosabaLinHiro : PersonaRelicBase
         Creature? applier,
         CardModel? cardSource)
     {
-        if (Owner?.Creature == null)
-            return;
-        if (power is not WithPower || power.Owner != Owner.Creature)
+        if (Owner?.Creature == null || !IsExternalWithPower(power))
             return;
 
-        var currentBand = StableNumericStateHelper.FloorDivisionToNonNegativeInt(power.Amount, 100m);
+        var currentBand = StableNumericStateHelper.FloorDivisionToNonNegativeInt(power.Amount, RewardBandSize);
         if (amount > 0m && currentBand > AstralParty_VariantPersonManosabaLinHiroLastRewardBand)
         {
             var rewardCount = currentBand - AstralParty_VariantPersonManosabaLinHiroLastRewardBand;
             for (var i = 0; i < rewardCount; i++)
-                await GrantFirewoodOrReplayExisting(this);
+                await GrantSaveOrReplayExisting(this);
         }
 
         AstralParty_VariantPersonManosabaLinHiroLastRewardBand = currentBand;
     }
 
-    internal int GetCurrentWithPower()
+    private int GetCurrentRewardBand()
     {
-        return StableNumericStateHelper.FloorToNonNegativeInt(Owner?.Creature?.GetPowerAmount<WithPower>() ?? 0m);
+        return StableNumericStateHelper.FloorDivisionToNonNegativeInt(GetCurrentWithAmount(), RewardBandSize);
     }
 
-    internal async Task TryTransferWithPowerAndRegainCard(Creature target, AbstractModel source)
+    private decimal GetCurrentWithAmount()
     {
         var ownerCreature = Owner?.Creature;
-        if (Owner == null || ownerCreature == null || target.Player == null)
-            return;
+        if (ownerCreature == null || !ManosabaLinCompat.IsLoaded())
+            return 0m;
 
-        var withPower = ownerCreature.GetPower<WithPower>();
-        if (withPower == null || withPower.Amount < TransferAmount)
-            return;
+        if (!ManosabaLinCompat.TryFindWithPower(out var externalWithPower))
+            return 0m;
 
-        await PowerCmd.ModifyAmount(withPower, -TransferAmount, ownerCreature, null, false);
-        await PowerCmd.Apply<WithPower>(target, TransferAmount, ownerCreature, null, false);
-        await GrantFirewoodOrReplayExisting(source);
+        return ownerCreature.Powers
+            .FirstOrDefault(power => power.Id == externalWithPower.Id)
+            ?.Amount ?? 0m;
     }
 
-    private async Task GrantFirewoodOrReplayExisting(AbstractModel source)
+    private bool IsExternalWithPower(PowerModel power)
     {
-        if (Owner?.Creature?.CombatState == null)
+        if (Owner?.Creature == null || power.Owner != Owner.Creature || !ManosabaLinCompat.IsLoaded())
+            return false;
+        if (!ManosabaLinCompat.TryFindWithPower(out var externalWithPower))
+            return false;
+
+        return power.Id == externalWithPower.Id;
+    }
+
+    private async Task ApplyExternalWithPower(Creature target, decimal amount, CardModel? sourceCard)
+    {
+        if (!ManosabaLinCompat.TryFindWithPower(out var externalWithPower))
             return;
 
-        var existingFirewood = PileType.Hand.GetPile(Owner).Cards
-            .Where(FateFirewoodStickCombatHelper.IsFirewoodCard)
-            .FirstOrDefault();
-        if (existingFirewood != null)
+        await PowerCmd.Apply(externalWithPower.ToMutable(), target, amount, Owner?.Creature, sourceCard, false);
+    }
+
+    private async Task GrantSaveOrReplayExisting(AbstractModel source)
+    {
+        if (Owner?.Creature?.CombatState == null || !ManosabaLinCompat.IsLoaded())
+            return;
+        if (!ManosabaLinCompat.TryFindSaveCard(out var saveCard))
+            return;
+
+        var existingSave = PileType.Hand.GetPile(Owner).Cards
+            .FirstOrDefault(card => card.Id == saveCard.Id || card.CanonicalInstance?.Id == saveCard.Id);
+        if (existingSave != null)
         {
-            SinkouSetHelper.AddReplayViaReflection(existingFirewood, 1);
-            CardCmd.Preview(existingFirewood);
+            SinkouSetHelper.AddReplayViaReflection(existingSave, 1);
+            CardCmd.Preview(existingSave);
             Flash();
             return;
         }
 
-        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFateFirewoodStick>(), Owner);
-        if (source is CardModel sourceCard && FateFirewoodStickCombatHelper.IsFirewoodCard(sourceCard))
+        var card = Owner.Creature.CombatState.CreateCard(saveCard.CanonicalInstance ?? saveCard, Owner);
+        if (source is CardModel sourceCard && (sourceCard.Id == saveCard.Id || sourceCard.CanonicalInstance?.Id == saveCard.Id))
             SinkouSetHelper.AddReplayViaReflection(card, 1);
         await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, source);
         Flash();

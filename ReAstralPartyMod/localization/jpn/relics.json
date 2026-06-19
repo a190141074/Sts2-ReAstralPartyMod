@@ -757,6 +757,6 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_WAMDUS.description": "・[blue]3[/blue]ターンごとに、[gold]六龍の『碧』[/gold]を[blue]1[/blue]枚手札に加える。\n・戦闘中、スキルカードに実際に[blue]1[/blue]点の耗能を使うたび、法力増幅を[blue]1[/blue]得る。\n・戦闘終了時、法力増幅が[blue]10[/blue]あるごとに最大HPを[blue]1[/blue]得て、その後すべての法力増幅を清算する。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_WAMDUS.flavor": "潮は魔力を持ち上げ、その代価をまた肉へ沈めていく。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.title": "【異格：二階堂希羅】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.description": "・あなたのターン開始時、[gold]運命の焚き棒[/gold]を[blue]1[/blue]枚手札に加える。すでに手札にあるなら、そのうち[blue]1[/blue]枚に[gold]Replay 1[/gold]を与える。\n・あなたの[gold]魔女化[/gold]がさらに[blue]100[/blue]層の境界を跨ぐたび、上記の獲得効果を[blue]1[/blue]回行う。\n・他の味方プレイヤーがダメージを受けるたび、あなたは[blue]10[/blue]層の[gold]魔女化[/gold]を得る。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.flavor": "焚き棒を渡す前に、運命のほうが先にその熱を確かめている。"
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.description": "・連携異格。[gold]《魔女審判》[/gold]が読み込まれている時のみ有効。\n・あなたのターン開始時、外部[gold]【拯救】[/gold]を[blue]1[/blue]枚手札に加える。すでに手札にあるなら、そのうち[blue]1[/blue]枚に[gold]Replay 1[/gold]を与える。\n・外部[gold]魔女化[/gold]がさらに[blue]100[/blue]層の境界を跨ぐたび、上記の獲得効果を[blue]1[/blue]回行う。\n・他の味方プレイヤーがダメージを受けるたび、あなたは外部[gold]魔女化[/gold]を[blue]10[/blue]層得る。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.flavor": "連携シリーズ・《魔女審判》"
 }

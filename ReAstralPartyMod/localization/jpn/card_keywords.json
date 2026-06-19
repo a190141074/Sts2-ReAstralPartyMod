@@ -41,8 +41,6 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ULTIMATE_SKILL.description": "究極のスキル カードは独立して課金され、最初はプレイできません。\n[blue]1[/blue] 以上のコストの攻撃カードをプレイするたびに、チャージは +[blue]1[/blue] となり、最大 [blue]100[/blue] になります。\nチャージが[blue]100[/blue]に達すると制限が解除され、プレイ後はチャージが[blue]0[/blue]に戻ります。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_FUSION_CLUE.title": "フュージョンキュー",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_FUSION_CLUE.description": "クロノナッツ、マント・オブ・エクセレンス、リズム・レムナント、バッファ・シールド。",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_FATE_FIREWOOD_STICK_DUEL.title": "運命の焚き木棒・ダイス勝負",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_FATE_FIREWOOD_STICK_DUEL.description": "この勝負に使う[gold]ノード[/gold]は【命運の焚き木棒】が供給する。\n成功時、対象に生存している全ユニットの[gold]魔女化[/gold]総層数の[blue]50%[/blue]に等しいダメージを与える。あなたの[gold]魔女化[/gold]が[blue]40[/blue]層以上なら、そのうち[blue]40[/blue]層を対象へ移し、このカードを[blue]1[/blue]枚再び得る。\n失敗時、生存している全体からランダムな[blue]1[/blue]体に、あなたの現在の[gold]魔女化[/gold]層数の[blue]10%[/blue]に等しいダメージを与える。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_INVESTIGATION_PROGRESS.title": "捜査の進捗状況",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_INVESTIGATION_PROGRESS.description": "[gold]調査対象[/gold]を持つターゲットが殺害されるたびに、殺人者は[gold]ステルス調査[/gold]イベントカードの現在のステージをトリガーし、[性格：ボニー]の所有者は[blue]5[/blue]ポイント[gold]星光[/gold]を獲得します。\n[blue] が 6 回[/blue] 回成功するたびに、フェーズが進みます。 [gold] フェーズ 1[/gold] -> [gold] フェーズ 2[/gold] -> [gold] フェーズ 3[/gold] -> [gold] 真実が明らかになる[/gold]。\n[gold]真実の暴露[/gold]が [blue] 6[/blue] 回トリガーされ、[gold]ステルスアクション[/gold]がエリートまたはボスに対して使用されると、[gold]真実の暴露[/gold]が直接トリガーされます。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_SOLAR_BOMBARDMENT.title": "軌道爆撃",

@@ -1,4 +1,5 @@
 using MegaCrit.Sts2.Core.Models;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.ManosabaLin;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
@@ -16,6 +17,7 @@ internal static class CompatContentGate
         return canonicalRelic switch
         {
             VariantPersonWindchaserThePlaneswalker => true,
+            VariantPersonManosabaLinHiro => true,
             _ => false
         };
     }
@@ -29,6 +31,7 @@ internal static class CompatContentGate
         return canonicalRelic switch
         {
             VariantPersonWindchaserThePlaneswalker => WindchaserCompat.IsLoaded(),
+            VariantPersonManosabaLinHiro => ManosabaLinCompat.IsLoaded(),
             _ => true
         };
     }
@@ -47,8 +50,10 @@ internal static class CompatContentGate
 
     public static bool ShouldForceStartingVariantPersonaForRun(RunStateLike runState)
     {
-        return WindchaserCompat.IsLoaded()
-               && runState.Players.Any(WindchaserCompat.IsCharacter);
+        return (WindchaserCompat.IsLoaded()
+                && runState.Players.Any(WindchaserCompat.IsCharacter))
+               || (ManosabaLinCompat.IsLoaded()
+                   && runState.Players.Any(ManosabaLinCompat.IsCharacter));
     }
 
     internal readonly record struct RunStateLike(IReadOnlyList<MegaCrit.Sts2.Core.Entities.Players.Player> Players);
