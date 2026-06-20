@@ -98,6 +98,8 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableAllPersonas { get; set; }
 
+    public bool EnableVariantPersonas { get; set; } = true;
+
     public bool EnableAllVariantPersonas { get; set; }
 
     // Legacy fields kept so older settings.json files still load cleanly.
@@ -162,6 +164,8 @@ public static partial class ReAstralPartyModSettingsManager
     private static bool _loggedMissingGameplaySnapshot;
 
     public static bool EnableAllPersonas => ReadRuntime(settings => settings.EnableAllPersonas);
+
+    public static bool EnableVariantPersonas => ReadRuntime(settings => settings.EnableVariantPersonas);
 
     public static bool EnableAllVariantPersonas => ReadRuntime(settings => settings.EnableAllVariantPersonas);
 
@@ -286,6 +290,23 @@ public static partial class ReAstralPartyModSettingsManager
             return false;
 
         return EnableAllPersonas;
+    }
+
+    public static bool GetEnableVariantPersonas(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableVariantPersonas;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableVariantPersonas;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableVariantPersonas;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableVariantPersonas;
     }
 
     public static bool GetEnableDreamSeriesEvents(IRunState? runState)
@@ -451,6 +472,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool GetEnableAllVariantPersonas(IRunState? runState)
     {
+        if (!GetEnableVariantPersonas(runState))
+            return false;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableAllVariantPersonas;
 
@@ -1151,6 +1175,19 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableVariantPersonas = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings => settings.EnableVariantPersonas,
+            (settings, value) =>
+            {
+                settings.EnableVariantPersonas = value;
+                ApplyRuntimeSettings(settings, "enable_variant_personas");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.label",
+                    value);
+            });
+
         var enableDreamSeriesEvents = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -1513,6 +1550,12 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description",
                         "If disabled, the run skips the starting persona selection entirely and no player starts with a persona relic."))
                 .AddToggle(
+                    "enable_variant_personas",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.label", "Enable Variant Personas"),
+                    enableVariantPersonas,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.description",
+                        "Control whether variant personas can appear during the starting persona selection for this run."))
+                .AddToggle(
                     "enable_dream_series_events",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label", "Enable Dream Series Events"),
                     enableDreamSeriesEvents,
@@ -1562,7 +1605,7 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.label", "Enable All Variant Personas"),
                     enableAllVariantPersonas,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.description",
-                        "At run start, append all built-in variant personas to the starting persona list. Linked crossover variants are excluded. Changes apply to new runs only."))
+                        "At run start, append all built-in variant personas to the starting persona list. Requires the Variant Personas master switch to stay enabled. Linked crossover variants are excluded. Changes apply to new runs only."))
                 .AddToggle(
                     "enable_extreme_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label", "Enable Extreme Mode"),
@@ -1975,7 +2018,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -2374,6 +2417,8 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableAllPersonas { get; init; }
 
+        public bool EnableVariantPersonas { get; init; } = true;
+
         public bool EnableAllVariantPersonas { get; init; }
 
         public StartingPersonaMode StartingPersonaMode { get; init; } = StartingPersonaMode.Standard;
@@ -2456,6 +2501,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableLucidDream = settings.EnableLucidDream,
                 NeowExtraOptionSelectionMode = settings.NeowExtraOptionSelectionMode,
                 EnableAllPersonas = settings.EnableAllPersonas,
+                EnableVariantPersonas = settings.EnableVariantPersonas,
                 EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
                 StartingPersonaMode = ResolveStartingPersonaMode(settings),
                 EnablePlayRecommendation = settings.EnablePlayRecommendation,

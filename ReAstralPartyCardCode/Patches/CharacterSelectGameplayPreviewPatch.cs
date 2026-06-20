@@ -181,6 +181,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private CheckButton? _neowExtraOptionToggle;
     private CheckButton? _lucidDreamToggle;
     private CheckButton? _allPersonasToggle;
+    private CheckButton? _variantPersonasToggle;
     private CheckButton? _allVariantPersonasToggle;
     private CheckButton? _extremeModeToggle;
     private OptionButton? _startingPersonaModeOption;
@@ -365,6 +366,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description"),
             out _startingPersonaSelectionToggle,
             OnEnableStartingPersonaSelectionToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.description"),
+            out _variantPersonasToggle,
+            OnEnableVariantPersonasToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.description"),
@@ -824,6 +830,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             var role = GetCurrentRoleForUi();
             var isEditable = IsEditableByLocalPlayer(role);
             var personaSelectionEnabled = snapshot.EnableStartingPersonaSelection;
+            var variantPersonasEnabled = snapshot.EnableVariantPersonas;
             var normalizedNeowSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
                 snapshot.EnableStartingRingOfSevenCurses,
                 snapshot.NeowExtraOptionSelectionMode);
@@ -846,6 +853,13 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _startingPersonaSelectionToggle.ButtonPressed = snapshot.EnableStartingPersonaSelection;
                 _startingPersonaSelectionToggle.Disabled = !isEditable;
                 _startingPersonaSelectionToggle.Text = snapshot.EnableStartingPersonaSelection ? "ON" : "OFF";
+            }
+
+            if (_variantPersonasToggle != null)
+            {
+                _variantPersonasToggle.ButtonPressed = snapshot.EnableVariantPersonas;
+                _variantPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled;
+                _variantPersonasToggle.Text = snapshot.EnableVariantPersonas ? "ON" : "OFF";
             }
 
             if (_dreamSeriesEventsToggle != null)
@@ -901,7 +915,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             if (_allVariantPersonasToggle != null)
             {
                 _allVariantPersonasToggle.ButtonPressed = snapshot.EnableAllVariantPersonas;
-                _allVariantPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled;
+                _allVariantPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled || !variantPersonasEnabled;
                 _allVariantPersonasToggle.Text = snapshot.EnableAllVariantPersonas ? "ON" : "OFF";
             }
 
@@ -935,6 +949,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 var lines = new List<string> { footer };
                 if (!personaSelectionEnabled)
                     lines.Add(GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.disabled_hint"));
+                if (personaSelectionEnabled && !variantPersonasEnabled)
+                    lines.Add(GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.disabled_hint"));
                 if (!snapshot.EnableNeowExtraOption)
                     lines.Add(GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.disabled_hint"));
                 _footerLabel.Text = string.Join("\n", lines);
@@ -1007,7 +1023,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableMoonPropShopSlots), Variant.From(snapshot.EnableNeowExtraOption),
             Variant.From(snapshot.EnableLucidDream),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
-            Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
+            Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableVariantPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
             Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
     }
 
@@ -1015,7 +1031,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableMoonPropShopSlots, bool enableNeowExtraOption,
         bool enableLucidDream,
         int neowExtraOptionSelectionMode,
-        bool enableAllPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
+        bool enableAllPersonas, bool enableVariantPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
     {
         ApplySnapshotToUi(new LobbyGameplaySettingsSnapshot
         {
@@ -1031,6 +1047,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 ? (NeowExtraOptionSelectionMode)neowExtraOptionSelectionMode
                 : NeowExtraOptionSelectionMode.DefaultRandom,
             EnableAllPersonas = enableAllPersonas,
+            EnableVariantPersonas = enableVariantPersonas,
             EnableAllVariantPersonas = enableAllVariantPersonas,
             EnableExtremeMode = enableExtremeMode,
             StartingPersonaMode = Enum.IsDefined(typeof(StartingPersonaMode), startingPersonaMode)
@@ -1083,6 +1100,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingPersonaSelection = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableVariantPersonasToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableVariantPersonas = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

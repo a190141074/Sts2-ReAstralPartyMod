@@ -457,6 +457,18 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
                 .ToList();
         }
 
+        if (!ReAstralPartyModSettingsManager.GetEnableVariantPersonas(runState))
+        {
+            return DeterministicMultiplayerChoiceHelper.OrderDeterministically(
+                pool,
+                relic => relic.Id.Entry,
+                MainFile.ModId,
+                "starting_persona_automatic_pool",
+                runState.Rng.StringSeed,
+                runState.Players.Count)
+                .ToList();
+        }
+
         if (ReAstralPartyModSettingsManager.GetEnableAllVariantPersonas(runState))
         {
             var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
@@ -501,6 +513,9 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         RunState runState,
         IReadOnlyList<RelicModel> source)
     {
+        if (!ReAstralPartyModSettingsManager.GetEnableVariantPersonas(runState))
+            return source;
+
         if (!CompatContentGate.ShouldForceStartingVariantPersonaForRun(
                 new CompatContentGate.RunStateLike(runState.Players)))
             return source;
@@ -537,6 +552,9 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         RunState runState,
         IReadOnlyList<RelicModel> source)
     {
+        if (!ReAstralPartyModSettingsManager.GetEnableVariantPersonas(runState))
+            return source;
+
         var options = AddForcedCompatVariantsIfNeeded(runState, source).ToList();
         if (ReAstralPartyModSettingsManager.GetEnableAllVariantPersonas(runState))
             return AddAllBuiltInVariantPersonas(runState, options);
