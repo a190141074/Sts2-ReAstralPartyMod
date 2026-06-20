@@ -1,4 +1,6 @@
 {
   "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_ENIGMATIC_SYNTHESIS_FORMULA.title": "神秘合成表",
-  "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_ENIGMATIC_SYNTHESIS_FORMULA.description": "すべての神秘合成レシピを確認します。ここでは直接作成しません。"
+  "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_ENIGMATIC_SYNTHESIS_FORMULA.description": "すべての神秘合成レシピを確認します。ここでは直接作成しません。",
+  "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_GLOBAL_SWITCHING_SETTINGS.title": "Content Mode Switch",
+  "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_GLOBAL_SWITCHING_SETTINGS.description": "Vanilla Mode と Modpack Mode を切り替え、それぞれ別々に保存された設定を読み込みます。"
 }

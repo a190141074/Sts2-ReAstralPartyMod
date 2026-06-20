@@ -86,7 +86,11 @@ internal static class LobbyGameplayNetRoleHelper
 
 public sealed class LobbyGameplaySettingsSnapshot
 {
+    public AstralContentMode CurrentContentMode { get; set; } = AstralContentMode.Vanilla;
+
     public bool EnableStartingInitialPoint { get; set; }
+
+    public bool EnableStartingAstralRelicStore { get; set; } = true;
 
     public bool EnableStartingRingOfSevenCurses { get; set; }
 
@@ -143,7 +147,9 @@ public sealed class LobbyGameplaySettingsSnapshot
     {
         return new LobbyGameplaySettingsSnapshot
         {
+            CurrentContentMode = CurrentContentMode,
             EnableStartingInitialPoint = EnableStartingInitialPoint,
+            EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,
@@ -180,23 +186,25 @@ public sealed class LobbyGameplaySettingsSnapshot
     {
         return new LobbyGameplaySettingsSnapshot
         {
-            EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
-            EnableStartingRingOfSevenCurses = settings.EnableStartingRingOfSevenCurses,
-            EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
-            EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
-            EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
-            EnableMoonPropShopSlots = settings.EnableMoonPropShopSlots,
-            EnableNeowExtraOption = settings.EnableNeowExtraOption,
-            EnableLucidDream = settings.EnableLucidDream,
+            CurrentContentMode = ReAstralPartyModSettingsManager.GetCurrentContentMode(),
+            EnableStartingInitialPoint = ReAstralPartyModSettingsManager.EnableStartingInitialPoint,
+            EnableStartingAstralRelicStore = ReAstralPartyModSettingsManager.EnableStartingAstralRelicStore,
+            EnableStartingRingOfSevenCurses = ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
+            EnableStartingPersonaSelection = ReAstralPartyModSettingsManager.EnableStartingPersonaSelection,
+            EnableDreamSeriesEvents = ReAstralPartyModSettingsManager.EnableDreamSeriesEvents,
+            EnableEnigmaticSeriesEvents = ReAstralPartyModSettingsManager.EnableEnigmaticSeriesEvents,
+            EnableMoonPropShopSlots = ReAstralPartyModSettingsManager.EnableMoonPropShopSlots,
+            EnableNeowExtraOption = ReAstralPartyModSettingsManager.EnableNeowExtraOption,
+            EnableLucidDream = ReAstralPartyModSettingsManager.EnableLucidDream,
             NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-                settings.EnableStartingRingOfSevenCurses,
-                settings.NeowExtraOptionSelectionMode),
-            EnableAllPersonas = settings.EnableAllPersonas,
-            EnableVariantPersonas = settings.EnableVariantPersonas,
-            EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
-            EnableExtremeMode = settings.EnableExtremeMode,
-            StartingPersonaMode = ReAstralPartyModSettingsManager.ResolveStartingPersonaMode(settings),
-            TokenSeriesMode = ReAstralPartyModSettingsManager.ResolveTokenSeriesMode(settings)
+                ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
+                ReAstralPartyModSettingsManager.NeowExtraOptionSelectionMode),
+            EnableAllPersonas = ReAstralPartyModSettingsManager.EnableAllPersonas,
+            EnableVariantPersonas = ReAstralPartyModSettingsManager.EnableVariantPersonas,
+            EnableAllVariantPersonas = ReAstralPartyModSettingsManager.EnableAllVariantPersonas,
+            EnableExtremeMode = ReAstralPartyModSettingsManager.EnableExtremeMode,
+            StartingPersonaMode = ReAstralPartyModSettingsManager.ConfiguredStartingPersonaMode,
+            TokenSeriesMode = ReAstralPartyModSettingsManager.TokenSeriesMode
         };
     }
 }
@@ -252,6 +260,15 @@ internal static class LobbyGameplaySettingsSync
         return LobbyGameplaySettingsSnapshot.FromPersistent(ReAstralPartyModSettingsManager.ReadLocalSettings());
     }
 
+    public static void ResetForContentModeSwitch()
+    {
+        SetSnapshotInternal(
+            LobbyGameplaySettingsSnapshot.FromPersistent(ReAstralPartyModSettingsManager.ReadLocalSettings()),
+            "content_mode_switch",
+            true);
+        BroadcastCurrentSnapshot();
+    }
+
     public static void UpdateLocalLobbySnapshot(Action<LobbyGameplaySettingsSnapshot> mutator)
     {
         ArgumentNullException.ThrowIfNull(mutator);
@@ -268,7 +285,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot updated: start_initial_point={updated.EnableStartingInitialPoint}, start_ring_of_seven_curses={updated.EnableStartingRingOfSevenCurses}, start_persona_selection={updated.EnableStartingPersonaSelection}, dream_series={updated.EnableDreamSeriesEvents}, enigmatic_series={updated.EnableEnigmaticSeriesEvents}, moon_shop_slots={updated.EnableMoonPropShopSlots}, neow_extra_option={updated.EnableNeowExtraOption}, lucid_dream={updated.EnableLucidDream}, neow_extra_selection={updated.NeowExtraOptionSelectionMode}, all_personas={updated.EnableAllPersonas}, variants_enabled={updated.EnableVariantPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot updated: content_mode={updated.CurrentContentMode}, start_initial_point={updated.EnableStartingInitialPoint}, start_astral_relic_store={updated.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={updated.EnableStartingRingOfSevenCurses}, start_persona_selection={updated.EnableStartingPersonaSelection}, dream_series={updated.EnableDreamSeriesEvents}, enigmatic_series={updated.EnableEnigmaticSeriesEvents}, moon_shop_slots={updated.EnableMoonPropShopSlots}, neow_extra_option={updated.EnableNeowExtraOption}, lucid_dream={updated.EnableLucidDream}, neow_extra_selection={updated.NeowExtraOptionSelectionMode}, all_personas={updated.EnableAllPersonas}, variants_enabled={updated.EnableVariantPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
         SnapshotChanged?.Invoke(updated.Clone());
     }
 
@@ -287,7 +304,7 @@ internal static class LobbyGameplaySettingsSync
 
         netService.SendMessage(new AstralLobbyGameplaySettingsSnapshotMessage(snapshot));
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: start_initial_point={snapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     public static void RequestSnapshotFromHost()
@@ -400,7 +417,7 @@ internal static class LobbyGameplaySettingsSync
         var snapshot = message.ToSnapshot();
         SetSnapshotInternal(snapshot, $"remote_snapshot_from_{senderId}", true);
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: start_initial_point={snapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     private static void HandleRequestMessage(AstralLobbyGameplaySettingsRequestMessage message, ulong senderId)
@@ -428,7 +445,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
         if (invokeEvent)
             SnapshotChanged?.Invoke(snapshot.Clone());
     }
@@ -477,9 +494,11 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 13;
+    private const int SchemaVersion = 14;
 
+    public AstralContentMode CurrentContentMode { get; set; }
     public bool EnableStartingInitialPoint { get; set; }
+    public bool EnableStartingAstralRelicStore { get; set; } = true;
     public bool EnableStartingRingOfSevenCurses { get; set; }
     public bool EnableStartingPersonaSelection { get; set; }
     public bool EnableDreamSeriesEvents { get; set; }
@@ -512,7 +531,9 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
 
     public AstralLobbyGameplaySettingsSnapshotMessage(LobbyGameplaySettingsSnapshot snapshot)
     {
+        CurrentContentMode = snapshot.CurrentContentMode;
         EnableStartingInitialPoint = snapshot.EnableStartingInitialPoint;
+        EnableStartingAstralRelicStore = snapshot.EnableStartingAstralRelicStore;
         EnableStartingRingOfSevenCurses = snapshot.EnableStartingRingOfSevenCurses;
         EnableStartingPersonaSelection = snapshot.EnableStartingPersonaSelection;
         EnableDreamSeriesEvents = snapshot.EnableDreamSeriesEvents;
@@ -552,7 +573,9 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public void Serialize(PacketWriter writer)
     {
         writer.WriteInt(SchemaVersion);
+        writer.WriteEnum(CurrentContentMode);
         writer.WriteBool(EnableStartingInitialPoint);
+        writer.WriteBool(EnableStartingAstralRelicStore);
         writer.WriteBool(EnableStartingRingOfSevenCurses);
         writer.WriteBool(EnableStartingPersonaSelection);
         writer.WriteBool(EnableDreamSeriesEvents);
@@ -587,9 +610,20 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public void Deserialize(PacketReader reader)
     {
         var schemaVersion = reader.ReadInt();
-        if (schemaVersion >= 10)
+        if (schemaVersion >= 14)
         {
+            var rawMode = reader.ReadEnum<AstralContentMode>();
+            CurrentContentMode = AstralContentModeRegistry.NormalizeMode(rawMode);
             EnableStartingInitialPoint = reader.ReadBool();
+            EnableStartingAstralRelicStore = reader.ReadBool();
+            EnableStartingRingOfSevenCurses = reader.ReadBool();
+            EnableStartingPersonaSelection = reader.ReadBool();
+        }
+        else if (schemaVersion >= 10)
+        {
+            CurrentContentMode = AstralContentMode.Vanilla;
+            EnableStartingInitialPoint = reader.ReadBool();
+            EnableStartingAstralRelicStore = true;
             EnableStartingRingOfSevenCurses = reader.ReadBool();
             EnableStartingPersonaSelection = reader.ReadBool();
         }
@@ -735,7 +769,9 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     {
         return new LobbyGameplaySettingsSnapshot
         {
+            CurrentContentMode = CurrentContentMode,
             EnableStartingInitialPoint = EnableStartingInitialPoint,
+            EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,

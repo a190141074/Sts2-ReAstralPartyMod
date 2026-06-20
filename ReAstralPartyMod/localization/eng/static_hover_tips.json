@@ -1,4 +1,6 @@
 {
   "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_ENIGMATIC_SYNTHESIS_FORMULA.title": "Enigmatic Synthesis Formulae",
-  "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_ENIGMATIC_SYNTHESIS_FORMULA.description": "View every Enigmatic Synthesis recipe without crafting anything."
+  "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_ENIGMATIC_SYNTHESIS_FORMULA.description": "View every Enigmatic Synthesis recipe without crafting anything.",
+  "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_GLOBAL_SWITCHING_SETTINGS.title": "Content Mode Switch",
+  "RE_ASTRAL_PARTY_MOD_TOPBARBUTTON_GLOBAL_SWITCHING_SETTINGS.description": "Switch between Vanilla Mode and Modpack Mode, each with its own separately saved settings."
 }

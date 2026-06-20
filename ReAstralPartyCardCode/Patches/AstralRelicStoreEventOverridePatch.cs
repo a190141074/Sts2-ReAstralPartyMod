@@ -56,6 +56,9 @@ public sealed class AstralRelicStoreEventOverridePatch : IPatchMethod
         if (runState == null || currentEvent == null)
             return false;
 
+        if (!Settings.ReAstralPartyModSettingsManager.GetEnableStartingAstralRelicStore(runState))
+            return false;
+
         if (!IsSecondAct(runState, act))
             return false;
 

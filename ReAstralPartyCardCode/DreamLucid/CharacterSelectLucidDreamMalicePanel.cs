@@ -502,8 +502,9 @@ internal sealed partial class CharacterSelectLucidDreamMalicePanel : Control
 
     private void ApplySnapshot(LobbyGameplaySettingsSnapshot snapshot)
     {
-        Visible = snapshot.EnableLucidDream;
-        if (!snapshot.EnableLucidDream)
+        var currentMode = AstralContentModeRegistry.NormalizeMode(snapshot.CurrentContentMode);
+        Visible = currentMode == AstralContentMode.Modpack && snapshot.EnableLucidDream;
+        if (!Visible)
             return;
 
         var isEditable = GetCurrentRoleForUi() == LobbyGameplayNetRole.Host;

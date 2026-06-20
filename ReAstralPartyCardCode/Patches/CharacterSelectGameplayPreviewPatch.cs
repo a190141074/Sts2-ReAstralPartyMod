@@ -173,6 +173,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private readonly Dictionary<Control, IReadOnlyList<IHoverTip>> _hoverTipsByControl = [];
     private CheckButton? _startingInitialPointToggle;
+    private CheckButton? _startingAstralRelicStoreToggle;
     private CheckButton? _startingRingOfSevenCursesToggle;
     private CheckButton? _startingPersonaSelectionToggle;
     private CheckButton? _dreamSeriesEventsToggle;
@@ -356,6 +357,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description"),
             out _startingInitialPointToggle,
             OnEnableStartingInitialPointToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.description"),
+            out _startingAstralRelicStoreToggle,
+            OnEnableStartingAstralRelicStoreToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.description"),
@@ -829,6 +835,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         {
             var role = GetCurrentRoleForUi();
             var isEditable = IsEditableByLocalPlayer(role);
+            var currentMode = AstralContentModeRegistry.NormalizeMode(snapshot.CurrentContentMode);
+            var isVanillaMode = currentMode == AstralContentMode.Vanilla;
             var personaSelectionEnabled = snapshot.EnableStartingPersonaSelection;
             var variantPersonasEnabled = snapshot.EnableVariantPersonas;
             var normalizedNeowSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
@@ -841,11 +849,19 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _startingInitialPointToggle.Text = snapshot.EnableStartingInitialPoint ? "ON" : "OFF";
             }
 
+            if (_startingAstralRelicStoreToggle != null)
+            {
+                _startingAstralRelicStoreToggle.ButtonPressed = snapshot.EnableStartingAstralRelicStore;
+                _startingAstralRelicStoreToggle.Disabled = !isEditable;
+                _startingAstralRelicStoreToggle.Text = snapshot.EnableStartingAstralRelicStore ? "ON" : "OFF";
+            }
+
             if (_startingRingOfSevenCursesToggle != null)
             {
                 _startingRingOfSevenCursesToggle.ButtonPressed = snapshot.EnableStartingRingOfSevenCurses;
                 _startingRingOfSevenCursesToggle.Disabled = !isEditable;
                 _startingRingOfSevenCursesToggle.Text = snapshot.EnableStartingRingOfSevenCurses ? "ON" : "OFF";
+                SetRowVisible(_startingRingOfSevenCursesToggle, !isVanillaMode);
             }
 
             if (_startingPersonaSelectionToggle != null)
@@ -860,6 +876,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _variantPersonasToggle.ButtonPressed = snapshot.EnableVariantPersonas;
                 _variantPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled;
                 _variantPersonasToggle.Text = snapshot.EnableVariantPersonas ? "ON" : "OFF";
+                SetRowVisible(_variantPersonasToggle, !isVanillaMode);
             }
 
             if (_dreamSeriesEventsToggle != null)
@@ -867,6 +884,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _dreamSeriesEventsToggle.ButtonPressed = snapshot.EnableDreamSeriesEvents;
                 _dreamSeriesEventsToggle.Disabled = !isEditable;
                 _dreamSeriesEventsToggle.Text = snapshot.EnableDreamSeriesEvents ? "ON" : "OFF";
+                SetRowVisible(_dreamSeriesEventsToggle, !isVanillaMode);
             }
 
             if (_enigmaticSeriesEventsToggle != null)
@@ -874,6 +892,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _enigmaticSeriesEventsToggle.ButtonPressed = snapshot.EnableEnigmaticSeriesEvents;
                 _enigmaticSeriesEventsToggle.Disabled = !isEditable;
                 _enigmaticSeriesEventsToggle.Text = snapshot.EnableEnigmaticSeriesEvents ? "ON" : "OFF";
+                SetRowVisible(_enigmaticSeriesEventsToggle, !isVanillaMode);
             }
 
             if (_moonPropShopSlotsToggle != null)
@@ -881,6 +900,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _moonPropShopSlotsToggle.ButtonPressed = snapshot.EnableMoonPropShopSlots;
                 _moonPropShopSlotsToggle.Disabled = !isEditable;
                 _moonPropShopSlotsToggle.Text = snapshot.EnableMoonPropShopSlots ? "ON" : "OFF";
+                SetRowVisible(_moonPropShopSlotsToggle, !isVanillaMode);
             }
 
             if (_neowExtraOptionToggle != null)
@@ -888,6 +908,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _neowExtraOptionToggle.ButtonPressed = snapshot.EnableNeowExtraOption;
                 _neowExtraOptionToggle.Disabled = !isEditable;
                 _neowExtraOptionToggle.Text = snapshot.EnableNeowExtraOption ? "ON" : "OFF";
+                SetRowVisible(_neowExtraOptionToggle, !isVanillaMode);
             }
 
             if (_lucidDreamToggle != null)
@@ -895,6 +916,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _lucidDreamToggle.ButtonPressed = snapshot.EnableLucidDream;
                 _lucidDreamToggle.Disabled = !isEditable;
                 _lucidDreamToggle.Text = snapshot.EnableLucidDream ? "ON" : "OFF";
+                SetRowVisible(_lucidDreamToggle, !isVanillaMode);
             }
 
             if (_neowExtraOptionSelectionModeOption != null)
@@ -903,6 +925,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _neowExtraOptionSelectionModeOption.Select(
                     IndexOfVisibleNeowExtraOptionSelectionMode(normalizedNeowSelectionMode));
                 _neowExtraOptionSelectionModeOption.Disabled = !isEditable || !snapshot.EnableNeowExtraOption;
+                SetRowVisible(_neowExtraOptionSelectionModeOption, !isVanillaMode);
             }
 
             if (_allPersonasToggle != null)
@@ -917,6 +940,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _allVariantPersonasToggle.ButtonPressed = snapshot.EnableAllVariantPersonas;
                 _allVariantPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled || !variantPersonasEnabled;
                 _allVariantPersonasToggle.Text = snapshot.EnableAllVariantPersonas ? "ON" : "OFF";
+                SetRowVisible(_allVariantPersonasToggle, !isVanillaMode);
             }
 
             if (_extremeModeToggle != null)
@@ -958,13 +982,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
             if (_stateLabel != null)
             {
-                _stateLabel.Text = role switch
+                var roleText = role switch
                 {
                     LobbyGameplayNetRole.Host => "Host",
                     LobbyGameplayNetRole.Singleplayer => "Solo",
                     LobbyGameplayNetRole.Client => "Read Only",
                     _ => "Syncing"
                 };
+                _stateLabel.Text = $"{(currentMode == AstralContentMode.Vanilla ? "原版" : "整合包")} | {roleText}";
             }
         }
         finally
@@ -976,6 +1001,12 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private static bool IsEditableByLocalPlayer(LobbyGameplayNetRole role)
     {
         return role == LobbyGameplayNetRole.Host;
+    }
+
+    private static void SetRowVisible(Control childControl, bool visible)
+    {
+        if (childControl.GetParent()?.GetParent() is Control rowRoot)
+            rowRoot.Visible = visible;
     }
 
     private LobbyGameplayNetRole GetCurrentRoleForUi()
@@ -1017,7 +1048,9 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         _secondsSinceSnapshotUpdate = 0d;
         _syncErrorShown = false;
         _hasReceivedSnapshotForCurrentSession = true;
-        CallDeferred(nameof(ApplySnapshotDeferred), Variant.From(snapshot.EnableStartingInitialPoint),
+        CallDeferred(nameof(ApplySnapshotDeferred), Variant.From((int)snapshot.CurrentContentMode),
+            Variant.From(snapshot.EnableStartingInitialPoint),
+            Variant.From(snapshot.EnableStartingAstralRelicStore),
             Variant.From(snapshot.EnableStartingRingOfSevenCurses),
             Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableDreamSeriesEvents),
             Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableMoonPropShopSlots), Variant.From(snapshot.EnableNeowExtraOption),
@@ -1027,7 +1060,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
     }
 
-    private void ApplySnapshotDeferred(bool enableStartingInitialPoint, bool enableStartingRingOfSevenCurses, bool enableStartingPersonaSelection,
+    private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint, bool enableStartingAstralRelicStore, bool enableStartingRingOfSevenCurses, bool enableStartingPersonaSelection,
         bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableMoonPropShopSlots, bool enableNeowExtraOption,
         bool enableLucidDream,
         int neowExtraOptionSelectionMode,
@@ -1035,7 +1068,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     {
         ApplySnapshotToUi(new LobbyGameplaySettingsSnapshot
         {
+            CurrentContentMode = Enum.IsDefined(typeof(AstralContentMode), currentContentMode)
+                ? (AstralContentMode)currentContentMode
+                : AstralContentMode.Vanilla,
             EnableStartingInitialPoint = enableStartingInitialPoint,
+            EnableStartingAstralRelicStore = enableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = enableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = enableStartingPersonaSelection,
             EnableDreamSeriesEvents = enableDreamSeriesEvents,
@@ -1074,6 +1111,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingInitialPoint = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableStartingAstralRelicStoreToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingAstralRelicStore = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

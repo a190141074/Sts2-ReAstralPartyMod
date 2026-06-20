@@ -57,6 +57,65 @@ public enum StartingPersonaMode
 
 public sealed class ReAstralPartyModSettings
 {
+    public sealed class AstralModeScopedGameplaySettings
+    {
+        public bool EnableExtremeMode { get; set; }
+
+        public bool EnableStartingInitialPoint { get; set; }
+
+        public bool EnableStartingAstralRelicStore { get; set; } = true;
+
+        public bool EnableStartingRingOfSevenCurses { get; set; }
+
+        public bool EnableStartingPersonaSelection { get; set; } = true;
+
+        public bool EnableDreamSeriesEvents { get; set; } = true;
+
+        public bool EnableEnigmaticSeriesEvents { get; set; } = true;
+
+        public bool EnableMoonPropShopSlots { get; set; } = true;
+
+        public bool EnableNeowExtraOption { get; set; } = true;
+
+        public bool EnableLucidDream { get; set; } = true;
+
+        public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; } =
+            NeowExtraOptionSelectionMode.DefaultRandom;
+
+        public bool EnableAllPersonas { get; set; }
+
+        public bool EnableVariantPersonas { get; set; } = true;
+
+        public bool EnableAllVariantPersonas { get; set; }
+
+        public StartingPersonaMode StartingPersonaMode { get; set; } = StartingPersonaMode.Standard;
+
+        public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
+
+        public AstralModeScopedGameplaySettings Clone()
+        {
+            return new AstralModeScopedGameplaySettings
+            {
+                EnableExtremeMode = EnableExtremeMode,
+                EnableStartingInitialPoint = EnableStartingInitialPoint,
+                EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
+                EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
+                EnableStartingPersonaSelection = EnableStartingPersonaSelection,
+                EnableDreamSeriesEvents = EnableDreamSeriesEvents,
+                EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
+                EnableMoonPropShopSlots = EnableMoonPropShopSlots,
+                EnableNeowExtraOption = EnableNeowExtraOption,
+                EnableLucidDream = EnableLucidDream,
+                NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode,
+                EnableAllPersonas = EnableAllPersonas,
+                EnableVariantPersonas = EnableVariantPersonas,
+                EnableAllVariantPersonas = EnableAllVariantPersonas,
+                StartingPersonaMode = StartingPersonaMode,
+                TokenSeriesMode = TokenSeriesMode
+            };
+        }
+    }
+
     public sealed class LobbyPanelStateModel
     {
         public bool IsCollapsed { get; set; }
@@ -75,9 +134,19 @@ public sealed class ReAstralPartyModSettings
     // Legacy field kept so older settings.json files still load cleanly.
     public List<string>? BannedPersonaRelicIds { get; set; }
 
+    public AstralContentMode CurrentContentMode { get; set; } = AstralContentMode.Vanilla;
+
+    public bool ContentModeSettingsInitialized { get; set; }
+
+    public AstralModeScopedGameplaySettings VanillaModeSettings { get; set; } = new();
+
+    public AstralModeScopedGameplaySettings ModpackModeSettings { get; set; } = new();
+
     public bool EnableExtremeMode { get; set; }
 
     public bool EnableStartingInitialPoint { get; set; }
+
+    public bool EnableStartingAstralRelicStore { get; set; } = true;
 
     public bool EnableStartingRingOfSevenCurses { get; set; }
 
@@ -173,6 +242,8 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool EnableStartingInitialPoint => ReadRuntime(settings => settings.EnableStartingInitialPoint);
 
+    public static bool EnableStartingAstralRelicStore => ReadRuntime(settings => settings.EnableStartingAstralRelicStore);
+
     public static bool EnableStartingRingOfSevenCurses => ReadRuntime(settings => settings.EnableStartingRingOfSevenCurses);
 
     public static bool EnableStartingPersonaSelection => ReadRuntime(settings => settings.EnableStartingPersonaSelection);
@@ -254,12 +325,41 @@ public static partial class ReAstralPartyModSettingsManager
     {
         try
         {
-            return RitsuLibFramework.GetDataStore(MainFile.ModId).Get<ReAstralPartyModSettings>(SettingsKey);
+            var settings = RitsuLibFramework.GetDataStore(MainFile.ModId).Get<ReAstralPartyModSettings>(SettingsKey);
+            EnsureContentModeSettingsInitialized(settings);
+            return settings;
         }
         catch
         {
-            return new ReAstralPartyModSettings();
+            var settings = new ReAstralPartyModSettings();
+            EnsureContentModeSettingsInitialized(settings);
+            return settings;
         }
+    }
+
+    public static AstralContentMode GetCurrentContentMode()
+    {
+        return ReadRuntime(settings => settings.CurrentContentMode);
+    }
+
+    public static AstralContentMode GetCurrentContentMode(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var runSnapshot))
+            return AstralContentModeRegistry.NormalizeMode(runSnapshot.CurrentContentMode);
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return AstralContentModeRegistry.NormalizeMode(lobbySnapshot.CurrentContentMode);
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.CurrentContentMode;
+
+        return GetCurrentContentMode();
+    }
+
+    public static void SetCurrentContentMode(AstralContentMode mode)
+    {
+        var normalizedMode = AstralContentModeRegistry.NormalizeMode(mode);
+        UpdatePersistentSettings(settings => settings.CurrentContentMode = normalizedMode, "set_current_content_mode");
     }
 
     public static TokenSeriesMode ResolveTokenSeriesMode(ReAstralPartyModSettings settings)
@@ -294,6 +394,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool GetEnableVariantPersonas(IRunState? runState)
     {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.VariantPersonas))
+            return false;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableVariantPersonas;
 
@@ -311,6 +414,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool GetEnableDreamSeriesEvents(IRunState? runState)
     {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.DreamSeriesEvents))
+            return false;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableDreamSeriesEvents;
 
@@ -328,6 +434,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool GetEnableEnigmaticSeriesEvents(IRunState? runState)
     {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.EnigmaticSeriesEvents))
+            return false;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableEnigmaticSeriesEvents;
 
@@ -345,6 +454,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool GetEnableMoonPropShopSlots(IRunState? runState)
     {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.MoonPropShopSlots))
+            return false;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableMoonPropShopSlots;
 
@@ -362,6 +474,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool GetEnableNeowExtraOption(IRunState? runState)
     {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.NeowExtraOption))
+            return false;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableNeowExtraOption;
 
@@ -379,6 +494,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool GetEnableLucidDream(IRunState? runState)
     {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.LucidDream))
+            return false;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableLucidDream;
 
@@ -396,6 +514,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static NeowExtraOptionSelectionMode GetNeowExtraOptionSelectionMode(IRunState? runState)
     {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.NeowExtraOptionSelectionMode))
+            return NeowExtraOptionSelectionMode.DefaultRandom;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return NormalizeNeowExtraOptionSelectionMode(
                 snapshot.EnableStartingRingOfSevenCurses,
@@ -436,8 +557,29 @@ public static partial class ReAstralPartyModSettingsManager
         return EnableStartingInitialPoint;
     }
 
+    public static bool GetEnableStartingAstralRelicStore(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableStartingAstralRelicStore;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableStartingAstralRelicStore;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableStartingAstralRelicStore;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableStartingAstralRelicStore;
+    }
+
+
     public static bool GetEnableStartingRingOfSevenCurses(IRunState? runState)
     {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.StartingRingOfSevenCurses))
+            return false;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableStartingRingOfSevenCurses;
 
@@ -1139,10 +1281,14 @@ public static partial class ReAstralPartyModSettingsManager
         var enableAllPersonas = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableAllPersonas,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableAllPersonas;
+            },
             (settings, value) =>
             {
-                settings.EnableAllPersonas = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableAllPersonas = value);
                 ApplyRuntimeSettings(settings, "enable_all_personas");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_personas.label",
@@ -1152,23 +1298,48 @@ public static partial class ReAstralPartyModSettingsManager
         var enableStartingInitialPoint = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableStartingInitialPoint,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableStartingInitialPoint;
+            },
             (settings, value) =>
             {
-                settings.EnableStartingInitialPoint = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableStartingInitialPoint = value);
                 ApplyRuntimeSettings(settings, "enable_starting_initial_point");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label",
                     value);
             });
 
+        var enableStartingAstralRelicStore = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableStartingAstralRelicStore;
+            },
+            (settings, value) =>
+            {
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableStartingAstralRelicStore = value);
+                ApplyRuntimeSettings(settings, "enable_starting_astral_relic_store");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.label",
+                    value);
+            });
+
         var enableStartingPersonaSelection = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableStartingPersonaSelection,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableStartingPersonaSelection;
+            },
             (settings, value) =>
             {
-                settings.EnableStartingPersonaSelection = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableStartingPersonaSelection = value);
                 ApplyRuntimeSettings(settings, "enable_starting_persona_selection");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label",
@@ -1178,10 +1349,14 @@ public static partial class ReAstralPartyModSettingsManager
         var enableVariantPersonas = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableVariantPersonas,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableVariantPersonas;
+            },
             (settings, value) =>
             {
-                settings.EnableVariantPersonas = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableVariantPersonas = value);
                 ApplyRuntimeSettings(settings, "enable_variant_personas");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.label",
@@ -1191,10 +1366,14 @@ public static partial class ReAstralPartyModSettingsManager
         var enableDreamSeriesEvents = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableDreamSeriesEvents,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableDreamSeriesEvents;
+            },
             (settings, value) =>
             {
-                settings.EnableDreamSeriesEvents = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableDreamSeriesEvents = value);
                 ApplyRuntimeSettings(settings, "enable_dream_series_events");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label",
@@ -1204,10 +1383,14 @@ public static partial class ReAstralPartyModSettingsManager
         var enableEnigmaticSeriesEvents = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableEnigmaticSeriesEvents,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableEnigmaticSeriesEvents;
+            },
             (settings, value) =>
             {
-                settings.EnableEnigmaticSeriesEvents = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableEnigmaticSeriesEvents = value);
                 ApplyRuntimeSettings(settings, "enable_enigmatic_series_events");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.label",
@@ -1217,10 +1400,14 @@ public static partial class ReAstralPartyModSettingsManager
         var enableMoonPropShopSlots = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableMoonPropShopSlots,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableMoonPropShopSlots;
+            },
             (settings, value) =>
             {
-                settings.EnableMoonPropShopSlots = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableMoonPropShopSlots = value);
                 ApplyRuntimeSettings(settings, "enable_moon_prop_shop_slots");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label",
@@ -1230,10 +1417,14 @@ public static partial class ReAstralPartyModSettingsManager
         var enableNeowExtraOption = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableNeowExtraOption,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableNeowExtraOption;
+            },
             (settings, value) =>
             {
-                settings.EnableNeowExtraOption = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableNeowExtraOption = value);
                 ApplyRuntimeSettings(settings, "enable_neow_extra_option");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label",
@@ -1243,10 +1434,14 @@ public static partial class ReAstralPartyModSettingsManager
         var enableLucidDream = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableLucidDream,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableLucidDream;
+            },
             (settings, value) =>
             {
-                settings.EnableLucidDream = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableLucidDream = value);
                 ApplyRuntimeSettings(settings, "enable_lucid_dream");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label",
@@ -1256,15 +1451,21 @@ public static partial class ReAstralPartyModSettingsManager
         var neowExtraOptionSelectionMode = ModSettingsBindings.Global<ReAstralPartyModSettings, NeowExtraOptionSelectionMode>(
             MainFile.ModId,
             SettingsKey,
-            settings => NormalizeNeowExtraOptionSelectionMode(
-                settings.EnableStartingRingOfSevenCurses,
-                settings.NeowExtraOptionSelectionMode),
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                var scoped = GetScopedSettingsForCurrentMode(settings);
+                return NormalizeNeowExtraOptionSelectionMode(
+                    scoped.EnableStartingRingOfSevenCurses,
+                    scoped.NeowExtraOptionSelectionMode);
+            },
             (settings, value) =>
             {
+                var scoped = GetScopedSettingsForCurrentMode(settings);
                 var normalizedValue = NormalizeNeowExtraOptionSelectionMode(
-                    settings.EnableStartingRingOfSevenCurses,
+                    scoped.EnableStartingRingOfSevenCurses,
                     value);
-                settings.NeowExtraOptionSelectionMode = normalizedValue;
+                UpdateCurrentModeScopedGameplaySettings(settings, activeScoped => activeScoped.NeowExtraOptionSelectionMode = normalizedValue);
                 ApplyRuntimeSettings(settings, "neow_extra_option_selection_mode");
                 ShowNeowExtraOptionSelectionModeToast(normalizedValue);
             });
@@ -1272,10 +1473,14 @@ public static partial class ReAstralPartyModSettingsManager
         var enableExtremeMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableExtremeMode,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableExtremeMode;
+            },
             (settings, value) =>
             {
-                settings.EnableExtremeMode = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableExtremeMode = value);
                 ApplyRuntimeSettings(settings, "enable_extreme_mode");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label",
@@ -1285,10 +1490,14 @@ public static partial class ReAstralPartyModSettingsManager
         var enableAllVariantPersonas = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableAllVariantPersonas,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableAllVariantPersonas;
+            },
             (settings, value) =>
             {
-                settings.EnableAllVariantPersonas = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableAllVariantPersonas = value);
                 ApplyRuntimeSettings(settings, "enable_all_variant_personas");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.label",
@@ -1298,10 +1507,14 @@ public static partial class ReAstralPartyModSettingsManager
         var tokenSeriesMode = ModSettingsBindings.Global<ReAstralPartyModSettings, TokenSeriesMode>(
             MainFile.ModId,
             SettingsKey,
-            settings => ResolveTokenSeriesModeCore(settings),
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).TokenSeriesMode;
+            },
             (settings, value) =>
             {
-                settings.TokenSeriesMode = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.TokenSeriesMode = value);
                 settings.EnableAllTokenSeries = null;
                 ApplyRuntimeSettings(settings, "token_series_mode");
                 ShowTokenSeriesModeToast(value);
@@ -1310,10 +1523,14 @@ public static partial class ReAstralPartyModSettingsManager
         var startingPersonaMode = ModSettingsBindings.Global<ReAstralPartyModSettings, StartingPersonaMode>(
             MainFile.ModId,
             SettingsKey,
-            settings => ResolveStartingPersonaMode(settings),
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).StartingPersonaMode;
+            },
             (settings, value) =>
             {
-                settings.StartingPersonaMode = value;
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.StartingPersonaMode = value);
                 settings.EnableDuplicatePersonas = null;
                 settings.EnableRandomCloneMode = null;
                 settings.StartingPersonaDisplayMode = null;
@@ -1338,13 +1555,20 @@ public static partial class ReAstralPartyModSettingsManager
         var enableStartingRingOfSevenCurses = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
-            settings => settings.EnableStartingRingOfSevenCurses,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableStartingRingOfSevenCurses;
+            },
             (settings, value) =>
             {
-                settings.EnableStartingRingOfSevenCurses = value;
-                settings.NeowExtraOptionSelectionMode = NormalizeNeowExtraOptionSelectionMode(
-                    settings.EnableStartingRingOfSevenCurses,
-                    settings.NeowExtraOptionSelectionMode);
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped =>
+                {
+                    scoped.EnableStartingRingOfSevenCurses = value;
+                    scoped.NeowExtraOptionSelectionMode = NormalizeNeowExtraOptionSelectionMode(
+                        scoped.EnableStartingRingOfSevenCurses,
+                        scoped.NeowExtraOptionSelectionMode);
+                });
                 ApplyRuntimeSettings(settings, "enable_starting_ring_of_seven_curses");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label",
@@ -1537,6 +1761,12 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description",
                         "At run start, every player automatically obtains Initial Point and loses 1 Gold."))
                 .AddToggle(
+                    "enable_starting_astral_relic_store",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.label", "Enable Astral Relic Store"),
+                    enableStartingAstralRelicStore,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.description",
+                        "Control whether the first actual event pull in Act 2 is replaced with Astral Relic Store."))
+                .AddToggle(
                     "enable_starting_ring_of_seven_curses",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label",
                         "Enable Starting Ring of Seven Curses"),
@@ -1661,7 +1891,52 @@ public static partial class ReAstralPartyModSettingsManager
                     },
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.description",
                         "Choose whether runs use two random expansions, all expansions, or no expansion series at all."),
-                    ModSettingsChoicePresentation.Dropdown))
+                    ModSettingsChoicePresentation.Dropdown)
+                .WithEntryEnabledWhen("enable_variant_personas", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.VariantPersonas,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_all_variant_personas", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.AllVariantPersonas,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_dream_series_events", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.DreamSeriesEvents,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_enigmatic_series_events", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.EnigmaticSeriesEvents,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_moon_prop_shop_slots", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.MoonPropShopSlots,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_neow_extra_option", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.NeowExtraOption,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("neow_extra_option_selection_mode", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.NeowExtraOptionSelectionMode,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_lucid_dream", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.LucidDream,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_starting_ring_of_seven_curses", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.StartingRingOfSevenCurses,
+                        roomSurface: false) == AstralModeAvailability.Editable))
             .AddSection("ban", section => section
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.ban.title", "BAN"))
                 .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.ban.description",
@@ -1999,6 +2274,7 @@ public static partial class ReAstralPartyModSettingsManager
         {
             var store = RitsuLibFramework.GetDataStore(MainFile.ModId);
             var settings = store.Get<ReAstralPartyModSettings>(SettingsKey);
+            EnsureContentModeSettingsInitialized(settings);
             mutator(settings);
             ApplyRuntimeSettings(settings, reason);
             store.Save(SettingsKey);
@@ -2011,6 +2287,7 @@ public static partial class ReAstralPartyModSettingsManager
 
     private static void ApplyRuntimeSettings(ReAstralPartyModSettings settings, string reason)
     {
+        EnsureContentModeSettingsInitialized(settings);
         var snapshot = LocalRuntimeSettings.FromPersistent(settings);
         lock (RuntimeSettingsGate)
         {
@@ -2018,7 +2295,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): start_initial_point={snapshot.EnableStartingInitialPoint}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonaMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -2375,6 +2652,112 @@ public static partial class ReAstralPartyModSettingsManager
         return true;
     }
 
+    private static bool IsGameplaySettingEnabledForMode(IRunState? runState, AstralGameplaySettingKey key)
+    {
+        return AstralContentModeRegistry.IsEnabledByMode(GetCurrentContentMode(runState), key);
+    }
+
+    private static void EnsureContentModeSettingsInitialized(ReAstralPartyModSettings settings)
+    {
+        if (settings.ContentModeSettingsInitialized)
+            return;
+
+        settings.ModpackModeSettings = BuildModeScopedSettingsFromLegacy(settings);
+        settings.VanillaModeSettings = BuildVanillaModeDefaults();
+        settings.CurrentContentMode = AstralContentMode.Vanilla;
+        settings.ContentModeSettingsInitialized = true;
+    }
+
+    private static ReAstralPartyModSettings.AstralModeScopedGameplaySettings BuildModeScopedSettingsFromLegacy(
+        ReAstralPartyModSettings settings)
+    {
+        return new ReAstralPartyModSettings.AstralModeScopedGameplaySettings
+        {
+            EnableExtremeMode = settings.EnableExtremeMode,
+            EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
+            EnableStartingAstralRelicStore = settings.EnableStartingAstralRelicStore,
+            EnableStartingRingOfSevenCurses = settings.EnableStartingRingOfSevenCurses,
+            EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
+            EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
+            EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
+            EnableMoonPropShopSlots = settings.EnableMoonPropShopSlots,
+            EnableNeowExtraOption = settings.EnableNeowExtraOption,
+            EnableLucidDream = settings.EnableLucidDream,
+            NeowExtraOptionSelectionMode = NormalizeNeowExtraOptionSelectionMode(
+                settings.EnableStartingRingOfSevenCurses,
+                settings.NeowExtraOptionSelectionMode),
+            EnableAllPersonas = settings.EnableAllPersonas,
+            EnableVariantPersonas = settings.EnableVariantPersonas,
+            EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
+            StartingPersonaMode = ResolveStartingPersonaMode(settings),
+            TokenSeriesMode = ResolveTokenSeriesModeCore(settings)
+        };
+    }
+
+    private static ReAstralPartyModSettings.AstralModeScopedGameplaySettings BuildVanillaModeDefaults()
+    {
+        return new ReAstralPartyModSettings.AstralModeScopedGameplaySettings
+        {
+            EnableExtremeMode = false,
+            EnableStartingInitialPoint = false,
+            EnableStartingAstralRelicStore = true,
+            EnableStartingRingOfSevenCurses = false,
+            EnableStartingPersonaSelection = true,
+            EnableDreamSeriesEvents = false,
+            EnableEnigmaticSeriesEvents = false,
+            EnableMoonPropShopSlots = false,
+            EnableNeowExtraOption = false,
+            EnableLucidDream = false,
+            NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom,
+            EnableAllPersonas = false,
+            EnableVariantPersonas = false,
+            EnableAllVariantPersonas = false,
+            StartingPersonaMode = StartingPersonaMode.Standard,
+            TokenSeriesMode = TokenSeriesMode.RandomTwo
+        };
+    }
+
+    private static ReAstralPartyModSettings.AstralModeScopedGameplaySettings GetScopedSettingsForCurrentMode(
+        ReAstralPartyModSettings settings)
+    {
+        EnsureContentModeSettingsInitialized(settings);
+        var mode = AstralContentModeRegistry.NormalizeMode(settings.CurrentContentMode);
+        return mode == AstralContentMode.Modpack
+            ? settings.ModpackModeSettings ??= BuildModeScopedSettingsFromLegacy(settings)
+            : settings.VanillaModeSettings ??= BuildVanillaModeDefaults();
+    }
+
+    private static void UpdateCurrentModeScopedGameplaySettings(
+        ReAstralPartyModSettings settings,
+        Action<ReAstralPartyModSettings.AstralModeScopedGameplaySettings> mutator)
+    {
+        EnsureContentModeSettingsInitialized(settings);
+        mutator(GetScopedSettingsForCurrentMode(settings));
+        SyncLegacyGameplayFields(settings);
+    }
+
+    private static void SyncLegacyGameplayFields(ReAstralPartyModSettings settings)
+    {
+        EnsureContentModeSettingsInitialized(settings);
+        var modpack = settings.ModpackModeSettings ??= BuildModeScopedSettingsFromLegacy(settings);
+        settings.EnableExtremeMode = modpack.EnableExtremeMode;
+        settings.EnableStartingInitialPoint = modpack.EnableStartingInitialPoint;
+        settings.EnableStartingAstralRelicStore = modpack.EnableStartingAstralRelicStore;
+        settings.EnableStartingRingOfSevenCurses = modpack.EnableStartingRingOfSevenCurses;
+        settings.EnableStartingPersonaSelection = modpack.EnableStartingPersonaSelection;
+        settings.EnableDreamSeriesEvents = modpack.EnableDreamSeriesEvents;
+        settings.EnableEnigmaticSeriesEvents = modpack.EnableEnigmaticSeriesEvents;
+        settings.EnableMoonPropShopSlots = modpack.EnableMoonPropShopSlots;
+        settings.EnableNeowExtraOption = modpack.EnableNeowExtraOption;
+        settings.EnableLucidDream = modpack.EnableLucidDream;
+        settings.NeowExtraOptionSelectionMode = modpack.NeowExtraOptionSelectionMode;
+        settings.EnableAllPersonas = modpack.EnableAllPersonas;
+        settings.EnableVariantPersonas = modpack.EnableVariantPersonas;
+        settings.EnableAllVariantPersonas = modpack.EnableAllVariantPersonas;
+        settings.StartingPersonaMode = modpack.StartingPersonaMode;
+        settings.TokenSeriesMode = modpack.TokenSeriesMode;
+    }
+
     private sealed class LocalRuntimeSettings
     {
         public sealed class LobbyPanelStateSnapshot
@@ -2394,9 +2777,13 @@ public static partial class ReAstralPartyModSettingsManager
 
         public IReadOnlySet<ModelId> BannedPersonaRelicIds => BannedRelicIds;
 
+        public AstralContentMode CurrentContentMode { get; init; } = AstralContentMode.Vanilla;
+
         public bool EnableExtremeMode { get; init; }
 
         public bool EnableStartingInitialPoint { get; init; }
+
+        public bool EnableStartingAstralRelicStore { get; init; } = true;
 
         public bool EnableStartingRingOfSevenCurses { get; init; }
 
@@ -2487,23 +2874,27 @@ public static partial class ReAstralPartyModSettingsManager
 
         public static LocalRuntimeSettings FromPersistent(ReAstralPartyModSettings settings)
         {
+            EnsureContentModeSettingsInitialized(settings);
+            var scoped = GetScopedSettingsForCurrentMode(settings);
             return new LocalRuntimeSettings
             {
                 BannedRelicIds = DeserializeModelIdSet(ResolveBannedRelicIds(settings)),
-                EnableExtremeMode = settings.EnableExtremeMode,
-                EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
-                EnableStartingRingOfSevenCurses = settings.EnableStartingRingOfSevenCurses,
-                EnableStartingPersonaSelection = settings.EnableStartingPersonaSelection,
-                EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
-                EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
-                EnableMoonPropShopSlots = settings.EnableMoonPropShopSlots,
-                EnableNeowExtraOption = settings.EnableNeowExtraOption,
-                EnableLucidDream = settings.EnableLucidDream,
-                NeowExtraOptionSelectionMode = settings.NeowExtraOptionSelectionMode,
-                EnableAllPersonas = settings.EnableAllPersonas,
-                EnableVariantPersonas = settings.EnableVariantPersonas,
-                EnableAllVariantPersonas = settings.EnableAllVariantPersonas,
-                StartingPersonaMode = ResolveStartingPersonaMode(settings),
+                CurrentContentMode = AstralContentModeRegistry.NormalizeMode(settings.CurrentContentMode),
+                EnableExtremeMode = scoped.EnableExtremeMode,
+                EnableStartingInitialPoint = scoped.EnableStartingInitialPoint,
+                EnableStartingAstralRelicStore = scoped.EnableStartingAstralRelicStore,
+                EnableStartingRingOfSevenCurses = scoped.EnableStartingRingOfSevenCurses,
+                EnableStartingPersonaSelection = scoped.EnableStartingPersonaSelection,
+                EnableDreamSeriesEvents = scoped.EnableDreamSeriesEvents,
+                EnableEnigmaticSeriesEvents = scoped.EnableEnigmaticSeriesEvents,
+                EnableMoonPropShopSlots = scoped.EnableMoonPropShopSlots,
+                EnableNeowExtraOption = scoped.EnableNeowExtraOption,
+                EnableLucidDream = scoped.EnableLucidDream,
+                NeowExtraOptionSelectionMode = scoped.NeowExtraOptionSelectionMode,
+                EnableAllPersonas = scoped.EnableAllPersonas,
+                EnableVariantPersonas = scoped.EnableVariantPersonas,
+                EnableAllVariantPersonas = scoped.EnableAllVariantPersonas,
+                StartingPersonaMode = scoped.StartingPersonaMode,
                 EnablePlayRecommendation = settings.EnablePlayRecommendation,
                 EnableRouteRecommendation = settings.EnableRouteRecommendation,
                 EnableTokenRecommendation = settings.EnableTokenRecommendation,
@@ -2517,7 +2908,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnablePersonaRelicNotifications = settings.EnablePersonaRelicNotifications,
                 EnableTokenRelicNotifications = settings.EnableTokenRelicNotifications,
                 EnableNeowDiagnosticsNotifications = settings.EnableNeowDiagnosticsNotifications,
-                TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
+                TokenSeriesMode = scoped.TokenSeriesMode,
                 EnablePureAngelMode = settings.EnablePureAngelMode,
                 EnableLucidDreamFalseLifeline = false,
                 EnableLucidDreamSmoothSailing = false,

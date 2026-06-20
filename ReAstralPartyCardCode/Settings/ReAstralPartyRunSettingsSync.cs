@@ -10,9 +10,13 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 public sealed class ReAstralPartyRunSettingsSnapshot
 {
+    public AstralContentMode CurrentContentMode { get; set; } = AstralContentMode.Vanilla;
+
     public bool EnableExtremeMode { get; set; }
 
     public bool EnableStartingInitialPoint { get; set; }
+
+    public bool EnableStartingAstralRelicStore { get; set; } = true;
 
     public bool EnableStartingRingOfSevenCurses { get; set; }
 
@@ -85,8 +89,10 @@ public sealed class ReAstralPartyRunSettingsSnapshot
     {
         return new ReAstralPartyRunSettingsSnapshot
         {
+            CurrentContentMode = CurrentContentMode,
             EnableExtremeMode = EnableExtremeMode,
             EnableStartingInitialPoint = EnableStartingInitialPoint,
+            EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,
@@ -179,7 +185,9 @@ internal static class ReAstralPartyRunSettingsSync
         LobbyGameplaySettingsSync.TryGetSnapshot(out var lobbySnapshot);
         return new ReAstralPartyRunSettingsSnapshot
         {
+            CurrentContentMode = ReAstralPartyModSettingsManager.GetCurrentContentMode(),
             EnableStartingInitialPoint = lobbySnapshot?.EnableStartingInitialPoint ?? settings.EnableStartingInitialPoint,
+            EnableStartingAstralRelicStore = lobbySnapshot?.EnableStartingAstralRelicStore ?? ReAstralPartyModSettingsManager.EnableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = lobbySnapshot?.EnableStartingRingOfSevenCurses ?? settings.EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = lobbySnapshot?.EnableStartingPersonaSelection ?? settings.EnableStartingPersonaSelection,
             EnableDreamSeriesEvents = lobbySnapshot?.EnableDreamSeriesEvents ?? settings.EnableDreamSeriesEvents,
@@ -227,8 +235,10 @@ internal static class ReAstralPartyRunSettingsSync
     {
         return new ReAstralPartyRunSettingsSnapshot
         {
+            CurrentContentMode = AstralContentMode.Vanilla,
             EnableExtremeMode = false,
             EnableStartingInitialPoint = false,
+            EnableStartingAstralRelicStore = true,
             EnableStartingRingOfSevenCurses = false,
             EnableStartingPersonaSelection = true,
             EnableDreamSeriesEvents = true,
@@ -337,8 +347,10 @@ internal static class ReAstralPartyRunSettingsSync
         var settings = ReAstralPartyModSettingsManager.ReadLocalSettings();
         snapshot = new ReAstralPartyRunSettingsSnapshot
         {
+            CurrentContentMode = lobbySnapshot.CurrentContentMode,
             EnableExtremeMode = lobbySnapshot.EnableExtremeMode,
             EnableStartingInitialPoint = lobbySnapshot.EnableStartingInitialPoint,
+            EnableStartingAstralRelicStore = lobbySnapshot.EnableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = lobbySnapshot.EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = lobbySnapshot.EnableStartingPersonaSelection,
             EnableDreamSeriesEvents = lobbySnapshot.EnableDreamSeriesEvents,

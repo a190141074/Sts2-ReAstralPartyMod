@@ -81,6 +81,20 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatches(
         [
             new ModPatchInfo(
+                "astral_content_mode_main_menu_button_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu),
+                nameof(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu._Ready),
+                typeof(AstralContentModeMainMenuButtonPatch),
+                false,
+                "UI patch: add the Astral content mode shortcut under the main menu patch notes button"),
+            new ModPatchInfo(
+                "astral_content_mode_main_menu_button_state_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NMainMenu),
+                "OnSubmenuStackChanged",
+                typeof(AstralContentModeMainMenuButtonPatch),
+                false,
+                "UI patch: refresh the Astral content mode main menu shortcut visibility"),
+            new ModPatchInfo(
                 "choose_relic_header_patch",
                 typeof(NChooseARelicSelection),
                 "_Ready",

@@ -24,6 +24,13 @@ public static class AstralRelicStoreFirstEventModifierInstaller
         if (runState == null)
             return;
 
+        if (!Settings.ReAstralPartyModSettingsManager.GetEnableStartingAstralRelicStore(runState))
+        {
+            MainFile.Logger.Info(
+                $"AstralRelicStore modifier install skipped | reason=setting_disabled | loadedRun={loadedRun}");
+            return;
+        }
+
         if (runState.Modifiers.Any(static modifier => modifier is AstralRelicStoreFirstEventModifier))
         {
             MainFile.Logger.Info(
