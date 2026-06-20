@@ -13,8 +13,8 @@ using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(EventCardPool))]
-public class CuriousCandyMachine : AstralPartyCardModel
+[RegisterCard(typeof(EventCardPool), StableEntryStem = "skill_token_curious_candy_machine")]
+public class SkillTokenCuriousCandyMachine : AstralPartyCardModel
 {
     private const int GoldCost = 12;
 
@@ -28,10 +28,10 @@ public class CuriousCandyMachine : AstralPartyCardModel
         HoverTipFactory.FromPower<DoomPower>()
     ];
 
-    public CuriousCandyMachine() : base(
+    public SkillTokenCuriousCandyMachine() : base(
         0,
         CardType.Skill,
-        CardRarity.Rare,
+        CardRarity.Token,
         TargetType.Self,
         false)
     {

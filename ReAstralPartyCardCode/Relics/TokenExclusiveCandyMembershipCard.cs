@@ -34,7 +34,7 @@ public class TokenExclusiveCandyMembershipCard : AstralPartyRelicModel, IModRigh
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<CuriousCandyMachine>(),
+        HoverTipFactory.FromCard<SkillTokenCuriousCandyMachine>(),
         HoverTipFactory.FromPower<ModificationPower>(),
         HoverTipFactory.FromPower<DoomPower>(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralGhostAlleySetId)
@@ -104,7 +104,7 @@ public class TokenExclusiveCandyMembershipCard : AstralPartyRelicModel, IModRigh
             < AstralParty_TokenExclusiveCandyMembershipCardNextReadyTurnIndex)
             return;
 
-        await CandyMachineHelper.CreateCuriousCandyMachineInHand(Owner);
+        await CandyMachineHelper.CreateSkillTokenCuriousCandyMachineCardInHand(Owner);
         AstralParty_TokenExclusiveCandyMembershipCardNextReadyTurnIndex =
             AstralParty_TokenExclusiveCandyMembershipCardCurrentTurnIndex + CooldownRounds;
         RefreshDisplay();

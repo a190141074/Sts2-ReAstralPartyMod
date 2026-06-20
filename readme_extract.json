@@ -28,7 +28,7 @@
       "desc": "Gain [blue]100[/blue] [gold]Stagnant Protocol[/gold]."
     },
     {
-      "class": "CuriousCandyMachine",
+      "class": "SkillTokenCuriousCandyMachine",
       "title": "Curious Candy Machine",
       "cost": "0",
       "type": "Skill",

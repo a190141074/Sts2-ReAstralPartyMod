@@ -12,28 +12,28 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class CandyMachineHelper
 {
-    public static bool HasCuriousCandyMachineInHand(Player owner)
+    public static bool HasSkillTokenCuriousCandyMachineInHand(Player owner)
     {
         return PileType.Hand.GetPile(owner).Cards.Any(card =>
-            card.CanonicalInstance is CuriousCandyMachine || card is CuriousCandyMachine);
+            card.CanonicalInstance is SkillTokenCuriousCandyMachine || card is SkillTokenCuriousCandyMachine);
     }
 
-    public static async Task EnsureCuriousCandyMachineInHand(Player owner)
+    public static async Task EnsureSkillTokenCuriousCandyMachineInHand(Player owner)
     {
         if (owner.Creature?.CombatState == null)
             return;
-        if (HasCuriousCandyMachineInHand(owner))
+        if (HasSkillTokenCuriousCandyMachineInHand(owner))
             return;
 
-        await CreateCuriousCandyMachineInHand(owner);
+        await CreateSkillTokenCuriousCandyMachineCardInHand(owner);
     }
 
-    public static async Task CreateCuriousCandyMachineInHand(Player owner)
+    public static async Task CreateSkillTokenCuriousCandyMachineCardInHand(Player owner)
     {
         if (owner.Creature?.CombatState == null)
             return;
 
-        var card = owner.Creature.CombatState.CreateCard(ModelDb.Card<CuriousCandyMachine>(), owner);
+        var card = owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTokenCuriousCandyMachine>(), owner);
         await GeneratedCardObserver.AddGeneratedCardToHandAndNotify(card, true);
     }
 

@@ -200,7 +200,7 @@ def build_relic_records(extract: dict, loc: dict) -> list[dict]:
 def group_cards(cards: list[dict]) -> list[tuple[str, list[dict]]]:
     groups = [
         ("基础能力牌", [c for c in cards if c["class"].startswith("BaseAbility")]),
-        ("收集器与特殊牌", [c for c in cards if c["class"].startswith("CollectorsCard") or c["class"] == "CuriousCandyMachine"]),
+        ("收集器与特殊牌", [c for c in cards if c["class"].startswith("CollectorsCard") or c["class"] == "SkillTokenCuriousCandyMachine"]),
         ("事件卡", [c for c in cards if c["class"].startswith("Event") or c["class"].startswith("Events")]),
         ("技能牌", [c for c in cards if c["class"].startswith("Skill")]),
     ]

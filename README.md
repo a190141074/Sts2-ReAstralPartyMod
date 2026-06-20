@@ -78,7 +78,7 @@
 |------|------|------|------|------|------|------|
 | `CollectorsCardIAmDragon` | 我是龙！ | `1` | `攻击` | `稀有` | `所有敌人` | 典藏<br>对所有敌人造成{Damage:diff()}点伤害，临时减少其{StrengthLoss:diff()}点力量。<br>当你受到伤害时自动打出<br>如果你本回合失去过生命，额外造成{BonusDamage:diff()}点伤害。 |
 | `CollectorsCardStagnantProtocol` | 静滞协议 | `2` | `能力` | `稀有` | `自己` | 典藏<br>获得100层静滞协议。 |
-| `CuriousCandyMachine` | 怪奇糖果机 | `0` | `技能` | `稀有` | `自己` | 消耗，保留，0费用。<br>使用后扣除12金币，获得随机1种糖果系列药水。 |
+| `SkillTokenCuriousCandyMachine` | 怪奇糖果机 | `0` | `技能` | `稀有` | `自己` | 消耗，保留，0费用。<br>使用后扣除12金币，获得随机1种糖果系列药水。 |
 
 ### 事件卡
 
