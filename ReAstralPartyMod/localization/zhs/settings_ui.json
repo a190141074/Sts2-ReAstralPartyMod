@@ -32,6 +32,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.description": "控制 Enigmatic 开头的星引擎内容，以及对应涅奥分支是否会在本局启用。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label": "开启【月球商品】",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description": "控制商店下方是否额外固定刷出 3 个月球遗物商店位。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label": "开启【月球遗物】",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.description": "控制普通商店库存是否会自然刷出月球遗物；不影响额外 3 个【月球商品】商店位。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label": "开启【涅奥】额外选项",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description": "控制涅奥阶段的第 4 个随机星引擎额外选项是否会出现。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label": "开启【清醒梦】",

@@ -102,6 +102,8 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public bool EnableMoonPropShopSlots { get; set; } = true;
 
+    public bool EnableMoonPropRelics { get; set; } = true;
+
     public bool EnableNeowExtraOption { get; set; } = true;
 
     public bool EnableLucidDream { get; set; } = true;
@@ -157,6 +159,7 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
+            EnableMoonPropRelics = EnableMoonPropRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
             EnableLucidDream = EnableLucidDream,
             EnableCollectorsCards = EnableCollectorsCards,
@@ -197,6 +200,7 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableDreamSeriesEvents = ReAstralPartyModSettingsManager.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = ReAstralPartyModSettingsManager.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = ReAstralPartyModSettingsManager.EnableMoonPropShopSlots,
+            EnableMoonPropRelics = ReAstralPartyModSettingsManager.EnableMoonPropRelics,
             EnableNeowExtraOption = ReAstralPartyModSettingsManager.EnableNeowExtraOption,
             EnableLucidDream = ReAstralPartyModSettingsManager.EnableLucidDream,
             EnableCollectorsCards = ReAstralPartyModSettingsManager.EnableCollectorsCards,
@@ -289,7 +293,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot updated: content_mode={updated.CurrentContentMode}, start_initial_point={updated.EnableStartingInitialPoint}, start_astral_relic_store={updated.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={updated.EnableStartingRingOfSevenCurses}, start_persona_selection={updated.EnableStartingPersonaSelection}, dream_series={updated.EnableDreamSeriesEvents}, enigmatic_series={updated.EnableEnigmaticSeriesEvents}, moon_shop_slots={updated.EnableMoonPropShopSlots}, neow_extra_option={updated.EnableNeowExtraOption}, lucid_dream={updated.EnableLucidDream}, neow_extra_selection={updated.NeowExtraOptionSelectionMode}, all_personas={updated.EnableAllPersonas}, variants_enabled={updated.EnableVariantPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot updated: content_mode={updated.CurrentContentMode}, start_initial_point={updated.EnableStartingInitialPoint}, start_astral_relic_store={updated.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={updated.EnableStartingRingOfSevenCurses}, start_persona_selection={updated.EnableStartingPersonaSelection}, dream_series={updated.EnableDreamSeriesEvents}, enigmatic_series={updated.EnableEnigmaticSeriesEvents}, moon_shop_slots={updated.EnableMoonPropShopSlots}, moon_relics={updated.EnableMoonPropRelics}, neow_extra_option={updated.EnableNeowExtraOption}, lucid_dream={updated.EnableLucidDream}, neow_extra_selection={updated.NeowExtraOptionSelectionMode}, all_personas={updated.EnableAllPersonas}, variants_enabled={updated.EnableVariantPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonaMode}, token_series={updated.TokenSeriesMode}");
         SnapshotChanged?.Invoke(updated.Clone());
     }
 
@@ -308,7 +312,7 @@ internal static class LobbyGameplaySettingsSync
 
         netService.SendMessage(new AstralLobbyGameplaySettingsSnapshotMessage(snapshot));
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, moon_relics={snapshot.EnableMoonPropRelics}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     public static void RequestSnapshotFromHost()
@@ -421,7 +425,7 @@ internal static class LobbyGameplaySettingsSync
         var snapshot = message.ToSnapshot();
         SetSnapshotInternal(snapshot, $"remote_snapshot_from_{senderId}", true);
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, moon_relics={snapshot.EnableMoonPropRelics}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
     }
 
     private static void HandleRequestMessage(AstralLobbyGameplaySettingsRequestMessage message, ulong senderId)
@@ -449,7 +453,7 @@ internal static class LobbyGameplaySettingsSync
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
+            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, moon_relics={snapshot.EnableMoonPropRelics}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonaMode}, token_series={snapshot.TokenSeriesMode}");
         if (invokeEvent)
             SnapshotChanged?.Invoke(snapshot.Clone());
     }
@@ -498,7 +502,7 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 15;
+    private const int SchemaVersion = 16;
 
     public AstralContentMode CurrentContentMode { get; set; }
     public bool EnableStartingInitialPoint { get; set; }
@@ -508,6 +512,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public bool EnableDreamSeriesEvents { get; set; }
     public bool EnableEnigmaticSeriesEvents { get; set; }
     public bool EnableMoonPropShopSlots { get; set; } = true;
+    public bool EnableMoonPropRelics { get; set; } = true;
     public bool EnableNeowExtraOption { get; set; }
     public bool EnableLucidDream { get; set; } = true;
     public bool EnableCollectorsCards { get; set; } = true;
@@ -544,6 +549,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableDreamSeriesEvents = snapshot.EnableDreamSeriesEvents;
         EnableEnigmaticSeriesEvents = snapshot.EnableEnigmaticSeriesEvents;
         EnableMoonPropShopSlots = snapshot.EnableMoonPropShopSlots;
+        EnableMoonPropRelics = snapshot.EnableMoonPropRelics;
         EnableNeowExtraOption = snapshot.EnableNeowExtraOption;
         EnableLucidDream = snapshot.EnableLucidDream;
         EnableCollectorsCards = snapshot.EnableCollectorsCards;
@@ -587,13 +593,14 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteBool(EnableDreamSeriesEvents);
         writer.WriteBool(EnableEnigmaticSeriesEvents);
         writer.WriteBool(EnableMoonPropShopSlots);
+        writer.WriteBool(EnableMoonPropRelics);
         writer.WriteBool(EnableNeowExtraOption);
         writer.WriteBool(EnableLucidDream);
         writer.WriteBool(EnableCollectorsCards);
         writer.WriteEnum(NeowExtraOptionSelectionMode);
         writer.WriteBool(EnableAllPersonas);
         writer.WriteBool(EnableVariantPersonas);
-       writer.WriteBool(EnableAllVariantPersonas);
+        writer.WriteBool(EnableAllVariantPersonas);
         writer.WriteBool(EnableExtremeMode);
         writer.WriteEnum(StartingPersonaMode);
         writer.WriteEnum(TokenSeriesMode);
@@ -639,11 +646,22 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             throw new InvalidOperationException($"{MainFile.ModId} received unsupported lobby gameplay snapshot schema {schemaVersion}.");
         }
 
-        if (schemaVersion >= 15)
+        if (schemaVersion >= 16)
         {
             EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
+            EnableMoonPropRelics = reader.ReadBool();
+            EnableNeowExtraOption = reader.ReadBool();
+            EnableLucidDream = reader.ReadBool();
+            EnableCollectorsCards = reader.ReadBool();
+        }
+        else if (schemaVersion >= 15)
+        {
+            EnableDreamSeriesEvents = reader.ReadBool();
+            EnableEnigmaticSeriesEvents = reader.ReadBool();
+            EnableMoonPropShopSlots = reader.ReadBool();
+            EnableMoonPropRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
             EnableLucidDream = reader.ReadBool();
             EnableCollectorsCards = reader.ReadBool();
@@ -653,6 +671,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
+            EnableMoonPropRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
             EnableLucidDream = reader.ReadBool();
             EnableCollectorsCards = true;
@@ -662,6 +681,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
+            EnableMoonPropRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
             EnableLucidDream = true;
             EnableCollectorsCards = true;
@@ -671,6 +691,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = true;
+            EnableMoonPropRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
             EnableLucidDream = true;
             EnableCollectorsCards = true;
@@ -680,6 +701,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableDreamSeriesEvents = true;
             EnableEnigmaticSeriesEvents = true;
             EnableMoonPropShopSlots = true;
+            EnableMoonPropRelics = true;
             EnableNeowExtraOption = true;
             EnableLucidDream = true;
             EnableCollectorsCards = true;
@@ -797,6 +819,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableDreamSeriesEvents = EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
+            EnableMoonPropRelics = EnableMoonPropRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
             EnableLucidDream = EnableLucidDream,
             EnableCollectorsCards = EnableCollectorsCards,

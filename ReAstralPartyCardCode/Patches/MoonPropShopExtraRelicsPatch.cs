@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Godot;
@@ -8,7 +9,9 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Merchant;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Gold;
+using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Nodes.Screens.Shops;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -95,6 +98,38 @@ internal static class MoonPropShopExtraRelicsHelper
             $"[{MainFile.ModId}] Added {ExtraRelicCount} MoonProp merchant relic entries for player {player.NetId} on floor {player.RunState?.TotalFloor ?? -1}.");
     }
 
+    public static void ReplaceNaturalMoonPropRelicEntries(MerchantInventory? inventory, Player? player)
+    {
+        if (inventory == null || player == null)
+            return;
+        if (ReAstralPartyModSettingsManager.GetEnableMoonPropRelics(player.RunState))
+            return;
+        if (!TryGetMutableRelicEntries(inventory, out var relicEntries))
+            return;
+
+        var replacedCount = 0;
+        for (var index = 0; index < relicEntries.Count; index++)
+        {
+            var entry = relicEntries[index];
+            if (!IsMoonPropRelic(entry.Model))
+                continue;
+
+            var replacement = TryCreateNonMoonShopRelic(player)
+                              ?? TryCreateFallbackNonMoonRelic(player);
+            if (replacement == null)
+                continue;
+
+            relicEntries[index] = new MerchantRelicEntry(replacement, player);
+            replacedCount++;
+        }
+
+        if (replacedCount > 0)
+        {
+            MainFile.Logger.Info(
+                $"[{MainFile.ModId}] Replaced {replacedCount} natural MoonProp merchant relic entries for player {player.NetId} on floor {player.RunState?.TotalFloor ?? -1}.");
+        }
+    }
+
     public static void EnsureMoonPropRelicSlots(NMerchantInventory merchantInventory, MerchantInventory inventory)
     {
         if (!ReAstralPartyModSettingsManager.GetEnableMoonPropShopSlots(inventory.Player?.RunState))
@@ -132,6 +167,57 @@ internal static class MoonPropShopExtraRelicsHelper
     private static RelicModel CreateMoonPropRelicForSlot(Player player, int slotIndex)
     {
         return CreateDeterministicMoonPropRelic(player, ContextId, slotIndex);
+    }
+
+    private static bool TryGetMutableRelicEntries(
+        MerchantInventory inventory,
+        out IList<MerchantRelicEntry> relicEntries)
+    {
+        if (inventory.RelicEntries is IList<MerchantRelicEntry> directList)
+        {
+            relicEntries = directList;
+            return true;
+        }
+
+        var backingField = typeof(MerchantInventory).GetField(
+            "<RelicEntries>k__BackingField",
+            BindingFlags.Instance | BindingFlags.NonPublic);
+        if (backingField?.GetValue(inventory) is IList<MerchantRelicEntry> backingList)
+        {
+            relicEntries = backingList;
+            return true;
+        }
+
+        relicEntries = null!;
+        return false;
+    }
+
+    private static RelicModel? TryCreateNonMoonShopRelic(Player player)
+    {
+        return TryPullRelic(player, RelicRarity.Shop, static candidate => !IsMoonPropRelic(candidate));
+    }
+
+    private static RelicModel? TryCreateFallbackNonMoonRelic(Player player)
+    {
+        return TryPullRelic(player, RelicRarity.Uncommon, static candidate => !IsMoonPropRelic(candidate))
+               ?? TryPullRelic(player, RelicRarity.Rare, static candidate => !IsMoonPropRelic(candidate))
+               ?? TryPullRelic(player, RelicRarity.Common, static candidate => !IsMoonPropRelic(candidate));
+    }
+
+    private static RelicModel? TryPullRelic(
+        Player player,
+        RelicRarity rarity,
+        Func<RelicModel, bool> filter)
+    {
+        if (player.RunState == null)
+            return null;
+
+        var relic = player.RelicGrabBag.PullFromFront(rarity, filter, player.RunState);
+        if (relic == null)
+            return null;
+
+        player.RunState.SharedRelicGrabBag.Remove(relic);
+        return relic.ToMutable();
     }
 
     private static List<Func<RelicModel>> GetAvailableMoonPropRelicFactories(
@@ -219,6 +305,7 @@ public sealed class MoonPropShopCreateInventoryPatch : IPatchMethod
 
     public static void Postfix(Player player, MerchantInventory __result)
     {
+        MoonPropShopExtraRelicsHelper.ReplaceNaturalMoonPropRelicEntries(__result, player);
         MoonPropShopExtraRelicsHelper.EnsureMoonPropEntries(__result, player);
     }
 }
@@ -241,6 +328,7 @@ public sealed class MoonPropShopInitializeInventoryPatch : IPatchMethod
         if (MoonPropShopExtraRelicsHelper.IsFakeMerchantInventory(__instance))
             return;
 
+        MoonPropShopExtraRelicsHelper.ReplaceNaturalMoonPropRelicEntries(inventory, inventory.Player);
         MoonPropShopExtraRelicsHelper.EnsureMoonPropEntries(inventory, inventory.Player);
         MoonPropShopExtraRelicsHelper.EnsureMoonPropRelicSlots(__instance, inventory);
     }

@@ -23,11 +23,12 @@ public enum AstralGameplaySettingKey
     DreamSeriesEvents = 9,
     EnigmaticSeriesEvents = 10,
     MoonPropShopSlots = 11,
-    NeowExtraOption = 12,
-    NeowExtraOptionSelectionMode = 13,
-    LucidDream = 14,
-    StartingRingOfSevenCurses = 15,
-    CollectorsCards = 16
+    MoonPropRelics = 12,
+    NeowExtraOption = 13,
+    NeowExtraOptionSelectionMode = 14,
+    LucidDream = 15,
+    StartingRingOfSevenCurses = 16,
+    CollectorsCards = 17
 }
 
 public enum AstralModeAvailability
@@ -148,6 +149,13 @@ public static class AstralContentModeRegistry
             "enable_moon_prop_shop_slots",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description",
+            AstralModeAvailability.LockedVisible,
+            AstralModeAvailability.Hidden),
+        new(
+            AstralGameplaySettingKey.MoonPropRelics,
+            "enable_moon_prop_relics",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.description",
             AstralModeAvailability.LockedVisible,
             AstralModeAvailability.Hidden),
         new(

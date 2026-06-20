@@ -179,6 +179,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private CheckButton? _dreamSeriesEventsToggle;
     private CheckButton? _enigmaticSeriesEventsToggle;
     private CheckButton? _moonPropShopSlotsToggle;
+    private CheckButton? _moonPropRelicsToggle;
     private CheckButton? _neowExtraOptionToggle;
     private CheckButton? _lucidDreamToggle;
     private CheckButton? _collectorsCardsToggle;
@@ -393,6 +394,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description"),
             out _moonPropShopSlotsToggle,
             OnEnableMoonPropShopSlotsToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.description"),
+            out _moonPropRelicsToggle,
+            OnEnableMoonPropRelicsToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description"),
@@ -909,6 +915,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 SetRowVisible(_moonPropShopSlotsToggle, !isVanillaMode);
             }
 
+            if (_moonPropRelicsToggle != null)
+            {
+                _moonPropRelicsToggle.ButtonPressed = snapshot.EnableMoonPropRelics;
+                _moonPropRelicsToggle.Disabled = !isEditable;
+                _moonPropRelicsToggle.Text = snapshot.EnableMoonPropRelics ? "ON" : "OFF";
+                SetRowVisible(_moonPropRelicsToggle, !isVanillaMode);
+            }
+
             if (_neowExtraOptionToggle != null)
             {
                 _neowExtraOptionToggle.ButtonPressed = snapshot.EnableNeowExtraOption;
@@ -1067,7 +1081,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From(snapshot.EnableStartingAstralRelicStore),
             Variant.From(snapshot.EnableStartingRingOfSevenCurses),
             Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableDreamSeriesEvents),
-            Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableMoonPropShopSlots), Variant.From(snapshot.EnableNeowExtraOption),
+            Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableMoonPropShopSlots),
+            Variant.From(snapshot.EnableMoonPropRelics), Variant.From(snapshot.EnableNeowExtraOption),
             Variant.From(snapshot.EnableLucidDream),
             Variant.From(snapshot.EnableCollectorsCards),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
@@ -1076,7 +1091,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     }
 
     private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint, bool enableStartingAstralRelicStore, bool enableStartingRingOfSevenCurses, bool enableStartingPersonaSelection,
-        bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableMoonPropShopSlots, bool enableNeowExtraOption,
+        bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableMoonPropShopSlots,
+        bool enableMoonPropRelics, bool enableNeowExtraOption,
         bool enableLucidDream, bool enableCollectorsCards,
         int neowExtraOptionSelectionMode,
         bool enableAllPersonas, bool enableVariantPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
@@ -1093,6 +1109,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             EnableDreamSeriesEvents = enableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = enableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = enableMoonPropShopSlots,
+            EnableMoonPropRelics = enableMoonPropRelics,
             EnableNeowExtraOption = enableNeowExtraOption,
             EnableLucidDream = enableLucidDream,
             EnableCollectorsCards = enableCollectorsCards,
@@ -1216,6 +1233,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableMoonPropShopSlots = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableMoonPropRelicsToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableMoonPropRelics = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

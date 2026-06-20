@@ -32,6 +32,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.description": "Control whether Enigmatic-prefixed Astral content, including its Neow branch, is enabled in this run.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label": "Enable Moon Shop Slots",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description": "Control whether shops always add three extra Moon relic slots below the normal inventory.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label": "Enable Moon Relics",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.description": "Control whether normal shop inventory can naturally roll Moon relics. This does not affect the three extra Moon shop slots.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label": "Enable Neow Extra Option",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description": "Control whether Astral's randomized fourth Neow option appears at run start.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label": "Enable Lucid Dream",

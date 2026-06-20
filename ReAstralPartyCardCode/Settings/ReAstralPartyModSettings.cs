@@ -75,6 +75,8 @@ public sealed class ReAstralPartyModSettings
 
         public bool EnableMoonPropShopSlots { get; set; } = true;
 
+        public bool EnableMoonPropRelics { get; set; } = true;
+
         public bool EnableNeowExtraOption { get; set; } = true;
 
         public bool EnableLucidDream { get; set; } = true;
@@ -106,6 +108,7 @@ public sealed class ReAstralPartyModSettings
                 EnableDreamSeriesEvents = EnableDreamSeriesEvents,
                 EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
                 EnableMoonPropShopSlots = EnableMoonPropShopSlots,
+                EnableMoonPropRelics = EnableMoonPropRelics,
                 EnableNeowExtraOption = EnableNeowExtraOption,
                 EnableLucidDream = EnableLucidDream,
                 EnableCollectorsCards = EnableCollectorsCards,
@@ -160,6 +163,8 @@ public sealed class ReAstralPartyModSettings
     public bool EnableEnigmaticSeriesEvents { get; set; } = true;
 
     public bool EnableMoonPropShopSlots { get; set; } = true;
+
+    public bool EnableMoonPropRelics { get; set; } = true;
 
     public bool EnableNeowExtraOption { get; set; } = true;
 
@@ -258,6 +263,8 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableEnigmaticSeriesEvents => ReadRuntime(settings => settings.EnableEnigmaticSeriesEvents);
 
     public static bool EnableMoonPropShopSlots => ReadRuntime(settings => settings.EnableMoonPropShopSlots);
+
+    public static bool EnableMoonPropRelics => ReadRuntime(settings => settings.EnableMoonPropRelics);
 
     public static bool EnableNeowExtraOption => ReadRuntime(settings => settings.EnableNeowExtraOption);
 
@@ -477,6 +484,26 @@ public static partial class ReAstralPartyModSettingsManager
             return true;
 
         return EnableMoonPropShopSlots;
+    }
+
+    public static bool GetEnableMoonPropRelics(IRunState? runState)
+    {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.MoonPropRelics))
+            return false;
+
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableMoonPropRelics;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableMoonPropRelics;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableMoonPropRelics;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableMoonPropRelics;
     }
 
     public static bool GetEnableNeowExtraOption(IRunState? runState)
@@ -1441,6 +1468,23 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableMoonPropRelics = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableMoonPropRelics;
+            },
+            (settings, value) =>
+            {
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableMoonPropRelics = value);
+                ApplyRuntimeSettings(settings, "enable_moon_prop_relics");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label",
+                    value);
+            });
+
         var enableNeowExtraOption = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -1848,6 +1892,12 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description",
                         "Control whether shops always add three extra Moon relic slots below the normal inventory."))
                 .AddToggle(
+                    "enable_moon_prop_relics",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label", "Enable Moon Relics"),
+                    enableMoonPropRelics,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.description",
+                        "Control whether normal shop inventory can naturally roll Moon relics. This does not affect the extra Moon shop slots."))
+                .AddToggle(
                     "enable_neow_extra_option",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label", "Enable Neow Extra Option"),
                     enableNeowExtraOption,
@@ -1966,6 +2016,11 @@ public static partial class ReAstralPartyModSettingsManager
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.MoonPropShopSlots,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_moon_prop_relics", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.MoonPropRelics,
                         roomSurface: false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_neow_extra_option", () =>
                     AstralContentModeRegistry.GetAvailability(
@@ -2744,6 +2799,7 @@ public static partial class ReAstralPartyModSettingsManager
             EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = settings.EnableMoonPropShopSlots,
+            EnableMoonPropRelics = settings.EnableMoonPropRelics,
             EnableNeowExtraOption = settings.EnableNeowExtraOption,
             EnableLucidDream = settings.EnableLucidDream,
             EnableCollectorsCards = settings.EnableCollectorsCards,
@@ -2770,6 +2826,7 @@ public static partial class ReAstralPartyModSettingsManager
             EnableDreamSeriesEvents = false,
             EnableEnigmaticSeriesEvents = false,
             EnableMoonPropShopSlots = false,
+            EnableMoonPropRelics = false,
             EnableNeowExtraOption = false,
             EnableLucidDream = false,
             EnableCollectorsCards = false,
@@ -2813,6 +2870,7 @@ public static partial class ReAstralPartyModSettingsManager
         settings.EnableDreamSeriesEvents = modpack.EnableDreamSeriesEvents;
         settings.EnableEnigmaticSeriesEvents = modpack.EnableEnigmaticSeriesEvents;
         settings.EnableMoonPropShopSlots = modpack.EnableMoonPropShopSlots;
+        settings.EnableMoonPropRelics = modpack.EnableMoonPropRelics;
         settings.EnableNeowExtraOption = modpack.EnableNeowExtraOption;
         settings.EnableLucidDream = modpack.EnableLucidDream;
         settings.EnableCollectorsCards = modpack.EnableCollectorsCards;
@@ -2860,6 +2918,8 @@ public static partial class ReAstralPartyModSettingsManager
         public bool EnableEnigmaticSeriesEvents { get; init; } = true;
 
         public bool EnableMoonPropShopSlots { get; init; } = true;
+
+        public bool EnableMoonPropRelics { get; init; } = true;
 
         public bool EnableNeowExtraOption { get; init; } = true;
 
@@ -2956,6 +3016,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableDreamSeriesEvents = scoped.EnableDreamSeriesEvents,
                 EnableEnigmaticSeriesEvents = scoped.EnableEnigmaticSeriesEvents,
                 EnableMoonPropShopSlots = scoped.EnableMoonPropShopSlots,
+                EnableMoonPropRelics = scoped.EnableMoonPropRelics,
                 EnableNeowExtraOption = scoped.EnableNeowExtraOption,
                 EnableLucidDream = scoped.EnableLucidDream,
                 EnableCollectorsCards = scoped.EnableCollectorsCards,
