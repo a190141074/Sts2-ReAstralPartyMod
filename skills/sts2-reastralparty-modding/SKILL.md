@@ -118,6 +118,45 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - 不要先手动给 `Owner`
   - 修 helper 时顺带检查同一条入牌链的相邻调用点，避免只修一处
 
+### 玩法设置 / 内容模式
+
+- 这个仓库的“玩法设置”默认不是单一 UI 开关，而是跨 4 层语义：
+  - 本地设置
+  - 房间玩法面板 / lobby snapshot
+  - run snapshot
+  - 运行时 getter / installer / patch 读取
+- 只改其中一层通常不够；如果用户说“增加玩法设置”或“房间同步”，默认一起检查：
+  - `ReAstralPartyModSettings`
+  - 设置页注册
+  - `CharacterSelectGameplayPreviewPatch`
+  - `LobbyGameplaySettingsSync`
+  - `ReAstralPartyRunSettingsSync`
+  - `ReAstralPartyModSettingsManager` getter
+- `原版模式 / 整合包模式` 下，优先把玩法项的可编辑/锁定/隐藏语义集中放进 `AstralContentModeRegistry`，不要把 mode 判断散在每个 toggle 和业务 patch 里。
+- 明确区分“玩法设置”和“通用设置”：
+  - 玩法设置可以做 mode-scoped 双份配置
+  - `其他 / 遥测 / 通知 / 联机诊断` 这类通用设置应保持单份全局值，不应随内容模式切换而跳到另一套状态
+- 如果某个总开关只是隐藏 UI，不足以代表运行时关闭；默认还要在统一 getter 层收口，让 runtime 也按关闭处理。
+
+### 商店 / 月球体系
+
+- 月球商店相关逻辑默认先分清两条语义，不要混写：
+  - `EnableMoonPropRelics` 控制普通商店自然库存里是否允许出现月球遗物
+  - `EnableMoonPropShopSlots` 控制商店下方额外固定追加的 3 个月球遗物位
+- 如果要禁止普通商店自然刷某类遗物，优先“替换 entry”为同类型可用替代项，不要直接删除 entry，避免商店正常位数量变少。
+- 特殊商人 / fake merchant 仍然是高风险链：
+  - 优先在 `NMerchantInventory.Initialize(...)` 前缀整体排除 `NFakeMerchantInventory`
+  - 不要只在 UI clone 或单个 helper 里晚期兜底
+- 当同一功能同时改库存数据和商店 UI 时，默认先改正常库存，再补额外 slots，避免把追加位误当成普通库存过滤掉。
+
+### 隐藏运行时载体
+
+- 这个仓库里，若某个玩法用隐藏 modifier 或等价运行时组件更稳定，可以采用，但默认要求：
+  - 不显示图标
+  - 不进常规 modifier UI
+  - 不进结算展示
+- 这条尤其适用于清醒梦、梦境模式、只用于保存本局状态的隐藏效果载体；可见 UI 与运行时持有层应分开设计。
+
 ### Decimal 边界
 
 - `decimal` 只用于运行时计算和公式推导。

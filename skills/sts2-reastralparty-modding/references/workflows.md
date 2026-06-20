@@ -131,3 +131,62 @@
 1. 优先走正式 `RunState.AddCard(...)`
 2. 不要预设 `Owner`
 3. 修一条 helper 时，顺手搜索同一条入牌链的其他入口
+
+## 玩法设置 / 内容模式
+
+固定顺序：
+
+1. 先确认这是“玩法设置”还是“通用设置”
+2. 如果是玩法设置，再确认它是否需要：
+   - 全局设置页
+   - 房间玩法面板
+   - lobby snapshot
+   - run snapshot
+   - runtime getter / patch
+3. 如果涉及 `原版模式 / 整合包模式`，优先把可编辑 / 锁定 / 隐藏规则收口到 `AstralContentModeRegistry`
+4. 再检查旧设置、旧 lobby、旧 run snapshot 的缺字段回退值
+5. 最后才补单个业务实现
+
+固定 checklist：
+
+1. `ReAstralPartyModSettings` 是否新增字段
+2. 设置页 `RegisterSettingsPage()` 是否注册并带本地化
+3. `CharacterSelectGameplayPreviewPatch` 是否补房主可改 / 客户端只读同步
+4. `LobbyGameplaySettingsSync` 是否补 snapshot、message schema、旧版本回退
+5. `ReAstralPartyRunSettingsSync` 是否补 run snapshot 建立与 restore
+6. `ReAstralPartyModSettingsManager` 是否补本地 getter、`IRunState` getter、总判断 helper
+7. 如果是总开关，runtime getter 是否统一收口，而不是只隐藏 UI
+8. 如果是通用设置，是否仍保持单份全局值，不会随内容模式切换串到另一套状态
+
+## 商店 / 月球体系 / 特殊商人
+
+固定顺序：
+
+1. 先区分“普通商店自然库存”与“额外追加商店位”
+2. 先查 `MerchantInventory.CreateForNormalMerchant(Player)` 的库存生成链
+3. 再查 `NMerchantInventory.Initialize(...)` 的 UI 初始化链
+4. 如果涉及特殊商人，先确认是否需要整链排除 `NFakeMerchantInventory`
+5. 最后才改 UI clone、位置或显示层
+
+固定 checklist：
+
+1. 是否错误地把“月球遗物自然出现”和“月球商品额外 3 位”混成一个开关
+2. 如果关闭自然出现，是否用“替换 entry”而不是“删除 entry”
+3. fake merchant 是否在 `NMerchantInventory.Initialize(...)` 前缀就提前返回
+4. 普通库存过滤是否发生在追加额外 3 位之前
+5. 额外 3 位是否只受 `EnableMoonPropShopSlots` 控制，不被普通库存过滤误伤
+
+## 主菜单工具按钮 / 弹窗
+
+固定顺序：
+
+1. 先分清这是主菜单入口还是跑局内 top bar 入口
+2. 主菜单若点击后没有稳定打开界面，优先改成 `NModalContainer` 浮窗链
+3. 跑局内按钮和主菜单按钮要分开管理，不要混用同一注册路径
+
+固定 checklist：
+
+1. 主菜单按钮位置是否避开 RitsuLib 自带按钮
+2. 点击是否走 modal popup，而不是依赖不稳定的 submenu 注册
+3. 关闭按钮、`Esc`、返回键是否都能关窗
+4. 如果用户要求只保留主菜单入口，是否彻底下线跑局内 top bar 注册而不是只隐藏
