@@ -1500,6 +1500,13 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description",
                         "At run start, every player automatically obtains Initial Point and loses 1 Gold."))
                 .AddToggle(
+                    "enable_starting_ring_of_seven_curses",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label",
+                        "Enable Starting Ring of Seven Curses"),
+                    enableStartingRingOfSevenCurses,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.description",
+                        "At run start, every player automatically obtains Ring of Seven Curses."))
+                .AddToggle(
                     "enable_starting_persona_selection",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label", "Enable Starting Persona Selection"),
                     enableStartingPersonaSelection,
@@ -1627,13 +1634,6 @@ public static partial class ReAstralPartyModSettingsManager
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.other.title", "Other"))
                 .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.other.description",
                     "Additional reserved toggles and experimental options."))
-                .AddToggle(
-                    "enable_starting_ring_of_seven_curses",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label",
-                        "Enable Starting Ring of Seven Curses"),
-                    enableStartingRingOfSevenCurses,
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.description",
-                        "At run start, every player automatically obtains Ring of Seven Curses."))
                 .AddToggle(
                     "enable_pure_angel_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_pure_angel_mode.label", "Enable Pure Angel Mode"),

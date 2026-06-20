@@ -324,14 +324,15 @@ internal static class NeowOptionInjectionHelper
                     ?? throw new InvalidOperationException(
                         "Neow had no owner when Prophecy Replicant Group was chosen.");
 
-        var obtained = await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(
+        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(
             owner,
             ModelDb.Relic<ProphecyReplicantGroup>());
-        if (obtained is ProphecyReplicantGroup relic)
+        var relic = owner.GetRelic<ProphecyReplicantGroup>();
+        if (relic != null)
         {
             var initialStacks = DeterministicMultiplayerChoiceHelper.RollDeterministically(
-                8,
-                17,
+                4,
+                11,
                 MainFile.ModId,
                 nameof(Neow),
                 "prophecy_replicant_group_initial_stacks",
@@ -339,6 +340,11 @@ internal static class NeowOptionInjectionHelper
                 owner.RunState?.CurrentActIndex ?? -1,
                 owner.NetId.ToString());
             relic.InitializeStacks(initialStacks);
+        }
+        else
+        {
+            MainFile.Logger.Warn(
+                $"[NeowOptionInjectionHelper] Failed to resolve live ProphecyReplicantGroup after deterministic obtain | owner={owner.NetId}.");
         }
 
         CompleteAncient(ancient);

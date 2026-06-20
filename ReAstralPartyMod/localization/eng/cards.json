@@ -237,5 +237,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SIX_DRAGONS_AZURE.title": "Six Dragons \"Azure\"",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SIX_DRAGONS_AZURE.description": "If your draw pile has an odd number of cards, all players gain [blue]1[/blue] [power]Buffer[/power].\nIf your draw pile has an even number of cards, randomly distribute [blue]Mana Amplification + 6[/blue] points among [gold]Summon[/gold], [gold]Vigor[/gold], and temporary [green]Dexterity[/green], and only you gain those benefits.\nIf your Mana Amplification is at least [blue]18[/blue], add [blue]1[/blue] [card]Transcend Dimensions[/card] to your hand.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.title": "Transcend Dimensions",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.description": "Shuffle your hand and discard pile back into your draw pile, draw [blue]5[/blue] cards, and gain {energyPrefix:energyIcons(5)}."
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.description": "Shuffle your hand and discard pile back into your draw pile, draw [blue]5[/blue] cards, and gain {energyPrefix:energyIcons(5)}.",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ENERGY_OVERLOAD.title": "Energy Overload",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ENERGY_OVERLOAD.description": "Lose [blue]2[/blue] temporary [green]Dexterity[/green]. Gain [blue]3[/blue] [power]Process[/power]."
 }

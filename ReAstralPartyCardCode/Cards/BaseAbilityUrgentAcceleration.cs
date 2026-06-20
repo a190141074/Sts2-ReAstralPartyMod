@@ -19,7 +19,7 @@ public class BaseAbilityUrgentAcceleration : AstralPartyCardModel
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 
-    public BaseAbilityUrgentAcceleration() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AnyAlly)
+    public BaseAbilityUrgentAcceleration() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AnyPlayer)
     {
     }
 
@@ -29,9 +29,10 @@ public class BaseAbilityUrgentAcceleration : AstralPartyCardModel
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (cardPlay.Target == null)
+        var target = cardPlay.Target;
+        if (target == null || !target.IsAlive || target.Player == null || target.PetOwner != null)
             return;
 
-        await AstralTemporaryDexterityPower.Apply(cardPlay.Target, 3m, this, Owner?.Creature, this, false);
+        await AstralTemporaryDexterityPower.Apply(target, 3m, this, Owner?.Creature, this, false);
     }
 }

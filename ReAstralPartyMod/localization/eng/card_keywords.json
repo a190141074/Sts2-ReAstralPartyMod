@@ -2,7 +2,7 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.title": "Astral Event",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.description": "A special card originating from the Astral Party event system.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.title": "Steps",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.description": "Steps gained from room entry for [Persona: Bionic Jasmine]. Unassigned, Rest Site, Shop, Treasure, Monster, and Map rooms grant [blue]2[/blue]. Event rooms grant [blue]3[/blue]. Elite rooms grant [blue]6[/blue]. Boss rooms grant [blue]10[/blue].",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.description": "Steps accumulated by [relic]Bionic Jasmine[/relic]-series effects.\nEvery [blue]13[/blue] steps convert into [blue]1[/blue] [red]Strength[/red] or [blue]1[/blue] [green]Dexterity[/green], alternating.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_TEMPORARY.title": "Temporary",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_TEMPORARY.description": "Discard this card at the end of turn. This keyword is removed after the card enters the discard pile.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MOON_PROP.title": "Moon Relic",

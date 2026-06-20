@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Gold;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
@@ -84,7 +85,8 @@ public sealed class ProphecyReplicantGroup : AstralPartyRelicModel, IModRightCli
             return;
 
         var clonedCard = CreateAutoplayClone(owner, selectedCard);
-        await CardCmd.AutoPlay(choiceContext, clonedCard, owner.Creature, AutoPlayType.Default, false, true);
+        var autoPlayTarget = ResolveAutoplayTarget(owner, clonedCard);
+        await CardCmd.AutoPlay(choiceContext, clonedCard, autoPlayTarget, AutoPlayType.Default, false, true);
         Flash();
         InvokeDisplayAmountChanged();
     }
@@ -103,7 +105,7 @@ public sealed class ProphecyReplicantGroup : AstralPartyRelicModel, IModRightCli
 
     private decimal GetCurrentPaidCost()
     {
-        return BasePaidActivationCost * (AstralParty_ProphecyReplicantGroupPaidActivationCount + 1);
+        return BasePaidActivationCost * (1m + 0.5m * AstralParty_ProphecyReplicantGroupPaidActivationCount);
     }
 
     private async Task<CardModel?> SelectCardFromHand(PlayerChoiceContext choiceContext, Player owner)
@@ -154,6 +156,20 @@ public sealed class ProphecyReplicantGroup : AstralPartyRelicModel, IModRightCli
             CardCmd.ApplyKeyword(clonedCard, CardKeyword.Exhaust);
 
         return clonedCard;
+    }
+
+    private static Creature? ResolveAutoplayTarget(Player owner, CardModel clonedCard)
+    {
+        var ownerCreature = owner.Creature;
+        if (ownerCreature?.CombatState == null)
+            return ownerCreature;
+
+        return clonedCard.TargetType switch
+        {
+            TargetType.AnyEnemy or TargetType.RandomEnemy =>
+                CombatTargetOrdering.GetLivingOpponentsStable(ownerCreature).FirstOrDefault(),
+            _ => ownerCreature
+        };
     }
 
     private static void CopyUpgradeLevel(CardModel sourceCard, CardModel clonedCard)

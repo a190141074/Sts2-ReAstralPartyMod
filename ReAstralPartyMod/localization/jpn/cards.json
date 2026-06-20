@@ -230,5 +230,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SIX_DRAGONS_AZURE.title": "六龍の『碧』",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SIX_DRAGONS_AZURE.description": "山札の枚数が奇数なら、すべてのプレイヤーは[blue]1[/blue]層の[gold]緩衝[/gold]を得る。\n山札の枚数が偶数なら、【法力増幅+[blue]6[/blue]】点を[gold]召喚[/gold]・[gold]活力[/gold]・臨時[green]敏捷[/green]へランダムに配分し、その利益を得るのはあなただけとなる。\n法力増幅が[blue]18[/blue]以上なら、[gold]超越次元[/gold]を[blue]1[/blue]枚手札に加える。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.title": "超越次元",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.description": "手札と捨て札を山札に戻して混ぜ、[blue]5[/blue]枚引き、{energyPrefix:energyIcons(5)}を得る。"
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.description": "手札と捨て札を山札に戻して混ぜ、[blue]5[/blue]枚引き、{energyPrefix:energyIcons(5)}を得る。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ENERGY_OVERLOAD.title": "エネルギー過負荷",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ENERGY_OVERLOAD.description": "臨時[green]敏捷[/green]-[blue]2[/blue]；[gold]進程[/gold]+[blue]3[/blue]。"
 }

@@ -18,7 +18,7 @@ public class SkillNotYetActivated : AstralPartyCardModel
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [AstralKeywords.AstralUnique, CardKeyword.Exhaust];
 
-    protected override bool ShouldAutoApplyCooldownEnchantment => true;
+    protected override bool ShouldAutoApplyCooldownEnchantment => false;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips => [];
 

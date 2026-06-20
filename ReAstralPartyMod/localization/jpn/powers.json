@@ -24,8 +24,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ADHERENT_MUCUS_POWER.description": "各スタックでは、[blue]-1[/blue] [red]力量[/red]、最大 [blue]3[/blue] スタックが得られます。その敵のラウンド中にリンクされている[relic]ペルソナ：スライム ルル[/relic]にブロックされていないダメージを与える敵がいない場合、ラウンド終了時に敵のすべての[power]付着粘液[/power]がそのスライム ルル失去[blue]1[/blue]にリンクしてスタックされます。",
   "RE_ASTRAL_PARTY_MOD_POWER_ADHERENT_MUCUS_POWER.smartDescription": "各スタックは [blue]-1[/blue] [red]力量[/red] から [blue]3[/blue] までを与えます。その敵ラウンドがリンクされているスライム ルルにブロックされていないダメージを与えない場合、リンクされているすべての [power]付着粘液[/power] 失去 [blue]1[/blue] がスタックします。",
   "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.title": "灵魂链接",
-  "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.description": "明確な単体指定ダメージを受けた時、他の敵はそれぞれそのダメージの[blue]50%[/blue]に等しい伝播ダメージを受ける。\n【灵魂链接】による伝播ダメージは再びこの効果を発動しない。",
-  "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.smartDescription": "明確な単体指定ダメージを受けた時、他の敵へ[blue]50%[/blue]を伝播する。伝播ダメージでは再発動しない。",
+  "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.description": "明確な単体指定ダメージを受けた時、【灵魂链接】を持つ他の敵はそれぞれそのダメージの[blue]50%[/blue]に等しい伝播ダメージを受ける。\n【灵魂链接】による伝播ダメージは再びこの効果を発動しない。\nターン終了時に[blue]1[/blue]層減少する。",
+  "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.smartDescription": "明確な単体指定ダメージを受けた時、【灵魂链接】を持つ他の敵へ[blue]50%[/blue]を伝播する。伝播ダメージでは再発動しない。ターン終了時に[blue]1[/blue]層減少する。",
   "RE_ASTRAL_PARTY_MOD_POWER_MOUSE_SHIELD_POWER.title": "鼠鼠护盾",
   "RE_ASTRAL_PARTY_MOD_POWER_MOUSE_SHIELD_POWER.description": "あなたが受けるすべてのHP損失を9減らします。この力。",
   "RE_ASTRAL_PARTY_MOD_POWER_MOUSE_SHIELD_POWER.smartDescription": "受けるHPの損失を9軽減します。",
@@ -312,5 +312,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.smartDescription": "現在持っている安定した攻撃カード増幅の合計値を表示します。",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.title": "スキル強化",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.description": "現在持っている安定したスキルカード増幅の合計値を表示します。",
-  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "現在持っている安定したスキルカード増幅の合計値を表示します。"
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "現在持っている安定したスキルカード増幅の合計値を表示します。",
+  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.title": "進程",
+  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.description": "戦闘終了時、層数に応じて【人格：グリーンβ】の[gold]歩数[/gold]へ変換する。\n【初始点】を所持し現在が[blue]1[/blue]/[blue]3[/blue]星なら、精算時に追加で[blue]1[/blue]/[blue]3[/blue]歩を得る。",
+  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "戦闘終了時、層数を【人格：グリーンβ】の[gold]歩数[/gold]へ変換する。【初始点】が[blue]1[/blue]/[blue]3[/blue]星なら追加で[blue]1[/blue]/[blue]3[/blue]歩。"
 }

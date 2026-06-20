@@ -24,8 +24,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ADHERENT_MUCUS_POWER.description": "Each stack gives you [blue]-1[/blue] [red]Strength[/red], up to [blue]3[/blue] stacks. If no enemy deals unblocked damage to the linked [relic]Persona: Slime Lulu[/relic] during that enemy round, all enemy [power]Adherent Mucus[/power] stacks linked to that Slime Lulu lose [blue]1[/blue] at the end of the round.",
   "RE_ASTRAL_PARTY_MOD_POWER_ADHERENT_MUCUS_POWER.smartDescription": "Each stack gives [blue]-1[/blue] [red]Strength[/red], up to [blue]3[/blue]. If that enemy round deals no unblocked damage to the linked Slime Lulu, all linked [power]Adherent Mucus[/power] lose [blue]1[/blue] stack.",
   "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.title": "Soul Link",
-  "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.description": "When this unit takes explicit single-target damage, each other enemy takes propagated damage equal to [blue]50%[/blue] of that hit.\nDamage propagated by [gold]Soul Link[/gold] cannot trigger it again.",
-  "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.smartDescription": "Explicit single-target damage propagates [blue]50%[/blue] of that hit to each other enemy; propagated damage cannot trigger this again.",
+  "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.description": "When this unit takes explicit single-target damage, each other enemy with [gold]Soul Link[/gold] takes propagated damage equal to [blue]50%[/blue] of that hit.\nDamage propagated by [gold]Soul Link[/gold] cannot trigger it again.\nAt end of turn, lose [blue]1[/blue] stack.",
+  "RE_ASTRAL_PARTY_MOD_POWER_LING_HUN_LIAN_JIE_POWER.smartDescription": "Explicit single-target damage propagates [blue]50%[/blue] of that hit to each other enemy with [gold]Soul Link[/gold]; propagated damage cannot trigger this again. Lose [blue]1[/blue] stack at end of turn.",
   "RE_ASTRAL_PARTY_MOD_POWER_MOUSE_SHIELD_POWER.title": "Mouse Shield",
   "RE_ASTRAL_PARTY_MOD_POWER_MOUSE_SHIELD_POWER.description": "Reduce all HP loss you take by 9. This power.",
   "RE_ASTRAL_PARTY_MOD_POWER_MOUSE_SHIELD_POWER.smartDescription": "Reduce all HP loss you take by 9.",
@@ -333,5 +333,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ATTACK_AMPLIFICATION_DISPLAY_POWER.smartDescription": "Displays your current total stable bonus damage for Attack cards.",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.title": "Skill Amplification",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.description": "Displays your current total stable bonus damage for Skill cards.",
-  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "Displays your current total stable bonus damage for Skill cards."
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "Displays your current total stable bonus damage for Skill cards.",
+  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.title": "Process",
+  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.description": "At combat end, convert stacks into [gold]Steps[/gold] for [relic]Persona: Bionic Jasmine Beta[/relic].\nIf you own [relic]Initial Point[/relic] at [blue]1[/blue] or [blue]3[/blue] stars, gain an extra [blue]1[/blue] or [blue]3[/blue] steps.",
+  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "At combat end, convert stacks into [gold]Steps[/gold] for [relic]Persona: Bionic Jasmine Beta[/relic]. [relic]Initial Point[/relic] adds [blue]1[/blue]/[blue]3[/blue] extra steps at [blue]1[/blue]/[blue]3[/blue] stars."
 }

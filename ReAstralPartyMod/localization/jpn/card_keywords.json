@@ -2,7 +2,7 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.title": "イベントカード",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.description": "Star Engine MOD[gold]Event[/gold] システムからの特別なカード。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.title": "歩数",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.description": "【性格：グリーン】 入室時の歩数が増加します。その他、休憩エリア、ショップ、宝箱の部屋には [blue]2[/blue] ステップがあります。\nイベント ルームには [blue]3[/blue] ステップが用意されています。\n通常のモンスター ルームには [blue]5[/blue] ステップがあります。\nエリート ルームには [blue]8[/blue] ステップがあります。\nボス部屋には [blue]12[/blue] のステップがあります。\nマップ フェーズでは、[blue]10[/blue] ステップが提供されます。",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.description": "【人格：グリーン】系の効果で累積する歩数。\n[blue]13[/blue]歩ごとに、[blue]1[/blue]点の[green]筋力[/green]または[blue]1[/blue]点の[green]敏捷[/green]へ交互に変換される。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_TEMPORARY.title": "一時的",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_TEMPORARY.description": "ラウンド終了時に自動的に破棄されます。このキーワードは捨て札に入ると自動的に消去されます。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MOON_PROP.title": "月球レリック",

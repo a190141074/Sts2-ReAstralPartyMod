@@ -19,7 +19,9 @@ public sealed class LingHunLianJiePower : AstralPartyPowerModel
 
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.None;
+    public override PowerStackType StackType => PowerStackType.Counter;
+
+    public override int DisplayAmount => Math.Max(0, (int)Amount);
 
     public override async Task AfterDamageGiven(
         PlayerChoiceContext choiceContext,
@@ -59,6 +61,18 @@ public sealed class LingHunLianJiePower : AstralPartyPowerModel
         }
     }
 
+    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
+    {
+        if (Owner == null || side != Owner.Side || Amount <= 0m)
+            return;
+
+        Flash();
+        if (Amount <= 1m)
+            await PowerCmd.Remove(this);
+        else
+            await PowerCmd.ModifyAmount(this, -1m, Owner, null, true);
+    }
+
     private bool ShouldPropagate(
         Creature? dealer,
         DamageResult result,
@@ -84,11 +98,20 @@ public sealed class LingHunLianJiePower : AstralPartyPowerModel
 
     private List<Creature> GetOtherLivingEnemies()
     {
-        if (Owner == null)
+        var owner = Owner;
+        var combatState = owner?.CombatState;
+        if (owner == null || combatState == null)
             return [];
 
-        return CombatTargetOrdering.GetLivingOpponentsStable(Owner)
-            .Where(enemy => enemy != Owner)
+        return combatState.Creatures
+            .Where(creature =>
+                creature.IsAlive
+                && creature != owner
+                && creature.Side == owner.Side
+                && creature.GetPower<LingHunLianJiePower>() != null)
+            .OrderBy(creature => creature.CombatId ?? uint.MaxValue)
+            .ThenBy(creature => creature.ModelId.ToString())
+            .ThenBy(creature => creature.SlotName ?? string.Empty)
             .ToList();
     }
 }
