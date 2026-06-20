@@ -84,6 +84,7 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 只要运行时真实 entry 和本地化 key 有一处拼写分段不一致，就优先修这个，不要先怀疑 UI。
 - 只要某个 power 会被 `HoverTipFactory.FromPower<T>()` 引到 relic/card 查看链里，就必须把它当成 canonical 模型也会被访问的对象处理。
 - `Description`、`SmartDescriptionLocKey`、`GetDescriptionLocKey()`、`GetSmartDescriptionLocKey()` 这些查看链函数里，默认不要直接读取 `Owner`、`Owner.Player`、`CombatState` 等 mutable 状态，除非先做 canonical-safe 防护。
+- 卡牌升级相关需求里，如果目标只是“突破默认升级上限”，默认先检查目标卡类能否直接设置 `MaxUpgradeLevel`；不要先猜需要额外 patch 升级系统。
 
 ### 战斗 / 联机 / 日志优先
 

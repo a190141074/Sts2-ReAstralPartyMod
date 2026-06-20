@@ -169,22 +169,32 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
         return Task.CompletedTask;
     }
 
-    private static async Task AddEliteEncounterGroup(CombatState combatState, BeadsEliteEncounterSnapshot snapshot)
+    private static async Task<bool> AddEliteEncounterGroup(CombatState combatState, BeadsEliteEncounterSnapshot snapshot)
     {
         var addedMonsters = new List<MonsterModel>();
         foreach (var monsterEntry in snapshot.Monsters)
         {
-            var canonicalMonster = ModelDb.GetById<MonsterModel>(ModelId.Deserialize(monsterEntry.MonsterId));
-            var mutableMonster = canonicalMonster.ToMutable();
-            var resolvedSlot = ResolveSpawnSlot(combatState, snapshot.EncounterId, monsterEntry);
-            var creature = await CreatureCmdCompat.Add(mutableMonster, combatState, CombatSide.Enemy, resolvedSlot);
-            addedMonsters.Add(creature.Monster);
-            MainFile.Logger.Info(
-                $"[{MainFile.ModId}] beads spawned monster with original slot | encounterId={snapshot.EncounterId} | monsterId={monsterEntry.MonsterId} | slot={resolvedSlot ?? "<auto_slot>"}");
+            try
+            {
+                var canonicalMonster = ModelDb.GetById<MonsterModel>(ModelId.Deserialize(monsterEntry.MonsterId));
+                var mutableMonster = canonicalMonster.ToMutable();
+                var resolvedSlot = ResolveSpawnSlot(combatState, snapshot.EncounterId, monsterEntry);
+                var creature = await CreatureCmdCompat.Add(mutableMonster, combatState, CombatSide.Enemy, resolvedSlot);
+                addedMonsters.Add(creature.Monster);
+                MainFile.Logger.Info(
+                    $"[{MainFile.ModId}] beads spawned monster with original slot | encounterId={snapshot.EncounterId} | monsterId={monsterEntry.MonsterId} | slot={resolvedSlot ?? "<auto_slot>"}");
+            }
+            catch (Exception ex)
+            {
+                MainFile.Logger.Error(
+                    $"[{MainFile.ModId}] beads failed to add elite monster; aborting encounter group | encounterId={snapshot.EncounterId} | monsterId={monsterEntry.MonsterId} | message={ex.Message}");
+                return false;
+            }
         }
 
         MainFile.Logger.Info(
             $"[{MainFile.ModId}] beads spawned full elite group | encounterId={snapshot.EncounterId} | monsterCount={snapshot.Monsters.Count} | slots={string.Join(",", snapshot.Monsters.Select(static monster => monster.Slot))}");
+        return true;
     }
 
     private static string? ResolveSpawnSlot(CombatState combatState, string encounterId, BeadsEliteMonsterEntry monsterEntry)
@@ -193,20 +203,55 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
             .Select(enemy => enemy.SlotName)
             .Where(static slot => !string.IsNullOrWhiteSpace(slot))
             .ToHashSet(StringComparer.Ordinal);
-        if (!string.IsNullOrWhiteSpace(monsterEntry.Slot) && !occupiedSlots.Contains(monsterEntry.Slot))
-            return monsterEntry.Slot;
+        var originalSlot = string.IsNullOrWhiteSpace(monsterEntry.Slot) ? null : monsterEntry.Slot;
+        if (!string.IsNullOrWhiteSpace(originalSlot)
+            && !occupiedSlots.Contains(originalSlot)
+            && CanUseOriginalEncounterSlot(originalSlot))
+            return originalSlot;
+
+        if (!string.IsNullOrWhiteSpace(originalSlot))
+        {
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}] beads original slot unavailable in current combat room | encounterId={encounterId} | monsterId={monsterEntry.MonsterId} | originalSlot={originalSlot} | hasEncounterSlots={HasEncounterSlots()}");
+        }
 
         var fallbackSlot = combatState.Encounter?.GetNextSlot(combatState);
         if (!string.IsNullOrWhiteSpace(fallbackSlot))
         {
             MainFile.Logger.Warn(
-                $"[{MainFile.ModId}] beads fallback slot resolved | encounterId={encounterId} | monsterId={monsterEntry.MonsterId} | originalSlot={monsterEntry.Slot ?? "<null_slot>"} | fallbackSlot={fallbackSlot}");
+                $"[{MainFile.ModId}] beads using safe fallback slot | encounterId={encounterId} | monsterId={monsterEntry.MonsterId} | resolvedSlot={fallbackSlot}");
             return fallbackSlot;
         }
 
         MainFile.Logger.Warn(
-            $"[{MainFile.ModId}] beads fallback slot unresolved; using auto layout | encounterId={encounterId} | monsterId={monsterEntry.MonsterId} | originalSlot={monsterEntry.Slot ?? "<null_slot>"}");
+            $"[{MainFile.ModId}] beads fallback slot unresolved; using auto layout | encounterId={encounterId} | monsterId={monsterEntry.MonsterId} | originalSlot={originalSlot ?? "<null_slot>"}");
         return null;
+    }
+
+    private static bool CanUseOriginalEncounterSlot(string slot)
+    {
+        if (string.IsNullOrWhiteSpace(slot) || NCombatRoom.Instance == null)
+            return false;
+
+        var encounterSlots = TryGetEncounterSlots();
+        if (encounterSlots == null)
+            return false;
+
+        if (encounterSlots is System.Collections.IDictionary dictionary)
+            return dictionary.Contains(slot);
+
+        return encounterSlots is IEnumerable<object> enumerable
+               && enumerable.Any(entry => string.Equals(entry?.ToString(), slot, StringComparison.Ordinal));
+    }
+
+    private static bool HasEncounterSlots()
+    {
+        return TryGetEncounterSlots() != null;
+    }
+
+    private static object? TryGetEncounterSlots()
+    {
+        return typeof(NCombatRoom).GetProperty("EncounterSlots")?.GetValue(NCombatRoom.Instance);
     }
 
     private void AddStandardEliteRewards(CombatRoom room, Player player)
@@ -337,7 +382,13 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
         if (owner.Creature?.CombatState is not CombatState combatState || owner.RunState == null)
             throw new InvalidOperationException("MoonPropBeadsOfFealty shared spawn requires an active combat state.");
 
-        await AddEliteEncounterGroup(combatState, snapshot);
+        var spawnSucceeded = await AddEliteEncounterGroup(combatState, snapshot);
+        if (!spawnSucceeded)
+        {
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}] beads shared elite spawn action aborted before completion | ownerNetId={owner.NetId} | encounterId={snapshot.EncounterId}");
+            return;
+        }
 
         var relic = owner.GetRelic<MoonPropBeadsOfFealty>();
         if (relic != null)

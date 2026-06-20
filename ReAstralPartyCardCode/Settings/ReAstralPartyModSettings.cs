@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -57,6 +58,11 @@ public enum StartingPersonaMode
 
 public sealed class ReAstralPartyModSettings
 {
+    private static readonly string[] DefaultBannedRelicIds =
+    [
+        ModelDb.Relic<MoonPropBeadsOfFealty>().Id.ToString()
+    ];
+
     public sealed class AstralModeScopedGameplaySettings
     {
         public bool EnableExtremeMode { get; set; }
@@ -135,10 +141,10 @@ public sealed class ReAstralPartyModSettings
         public float Height { get; set; } = 520f;
     }
 
-    public List<string> BannedRelicIds { get; set; } = new();
+    public List<string> BannedRelicIds { get; set; } = [.. DefaultBannedRelicIds];
 
     // Legacy field kept so older settings.json files still load cleanly.
-    public List<string>? BannedPersonaRelicIds { get; set; }
+    public List<string>? BannedPersonaRelicIds { get; set; } = [.. DefaultBannedRelicIds];
 
     public AstralContentMode CurrentContentMode { get; set; } = AstralContentMode.Vanilla;
 

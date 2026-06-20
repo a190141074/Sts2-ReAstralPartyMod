@@ -225,6 +225,7 @@ internal static class MoonPropShopExtraRelicsHelper
         IReadOnlyCollection<ModelId>? excludedRelicIds)
     {
         var excluded = excludedRelicIds ?? Array.Empty<ModelId>();
+        var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(player.RunState);
         var hasOwnedBeadsOfFealty = RunHasEverOwnedRelic(player.RunState, ModelDb.Relic<MoonPropBeadsOfFealty>().Id);
         return MoonPropRelicFactories
             .Where(factory =>
@@ -232,6 +233,8 @@ internal static class MoonPropShopExtraRelicsHelper
                 var relic = factory();
                 var relicId = GetCanonicalRelicId(relic);
                 if (excluded.Contains(relicId))
+                    return false;
+                if (BannedRelicRegistry.IsBanned(bannedRelicIds, relic))
                     return false;
                 if (relic is MoonPropBeadsOfFealty && hasOwnedBeadsOfFealty)
                     return false;

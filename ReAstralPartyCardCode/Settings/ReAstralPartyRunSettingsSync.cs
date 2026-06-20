@@ -278,7 +278,11 @@ internal static class ReAstralPartyRunSettingsSync
             EnableLucidDreamPitchBlackImpulse = false,
             EnableLucidDreamBubblePotionOfDreams = false,
             EnableLucidDreamHarmlessWhisper = false,
-            BannedRelicIdsSerialized = []
+            BannedRelicIdsSerialized = [.. ReAstralPartyModSettingsManager.GetBannedRelicIds(null)
+                .Where(static id => id != MegaCrit.Sts2.Core.Models.ModelId.none)
+                .Select(static id => id.ToString())
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(static id => id, StringComparer.Ordinal)]
         };
     }
 
