@@ -111,7 +111,13 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
     private static IEnumerable<EncounterModel> GetEliteEncounterCandidates(Player owner)
     {
         return owner.RunState?.Act?.AllEliteEncounters
+                   .Where(IsBaseGameEliteEncounter)
                ?? [];
+    }
+
+    private static bool IsBaseGameEliteEncounter(EncounterModel encounter)
+    {
+        return encounter.GetType().Namespace == "MegaCrit.Sts2.Core.Models.Encounters";
     }
 
     private static async Task AddEliteEncounterGroup(CombatState combatState, EncounterModel encounter)

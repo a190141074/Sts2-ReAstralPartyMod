@@ -2664,8 +2664,16 @@ public static partial class ReAstralPartyModSettingsManager
 
         settings.ModpackModeSettings = BuildModeScopedSettingsFromLegacy(settings);
         settings.VanillaModeSettings = BuildVanillaModeDefaults();
-        settings.CurrentContentMode = AstralContentMode.Vanilla;
+        settings.CurrentContentMode = ResolveInitialContentMode(settings);
         settings.ContentModeSettingsInitialized = true;
+    }
+
+    private static AstralContentMode ResolveInitialContentMode(ReAstralPartyModSettings settings)
+    {
+        if (Enum.IsDefined(typeof(AstralContentMode), settings.CurrentContentMode))
+            return AstralContentModeRegistry.NormalizeMode(settings.CurrentContentMode);
+
+        return AstralContentMode.Modpack;
     }
 
     private static ReAstralPartyModSettings.AstralModeScopedGameplaySettings BuildModeScopedSettingsFromLegacy(

@@ -133,6 +133,7 @@ public class EnigmaticSynthesisEscapeScroll : AstralPartyRelicModel
         var hasSevenCurses = Owner?.GetRelic<EnigmaticSevenCurses>() != null;
         var percentLoss = hasSevenCurses ? SevenCursesMaxHpLossPercent : BaseMaxHpLossPercent;
         var flatLoss = hasSevenCurses ? SevenCursesFlatMaxHpLoss : BaseFlatMaxHpLoss;
-        return Math.Max(1m, Math.Ceiling(creature.MaxHp * percentLoss) + flatLoss);
+        var baseMaxHp = BaseMaxHpHelper.GetBaseMaxHp(creature);
+        return Math.Max(1m, Math.Ceiling(baseMaxHp * percentLoss) + flatLoss);
     }
 }

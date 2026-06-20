@@ -149,11 +149,12 @@ public class MoonPropTranscendence : MoonPropStackableRelicBase
 
     private decimal EnsureBaseMaxHpSnapshot(Creature creature)
     {
-        var snapshot = GetBaseMaxHpSnapshot();
-        if (snapshot > 0m)
-            return snapshot;
+        var snapshot = BaseMaxHpHelper.GetBaseMaxHp(creature);
+        if (snapshot <= 0m)
+            snapshot = GetBaseMaxHpSnapshot();
+        if (snapshot <= 0m)
+            snapshot = creature.MaxHp;
 
-        snapshot = creature.MaxHp;
         AstralParty_MoonPropTranscendenceBaseMaxHpSnapshotSerialized = StableNumericStateHelper.SerializeDecimal(snapshot);
         return snapshot;
     }

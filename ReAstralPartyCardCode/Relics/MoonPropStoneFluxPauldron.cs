@@ -68,11 +68,12 @@ public class MoonPropStoneFluxPauldron : MoonPropStackableRelicBase
 
     private decimal EnsureBaseMaxHpSnapshot(Creature creature)
     {
-        var snapshot = GetBaseMaxHpSnapshot();
-        if (snapshot > 0m)
-            return snapshot;
+        var snapshot = BaseMaxHpHelper.GetBaseMaxHp(creature);
+        if (snapshot <= 0m)
+            snapshot = GetBaseMaxHpSnapshot();
+        if (snapshot <= 0m)
+            snapshot = creature.MaxHp;
 
-        snapshot = creature.MaxHp;
         AstralParty_MoonPropStoneFluxBaseMaxHpSnapshotSerialized = StableNumericStateHelper.SerializeDecimal(snapshot);
         return snapshot;
     }

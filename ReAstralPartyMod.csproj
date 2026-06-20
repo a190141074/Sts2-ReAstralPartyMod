@@ -61,6 +61,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="description\eng.md" />
+		<Content Include="description\zhs.md" />
 		<Content Include="README.md"/>
 		<Content Include="ReAstralPartyMod.json"/>
 		<Content Include="ReAstralPartyMod\images\astral_token.png"/>
