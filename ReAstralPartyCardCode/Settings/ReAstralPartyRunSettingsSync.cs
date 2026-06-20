@@ -32,6 +32,8 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public bool EnableLucidDream { get; set; } = true;
 
+    public bool EnableCollectorsCards { get; set; } = true;
+
     public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; } =
         NeowExtraOptionSelectionMode.DefaultRandom;
 
@@ -100,6 +102,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableNeowExtraOption = EnableNeowExtraOption,
             EnableLucidDream = EnableLucidDream,
+            EnableCollectorsCards = EnableCollectorsCards,
             NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode,
             EnableAllPersonas = EnableAllPersonas,
             EnableVariantPersonas = EnableVariantPersonas,
@@ -195,6 +198,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableMoonPropShopSlots = lobbySnapshot?.EnableMoonPropShopSlots ?? settings.EnableMoonPropShopSlots,
             EnableNeowExtraOption = lobbySnapshot?.EnableNeowExtraOption ?? settings.EnableNeowExtraOption,
             EnableLucidDream = lobbySnapshot?.EnableLucidDream ?? settings.EnableLucidDream,
+            EnableCollectorsCards = lobbySnapshot?.EnableCollectorsCards ?? settings.EnableCollectorsCards,
             NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
                 lobbySnapshot?.EnableStartingRingOfSevenCurses ?? settings.EnableStartingRingOfSevenCurses,
                 lobbySnapshot?.NeowExtraOptionSelectionMode ?? settings.NeowExtraOptionSelectionMode),
@@ -246,6 +250,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableMoonPropShopSlots = true,
             EnableNeowExtraOption = true,
             EnableLucidDream = true,
+            EnableCollectorsCards = true,
             NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom,
             EnableAllPersonas = false,
             EnableVariantPersonas = true,
@@ -358,6 +363,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableMoonPropShopSlots = lobbySnapshot.EnableMoonPropShopSlots,
             EnableNeowExtraOption = lobbySnapshot.EnableNeowExtraOption,
             EnableLucidDream = lobbySnapshot.EnableLucidDream,
+            EnableCollectorsCards = lobbySnapshot.EnableCollectorsCards,
             NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
                 lobbySnapshot.EnableStartingRingOfSevenCurses,
                 lobbySnapshot.NeowExtraOptionSelectionMode),

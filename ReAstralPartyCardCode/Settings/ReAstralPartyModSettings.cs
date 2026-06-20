@@ -79,6 +79,8 @@ public sealed class ReAstralPartyModSettings
 
         public bool EnableLucidDream { get; set; } = true;
 
+        public bool EnableCollectorsCards { get; set; } = true;
+
         public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; } =
             NeowExtraOptionSelectionMode.DefaultRandom;
 
@@ -106,6 +108,7 @@ public sealed class ReAstralPartyModSettings
                 EnableMoonPropShopSlots = EnableMoonPropShopSlots,
                 EnableNeowExtraOption = EnableNeowExtraOption,
                 EnableLucidDream = EnableLucidDream,
+                EnableCollectorsCards = EnableCollectorsCards,
                 NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode,
                 EnableAllPersonas = EnableAllPersonas,
                 EnableVariantPersonas = EnableVariantPersonas,
@@ -161,6 +164,8 @@ public sealed class ReAstralPartyModSettings
     public bool EnableNeowExtraOption { get; set; } = true;
 
     public bool EnableLucidDream { get; set; } = true;
+
+    public bool EnableCollectorsCards { get; set; } = true;
 
     public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; } =
         NeowExtraOptionSelectionMode.DefaultRandom;
@@ -257,6 +262,8 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableNeowExtraOption => ReadRuntime(settings => settings.EnableNeowExtraOption);
 
     public static bool EnableLucidDream => ReadRuntime(settings => settings.EnableLucidDream);
+
+    public static bool EnableCollectorsCards => ReadRuntime(settings => settings.EnableCollectorsCards);
 
     public static NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode =>
         ReadRuntime(settings => settings.NeowExtraOptionSelectionMode);
@@ -510,6 +517,26 @@ public static partial class ReAstralPartyModSettingsManager
             return true;
 
         return EnableLucidDream;
+    }
+
+    public static bool GetEnableCollectorsCards(IRunState? runState)
+    {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.CollectorsCards))
+            return false;
+
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableCollectorsCards;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableCollectorsCards;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableCollectorsCards;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableCollectorsCards;
     }
 
     public static NeowExtraOptionSelectionMode GetNeowExtraOptionSelectionMode(IRunState? runState)
@@ -1448,6 +1475,23 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableCollectorsCards = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableCollectorsCards;
+            },
+            (settings, value) =>
+            {
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableCollectorsCards = value);
+                ApplyRuntimeSettings(settings, "enable_collectors_cards");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.label",
+                    value);
+            });
+
         var neowExtraOptionSelectionMode = ModSettingsBindings.Global<ReAstralPartyModSettings, NeowExtraOptionSelectionMode>(
             MainFile.ModId,
             SettingsKey,
@@ -1815,6 +1859,12 @@ public static partial class ReAstralPartyModSettingsManager
                     enableLucidDream,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.description",
                         "Control whether the Lucid Dream panels are shown in the room and whether Lucid Dream effects are active for this run."))
+                .AddToggle(
+                    "enable_collectors_cards",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.label", "Enable Collectors Cards"),
+                    enableCollectorsCards,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.description",
+                        "Control whether collectors cards can appear through normal card rewards and other standard card acquisition paths in this run."))
                 .AddEnumChoice(
                     "neow_extra_option_selection_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label",
@@ -1931,6 +1981,11 @@ public static partial class ReAstralPartyModSettingsManager
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.LucidDream,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_collectors_cards", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.CollectorsCards,
                         roomSurface: false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_starting_ring_of_seven_curses", () =>
                     AstralContentModeRegistry.GetAvailability(
@@ -2691,6 +2746,7 @@ public static partial class ReAstralPartyModSettingsManager
             EnableMoonPropShopSlots = settings.EnableMoonPropShopSlots,
             EnableNeowExtraOption = settings.EnableNeowExtraOption,
             EnableLucidDream = settings.EnableLucidDream,
+            EnableCollectorsCards = settings.EnableCollectorsCards,
             NeowExtraOptionSelectionMode = NormalizeNeowExtraOptionSelectionMode(
                 settings.EnableStartingRingOfSevenCurses,
                 settings.NeowExtraOptionSelectionMode),
@@ -2716,6 +2772,7 @@ public static partial class ReAstralPartyModSettingsManager
             EnableMoonPropShopSlots = false,
             EnableNeowExtraOption = false,
             EnableLucidDream = false,
+            EnableCollectorsCards = false,
             NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom,
             EnableAllPersonas = false,
             EnableVariantPersonas = false,
@@ -2758,6 +2815,7 @@ public static partial class ReAstralPartyModSettingsManager
         settings.EnableMoonPropShopSlots = modpack.EnableMoonPropShopSlots;
         settings.EnableNeowExtraOption = modpack.EnableNeowExtraOption;
         settings.EnableLucidDream = modpack.EnableLucidDream;
+        settings.EnableCollectorsCards = modpack.EnableCollectorsCards;
         settings.NeowExtraOptionSelectionMode = modpack.NeowExtraOptionSelectionMode;
         settings.EnableAllPersonas = modpack.EnableAllPersonas;
         settings.EnableVariantPersonas = modpack.EnableVariantPersonas;
@@ -2806,6 +2864,8 @@ public static partial class ReAstralPartyModSettingsManager
         public bool EnableNeowExtraOption { get; init; } = true;
 
         public bool EnableLucidDream { get; init; } = true;
+
+        public bool EnableCollectorsCards { get; init; } = true;
 
         public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; init; } =
             NeowExtraOptionSelectionMode.DefaultRandom;
@@ -2898,6 +2958,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableMoonPropShopSlots = scoped.EnableMoonPropShopSlots,
                 EnableNeowExtraOption = scoped.EnableNeowExtraOption,
                 EnableLucidDream = scoped.EnableLucidDream,
+                EnableCollectorsCards = scoped.EnableCollectorsCards,
                 NeowExtraOptionSelectionMode = scoped.NeowExtraOptionSelectionMode,
                 EnableAllPersonas = scoped.EnableAllPersonas,
                 EnableVariantPersonas = scoped.EnableVariantPersonas,

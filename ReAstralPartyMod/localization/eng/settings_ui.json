@@ -36,6 +36,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description": "Control whether Astral's randomized fourth Neow option appears at run start.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label": "Enable Lucid Dream",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.description": "Control whether the Lucid Dream panels are shown in the room and whether Lucid Dream effects are active for this run.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.label": "Enable Collectors Cards",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.description": "Control whether collectors cards can appear through normal card rewards and other standard card acquisition paths in this run.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label": "Forced Neow Extra Option",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.description": "Choose the extra Neow option shared by all players this room, or keep the existing deterministic random behavior.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random": "Default",

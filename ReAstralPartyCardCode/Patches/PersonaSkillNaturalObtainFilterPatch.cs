@@ -1,4 +1,5 @@
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Runs;
 using STS2RitsuLib.Patching.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -18,8 +19,8 @@ public sealed class PersonaSkillNaturalObtainFilterPatch : IPatchMethod
         return [new(typeof(CardCreationOptions), nameof(CardCreationOptions.GetPossibleCards), [typeof(MegaCrit.Sts2.Core.Entities.Players.Player)])];
     }
 
-    public static IEnumerable<CardModel> Postfix(IEnumerable<CardModel> __result)
+    public static IEnumerable<CardModel> Postfix(IEnumerable<CardModel> __result, Player player)
     {
-        return __result.Where(PersonaSkillCardFilter.AllowNaturalObtain).ToList();
+        return __result.Where(card => PersonaSkillCardFilter.AllowNaturalObtain(card, player?.RunState)).ToList();
     }
 }

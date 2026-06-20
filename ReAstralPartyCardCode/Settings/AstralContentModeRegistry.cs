@@ -26,7 +26,8 @@ public enum AstralGameplaySettingKey
     NeowExtraOption = 12,
     NeowExtraOptionSelectionMode = 13,
     LucidDream = 14,
-    StartingRingOfSevenCurses = 15
+    StartingRingOfSevenCurses = 15,
+    CollectorsCards = 16
 }
 
 public enum AstralModeAvailability
@@ -171,6 +172,13 @@ public static class AstralContentModeRegistry
             AstralModeAvailability.LockedVisible,
             AstralModeAvailability.Hidden),
         new(
+            AstralGameplaySettingKey.CollectorsCards,
+            "enable_collectors_cards",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.label",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.description",
+            AstralModeAvailability.LockedVisible,
+            AstralModeAvailability.Hidden),
+        new(
             AstralGameplaySettingKey.StartingRingOfSevenCurses,
             "enable_starting_ring_of_seven_curses",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label",
@@ -253,4 +261,3 @@ public static class AstralContentModeRegistry
         return result;
     }
 }
-

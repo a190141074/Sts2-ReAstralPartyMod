@@ -36,6 +36,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description": "ゲーム開始時にスターエンジンの 4 つ目の追加 Neow 選択肢を表示するかを制御します。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label": "清醒夢を有効化",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.description": "ルーム内で【清醒夢】設定パネルを表示するかと、このランで清醒夢効果を有効にするかを制御します。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.label": "典藏カードを有効化",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.description": "このランで、典藏カードが通常のカード報酬やその他の標準的なカード入手経路から出現するかを制御します。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label": "追加 Neow 選択肢を指定",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.description": "この部屋の全プレイヤーで共有する追加 Neow 選択肢を指定するか、既存の安定ランダム挙動を維持します。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random": "デフォルト",

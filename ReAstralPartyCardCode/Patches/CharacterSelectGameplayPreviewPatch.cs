@@ -181,6 +181,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private CheckButton? _moonPropShopSlotsToggle;
     private CheckButton? _neowExtraOptionToggle;
     private CheckButton? _lucidDreamToggle;
+    private CheckButton? _collectorsCardsToggle;
     private CheckButton? _allPersonasToggle;
     private CheckButton? _variantPersonasToggle;
     private CheckButton? _allVariantPersonasToggle;
@@ -402,6 +403,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.description"),
             out _lucidDreamToggle,
             OnEnableLucidDreamToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.description"),
+            out _collectorsCardsToggle,
+            OnEnableCollectorsCardsToggled));
         body.AddChild(BuildEnumRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.description"),
@@ -919,6 +925,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 SetRowVisible(_lucidDreamToggle, !isVanillaMode);
             }
 
+            if (_collectorsCardsToggle != null)
+            {
+                _collectorsCardsToggle.ButtonPressed = snapshot.EnableCollectorsCards;
+                _collectorsCardsToggle.Disabled = !isEditable;
+                _collectorsCardsToggle.Text = snapshot.EnableCollectorsCards ? "ON" : "OFF";
+                SetRowVisible(_collectorsCardsToggle, !isVanillaMode);
+            }
+
             if (_neowExtraOptionSelectionModeOption != null)
             {
                 RebuildNeowExtraOptionSelectionModeItems(snapshot.EnableStartingRingOfSevenCurses);
@@ -1055,6 +1069,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From(snapshot.EnableStartingPersonaSelection), Variant.From(snapshot.EnableDreamSeriesEvents),
             Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableMoonPropShopSlots), Variant.From(snapshot.EnableNeowExtraOption),
             Variant.From(snapshot.EnableLucidDream),
+            Variant.From(snapshot.EnableCollectorsCards),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
             Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableVariantPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
             Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
@@ -1062,7 +1077,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint, bool enableStartingAstralRelicStore, bool enableStartingRingOfSevenCurses, bool enableStartingPersonaSelection,
         bool enableDreamSeriesEvents, bool enableEnigmaticSeriesEvents, bool enableMoonPropShopSlots, bool enableNeowExtraOption,
-        bool enableLucidDream,
+        bool enableLucidDream, bool enableCollectorsCards,
         int neowExtraOptionSelectionMode,
         bool enableAllPersonas, bool enableVariantPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
     {
@@ -1080,6 +1095,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             EnableMoonPropShopSlots = enableMoonPropShopSlots,
             EnableNeowExtraOption = enableNeowExtraOption,
             EnableLucidDream = enableLucidDream,
+            EnableCollectorsCards = enableCollectorsCards,
             NeowExtraOptionSelectionMode = Enum.IsDefined(typeof(NeowExtraOptionSelectionMode), neowExtraOptionSelectionMode)
                 ? (NeowExtraOptionSelectionMode)neowExtraOptionSelectionMode
                 : NeowExtraOptionSelectionMode.DefaultRandom,
@@ -1102,6 +1118,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableAllPersonas = value);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableCollectorsCardsToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableCollectorsCards = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 
