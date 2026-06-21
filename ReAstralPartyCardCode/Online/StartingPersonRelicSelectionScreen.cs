@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Godot;
+using HarmonyLib;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
@@ -42,6 +44,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
     private const int SelectionCommitTimeoutMilliseconds = 10 * 60 * 1000;
     private const int SelectionCommitGraceMilliseconds = 5 * 1000;
     private const int AutomaticSelectionMinimumCountdownMilliseconds = 250;
+    private static readonly Dictionary<Type, FieldInfo?> VoteDelegateFields = new();
 
     private readonly TaskCompletionSource _completionSource = new();
     private readonly TaskCompletionSource _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -319,12 +322,11 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
             }
 
             holder.Initialize(_relicOptions[entry.Key], _runState);
-            holder.VoteContainer.RefreshPlayerVotes();
+            RebindVoteContainer(holder);
         }
 
         ApplyHolderLayout(_holdersByIndex.OrderBy(entry => entry.Key).Select(entry => entry.Value).ToList(), _relicOptions.Count);
         ConfigureHolderFocusNeighbors();
-        RefreshVotes(false);
     }
 
     private void AnimateIn()
@@ -1062,8 +1064,45 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
             if (!IsInstanceValid(holder) || !IsInstanceValid(holder.VoteContainer))
                 continue;
 
-            holder.VoteContainer.RefreshPlayerVotes(animate);
+            try
+            {
+                holder.VoteContainer.RefreshPlayerVotes(animate);
+            }
+            catch (Exception ex)
+            {
+                LogWarn("P132A",
+                    $"Starting persona selection vote refresh skipped after holder initialization failure: holderIndex={holder.Index} animate={animate}. {ex.Message}");
+            }
         }
+    }
+
+    private void RebindVoteContainer(NTreasureRoomRelicHolder holder)
+    {
+        if (!IsInstanceValid(holder) || !IsInstanceValid(holder.VoteContainer))
+            return;
+
+        var voteContainer = holder.VoteContainer;
+        var voteContainerType = voteContainer.GetType();
+        if (!VoteDelegateFields.TryGetValue(voteContainerType, out var delegateField))
+        {
+            delegateField = AccessTools.Field(voteContainerType, "_playerVotedDelegate");
+            VoteDelegateFields[voteContainerType] = delegateField;
+        }
+
+        if (delegateField == null)
+            return;
+
+        var delegateType = delegateField.FieldType;
+        var votedMethod = AccessTools.Method(
+            typeof(StartingPersonRelicSelectionScreen),
+            nameof(PlayerSelectedHolder),
+            new[] { typeof(Player), typeof(int) });
+        if (votedMethod == null)
+            return;
+
+        var predicate = (Func<Player, bool>)(player => PlayerSelectedHolder(player, holder.Index));
+        var reboundDelegate = Delegate.CreateDelegate(delegateType, predicate.Target, predicate.Method);
+        delegateField.SetValue(voteContainer, reboundDelegate);
     }
 
     private bool PlayerSelectedHolder(Player player, int holderIndex)

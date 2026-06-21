@@ -144,6 +144,43 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 起始人格 / Neow restore 问题：
   - 先查状态恢复和重建链，例如 `StartingPersonaNeowReadyFlow`、`StartingPersonaRelicSelectionScreen`、`SetInitialEventState(...)`
   - 不先猜 UI 延迟、动画时序或展示层问题
+- 人格选择 / `StartingPerson*` / `StartingPersona*` / Neow ready-page / host-launch / persona overlay / remote choice pre-restore` 默认属于仓库高危区：
+  - 能不动就不动；这条链默认按坏味道很重的历史屎山处理，不要把它当普通 UI / 同步功能随手重构
+  - 没有明确根因和双端日志验证时，不要轻易改
+  - 任何改动后至少一起核对：
+    - 主机 `host_local_click optionPayloadCount`
+    - 客机 `host_broadcast optionPayloadCount`
+    - 主客 overlay 候选数量与顺序
+    - `EVENT.NEOW` 首次真实点击前是否仍停在 ready-page
+  - “界面能弹出”不算通过；必须确认主客吃到的是同一份候选人格 payload
+  - 这条链优先最小修补，不要顺手重构或扩大到别的同步系统
+  - 验证这条链时，默认优先看带时间戳的最新 `godotYYYY-MM-DDTHH.MM.SS.log`，不要先拿滚动 `godot.log` 里的旧异常下结论
+  - 如果 `godot.log` 里仍残留旧的 `P132A`、`PlayerVotedForRelic`、黑图标阶段报错，但最新带时间戳日志里已经满足：
+    - 主机 `host_local_click optionPayloadCount == resolvedCount`
+    - 客机 `host_broadcast optionPayloadCount == resolvedCount`
+    - `P014/P015` 正常出现
+    - 没有新的首个硬错误打断 overlay 初始化
+    - 则默认判定“最近一次已通过”，不要被滚动日志里的历史噪音误导
+  - 这条链里，主机本地和主机广播绝不能各自重新生成一份人格候选：
+    - `StartingPersonNeowReadyFlow` 必须先生成一次 `serializedRelicOptionIds`
+    - 这同一份 payload 同时给 `host_local_click`
+    - 同时给 `StartingPersonHostLaunchSync.BroadcastLaunch(...)`
+    - 不允许主机本地 `HandleReadyLaunchAsync(...)` 走空 payload 或默认 `null`
+  - `StartingPersonHostLaunchSync.BroadcastLaunch(...)` 这类入口，默认优先显式接收已生成 payload，不要在广播函数内部再隐式重建一份候选列表；否则主客很容易因为二次生成时机不同而分叉
+  - 如果人格选择 overlay 出现“全黑图标 / 黑圆圈 / 只有底板没有内容”，默认先怀疑 overlay 初始化阶段被异常打断，不要先怀疑图片资源丢失：
+    - 先查 `PlayerVotedForRelic`
+    - 先查 `NMultiplayerVoteContainer.RefreshPlayerVotes`
+    - 先查 `StartingPersonRelicSelectionScreen.BuildRelicHoldersIfNeededAsync()`
+    - 很多情况下黑图标只是 holder 停在初始 `Colors.Black`，不是贴图真的没包进去
+  - `StartingPersonRelicSelectionScreen` 在 holder 初建阶段默认不要急着刷 vote UI：
+    - 不要在每个 holder `Initialize(...)` 后立刻 `RefreshPlayerVotes()`
+    - 不要在 holder 全部建完但真实选择/投票上下文还没稳定前强刷 `RefreshVotes(false)`
+    - 如果这里命中 `PlayerVotedForRelic` 越界，优先先停掉早期 vote refresh，再决定是否补更窄 gate
+  - 对人格选择链，`Asset not cached` 往往只是噪音；若同时存在 `PlayerVotedForRelic` / `Index was out of range` / `P132A`，默认先修越界链，再讨论资源
+  - 只要用户没有明确要求动这条链，默认避免顺手“顺便整理 / 顺便统一 / 顺便优化”：
+    - 先怀疑是否能在外围绕开
+    - 先怀疑是否能只补单点 helper / guard / payload 透传
+    - 不要因为看起来命名乱、职责散，就立刻做结构性清理
 - 隐藏 beta 立绘：
   - 先看 `godot*.log` 的实时设置
   - 再看资源目录是否真有对应 `_beta` 文件
@@ -177,6 +214,14 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - `_runtimeSettings` 首次建立时是否已经吃到迁移结果
   - lobby / run snapshot 初始值是否带上该默认值
   - 对应 UI 列表是否真的包含目标内容，而不是只改了状态不改来源列表
+  - 如果默认 ban 看起来“代码已经加了，但 UI 和运行时都没命中”，默认优先怀疑 3 件事：
+    - 用错了 relic ID
+    - 迁移只改了内存，没有真正 `Save(...)` 落盘
+    - UI 列表来源里根本没把目标内容纳入分类
+  - 对旧设置补默认 ban 时，默认做一次性迁移而不是每次启动强塞：
+    - 只在“尚未初始化默认 ban”的旧配置上补入默认值
+    - 迁移后立刻落盘
+    - 用户后续手动取消 ban 后，要尊重用户配置，不要每次启动再自动加回
 - 设置 / lobby / run snapshot 这类边界类型里，如果旧错误命名只是过渡 alias，不要长期依赖：
   - 能直接改主字段/主类型名的，尽快改成 `StartingPerson*`、`Person*`。
   - 只把真正需要跨版本读取旧存档/旧消息的兼容留在边界层，不要把 alias 扩散回业务代码。
@@ -190,6 +235,7 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 对 ban relic 这类框架问题，先核对真实运行时 canonical ID，再看 UI、默认值和过滤入口：
   - 优先从运行时保存、历史记录、日志或 `ModelDb` 确认真实 ID
   - 不要拿手写短 ID、显示名或想当然的 entry stem 直接当过滤 key
+  - 这类问题一旦出现“UI 里看得到内容，但默认 ban 命不中”，优先怀疑默认 ban 存的是错误短 ID，而 UI / 候选池比较用的是完整 canonical ID
 - 如果要禁止普通商店自然刷某类遗物，优先“替换 entry”为同类型可用替代项，不要直接删除 entry，避免商店正常位数量变少。
 - 特殊商人 / fake merchant 仍然是高风险链：
   - 优先在 `NMerchantInventory.Initialize(...)` 前缀整体排除 `NFakeMerchantInventory`
@@ -198,6 +244,11 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - ban relic 机制默认不是底层全局强封禁，而是“各个来源主动读取 ban 集”：
   - 如果需求只是“默认不让某个商店/卡池/候选池刷出某件 relic”，优先修对应来源入口 + 默认 ban 落盘链
   - 如果需求是“所有来源彻底禁用某件 relic”，需要逐入口审计，不要假设 ban UI 自动全局生效
+  - 对月球遗物相关问题，默认先复用现有 ban 框架和候选池过滤，不要为了单个 relic 临时写一条 if/黑名单旁路：
+    - 先修默认 ban 初始化
+    - 再修真实 ID 命中
+    - 再确认 `MoonPropShopExtraRelicsHelper` / deterministic helper 真在读取同一份 ban 集
+    - 只有框架已经确认无解，才考虑 feature-local 特判
 
 ### 构建 / 导出
 
@@ -206,6 +257,10 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 不要默认再额外导出到临时验证目录、仓库自定义输出目录或其它多余位置。
 - 只有当游戏目录文件被占用、Godot 导出失败、或用户明确允许 compile-only fallback 时，才退回临时验证产物。
 - 如果只是 C# 改动且资源未变，优先确认 DLL 已更新到游戏目录；不要把“compile-only 产物生成成功”当成“已经导出”。
+- 对这类联机 / 启动链修复，构建后要额外核对游戏目录与仓库编译产物的时间戳或大小是否真的更新：
+  - `B:\Documents\re-astral-party-mod\.godot\mono\temp\bin\Debug\ReAstralPartyMod.dll`
+  - `D:\Steam\steamapps\common\Slay the Spire 2\mods\ReAstralPartyMod\ReAstralPartyMod.dll`
+  - 如果游戏目录仍是旧 DLL，就不要用新日志之外的现象来评价本轮修复是否生效
 
 ### 隐藏运行时载体
 

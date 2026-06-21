@@ -49,21 +49,20 @@ internal static class StartingPersonHostLaunchSync
         }
     }
 
-    public static void BroadcastLaunch(RunState runState)
+    public static void BroadcastLaunch(RunState runState, IReadOnlyList<string> serializedRelicOptionIds)
     {
         ArgumentNullException.ThrowIfNull(runState);
+        ArgumentNullException.ThrowIfNull(serializedRelicOptionIds);
 
         var netService = _registeredNetService ?? RunManager.Instance?.NetService;
         if (netService == null || netService.Type != NetGameType.Host || !netService.IsConnected)
             return;
 
         var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
-        var relicOptionIds = StartingPersonRelicSelectionPatch.CreateOverlayRelicOptions(runState)
-            .Select(relic => (relic.CanonicalInstance?.Id ?? relic.Id).ToString())
-            .ToList();
+        var relicOptionIds = serializedRelicOptionIds.ToList();
         netService.SendMessage(new StartingPersonHostLaunchMessage(runKey, relicOptionIds));
         MainFile.Logger.Info(
-            $"[StartingPersonHostLaunchSync] Host broadcast persona-selection launch | runKey={runKey} options={relicOptionIds.Count}.");
+            $"[StartingPersonHostLaunchSync] Host broadcast persona-selection launch | runKey={runKey} options={relicOptionIds.Count} ids={FormatPayloadSummary(relicOptionIds)}.");
     }
 
     private static void HandleLaunchMessage(StartingPersonHostLaunchMessage message, ulong senderId)
@@ -85,11 +84,23 @@ internal static class StartingPersonHostLaunchSync
         }
 
         MainFile.Logger.Info(
-            $"[StartingPersonHostLaunchSync] Client received host-launch | runKey={message.RunKey} sender={senderId}.");
+            $"[StartingPersonHostLaunchSync] Client received host-launch | runKey={message.RunKey} sender={senderId} options={message.RelicOptionIds.Count} ids={FormatPayloadSummary(message.RelicOptionIds)}.");
         _ = StartingPersonNeowReadyFlow.HandleReadyLaunchAsync(
             message.RunKey,
             "host_broadcast",
             message.RelicOptionIds);
+    }
+
+    private static string FormatPayloadSummary(IReadOnlyList<string> serializedRelicOptionIds)
+    {
+        if (serializedRelicOptionIds.Count == 0)
+            return "<empty>";
+
+        const int limit = 4;
+        var preview = string.Join(", ", serializedRelicOptionIds.Take(limit));
+        return serializedRelicOptionIds.Count > limit
+            ? $"{preview}, ... ({serializedRelicOptionIds.Count} total)"
+            : preview;
     }
 }
 

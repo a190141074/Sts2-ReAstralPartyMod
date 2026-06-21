@@ -681,7 +681,7 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_REPLICANT_GROUP.flavor": "2012年4月的平衡性调整,克隆机被从游戏中移除。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_REPLICANT_GROUP.select_prompt": "选择[blue]1[/blue]张要克隆并自动打出的手牌",
   "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.title": "【全息球】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.description": "· 拾起时，从你的牌组中选择[blue]3[/blue]张牌，附魔[gold]战争铸造[/gold]。\n· 现在你可以在[gold]休息处[/gold]进行[gold]战争铸造[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.description": "· 拾起时，从你的牌组中选择[blue]2[/blue]张牌，附魔[gold]战争铸造[/gold]。\n· 现在你可以在[gold]休息处[/gold]进行[gold]战争铸造[/gold]。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.flavor": "它投出的不是影像，而是另一种作战结构。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.select_prompt": "选择要附魔【战争铸造】的牌",
   "RE_ASTRAL_PARTY_MOD_RELIC_DREAM_COIN_EXPLOSION.title": "【梦境·硬币爆炸】",

@@ -621,7 +621,7 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_REPLICANT_GROUP.flavor": "複製は原型を守るためではない。原型をもう一度死なせるためにある。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_REPLICANT_GROUP.select_prompt": "複製して自動使用する手札を[blue]1[/blue]枚選ぶ",
   "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.title": "【全息球】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.description": "獲得時、デッキから[blue]3[/blue]枚を選び、[gold]戦争鋳造[/gold]を付与する。表示されるのは現在合法に付与でき、なおかつ未付与のカードだけで、[blue]3[/blue]枚未満ならその枚数だけ選ぶ。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.description": "獲得時、デッキから[blue]2[/blue]枚を選び、[gold]戦争鋳造[/gold]を付与する。表示されるのは現在合法に付与でき、なおかつ未付与のカードだけで、[blue]2[/blue]枚未満ならその枚数だけ選ぶ。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.flavor": "映すのは像ではなく、別の戦い方そのものだ。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.select_prompt": "【戦争鋳造】を付与するカードを選ぶ",
   "RE_ASTRAL_PARTY_MOD_RELIC_DREAM_COIN_EXPLOSION.title": "夢境・コイン爆発",

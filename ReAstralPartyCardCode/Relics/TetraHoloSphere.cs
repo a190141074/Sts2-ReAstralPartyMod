@@ -44,7 +44,7 @@ public sealed class TetraHoloSphere : AstralPartyRelicModel
         var eligibleCards = EventDeckCardHelper.GetRunDeckCards(owner)
             .Where(card => card.Enchantment == null && enchantment.CanEnchant(card))
             .ToList();
-        var targetCount = Math.Min(3, eligibleCards.Count);
+        var targetCount = Math.Min(2, eligibleCards.Count);
         if (targetCount <= 0)
             return;
 

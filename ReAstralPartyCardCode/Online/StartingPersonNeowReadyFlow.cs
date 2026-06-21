@@ -36,6 +36,7 @@ internal static class StartingPersonNeowReadyFlow
     private static readonly object SyncLock = new();
     private static readonly Dictionary<Neow, ReadyPageState> ReadyPages = [];
     private static readonly Dictionary<string, Task<bool>> SelectionTasksByRun = [];
+    private static readonly Dictionary<string, List<string>> LaunchPayloadsByRun = [];
     private static readonly HashSet<string> LaunchingRunKeys = [];
     private static readonly MethodInfo? SetEventStateMethod = AccessTools.Method(
         typeof(EventModel),
@@ -195,9 +196,16 @@ internal static class StartingPersonNeowReadyFlow
 
             if (netService != null && netService.Type == NetGameType.Host)
             {
+                var serializedRelicOptionIds = CreateSerializedLaunchPayload(runState);
+                CacheLaunchPayload(runState, serializedRelicOptionIds);
                 MainFile.Logger.Info(
                     $"[StartingPersonNeowReadyFlow] Host started persona selection from Neow ready page | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)}.");
-                StartingPersonHostLaunchSync.BroadcastLaunch(runState);
+                StartingPersonHostLaunchSync.BroadcastLaunch(runState, serializedRelicOptionIds);
+                await HandleReadyLaunchAsync(
+                    StartingPersonRelicSelectionPatch.GetRunKey(runState),
+                    "host_local_click",
+                    serializedRelicOptionIds);
+                return;
             }
 
             await HandleReadyLaunchAsync(
@@ -302,8 +310,9 @@ internal static class StartingPersonNeowReadyFlow
         string sourceTag,
         IReadOnlyList<string>? serializedRelicOptionIds = null)
     {
+        var effectivePayload = GetEffectiveLaunchPayload(runKey, sourceTag, serializedRelicOptionIds);
         MainFile.Logger.Info(
-            $"[StartingPersonNeowReadyFlow] Ready launch received | runKey={runKey} source={sourceTag} optionPayloadCount={serializedRelicOptionIds?.Count ?? 0}.");
+            $"[StartingPersonNeowReadyFlow] Ready launch received | runKey={runKey} source={sourceTag} optionPayloadCount={effectivePayload?.Count ?? 0}.");
         lock (SyncLock)
         {
             if (SelectionTasksByRun.TryGetValue(runKey, out var existingTask))
@@ -317,7 +326,7 @@ internal static class StartingPersonNeowReadyFlow
             }
 
             LaunchingRunKeys.Add(runKey);
-            var createdTask = RunSelectionTaskAsync(runState, runKey, sourceTag, serializedRelicOptionIds);
+            var createdTask = RunSelectionTaskAsync(runState, runKey, sourceTag, effectivePayload);
             SelectionTasksByRun[runKey] = createdTask;
             return createdTask;
         }
@@ -336,7 +345,12 @@ internal static class StartingPersonNeowReadyFlow
             if (serializedRelicOptionIds != null && serializedRelicOptionIds.Count > 0 && overrideRelicOptions.Count == 0)
             {
                 MainFile.Logger.Warn(
-                    $"[StartingPersonNeowReadyFlow] Host persona option payload resolved to 0 options; falling back to local generation | runKey={runKey} source={sourceTag}.");
+                    $"[StartingPersonNeowReadyFlow] Host persona option payload resolved to 0 options; falling back to local generation | runKey={runKey} source={sourceTag} payloadCount={serializedRelicOptionIds.Count}.");
+            }
+            else if (serializedRelicOptionIds != null)
+            {
+                MainFile.Logger.Info(
+                    $"[StartingPersonNeowReadyFlow] Starting persona payload resolved | runKey={runKey} source={sourceTag} payloadCount={serializedRelicOptionIds.Count} resolvedCount={overrideRelicOptions.Count}.");
             }
 
             var opened = await StartingPersonRelicSelectionPatch.OpenSelectionOverlayAsync(
@@ -365,8 +379,47 @@ internal static class StartingPersonNeowReadyFlow
             {
                 LaunchingRunKeys.Remove(runKey);
                 SelectionTasksByRun.Remove(runKey);
+                LaunchPayloadsByRun.Remove(runKey);
             }
         }
+    }
+
+    private static List<string> CreateSerializedLaunchPayload(RunState runState)
+    {
+        return StartingPersonRelicSelectionPatch.CreateOverlayRelicOptions(runState)
+            .Select(relic => (relic.CanonicalInstance?.Id ?? relic.Id).ToString())
+            .ToList();
+    }
+
+    private static void CacheLaunchPayload(RunState runState, IReadOnlyList<string> serializedRelicOptionIds)
+    {
+        var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
+        lock (SyncLock)
+        {
+            LaunchPayloadsByRun[runKey] = serializedRelicOptionIds.ToList();
+        }
+    }
+
+    private static IReadOnlyList<string>? GetEffectiveLaunchPayload(
+        string runKey,
+        string sourceTag,
+        IReadOnlyList<string>? serializedRelicOptionIds)
+    {
+        if (serializedRelicOptionIds != null && serializedRelicOptionIds.Count > 0)
+            return serializedRelicOptionIds;
+
+        List<string>? cachedPayload;
+        lock (SyncLock)
+        {
+            LaunchPayloadsByRun.TryGetValue(runKey, out cachedPayload);
+        }
+
+        if (cachedPayload == null || cachedPayload.Count == 0)
+            return serializedRelicOptionIds;
+
+        MainFile.Logger.Warn(
+            $"[StartingPersonNeowReadyFlow] Starting persona launch payload missing or empty; reusing cached payload | runKey={runKey} source={sourceTag} cachedCount={cachedPayload.Count}.");
+        return cachedPayload;
     }
 
     private static bool TryResolveRunState(Neow neow, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out RunState? runState)
