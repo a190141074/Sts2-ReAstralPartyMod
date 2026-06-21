@@ -356,6 +356,7 @@ internal static class GameplayStaticPatchCatalog
         ]);
 
         patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
+        patcher.RegisterPatch<CollectorsCardRewardFilterPatch>();
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
         patcher.RegisterPatch<CreatureHealMoonPropCorpsebloomPatch>();
         patcher.RegisterPatch<CreatureHealMoonPropShapedGlassPatch>();

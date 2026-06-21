@@ -634,6 +634,19 @@
 		<Content Include="ReAstralPartyMod\localization\zhs\rest_site_ui.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\static_hover_tips.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\settings_ui.json"/>
+		<Content Include="skills\sts2-reastralparty-modding\agents\openai.yaml" />
+		<Content Include="skills\sts2-reastralparty-modding\references\bilingual-glossary-template.md" />
+		<Content Include="skills\sts2-reastralparty-modding\references\timing-map.md" />
+		<Content Include="skills\sts2-reastralparty-modding\references\workflows.md" />
+		<Content Include="skills\sts2-reastralparty-modding\SKILL.md" />
+		<Content Include="skills\sts2-ritsulib-modding\agents\openai.yaml" />
+		<Content Include="skills\sts2-ritsulib-modding\references\migration-map.md" />
+		<Content Include="skills\sts2-ritsulib-modding\references\project-patterns.md" />
+		<Content Include="skills\sts2-ritsulib-modding\references\source-map.md" />
+		<Content Include="skills\sts2-ritsulib-modding\references\timing-map.md" />
+		<Content Include="skills\sts2-ritsulib-modding\references\workflows.md" />
+		<Content Include="skills\sts2-ritsulib-modding\scripts\find-ritsulib-symbol.ps1" />
+		<Content Include="skills\sts2-ritsulib-modding\SKILL.md" />
 	</ItemGroup>
 
 	<ItemGroup>

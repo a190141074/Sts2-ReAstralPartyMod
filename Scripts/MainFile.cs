@@ -10,6 +10,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 using ReAstralPartyMod.ReAstralPartyCardCode.Rewards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
+using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib;
 using STS2RitsuLib.Interop;
@@ -36,6 +37,7 @@ public class MainFile
         // Current content still references minted CardKeyword values while models materialize,
         // so keywords must be registered before assembly auto-discovery runs.
         AstralKeywords.RegisterAll();
+        AstralCardTags.RegisterAll();
         EnigmaticRewardRegistry.RegisterAll();
         StokovStarterBundleHelper.RegisterAll();
         SavedPropertyGovernance.LogGovernanceSummary(assembly);

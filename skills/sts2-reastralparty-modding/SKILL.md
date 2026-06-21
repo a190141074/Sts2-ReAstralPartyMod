@@ -17,6 +17,7 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 4. 本 skill
 5. 本 skill 的 [references/workflows.md](references/workflows.md)
 6. 本 skill 的 [references/timing-map.md](references/timing-map.md)
+7. 本 skill 的 [references/bilingual-glossary-template.md](references/bilingual-glossary-template.md)
 
 ## Maintenance Rule
 
@@ -40,6 +41,7 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - `AstralPartyPowerModel`
 - 如果必须手写 `RelicId`、`IconBasePath`、`CardId`、`PortraitBasePath`、`FrameBasePath`、`PowerId`、`ResolveIconPath()`，先证明默认链不适用，再确认不会把同套内容的命名链写散。
 - 遇到“回合开始该挂哪一种 / 该不该 patch / 哪个 hook 更窄更稳”这类问题，先读 `references/timing-map.md`。
+- 遇到中文玩法名、遗物名、系统名容易翻错或混用时，先看 `references/bilingual-glossary-template.md`，后续按仓库实际用词补全。
 - 发现一种会反复出现的 repo-specific 失败模式时，默认要把它沉淀回这个 overlay，而不是继续留在临时对话里。
 
 ## Repo Stability Notes
@@ -59,6 +61,17 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - 有 `smartDescription` 时只会 `new LocString("powers", SmartDescriptionLocKey)`
   - 不会自动补 `Amount`、`DynamicVars` 或别的占位符
 - 因此 `smartDescription` 里凡是有 `{Amount}`、`{Threshold}`、`{Energy}`、`{OwnerName}` 之类变量，都必须先确认当前查看链显式注值。
+- 做中英文对照或本地化翻译时，前缀要先单独识别，再决定是否简写：
+  - 写清楚前缀不是为了强制保留前缀，而是为了翻译时优先判断“这个前缀是否可以安全省略”
+  - 常见像 `Person*`、`Variant Person*`、`*Power`、`Moon Prop*`、`Token Gold*`、`Base Ability*` 这类，都先按结构识别，再做简称
+- 中英文本地化除了语义对应，还要保持标签结构对齐：
+  - 不要出现中文用 `[gold]`、英文改成 `[card]` 这种跨语种结构漂移
+  - 不要出现中文用 `[blue]`、英文改成 `[power]` 这种标签替换
+  - 本仓库本地化统一不使用 `[power]`、`[card]`、`[relic]` 这类标签
+- 本地化里的占位变量写法要遵循 RitsuLib 教程和当前仓库注值链：
+  - 先确认变量由哪条 `LocString` / `SmartDescription` / helper 注入
+  - 不要在文案里随意新增仓库当前不会注值的占位符
+  - 变量名与花括号结构在中英日三语里保持一致，避免只改某一语种
 
 ### 新异格 / 新人格 / 成套内容
 
@@ -138,17 +151,37 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - 玩法设置可以做 mode-scoped 双份配置
   - `其他 / 遥测 / 通知 / 联机诊断` 这类通用设置应保持单份全局值，不应随内容模式切换而跳到另一套状态
 - 如果某个总开关只是隐藏 UI，不足以代表运行时关闭；默认还要在统一 getter 层收口，让 runtime 也按关闭处理。
+- 对“默认启用 / 默认 ban”类需求，不要只改 `ReAstralPartyModSettings` 字段默认值；默认一起检查：
+  - 持久化设置迁移是否真的落盘到 `settings.json`
+  - `_runtimeSettings` 首次建立时是否已经吃到迁移结果
+  - lobby / run snapshot 初始值是否带上该默认值
+  - 对应 UI 列表是否真的包含目标内容，而不是只改了状态不改来源列表
 
 ### 商店 / 月球体系
 
 - 月球商店相关逻辑默认先分清两条语义，不要混写：
   - `EnableMoonPropRelics` 控制普通商店自然库存里是否允许出现月球遗物
   - `EnableMoonPropShopSlots` 控制商店下方额外固定追加的 3 个月球遗物位
+- 仓库里如果本身已经有现成框架，例如 ban relic、settings sync、reward sync、候选池过滤，默认先沿现有框架查“为什么没命中”，不要一上来给单个内容补特殊分支。
+- 对 ban relic 这类框架问题，先核对真实运行时 canonical ID，再看 UI、默认值和过滤入口：
+  - 优先从运行时保存、历史记录、日志或 `ModelDb` 确认真实 ID
+  - 不要拿手写短 ID、显示名或想当然的 entry stem 直接当过滤 key
 - 如果要禁止普通商店自然刷某类遗物，优先“替换 entry”为同类型可用替代项，不要直接删除 entry，避免商店正常位数量变少。
 - 特殊商人 / fake merchant 仍然是高风险链：
   - 优先在 `NMerchantInventory.Initialize(...)` 前缀整体排除 `NFakeMerchantInventory`
   - 不要只在 UI clone 或单个 helper 里晚期兜底
 - 当同一功能同时改库存数据和商店 UI 时，默认先改正常库存，再补额外 slots，避免把追加位误当成普通库存过滤掉。
+- ban relic 机制默认不是底层全局强封禁，而是“各个来源主动读取 ban 集”：
+  - 如果需求只是“默认不让某个商店/卡池/候选池刷出某件 relic”，优先修对应来源入口 + 默认 ban 落盘链
+  - 如果需求是“所有来源彻底禁用某件 relic”，需要逐入口审计，不要假设 ban UI 自动全局生效
+
+### 构建 / 导出
+
+- 对 `B:\Documents\re-astral-party-mod`，默认“构建导出”就是直接更新游戏目录：
+  - `D:\Steam\steamapps\common\Slay the Spire 2\mods\ReAstralPartyMod\`
+- 不要默认再额外导出到临时验证目录、仓库自定义输出目录或其它多余位置。
+- 只有当游戏目录文件被占用、Godot 导出失败、或用户明确允许 compile-only fallback 时，才退回临时验证产物。
+- 如果只是 C# 改动且资源未变，优先确认 DLL 已更新到游戏目录；不要把“compile-only 产物生成成功”当成“已经导出”。
 
 ### 隐藏运行时载体
 

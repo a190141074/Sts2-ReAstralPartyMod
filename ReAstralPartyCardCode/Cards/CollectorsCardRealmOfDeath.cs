@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -18,6 +19,8 @@ public sealed class CollectorsCardRealmOfDeath : AstralPartyCardModel
     private const decimal BlockPercent = 0.1m;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
+
+    protected override HashSet<CardTag> CanonicalTags => [AstralCardTags.Collectors];
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [

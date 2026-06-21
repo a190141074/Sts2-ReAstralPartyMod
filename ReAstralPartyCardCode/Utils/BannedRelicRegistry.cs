@@ -15,14 +15,7 @@ public enum BannedRelicCategory
 
 public static class BannedRelicRegistry
 {
-    private static readonly IReadOnlyList<RelicModel> AllAstralRelics = DeterministicTypeCatalog
-        .GetAssignableTypes<AstralPartyRelicModel>(typeof(AstralPartyRelicModel).Assembly)
-        .Where(static type => !type.IsAbstract)
-        .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
-        .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
-        .Where(CompatContentGate.IsGameplayRelicAvailable)
-        .OrderBy(relic => (relic.CanonicalInstance?.Id ?? relic.Id).Entry, StringComparer.Ordinal)
-        .ToList();
+    private static readonly IReadOnlyList<RelicModel> AllAstralRelics = BuildAllAstralRelics();
 
     private static readonly IReadOnlyList<RelicModel> PersonalityDerivativeRelics = AllAstralRelics
         .Where(IsPersonalityDerivativeRelicInternal)
@@ -109,5 +102,35 @@ public static class BannedRelicRegistry
     {
         var id = relic.CanonicalInstance?.Id ?? relic.Id;
         return id.Entry.Contains("_PERSONALITY_DERIVATIVE_", StringComparison.Ordinal);
+    }
+
+    private static IReadOnlyList<RelicModel> BuildAllAstralRelics()
+    {
+        var relics = DeterministicTypeCatalog
+            .GetAssignableTypes<AstralPartyRelicModel>(typeof(AstralPartyRelicModel).Assembly)
+            .Where(static type => !type.IsAbstract)
+            .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
+            .ToList();
+
+        TryAppendCanonicalRelic<MoonPropBeadsOfFealty>(relics);
+
+        return relics
+            .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
+            .Where(CompatContentGate.IsGameplayRelicAvailable)
+            .OrderBy(relic => (relic.CanonicalInstance?.Id ?? relic.Id).Entry, StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private static void TryAppendCanonicalRelic<TRelic>(ICollection<RelicModel> relics)
+        where TRelic : RelicModel
+    {
+        try
+        {
+            relics.Add(ModelDb.Relic<TRelic>());
+        }
+        catch
+        {
+            // Keep the registry usable even if a specific relic failed to register.
+        }
     }
 }

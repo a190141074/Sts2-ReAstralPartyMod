@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
@@ -10,6 +11,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 public class CollectorsCardYouHaveMeToo : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
+
+    protected override HashSet<CardTag> CanonicalTags => [AstralCardTags.Collectors];
 
     protected override bool IsPlayable => BaseAbilityHelper.HasOtherLivingPlayerTarget(Owner);
 

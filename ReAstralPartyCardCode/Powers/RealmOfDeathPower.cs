@@ -88,6 +88,24 @@ public sealed class RealmOfDeathPower : AstralPartyPowerModel
         AstralParty_RealmOfDeathMarkedTargetCombatId = 0u;
     }
 
+    public override async Task AfterDeath(
+        PlayerChoiceContext choiceContext,
+        Creature creature,
+        bool wasRemovalPrevented,
+        float deathAnimLength)
+    {
+        if (wasRemovalPrevented
+            || Owner?.Player == null
+            || AstralParty_RealmOfDeathMarkedTargetCombatId == 0u
+            || creature.CombatId != AstralParty_RealmOfDeathMarkedTargetCombatId)
+        {
+            return;
+        }
+
+        AstralParty_RealmOfDeathMarkedTargetCombatId = 0u;
+        await PowerCmd.Remove(this);
+    }
+
     public static async Task<RealmOfDeathPower?> ApplyToTarget(
         Creature target,
         Creature? applier,

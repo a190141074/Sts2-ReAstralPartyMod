@@ -15,6 +15,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 using STS2RitsuLib.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
@@ -38,6 +39,8 @@ public class CollectorsCardIAmDragon : AstralPartyCardModel
     public override bool ShouldReceiveCombatHooks => true;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Retain, CardKeyword.Exhaust];
+
+    protected override HashSet<CardTag> CanonicalTags => [AstralCardTags.Collectors];
 
     protected override IEnumerable<DynamicVar> CanonicalVars =>
     [

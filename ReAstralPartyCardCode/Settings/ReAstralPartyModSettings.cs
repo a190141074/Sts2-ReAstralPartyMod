@@ -58,10 +58,16 @@ public enum StartingPersonaMode
 
 public sealed class ReAstralPartyModSettings
 {
-    private static readonly string[] DefaultBannedRelicIds =
+    // Settings defaults are initialized before content registration, so banned relic defaults
+    // must not resolve ids from ModelDb here.
+    internal static readonly string[] DefaultBannedRelicIds =
     [
-        ModelDb.Relic<MoonPropBeadsOfFealty>().Id.ToString()
+        "RELIC.RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_BEADS_OF_FEALTY"
     ];
+
+    internal const string LegacyMoonPropBeadsOfFealtyRelicId = "RELIC.MOON_PROP_BEADS_OF_FEALTY";
+
+    public bool DefaultBannedRelicsInitialized { get; set; }
 
     public sealed class AstralModeScopedGameplaySettings
     {
@@ -1247,6 +1253,7 @@ public static partial class ReAstralPartyModSettingsManager
         if (_registered)
             return;
 
+        bool migratedDefaultBannedRelics = false;
         using (RitsuLibFramework.BeginModDataRegistration(MainFile.ModId))
         {
             var store = RitsuLibFramework.GetDataStore(MainFile.ModId);
@@ -1266,9 +1273,14 @@ public static partial class ReAstralPartyModSettingsManager
                     {
                         WritePolicy = RunSavedDataWritePolicy.WhenNonDefault
                     });
+
+            var settings = store.Get<ReAstralPartyModSettings>(SettingsKey);
+            migratedDefaultBannedRelics = EnsureDefaultBannedRelicIdsInitialized(settings);
+            ApplyRuntimeSettings(settings, "register");
+            if (migratedDefaultBannedRelics)
+                store.Save(SettingsKey);
         }
 
-        ApplyRuntimeSettings(ReadLocalSettings(), "register");
         RegisterSettingsPage();
         _registered = true;
         MainFile.Logger.Info($"{MainFile.ModId} mod settings registered.");
@@ -2695,6 +2707,30 @@ public static partial class ReAstralPartyModSettingsManager
         return settings.BannedPersonaRelicIds;
     }
 
+    private static bool EnsureDefaultBannedRelicIdsInitialized(ReAstralPartyModSettings settings)
+    {
+        var beadsId = ReAstralPartyModSettings.DefaultBannedRelicIds[0];
+        var serialized = new HashSet<string>(
+            (ResolveBannedRelicIds(settings) ?? [])
+            .Where(static id => !string.IsNullOrWhiteSpace(id)),
+            StringComparer.Ordinal);
+
+        var containsLegacyBeads = serialized.Remove(ReAstralPartyModSettings.LegacyMoonPropBeadsOfFealtyRelicId);
+        if (settings.DefaultBannedRelicsInitialized && !containsLegacyBeads)
+            return false;
+
+        foreach (var relicId in ReAstralPartyModSettings.DefaultBannedRelicIds)
+            serialized.Add(relicId);
+
+        settings.BannedRelicIds = [.. serialized.OrderBy(static id => id, StringComparer.Ordinal)];
+        settings.BannedPersonaRelicIds = [.. settings.BannedRelicIds];
+        settings.DefaultBannedRelicsInitialized = true;
+        var containsBeads = settings.BannedRelicIds.Contains(beadsId, StringComparer.Ordinal);
+        MainFile.Logger.Info(
+            $"{MainFile.ModId} default banned relics initialized: count={settings.BannedRelicIds.Count}, contains_beads={containsBeads}, beads_id={beadsId}");
+        return true;
+    }
+
     private static string GetRelicDisplayName(RelicModel relic)
     {
         try
@@ -2775,6 +2811,8 @@ public static partial class ReAstralPartyModSettingsManager
 
     private static void EnsureContentModeSettingsInitialized(ReAstralPartyModSettings settings)
     {
+        EnsureDefaultBannedRelicIdsInitialized(settings);
+
         if (settings.ContentModeSettingsInitialized)
             return;
 

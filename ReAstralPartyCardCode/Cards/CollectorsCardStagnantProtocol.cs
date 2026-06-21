@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -17,6 +18,8 @@ public class CollectorsCardStagnantProtocol : AstralPartyCardModel
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
+
+    protected override HashSet<CardTag> CanonicalTags => [AstralCardTags.Collectors];
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
