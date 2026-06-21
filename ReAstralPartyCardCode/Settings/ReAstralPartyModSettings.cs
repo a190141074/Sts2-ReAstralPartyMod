@@ -131,7 +131,7 @@ public sealed class ReAstralPartyModSettings
             set => EnableAllVariantPersons = value;
         }
 
-        public StartingPersonaMode StartingPersonaMode
+        public StartingPersonMode StartingPersonaMode
         {
             get => StartingPersonMode;
             set => StartingPersonMode = value;
@@ -270,19 +270,19 @@ public sealed class ReAstralPartyModSettings
         set => EnableDuplicatePersons = value;
     }
 
-    public StartingPersonaDisplayMode? StartingPersonaDisplayMode
+    public StartingPersonDisplayMode? StartingPersonaDisplayMode
     {
         get => StartingPersonDisplayMode;
         set => StartingPersonDisplayMode = value;
     }
 
-    public StartingPersonaAssignmentMode? StartingPersonaAssignmentMode
+    public StartingPersonAssignmentMode? StartingPersonaAssignmentMode
     {
         get => StartingPersonAssignmentMode;
         set => StartingPersonAssignmentMode = value;
     }
 
-    public StartingPersonaMode StartingPersonaMode
+    public StartingPersonMode StartingPersonaMode
     {
         get => StartingPersonMode;
         set => StartingPersonMode = value;
@@ -3159,7 +3159,7 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableAllVariantPersonas => EnableAllVariantPersons;
 
-        public StartingPersonaMode StartingPersonaMode => StartingPersonMode;
+        public StartingPersonMode StartingPersonaMode => StartingPersonMode;
 
         public bool EnablePersonaRelicNotifications => EnablePersonRelicNotifications;
 

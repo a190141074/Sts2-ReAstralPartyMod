@@ -150,27 +150,6 @@ internal static class AstralTelemetry
         int PersonSkillUseCount,
         IReadOnlyList<string> ObtainedTokens);
 
-    // Keep the old JSON field names readable after the internal Person* rename.
-    private sealed class LegacyPlayerTelemetrySnapshot
-    {
-        public ulong NetId { get; set; }
-        public int Slot { get; set; }
-        public string Character { get; set; } = string.Empty;
-        public string? PersonaSelected { get; set; }
-        public string? PersonaSkillCardId { get; set; }
-        public int PersonaSkillUseCount { get; set; }
-        public IReadOnlyList<string>? ObtainedTokens { get; set; }
-    }
-
-    private sealed class LegacyActiveRunSnapshot
-    {
-        public string RunKey { get; set; } = string.Empty;
-        public string Seed { get; set; } = string.Empty;
-        public IReadOnlyList<LegacyPlayerTelemetrySnapshot>? Players { get; set; }
-        public IReadOnlyList<PersonChoiceRecord>? PersonChoices { get; set; }
-        public IReadOnlyList<TokenChoiceRecord>? TokenChoices { get; set; }
-    }
-
     private static void RegisterApplicantIfNeeded()
     {
         if (_applicantRegistered)
@@ -747,11 +726,6 @@ internal static class AstralTelemetry
                 return null;
 
             var json = File.ReadAllText(path, Encoding.UTF8);
-            if (json.Contains("\"PersonaSelected\"", StringComparison.Ordinal)
-                || json.Contains("\"PersonaSkillCardId\"", StringComparison.Ordinal)
-                || json.Contains("\"PersonaSkillUseCount\"", StringComparison.Ordinal))
-                return TryDeserializeLegacyActiveRunSnapshot(json);
-
             return JsonSerializer.Deserialize<ActiveRunSnapshot>(json, JsonOptions);
         }
         catch (Exception ex)
@@ -780,28 +754,6 @@ internal static class AstralTelemetry
             foreach (var tokenId in player.ObtainedTokens.Where(static id => !string.IsNullOrWhiteSpace(id)))
                 playerState.ObtainedTokenIds.Add(tokenId);
         }
-    }
-
-    private static ActiveRunSnapshot? TryDeserializeLegacyActiveRunSnapshot(string json)
-    {
-        var legacy = JsonSerializer.Deserialize<LegacyActiveRunSnapshot>(json, JsonOptions);
-        if (legacy == null)
-            return null;
-
-        return new ActiveRunSnapshot(
-            legacy.RunKey,
-            legacy.Seed,
-            legacy.Players?.Select(static player => new PlayerTelemetrySnapshot(
-                player.NetId,
-                player.Slot,
-                player.Character,
-                player.PersonaSelected,
-                player.PersonaSkillCardId,
-                player.PersonaSkillUseCount,
-                player.ObtainedTokens ?? []))
-                .ToArray() ?? [],
-            legacy.PersonChoices ?? [],
-            legacy.TokenChoices ?? []);
     }
 
     private static void DeleteActiveRunSnapshotLocked()

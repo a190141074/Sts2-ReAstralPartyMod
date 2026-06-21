@@ -113,7 +113,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
         set => EnableAllVariantPersons = value;
     }
 
-    public StartingPersonaMode StartingPersonaMode
+    public StartingPersonMode StartingPersonaMode
     {
         get => StartingPersonMode;
         set => StartingPersonMode = value;

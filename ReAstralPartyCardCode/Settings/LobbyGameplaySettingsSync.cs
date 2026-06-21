@@ -175,7 +175,7 @@ public sealed class LobbyGameplaySettingsSnapshot
         set => EnableAllVariantPersons = value;
     }
 
-    public StartingPersonaMode StartingPersonaMode
+    public StartingPersonMode StartingPersonaMode
     {
         get => StartingPersonMode;
         set => StartingPersonMode = value;
