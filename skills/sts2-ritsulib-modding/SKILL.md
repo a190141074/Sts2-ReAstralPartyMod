@@ -61,6 +61,10 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - 遇到 hook/时机选择问题，不要凭感觉选最宽的入口；先看 `timing-map.md`，再决定是模型 override、RitsuLib lifecycle event，还是更窄的仓库 base/helper。
 - `STS2_WineFox-main` 是高价值 RitsuLib 实战案例，但不要无脑照抄。先抽取结构模式，再贴合当前仓库实现。
 - 如果仓库已经有自己的 working example、agent 文档、技能 overlay 或命名/资源约定，优先在仓库内找同类参照，不要强推通用模板。
+- 需要跨存档、联机或显示稳定性的概率/倍率/百分比状态，优先存成稳定整型刻度（如 basis points），不要默认直接持久化 `float` / `decimal`。
+- 游戏 API 漂移若只影响单条功能链，优先做 feature-local compat helper；不要一上来把兼容逻辑扩成全局 patch 或全仓抽象。
+- 对依赖本地化、UI 节点树或延后初始化对象的 patch，优先考虑 required patcher + deferred patcher 分层；延迟 patch 要和明确初始化条件绑定。
+- 多阶段复杂玩法链若有来源、目标、交付方式、bonus/fallback 等多维状态，优先增加一个窄 `...ExecutionContext` / `...ResolveContext` 收口，而不是直接扩成大框架。
 
 ## Task Routing
 
@@ -139,6 +143,7 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - 推荐写法是双层判断：
   - `CanEnchantCardType(CardType)` 负责限制 `Attack`、`Skill` 或其它明确牌型集合
   - `CanEnchant(CardModel card)` 再补关键词、已有状态、额外限制
+- 只要场景是“从牌组里选择可附魔卡牌”，优先使用 `CardSelectCmd.FromDeckForEnchantment(...)` 这类专用入口，而不是 generic deck picker 再手写一层附魔 filter。
 - 至少要确认它是否应限制为：
   - `CardType.Attack`
   - `CardType.Skill`

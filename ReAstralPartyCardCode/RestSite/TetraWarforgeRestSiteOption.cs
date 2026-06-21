@@ -33,14 +33,16 @@ public sealed class TetraWarforgeRestSiteOption : AstralPartyRestSiteOptionModel
             return false;
 
         var enchantment = ModelDb.Enchantment<TetraWarforgeEnchantment>();
-        var selectedCards = await CardSelectCmd.FromDeckGeneric(
+        var selectedCards = await CardSelectCmd.FromDeckForEnchantment(
             Owner,
+            enchantment,
+            1,
+            card => card.Enchantment == null && enchantment.CanEnchant(card),
             new CardSelectorPrefs(SelectionPrompt, 1, 1)
             {
                 Cancelable = true,
                 RequireManualConfirmation = true
-            },
-            card => card.Enchantment == null && enchantment.CanEnchant(card));
+            });
         var selectedList = selectedCards.ToList();
         if (selectedList.Count != 1)
             return false;

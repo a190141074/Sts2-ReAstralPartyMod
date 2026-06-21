@@ -48,14 +48,16 @@ public sealed class TetraHoloSphere : AstralPartyRelicModel
         if (targetCount <= 0)
             return;
 
-        var selectedCards = await CardSelectCmd.FromDeckGeneric(
+        var selectedCards = await CardSelectCmd.FromDeckForEnchantment(
             owner,
+            enchantment,
+            targetCount,
+            card => card.Enchantment == null && enchantment.CanEnchant(card),
             new CardSelectorPrefs(SelectionPrompt, targetCount, targetCount)
             {
                 Cancelable = false,
                 RequireManualConfirmation = true
-            },
-            card => card.Enchantment == null && enchantment.CanEnchant(card));
+            });
         var selectedList = selectedCards.ToList();
         if (selectedList.Count != targetCount)
         {

@@ -43,6 +43,10 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 遇到“回合开始该挂哪一种 / 该不该 patch / 哪个 hook 更窄更稳”这类问题，先读 `references/timing-map.md`。
 - 遇到中文玩法名、遗物名、系统名容易翻错或混用时，先看 `references/bilingual-glossary-template.md`，后续按仓库实际用词补全。
 - 发现一种会反复出现的 repo-specific 失败模式时，默认要把它沉淀回这个 overlay，而不是继续留在临时对话里。
+- 仓库里凡是需要跨存档、联机或显示稳定性的概率/倍率/百分比状态，默认先想“稳定整型刻度”而不是 `float` / `decimal` 持久化。
+- 遇到单条功能链的 API 漂移时，默认优先做 feature-local compat helper；不要动不动扩成全局 patch 或通用兼容层。
+- 对依赖本地化、UI 节点树、延后初始化对象的 patch，优先考虑 required patcher + deferred patcher 分层，并把 apply 时机绑到明确初始化事件。
+- 做多阶段玩法链时，如果参数已经开始包含来源、目标、交付方式、bonus/fallback 等多维状态，默认尽快收口成窄 `...ExecutionContext` / `...ResolveContext`。
 
 ## Repo Stability Notes
 
@@ -87,6 +91,7 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - 推荐保持双层判断：
     - `CanEnchantCardType(CardType)` 管牌型
     - `CanEnchant(CardModel card)` 管关键词、已有附魔、额外状态
+  - 只要入口是“从牌组中选可附魔卡牌”，优先尝试 `CardSelectCmd.FromDeckForEnchantment(...)` 之类专用入口，不要先上 generic 选牌再补 filter。
   - 当前仓库已踩过“冷却附魔没限定牌型，后面再补兼容”的坑；默认先问清或沿同类成品收口成 `Attack`、`Skill` 或 `Attack/Skill`。
   - 不要只靠调用点 filter 兜底错误牌型；这类约束要先落在附魔类本体。
 - 新增或排错时，至少一起搜索这些面：
