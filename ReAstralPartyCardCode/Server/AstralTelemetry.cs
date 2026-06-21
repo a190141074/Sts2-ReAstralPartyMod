@@ -84,18 +84,18 @@ internal static class AstralTelemetry
     internal sealed record PlayerRunTelemetry(
         int Slot,
         string Character,
-        string? PersonaSelected,
-        string? PersonaSkillCardId,
-        int PersonaSkillUseCount,
+        string? PersonSelected,
+        string? PersonSkillCardId,
+        int PersonSkillUseCount,
         IReadOnlyList<string> ObtainedTokens);
 
     private sealed class PlayerTelemetryState
     {
         public required int Slot { get; init; }
         public required string Character { get; init; }
-        public string? PersonaSelected { get; set; }
-        public string? PersonaSkillCardId { get; set; }
-        public int PersonaSkillUseCount { get; set; }
+        public string? PersonSelected { get; set; }
+        public string? PersonSkillCardId { get; set; }
+        public int PersonSkillUseCount { get; set; }
         public HashSet<string> ObtainedTokenIds { get; } = new(StringComparer.Ordinal);
     }
 
@@ -145,10 +145,31 @@ internal static class AstralTelemetry
         ulong NetId,
         int Slot,
         string Character,
-        string? PersonaSelected,
-        string? PersonaSkillCardId,
-        int PersonaSkillUseCount,
+        string? PersonSelected,
+        string? PersonSkillCardId,
+        int PersonSkillUseCount,
         IReadOnlyList<string> ObtainedTokens);
+
+    // Keep the old JSON field names readable after the internal Person* rename.
+    private sealed class LegacyPlayerTelemetrySnapshot
+    {
+        public ulong NetId { get; set; }
+        public int Slot { get; set; }
+        public string Character { get; set; } = string.Empty;
+        public string? PersonaSelected { get; set; }
+        public string? PersonaSkillCardId { get; set; }
+        public int PersonaSkillUseCount { get; set; }
+        public IReadOnlyList<string>? ObtainedTokens { get; set; }
+    }
+
+    private sealed class LegacyActiveRunSnapshot
+    {
+        public string RunKey { get; set; } = string.Empty;
+        public string Seed { get; set; } = string.Empty;
+        public IReadOnlyList<LegacyPlayerTelemetrySnapshot>? Players { get; set; }
+        public IReadOnlyList<PersonChoiceRecord>? PersonChoices { get; set; }
+        public IReadOnlyList<TokenChoiceRecord>? TokenChoices { get; set; }
+    }
 
     private static void RegisterApplicantIfNeeded()
     {
@@ -421,8 +442,8 @@ internal static class AstralTelemetry
                 state.PersonChoices.Add(new PersonChoiceRecord(slot, optionIds, selected));
                 if (state.PlayerStates.TryGetValue(player.NetId, out var playerState))
                 {
-                    playerState.PersonaSelected = selected;
-                    playerState.PersonaSkillCardId =
+                    playerState.PersonSelected = selected;
+                    playerState.PersonSkillCardId =
                         selected == null ? null : PersonSkillRegistry.TryGetPersonSkillCardId(selected);
                 }
             }
@@ -494,13 +515,13 @@ internal static class AstralTelemetry
             if (!state.PlayerStates.TryGetValue(card.Owner.NetId, out var playerState))
                 return;
 
-            if (playerState.PersonaSkillCardId == null)
-                playerState.PersonaSkillCardId = canonicalCard.Id.Entry;
+            if (playerState.PersonSkillCardId == null)
+                playerState.PersonSkillCardId = canonicalCard.Id.Entry;
 
-            if (!string.Equals(playerState.PersonaSkillCardId, canonicalCard.Id.Entry, StringComparison.Ordinal))
+            if (!string.Equals(playerState.PersonSkillCardId, canonicalCard.Id.Entry, StringComparison.Ordinal))
                 return;
 
-            playerState.PersonaSkillUseCount++;
+            playerState.PersonSkillUseCount++;
             PersistRunStateLocked(state);
         }
     }
@@ -616,9 +637,9 @@ internal static class AstralTelemetry
                 return new PlayerRunTelemetry(
                     GetPlayerSlot(runState, player),
                     player.Character.Id.Entry,
-                    playerState?.PersonaSelected,
-                    playerState?.PersonaSkillCardId,
-                    playerState?.PersonaSkillUseCount ?? 0,
+                    playerState?.PersonSelected,
+                    playerState?.PersonSkillCardId,
+                    playerState?.PersonSkillUseCount ?? 0,
                     playerState?.ObtainedTokenIds.OrderBy(static id => id, StringComparer.Ordinal).ToArray() ?? []);
             })
             .ToArray();
@@ -703,9 +724,9 @@ internal static class AstralTelemetry
                 pair.Key,
                 pair.Value.Slot,
                 pair.Value.Character,
-                pair.Value.PersonaSelected,
-                pair.Value.PersonaSkillCardId,
-                pair.Value.PersonaSkillUseCount,
+                pair.Value.PersonSelected,
+                pair.Value.PersonSkillCardId,
+                pair.Value.PersonSkillUseCount,
                 pair.Value.ObtainedTokenIds.OrderBy(static id => id, StringComparer.Ordinal).ToArray()))
             .ToArray();
 
@@ -726,6 +747,11 @@ internal static class AstralTelemetry
                 return null;
 
             var json = File.ReadAllText(path, Encoding.UTF8);
+            if (json.Contains("\"PersonaSelected\"", StringComparison.Ordinal)
+                || json.Contains("\"PersonaSkillCardId\"", StringComparison.Ordinal)
+                || json.Contains("\"PersonaSkillUseCount\"", StringComparison.Ordinal))
+                return TryDeserializeLegacyActiveRunSnapshot(json);
+
             return JsonSerializer.Deserialize<ActiveRunSnapshot>(json, JsonOptions);
         }
         catch (Exception ex)
@@ -747,13 +773,35 @@ internal static class AstralTelemetry
             if (!state.PlayerStates.TryGetValue(player.NetId, out var playerState))
                 continue;
 
-            playerState.PersonaSelected = player.PersonaSelected;
-            playerState.PersonaSkillCardId = player.PersonaSkillCardId;
-            playerState.PersonaSkillUseCount = Math.Max(0, player.PersonaSkillUseCount);
+            playerState.PersonSelected = player.PersonSelected;
+            playerState.PersonSkillCardId = player.PersonSkillCardId;
+            playerState.PersonSkillUseCount = Math.Max(0, player.PersonSkillUseCount);
             playerState.ObtainedTokenIds.Clear();
             foreach (var tokenId in player.ObtainedTokens.Where(static id => !string.IsNullOrWhiteSpace(id)))
                 playerState.ObtainedTokenIds.Add(tokenId);
         }
+    }
+
+    private static ActiveRunSnapshot? TryDeserializeLegacyActiveRunSnapshot(string json)
+    {
+        var legacy = JsonSerializer.Deserialize<LegacyActiveRunSnapshot>(json, JsonOptions);
+        if (legacy == null)
+            return null;
+
+        return new ActiveRunSnapshot(
+            legacy.RunKey,
+            legacy.Seed,
+            legacy.Players?.Select(static player => new PlayerTelemetrySnapshot(
+                player.NetId,
+                player.Slot,
+                player.Character,
+                player.PersonaSelected,
+                player.PersonaSkillCardId,
+                player.PersonaSkillUseCount,
+                player.ObtainedTokens ?? []))
+                .ToArray() ?? [],
+            legacy.PersonChoices ?? [],
+            legacy.TokenChoices ?? []);
     }
 
     private static void DeleteActiveRunSnapshotLocked()
@@ -1160,7 +1208,7 @@ internal static class AstralTelemetry
     {
         return new TelemetryEventRecord(
             "astral_token_obtained",
-            CreateBaseProperties(payload, player.Slot, player, player.PersonaSelected)
+            CreateBaseProperties(payload, player.Slot, player, player.PersonSelected)
                 .With("token_id", tokenId)
                 .With("token_label", GetRelicLabel(tokenId))
                 .With("token_label_zhs", GetRelicLabel(tokenId, "zhs"))
@@ -1178,17 +1226,17 @@ internal static class AstralTelemetry
     {
         return new TelemetryEventRecord(
             "astral_run_finished",
-            CreateBaseProperties(payload, player.Slot, player, player.PersonaSelected)
+            CreateBaseProperties(payload, player.Slot, player, player.PersonSelected)
                 .With("character", player.Character)
-                .With("persona_selected", player.PersonaSelected)
-                .With("persona_selected_label", GetRelicLabel(player.PersonaSelected))
-                .With("persona_selected_label_zhs", GetRelicLabel(player.PersonaSelected, "zhs"))
-                .With("persona_selected_label_en", GetRelicLabel(player.PersonaSelected, "eng"))
-                .With("persona_skill_card_id", player.PersonaSkillCardId)
-                .With("persona_skill_card_label", GetCardLabel(player.PersonaSkillCardId))
-                .With("persona_skill_card_label_zhs", GetCardLabel(player.PersonaSkillCardId, "zhs"))
-                .With("persona_skill_card_label_en", GetCardLabel(player.PersonaSkillCardId, "eng"))
-                .With("persona_skill_use_count", player.PersonaSkillUseCount)
+                .With("persona_selected", player.PersonSelected)
+                .With("persona_selected_label", GetRelicLabel(player.PersonSelected))
+                .With("persona_selected_label_zhs", GetRelicLabel(player.PersonSelected, "zhs"))
+                .With("persona_selected_label_en", GetRelicLabel(player.PersonSelected, "eng"))
+                .With("persona_skill_card_id", player.PersonSkillCardId)
+                .With("persona_skill_card_label", GetCardLabel(player.PersonSkillCardId))
+                .With("persona_skill_card_label_zhs", GetCardLabel(player.PersonSkillCardId, "zhs"))
+                .With("persona_skill_card_label_en", GetCardLabel(player.PersonSkillCardId, "eng"))
+                .With("persona_skill_use_count", player.PersonSkillUseCount)
                 .With("obtained_tokens", player.ObtainedTokens.ToArray())
                 .With("obtained_token_labels", player.ObtainedTokens.Select(GetRelicLabel).ToArray())
                 .With("obtained_token_labels_zhs", player.ObtainedTokens.Select(tokenId => GetRelicLabel(tokenId, "zhs")).ToArray())
