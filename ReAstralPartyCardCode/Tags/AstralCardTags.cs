@@ -46,7 +46,9 @@ public static class AstralCardTags
 
     public static bool HasTag(CardModel? card, string qualifiedTagId)
     {
-        return card != null && card.HasModCardTag(qualifiedTagId);
+        return card != null
+               && ModCardTagRegistry.TryGetCardTag(qualifiedTagId, out var tag)
+               && card.Tags.Contains(tag);
     }
 
     public static bool HasCollectorsTag(CardModel? card)

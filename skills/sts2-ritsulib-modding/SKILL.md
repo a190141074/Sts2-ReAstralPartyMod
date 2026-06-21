@@ -65,6 +65,8 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - 游戏 API 漂移若只影响单条功能链，优先做 feature-local compat helper；不要一上来把兼容逻辑扩成全局 patch 或全仓抽象。
 - 对依赖本地化、UI 节点树或延后初始化对象的 patch，优先考虑 required patcher + deferred patcher 分层；延迟 patch 要和明确初始化条件绑定。
 - 多阶段复杂玩法链若有来源、目标、交付方式、bonus/fallback 等多维状态，优先增加一个窄 `...ExecutionContext` / `...ResolveContext` 收口，而不是直接扩成大框架。
+- 构建 warning 不是纯样式噪音；若它暴露空引用、不安全重载、可空边界失真，默认按潜在 runtime 薄弱点处理。
+- 对选择、生成、抽取类 API，默认接受“空结果/数量不符即安全返回”的保守语义，不要强行继续结算。
 
 ## Task Routing
 

@@ -93,13 +93,13 @@ internal static class StokovCardRewardRefreshHelper
         await PerformRepeatableRerollAsync(reward);
     }
 
-    private static async Task PerformRepeatableRerollAsync(CardReward reward)
+    private static Task PerformRepeatableRerollAsync(CardReward reward)
     {
         if (CardsField == null || HasBeenRerolledField == null)
         {
             reward.Reroll();
             reward.CanReroll = true;
-            return;
+            return Task.CompletedTask;
         }
 
         var currentCards = reward.Cards.ToArray();
@@ -112,6 +112,7 @@ internal static class StokovCardRewardRefreshHelper
         reward.CanReroll = true;
         reward.Populate();
         reward.CanReroll = true;
+        return Task.CompletedTask;
     }
 
     private static void RecordSkippedCards(CardReward reward, IReadOnlyList<CardModel> cards)

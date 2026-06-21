@@ -16,7 +16,7 @@ public static class PowerCmdCompat
 {
     private static readonly PlayerChoiceContext DefaultChoiceContext = new ThrowingPlayerChoiceContext();
 
-    public static Task<TPower> Apply<TPower>(
+    public static Task<TPower?> Apply<TPower>(
         Creature target,
         decimal amount,
         Creature? applier,
@@ -140,7 +140,13 @@ public static class CreatureCmdCompat
         ValueProp props,
         CardModel? cardSource)
     {
-        return MegaCrit.Sts2.Core.Commands.CreatureCmd.Damage(choiceContext, target, amount, props, cardSource);
+        return MegaCrit.Sts2.Core.Commands.CreatureCmd.Damage(
+            choiceContext,
+            target,
+            amount,
+            props,
+            dealer: null,
+            cardSource);
     }
 
     public static Task<IEnumerable<DamageResult>> Damage(

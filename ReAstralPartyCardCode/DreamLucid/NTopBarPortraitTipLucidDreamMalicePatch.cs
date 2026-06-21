@@ -37,6 +37,9 @@ public static class NTopBarPortraitTipLucidDreamMalicePatch
             return;
 
         var tipSet = NHoverTipSet.CreateAndShow(__instance, [ascensionTip, lucidDreamTip.Value]);
+        if (tipSet == null)
+            return;
+
         tipSet.GlobalPosition = __instance.GlobalPosition + new Vector2(0f, __instance.Size.Y + 20f);
     }
 

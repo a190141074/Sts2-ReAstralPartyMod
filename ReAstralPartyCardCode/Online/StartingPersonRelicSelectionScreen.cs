@@ -1805,7 +1805,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         var authorityNetId = netService.Type == NetGameType.Host
             ? netService.NetId
             : netService is INetClientGameService clientService
-                ? clientService.NetClient.HostNetId
+                ? clientService.NetClient?.HostNetId ?? 0UL
                 : 0UL;
 
         if (authorityNetId != 0UL)

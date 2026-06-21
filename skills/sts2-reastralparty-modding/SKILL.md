@@ -47,6 +47,8 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 遇到单条功能链的 API 漂移时，默认优先做 feature-local compat helper；不要动不动扩成全局 patch 或通用兼容层。
 - 对依赖本地化、UI 节点树、延后初始化对象的 patch，优先考虑 required patcher + deferred patcher 分层，并把 apply 时机绑到明确初始化事件。
 - 做多阶段玩法链时，如果参数已经开始包含来源、目标、交付方式、bonus/fallback 等多维状态，默认尽快收口成窄 `...ExecutionContext` / `...ResolveContext`。
+- 当前仓库里，构建 warning 只要暴露空引用、不安全重载、可空边界失真，默认就按 runtime 薄弱点修，不把它们当纯编译噪音。
+- 对选牌、抽奖励、生成怪物、显示 hover 这类高频链，默认接受“返回 null / 数量不符就直接安全返回”的保守语义，优先不中断主流程。
 
 ## Repo Stability Notes
 

@@ -180,6 +180,13 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
                 var mutableMonster = canonicalMonster.ToMutable();
                 var resolvedSlot = ResolveSpawnSlot(combatState, snapshot.EncounterId, monsterEntry);
                 var creature = await CreatureCmdCompat.Add(mutableMonster, combatState, CombatSide.Enemy, resolvedSlot);
+                if (creature?.Monster == null)
+                {
+                    MainFile.Logger.Error(
+                        $"[{MainFile.ModId}] beads add monster returned null creature or monster; aborting encounter group | encounterId={snapshot.EncounterId} | monsterId={monsterEntry.MonsterId}");
+                    return false;
+                }
+
                 addedMonsters.Add(creature.Monster);
                 MainFile.Logger.Info(
                     $"[{MainFile.ModId}] beads spawned monster with original slot | encounterId={snapshot.EncounterId} | monsterId={monsterEntry.MonsterId} | slot={resolvedSlot ?? "<auto_slot>"}");
@@ -324,7 +331,8 @@ public class MoonPropBeadsOfFealty : AstralPartyRelicModel
         if (candidates.Count == 0)
             return null;
 
-        return player.PlayerRng.Rewards.NextItem(candidates).ToMutable();
+        var selected = player.PlayerRng.Rewards.NextItem(candidates);
+        return selected?.ToMutable();
     }
 
     private static RelicModel? TryCreateNonCommonNonMoonRelic(Player player)

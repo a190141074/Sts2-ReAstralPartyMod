@@ -37,7 +37,7 @@ public sealed class TetraWarforgeRestSiteOption : AstralPartyRestSiteOptionModel
             Owner,
             enchantment,
             1,
-            card => card.Enchantment == null && enchantment.CanEnchant(card),
+            static card => CanSelectWarforgeCard(card),
             new CardSelectorPrefs(SelectionPrompt, 1, 1)
             {
                 Cancelable = true,
@@ -58,5 +58,10 @@ public sealed class TetraWarforgeRestSiteOption : AstralPartyRestSiteOptionModel
     private TetraHoloSphere? ResolveRelic()
     {
         return Owner.GetRelic<TetraHoloSphere>();
+    }
+
+    private static bool CanSelectWarforgeCard(CardModel? card)
+    {
+        return card is { Enchantment: null } && ModelDb.Enchantment<TetraWarforgeEnchantment>().CanEnchant(card);
     }
 }

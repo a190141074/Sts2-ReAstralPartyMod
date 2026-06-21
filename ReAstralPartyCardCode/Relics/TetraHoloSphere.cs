@@ -52,7 +52,7 @@ public sealed class TetraHoloSphere : AstralPartyRelicModel
             owner,
             enchantment,
             targetCount,
-            card => card.Enchantment == null && enchantment.CanEnchant(card),
+            static card => CanSelectWarforgeCard(card),
             new CardSelectorPrefs(SelectionPrompt, targetCount, targetCount)
             {
                 Cancelable = false,
@@ -80,5 +80,10 @@ public sealed class TetraHoloSphere : AstralPartyRelicModel
         var enchantment = ModelDb.Enchantment<TetraWarforgeEnchantment>();
         return EventDeckCardHelper.GetRunDeckCards(player)
             .Any(card => card.Enchantment == null && enchantment.CanEnchant(card));
+    }
+
+    private static bool CanSelectWarforgeCard(CardModel? card)
+    {
+        return card is { Enchantment: null } && ModelDb.Enchantment<TetraWarforgeEnchantment>().CanEnchant(card);
     }
 }

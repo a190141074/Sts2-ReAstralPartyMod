@@ -97,7 +97,8 @@ public class PersonSlimeLulu : CooldownPersonRelicBase
         CardModel? cardSource
     )
     {
-        var ownerCreature = Owner?.Creature;
+        var owner = Owner;
+        var ownerCreature = owner?.Creature;
         if (ownerCreature == null)
             return;
         if (!IsOwnedByTarget(target, ownerCreature))
@@ -107,7 +108,7 @@ public class PersonSlimeLulu : CooldownPersonRelicBase
             return;
 
         if (ownerCreature.CombatState is MegaCrit.Sts2.Core.Combat.CombatState combatState)
-            await AdherentMucusPower.MarkUnblockedHitForBoundSlime(combatState, Owner.NetId);
+            await AdherentMucusPower.MarkUnblockedHitForBoundSlime(combatState, owner.NetId);
 
         Flash();
 
@@ -122,7 +123,7 @@ public class PersonSlimeLulu : CooldownPersonRelicBase
         if (dealer != null && dealer.Side != ownerCreature.Side && dealer.IsAlive)
             await AdherentMucusPower.Apply(
                 dealer,
-                Owner,
+                owner,
                 ownerCreature,
                 cardSource
             );

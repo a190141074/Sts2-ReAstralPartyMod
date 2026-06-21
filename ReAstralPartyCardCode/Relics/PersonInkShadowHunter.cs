@@ -208,9 +208,14 @@ public class PersonInkShadowHunter : CooldownPersonRelicBase
 
     private async Task RemoveAttackLimitPower()
     {
-        if (Owner?.Creature == null || !Owner.Creature.HasPower<ShadowsLimitPower>())
+        var ownerCreature = Owner?.Creature;
+        if (ownerCreature == null)
             return;
 
-        await PowerCmd.Remove(Owner.Creature.GetPower<ShadowsLimitPower>());
+        var power = ownerCreature.GetPower<ShadowsLimitPower>();
+        if (power == null)
+            return;
+
+        await PowerCmd.Remove(power);
     }
 }

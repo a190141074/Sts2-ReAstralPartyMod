@@ -113,6 +113,9 @@ public static partial class NTopBarOpenTokenSeriesPatch
                 return;
 
             var tip = NHoverTipSet.CreateAndShow(this, _hoverTips);
+            if (tip == null)
+                return;
+
             tip.GlobalPosition = GlobalPosition + new Vector2(0f, Size.Y + 20f);
         }
 

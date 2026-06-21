@@ -143,12 +143,14 @@ internal static class StartingPersonNeowReadyFlow
 
     private static bool ShouldInjectReadyPage(Neow neow, out RunState runState, out string reason)
     {
-        if (!TryResolveRunState(neow, out runState))
+        if (!TryResolveRunState(neow, out var resolvedRunState))
         {
             reason = "Neow owner or run state was unavailable";
+            runState = null!;
             return false;
         }
 
+        runState = resolvedRunState;
         return StartingPersonRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out reason);
     }
 
@@ -215,7 +217,7 @@ internal static class StartingPersonNeowReadyFlow
             return false;
         if (!IsReadyOptionTextKey(optionButton.Option?.TextKey))
             return false;
-        if (!TryResolveRunState(neow, out var runState) || runState == null)
+        if (!TryResolveRunState(neow, out var runState))
             return false;
 
         MainFile.Logger.Info(
@@ -233,7 +235,7 @@ internal static class StartingPersonNeowReadyFlow
             return false;
         if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is not Neow neow)
             return false;
-        if (!TryResolveRunState(neow, out var runState) || runState == null)
+        if (!TryResolveRunState(neow, out var runState))
             return false;
 
         var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
@@ -340,7 +342,7 @@ internal static class StartingPersonNeowReadyFlow
         }
     }
 
-    private static bool TryResolveRunState(Neow neow, out RunState? runState)
+    private static bool TryResolveRunState(Neow neow, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out RunState? runState)
     {
         if (neow.Owner?.RunState is RunState ownerRunState)
         {
@@ -352,7 +354,7 @@ internal static class StartingPersonNeowReadyFlow
         return runState is not null;
     }
 
-    private static bool TryResolveReadyRunState(string runKey, out RunState? runState)
+    private static bool TryResolveReadyRunState(string runKey, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out RunState? runState)
     {
         lock (SyncLock)
         {
