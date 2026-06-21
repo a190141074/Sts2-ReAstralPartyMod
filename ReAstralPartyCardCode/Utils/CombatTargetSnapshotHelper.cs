@@ -11,10 +11,7 @@ internal static class CombatTargetSnapshotHelper
     // so callers that may kill/remove targets should iterate a stable snapshot first.
     public static IReadOnlyList<Creature> GetAliveOpponents(Creature ownerCreature)
     {
-        return ownerCreature.CombatState?
-            .GetOpponentsOf(ownerCreature)
-            .Where(static creature => creature.IsAlive)
-            .ToList() ?? [];
+        return CombatTargetOrdering.GetLivingOpponentsStable(ownerCreature);
     }
 
     public static IReadOnlyList<Creature> GetAliveTeammates(Creature ownerCreature)
@@ -22,6 +19,10 @@ internal static class CombatTargetSnapshotHelper
         return ownerCreature.CombatState?
             .GetTeammatesOf(ownerCreature)
             .Where(static creature => creature.IsAlive)
+            .OrderBy(creature => creature.Player?.NetId ?? ulong.MaxValue)
+            .ThenBy(creature => creature.CombatId ?? uint.MaxValue)
+            .ThenBy(creature => creature.ModelId.ToString())
+            .ThenBy(creature => creature.SlotName ?? string.Empty)
             .ToList() ?? [];
     }
 
@@ -29,6 +30,9 @@ internal static class CombatTargetSnapshotHelper
     {
         return combatState.Creatures
             .Where(creature => creature.IsAlive && creature.Side != ownerCreature.Side)
+            .OrderBy(creature => creature.CombatId ?? uint.MaxValue)
+            .ThenBy(creature => creature.ModelId.ToString())
+            .ThenBy(creature => creature.SlotName ?? string.Empty)
             .ToList();
     }
 }
