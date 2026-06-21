@@ -29,7 +29,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverlayScreen, IScreenContext
 {
     private const string BackgroundTexturePath =
-        "res://ReAstralPartyMod/images/background/starting_persona_pelic_selection_screen.png";
+        "res://ReAstralPartyMod/images/background/starting_person_pelic_selection_screen.png";
 
     private const string TreasureRelicHolderScenePath = "ui/treasure_relic_holder";
     private const float HolderWidth = 136f;
@@ -161,10 +161,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
             return;
 
         _opened = true;
-        BuildRelicHoldersIfNeeded();
-        AnimateIn();
-        _openedTicks = Time.GetTicksMsec();
-        _ = RunSelectionFlow();
+        _ = OpenOverlayAsync();
     }
 
     public void AfterOverlayClosed()
@@ -187,12 +184,24 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         Visible = false;
     }
 
+    private async Task OpenOverlayAsync()
+    {
+        await BuildRelicHoldersIfNeededAsync();
+        AnimateIn();
+        _openedTicks = Time.GetTicksMsec();
+        _ = RunSelectionFlow();
+    }
+
     private void BuildStaticUi()
     {
+        var backgroundTexture = GD.Load<Texture2D>(BackgroundTexturePath);
+        if (backgroundTexture == null)
+            LogWarn("P132", $"Starting persona selection background texture failed to load: path={BackgroundTexturePath}.");
+
         var background = new TextureRect
         {
             Name = "Background",
-            Texture = GD.Load<Texture2D>(BackgroundTexturePath),
+            Texture = backgroundTexture,
             ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
             StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered,
             MouseFilter = MouseFilterEnum.Ignore
@@ -268,7 +277,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         _fightBackstop.AddChild(_fightLabel);
     }
 
-    private void BuildRelicHoldersIfNeeded()
+    private async Task BuildRelicHoldersIfNeededAsync()
     {
         if (_holdersBuilt)
             return;
@@ -286,13 +295,31 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
             holder.MouseFilter = MouseFilterEnum.Ignore;
             holder.Disable();
             _holderContainer.AddChild(holder);
-            holder.Initialize(relic, _runState);
-            holder.VoteContainer.Initialize(
-                player => PlayerSelectedHolder(player, holder.Index),
-                _orderedPlayers);
             holder.Connect(NClickableControl.SignalName.Released,
                 Callable.From<NTreasureRoomRelicHolder>(_ => OnHolderSelected(holder)));
             _holdersByIndex[index] = holder;
+        }
+
+        await AwaitProcessFrameIfInsideTreeAsync();
+
+        foreach (var entry in _holdersByIndex.OrderBy(entry => entry.Key))
+        {
+            var holder = entry.Value;
+            if (!IsInstanceValid(holder))
+            {
+                LogWarn("P130", $"Starting persona selection holder became invalid before initialization: index={entry.Key}.");
+                continue;
+            }
+
+            if (holder.Relic == null || holder.VoteContainer == null)
+            {
+                LogWarn("P131",
+                    $"Starting persona selection holder missing ready dependencies after add-child: index={entry.Key} relicReady={holder.Relic != null} voteReady={holder.VoteContainer != null}.");
+                continue;
+            }
+
+            holder.Initialize(_relicOptions[entry.Key], _runState);
+            holder.VoteContainer.RefreshPlayerVotes();
         }
 
         ApplyHolderLayout(_holdersByIndex.OrderBy(entry => entry.Key).Select(entry => entry.Value).ToList(), _relicOptions.Count);

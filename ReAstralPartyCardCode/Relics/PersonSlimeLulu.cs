@@ -98,8 +98,7 @@ public class PersonSlimeLulu : CooldownPersonRelicBase
     )
     {
         var owner = Owner;
-        var ownerCreature = owner?.Creature;
-        if (ownerCreature == null)
+        if (owner?.Creature is not { } ownerCreature)
             return;
         if (!IsOwnedByTarget(target, ownerCreature))
             return;

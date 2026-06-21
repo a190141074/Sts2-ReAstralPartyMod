@@ -229,8 +229,14 @@ internal static class ProphecySoulDevourHelper
         int rerollOrdinal,
         IReadOnlySet<ProphecySoulDevourKind> previouslySeen)
     {
-        var legal = GetLegalDefinitions(relic)
-            .Where(definition => !previouslySeen.Contains(definition.Kind))
+        return BuildDiscoveryOptions(CreateDiscoveryContext(relic, rerollOrdinal, previouslySeen));
+    }
+
+    private static IReadOnlyList<ProphecySoulDevourKind> BuildDiscoveryOptions(
+        ProphecySoulDevourDiscoveryContext context)
+    {
+        var legal = GetLegalDefinitions(context.Relic)
+            .Where(definition => !context.PreviouslySeen.Contains(definition.Kind))
             .ToList();
         if (legal.Count == 0)
             return [];
@@ -239,14 +245,14 @@ internal static class ProphecySoulDevourHelper
             legal,
             definition => definition.Kind.ToString(),
             MainFile.ModId,
-            relic.Id.Entry,
+            context.Relic.Id.Entry,
             "discovery",
-            relic.Owner?.RunState?.Rng.StringSeed,
-            relic.Owner?.RunState?.CurrentActIndex,
-            relic.Owner?.RunState?.TotalFloor,
-            relic.Owner?.NetId,
-            relic.AstralParty_ProphecySoulDevourDiscoverySequenceCounter,
-            rerollOrdinal);
+            context.Owner?.RunState?.Rng.StringSeed,
+            context.Owner?.RunState?.CurrentActIndex,
+            context.Owner?.RunState?.TotalFloor,
+            context.Owner?.NetId,
+            context.DiscoverySequenceCounter,
+            context.RerollOrdinal);
         return ordered.Take(Math.Min(DiscoveryChoiceCount, ordered.Count)).Select(static definition => definition.Kind).ToList();
     }
 
@@ -298,8 +304,8 @@ internal static class ProphecySoulDevourHelper
         if (relic.Owner?.RunState is not RunState runState)
             return null;
 
-        var allowRefresh = relic.AstralParty_ProphecySoulDevourRefreshNextDiscoveryPending;
-        var initialOptions = BuildDiscoveryOptions(relic, 0, new HashSet<ProphecySoulDevourKind>());
+        var discoveryContext = CreateDiscoveryContext(relic, 0, []);
+        var initialOptions = BuildDiscoveryOptions(discoveryContext);
         if (initialOptions.Count == 0)
             return null;
 
@@ -307,19 +313,19 @@ internal static class ProphecySoulDevourHelper
         var gameType = runManager.NetService.Type;
         if (gameType is NetGameType.Singleplayer or NetGameType.None)
         {
-            var localResult = await ShowLocalDiscoveryAsync(relic, initialOptions, allowRefresh);
+            var localResult = await ShowLocalDiscoveryAsync(discoveryContext, initialOptions);
             return localResult;
         }
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
-            return await ShowLocalDiscoveryAsync(relic, initialOptions, allowRefresh);
+            return await ShowLocalDiscoveryAsync(discoveryContext, initialOptions);
 
         var choiceId = synchronizer.ReserveChoiceId(relic.Owner);
-        var sessionKey = $"{AstralChoiceKind.RefreshableProphecySelection}|{relic.Id.Entry}|{relic.Owner.NetId}|{relic.AstralParty_ProphecySoulDevourDiscoverySequenceCounter}";
+        var sessionKey = discoveryContext.SessionKey;
         if (relic.Owner.NetId == runManager.NetService.NetId)
         {
-            var localResult = await ShowLocalDiscoveryAsync(relic, initialOptions, allowRefresh);
+            var localResult = await ShowLocalDiscoveryAsync(discoveryContext, initialOptions);
             if (localResult == null)
                 return null;
 
@@ -369,7 +375,7 @@ internal static class ProphecySoulDevourHelper
         var seen = options.ToHashSet();
         for (var rerollOrdinal = 0; rerollOrdinal < rerollHistory.Count; rerollOrdinal++)
         {
-            options = BuildDiscoveryOptions(relic, rerollOrdinal + 1, seen);
+            options = BuildDiscoveryOptions(CreateDiscoveryContext(relic, rerollOrdinal + 1, seen));
             foreach (var option in options)
                 seen.Add(option);
         }
@@ -382,15 +388,15 @@ internal static class ProphecySoulDevourHelper
         ProphecySoulDevour relic,
         ProphecySoulDevourKind kind)
     {
-        var owner = relic.Owner;
-        if (owner?.Creature == null)
+        var grantContext = CreateGrantContext(choiceContext, relic, kind);
+        if (grantContext.Owner?.Creature == null)
             return;
 
         switch (kind)
         {
             case ProphecySoulDevourKind.UndergroundTrade:
-                await CreatureCmd.SetCurrentHp(owner.Creature, owner.Creature.CurrentHp - 6m);
-                await PersonMultiplayerEffectHelper.GainGoldDeterministic(60m, owner);
+                await CreatureCmd.SetCurrentHp(grantContext.Owner.Creature, grantContext.Owner.Creature.CurrentHp - 6m);
+                await PersonMultiplayerEffectHelper.GainGoldDeterministic(60m, grantContext.Owner);
                 break;
             case ProphecySoulDevourKind.TreasureHunting:
             case ProphecySoulDevourKind.MatrixRecycling:
@@ -400,23 +406,23 @@ internal static class ProphecySoulDevourHelper
                 GrantPermanentProphecy(relic, kind);
                 break;
             case ProphecySoulDevourKind.MimicLarva:
-                await ResolveMimicLarvaAsync(choiceContext, relic);
+                await ResolveMimicLarvaAsync(grantContext);
                 break;
             case ProphecySoulDevourKind.Ascension:
                 relic.AstralParty_ProphecySoulDevourPendingSmithBonusCounter = Math.Min(5, relic.AstralParty_ProphecySoulDevourPendingSmithBonusCounter + 1);
                 break;
             case ProphecySoulDevourKind.GoldMiner:
-                await ResolveGoldMinerAsync(choiceContext, relic);
+                await ResolveGoldMinerAsync(grantContext);
                 break;
             case ProphecySoulDevourKind.HumanWaveTactics:
-                await ResolveCardDiscoveryAsync(choiceContext, relic, CardRarity.Common, $"{kind}.common_reward");
+                await ResolveCardDiscoveryAsync(grantContext, CardRarity.Common, $"{kind}.common_reward");
                 break;
             case ProphecySoulDevourKind.EventStop:
                 relic.AstralParty_ProphecySoulDevourEventStopPending = true;
                 break;
             case ProphecySoulDevourKind.EnergyConversion:
                 relic.AstralParty_ProphecySoulDevourDisableNextSmithPending = true;
-                await PersonMultiplayerEffectHelper.GainGoldDeterministic(75m, owner);
+                await PersonMultiplayerEffectHelper.GainGoldDeterministic(75m, grantContext.Owner);
                 break;
             case ProphecySoulDevourKind.FastFluctuation:
                 ApplyFastFluctuation(relic);
@@ -428,12 +434,24 @@ internal static class ProphecySoulDevourHelper
                 relic.AstralParty_ProphecySoulDevourRefreshNextDiscoveryPending = true;
                 break;
             case ProphecySoulDevourKind.HiddenStrikeCard:
-                await ResolveHiddenStrikeCardAsync(choiceContext, relic);
+                await ResolveHiddenStrikeCardAsync(grantContext);
                 break;
             case ProphecySoulDevourKind.HiddenStrikeRelic:
-                await ResolveHiddenStrikeRelicAsync(choiceContext, relic);
+                await ResolveHiddenStrikeRelicAsync(grantContext);
                 break;
         }
+    }
+
+    internal static Task ResolveCardDiscoveryAsync(
+        PlayerChoiceContext? choiceContext,
+        ProphecySoulDevour relic,
+        CardRarity rarity,
+        string discoveryContext)
+    {
+        return ResolveCardDiscoveryAsync(
+            CreateGrantContext(choiceContext, relic, ProphecySoulDevourKind.None),
+            rarity,
+            discoveryContext);
     }
 
     public static IReadOnlyList<CardModel> CreateSafeBaseGameAncientCards()
@@ -501,9 +519,9 @@ internal static class ProphecySoulDevourHelper
             .ToList();
     }
 
-    private static async Task ResolveMimicLarvaAsync(PlayerChoiceContext? choiceContext, ProphecySoulDevour relic)
+    private static async Task ResolveMimicLarvaAsync(ProphecySoulDevourGrantContext context)
     {
-        var owner = relic.Owner;
+        var owner = context.Owner;
         if (owner == null)
             return;
 
@@ -511,22 +529,21 @@ internal static class ProphecySoulDevourHelper
         if (cards.Count == 0)
             return;
 
-        var context = choiceContext ?? NoChoiceContext;
         var selected = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayerGrid(
-            context,
+            context.ChoiceContext,
             owner,
             cards,
             ProphecyDeckCardGridPrefs,
-            $"{relic.Id.Entry}.mimic_larva");
+            $"{context.Relic.Id.Entry}.mimic_larva");
         if (selected == null)
             return;
 
-        relic.MimicSnapshots.Add(new ProphecySoulDevourMimicSnapshot((selected.CanonicalInstance ?? selected).Id, selected.CurrentUpgradeLevel));
+        context.Relic.MimicSnapshots.Add(new ProphecySoulDevourMimicSnapshot((selected.CanonicalInstance ?? selected).Id, selected.CurrentUpgradeLevel));
     }
 
-    private static async Task ResolveGoldMinerAsync(PlayerChoiceContext? choiceContext, ProphecySoulDevour relic)
+    private static async Task ResolveGoldMinerAsync(ProphecySoulDevourGrantContext context)
     {
-        var owner = relic.Owner;
+        var owner = context.Owner;
         if (owner == null)
             return;
 
@@ -534,13 +551,12 @@ internal static class ProphecySoulDevourHelper
         if (selectableCards.Count == 0)
             return;
 
-        var context = choiceContext ?? NoChoiceContext;
         var selected = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayerGrid(
-            context,
+            context.ChoiceContext,
             owner,
             selectableCards,
             ProphecyDeckCardGridPrefs,
-            $"{relic.Id.Entry}.gold_miner");
+            $"{context.Relic.Id.Entry}.gold_miner");
         if (selected == null)
             return;
 
@@ -549,30 +565,28 @@ internal static class ProphecySoulDevourHelper
         if (liveCard == null)
             return;
 
-        await EventDeckCardMutationHelper.UpgradeSingleWithSmithPreview(owner, liveCard, $"{relic.Id.Entry}.gold_miner");
+        await EventDeckCardMutationHelper.UpgradeSingleWithSmithPreview(owner, liveCard, $"{context.Relic.Id.Entry}.gold_miner");
     }
 
-    internal static async Task ResolveCardDiscoveryAsync(
-        PlayerChoiceContext? choiceContext,
-        ProphecySoulDevour relic,
+    private static async Task ResolveCardDiscoveryAsync(
+        ProphecySoulDevourGrantContext context,
         CardRarity rarity,
-        string context)
+        string discoveryContext)
     {
-        var owner = relic.Owner;
+        var owner = context.Owner;
         if (owner == null)
             return;
 
-        var options = CreateDeterministicRewardStyleCards(owner, rarity, context);
+        var options = CreateDeterministicRewardStyleCards(owner, rarity, discoveryContext);
         if (options.Count == 0)
             return;
 
-        var choiceCtx = choiceContext ?? NoChoiceContext;
         var selected = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayer(
-            choiceCtx,
+            context.ChoiceContext,
             owner,
             options,
             false,
-            $"{relic.Id.Entry}.{context}");
+            $"{context.Relic.Id.Entry}.{discoveryContext}");
         if (selected == null)
             return;
 
@@ -581,9 +595,9 @@ internal static class ProphecySoulDevourHelper
         await EventDeckCardHelper.AddCardToRunDeckAsync(owner, mutableCard);
     }
 
-    private static async Task ResolveHiddenStrikeCardAsync(PlayerChoiceContext? choiceContext, ProphecySoulDevour relic)
+    private static async Task ResolveHiddenStrikeCardAsync(ProphecySoulDevourGrantContext context)
     {
-        var owner = relic.Owner;
+        var owner = context.Owner;
         if (owner == null)
             return;
 
@@ -591,25 +605,24 @@ internal static class ProphecySoulDevourHelper
         if (options.Count == 0)
             return;
 
-        var choiceCtx = choiceContext ?? NoChoiceContext;
         var selected = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayerGrid(
-            choiceCtx,
+            context.ChoiceContext,
             owner,
             options,
             ProphecyDeckCardGridPrefs,
-            $"{relic.Id.Entry}.hidden_strike_card");
+            $"{context.Relic.Id.Entry}.hidden_strike_card");
         if (selected == null)
             return;
 
-        relic.PendingDelayedCards.Add(new ProphecySoulDevourDelayedCardGrant(
+        context.Relic.PendingDelayedCards.Add(new ProphecySoulDevourDelayedCardGrant(
             (selected.CanonicalInstance ?? selected).Id,
             selected.CurrentUpgradeLevel,
             HiddenStrikeDelayFloors));
     }
 
-    private static async Task ResolveHiddenStrikeRelicAsync(PlayerChoiceContext? choiceContext, ProphecySoulDevour relic)
+    private static async Task ResolveHiddenStrikeRelicAsync(ProphecySoulDevourGrantContext context)
     {
-        var owner = relic.Owner;
+        var owner = context.Owner;
         if (owner == null)
             return;
 
@@ -629,38 +642,65 @@ internal static class ProphecySoulDevourHelper
             ProphecySoulDevourRegistry.HiddenStrikeRelicRelicTitle.GetRawText(),
             ProphecySoulDevourRegistry.HiddenStrikeRelicRelicSubtitle.GetRawText(),
             ProphecySoulDevourRegistry.HiddenStrikeRelicSkip.GetRawText(),
-            $"{relic.Id.Entry}.hidden_strike_relic.{relic.AstralParty_ProphecySoulDevourHiddenRelicSelectionSequenceCounter++}",
+            $"{context.Relic.Id.Entry}.hidden_strike_relic.{context.Relic.AstralParty_ProphecySoulDevourHiddenRelicSelectionSequenceCounter++}",
             true);
         if (selected == null)
             return;
 
-        relic.PendingDelayedRelics.Add(new ProphecySoulDevourDelayedRelicGrant(
+        context.Relic.PendingDelayedRelics.Add(new ProphecySoulDevourDelayedRelicGrant(
             (selected.CanonicalInstance ?? selected).Id,
             HiddenStrikeDelayFloors));
     }
 
     private static async Task<RefreshableProphecySelectionResult?> ShowLocalDiscoveryAsync(
-        ProphecySoulDevour relic,
-        IReadOnlyList<ProphecySoulDevourKind> initialOptions,
-        bool allowRefresh)
+        ProphecySoulDevourDiscoveryContext context,
+        IReadOnlyList<ProphecySoulDevourKind> initialOptions)
     {
         var overlayStack = await WaitForOverlayStackAsync();
         if (overlayStack == null)
             return null;
 
         var screen = RefreshableProphecySelectionScreen.Create(
-            relic.Owner!,
+            context.Owner!,
             initialOptions,
             ProphecySoulDevourRegistry.SelectionHeader.GetRawText(),
             ProphecySoulDevourRegistry.SelectionSubtitle.GetRawText(),
-            RefreshGoldCost,
-            allowRefresh,
-            (_, rerollOrdinal, seen) => BuildDiscoveryOptions(relic, rerollOrdinal + 1, seen));
+            context.RefreshCost,
+            context.AllowRefresh,
+            (_, rerollOrdinal, seen) => BuildDiscoveryOptions(CreateDiscoveryContext(context.Relic, rerollOrdinal + 1, seen)));
         overlayStack.Push(screen);
         var result = await screen.WaitForResult();
         screen.Close();
         await screen.WaitUntilClosedAsync();
         return result;
+    }
+
+    private static ProphecySoulDevourDiscoveryContext CreateDiscoveryContext(
+        ProphecySoulDevour relic,
+        int rerollOrdinal,
+        IEnumerable<ProphecySoulDevourKind> previouslySeen)
+    {
+        return new ProphecySoulDevourDiscoveryContext(
+            relic,
+            relic.Owner,
+            $"{AstralChoiceKind.RefreshableProphecySelection}|{relic.Id.Entry}|{relic.Owner?.NetId}|{relic.AstralParty_ProphecySoulDevourDiscoverySequenceCounter}",
+            rerollOrdinal,
+            previouslySeen.ToHashSet(),
+            relic.AstralParty_ProphecySoulDevourRefreshNextDiscoveryPending,
+            RefreshGoldCost,
+            relic.AstralParty_ProphecySoulDevourDiscoverySequenceCounter);
+    }
+
+    private static ProphecySoulDevourGrantContext CreateGrantContext(
+        PlayerChoiceContext? choiceContext,
+        ProphecySoulDevour relic,
+        ProphecySoulDevourKind kind)
+    {
+        return new ProphecySoulDevourGrantContext(
+            relic,
+            relic.Owner,
+            choiceContext ?? NoChoiceContext,
+            kind);
     }
 
     private static List<int> EncodeDiscoveryPayload(RefreshableProphecySelectionResult result)
@@ -731,4 +771,20 @@ internal static class ProphecySoulDevourHelper
             return Task.CompletedTask;
         }
     }
+
+    private sealed record ProphecySoulDevourDiscoveryContext(
+        ProphecySoulDevour Relic,
+        Player? Owner,
+        string SessionKey,
+        int RerollOrdinal,
+        IReadOnlySet<ProphecySoulDevourKind> PreviouslySeen,
+        bool AllowRefresh,
+        int RefreshCost,
+        int DiscoverySequenceCounter);
+
+    private sealed record ProphecySoulDevourGrantContext(
+        ProphecySoulDevour Relic,
+        Player? Owner,
+        PlayerChoiceContext ChoiceContext,
+        ProphecySoulDevourKind Kind);
 }

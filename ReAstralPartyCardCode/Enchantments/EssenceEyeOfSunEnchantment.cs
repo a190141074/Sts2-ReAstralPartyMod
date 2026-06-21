@@ -1,3 +1,5 @@
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using STS2RitsuLib.Scaffolding.Content;
 
@@ -13,4 +15,15 @@ public class EssenceEyeOfSunEnchantment : ModEnchantmentTemplate
     {
         IconPath = "res://ReAstralPartyMod/images/enchantments/essence_eye_of_sun_enchantment.png"
     };
+
+    public override bool CanEnchantCardType(CardType cardType)
+    {
+        return cardType is CardType.Attack or CardType.Skill;
+    }
+
+    public override bool CanEnchant(CardModel card)
+    {
+        return base.CanEnchant(card)
+               && CanEnchantCardType(card.Type);
+    }
 }

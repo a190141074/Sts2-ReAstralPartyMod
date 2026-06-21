@@ -31,6 +31,7 @@ internal static class StartingPersonNeowReadyFlow
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.options.READY";
     private const string WaitingOptionTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY_WAITING.options.WAITING";
+    private const string ReadyOptionIconPath = "res://ReAstralPartyMod/images/ui/person_choose.png";
 
     private static readonly object SyncLock = new();
     private static readonly Dictionary<Neow, ReadyPageState> ReadyPages = [];
@@ -249,6 +250,8 @@ internal static class StartingPersonNeowReadyFlow
         if (!IsReadyOptionTextKey(optionButton.Option?.TextKey))
             return;
 
+        TryApplyReadyOptionIcon(optionButton);
+
         var netService = RunManager.Instance?.NetService;
         if (netService == null || netService.Type is NetGameType.None or NetGameType.Singleplayer)
             return;
@@ -268,6 +271,30 @@ internal static class StartingPersonNeowReadyFlow
         }
 
         optionButton.Modulate = new Color(optionButton.Modulate, 0.85f);
+    }
+
+    private static void TryApplyReadyOptionIcon(NEventOptionButton optionButton)
+    {
+        var icon = optionButton.GetNodeOrNull<TextureRect>("%RelicIcon");
+        if (icon == null)
+        {
+            MainFile.Logger.Warn("[StartingPersonNeowReadyFlow] Ready option icon node %RelicIcon was not found.");
+            return;
+        }
+
+        var texture = GD.Load<Texture2D>(ReadyOptionIconPath);
+        if (texture == null)
+        {
+            MainFile.Logger.Warn($"[StartingPersonNeowReadyFlow] Failed to load ready option icon at {ReadyOptionIconPath}.");
+            return;
+        }
+
+        icon.Texture = texture;
+        icon.Visible = true;
+
+        var outline = icon.GetNodeOrNull<TextureRect>("%Outline");
+        if (outline != null)
+            outline.Texture = texture;
     }
 
     internal static Task HandleReadyLaunchAsync(

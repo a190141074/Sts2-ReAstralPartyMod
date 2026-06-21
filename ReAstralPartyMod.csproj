@@ -67,8 +67,8 @@
 		<Content Include="ReAstralPartyMod.json"/>
 		<Content Include="ReAstralPartyMod\images\astral_token.png"/>
 		<Content Include="ReAstralPartyMod\images\astral_token.png.import"/>
-		<Content Include="ReAstralPartyMod\images\background\starting_persona_pelic_selection_screen.png"/>
-		<Content Include="ReAstralPartyMod\images\background\starting_persona_pelic_selection_screen.png.import"/>
+		<Content Include="ReAstralPartyMod\images\background\starting_person_pelic_selection_screen.png"/>
+		<Content Include="ReAstralPartyMod\images\background\starting_person_pelic_selection_screen.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\base_ability_orbital_railgun.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\base_ability_orbital_railgun.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\collectors_card_iam_dragon.png"/>

@@ -21,7 +21,7 @@ internal sealed partial class GroupedRelicSelectionScreen : Control, IOverlayScr
     private const float GroupCardHeight = 330f;
     private const float GroupIconSize = 148f;
     private const float RelicIconSize = 120f;
-    private const string GroupBackgroundPath = "res://ReAstralPartyMod/images/background/starting_persona_pelic_selection_screen.png";
+    private const string GroupBackgroundPath = "res://ReAstralPartyMod/images/background/starting_person_pelic_selection_screen.png";
     private const string CommonRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_blue.png";
     private const string UncommonRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_purple.png";
     private const string RareRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_gold.png";

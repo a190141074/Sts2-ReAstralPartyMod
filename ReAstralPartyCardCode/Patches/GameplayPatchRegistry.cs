@@ -28,8 +28,8 @@ using MegaCrit.Sts2.Core.Saves;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using STS2RitsuLib;
 using STS2RitsuLib.Combat.HandSize;
-using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Core;
+using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
@@ -39,15 +39,57 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
 public static class GameplayPatchRegistry
 {
+    private static ModPatcher? _requiredPatcher;
+    private static ModPatcher? _deferredPatcher;
+    private static bool _deferredPatchesApplied;
+
     public static void RegisterAndApply()
+    {
+        _requiredPatcher ??= CreateRequiredPatcher();
+        if (!RitsuLibFramework.ApplyRequiredPatcher(
+                _requiredPatcher,
+                DisableGameplayPatches,
+                $"Failed to apply required gameplay patches for {MainFile.ModId}."))
+            throw new InvalidOperationException($"Failed to apply required gameplay patches for {MainFile.ModId}.");
+
+        RitsuLibFramework.SubscribeLifecycleOnce<MainMenuReadyEvent>(_ => ApplyDeferredPatches());
+    }
+
+    private static ModPatcher CreateRequiredPatcher()
     {
         var patcher = RitsuLibFramework.CreatePatcher(MainFile.ModId, "gameplay-patches", "gameplay patches");
         patcher.RegisterPatch<MainMenuLoadedToastPatch>();
         patcher.RegisterPatches<GameplayStaticPatches>();
         patcher.ApplyDynamic(GameplayDynamicPatches.CreateBuilder(), true);
+        return patcher;
+    }
 
-        if (!patcher.PatchAll())
-            throw new InvalidOperationException($"Failed to apply required gameplay patches for {MainFile.ModId}.");
+    private static void ApplyDeferredPatches()
+    {
+        if (_deferredPatchesApplied)
+            return;
+
+        _deferredPatcher ??= CreateDeferredPatcher();
+        _deferredPatchesApplied = _deferredPatcher.PatchAll();
+        if (_deferredPatchesApplied)
+            return;
+
+        _deferredPatcher.Logger.ErrorNoTrace(
+            $"Deferred gameplay patches failed for {MainFile.ModId}. Core content remains active, but startup-sensitive patch chains may be degraded.");
+    }
+
+    private static ModPatcher CreateDeferredPatcher()
+    {
+        var patcher = RitsuLibFramework.CreatePatcher(
+            MainFile.ModId,
+            "gameplay-patches-deferred",
+            "deferred gameplay patches");
+        GameplayDeferredPatchCatalog.RegisterAll(patcher);
+        return patcher;
+    }
+
+    private static void DisableGameplayPatches()
+    {
     }
 }
 
@@ -73,7 +115,6 @@ internal static class GameplayStaticPatchCatalog
     {
         RegisterUiPatches(patcher);
         RegisterGameplayPatches(patcher);
-        RegisterFragileGameplayPatches(patcher);
     }
 
     private static void RegisterUiPatches(ModPatcher patcher)
@@ -400,7 +441,11 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<StokovStarterRelicUpgradePatch>();
     }
 
-    private static void RegisterFragileGameplayPatches(ModPatcher patcher)
+}
+
+internal static class GameplayDeferredPatchCatalog
+{
+    public static void RegisterAll(ModPatcher patcher)
     {
         patcher.RegisterPatch<StartingPersonRelicSelectionPatch>();
         patcher.RegisterPatches(

@@ -10,7 +10,7 @@ internal static class NeowDreamFaceTheShadowIconPatch
     private const string StartingPersonaReadyTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.options.READY";
 
-    private const string StartingPersonaReadyIconPath = "res://ReAstralPartyMod/images/ancient/starting_persona_ready.png";
+    private const string StartingPersonaReadyIconPath = "res://ReAstralPartyMod/images/ui/person_choose.png";
 
     public static void Postfix(NEventOptionButton __instance)
     {

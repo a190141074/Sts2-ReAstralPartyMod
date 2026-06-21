@@ -17,11 +17,14 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
+using STS2RitsuLib.Combat.Ui.ExtraCornerAmountLabels;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
+public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase,
+    IRelicExtraIconAmountLabelsProvider,
+    IRelicExtraIconAmountLabelsChangeSource
 {
     private const int BaseStepThreshold = 13;
     private const int AutoProcessTurnLimit = 16;
@@ -33,6 +36,9 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
     [SavedProperty] public int AstralParty_PersonBionicJasmineDoppelgangerPersistentStrengthBonuses { get; set; }
     [SavedProperty] public int AstralParty_PersonBionicJasmineDoppelgangerPersistentDexterityBonuses { get; set; }
     [SavedProperty] public int AstralParty_PersonBionicJasmineDoppelgangerOwnTurnCountThisCombat { get; set; }
+    [SavedProperty] public int AstralParty_PersonBionicJasmineDoppelgangerProcessThisCombat { get; set; }
+
+    public event Action? RelicExtraIconAmountLabelsInvalidated;
 
     protected override int CounterValue
     {
@@ -52,8 +58,6 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
 
     public override bool ShowCounter => true;
 
-    public override int DisplayAmount => Math.Max(0, AstralParty_PersonBionicJasmineDoppelgangerSteps);
-
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillEnergyOverload>(),
@@ -64,6 +68,7 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
     public override Task BeforeCombatStart()
     {
         AstralParty_PersonBionicJasmineDoppelgangerOwnTurnCountThisCombat = 0;
+        AstralParty_PersonBionicJasmineDoppelgangerProcessThisCombat = 0;
         return Task.CompletedTask;
     }
 
@@ -102,10 +107,11 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
         if (ownerCreature == null)
         {
             AstralParty_PersonBionicJasmineDoppelgangerOwnTurnCountThisCombat = 0;
+            AstralParty_PersonBionicJasmineDoppelgangerProcessThisCombat = 0;
             return;
         }
 
-        var processStacks = Math.Max(0, (int)ownerCreature.GetPowerAmount<PassivePower>());
+        var processStacks = Math.Max(0, AstralParty_PersonBionicJasmineDoppelgangerProcessThisCombat);
         var initialPointBonus = GetInitialPointStepBonus();
         AddSteps(processStacks + initialPointBonus);
 
@@ -114,6 +120,7 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
             await PowerCmd.Remove(processPower);
 
         AstralParty_PersonBionicJasmineDoppelgangerOwnTurnCountThisCombat = 0;
+        AstralParty_PersonBionicJasmineDoppelgangerProcessThisCombat = 0;
     }
 
     protected override async Task GrantCooldownCard()
@@ -126,6 +133,18 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
+    public IReadOnlyList<ExtraIconAmountLabelSlot> GetRelicExtraIconAmountLabelSlots()
+    {
+        var steps = Math.Max(0, AstralParty_PersonBionicJasmineDoppelgangerSteps);
+        if (steps <= 0)
+            return [];
+
+        return
+        [
+            ExtraIconAmountLabelSlot.At(ExtraIconAmountLabelCorner.TopRight, steps.ToString())
+        ];
+    }
+
     public static Task ApplyProcessAsync(
         Creature owner,
         decimal amount,
@@ -135,6 +154,11 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
     {
         if (amount <= 0m)
             return Task.CompletedTask;
+
+        var player = owner.Player;
+        var relic = player?.GetRelic<PersonBionicJasmineDoppelganger>();
+        if (relic != null)
+            relic.AddProcessThisCombat(amount);
 
         return PowerCmd.Apply<PassivePower>(owner, amount, applier, cardSource, false);
     }
@@ -196,7 +220,17 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
         AstralParty_PersonBionicJasmineDoppelgangerSteps += stepsToAdd;
         ResolvePersistentBonusesFromSteps();
         Flash();
-        InvokeDisplayAmountChanged();
+        NotifyDisplayChanged();
+    }
+
+    private void AddProcessThisCombat(decimal amount)
+    {
+        var added = StableNumericStateHelper.FloorToNonNegativeInt(amount);
+        if (added <= 0)
+            return;
+
+        AstralParty_PersonBionicJasmineDoppelgangerProcessThisCombat =
+            Math.Max(0, AstralParty_PersonBionicJasmineDoppelgangerProcessThisCombat) + added;
     }
 
     private void ResolvePersistentBonusesFromSteps()
@@ -213,5 +247,11 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
             AstralParty_PersonBionicJasmineDoppelgangerNextBonusIsStrength =
                 !AstralParty_PersonBionicJasmineDoppelgangerNextBonusIsStrength;
         }
+    }
+
+    private void NotifyDisplayChanged()
+    {
+        InvokeDisplayAmountChanged();
+        RelicExtraIconAmountLabelsInvalidated?.Invoke();
     }
 }

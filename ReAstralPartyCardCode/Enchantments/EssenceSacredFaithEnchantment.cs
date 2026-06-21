@@ -15,9 +15,14 @@ public class EssenceSacredFaithEnchantment : ModEnchantmentTemplate
         IconPath = "res://ReAstralPartyMod/images/enchantments/essence_sacred_faith_enchantment.png"
     };
 
+    public override bool CanEnchantCardType(CardType cardType)
+    {
+        return cardType == CardType.Attack;
+    }
+
     public override bool CanEnchant(CardModel card)
     {
         return base.CanEnchant(card)
-               && card.Type == CardType.Attack;
+               && CanEnchantCardType(card.Type);
     }
 }
