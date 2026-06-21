@@ -131,6 +131,22 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 
 先看 RitsuLib 文档章节；如果 public 接口面不清楚，先补查 `STS2-RitsuLib.xml`；再看 RitsuLib code 里的对应模板或注册属性，最后对照 WineFox 或当前仓库已有实现。
 
+做附魔时默认额外确认一件事，不要省略：
+
+- 先明确 `CanEnchant(CardModel card)` 的目标牌型与边界。
+- 默认优先实现 `CanEnchantCardType(CardType)`，先把合法牌型在类型层收死。
+- 默认不要只写 `base.CanEnchant(card)` 就结束。
+- 推荐写法是双层判断：
+  - `CanEnchantCardType(CardType)` 负责限制 `Attack`、`Skill` 或其它明确牌型集合
+  - `CanEnchant(CardModel card)` 再补关键词、已有状态、额外限制
+- 至少要确认它是否应限制为：
+  - `CardType.Attack`
+  - `CardType.Skill`
+  - `Attack or Skill`
+  - 或其它明确牌型集合
+- 不要只靠事件、遗物、休息房等调用点的 filter 去兜底错误牌型；牌型约束应优先落在附魔模型自身。
+- 如果用户没指定，默认主动确认或从同类成品中找出稳定口径；否则很容易把本不该吃附魔的牌型也放进候选，后续再补兼容会更贵。
+
 ### BaseLib -> RitsuLib 迁移
 
 遇到这些请求时，先打开 [references/migration-map.md](references/migration-map.md)：

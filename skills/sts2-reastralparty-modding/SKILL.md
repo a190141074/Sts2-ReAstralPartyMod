@@ -81,6 +81,14 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - `ShouldAutoApplyCooldownEnchantment => true`
   - `CanonicalKeywords` 包含 `AstralUnique`
   - 除非用户明确要求关闭冷却附魔、移除唯一，或另行指定别的词缀组合。
+- 做附魔时不要默认放宽 `CanEnchant`：
+  - 先明确目标牌型，再落代码。
+  - 默认优先实现 `CanEnchantCardType(CardType)`，先把牌型边界封在附魔模型自身。
+  - 推荐保持双层判断：
+    - `CanEnchantCardType(CardType)` 管牌型
+    - `CanEnchant(CardModel card)` 管关键词、已有附魔、额外状态
+  - 当前仓库已踩过“冷却附魔没限定牌型，后面再补兼容”的坑；默认先问清或沿同类成品收口成 `Attack`、`Skill` 或 `Attack/Skill`。
+  - 不要只靠调用点 filter 兜底错误牌型；这类约束要先落在附魔类本体。
 - 新增或排错时，至少一起搜索这些面：
   - `RelicId`
   - `IconBasePath`
@@ -109,6 +117,12 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 ### 新版兼容 / patch 漂移
 
 - 当前仓库做新版兼容时，先清 loader 级红字，再清 gameplay patch 红字；不要先被下游 UI 症状带跑。
+- 对 `Persona -> Person` 这类内部命名纠偏，兼容层不要长期保留：
+  - 如果只是仓库内调用点过渡，优先尽快删掉 `global using` 旧名别名，直接把调用点改成 `Person*` 正名。
+  - 否则后面很容易继续把 `StartingPersona*` 之类错误名扩散进 settings / snapshot / UI 链。
+- 如果确实要给本地 JSON / telemetry active-run 快照做旧字段兼容，先确认 `System.Text.Json` 实际落盘命名策略：
+  - 当前仓库 `JsonSerializerDefaults.Web` 默认是 camelCase。
+  - 不要拿 `PersonaSelected` 这种 PascalCase 字面去判断旧文件内容是否存在；要么按真实落盘字段名兼容，要么直接不保留旧快照兼容。
 - 运行时若出现 `Detected old-style dependencies without min version specified` 或 `does not declare min game version`，先修 `ReAstralPartyMod.json`：
   - 补 `min_game_version`
   - 依赖改成对象写法并补 `min_version`
@@ -156,6 +170,9 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - `_runtimeSettings` 首次建立时是否已经吃到迁移结果
   - lobby / run snapshot 初始值是否带上该默认值
   - 对应 UI 列表是否真的包含目标内容，而不是只改了状态不改来源列表
+- 设置 / lobby / run snapshot 这类边界类型里，如果旧错误命名只是过渡 alias，不要长期依赖：
+  - 能直接改主字段/主类型名的，尽快改成 `StartingPerson*`、`Person*`。
+  - 只把真正需要跨版本读取旧存档/旧消息的兼容留在边界层，不要把 alias 扩散回业务代码。
 
 ### 商店 / 月球体系
 

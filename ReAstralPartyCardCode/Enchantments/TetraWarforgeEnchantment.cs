@@ -14,9 +14,14 @@ public class TetraWarforgeEnchantment : ModEnchantmentTemplate
 
     public override bool HasExtraCardText => true;
 
+    public override bool CanEnchantCardType(CardType cardType)
+    {
+        return cardType is CardType.Attack or CardType.Skill;
+    }
+
     public override bool CanEnchant(CardModel card)
     {
         return base.CanEnchant(card)
-               && card.Type is CardType.Attack or CardType.Skill;
+               && CanEnchantCardType(card.Type);
     }
 }
