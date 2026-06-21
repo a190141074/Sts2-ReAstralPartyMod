@@ -11,7 +11,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillSummonRain : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -35,7 +35,7 @@ public class SkillSummonRain : AstralPartyCardModel
         if (Owner?.Creature?.CombatState == null)
             return;
 
-        foreach (var player in PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner))
+        foreach (var player in PersonMultiplayerEffectHelper.GetStableCombatPlayers(Owner))
         {
             var creature = player.Creature;
             if (creature == null || !creature.IsAlive)

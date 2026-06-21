@@ -34,8 +34,8 @@ internal static class AstralRelicDiagnosticHelper
             return true;
         }
 
-        if (PersonaRelicRegistry.IsPersonaRelic(canonicalRelic)
-            || PersonaRelicRegistry.IsVariantPersonaRelic(canonicalRelic)
+        if (PersonRelicRegistry.IsPersonaRelic(canonicalRelic)
+            || PersonRelicRegistry.IsVariantPersonaRelic(canonicalRelic)
             || canonicalRelic.GetType().Name.StartsWith("PersonalityDerivative", StringComparison.Ordinal))
         {
             area = AstralNotificationArea.PersonaRelic;

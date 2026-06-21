@@ -26,7 +26,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
-public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOverlayScreen, IScreenContext
+public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverlayScreen, IScreenContext
 {
     private const string BackgroundTexturePath =
         "res://ReAstralPartyMod/images/background/starting_persona_pelic_selection_screen.png";
@@ -49,8 +49,8 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     private readonly TaskCompletionSource<CommittedSelectionSnapshot> _multiplayerCommitSource = new();
     private readonly RunState _runState;
     private readonly IReadOnlyList<RelicModel> _relicOptions;
-    private readonly StartingPersonaDisplayMode _displayMode;
-    private readonly StartingPersonaAssignmentMode _assignmentMode;
+    private readonly StartingPersonDisplayMode _displayMode;
+    private readonly StartingPersonAssignmentMode _assignmentMode;
     private readonly bool _allowDuplicates;
     private readonly int _automaticSelectionCountdownSeconds;
     private readonly List<Player> _orderedPlayers;
@@ -83,11 +83,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     public Control? DefaultFocusedControl => _holdersByIndex.Values.OrderBy(holder => holder.Index).FirstOrDefault();
 
-    private StartingPersonaRelicSelectionScreen(
+    private StartingPersonRelicSelectionScreen(
         RunState runState,
         IReadOnlyList<RelicModel> relicOptions,
-        StartingPersonaDisplayMode displayMode,
-        StartingPersonaAssignmentMode assignmentMode,
+        StartingPersonDisplayMode displayMode,
+        StartingPersonAssignmentMode assignmentMode,
         int automaticSelectionCountdownSeconds)
     {
         _runState = runState;
@@ -110,7 +110,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             _pendingLocalSelectionIndexes[player.NetId] = -1;
         }
 
-        Name = nameof(StartingPersonaRelicSelectionScreen);
+        Name = nameof(StartingPersonRelicSelectionScreen);
         SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         MouseFilter = MouseFilterEnum.Stop;
         FocusMode = FocusModeEnum.All;
@@ -119,14 +119,14 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         BuildStaticUi();
     }
 
-    public static StartingPersonaRelicSelectionScreen Create(
+    public static StartingPersonRelicSelectionScreen Create(
         RunState runState,
         IReadOnlyList<RelicModel> relicOptions,
-        StartingPersonaDisplayMode displayMode,
-        StartingPersonaAssignmentMode assignmentMode,
+        StartingPersonDisplayMode displayMode,
+        StartingPersonAssignmentMode assignmentMode,
         int automaticSelectionCountdownSeconds)
     {
-        return new StartingPersonaRelicSelectionScreen(
+        return new StartingPersonRelicSelectionScreen(
             runState,
             relicOptions,
             displayMode,
@@ -316,7 +316,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 .SetTrans(Tween.TransitionType.Back);
             tween.TweenCallback(Callable.From(delegate
             {
-                if (_displayMode == StartingPersonaDisplayMode.Automatic)
+                if (_displayMode == StartingPersonDisplayMode.Automatic)
                 {
                     holder.MouseFilter = MouseFilterEnum.Ignore;
                     holder.Disable();
@@ -366,7 +366,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         SaveAllOptionsAsSeen();
 
-        if (_displayMode == StartingPersonaDisplayMode.Automatic)
+        if (_displayMode == StartingPersonDisplayMode.Automatic)
         {
             await CollectAutomaticSelectionsAsync();
             return;
@@ -521,12 +521,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         return _selectionStates.Values.All(static state => state.SelectedRelic != null);
     }
 
-    private List<StartingPersonaSelectionResult> ResolveSelectionResults()
+    private List<StartingPersonSelectionResult> ResolveSelectionResults()
     {
-        if (_displayMode == StartingPersonaDisplayMode.Automatic)
+        if (_displayMode == StartingPersonDisplayMode.Automatic)
             return ResolveAutomaticSelectionResults();
 
-        if (_assignmentMode == StartingPersonaAssignmentMode.Clone)
+        if (_assignmentMode == StartingPersonAssignmentMode.Clone)
             return ResolveCloneSelectionResults();
 
         if (_allowDuplicates)
@@ -546,7 +546,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             votesByRelic[state.SelectedRelic.Id].Add(state.Player);
         }
 
-        var results = new List<StartingPersonaSelectionResult>();
+        var results = new List<StartingPersonSelectionResult>();
         var unclaimedRelics = new List<RelicModel>();
 
         foreach (var relic in _relicOptions)
@@ -560,7 +560,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
             if (voters.Count == 1)
             {
-                results.Add(new StartingPersonaSelectionResult
+                results.Add(new StartingPersonSelectionResult
                 {
                     type = RelicPickingResultType.OnlyOnePlayerVoted,
                     relic = relic,
@@ -590,7 +590,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         {
             var relic = orderedUnclaimedRelics[i];
             if (i < consolationPlayers.Count)
-                results.Add(new StartingPersonaSelectionResult
+                results.Add(new StartingPersonSelectionResult
                 {
                     type = RelicPickingResultType.ConsolationPrize,
                     player = consolationPlayers[i],
@@ -598,7 +598,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                     optionIndex = IndexOfRelic(_relicOptions, relic)
                 });
             else
-                results.Add(new StartingPersonaSelectionResult
+                results.Add(new StartingPersonSelectionResult
                 {
                     type = RelicPickingResultType.Skipped,
                     player = null,
@@ -613,12 +613,12 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             .ToList();
     }
 
-    private List<StartingPersonaSelectionResult> ResolveSelectionResultsAllowingDuplicates()
+    private List<StartingPersonSelectionResult> ResolveSelectionResultsAllowingDuplicates()
     {
         return _orderedPlayers
             .Select(player => _selectionStates[player.NetId])
             .Where(state => state.SelectedRelic != null)
-            .Select(state => new StartingPersonaSelectionResult
+            .Select(state => new StartingPersonSelectionResult
             {
                 type = RelicPickingResultType.OnlyOnePlayerVoted,
                 relic = state.SelectedRelic!,
@@ -630,7 +630,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             .ToList();
     }
 
-    private List<StartingPersonaSelectionResult> ResolveCloneSelectionResults()
+    private List<StartingPersonSelectionResult> ResolveCloneSelectionResults()
     {
         if (IsDestinedCloneMode())
         {
@@ -639,7 +639,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
             var authorityRelic = _relicOptions[authoritySelectedIndex];
             return _orderedPlayers
-                .Select(player => new StartingPersonaSelectionResult
+                .Select(player => new StartingPersonSelectionResult
                 {
                     type = RelicPickingResultType.OnlyOnePlayerVoted,
                     relic = authorityRelic,
@@ -667,7 +667,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         var sharedRelic = _relicOptions[selectedIndex];
 
         return _orderedPlayers
-            .Select(player => new StartingPersonaSelectionResult
+            .Select(player => new StartingPersonSelectionResult
             {
                 type = RelicPickingResultType.OnlyOnePlayerVoted,
                 relic = sharedRelic,
@@ -677,14 +677,14 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             .ToList();
     }
 
-    private List<StartingPersonaSelectionResult> ResolveAutomaticSelectionResults()
+    private List<StartingPersonSelectionResult> ResolveAutomaticSelectionResults()
     {
         var selectedIndexes = BuildCommittedSelectionIndexes();
-        var results = new List<StartingPersonaSelectionResult>(_orderedPlayers.Count);
+        var results = new List<StartingPersonSelectionResult>(_orderedPlayers.Count);
         for (var i = 0; i < _orderedPlayers.Count; i++)
         {
             var selectedIndex = selectedIndexes[i];
-            results.Add(new StartingPersonaSelectionResult
+            results.Add(new StartingPersonSelectionResult
             {
                 type = RelicPickingResultType.OnlyOnePlayerVoted,
                 relic = _relicOptions[selectedIndex],
@@ -696,7 +696,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         return results;
     }
 
-    private StartingPersonaSelectionResult GenerateDeterministicFight(List<Player> players, RelicModel relic)
+    private StartingPersonSelectionResult GenerateDeterministicFight(List<Player> players, RelicModel relic)
     {
         var fight = new RelicPickingFight();
         fight.playersInvolved.AddRange(players);
@@ -753,7 +753,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             roundIndex++;
         }
 
-        return new StartingPersonaSelectionResult
+        return new StartingPersonSelectionResult
         {
             type = RelicPickingResultType.FoughtOver,
             relic = relic,
@@ -782,11 +782,11 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         return (int)(move1 + 1) % 3 == (int)move2 ? move1 : move2;
     }
 
-    private async Task AnimateSelectionResultsAsync(List<StartingPersonaSelectionResult> results)
+    private async Task AnimateSelectionResultsAsync(List<StartingPersonSelectionResult> results)
     {
         _subtitleLabel.Text = IsDestinedCloneMode()
             ? "房主人格已锁定，开始统一结算。"
-            : _assignmentMode == StartingPersonaAssignmentMode.Clone
+            : _assignmentMode == StartingPersonAssignmentMode.Clone
                 ? "最终人格已锁定，开始结算归属。"
                 : "选择已锁定，开始结算归属。";
         var remainingAnimationsByOptionIndex = results
@@ -923,7 +923,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         return new Vector2(x, y);
     }
 
-    private async Task AwardRelicsAsync(List<StartingPersonaSelectionResult> results)
+    private async Task AwardRelicsAsync(List<StartingPersonSelectionResult> results)
     {
         var awardedResults = new List<(Player Player, RelicModel Relic)>();
 
@@ -933,7 +933,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 continue;
 
             var relic = result.relic.ToMutable();
-            if (PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(result.player, relic))
+            if (PersonMultiplayerEffectHelper.IsRelicBannedForOwner(result.player, relic))
             {
                 MainFile.Logger.Warn(
                     $"[P108] Starting persona selection skipped banned relic '{relic.Id.Entry}' for player {result.player.NetId}.");
@@ -984,7 +984,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (_selectionFinalized)
             return;
 
-        if (_displayMode == StartingPersonaDisplayMode.Automatic)
+        if (_displayMode == StartingPersonDisplayMode.Automatic)
             return;
 
         if (IsDestinedCloneMode() && !IsLocalAuthorityPlayer())
@@ -1114,7 +1114,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         public required IReadOnlyList<int> SelectedIndexes { get; init; }
     }
 
-    private sealed class StartingPersonaSelectionResult
+    private sealed class StartingPersonSelectionResult
     {
         public required RelicPickingResultType type { get; init; }
 
@@ -1348,7 +1348,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private CommittedSelectionSnapshot BuildTimeoutFallbackSnapshot()
     {
-        if (_displayMode == StartingPersonaDisplayMode.Automatic)
+        if (_displayMode == StartingPersonDisplayMode.Automatic)
         {
             return new CommittedSelectionSnapshot
             {
@@ -1408,7 +1408,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
                 0,
                 int.MaxValue,
                 MainFile.ModId,
-                nameof(StartingPersonaRelicSelectionScreen),
+                nameof(StartingPersonRelicSelectionScreen),
                 "timeout_fallback",
                 _runState.Rng.StringSeed,
                 _orderedPlayers.Count,
@@ -1481,7 +1481,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private List<int> BuildAutomaticCommittedSelectionIndexes()
     {
-        if (_assignmentMode == StartingPersonaAssignmentMode.Clone)
+        if (_assignmentMode == StartingPersonAssignmentMode.Clone)
         {
             var selectedIndex = DeterministicMultiplayerChoiceHelper.RollDeterministically(
                 0,
@@ -1538,7 +1538,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             $"Starting persona selection applied committed snapshot: {string.Join(",", snapshot.SelectedIndexes)}.");
         FinalizeSelectionDisplay(IsDestinedCloneMode()
             ? "房主人格已锁定，开始统一结算……"
-            : _assignmentMode == StartingPersonaAssignmentMode.Clone
+            : _assignmentMode == StartingPersonAssignmentMode.Clone
                 ? "最终人格已锁定，开始结算……"
                 : "所有玩家已锁定选择，开始结算……");
     }
@@ -1557,7 +1557,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
         if (_selectionFinalized)
             return;
 
-        if (_displayMode == StartingPersonaDisplayMode.Automatic)
+        if (_displayMode == StartingPersonDisplayMode.Automatic)
             return;
 
         var selectedCount = _selectionStates.Values.Count(static state => state.SelectedRelic != null);
@@ -1597,19 +1597,19 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
     {
         var mode = ReAstralPartyModSettingsManager.GetStartingPersonaMode(runState);
 
-        if (mode == StartingPersonaMode.RandomAssign)
+        if (mode == StartingPersonMode.RandomAssign)
             return "当前为随机分配模式：展示等于玩家数量的人格候选，5 秒后自动为每名玩家分配结果。";
 
-        if (mode == StartingPersonaMode.RandomClone)
+        if (mode == StartingPersonMode.RandomClone)
             return "当前为随机克隆模式：展示等于玩家数量的人格候选，5 秒后自动命中 1 个并为所有玩家统一发放。";
 
-        if (mode == StartingPersonaMode.Clone)
+        if (mode == StartingPersonMode.Clone)
             return "当前为克隆模式：所有玩家先正常选择，锁定后会从已提交选择中稳定随机命中 1 个，并为所有玩家统一发放。";
 
-        if (mode == StartingPersonaMode.DestinedClone)
+        if (mode == StartingPersonMode.DestinedClone)
             return "当前为天命克隆模式：仅房主选择的人格会生效，锁定后统一发给所有玩家；其他玩家无法选择。";
 
-        if (mode == StartingPersonaMode.StandardDuplicate)
+        if (mode == StartingPersonMode.StandardDuplicate)
         {
             return "当前为标准可重复模式：所有玩家共享同一批人格。全员完成前可以改选；多人选择同一人格时，都会直接获得。";
         }
@@ -1820,7 +1820,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private void FlushPendingLocalSelectionIfNeeded()
     {
-        if (_displayMode == StartingPersonaDisplayMode.Automatic)
+        if (_displayMode == StartingPersonDisplayMode.Automatic)
             return;
 
         if (_localPlayer == null || _multiplayerSynchronizer == null)
@@ -1852,7 +1852,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
             var now = Time.GetTicksMsec();
             var remainingMilliseconds = deadline > now ? deadline - now : 0UL;
             var remainingSeconds = (int)Math.Ceiling(remainingMilliseconds / 1000d);
-            _subtitleLabel.Text = _assignmentMode == StartingPersonaAssignmentMode.Clone
+            _subtitleLabel.Text = _assignmentMode == StartingPersonAssignmentMode.Clone
                 ? $"随机克隆模式：{Math.Max(0, remainingSeconds)} 秒后自动统一命中 1 个人格。"
                 : $"随机模式：{Math.Max(0, remainingSeconds)} 秒后自动分配人格。";
 
@@ -1868,7 +1868,7 @@ public sealed partial class StartingPersonaRelicSelectionScreen : Control, IOver
 
     private bool IsDestinedCloneMode()
     {
-        return ReAstralPartyModSettingsManager.GetStartingPersonaMode(_runState) == StartingPersonaMode.DestinedClone;
+        return ReAstralPartyModSettingsManager.GetStartingPersonaMode(_runState) == StartingPersonMode.DestinedClone;
     }
 
     private bool IsLocalAuthorityPlayer()

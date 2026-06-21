@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class UltimateSkillForgottenRoar : UltimateSkillCardModel
 {
     private const int HitCount = 13;

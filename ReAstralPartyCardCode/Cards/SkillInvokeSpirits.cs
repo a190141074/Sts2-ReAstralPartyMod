@@ -19,7 +19,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillInvokeSpirits : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;

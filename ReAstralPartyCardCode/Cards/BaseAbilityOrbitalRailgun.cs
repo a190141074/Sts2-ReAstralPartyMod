@@ -12,7 +12,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
-public class BaseAbilityOrbitalRailgun : AstralPartyCardModel
+public class BaseAbilityOrbitalRailgun : BaseAbilityCardModel
 {
     private const int BaseDamage = 6;
 

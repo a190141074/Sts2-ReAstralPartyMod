@@ -19,7 +19,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonSocialFearNun : LegacyCooldownPersonaRelicBase
+public class PersonSocialFearNun : LegacyCooldownPersonRelicBase
 {
     private bool _boundaryAppliedThisTurn;
     private bool _hasCanonicalBoundaryAppliedThisTurn;
@@ -113,7 +113,7 @@ public class PersonSocialFearNun : LegacyCooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillIronVirgin>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private async Task ApplyBoundaryReinforcement()

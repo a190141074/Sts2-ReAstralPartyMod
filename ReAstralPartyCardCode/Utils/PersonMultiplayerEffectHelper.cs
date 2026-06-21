@@ -24,7 +24,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
-public static class PersonaMultiplayerEffectHelper
+public static class PersonMultiplayerEffectHelper
 {
     private const int DuplicateInitialPointFallbackEternalStarlightStacks = 3;
     private static readonly AsyncLocal<int> DerivedSupportPowerDepth = new();

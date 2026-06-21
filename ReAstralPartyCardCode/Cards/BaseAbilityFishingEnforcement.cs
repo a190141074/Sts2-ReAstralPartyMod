@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
-public class BaseAbilityFishingEnforcement : AstralPartyCardModel
+public class BaseAbilityFishingEnforcement : BaseAbilityCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 

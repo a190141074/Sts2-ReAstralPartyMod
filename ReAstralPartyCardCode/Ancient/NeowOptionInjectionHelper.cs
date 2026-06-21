@@ -273,7 +273,7 @@ internal static class NeowOptionInjectionHelper
     private static string GetRunKey(RunState? runState, Player? owner)
     {
         if (runState != null)
-            return StartingPersonaRelicSelectionPatch.GetRunKey(runState);
+            return StartingPersonRelicSelectionPatch.GetRunKey(runState);
 
         return $"{owner?.RunState?.Rng.StringSeed ?? "<null_seed>"}|{owner?.NetId.ToString() ?? "<null_owner>"}";
     }
@@ -294,7 +294,7 @@ internal static class NeowOptionInjectionHelper
                     ?? throw new InvalidOperationException(
                         "Neow had no owner when Ring of Seven Curses was chosen.");
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<EnigmaticSevenCurses>());
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<EnigmaticSevenCurses>());
         CompleteAncient(ancient);
     }
 
@@ -314,7 +314,7 @@ internal static class NeowOptionInjectionHelper
                     ?? throw new InvalidOperationException(
                         "Neow had no owner when Soul Devour was chosen.");
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<ProphecySoulDevour>());
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<ProphecySoulDevour>());
         CompleteAncient(ancient);
     }
 
@@ -324,7 +324,7 @@ internal static class NeowOptionInjectionHelper
                     ?? throw new InvalidOperationException(
                         "Neow had no owner when Prophecy Replicant Group was chosen.");
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(
             owner,
             ModelDb.Relic<ProphecyReplicantGroup>());
         var relic = owner.GetRelic<ProphecyReplicantGroup>();
@@ -356,7 +356,7 @@ internal static class NeowOptionInjectionHelper
                     ?? throw new InvalidOperationException(
                         "Neow had no owner when Dream Coin Explosion was chosen.");
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<DreamCoinExplosion>());
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<DreamCoinExplosion>());
         CompleteAncient(ancient);
     }
 
@@ -366,7 +366,7 @@ internal static class NeowOptionInjectionHelper
                     ?? throw new InvalidOperationException(
                         "Neow had no owner when Dream Disintegration Claw was chosen.");
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<DreamDisintegrationClaw>());
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<DreamDisintegrationClaw>());
         CompleteAncient(ancient);
     }
 
@@ -376,7 +376,7 @@ internal static class NeowOptionInjectionHelper
                     ?? throw new InvalidOperationException(
                         "Neow had no owner when Tetra Warforge was chosen.");
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<TetraHoloSphere>());
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<TetraHoloSphere>());
         CompleteAncient(ancient);
     }
 

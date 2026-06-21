@@ -6,12 +6,17 @@ using MegaCrit.Sts2.Core.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
-public static class PersonaRelicHelper
+public static class PersonRelicHelper
 {
-    public static bool IsPersonaSkillCard(CardModel card)
+    public static bool IsPersonSkillCard(CardModel card)
     {
         return WarforgeEnchantmentHelper.CountsAsSkill(card)
                && AstralPartyCardModel.ShouldAutoApplyCooldown(card);
+    }
+
+    public static bool IsPersonaSkillCard(CardModel card)
+    {
+        return IsPersonSkillCard(card);
     }
 
     public static void AdvanceCooldownRelics(Player owner, int amount)
@@ -22,7 +27,7 @@ public static class PersonaRelicHelper
         foreach (var relic in owner.Relics)
             switch (relic)
             {
-                case CooldownPersonaRelicBase cooldownRelic:
+                case CooldownPersonRelicBase cooldownRelic:
                     cooldownRelic.AdvanceCooldownProgressFromExternalEffect(amount);
                     break;
                 case PersonBionicJasmine bionicJasmine:

@@ -24,7 +24,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonTwelveFlowersCup : CooldownPersonaRelicBase
+public class VariantPersonTwelveFlowersCup : CooldownPersonRelicBase
 {
     private const decimal AttackDamageBonusPerEnemy = 0.15m;
     private const int MaxPassiveCeremonialBombTriggersPerTurn = 3;
@@ -175,7 +175,7 @@ public class VariantPersonTwelveFlowersCup : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTwelveFragrantDream>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     public async Task TryGrantFallenFlowerEnergy(PlayerChoiceContext choiceContext)
@@ -208,7 +208,7 @@ public class VariantPersonTwelveFlowersCup : CooldownPersonaRelicBase
         if (Owner == null)
             return;
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativePoemGathering>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativePoemGathering>(Owner);
         await VigilCounterCombatHelper.EnsureContextPower(Owner);
     }
 

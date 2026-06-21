@@ -21,7 +21,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonInkShadowHunter : CooldownPersonaRelicBase
+public class PersonInkShadowHunter : CooldownPersonRelicBase
 {
     private const int InkShadowHunterBaseMaxCounter = 4;
     private const int TwinShadowDuration = 2;
@@ -152,7 +152,7 @@ public class PersonInkShadowHunter : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillShadowFusion>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private async Task ApplyTwinShadowToRandomEnemy()

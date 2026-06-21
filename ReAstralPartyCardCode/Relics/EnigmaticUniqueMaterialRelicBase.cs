@@ -114,7 +114,7 @@ public abstract class EnigmaticUniqueMaterialRelicBase : AstralPartyRelicModel
             return relic;
         }
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<T>());
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<T>());
         relic = owner.GetRelic<T>();
         relic?.AddStacks(amount - 1);
         return relic;
@@ -144,7 +144,7 @@ public abstract class EnigmaticNonStackableUniqueMaterialRelicBase : EnigmaticUn
         var canonicalRelic = ModelDb.Relic<T>();
         for (var i = 0; i < amount; i++)
         {
-            var obtained = await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, canonicalRelic);
+            var obtained = await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, canonicalRelic);
             if (obtained is T typed)
                 granted.Add(typed);
         }

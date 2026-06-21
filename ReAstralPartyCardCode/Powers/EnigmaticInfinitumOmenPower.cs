@@ -25,6 +25,6 @@ public class EnigmaticInfinitumOmenPower : EnigmaticOmenPowerBase
             return;
 
         var card = player.Creature.CombatState.CreateCard(ModelDb.Card<EnigmaticTheInfinitum>(), player);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

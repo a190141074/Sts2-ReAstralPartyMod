@@ -14,7 +14,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillWeaknessAnalysis : AstralPartyCardModel
 {
     private static readonly Dictionary<string, int> UsesThisTurnByPlayer = new();

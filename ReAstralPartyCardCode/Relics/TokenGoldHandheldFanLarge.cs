@@ -31,7 +31,7 @@ public class TokenGoldHandheldFanLarge : AstralPartyRelicModel
             return;
         if (cardPlay.Card.Owner != Owner)
             return;
-        if (!IsPersonaSkillCard(cardPlay.Card))
+        if (!PersonRelicHelper.IsPersonSkillCard(cardPlay.Card))
             return;
 
         Flash();
@@ -46,8 +46,4 @@ public class TokenGoldHandheldFanLarge : AstralPartyRelicModel
         await PowerCmd.Apply<MarkLockPower>(target, 1m, Owner.Creature, cardPlay.Card, false);
     }
 
-    private static bool IsPersonaSkillCard(CardModel card)
-    {
-        return card.Type == CardType.Skill && AstralPartyCardModel.ShouldAutoApplyCooldown(card);
-    }
 }

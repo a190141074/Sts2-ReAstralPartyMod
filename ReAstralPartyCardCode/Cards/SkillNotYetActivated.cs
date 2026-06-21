@@ -12,8 +12,8 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool), StableEntryStem = "skill_not_yet_activated")]
-public class SkillNotYetActivated : AstralPartyCardModel
+[RegisterCard(typeof(PersonSkillCardPool), StableEntryStem = "skill_not_yet_activated")]
+public class SkillNotYetActivated : PersonSkillCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [AstralKeywords.AstralUnique, CardKeyword.Exhaust];
@@ -48,7 +48,7 @@ public class SkillNotYetActivated : AstralPartyCardModel
         creativeAi.EnergyCost.UpgradeBy(-1);
         subroutine.EnergyCost.UpgradeBy(-1);
 
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(creativeAi, true, CardPilePosition.Top, this);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(subroutine, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(creativeAi, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(subroutine, true, CardPilePosition.Top, this);
     }
 }

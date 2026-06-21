@@ -23,7 +23,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonMascotGirlMimi : CooldownPersonaRelicBase
+public class PersonMascotGirlMimi : CooldownPersonRelicBase
 {
     private const int DrawsPerTokenMemoryChoice = 25;
     private const int TokenChoiceCount = 3;
@@ -96,7 +96,7 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillProductRestocking>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private async Task<PersonalityDerivativeMascotGirlMimiTokenMemory?> EnsureTokenMemoryRelic()
@@ -108,7 +108,7 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
         if (memoryRelic != null)
             return memoryRelic;
 
-        await PersonaMultiplayerEffectHelper
+        await PersonMultiplayerEffectHelper
             .ObtainDerivativeRelicIfMissing<PersonalityDerivativeMascotGirlMimiTokenMemory>(
                 Owner);
 
@@ -203,7 +203,7 @@ public class PersonMascotGirlMimi : CooldownPersonaRelicBase
             ? filteredCandidates
             : allCandidates;
 
-        return PersonaMultiplayerEffectHelper.CreateWeightedDeterministicRelicChoiceOptions(
+        return PersonMultiplayerEffectHelper.CreateWeightedDeterministicRelicChoiceOptions(
             candidates,
             TokenChoiceCount,
             relic => TokenRelicRegistry.IsBankCardTokenRelic(relic) ? PreferredBankCardWeight : 1,

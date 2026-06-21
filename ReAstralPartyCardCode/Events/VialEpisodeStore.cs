@@ -39,7 +39,7 @@ public sealed class VialEpisodeStore : AstralPartyEventModel
     private async Task OpenStorefront()
     {
         ArgumentNullException.ThrowIfNull(Owner);
-        await PersonaMultiplayerEffectHelper.GainGoldDeterministic(1m, Owner);
+        await PersonMultiplayerEffectHelper.GainGoldDeterministic(1m, Owner);
         SetEventState(PageDescription("STOREFRONT"), CreateStorefrontOptions());
     }
 
@@ -91,7 +91,7 @@ public sealed class VialEpisodeStore : AstralPartyEventModel
             return;
         }
 
-        await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, Owner, GoldLossType.Spent);
+        await PersonMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, Owner, GoldLossType.Spent);
         var potionReward = new PotionReward(ModelDb.Potion<TPotion>().ToMutable(), Owner);
         await RewardsCmd.OfferCustom(Owner, [potionReward]);
         SetEventFinished(PageDescription(finishPageName));

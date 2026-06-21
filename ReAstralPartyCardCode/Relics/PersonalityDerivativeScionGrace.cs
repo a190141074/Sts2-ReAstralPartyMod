@@ -46,7 +46,7 @@ public class PersonalityDerivativeScionGrace : AstralPartyRelicModel
             return;
 
         var combatState = Owner.Creature.CombatState;
-        var stablePlayers = PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner);
+        var stablePlayers = PersonMultiplayerEffectHelper.GetStableCombatPlayers(Owner);
         if (stablePlayers.Count == 0)
             return;
 
@@ -57,7 +57,7 @@ public class PersonalityDerivativeScionGrace : AstralPartyRelicModel
                 continue;
 
             var card = combatState.CreateCard(ModelDb.Card<Royalties>(), player);
-            await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
+            await PersonMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
                 card,
                 CardPilePosition.Top,
                 this);
@@ -79,7 +79,7 @@ public class PersonalityDerivativeScionGrace : AstralPartyRelicModel
 
         var wishCard = Owner.Creature.CombatState.CreateCard(ModelDb.Card<Wish>(), Owner);
         Flash();
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
             wishCard,
             true,
             CardPilePosition.Top,

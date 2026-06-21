@@ -27,6 +27,6 @@ public class EtheriumSwordRecallOmenPower : EnigmaticOmenPowerBase
             return;
 
         var card = player.Creature.CombatState.CreateCard(ModelDb.Card<EnigmaticStrikeEtheriumSword>(), player);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

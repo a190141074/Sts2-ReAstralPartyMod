@@ -8,7 +8,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
-public class BaseAbilityMonsterLaser : AstralPartyCardModel
+public class BaseAbilityMonsterLaser : BaseAbilityCardModel
 {
     private const decimal BaseDamage = 3m;
     private const decimal BonusDamage = 3m;

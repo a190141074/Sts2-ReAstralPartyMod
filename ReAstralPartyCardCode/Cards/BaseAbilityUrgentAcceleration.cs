@@ -10,7 +10,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
-public class BaseAbilityUrgentAcceleration : AstralPartyCardModel
+public class BaseAbilityUrgentAcceleration : BaseAbilityCardModel
 {
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [

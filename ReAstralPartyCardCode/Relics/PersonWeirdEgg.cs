@@ -18,7 +18,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonWeirdEgg : LegacyCooldownPersonaRelicBase
+public class PersonWeirdEgg : LegacyCooldownPersonRelicBase
 {
     private const int EventRoomBaseGoldGain = 9;
     private const decimal StarLightPerTriggeredEventCard = 3m;
@@ -83,7 +83,7 @@ public class PersonWeirdEgg : LegacyCooldownPersonaRelicBase
 
         var goldToGain = GetEventRoomGoldGain(AstralParty_PersonWeirdEggConsecutiveEventRooms);
         Flash();
-        await PersonaMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
+        await PersonMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
     }
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -114,7 +114,7 @@ public class PersonWeirdEgg : LegacyCooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTroubleMaker>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private static decimal GetEventRoomGoldGain(int consecutiveEventRooms)

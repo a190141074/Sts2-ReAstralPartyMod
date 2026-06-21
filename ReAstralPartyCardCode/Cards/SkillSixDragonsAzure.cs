@@ -14,7 +14,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public sealed class SkillSixDragonsAzure : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -42,7 +42,7 @@ public sealed class SkillSixDragonsAzure : AstralPartyCardModel
         var drawPileCount = PileType.Draw.GetPile(Owner).Cards.Count;
         if (drawPileCount % 2 != 0)
         {
-            foreach (var player in PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner))
+            foreach (var player in PersonMultiplayerEffectHelper.GetStableCombatPlayers(Owner))
             {
                 if (player.Creature == null || !player.Creature.IsAlive)
                     continue;
@@ -58,7 +58,7 @@ public sealed class SkillSixDragonsAzure : AstralPartyCardModel
         if (ManaAmplificationHelper.GetCurrent(Owner) >= 18 && Owner.Creature.CombatState != null)
         {
             var transcend = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTokenTranscendDimensions>(), Owner);
-            await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(transcend, true, CardPilePosition.Top, this);
+            await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(transcend, true, CardPilePosition.Top, this);
         }
     }
 

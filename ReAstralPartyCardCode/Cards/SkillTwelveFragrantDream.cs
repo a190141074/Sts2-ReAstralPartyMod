@@ -11,7 +11,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillTwelveFragrantDream : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>

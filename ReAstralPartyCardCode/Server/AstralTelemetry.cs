@@ -53,7 +53,7 @@ internal static class AstralTelemetry
         string UploadedAtUtc,
         RunTelemetry Run,
         IReadOnlyList<PlayerRunTelemetry> Players,
-        IReadOnlyList<PersonaChoiceRecord> PersonaChoices,
+        IReadOnlyList<PersonChoiceRecord> PersonChoices,
         IReadOnlyList<TokenChoiceRecord> TokenChoices);
 
     private sealed record RunTelemetry(
@@ -69,7 +69,7 @@ internal static class AstralTelemetry
 
     private sealed record TelemetryEventRecord(string EventName, Dictionary<string, object?> Properties);
 
-    internal sealed record PersonaChoiceRecord(
+    internal sealed record PersonChoiceRecord(
         int PlayerSlot,
         IReadOnlyList<string> Options,
         string? Selected);
@@ -130,7 +130,7 @@ internal static class AstralTelemetry
         public string RunKey { get; init; } = string.Empty;
         public string Seed { get; init; } = string.Empty;
         public Dictionary<ulong, PlayerTelemetryState> PlayerStates { get; } = new();
-        public List<PersonaChoiceRecord> PersonaChoices { get; } = [];
+        public List<PersonChoiceRecord> PersonChoices { get; } = [];
         public List<TokenChoiceRecord> TokenChoices { get; } = [];
     }
 
@@ -138,7 +138,7 @@ internal static class AstralTelemetry
         string RunKey,
         string Seed,
         IReadOnlyList<PlayerTelemetrySnapshot> Players,
-        IReadOnlyList<PersonaChoiceRecord> PersonaChoices,
+        IReadOnlyList<PersonChoiceRecord> PersonChoices,
         IReadOnlyList<TokenChoiceRecord> TokenChoices);
 
     private sealed record PlayerTelemetrySnapshot(
@@ -360,7 +360,7 @@ internal static class AstralTelemetry
             {
                 ApplySnapshotToState(state, snapshot);
                 MainFile.Logger.Info(
-                    $"[{MainFile.ModId}][Telemetry] Restored active run snapshot runKey={runKey} personaChoices={state.PersonaChoices.Count} tokenChoices={state.TokenChoices.Count}.");
+                    $"[{MainFile.ModId}][Telemetry] Restored active run snapshot runKey={runKey} personChoices={state.PersonChoices.Count} tokenChoices={state.TokenChoices.Count}.");
             }
             else
             {
@@ -407,7 +407,7 @@ internal static class AstralTelemetry
         var state = GetOrCreateRunState(runState);
         lock (StateLock)
         {
-            state.PersonaChoices.Clear();
+            state.PersonChoices.Clear();
             foreach (var player in runState.Players.OrderBy(static player => player.NetId))
             {
                 var slot = GetPlayerSlot(runState, player);
@@ -418,17 +418,17 @@ internal static class AstralTelemetry
                     && selectedIndex < options.Count)
                     selected = GetRelicId(options[selectedIndex]);
 
-                state.PersonaChoices.Add(new PersonaChoiceRecord(slot, optionIds, selected));
+                state.PersonChoices.Add(new PersonChoiceRecord(slot, optionIds, selected));
                 if (state.PlayerStates.TryGetValue(player.NetId, out var playerState))
                 {
                     playerState.PersonaSelected = selected;
                     playerState.PersonaSkillCardId =
-                        selected == null ? null : PersonaSkillRegistry.TryGetPersonaSkillCardId(selected);
+                        selected == null ? null : PersonSkillRegistry.TryGetPersonSkillCardId(selected);
                 }
             }
 
             MainFile.Logger.Info(
-                $"[{MainFile.ModId}][Telemetry] Recorded persona choices: players={state.PersonaChoices.Count} runKey={state.RunKey}");
+                $"[{MainFile.ModId}][Telemetry] Recorded person choices: players={state.PersonChoices.Count} runKey={state.RunKey}");
             PersistRunStateLocked(state);
         }
     }
@@ -485,7 +485,7 @@ internal static class AstralTelemetry
             return;
 
         var canonicalCard = card.CanonicalInstance ?? card;
-        if (!PersonaSkillRegistry.IsTrackedPersonaSkillCard(canonicalCard))
+        if (!PersonSkillRegistry.IsTrackedPersonSkillCard(canonicalCard))
             return;
 
         var state = GetOrCreateRunState(runState);
@@ -624,7 +624,7 @@ internal static class AstralTelemetry
             .ToArray();
 
         MainFile.Logger.Info(
-            $"[{MainFile.ModId}][Telemetry] Built payload: personaChoices={state.PersonaChoices.Count} tokenChoices={state.TokenChoices.Count} players={players.Length} runKey={state.RunKey}");
+            $"[{MainFile.ModId}][Telemetry] Built payload: personChoices={state.PersonChoices.Count} tokenChoices={state.TokenChoices.Count} players={players.Length} runKey={state.RunKey}");
 
         return new RunEndedPayload(
             1,
@@ -643,7 +643,7 @@ internal static class AstralTelemetry
                 runState.TotalFloor,
                 serializableRun.RunTime),
             players,
-            state.PersonaChoices.ToArray(),
+            state.PersonChoices.ToArray(),
             state.TokenChoices.ToArray());
     }
 
@@ -713,7 +713,7 @@ internal static class AstralTelemetry
             state.RunKey,
             state.Seed,
             players,
-            state.PersonaChoices.ToArray(),
+            state.PersonChoices.ToArray(),
             state.TokenChoices.ToArray());
     }
 
@@ -737,8 +737,8 @@ internal static class AstralTelemetry
 
     private static void ApplySnapshotToState(RunTelemetryState state, ActiveRunSnapshot snapshot)
     {
-        state.PersonaChoices.Clear();
-        state.PersonaChoices.AddRange(snapshot.PersonaChoices ?? []);
+        state.PersonChoices.Clear();
+        state.PersonChoices.AddRange(snapshot.PersonChoices ?? []);
         state.TokenChoices.Clear();
         state.TokenChoices.AddRange(snapshot.TokenChoices ?? []);
 
@@ -1050,12 +1050,12 @@ internal static class AstralTelemetry
 
     private static IEnumerable<TelemetryEventRecord> BuildTelemetryEvents(RunEndedPayload payload)
     {
-        foreach (var choice in payload.PersonaChoices)
+        foreach (var choice in payload.PersonChoices)
         {
             foreach (var optionEvent in CreatePersonaOptionOfferedEvents(payload, choice))
                 yield return optionEvent;
 
-            yield return CreatePersonaChoiceEvent(payload, choice);
+            yield return CreatePersonChoiceEvent(payload, choice);
         }
 
         foreach (var choice in payload.TokenChoices)
@@ -1077,7 +1077,7 @@ internal static class AstralTelemetry
 
     private static IEnumerable<TelemetryEventRecord> CreatePersonaOptionOfferedEvents(
         RunEndedPayload payload,
-        PersonaChoiceRecord choice)
+        PersonChoiceRecord choice)
     {
         foreach (var optionId in choice.Options)
             yield return new TelemetryEventRecord(
@@ -1115,7 +1115,7 @@ internal static class AstralTelemetry
                     .With("reroll_count", choice.RerollCount));
     }
 
-    private static TelemetryEventRecord CreatePersonaChoiceEvent(RunEndedPayload payload, PersonaChoiceRecord choice)
+    private static TelemetryEventRecord CreatePersonChoiceEvent(RunEndedPayload payload, PersonChoiceRecord choice)
     {
         var optionLabels = choice.Options.Select(GetRelicLabel).ToArray();
         var optionLabelsZhs = choice.Options.Select(optionId => GetRelicLabel(optionId, "zhs")).ToArray();
@@ -1368,9 +1368,9 @@ internal static class AstralTelemetryDictionaryExtensions
     }
 }
 
-internal static class PersonaSkillRegistry
+internal static class PersonSkillRegistry
 {
-    private static readonly Dictionary<string, string> PersonaToSkillCardId = new(StringComparer.Ordinal)
+    private static readonly Dictionary<string, string> PersonToSkillCardId = new(StringComparer.Ordinal)
     {
         ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_BLUE_WHALE"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FATE_WEAK_MPRINT",
         ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_CYBER_KITTY"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_REMOTE_INTRUSION",
@@ -1405,16 +1405,16 @@ internal static class PersonaSkillRegistry
         ["RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_WEIRD_EGG"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ANOMALY_MAKER"
     };
 
-    private static readonly HashSet<string> TrackedPersonaSkillCardIds =
-        PersonaToSkillCardId.Values.ToHashSet(StringComparer.Ordinal);
+    private static readonly HashSet<string> TrackedPersonSkillCardIds =
+        PersonToSkillCardId.Values.ToHashSet(StringComparer.Ordinal);
 
-    public static string? TryGetPersonaSkillCardId(string personaRelicId)
+    public static string? TryGetPersonSkillCardId(string personRelicId)
     {
-        return PersonaToSkillCardId.GetValueOrDefault(personaRelicId);
+        return PersonToSkillCardId.GetValueOrDefault(personRelicId);
     }
 
-    public static bool IsTrackedPersonaSkillCard(CardModel canonicalCard)
+    public static bool IsTrackedPersonSkillCard(CardModel canonicalCard)
     {
-        return TrackedPersonaSkillCardIds.Contains(canonicalCard.Id.Entry);
+        return TrackedPersonSkillCardIds.Contains(canonicalCard.Id.Entry);
     }
 }

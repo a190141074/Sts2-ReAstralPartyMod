@@ -6,7 +6,7 @@ using STS2RitsuLib.Combat.HandSize;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
 [HarmonyPatch(typeof(MaxHandSizeCalculator), nameof(MaxHandSizeCalculator.ApplyHookListenerModifiers))]
-public class PersonaMaxHandSizeGuardPatch
+public class PersonMaxHandSizeGuardPatch
 {
     private static int _guardLogCount;
 

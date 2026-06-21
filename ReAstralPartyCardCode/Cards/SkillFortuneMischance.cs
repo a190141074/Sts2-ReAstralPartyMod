@@ -15,7 +15,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillFortuneMischance : AstralPartyCardModel
 {
     private const decimal BaseHeal = 2m;

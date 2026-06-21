@@ -95,7 +95,7 @@ public class MoonPropFragileCrown : MoonPropStackableRelicBase
             return;
 
         Flash();
-        await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldToLose, Owner, GoldLossType.Spent);
+        await PersonMultiplayerEffectHelper.LoseGoldDeterministic(goldToLose, Owner, GoldLossType.Spent);
     }
 
     private bool IsTrackedOutboundDamage(Creature? dealer, Creature target, decimal amount, CardModel? cardSource)

@@ -10,7 +10,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
-public class BaseAbilityHamburger : AstralPartyCardModel
+public class BaseAbilityHamburger : BaseAbilityCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 

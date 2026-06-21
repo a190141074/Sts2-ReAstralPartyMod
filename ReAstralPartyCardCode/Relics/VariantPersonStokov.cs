@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonStokov : PersonaRelicBase
+public class VariantPersonStokov : PersonRelicBase
 {
     private static readonly AsyncLocal<int> CardPropagationDepth = new();
     private static readonly AsyncLocal<int> RelicPropagationDepth = new();

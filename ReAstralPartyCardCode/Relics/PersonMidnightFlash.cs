@@ -21,7 +21,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonMidnightFlash : CooldownPersonaRelicBase
+public class PersonMidnightFlash : CooldownPersonRelicBase
 {
     private const int CooldownReductionOnKill = 2;
 
@@ -81,6 +81,6 @@ public class PersonMidnightFlash : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillUnstoppable>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

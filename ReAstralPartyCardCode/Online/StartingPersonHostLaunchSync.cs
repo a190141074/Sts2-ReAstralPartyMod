@@ -10,7 +10,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
-internal static class StartingPersonaHostLaunchSync
+internal static class StartingPersonHostLaunchSync
 {
     private static readonly object Gate = new();
 
@@ -28,13 +28,13 @@ internal static class StartingPersonaHostLaunchSync
                 return;
 
             if (_registeredNetService != null)
-                _registeredNetService.UnregisterMessageHandler<StartingPersonaHostLaunchMessage>(HandleLaunchMessage);
+                _registeredNetService.UnregisterMessageHandler<StartingPersonHostLaunchMessage>(HandleLaunchMessage);
 
-            netService.RegisterMessageHandler<StartingPersonaHostLaunchMessage>(HandleLaunchMessage);
+            netService.RegisterMessageHandler<StartingPersonHostLaunchMessage>(HandleLaunchMessage);
             _registeredNetService = netService;
         }
 
-        MainFile.Logger.Info("[StartingPersonaHostLaunchSync] Registered host-launch message handler.");
+        MainFile.Logger.Info("[StartingPersonHostLaunchSync] Registered host-launch message handler.");
     }
 
     public static void Unregister()
@@ -44,7 +44,7 @@ internal static class StartingPersonaHostLaunchSync
             if (_registeredNetService == null)
                 return;
 
-            _registeredNetService.UnregisterMessageHandler<StartingPersonaHostLaunchMessage>(HandleLaunchMessage);
+            _registeredNetService.UnregisterMessageHandler<StartingPersonHostLaunchMessage>(HandleLaunchMessage);
             _registeredNetService = null;
         }
     }
@@ -57,16 +57,16 @@ internal static class StartingPersonaHostLaunchSync
         if (netService == null || netService.Type != NetGameType.Host || !netService.IsConnected)
             return;
 
-        var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
-        var relicOptionIds = StartingPersonaRelicSelectionPatch.CreateOverlayRelicOptions(runState)
+        var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
+        var relicOptionIds = StartingPersonRelicSelectionPatch.CreateOverlayRelicOptions(runState)
             .Select(relic => (relic.CanonicalInstance?.Id ?? relic.Id).ToString())
             .ToList();
-        netService.SendMessage(new StartingPersonaHostLaunchMessage(runKey, relicOptionIds));
+        netService.SendMessage(new StartingPersonHostLaunchMessage(runKey, relicOptionIds));
         MainFile.Logger.Info(
-            $"[StartingPersonaHostLaunchSync] Host broadcast persona-selection launch | runKey={runKey} options={relicOptionIds.Count}.");
+            $"[StartingPersonHostLaunchSync] Host broadcast persona-selection launch | runKey={runKey} options={relicOptionIds.Count}.");
     }
 
-    private static void HandleLaunchMessage(StartingPersonaHostLaunchMessage message, ulong senderId)
+    private static void HandleLaunchMessage(StartingPersonHostLaunchMessage message, ulong senderId)
     {
         var netService = _registeredNetService ?? RunManager.Instance?.NetService;
         if (netService == null)
@@ -80,27 +80,27 @@ internal static class StartingPersonaHostLaunchSync
         if (expectedHostNetId == 0UL || senderId != expectedHostNetId)
         {
             MainFile.Logger.Warn(
-                $"[StartingPersonaHostLaunchSync] Rejected host-launch from non-host sender | runKey={message.RunKey} sender={senderId} expectedHost={expectedHostNetId}.");
+                $"[StartingPersonHostLaunchSync] Rejected host-launch from non-host sender | runKey={message.RunKey} sender={senderId} expectedHost={expectedHostNetId}.");
             return;
         }
 
         MainFile.Logger.Info(
-            $"[StartingPersonaHostLaunchSync] Client received host-launch | runKey={message.RunKey} sender={senderId}.");
-        _ = StartingPersonaNeowReadyFlow.HandleReadyLaunchAsync(
+            $"[StartingPersonHostLaunchSync] Client received host-launch | runKey={message.RunKey} sender={senderId}.");
+        _ = StartingPersonNeowReadyFlow.HandleReadyLaunchAsync(
             message.RunKey,
             "host_broadcast",
             message.RelicOptionIds);
     }
 }
 
-public struct StartingPersonaHostLaunchMessage : INetMessage, IPacketSerializable
+public struct StartingPersonHostLaunchMessage : INetMessage, IPacketSerializable
 {
     private const int SchemaVersion = 2;
 
     public string RunKey { get; set; }
     public List<string> RelicOptionIds { get; set; }
 
-    public StartingPersonaHostLaunchMessage(string runKey, List<string>? relicOptionIds = null)
+    public StartingPersonHostLaunchMessage(string runKey, List<string>? relicOptionIds = null)
     {
         RunKey = runKey;
         RelicOptionIds = relicOptionIds ?? [];

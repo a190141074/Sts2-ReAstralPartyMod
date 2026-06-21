@@ -65,7 +65,7 @@ public class EnigmaticSynthesisCursedScroll : AstralPartyRelicModel
         if (extraDraw <= 0)
             return;
 
-        await PersonaMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, extraDraw, Owner!, this);
+        await PersonMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, extraDraw, Owner!, this);
     }
 
     public override decimal ModifyDamageAdditive(

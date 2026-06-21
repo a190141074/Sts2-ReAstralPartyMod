@@ -10,7 +10,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
-public class BaseAbilityExpiredLunch : AstralPartyCardModel
+public class BaseAbilityExpiredLunch : BaseAbilityCardModel
 {
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [

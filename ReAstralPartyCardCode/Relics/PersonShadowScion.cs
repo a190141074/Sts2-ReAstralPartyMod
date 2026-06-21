@@ -22,7 +22,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonShadowScion : CooldownPersonaRelicBase
+public class PersonShadowScion : CooldownPersonRelicBase
 {
     private const int EternalStarlightPerCombatBonus = 13;
     private const decimal CombatBonusPerThreshold = 1m;
@@ -57,7 +57,7 @@ public class PersonShadowScion : CooldownPersonaRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeScionGrace>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeScionGrace>(Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -65,7 +65,7 @@ public class PersonShadowScion : CooldownPersonaRelicBase
         if (Owner?.Creature?.CombatState == null || Owner.RunState == null)
             return;
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeScionGrace>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeScionGrace>(Owner);
 
         var eternalStarlightStacks = Owner.GetRelic<TokenEternalStarlight>()?.GetStacks() ?? 0;
         var combatBonus = eternalStarlightStacks / EternalStarlightPerCombatBonus;
@@ -142,6 +142,6 @@ public class PersonShadowScion : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillPowerfulPity>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

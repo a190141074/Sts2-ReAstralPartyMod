@@ -14,8 +14,8 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool), StableEntryStem = "ultimate_skill_absolute_form")]
-public class UltimateSkillAbsoluteForm : AstralPartyCardModel
+[RegisterCard(typeof(PersonSkillCardPool), StableEntryStem = "ultimate_skill_absolute_form")]
+public class UltimateSkillAbsoluteForm : UltimateSkillCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [AstralKeywords.AstralUltimateSkill, CardKeyword.Ethereal, CardKeyword.Exhaust];

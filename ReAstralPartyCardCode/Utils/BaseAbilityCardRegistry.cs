@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
+using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -68,7 +69,7 @@ public static class BaseAbilityCardRegistry
             .Where(type =>
                 !type.IsAbstract
                 && typeof(AstralPartyCardModel).IsAssignableFrom(type)
-                && type.Name.StartsWith("BaseAbility", StringComparison.Ordinal))
+                && AstralCardTags.HasBaseAbilityTag(ModelDb.GetById<CardModel>(ModelDb.GetId(type))))
             .OrderBy(type => type.Name, StringComparer.Ordinal)
             .ToArray();
     }

@@ -77,7 +77,7 @@ public sealed class DreamCoinExplosion : AstralPartyRelicModel
         if (goldCost <= 0 || Owner.Gold < goldCost)
             return;
 
-        await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, Owner, GoldLossType.Spent);
+        await PersonMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, Owner, GoldLossType.Spent);
 
         var rolledHeads = RollHeadsForCurrentAttack(cardPlay.Card);
         if (rolledHeads)

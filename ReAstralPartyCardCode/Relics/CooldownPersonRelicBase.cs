@@ -5,7 +5,7 @@ using MegaCrit.Sts2.Core.Rooms;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-public abstract class CooldownPersonaRelicBase : PersonaRelicBase
+public abstract class CooldownPersonRelicBase : PersonRelicBase
 {
     protected abstract int CounterValue { get; set; }
     protected abstract bool PendingCombatStartCard { get; set; }

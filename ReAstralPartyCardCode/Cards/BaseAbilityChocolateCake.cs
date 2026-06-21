@@ -11,7 +11,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
-public class BaseAbilityChocolateCake : AstralPartyCardModel
+public class BaseAbilityChocolateCake : BaseAbilityCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
 

@@ -17,7 +17,7 @@ using STS2RitsuLib.Cards.DynamicVars;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillShatterStar : AstralPartyCardModel
 {
     private const decimal BaseDamage = 21m;

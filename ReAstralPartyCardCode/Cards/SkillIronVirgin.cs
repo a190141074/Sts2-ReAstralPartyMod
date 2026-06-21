@@ -11,7 +11,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillIronVirgin : AstralPartyCardModel
 {
     private const decimal BoundaryStrengthBonus = 3m;

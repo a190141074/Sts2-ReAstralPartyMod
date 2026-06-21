@@ -103,9 +103,9 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
             if (selectionResult.SelectedRelic == null)
                 return false;
 
-            await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, player, GoldLossType.Spent);
+            await PersonMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, player, GoldLossType.Spent);
             AstralParty_TokenGoldInitialPointRemainingRerolls = selectionResult.RemainingRerolls;
-            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(player, selectionResult.SelectedRelic);
+            await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(player, selectionResult.SelectedRelic);
             AstralParty_TokenGoldInitialPointAscensionCount =
                 Math.Min(MaxAscensions, AstralParty_TokenGoldInitialPointAscensionCount + 1);
             InvokeDisplayAmountChanged();

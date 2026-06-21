@@ -64,7 +64,7 @@ internal static class AstralNoaHelper
 
     public static async Task EnsureGlitchRobot(Player? owner)
     {
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeGlitchRobot>(owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeGlitchRobot>(owner);
     }
 
     public static async Task InitializeOpeningState(Player owner)

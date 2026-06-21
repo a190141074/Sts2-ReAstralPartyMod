@@ -23,7 +23,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonProprietress : CooldownPersonaRelicBase
+public class PersonProprietress : CooldownPersonRelicBase
 {
     private const int ProprietressBaseMaxCounter = 3;
     private const int ShopGoldGainStep = 10;
@@ -130,7 +130,7 @@ public class PersonProprietress : CooldownPersonaRelicBase
         await base.AfterObtained();
         AstralParty_PersonProprietressVisitedShops = 0;
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeProprietressWealthism>(
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeProprietressWealthism>(
             Owner);
     }
 
@@ -142,7 +142,7 @@ public class PersonProprietress : CooldownPersonaRelicBase
         AstralParty_PersonProprietressVisitedShops++;
         var goldToGain = ShopGoldGainStep;
         Flash();
-        await PersonaMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
+        await PersonMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
     }
 
     public override decimal ModifyMerchantPrice(Player player, MerchantEntry entry, decimal originalPrice)
@@ -236,7 +236,7 @@ public class PersonProprietress : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTransfer>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private sealed class DiscountRollState

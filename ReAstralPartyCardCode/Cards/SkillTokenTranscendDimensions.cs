@@ -10,8 +10,8 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool), StableEntryStem = "skill_token_transcend_dimensions")]
-public sealed class SkillTokenTranscendDimensions : AstralPartyCardModel
+[RegisterCard(typeof(PersonSkillCardPool), StableEntryStem = "skill_token_transcend_dimensions")]
+public sealed class SkillTokenTranscendDimensions : PersonSkillCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [CardKeyword.Exhaust, CardKeyword.Eternal];
@@ -48,7 +48,7 @@ public sealed class SkillTokenTranscendDimensions : AstralPartyCardModel
         foreach (var card in orderedCards)
             await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Bottom, this);
 
-        await PersonaMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, 5m, Owner, this);
+        await PersonMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, 5m, Owner, this);
         await PlayerCmd.GainEnergy(5m, Owner);
     }
 

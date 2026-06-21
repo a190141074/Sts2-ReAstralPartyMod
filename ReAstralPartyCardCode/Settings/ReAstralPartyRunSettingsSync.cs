@@ -20,7 +20,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public bool EnableStartingRingOfSevenCurses { get; set; }
 
-    public bool EnableStartingPersonaSelection { get; set; } = true;
+    public bool EnableStartingPersonSelection { get; set; } = true;
 
     public bool EnableDreamSeriesEvents { get; set; } = true;
 
@@ -39,13 +39,13 @@ public sealed class ReAstralPartyRunSettingsSnapshot
     public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; } =
         NeowExtraOptionSelectionMode.DefaultRandom;
 
-    public bool EnableAllPersonas { get; set; }
+    public bool EnableAllPersons { get; set; }
 
-    public bool EnableVariantPersonas { get; set; } = true;
+    public bool EnableVariantPersons { get; set; } = true;
 
-    public bool EnableAllVariantPersonas { get; set; }
+    public bool EnableAllVariantPersons { get; set; }
 
-    public StartingPersonaMode StartingPersonaMode { get; set; } = StartingPersonaMode.Standard;
+    public StartingPersonMode StartingPersonMode { get; set; } = StartingPersonMode.Standard;
 
     public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
 
@@ -83,10 +83,46 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public List<string> BannedRelicIdsSerialized { get; set; } = [];
 
-    public List<string> BannedPersonaRelicIdsSerialized
+    public List<string> BannedPersonRelicIdsSerialized
     {
         get => BannedRelicIdsSerialized;
         set => BannedRelicIdsSerialized = value;
+    }
+
+    public bool EnableStartingPersonaSelection
+    {
+        get => EnableStartingPersonSelection;
+        set => EnableStartingPersonSelection = value;
+    }
+
+    public bool EnableAllPersonas
+    {
+        get => EnableAllPersons;
+        set => EnableAllPersons = value;
+    }
+
+    public bool EnableVariantPersonas
+    {
+        get => EnableVariantPersons;
+        set => EnableVariantPersons = value;
+    }
+
+    public bool EnableAllVariantPersonas
+    {
+        get => EnableAllVariantPersons;
+        set => EnableAllVariantPersons = value;
+    }
+
+    public StartingPersonaMode StartingPersonaMode
+    {
+        get => StartingPersonMode;
+        set => StartingPersonMode = value;
+    }
+
+    public List<string> BannedPersonaRelicIdsSerialized
+    {
+        get => BannedPersonRelicIdsSerialized;
+        set => BannedPersonRelicIdsSerialized = value;
     }
 
     public ReAstralPartyRunSettingsSnapshot Clone()
@@ -110,7 +146,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
             EnableAllPersonas = EnableAllPersonas,
             EnableVariantPersonas = EnableVariantPersonas,
             EnableAllVariantPersonas = EnableAllVariantPersonas,
-            StartingPersonaMode = StartingPersonaMode,
+            StartingPersonMode = StartingPersonMode,
             TokenSeriesMode = TokenSeriesMode,
             EnablePureAngelMode = EnablePureAngelMode,
             EnableLucidDreamFalseLifeline = EnableLucidDreamFalseLifeline,
@@ -209,7 +245,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableAllPersonas = lobbySnapshot?.EnableAllPersonas ?? settings.EnableAllPersonas,
             EnableVariantPersonas = lobbySnapshot?.EnableVariantPersonas ?? settings.EnableVariantPersonas,
             EnableAllVariantPersonas = lobbySnapshot?.EnableAllVariantPersonas ?? settings.EnableAllVariantPersonas,
-            StartingPersonaMode = lobbySnapshot?.StartingPersonaMode
+            StartingPersonMode = lobbySnapshot?.StartingPersonMode
                                   ?? ReAstralPartyModSettingsManager.ResolveStartingPersonaMode(settings),
             TokenSeriesMode = lobbySnapshot?.TokenSeriesMode
                               ?? ReAstralPartyModSettingsManager.ResolveTokenSeriesMode(settings),
@@ -260,7 +296,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableAllPersonas = false,
             EnableVariantPersonas = true,
             EnableAllVariantPersonas = false,
-            StartingPersonaMode = StartingPersonaMode.Standard,
+            StartingPersonMode = StartingPersonMode.Standard,
             TokenSeriesMode = TokenSeriesMode.RandomTwo,
             EnablePureAngelMode = false,
             EnableLucidDreamFalseLifeline = false,
@@ -326,7 +362,7 @@ internal static class ReAstralPartyRunSettingsSync
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
             LogSnapshotEstablished(runState, "lobby_snapshot");
             MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync established from lobby snapshot: start_initial_point={lobbySnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={lobbySnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={lobbySnapshot.EnableStartingPersonaSelection}, dream_series={lobbySnapshot.EnableDreamSeriesEvents}, enigmatic_series={lobbySnapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={lobbySnapshot.EnableMoonPropShopSlots}, moon_relics={lobbySnapshot.EnableMoonPropRelics}, neow_extra_option={lobbySnapshot.EnableNeowExtraOption}, lucid_dream={lobbySnapshot.EnableLucidDream}, neow_extra_selection={lobbySnapshot.NeowExtraOptionSelectionMode}, all_personas={lobbySnapshot.EnableAllPersonas}, variants_enabled={lobbySnapshot.EnableVariantPersonas}, all_variants={lobbySnapshot.EnableAllVariantPersonas}, persona_mode={lobbySnapshot.StartingPersonaMode}, token_series={lobbySnapshot.TokenSeriesMode}, pure_angel={lobbySnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(lobbySnapshot)}, banned_relics={lobbySnapshot.BannedRelicIdsSerialized.Count}");
+                $"{MainFile.ModId} settings sync established from lobby snapshot: start_initial_point={lobbySnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={lobbySnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={lobbySnapshot.EnableStartingPersonaSelection}, dream_series={lobbySnapshot.EnableDreamSeriesEvents}, enigmatic_series={lobbySnapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={lobbySnapshot.EnableMoonPropShopSlots}, moon_relics={lobbySnapshot.EnableMoonPropRelics}, neow_extra_option={lobbySnapshot.EnableNeowExtraOption}, lucid_dream={lobbySnapshot.EnableLucidDream}, neow_extra_selection={lobbySnapshot.NeowExtraOptionSelectionMode}, all_personas={lobbySnapshot.EnableAllPersonas}, variants_enabled={lobbySnapshot.EnableVariantPersonas}, all_variants={lobbySnapshot.EnableAllVariantPersonas}, persona_mode={lobbySnapshot.StartingPersonMode}, token_series={lobbySnapshot.TokenSeriesMode}, pure_angel={lobbySnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(lobbySnapshot)}, banned_relics={lobbySnapshot.BannedRelicIdsSerialized.Count}");
             return Task.FromResult(lobbySnapshot);
         }
 
@@ -337,7 +373,7 @@ internal static class ReAstralPartyRunSettingsSync
             LobbyGameplaySettingsSync.OnRunSnapshotEstablished();
             LogSnapshotEstablished(runState, "host_runtime_fallback");
             MainFile.Logger.Info(
-                $"{MainFile.ModId} settings sync established from host runtime fallback without PlayerChoiceSynchronizer: start_initial_point={localSnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={localSnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={localSnapshot.EnableStartingPersonaSelection}, dream_series={localSnapshot.EnableDreamSeriesEvents}, enigmatic_series={localSnapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={localSnapshot.EnableMoonPropShopSlots}, moon_relics={localSnapshot.EnableMoonPropRelics}, neow_extra_option={localSnapshot.EnableNeowExtraOption}, lucid_dream={localSnapshot.EnableLucidDream}, neow_extra_selection={localSnapshot.NeowExtraOptionSelectionMode}, all_personas={localSnapshot.EnableAllPersonas}, variants_enabled={localSnapshot.EnableVariantPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, persona_mode={localSnapshot.StartingPersonaMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(localSnapshot)}, banned_relics={localSnapshot.BannedRelicIdsSerialized.Count}");
+                $"{MainFile.ModId} settings sync established from host runtime fallback without PlayerChoiceSynchronizer: start_initial_point={localSnapshot.EnableStartingInitialPoint}, start_ring_of_seven_curses={localSnapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={localSnapshot.EnableStartingPersonaSelection}, dream_series={localSnapshot.EnableDreamSeriesEvents}, enigmatic_series={localSnapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={localSnapshot.EnableMoonPropShopSlots}, moon_relics={localSnapshot.EnableMoonPropRelics}, neow_extra_option={localSnapshot.EnableNeowExtraOption}, lucid_dream={localSnapshot.EnableLucidDream}, neow_extra_selection={localSnapshot.NeowExtraOptionSelectionMode}, all_personas={localSnapshot.EnableAllPersonas}, variants_enabled={localSnapshot.EnableVariantPersonas}, all_variants={localSnapshot.EnableAllVariantPersonas}, persona_mode={localSnapshot.StartingPersonMode}, token_series={localSnapshot.TokenSeriesMode}, pure_angel={localSnapshot.EnablePureAngelMode}, lucid_malice_flags={CountEnabledLucidDreamMaliceFlags(localSnapshot)}, banned_relics={localSnapshot.BannedRelicIdsSerialized.Count}");
             return Task.FromResult(localSnapshot);
         }
 
@@ -380,7 +416,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableAllPersonas = lobbySnapshot.EnableAllPersonas,
             EnableVariantPersonas = lobbySnapshot.EnableVariantPersonas,
             EnableAllVariantPersonas = lobbySnapshot.EnableAllVariantPersonas,
-            StartingPersonaMode = lobbySnapshot.StartingPersonaMode,
+            StartingPersonMode = lobbySnapshot.StartingPersonMode,
             TokenSeriesMode = lobbySnapshot.TokenSeriesMode,
             EnablePureAngelMode = settings.EnablePureAngelMode,
             EnableLucidDreamFalseLifeline = lobbySnapshot.EnableLucidDreamFalseLifeline,
@@ -447,8 +483,8 @@ internal static class ReAstralPartyRunSettingsSync
     private static void LogSnapshotEstablished(RunState runState, string source)
     {
         var netMode = RunManager.Instance?.NetService?.Type.ToString() ?? "Unknown";
-        var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
-        var personaWindow = StartingPersonaRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out var reason);
+        var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
+        var personaWindow = StartingPersonRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out var reason);
         MainFile.Logger.Info(
             $"{MainFile.ModId} settings sync established before persona ready flow: source={source}, runKey={runKey}, netMode={netMode}, persona_window_open={personaWindow}, persona_gate_reason={reason}");
     }

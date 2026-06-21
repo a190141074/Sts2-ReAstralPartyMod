@@ -390,7 +390,7 @@ internal static class ProphecySoulDevourHelper
         {
             case ProphecySoulDevourKind.UndergroundTrade:
                 await CreatureCmd.SetCurrentHp(owner.Creature, owner.Creature.CurrentHp - 6m);
-                await PersonaMultiplayerEffectHelper.GainGoldDeterministic(60m, owner);
+                await PersonMultiplayerEffectHelper.GainGoldDeterministic(60m, owner);
                 break;
             case ProphecySoulDevourKind.TreasureHunting:
             case ProphecySoulDevourKind.MatrixRecycling:
@@ -416,7 +416,7 @@ internal static class ProphecySoulDevourHelper
                 break;
             case ProphecySoulDevourKind.EnergyConversion:
                 relic.AstralParty_ProphecySoulDevourDisableNextSmithPending = true;
-                await PersonaMultiplayerEffectHelper.GainGoldDeterministic(75m, owner);
+                await PersonMultiplayerEffectHelper.GainGoldDeterministic(75m, owner);
                 break;
             case ProphecySoulDevourKind.FastFluctuation:
                 ApplyFastFluctuation(relic);

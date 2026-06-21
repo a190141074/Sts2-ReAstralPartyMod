@@ -18,7 +18,7 @@ using STS2RitsuLib.Combat.Ui.ExtraCornerAmountLabels;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public sealed class VariantPersonWamdus : CooldownPersonaRelicBase, IRelicExtraIconAmountLabelsProvider,
+public sealed class VariantPersonWamdus : CooldownPersonRelicBase, IRelicExtraIconAmountLabelsProvider,
     IRelicExtraIconAmountLabelsChangeSource
 {
     [SavedProperty] public int AstralParty_VariantPersonWamdusCounter { get; set; } = 1;
@@ -95,7 +95,7 @@ public sealed class VariantPersonWamdus : CooldownPersonaRelicBase, IRelicExtraI
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillSixDragonsAzure>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     public IReadOnlyList<ExtraIconAmountLabelSlot> GetRelicExtraIconAmountLabelSlots()

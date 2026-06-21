@@ -10,7 +10,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillBigEater : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -41,7 +41,7 @@ public class SkillBigEater : AstralPartyCardModel
         var generatedCard = Owner.Creature.CombatState.CreateCard(
             PandaPersonaHelper.GetDeterministicFoodCardModel(Owner),
             Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(generatedCard, true, CardPilePosition.Top,
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(generatedCard, true, CardPilePosition.Top,
             this);
     }
 }

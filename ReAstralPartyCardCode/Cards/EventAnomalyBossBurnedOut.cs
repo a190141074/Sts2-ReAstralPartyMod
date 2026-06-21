@@ -47,6 +47,6 @@ public class EventAnomalyBossBurnedOut : AstralPartyCardModel
         }
 
         foreach (var player in CombatState!.Players)
-            PersonaRelicHelper.AdvanceCooldownRelics(player, 1);
+            PersonRelicHelper.AdvanceCooldownRelics(player, 1);
     }
 }

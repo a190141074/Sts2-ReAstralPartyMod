@@ -273,7 +273,7 @@ public class ProphecySoulDevour : AstralPartyRelicModel
             "Skip",
             async () =>
             {
-                await PersonaMultiplayerEffectHelper.GainGoldDeterministic(20m, player);
+                await PersonMultiplayerEffectHelper.GainGoldDeterministic(20m, player);
                 var historyEntry = LocalContext.NetId.HasValue
                     ? player.RunState.CurrentMapPointHistoryEntry?.GetEntry(LocalContext.NetId.Value)
                     : null;
@@ -292,7 +292,7 @@ public class ProphecySoulDevour : AstralPartyRelicModel
         if (!AstralParty_ProphecySoulDevourMineralRecoveryPermanent || Owner == null)
             return;
 
-        await PersonaMultiplayerEffectHelper.GainGoldDeterministic(10m, Owner);
+        await PersonMultiplayerEffectHelper.GainGoldDeterministic(10m, Owner);
         Flash();
     }
 
@@ -344,7 +344,7 @@ public class ProphecySoulDevour : AstralPartyRelicModel
             {
                 var totalCost = selectionResult.RefreshCount * selectionResult.RefreshCost;
                 if (totalCost > 0)
-                    await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(totalCost, Owner, GoldLossType.Spent);
+                    await PersonMultiplayerEffectHelper.LoseGoldDeterministic(totalCost, Owner, GoldLossType.Spent);
             }
 
             AstralParty_ProphecySoulDevourPendingDiscoveryCounter--;
@@ -390,7 +390,7 @@ public class ProphecySoulDevour : AstralPartyRelicModel
             var grant = _readyDelayedRelics[i];
             var relic = ModelDb.GetById<RelicModel>(grant.RelicId);
             if (relic != null)
-                await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, relic.CanonicalInstance ?? relic);
+                await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, relic.CanonicalInstance ?? relic);
 
             _readyDelayedRelics.RemoveAt(i);
         }

@@ -21,7 +21,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonJillSteinle : CooldownPersonaRelicBase
+public class PersonJillSteinle : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_PersonJillSteinleCounter { get; set; } = 1;
 
@@ -57,6 +57,6 @@ public class PersonJillSteinle : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillMixedCocktails>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

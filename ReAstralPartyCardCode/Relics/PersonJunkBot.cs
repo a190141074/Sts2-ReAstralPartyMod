@@ -25,7 +25,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonJunkBot : CooldownPersonaRelicBase
+public class PersonJunkBot : CooldownPersonRelicBase
 {
     private const int MarkedCombatCount = 16;
     private const int KillsPerWeaponFrameStack = 2;
@@ -147,12 +147,12 @@ public class PersonJunkBot : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillComeHereYou>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     private async Task EnsureWeaponFrameRelic()
     {
-        await PersonaMultiplayerEffectHelper
+        await PersonMultiplayerEffectHelper
             .ObtainDerivativeRelicIfMissing<PersonalityDerivativeZ3000WeaponFrame>(Owner);
     }
 

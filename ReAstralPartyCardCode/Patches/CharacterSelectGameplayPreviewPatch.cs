@@ -151,14 +151,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private const float BodyMinVisibleHeight = 180f;
     private const float PanelAspectRatio = DefaultPanelWidth / DefaultPanelHeight;
 
-    private static readonly StartingPersonaMode[] StartingPersonaModes =
+    private static readonly StartingPersonMode[] StartingPersonaModes =
     [
-        StartingPersonaMode.Standard,
-        StartingPersonaMode.StandardDuplicate,
-        StartingPersonaMode.RandomAssign,
-        StartingPersonaMode.Clone,
-        StartingPersonaMode.RandomClone,
-        StartingPersonaMode.DestinedClone
+        StartingPersonMode.Standard,
+        StartingPersonMode.StandardDuplicate,
+        StartingPersonMode.RandomAssign,
+        StartingPersonMode.Clone,
+        StartingPersonMode.RandomClone,
+        StartingPersonMode.DestinedClone
     ];
 
     private static readonly TokenSeriesMode[] TokenSeriesModes =
@@ -980,7 +980,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
             if (_startingPersonaModeOption != null)
             {
-                _startingPersonaModeOption.Select(IndexOfStartingPersonaMode(snapshot.StartingPersonaMode));
+                _startingPersonaModeOption.Select(IndexOfStartingPersonaMode(snapshot.StartingPersonMode));
                 _startingPersonaModeOption.Disabled = !isEditable || !personaSelectionEnabled;
             }
 
@@ -1087,7 +1087,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From(snapshot.EnableCollectorsCards),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
             Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableVariantPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
-            Variant.From((int)snapshot.StartingPersonaMode), Variant.From((int)snapshot.TokenSeriesMode));
+            Variant.From((int)snapshot.StartingPersonMode), Variant.From((int)snapshot.TokenSeriesMode));
     }
 
     private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint, bool enableStartingAstralRelicStore, bool enableStartingRingOfSevenCurses, bool enableStartingPersonaSelection,
@@ -1120,9 +1120,9 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             EnableVariantPersonas = enableVariantPersonas,
             EnableAllVariantPersonas = enableAllVariantPersonas,
             EnableExtremeMode = enableExtremeMode,
-            StartingPersonaMode = Enum.IsDefined(typeof(StartingPersonaMode), startingPersonaMode)
-                ? (StartingPersonaMode)startingPersonaMode
-                : StartingPersonaMode.Standard,
+            StartingPersonMode = Enum.IsDefined(typeof(StartingPersonMode), startingPersonaMode)
+                ? (StartingPersonMode)startingPersonaMode
+                : StartingPersonMode.Standard,
             TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), tokenSeriesMode)
                 ? (TokenSeriesMode)tokenSeriesMode
                 : TokenSeriesMode.RandomTwo
@@ -1301,7 +1301,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         var selectedMode = StartingPersonaModes[selectedIndex];
-        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.StartingPersonaMode = selectedMode);
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.StartingPersonMode = selectedMode);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 
@@ -1318,7 +1318,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 
-    private static int IndexOfStartingPersonaMode(StartingPersonaMode mode)
+    private static int IndexOfStartingPersonaMode(StartingPersonMode mode)
     {
         for (var i = 0; i < StartingPersonaModes.Length; i++)
         {

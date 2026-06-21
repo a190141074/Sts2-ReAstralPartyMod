@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -83,11 +83,11 @@ public static class CyberKittyCombatHelper
         if (playerCombatState == null)
             return null;
 
-        var selected = PersonaMultiplayerEffectHelper.SelectRandomUpgradeableCombatCard(
+        var selected = PersonMultiplayerEffectHelper.SelectRandomUpgradeableCombatCard(
             owner,
             WarforgeEnchantmentHelper.CountsAsAttack,
             owner.RunState.Rng.CombatCardSelection);
-        var fallback = selected ?? PersonaMultiplayerEffectHelper.SelectRandomUpgradeableCombatCard(
+        var fallback = selected ?? PersonMultiplayerEffectHelper.SelectRandomUpgradeableCombatCard(
             owner,
             _ => true,
             owner.RunState.Rng.CombatCardSelection);

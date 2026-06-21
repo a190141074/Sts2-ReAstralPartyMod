@@ -14,7 +14,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillDragonsRoar : AstralPartyCardModel
 {
     private sealed class DragonsRoarTemporaryStrengthPower : AstralPartyPowerModel

@@ -16,7 +16,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonFengShui : PersonaRelicBase
+public class PersonFengShui : PersonRelicBase
 {
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
@@ -32,7 +32,7 @@ public class PersonFengShui : PersonaRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeFortuneMischance>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeFortuneMischance>(Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -40,7 +40,7 @@ public class PersonFengShui : PersonaRelicBase
         if (Owner?.Creature?.CombatState == null)
             return;
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeFortuneMischance>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeFortuneMischance>(Owner);
         await PowerCmd.SetAmount<FengShuiNodePower>(Owner.Creature, 1m, Owner.Creature, null);
 
         var alreadyExists = Owner.PlayerCombatState?.AllCards.Any(card =>
@@ -50,7 +50,7 @@ public class PersonFengShui : PersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFortuneMischance>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -64,7 +64,7 @@ public class PersonFengShui : PersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFortuneMischance>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     private bool HasFortuneMischanceInPrimaryPiles()

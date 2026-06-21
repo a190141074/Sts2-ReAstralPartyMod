@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillChannelEnergy : AstralPartyCardModel
 {
     private const decimal BaseHealAmount = 2m;

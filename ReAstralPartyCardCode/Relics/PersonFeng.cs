@@ -21,7 +21,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonFeng : CooldownPersonaRelicBase
+public class PersonFeng : CooldownPersonRelicBase
 {
     private const int MaxGatheringStrengthStacks = 5;
     private const int BaseAttackConsumption = 1;
@@ -195,7 +195,7 @@ public class PersonFeng : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillChannelEnergy>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     private async Task SetGatheringStrengthAmount(int amount, CardModel? cardSource)

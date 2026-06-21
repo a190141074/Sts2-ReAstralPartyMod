@@ -6,7 +6,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
-public sealed class PersonaSkillNaturalObtainFilterPatch : IPatchMethod
+public sealed class PersonSkillNaturalObtainFilterPatch : IPatchMethod
 {
     public static string PatchId => "persona_skill_natural_obtain_filter";
 
@@ -21,6 +21,6 @@ public sealed class PersonaSkillNaturalObtainFilterPatch : IPatchMethod
 
     public static IEnumerable<CardModel> Postfix(IEnumerable<CardModel> __result, Player player)
     {
-        return __result.Where(card => PersonaSkillCardFilter.AllowNaturalObtain(card, player?.RunState)).ToList();
+        return __result.Where(card => PersonSkillCardFilter.AllowNaturalObtain(card, player?.RunState)).ToList();
     }
 }

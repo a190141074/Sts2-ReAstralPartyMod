@@ -15,7 +15,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonGunsmithMoses : CooldownPersonaRelicBase
+public class PersonGunsmithMoses : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_PersonGunsmithMosesCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonGunsmithMosesPendingCombatStartCard { get; set; }
@@ -50,12 +50,12 @@ public class PersonGunsmithMoses : CooldownPersonaRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeMysteriousDodgingMan>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeMysteriousDodgingMan>(Owner);
     }
 
     public override async Task BeforeCombatStart()
     {
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeMysteriousDodgingMan>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeMysteriousDodgingMan>(Owner);
         await MosesCombatHelper.EnsureNodeCarrier(Owner);
     }
 
@@ -66,6 +66,6 @@ public class PersonGunsmithMoses : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillWeaknessAnalysis>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

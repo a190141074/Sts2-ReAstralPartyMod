@@ -23,7 +23,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
-internal static class StartingPersonaNeowReadyFlow
+internal static class StartingPersonNeowReadyFlow
 {
     private const string ReadyPageDescriptionKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.description";
@@ -89,7 +89,7 @@ internal static class StartingPersonaNeowReadyFlow
         // If the client is still on the 1-button ready page, restore the real Neow page first.
         RestoreOriginalOptionsOrFinish(neow, "remote_choice_pre_restore");
         MainFile.Logger.Warn(
-            $"[StartingPersonaNeowReadyFlow] Restored cached Neow option page before remote choice processing | runKey={state.RunKey} sender={senderId} optionIndex={optionIndex} localCount={localOptionCount} cachedCount={state.OriginalOptions.Count}.");
+            $"[StartingPersonNeowReadyFlow] Restored cached Neow option page before remote choice processing | runKey={state.RunKey} sender={senderId} optionIndex={optionIndex} localCount={localOptionCount} cachedCount={state.OriginalOptions.Count}.");
         return true;
     }
 
@@ -97,7 +97,7 @@ internal static class StartingPersonaNeowReadyFlow
     {
         if (!ShouldInjectReadyPage(neow, out var runState, out var reason))
         {
-            MainFile.Logger.Info($"[StartingPersonaNeowReadyFlow] Skipped Neow ready page: {reason}.");
+            MainFile.Logger.Info($"[StartingPersonNeowReadyFlow] Skipped Neow ready page: {reason}.");
             return;
         }
 
@@ -106,7 +106,7 @@ internal static class StartingPersonaNeowReadyFlow
             if (ReadyPages.ContainsKey(neow))
                 return;
 
-            var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
+            var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
             var originalOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
                 neow,
                 neow.CurrentOptions,
@@ -128,7 +128,7 @@ internal static class StartingPersonaNeowReadyFlow
 
         SetEventStateMethod.Invoke(neow, [CreateReadyPageDescription(), readyOptions]);
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Ready page injected | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
+            $"[StartingPersonNeowReadyFlow] Ready page injected | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)}.");
     }
 
     internal static LocString CreateReadyPageDescription()
@@ -149,7 +149,7 @@ internal static class StartingPersonaNeowReadyFlow
             return false;
         }
 
-        return StartingPersonaRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out reason);
+        return StartingPersonRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out reason);
     }
 
     private static EventOption CreateReadyOption(Neow neow, RunState runState)
@@ -158,7 +158,7 @@ internal static class StartingPersonaNeowReadyFlow
         if (netService == null || netService.Type is NetGameType.None or NetGameType.Singleplayer)
         {
             MainFile.Logger.Info(
-                $"[StartingPersonaNeowReadyFlow] Host can start persona selection | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)} role=Singleplayer.");
+                $"[StartingPersonNeowReadyFlow] Host can start persona selection | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)} role=Singleplayer.");
             return new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
                 .ThatWontSaveToChoiceHistory();
         }
@@ -167,13 +167,13 @@ internal static class StartingPersonaNeowReadyFlow
         if (role == LobbyGameplayNetRole.Host)
         {
             MainFile.Logger.Info(
-                $"[StartingPersonaNeowReadyFlow] Host can start persona selection | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)} role=Host.");
+                $"[StartingPersonNeowReadyFlow] Host can start persona selection | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)} role=Host.");
             return new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
                 .ThatWontSaveToChoiceHistory();
         }
 
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Non-host ready page shown with host-gated interaction | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)} role={role}.");
+            $"[StartingPersonNeowReadyFlow] Non-host ready page shown with host-gated interaction | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)} role={role}.");
         return new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
             .ThatWontSaveToChoiceHistory();
     }
@@ -186,25 +186,25 @@ internal static class StartingPersonaNeowReadyFlow
             if (netService != null && netService.Type == NetGameType.Client)
             {
                 MainFile.Logger.Info(
-                    $"[StartingPersonaNeowReadyFlow] Ignored non-host ready activation | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
+                    $"[StartingPersonNeowReadyFlow] Ignored non-host ready activation | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)}.");
                 return;
             }
 
             if (netService != null && netService.Type == NetGameType.Host)
             {
                 MainFile.Logger.Info(
-                    $"[StartingPersonaNeowReadyFlow] Host started persona selection from Neow ready page | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
-                StartingPersonaHostLaunchSync.BroadcastLaunch(runState);
+                    $"[StartingPersonNeowReadyFlow] Host started persona selection from Neow ready page | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)}.");
+                StartingPersonHostLaunchSync.BroadcastLaunch(runState);
             }
 
             await HandleReadyLaunchAsync(
-                StartingPersonaRelicSelectionPatch.GetRunKey(runState),
+                StartingPersonRelicSelectionPatch.GetRunKey(runState),
                 netService?.Type == NetGameType.Host ? "host_local_click" : "singleplayer_local_click");
         }
         catch (Exception ex)
         {
             MainFile.Logger.Warn(
-                $"[StartingPersonaNeowReadyFlow] Ready page selection flow failed: {ex}");
+                $"[StartingPersonNeowReadyFlow] Ready page selection flow failed: {ex}");
             RestoreOriginalOptionsOrFinish(neow, "ready_selection_failed");
         }
     }
@@ -219,7 +219,7 @@ internal static class StartingPersonaNeowReadyFlow
             return false;
 
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Intercepted ready option release outside default event flow | runKey={StartingPersonaRelicSelectionPatch.GetRunKey(runState)}.");
+            $"[StartingPersonNeowReadyFlow] Intercepted ready option release outside default event flow | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)}.");
         TaskHelper.RunSafely(OnReadyChosenAsync(neow, runState));
         return true;
     }
@@ -236,9 +236,9 @@ internal static class StartingPersonaNeowReadyFlow
         if (!TryResolveRunState(neow, out var runState) || runState == null)
             return false;
 
-        var runKey = StartingPersonaRelicSelectionPatch.GetRunKey(runState);
+        var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Swallowed ready option at event room entry | runKey={runKey} index={index}.");
+            $"[StartingPersonNeowReadyFlow] Swallowed ready option at event room entry | runKey={runKey} index={index}.");
         return true;
     }
 
@@ -274,7 +274,7 @@ internal static class StartingPersonaNeowReadyFlow
         IReadOnlyList<string>? serializedRelicOptionIds = null)
     {
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Ready launch received | runKey={runKey} source={sourceTag} optionPayloadCount={serializedRelicOptionIds?.Count ?? 0}.");
+            $"[StartingPersonNeowReadyFlow] Ready launch received | runKey={runKey} source={sourceTag} optionPayloadCount={serializedRelicOptionIds?.Count ?? 0}.");
         lock (SyncLock)
         {
             if (SelectionTasksByRun.TryGetValue(runKey, out var existingTask))
@@ -283,7 +283,7 @@ internal static class StartingPersonaNeowReadyFlow
             if (!TryResolveReadyRunState(runKey, out var runState))
             {
                 MainFile.Logger.Warn(
-                    $"[StartingPersonaNeowReadyFlow] Ready launch ignored because no run state was available | runKey={runKey} source={sourceTag}.");
+                    $"[StartingPersonNeowReadyFlow] Ready launch ignored because no run state was available | runKey={runKey} source={sourceTag}.");
                 return Task.CompletedTask;
             }
 
@@ -303,14 +303,14 @@ internal static class StartingPersonaNeowReadyFlow
         try
         {
             var overrideRelicOptions =
-                StartingPersonaRelicSelectionPatch.ResolveRelicOptionsFromSerializedIds(serializedRelicOptionIds, sourceTag);
+                StartingPersonRelicSelectionPatch.ResolveRelicOptionsFromSerializedIds(serializedRelicOptionIds, sourceTag);
             if (serializedRelicOptionIds != null && serializedRelicOptionIds.Count > 0 && overrideRelicOptions.Count == 0)
             {
                 MainFile.Logger.Warn(
-                    $"[StartingPersonaNeowReadyFlow] Host persona option payload resolved to 0 options; falling back to local generation | runKey={runKey} source={sourceTag}.");
+                    $"[StartingPersonNeowReadyFlow] Host persona option payload resolved to 0 options; falling back to local generation | runKey={runKey} source={sourceTag}.");
             }
 
-            var opened = await StartingPersonaRelicSelectionPatch.OpenSelectionOverlayAsync(
+            var opened = await StartingPersonRelicSelectionPatch.OpenSelectionOverlayAsync(
                 runState,
                 $"neow_ready_launch:{sourceTag}",
                 overrideRelicOptions.Count > 0 ? overrideRelicOptions : null);
@@ -318,13 +318,13 @@ internal static class StartingPersonaNeowReadyFlow
             {
                 RebuildInitialOptionsForRun(runKey, "post_selection_rebuild");
                 MainFile.Logger.Info(
-                    $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial page after persona overlay | runKey={runKey} source={sourceTag}.");
+                    $"[StartingPersonNeowReadyFlow] Rebuilt Neow initial page after persona overlay | runKey={runKey} source={sourceTag}.");
             }
             else
             {
                 RestoreOriginalOptionsForRun(runKey, "ready_launch_overlay_not_opened");
                 MainFile.Logger.Info(
-                    $"[StartingPersonaNeowReadyFlow] Restored cached Neow options because persona overlay did not open | runKey={runKey} source={sourceTag}.");
+                    $"[StartingPersonNeowReadyFlow] Restored cached Neow options because persona overlay did not open | runKey={runKey} source={sourceTag}.");
             }
 
             await RefreshRestoredNeowUiAfterOverlayClosedAsync(runState, runKey, "post_overlay_verify");
@@ -367,7 +367,7 @@ internal static class StartingPersonaNeowReadyFlow
         }
 
         var debugRunState = RunManager.Instance?.DebugOnlyGetState() as RunState;
-        if (debugRunState != null && StartingPersonaRelicSelectionPatch.GetRunKey(debugRunState) == runKey)
+        if (debugRunState != null && StartingPersonRelicSelectionPatch.GetRunKey(debugRunState) == runKey)
         {
             runState = debugRunState;
             return true;
@@ -424,7 +424,7 @@ internal static class StartingPersonaNeowReadyFlow
         {
             neow.StartPreFinished();
             MainFile.Logger.Info(
-                $"[StartingPersonaNeowReadyFlow] Ready page restored by finishing Neow immediately because the original option page was empty | runKey={state.RunKey} reason={reason}.");
+                $"[StartingPersonNeowReadyFlow] Ready page restored by finishing Neow immediately because the original option page was empty | runKey={state.RunKey} reason={reason}.");
             return;
         }
 
@@ -433,7 +433,7 @@ internal static class StartingPersonaNeowReadyFlow
 
         SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
+            $"[StartingPersonNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
     }
 
     private static void RebuildInitialOptionsOrFallback(Neow neow, string reason)
@@ -459,18 +459,18 @@ internal static class StartingPersonaNeowReadyFlow
             if (rebuiltOptionCount < cachedOptionCount)
             {
                 MainFile.Logger.Warn(
-                    $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial option page produced fewer options than the cached page; falling back to cached options | runKey={state.RunKey} reason={reason} rebuilt={rebuiltOptionCount} cached={cachedOptionCount}.");
+                    $"[StartingPersonNeowReadyFlow] Rebuilt Neow initial option page produced fewer options than the cached page; falling back to cached options | runKey={state.RunKey} reason={reason} rebuilt={rebuiltOptionCount} cached={cachedOptionCount}.");
                 RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached_after_short_rebuild");
                 return;
             }
 
             MainFile.Logger.Info(
-                $"[StartingPersonaNeowReadyFlow] Rebuilt Neow initial option page from source event state | runKey={state.RunKey} reason={reason} optionCount={rebuiltOptionCount}.");
+                $"[StartingPersonNeowReadyFlow] Rebuilt Neow initial option page from source event state | runKey={state.RunKey} reason={reason} optionCount={rebuiltOptionCount}.");
         }
         catch (Exception ex)
         {
             MainFile.Logger.Warn(
-                $"[StartingPersonaNeowReadyFlow] Failed to rebuild Neow initial option page; falling back to cached options | runKey={state.RunKey} reason={reason}: {ex}");
+                $"[StartingPersonNeowReadyFlow] Failed to rebuild Neow initial option page; falling back to cached options | runKey={state.RunKey} reason={reason}: {ex}");
             RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached");
         }
     }
@@ -485,7 +485,7 @@ internal static class StartingPersonaNeowReadyFlow
         {
             neow.StartPreFinished();
             MainFile.Logger.Info(
-                $"[StartingPersonaNeowReadyFlow] Ready page restored by finishing Neow immediately because the cached option page was empty | runKey={state.RunKey} reason={reason}.");
+                $"[StartingPersonNeowReadyFlow] Ready page restored by finishing Neow immediately because the cached option page was empty | runKey={state.RunKey} reason={reason}.");
             return;
         }
 
@@ -494,7 +494,7 @@ internal static class StartingPersonaNeowReadyFlow
 
         SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Restored cached Neow option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
+            $"[StartingPersonNeowReadyFlow] Restored cached Neow option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
     }
 
     private static async Task RefreshRestoredNeowUiAsync(RunState runState, string runKey, string stage)
@@ -522,7 +522,7 @@ internal static class StartingPersonaNeowReadyFlow
             catch (Exception ex)
             {
                 MainFile.Logger.Warn(
-                    $"[StartingPersonaNeowReadyFlow] Failed to rebuild Neow event room UI | runKey={runKey} stage={stage}: {ex}");
+                    $"[StartingPersonNeowReadyFlow] Failed to rebuild Neow event room UI | runKey={runKey} stage={stage}: {ex}");
             }
         }
 
@@ -538,13 +538,13 @@ internal static class StartingPersonaNeowReadyFlow
     private static async Task RefreshRestoredNeowUiAfterOverlayClosedAsync(RunState runState, string runKey, string stage)
     {
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Neow restore frame barrier begin | runKey={runKey} stage={stage}.");
+            $"[StartingPersonNeowReadyFlow] Neow restore frame barrier begin | runKey={runKey} stage={stage}.");
         await AwaitFramesAsync(2);
         await RefreshRestoredNeowUiAsync(runState, runKey, $"{stage}:post_close_before_refresh");
         await AwaitFramesAsync(1);
         await RefreshRestoredNeowUiAsync(runState, runKey, $"{stage}:post_close_after_refresh");
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Neow restore frame barrier end | runKey={runKey} stage={stage}.");
+            $"[StartingPersonNeowReadyFlow] Neow restore frame barrier end | runKey={runKey} stage={stage}.");
     }
 
     private static EventModel? TryResolveCurrentEventModel(RunState runState)
@@ -647,7 +647,7 @@ internal static class StartingPersonaNeowReadyFlow
     {
         InternalNeowRefreshDepth.Value++;
         MainFile.Logger.Info(
-            $"[StartingPersonaNeowReadyFlow] Entered internal Neow refresh scope | runKey={runKey} stage={stage} depth={InternalNeowRefreshDepth.Value}.");
+            $"[StartingPersonNeowReadyFlow] Entered internal Neow refresh scope | runKey={runKey} stage={stage} depth={InternalNeowRefreshDepth.Value}.");
         return new InternalNeowRefreshScope(runKey, stage);
     }
 
@@ -657,7 +657,7 @@ internal static class StartingPersonaNeowReadyFlow
         {
             InternalNeowRefreshDepth.Value = Math.Max(0, InternalNeowRefreshDepth.Value - 1);
             MainFile.Logger.Info(
-                $"[StartingPersonaNeowReadyFlow] Exited internal Neow refresh scope | runKey={runKey} stage={stage} depth={InternalNeowRefreshDepth.Value}.");
+                $"[StartingPersonNeowReadyFlow] Exited internal Neow refresh scope | runKey={runKey} stage={stage} depth={InternalNeowRefreshDepth.Value}.");
         }
     }
 }
@@ -671,7 +671,7 @@ internal sealed class StartingPersonaNeowReadyInitialStatePatch
         if (__instance is not Neow neow)
             return;
 
-        StartingPersonaNeowReadyFlow.TryReplaceInitialState(neow);
+        StartingPersonNeowReadyFlow.TryReplaceInitialState(neow);
     }
 }
 
@@ -681,7 +681,7 @@ internal static class StartingPersonaNeowReadyOptionReleasePatch
     [HarmonyPrefix]
     public static bool Prefix(NEventOptionButton __instance)
     {
-        return !StartingPersonaNeowReadyFlow.TryInterceptReadyOptionRelease(__instance);
+        return !StartingPersonNeowReadyFlow.TryInterceptReadyOptionRelease(__instance);
     }
 }
 
@@ -691,7 +691,7 @@ internal static class StartingPersonaNeowReadyOptionUiPatch
     [HarmonyPostfix]
     public static void Postfix(NEventOptionButton __instance)
     {
-        StartingPersonaNeowReadyFlow.ApplyLocalReadyOptionUi(__instance);
+        StartingPersonNeowReadyFlow.ApplyLocalReadyOptionUi(__instance);
     }
 }
 
@@ -701,7 +701,7 @@ internal static class StartingPersonaNeowReadyEventRoomGuardPatch
     [HarmonyPrefix]
     public static bool Prefix(NEventRoom __instance, EventOption option, int index)
     {
-        return !StartingPersonaNeowReadyFlow.TrySwallowReadyOptionAtEventRoomEntry(__instance, option, index);
+        return !StartingPersonNeowReadyFlow.TrySwallowReadyOptionAtEventRoomEntry(__instance, option, index);
     }
 }
 
@@ -714,6 +714,6 @@ internal static class StartingPersonaNeowReadyRemoteChoiceRestorePatch
         if (message.type != OptionIndexType.Event)
             return;
 
-        StartingPersonaNeowReadyFlow.TryRestoreCachedNeowOptionsBeforeRemoteChoice(message.optionIndex, senderId);
+        StartingPersonNeowReadyFlow.TryRestoreCachedNeowOptionsBeforeRemoteChoice(message.optionIndex, senderId);
     }
 }

@@ -26,16 +26,16 @@ public static class BannedRelicRegistry
         .ToHashSet();
 
     private static readonly IReadOnlyList<RelicModel> OtherRelics = AllAstralRelics
-        .Where(relic => !PersonaRelicRegistry.IsPersonaRelic(relic))
-        .Where(relic => !PersonaRelicRegistry.IsVariantPersonaRelic(relic))
+        .Where(relic => !PersonRelicRegistry.IsPersonaRelic(relic))
+        .Where(relic => !PersonRelicRegistry.IsVariantPersonaRelic(relic))
         .Where(relic => !IsPersonalityDerivativeRelicInternal(relic))
         .Where(relic => !TokenRelicRegistry.IsTokenRelic(relic))
         .ToList();
 
     private static readonly IReadOnlyList<RelicModel> CanonicalBannableRelics =
     [
-        .. PersonaRelicRegistry.GetCanonicalPersonaRelics(),
-        .. PersonaRelicRegistry.GetCanonicalVariantPersonaRelics(),
+        .. PersonRelicRegistry.GetCanonicalPersonaRelics(),
+        .. PersonRelicRegistry.GetCanonicalVariantPersonaRelics(),
         .. PersonalityDerivativeRelics,
         .. TokenRelicRegistry.GetCanonicalTokenRelics(),
         .. OtherRelics
@@ -59,8 +59,8 @@ public static class BannedRelicRegistry
     {
         return category switch
         {
-            BannedRelicCategory.Persona => PersonaRelicRegistry.GetCanonicalPersonaRelics(),
-            BannedRelicCategory.VariantPersona => PersonaRelicRegistry.GetCanonicalVariantPersonaRelics(),
+            BannedRelicCategory.Persona => PersonRelicRegistry.GetCanonicalPersonaRelics(),
+            BannedRelicCategory.VariantPersona => PersonRelicRegistry.GetCanonicalVariantPersonaRelics(),
             BannedRelicCategory.PersonalityDerivative => PersonalityDerivativeRelics,
             BannedRelicCategory.Token => TokenRelicRegistry.GetCanonicalTokenRelics(),
             BannedRelicCategory.Other => OtherRelics,

@@ -22,7 +22,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonBlueWhale : CooldownPersonaRelicBase
+public class PersonBlueWhale : CooldownPersonRelicBase
 {
     private const int FateWeakImprintKillGold = 3;
     private const int ExactRoundRewardBase = 6;
@@ -97,7 +97,7 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
             return;
 
         Flash();
-        await PersonaMultiplayerEffectHelper.GainGoldDeterministic(FateWeakImprintKillGold, Owner);
+        await PersonMultiplayerEffectHelper.GainGoldDeterministic(FateWeakImprintKillGold, Owner);
     }
 
     protected override async Task BeforeAdvanceCounterAfterCombatEnd(CombatRoom room)
@@ -115,7 +115,7 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
                 ExactRoundRewardBase
                 + (AstralParty_PersonBlueWhaleExactRound6RewardCount - 1) * ExactRoundRewardBonusPerRepeat;
             Flash();
-            await PersonaMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
+            await PersonMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
         }
     }
 
@@ -126,7 +126,7 @@ public class PersonBlueWhale : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFateWeakMprint>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     public override async Task BeforeCombatStart()

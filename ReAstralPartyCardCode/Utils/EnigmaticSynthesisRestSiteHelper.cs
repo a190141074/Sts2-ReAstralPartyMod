@@ -230,7 +230,7 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
                 !owned.IsMelted && GetCanonicalId(owned) == GetCanonicalId(recipe.Result.ResultRelic)))
             return false;
         if (recipe.Result.ResultRelic != null
-            && PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
+            && PersonMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
             return false;
 
         var consumptionPlan = BuildConsumptionPlan(owner, recipe.Costs);
@@ -256,7 +256,7 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
                 !owned.IsMelted && GetCanonicalId(owned) == GetCanonicalId(recipe.Result.ResultRelic)))
             return false;
         if (recipe.Result.ResultRelic != null
-            && PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
+            && PersonMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
             return false;
 
         var consumptionPlan = BuildConsumptionPlan(owner, recipe.Costs);
@@ -287,7 +287,7 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
                    || owner.Relics.All(owned =>
                        owned.IsMelted || GetCanonicalId(owned) != GetCanonicalId(internalRecipe.Result.ResultRelic)))
                && (internalRecipe.Result.ResultRelic == null
-                   || !PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, internalRecipe.Result.ResultRelic));
+                   || !PersonMultiplayerEffectHelper.IsRelicBannedForOwner(owner, internalRecipe.Result.ResultRelic));
     }
 
     public static bool TryGetSourceRecipeIndex(EnigmaticUniqueMaterialKind kind, out int recipeIndex)
@@ -325,7 +325,7 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
                              || owner.Relics.All(owned =>
                                  owned.IsMelted || GetCanonicalId(owned) != GetCanonicalId(recipe.Result.ResultRelic)))
             .Where(recipe => recipe.Result.ResultRelic == null
-                             || !PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
+                             || !PersonMultiplayerEffectHelper.IsRelicBannedForOwner(owner, recipe.Result.ResultRelic))
             .ToList();
     }
 
@@ -448,7 +448,7 @@ private static readonly IReadOnlyList<EnigmaticSynthesisRecipe> Recipes =
         if (GetCanonicalId(resultRelic) == ModelDb.Relic<EnigmaticSynthesisTwistedHeart>().Id)
             await EnigmaticSynthesisTwistedHeart.GrantStacks(owner, 1);
         else
-            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, resultRelic);
+            await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, resultRelic);
     }
 
     private static ModelId GetCanonicalId(RelicModel relic)

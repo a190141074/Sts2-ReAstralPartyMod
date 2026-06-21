@@ -11,7 +11,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillHealingSlime : AstralPartyCardModel
 {
     protected override IEnumerable<DynamicVar> CanonicalVars =>

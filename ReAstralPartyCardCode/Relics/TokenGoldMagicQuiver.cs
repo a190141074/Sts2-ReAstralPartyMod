@@ -128,7 +128,7 @@ public class TokenGoldMagicQuiver : AstralPartyRelicModel
             if (!_shouldCopyTrackedSkillCard)
                 return;
 
-            await PersonaMultiplayerEffectHelper.CopyCardToHandOrRedirectLivingFolioAsync(
+            await PersonMultiplayerEffectHelper.CopyCardToHandOrRedirectLivingFolioAsync(
                 Owner,
                 cardPlay.Card,
                 this,

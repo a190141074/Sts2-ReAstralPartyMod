@@ -18,7 +18,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonSupermanMegas : LegacyCooldownPersonaRelicBase
+public class PersonSupermanMegas : LegacyCooldownPersonRelicBase
 {
     private const int NextTurnDrawThreshold = 5;
 
@@ -109,6 +109,6 @@ public class PersonSupermanMegas : LegacyCooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillSolarBombardment>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

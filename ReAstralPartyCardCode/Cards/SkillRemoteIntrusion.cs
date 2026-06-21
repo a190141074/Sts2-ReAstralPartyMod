@@ -14,7 +14,7 @@ using MegaCrit.Sts2.Core.Models.Cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillRemoteIntrusion : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>

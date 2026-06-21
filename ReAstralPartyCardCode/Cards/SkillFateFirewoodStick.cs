@@ -11,7 +11,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public sealed class SkillFateFirewoodStick : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Retain];
@@ -71,6 +71,6 @@ public sealed class SkillFateFirewoodStick : AstralPartyCardModel
             return;
 
         var createdBranch = ownerCreature.CombatState.CreateCard(selectedBranch.CanonicalInstance ?? selectedBranch, owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(createdBranch, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(createdBranch, true, CardPilePosition.Top, this);
     }
 }

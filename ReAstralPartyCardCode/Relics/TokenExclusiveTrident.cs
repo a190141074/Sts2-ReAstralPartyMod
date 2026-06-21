@@ -32,7 +32,7 @@ public class TokenExclusiveTrident : AstralPartyRelicModel
             return;
         if (cardPlay.Card.Owner != Owner)
             return;
-        if (!PersonaRelicHelper.IsPersonaSkillCard(cardPlay.Card))
+        if (!PersonRelicHelper.IsPersonSkillCard(cardPlay.Card))
             return;
 
         var candidates = Owner.Creature.CombatState.Players

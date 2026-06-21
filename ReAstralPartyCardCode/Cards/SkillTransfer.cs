@@ -15,7 +15,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillTransfer : AstralPartyCardModel
 {
     private const int TransferGoldCost = 5;
@@ -57,7 +57,7 @@ public class SkillTransfer : AstralPartyCardModel
 
         var ownerCreature = Owner!.Creature!;
         var resolvedTarget = target!;
-        await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(TransferGoldCost, Owner, GoldLossType.Spent);
+        await PersonMultiplayerEffectHelper.LoseGoldDeterministic(TransferGoldCost, Owner, GoldLossType.Spent);
         Owner.GetRelic<TokenGoldStarCoinHammer>()?.RefreshDisplayedBonusDamage();
         Owner.GetRelic<PersonalityDerivativeProprietressWealthism>()?.RecordTransferSpend(TransferGoldCost);
         await PowerCmd.Apply(

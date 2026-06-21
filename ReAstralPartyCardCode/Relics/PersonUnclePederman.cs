@@ -24,7 +24,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonUnclePederman : CooldownPersonaRelicBase
+public class PersonUnclePederman : CooldownPersonRelicBase
 {
     private static readonly FieldInfo? DamagePropsField =
         typeof(AttackCommand).GetField("<DamageProps>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic);
@@ -134,7 +134,7 @@ public class PersonUnclePederman : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillReallyAngry>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     private async Task<int> ResolveNodeAmount(int roundNumber)

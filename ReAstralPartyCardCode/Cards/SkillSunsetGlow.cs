@@ -10,7 +10,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public sealed class SkillSunsetGlow : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>

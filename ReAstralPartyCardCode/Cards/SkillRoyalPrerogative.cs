@@ -11,7 +11,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillRoyalPrerogative : AstralPartyCardModel
 {
     private const decimal CardsToDraw = 3m;

@@ -19,7 +19,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonNinja : CooldownPersonaRelicBase
+public class PersonNinja : CooldownPersonRelicBase
 {
     private const int CopyQuotaPerTurn = CopyQuotaPower.MaxTrackedSkillsPerTurn;
 
@@ -56,7 +56,7 @@ public class PersonNinja : CooldownPersonaRelicBase
         AstralParty_PersonNinjaSkillCardsPlayedThisTurn = 0;
         _lastCopyableSkillCard = null;
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeNinjaGarrote>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeNinjaGarrote>(Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -114,7 +114,7 @@ public class PersonNinja : CooldownPersonaRelicBase
             return;
 
         Flash();
-        await PersonaMultiplayerEffectHelper.CopyCardToHandOrRedirectLivingFolioAsync(
+        await PersonMultiplayerEffectHelper.CopyCardToHandOrRedirectLivingFolioAsync(
             Owner,
             _lastCopyableSkillCard,
             this,
@@ -144,6 +144,6 @@ public class PersonNinja : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillNinjutsuCombo>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 [RegisterCard(typeof(EventCardPool))]
-public class BaseAbilityKingsPower : AstralPartyCardModel
+public class BaseAbilityKingsPower : BaseAbilityCardModel
 {
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [

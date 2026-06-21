@@ -18,7 +18,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonSamuraiPrawn : LegacyCooldownPersonaRelicBase
+public class PersonSamuraiPrawn : LegacyCooldownPersonRelicBase
 {
     [SavedProperty]
     public int AstralParty_PersonSamuraiPrawnCounter
@@ -71,7 +71,7 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonaRelicBase
         await base.AfterObtained();
         AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntent>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntent>(Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -135,7 +135,7 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBlade>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private async Task EnsureSwordIntentRelic()
@@ -143,7 +143,7 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonaRelicBase
         if (Owner == null || Owner.GetRelic<PersonalityDerivativeSwordIntent>() != null)
             return;
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntent>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntent>(Owner);
     }
 
     private async Task EnsureHandCostCapPower()

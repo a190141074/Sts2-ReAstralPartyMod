@@ -389,7 +389,7 @@ internal static class LucidDreamMaliceRuntimeHelper
         if (suppressedHeal <= 0m)
             return;
 
-        await PersonaMultiplayerEffectHelper.GainGoldDeterministic(suppressedHeal * 3m, player);
+        await PersonMultiplayerEffectHelper.GainGoldDeterministic(suppressedHeal * 3m, player);
     }
 
     public static int GetWildnessBonusPercent(IRunState? runState)

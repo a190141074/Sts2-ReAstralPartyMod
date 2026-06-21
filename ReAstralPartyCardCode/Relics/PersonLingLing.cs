@@ -18,7 +18,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public sealed class PersonLingLing : PersonaRelicBase
+public sealed class PersonLingLing : PersonRelicBase
 {
     [SavedProperty] public bool AstralParty_PersonLingLingPendingNextCombatEffect { get; set; }
 
@@ -46,7 +46,7 @@ public sealed class PersonLingLing : PersonaRelicBase
         Flash();
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillReinforcedDenial>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
         await AstralTemporaryDexterityPower.Apply(Owner.Creature, 2m, this, Owner.Creature, null);
     }
 

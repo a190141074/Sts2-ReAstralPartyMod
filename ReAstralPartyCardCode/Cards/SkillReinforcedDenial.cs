@@ -13,7 +13,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public sealed class SkillReinforcedDenial : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>

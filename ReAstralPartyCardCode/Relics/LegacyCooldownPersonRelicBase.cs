@@ -1,6 +1,6 @@
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-public abstract class LegacyCooldownPersonaRelicBase : CooldownPersonaRelicBase
+public abstract class LegacyCooldownPersonRelicBase : CooldownPersonRelicBase
 {
     private int _legacyCounter = 1;
     private bool _legacyPendingCombatStartCard;

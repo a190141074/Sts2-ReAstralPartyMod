@@ -19,7 +19,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonZhao : CooldownPersonaRelicBase
+public class PersonZhao : CooldownPersonRelicBase
 {
     private const int FoxfireCostThreshold = 2;
 
@@ -117,7 +117,7 @@ public class PersonZhao : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillInvokeSpirits>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     private bool IsCurrentInvokeTarget(Player? player)

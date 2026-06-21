@@ -11,8 +11,8 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool), StableEntryStem = "death_rewind")]
-public sealed class DeathRewind : AstralPartyCardModel
+[RegisterCard(typeof(PersonSkillCardPool), StableEntryStem = "death_rewind")]
+public sealed class DeathRewind : PersonSkillCardModel
 {
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [

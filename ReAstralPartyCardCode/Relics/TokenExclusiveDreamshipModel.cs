@@ -77,7 +77,7 @@ public class TokenExclusiveDreamshipModel : AstralPartyRelicModel
             return Task.CompletedTask;
 
         Flash();
-        PersonaRelicHelper.AdvanceCooldownRelics(Owner, triggerCount);
+        PersonRelicHelper.AdvanceCooldownRelics(Owner, triggerCount);
         return Task.CompletedTask;
     }
 }

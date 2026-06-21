@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public sealed class SkillFateFirewoodStickRen : AstralPartyCardModel
 {
     protected override bool ShouldAutoApplyCooldownEnchantment => false;

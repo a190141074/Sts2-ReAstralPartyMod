@@ -52,7 +52,7 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         MainFile.Logger.Info(
             $"AstralRelicStore OpenStorefront begin | owner={owner.NetId} | gold_before={owner.Gold}");
 
-        await PersonaMultiplayerEffectHelper.GainGoldDeterministic(1m, owner);
+        await PersonMultiplayerEffectHelper.GainGoldDeterministic(1m, owner);
 
         MainFile.Logger.Info(
             $"AstralRelicStore OpenStorefront success | owner={owner.NetId} | gold_after={owner.Gold}");
@@ -119,7 +119,7 @@ public sealed class AstralRelicStore : AstralPartyEventModel
             return;
         }
 
-        await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, owner, GoldLossType.Spent);
+        await PersonMultiplayerEffectHelper.LoseGoldDeterministic(goldCost, owner, GoldLossType.Spent);
         await GrantStorePurchase(owner, ModelDb.Relic<TRelic>());
         MainFile.Logger.Info(
             $"AstralRelicStore CompletePurchase success | owner={owner.NetId} | relic={typeof(TRelic).Name} | gold_after={owner.Gold}");
@@ -129,7 +129,7 @@ public sealed class AstralRelicStore : AstralPartyEventModel
     private static async Task GrantStorePurchase(Player owner, RelicModel relic)
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
-        if (PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, canonicalRelic))
+        if (PersonMultiplayerEffectHelper.IsRelicBannedForOwner(owner, canonicalRelic))
         {
             MainFile.Logger.Warn(
                 $"AstralRelicStore skipped banned store relic '{canonicalRelic.Id.Entry}' for player {owner.NetId}.");
@@ -141,7 +141,7 @@ public sealed class AstralRelicStore : AstralPartyEventModel
             if (owner.GetRelic<TokenGoldInitialPoint>() != null)
                 await ObtainDuplicateInitialPointFallbackAsReward(owner);
             else
-                await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, canonicalRelic);
+                await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, canonicalRelic);
 
             return;
         }
@@ -154,7 +154,7 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         var eternalStarlight = owner.GetRelic<TokenEternalStarlight>();
         if (eternalStarlight == null)
             eternalStarlight =
-                await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner,
+                await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner,
                         ModelDb.Relic<TokenEternalStarlight>())
                     as TokenEternalStarlight
                 ?? owner.GetRelic<TokenEternalStarlight>();

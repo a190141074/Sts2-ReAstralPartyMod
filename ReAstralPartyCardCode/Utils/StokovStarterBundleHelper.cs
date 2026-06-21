@@ -117,7 +117,7 @@ internal static class StokovStarterBundleHelper
             var starterRelicId = (starterRelic.CanonicalInstance?.Id ?? starterRelic.Id).ToString();
             trackedStarterRelicIds.Add(starterRelicId);
             if (owner.Relics.All(relic => (relic.CanonicalInstance?.Id ?? relic.Id) != (starterRelic.CanonicalInstance?.Id ?? starterRelic.Id)))
-                await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, starterRelic);
+                await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, starterRelic);
 
             var canonicalCard = ModelDb.GetById<CardModel>(ModelDb.GetId(bundle.UpgradeableStarterCardType));
             var mutableCard = canonicalCard.ToMutable();

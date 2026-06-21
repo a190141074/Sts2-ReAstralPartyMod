@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -14,7 +14,7 @@ using MegaCrit.Sts2.Core.Unlocks;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
 [HarmonyPatch(typeof(NRelicCollectionCategory), "LoadRelics")]
-public static class PersonaRelicCollectionPatch
+public static class PersonRelicCollectionPatch
 {
     private const string PersonaChestIconPath = "res://ReAstralPartyMod/images/potion/person_chest_choose.png";
     private const string VariantPersonaIconPath = "res://ReAstralPartyMod/images/ui/variant_persona_relic_pool.png";
@@ -91,10 +91,10 @@ public static class PersonaRelicCollectionPatch
         HashSet<RelicModel> seenRelics,
         HashSet<RelicModel> allUnlockedRelics)
     {
-        if (collection.Relics.Any(PersonaRelicRegistry.IsPersonaRelic))
+        if (collection.Relics.Any(PersonRelicRegistry.IsPersonaRelic))
             return;
 
-        var personaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics();
+        var personaRelics = PersonRelicRegistry.GetCanonicalPersonaRelics();
         if (personaRelics.Count == 0)
             return;
 
@@ -125,10 +125,10 @@ public static class PersonaRelicCollectionPatch
         HashSet<RelicModel> seenRelics,
         HashSet<RelicModel> allUnlockedRelics)
     {
-        if (collection.Relics.Any(PersonaRelicRegistry.IsVariantPersonaRelic))
+        if (collection.Relics.Any(PersonRelicRegistry.IsVariantPersonaRelic))
             return;
 
-        var variantPersonaRelics = PersonaRelicRegistry.GetCanonicalVariantPersonaRelics();
+        var variantPersonaRelics = PersonRelicRegistry.GetCanonicalVariantPersonaRelics();
         if (variantPersonaRelics.Count == 0)
             return;
 

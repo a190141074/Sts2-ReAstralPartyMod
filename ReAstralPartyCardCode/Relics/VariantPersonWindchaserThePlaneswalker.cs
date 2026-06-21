@@ -15,7 +15,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonWindchaserThePlaneswalker : PersonaRelicBase
+public class VariantPersonWindchaserThePlaneswalker : PersonRelicBase
 {
     private const int CardsPerTrigger = 10;
 
@@ -56,7 +56,7 @@ public class VariantPersonWindchaserThePlaneswalker : PersonaRelicBase
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillGrantSpark>(), Owner);
         CardCmd.Upgrade(card);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -98,7 +98,7 @@ public class VariantPersonWindchaserThePlaneswalker : PersonaRelicBase
         }
 
         AstralParty_VariantPersonWindchaserPendingNextTurnRewards = 0;
-        await PersonaMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, pendingRewards, Owner, this);
+        await PersonMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, pendingRewards, Owner, this);
         await PlayerCmd.GainEnergy(pendingRewards, Owner);
         RefreshCooldownDisplay();
     }

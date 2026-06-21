@@ -21,7 +21,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonVampire : CooldownPersonaRelicBase
+public class PersonVampire : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_PersonVampireCounter { get; set; } = 1;
 
@@ -90,6 +90,6 @@ public class PersonVampire : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillVampireBite>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

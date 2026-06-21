@@ -16,7 +16,7 @@ using MegaCrit.Sts2.Core.Models.Powers;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillUnstoppable : AstralPartyCardModel
 {
     private const decimal DrawAmount = 12m;
@@ -59,7 +59,7 @@ public class SkillUnstoppable : AstralPartyCardModel
 
         var mudTruck = MidnightFlashHelper.CreateMudTruckCard(Owner);
         if (mudTruck != null)
-            await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
+            await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
                 mudTruck,
                 true,
                 CardPilePosition.Top,
@@ -102,7 +102,7 @@ public class SkillUnstoppable : AstralPartyCardModel
             if (mudTruck == null)
                 break;
 
-            await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
+            await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
                 mudTruck,
                 true,
                 CardPilePosition.Top,

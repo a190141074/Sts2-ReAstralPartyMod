@@ -19,7 +19,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonDorothyHaze : CooldownPersonaRelicBase
+public class PersonDorothyHaze : CooldownPersonRelicBase
 {
     public const int MaxWarmStacks = 5;
     private const int DorothyBaseMaxCounter = 3;
@@ -94,7 +94,7 @@ public class PersonDorothyHaze : CooldownPersonaRelicBase
             await CreatureCmd.Heal(targetCreature, TurnStartHealAmount, true);
 
         if (player != Owner && player.Gold >= StolenGoldAmount)
-            await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(StolenGoldAmount, player, GoldLossType.Spent);
+            await PersonMultiplayerEffectHelper.LoseGoldDeterministic(StolenGoldAmount, player, GoldLossType.Spent);
 
         await PowerCmd.Apply<StarLightPower>(Owner.Creature, StolenStarLightAmount, Owner.Creature, null, false);
     }
@@ -106,7 +106,7 @@ public class PersonDorothyHaze : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTrueMe>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     internal static async Task TryGainWarmFromHeal(Player player, decimal amount)

@@ -6,9 +6,9 @@ using STS2RitsuLib.Scaffolding.Content;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.CardPools;
 
 [RegisterSharedCardPool]
-public sealed class PersonaSkillCardPool : TypeListCardPoolModel
+public sealed class PersonSkillCardPool : TypeListCardPoolModel
 {
-    public override string Title => "persona_skill_pool";
+    public override string Title => "person_skill_pool";
     public override string EnergyColorName => "colorless";
     public override Color DeckEntryCardColor => new("FFFFFF");
     public override bool IsColorless => true;

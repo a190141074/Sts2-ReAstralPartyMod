@@ -43,7 +43,7 @@ public static class FateGuidanceCompatibilityHelper
         }
 
         var card = CreateFateGuidanceCard(combatState, recipient, sourceBlueWhale.Owner!.NetId);
-        await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
+        await PersonMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
             card,
             CardPilePosition.Top,
             sourceBlueWhale);

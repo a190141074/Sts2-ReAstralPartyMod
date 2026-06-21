@@ -19,7 +19,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonDeityLin : CooldownPersonaRelicBase
+public class PersonDeityLin : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_PersonDeityLinCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonDeityLinPendingCombatStartCard { get; set; }
@@ -63,7 +63,7 @@ public class PersonDeityLin : CooldownPersonaRelicBase
         await EnsureLivingFolioRelic();
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillLivingFolio>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -77,7 +77,7 @@ public class PersonDeityLin : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillLivingFolio>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     protected override Task BeforeCooldownCardCheck(PlayerChoiceContext choiceContext, Player player)
@@ -144,7 +144,7 @@ public class PersonDeityLin : CooldownPersonaRelicBase
 
     private async Task EnsureLivingFolioRelic()
     {
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeLivingFolio>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeLivingFolio>(Owner);
     }
 
     private bool HasLivingFolioInPrimaryPiles()

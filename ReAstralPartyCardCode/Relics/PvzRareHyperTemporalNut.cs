@@ -107,7 +107,7 @@ public class PvzRareHyperTemporalNut : AstralPartyRelicModel
         AstralParty_PvzRareHyperTemporalNutFusionProcessed = true;
         MainFile.Logger.Info($"[PvzRareHyperTemporalNut] Fusing into ultimate nut | owner={Owner.NetId}");
         await PvzNutRelicHelper.MeltRelicsAsync(fusionRelics);
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, ModelDb.Relic<PvzUltimateHyperSpacetimeNut>());
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, ModelDb.Relic<PvzUltimateHyperSpacetimeNut>());
     }
 
     private decimal ResolveRestoredHp(Creature creature)

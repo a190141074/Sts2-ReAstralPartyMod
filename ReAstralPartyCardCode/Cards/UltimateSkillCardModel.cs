@@ -9,7 +9,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-public abstract class UltimateSkillCardModel : AstralPartyCardModel
+public abstract class UltimateSkillCardModel : PersonSkillCardModel
 {
     private const string ChargeVarName = "UltimateCharge";
     private static readonly System.Reflection.MethodInfo? InvokeDisplayAmountChangedMethod = typeof(CardModel)

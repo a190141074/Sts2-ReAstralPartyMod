@@ -105,7 +105,7 @@ internal static class GameplayStaticPatchCatalog
                 "persona_relic_collection_patch",
                 typeof(NRelicCollectionCategory),
                 "LoadRelics",
-                typeof(PersonaRelicCollectionPatch),
+                typeof(PersonRelicCollectionPatch),
                 false,
                 "UI patch: inject persona relic subsection into the compendium"),
             new ModPatchInfo(
@@ -325,7 +325,7 @@ internal static class GameplayStaticPatchCatalog
                 "persona_max_hand_size_guard_patch",
                 typeof(MaxHandSizeCalculator),
                 nameof(MaxHandSizeCalculator.ApplyHookListenerModifiers),
-                typeof(PersonaMaxHandSizeGuardPatch),
+                typeof(PersonMaxHandSizeGuardPatch),
                 false,
                 "Gameplay patch: guard persona relic max-hand-size modifiers when hook-listener enumeration misses them",
                 [typeof(Player), typeof(int)]),
@@ -355,7 +355,7 @@ internal static class GameplayStaticPatchCatalog
                 [typeof(SerializableRun), typeof(bool), typeof(bool), typeof(MegaCrit.Sts2.Core.Platform.PlatformType)])
         ]);
 
-        patcher.RegisterPatch<PersonaSkillNaturalObtainFilterPatch>();
+        patcher.RegisterPatch<PersonSkillNaturalObtainFilterPatch>();
         patcher.RegisterPatch<CollectorsCardRewardFilterPatch>();
         patcher.RegisterPatch<CreatureHealBaiZeBlessingPatch>();
         patcher.RegisterPatch<CreatureHealMoonPropCorpsebloomPatch>();
@@ -402,7 +402,7 @@ internal static class GameplayStaticPatchCatalog
 
     private static void RegisterFragileGameplayPatches(ModPatcher patcher)
     {
-        patcher.RegisterPatch<StartingPersonaRelicSelectionPatch>();
+        patcher.RegisterPatch<StartingPersonRelicSelectionPatch>();
         patcher.RegisterPatches(
         [
             new ModPatchInfo(

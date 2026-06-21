@@ -23,18 +23,18 @@ internal static class AstralDivinePersonaHelper
     private const decimal DivinePowerAmount = 1m;
     public static IReadOnlyList<Player> GetStablePlayers(Player owner)
     {
-        return PersonaMultiplayerEffectHelper.GetStableCombatPlayers(owner);
+        return PersonMultiplayerEffectHelper.GetStableCombatPlayers(owner);
     }
 
     public static async Task<PersonalityDerivativeDivineThrone?> EnsureDivineThrone(Player? owner)
     {
-        return await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeDivineThrone>(owner)
+        return await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeDivineThrone>(owner)
                as PersonalityDerivativeDivineThrone;
     }
 
     public static async Task<PersonalityDerivativeBookOfHeaven?> EnsureBookOfHeaven(Player? owner)
     {
-        return await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeBookOfHeaven>(owner)
+        return await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeBookOfHeaven>(owner)
                as PersonalityDerivativeBookOfHeaven;
     }
 

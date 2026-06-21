@@ -46,7 +46,7 @@ public class EventAnomalyTransferRequest : AstralPartyCardModel
             if (player.Gold < GoldLossPerOtherPlayer)
                 continue;
 
-            await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(GoldLossPerOtherPlayer, player,
+            await PersonMultiplayerEffectHelper.LoseGoldDeterministic(GoldLossPerOtherPlayer, player,
                 GoldLossType.Spent);
         }
 

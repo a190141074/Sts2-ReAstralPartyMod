@@ -18,7 +18,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonYanxin : CooldownPersonaRelicBase
+public class VariantPersonYanxin : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_VariantPersonYanxinCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_VariantPersonYanxinPendingCombatStartCard { get; set; }
@@ -100,6 +100,6 @@ public class VariantPersonYanxin : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillDivinePunishment>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

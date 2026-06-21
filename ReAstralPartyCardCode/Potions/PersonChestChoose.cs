@@ -50,7 +50,7 @@ public class PersonChestChoose : AstralPartyPotionModel
             return;
 
         // Build a stable snapshot before reserving the synced relic choice id.
-        var relicOptions = PersonaMultiplayerEffectHelper.CreateDeterministicRelicChoiceOptions(
+        var relicOptions = PersonMultiplayerEffectHelper.CreateDeterministicRelicChoiceOptions(
                 availableRelics,
                 RevealCount,
                 MainFile.ModId,
@@ -72,17 +72,17 @@ public class PersonChestChoose : AstralPartyPotionModel
         if (selectedRelic == null)
             return;
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, selectedRelic);
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, selectedRelic);
     }
 
     private static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(MegaCrit.Sts2.Core.Entities.Players.Player owner)
     {
         var bannedPersonaRelicIds = ReAstralPartyModSettingsManager.GetBannedPersonaRelicIds(owner.RunState);
-        var available = PersonaRelicRegistry.GetAvailablePersonaRelics(owner, bannedPersonaRelicIds);
+        var available = PersonRelicRegistry.GetAvailablePersonaRelics(owner, bannedPersonaRelicIds);
         if (available.Count > 0)
             return available;
 
         MainFile.Logger.Warn("ban list filtered all persona options; falling back to the full persona pool.");
-        return PersonaRelicRegistry.GetAvailablePersonaRelics(owner);
+        return PersonRelicRegistry.GetAvailablePersonaRelics(owner);
     }
 }

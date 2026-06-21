@@ -58,7 +58,7 @@ public class PersonalityDerivativeProprietressWealthism : AstralPartyRelicModel
             var goldToGain = AstralParty_PersonalityDerivativeProprietressWealthismCounter;
             RecordIncome(goldToGain);
             Flash();
-            await PersonaMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
+            await PersonMultiplayerEffectHelper.GainGoldDeterministic(goldToGain, Owner);
         }
 
         // This relic pays out on the 1st, 3rd, 5th... room entries after it is obtained.

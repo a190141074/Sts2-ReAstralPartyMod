@@ -14,7 +14,7 @@ public enum AstralGameplaySettingKey
     StartingInitialPoint = 0,
     StartingAstralRelicStore = 1,
     StartingPersonaSelection = 2,
-    StartingPersonaMode = 3,
+    StartingPersonMode = 3,
     TokenSeriesMode = 4,
     AllPersonas = 5,
     ExtremeMode = 6,
@@ -89,7 +89,7 @@ public static class AstralContentModeRegistry
             AstralModeAvailability.Editable,
             AstralModeAvailability.Editable),
         new(
-            AstralGameplaySettingKey.StartingPersonaMode,
+            AstralGameplaySettingKey.StartingPersonMode,
             "starting_persona_mode",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.label",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.description",

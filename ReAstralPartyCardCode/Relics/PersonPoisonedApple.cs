@@ -21,7 +21,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonPoisonedApple : CooldownPersonaRelicBase
+public class PersonPoisonedApple : CooldownPersonRelicBase
 {
     private const decimal MarkedAttackBonusDamage = 3m;
 
@@ -118,6 +118,6 @@ public class PersonPoisonedApple : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillConcealingOperation>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

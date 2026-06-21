@@ -44,9 +44,9 @@ public class MainFile
         SavedPropertyCacheBootstrap.ScheduleVerification(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
         var contentRegistry = RitsuLibFramework.GetContentRegistry(ModId);
-        contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<PersonaSkillCardPool>(
-            "persona_skill_pool",
-            "res://ReAstralPartyMod/images/ui/persona_skill_pool.png");
+        contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<PersonSkillCardPool>(
+            "person_skill_pool",
+            "res://ReAstralPartyMod/images/ui/person_skill_pool.png");
         contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<AstralEventCardPool>(
             "astral_event_card_pool",
             "res://ReAstralPartyMod/images/ui/astral_event_card_pool.png");

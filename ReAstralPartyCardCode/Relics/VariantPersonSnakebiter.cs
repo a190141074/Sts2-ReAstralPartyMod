@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonSnakebiter : PersonaRelicBase
+public class VariantPersonSnakebiter : PersonRelicBase
 {
     protected override string RelicId => "variant_person_snakebiter";
 

@@ -21,7 +21,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public sealed class VariantPersonElena : PersonaRelicBase
+public sealed class VariantPersonElena : PersonRelicBase
 {
     private const int EnergyGainInterval = 5;
     private const int CombatCycleResetThreshold = 3;
@@ -130,7 +130,7 @@ public sealed class VariantPersonElena : PersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillSunsetGlow>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     public override async Task AfterCombatEnd(CombatRoom room)
@@ -151,7 +151,7 @@ public sealed class VariantPersonElena : PersonaRelicBase
         {
             Flash();
             var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillSunsetGlow>(), Owner);
-            await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+            await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
         }
 
         if (!AstralParty_VariantPersonElenaPendingResetAtNextOwnerTurnStart)

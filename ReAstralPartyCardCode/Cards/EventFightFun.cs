@@ -37,7 +37,7 @@ public class EventFightFun : AstralPartyCardModel
             CardCmd.Upgrade(card);
             card.AddKeyword(CardKeyword.Exhaust);
             card.AddKeyword(CardKeyword.Ethereal);
-            await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
+            await PersonMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
                 card,
                 CardPilePosition.Top,
                 this);

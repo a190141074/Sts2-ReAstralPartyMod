@@ -373,7 +373,7 @@ public static class ConcealingInvestigationHelper
     {
         await CardGainAttribution.RunWithSource(source, async () =>
         {
-            await PersonaMultiplayerEffectHelper.MoveCombatCardToHandAndNotify(
+            await PersonMultiplayerEffectHelper.MoveCombatCardToHandAndNotify(
                 recipient,
                 card,
                 CardPilePosition.Bottom,

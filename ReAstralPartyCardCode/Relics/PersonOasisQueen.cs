@@ -22,7 +22,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonOasisQueen : LegacyCooldownPersonaRelicBase
+public class PersonOasisQueen : LegacyCooldownPersonRelicBase
 {
     private const int MaxTemporaryDamageBonus = 3;
 
@@ -83,6 +83,6 @@ public class PersonOasisQueen : LegacyCooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillRoyalPrerogative>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

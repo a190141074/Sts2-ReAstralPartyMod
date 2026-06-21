@@ -127,7 +127,7 @@ public class PersonalityDerivativeXiaoLeiDragonGate : AstralPartyRelicModel
             return;
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillDragonsRoar>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private HoverTip BuildProgressHoverTip()

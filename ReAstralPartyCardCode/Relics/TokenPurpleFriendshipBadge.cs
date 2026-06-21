@@ -58,7 +58,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
 
     private bool ShouldTrigger(PowerModel canonicalPower, Creature target, decimal amount, Creature? applier)
     {
-        if (PersonaMultiplayerEffectHelper.IsResolvingDerivedSupportPower)
+        if (PersonMultiplayerEffectHelper.IsResolvingDerivedSupportPower)
             return false;
         if (Owner?.Creature == null || Owner.Creature.CombatState == null)
             return false;

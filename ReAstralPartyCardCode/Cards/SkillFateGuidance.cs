@@ -12,7 +12,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillFateGuidance : AstralPartyCardModel
 {
     [SavedProperty] public string AstralParty_FateGuidanceSourceBlueWhalePlayerNetIdRaw { get; set; } = string.Empty;
@@ -48,7 +48,7 @@ public class SkillFateGuidance : AstralPartyCardModel
         if (Owner == null)
             return;
 
-        PersonaRelicHelper.AdvanceCooldownRelics(Owner, 1);
+        PersonRelicHelper.AdvanceCooldownRelics(Owner, 1);
 
         await PlayerCmd.GainEnergy(1m, Owner);
     }

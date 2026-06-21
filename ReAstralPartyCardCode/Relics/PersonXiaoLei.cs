@@ -19,7 +19,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonXiaoLei : LegacyCooldownPersonaRelicBase
+public class PersonXiaoLei : LegacyCooldownPersonRelicBase
 {
     [SavedProperty]
     public int AstralParty_PersonXiaoLeiCounter
@@ -61,7 +61,7 @@ public class PersonXiaoLei : LegacyCooldownPersonaRelicBase
     {
         await base.AfterObtained();
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeXiaoLeiDragonGate>(
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeXiaoLeiDragonGate>(
             Owner);
     }
 
@@ -83,6 +83,6 @@ public class PersonXiaoLei : LegacyCooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillChainReaction>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

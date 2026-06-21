@@ -18,7 +18,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonBionicJasmine : PersonaRelicBase
+public class PersonBionicJasmine : PersonRelicBase
 {
     [SavedProperty] public int AstralParty_PersonBionicJasmineSteps { get; set; }
 

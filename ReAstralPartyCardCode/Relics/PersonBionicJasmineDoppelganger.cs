@@ -21,7 +21,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public sealed class PersonBionicJasmineDoppelganger : CooldownPersonaRelicBase
+public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase
 {
     private const int BaseStepThreshold = 13;
     private const int AutoProcessTurnLimit = 16;
@@ -123,7 +123,7 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillEnergyOverload>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     public static Task ApplyProcessAsync(

@@ -48,7 +48,7 @@ public abstract class RandomTokenPackRelicBase : AstralPartyRelicModel
         if (selectionResult.SelectedRelic == null)
             return;
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, selectionResult.SelectedRelic);
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, selectionResult.SelectedRelic);
     }
 
     private List<RelicModel> BuildRewardOptions(Player owner)

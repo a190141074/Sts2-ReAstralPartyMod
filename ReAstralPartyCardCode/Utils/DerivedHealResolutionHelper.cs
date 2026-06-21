@@ -137,7 +137,7 @@ internal static class DerivedHealResolutionHelper
                         $"[{MainFile.ModId}] [DerivedHealResolution] Flushing derived heal queue | reason={reason} | pass={pass} | halfLifeTargets={halfLifeEntries.Length} | warmTargets={warmEntries.Length}");
                 }
 
-                await PersonaMultiplayerEffectHelper.RunAsDerivedSupportPower(async () =>
+                await PersonMultiplayerEffectHelper.RunAsDerivedSupportPower(async () =>
                 {
                     foreach (var (target, pending) in halfLifeEntries)
                     {

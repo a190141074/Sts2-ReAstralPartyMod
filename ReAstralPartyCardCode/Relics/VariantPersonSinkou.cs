@@ -17,7 +17,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonSinkou : CooldownPersonaRelicBase
+public class VariantPersonSinkou : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_VariantPersonSinkouCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_VariantPersonSinkouPendingCombatStartCard { get; set; }
@@ -82,6 +82,6 @@ public class VariantPersonSinkou : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillPunitiveJudgment>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

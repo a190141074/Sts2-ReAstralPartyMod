@@ -150,7 +150,7 @@ public class PvzSimpleNut : AstralPartyRelicModel
                TryDequeuePendingRewardRelic(out var pendingReward) &&
                pendingReward != null)
         {
-            if (PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(Owner, pendingReward))
+            if (PersonMultiplayerEffectHelper.IsRelicBannedForOwner(Owner, pendingReward))
             {
                 break;
             }

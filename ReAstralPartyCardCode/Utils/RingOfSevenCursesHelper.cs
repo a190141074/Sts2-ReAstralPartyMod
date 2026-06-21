@@ -36,10 +36,10 @@ internal static class RingOfSevenCursesHelper
             return;
 
         var canonicalRelic = ModelDb.Relic<TMissing>().CanonicalInstance ?? ModelDb.Relic<TMissing>();
-        if (PersonaMultiplayerEffectHelper.IsRelicBannedForOwner(owner, canonicalRelic))
+        if (PersonMultiplayerEffectHelper.IsRelicBannedForOwner(owner, canonicalRelic))
             return;
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, canonicalRelic);
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, canonicalRelic);
     }
 
     public static async Task EnsureSeriesIntegrityAsync(Player? owner)

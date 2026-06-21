@@ -5,7 +5,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class ExtraBatteryRelicHelper
 {
-    public static int GetAdjustedCooldownMaxCounter(Player? owner, int baseMaxCounter, PersonaRelicBase? sourceRelic = null)
+    public static int GetAdjustedCooldownMaxCounter(Player? owner, int baseMaxCounter, PersonRelicBase? sourceRelic = null)
     {
         var adjustedCounter = baseMaxCounter;
 

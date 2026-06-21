@@ -19,7 +19,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonCyberKitty : CooldownPersonaRelicBase
+public class PersonCyberKitty : CooldownPersonRelicBase
 {
     private const int PassiveTemporaryStatAmount = 1;
     private const int NodeThreshold = 3;
@@ -147,6 +147,6 @@ public class PersonCyberKitty : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillRemoteIntrusion>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

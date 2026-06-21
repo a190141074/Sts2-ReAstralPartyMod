@@ -21,7 +21,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public sealed class VariantPersonManosabaLinHiro : PersonaRelicBase
+public sealed class VariantPersonManosabaLinHiro : PersonRelicBase
 {
     private const int RewardBandSize = 100;
     private const int TransferAmount = 40;
@@ -183,7 +183,7 @@ public sealed class VariantPersonManosabaLinHiro : PersonaRelicBase
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFateFirewoodStick>(), Owner);
         if (source is CardModel sourceCard && FateFirewoodStickCombatHelper.IsFirewoodCard(sourceCard))
             SinkouSetHelper.AddReplayViaReflection(card, 1);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, source);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, source);
         Flash();
     }
 }

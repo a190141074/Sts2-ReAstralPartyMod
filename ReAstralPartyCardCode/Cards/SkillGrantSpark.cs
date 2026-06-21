@@ -10,7 +10,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillGrantSpark : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -64,6 +64,6 @@ public class SkillGrantSpark : AstralPartyCardModel
 
         var cardToAdd = Owner.Creature.CombatState.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, Owner);
         CardCmd.Upgrade(cardToAdd);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(cardToAdd, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(cardToAdd, true, CardPilePosition.Top, this);
     }
 }

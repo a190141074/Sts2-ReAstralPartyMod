@@ -7,16 +7,14 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
-public static class PersonaSkillCardFilter
+public static class PersonSkillCardFilter
 {
-    public static bool IsPersonaSkill(CardModel? card)
+    public static bool IsPersonSkill(CardModel? card)
     {
         if (card == null)
             return false;
 
-        var type = card.GetType();
-        return string.Equals(type.Namespace, "ReAstralPartyMod.ReAstralPartyCardCode.Cards", StringComparison.Ordinal)
-               && type.Name.StartsWith("Skill", StringComparison.Ordinal);
+        return AstralCardTags.HasPersonSkillTag(card);
     }
 
     public static bool AllowNaturalObtain(CardModel? card)
@@ -31,7 +29,7 @@ public static class PersonaSkillCardFilter
 
     public static bool AllowNaturalObtain(CardModel? card, IRunState? runState)
     {
-        if (IsPersonaSkill(card))
+        if (IsPersonSkill(card))
             return false;
 
         if (IsCollectorsCard(card) && !ReAstralPartyModSettingsManager.GetEnableCollectorsCards(runState))

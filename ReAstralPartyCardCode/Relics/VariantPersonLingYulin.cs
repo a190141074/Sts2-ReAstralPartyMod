@@ -18,7 +18,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool), StableEntryStem = "variant_person_ling_yulin")]
-public class VariantPersonLingYulin : CooldownPersonaRelicBase
+public class VariantPersonLingYulin : CooldownPersonRelicBase
 {
     private const decimal MaxHpBonus = 10m;
     private const decimal WaterWrapTriggerThreshold = 8m;
@@ -84,6 +84,6 @@ public class VariantPersonLingYulin : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillSummonRain>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

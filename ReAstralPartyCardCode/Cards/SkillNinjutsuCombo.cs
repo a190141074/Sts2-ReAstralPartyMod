@@ -13,7 +13,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillNinjutsuCombo : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
@@ -58,7 +58,7 @@ public class SkillNinjutsuCombo : AstralPartyCardModel
         var createdCard = Owner.Creature.CombatState.CreateCard(
             baseAbilityCard.CanonicalInstance ?? baseAbilityCard,
             Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(
             createdCard,
             true,
             CardPilePosition.Top,

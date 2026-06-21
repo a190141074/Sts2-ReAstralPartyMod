@@ -18,7 +18,7 @@ using MegaCrit.Sts2.Core.Models.Events;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillPowerfulPity : AstralPartyCardModel
 {
     private const int MaxSelectedCards = 3;
@@ -69,7 +69,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
             if (!copiedCard.Keywords.Contains(CardKeyword.Ethereal))
                 CardCmd.ApplyKeyword(copiedCard, CardKeyword.Ethereal);
 
-            await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
+            await PersonMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
                 copiedCard,
                 CardPilePosition.Top,
                 this);

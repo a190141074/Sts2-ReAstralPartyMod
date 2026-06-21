@@ -19,7 +19,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonKawaiiAngel : CooldownPersonaRelicBase
+public class PersonKawaiiAngel : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_PersonKawaiiAngelCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonKawaiiAngelPendingCombatStartCard { get; set; }
@@ -47,7 +47,7 @@ public class PersonKawaiiAngel : CooldownPersonaRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeKawaiiAngel>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeKawaiiAngel>(Owner);
     }
 
     public override async Task AfterDamageReceived(
@@ -95,7 +95,7 @@ public class PersonKawaiiAngel : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillCyberAngel>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     private bool IsTrackedDealer(Creature? dealer)

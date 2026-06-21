@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillEmotionalOverdose : AstralPartyCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords =>

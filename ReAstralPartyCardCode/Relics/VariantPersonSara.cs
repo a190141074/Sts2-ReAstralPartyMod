@@ -21,7 +21,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonSara : CooldownPersonaRelicBase
+public class VariantPersonSara : CooldownPersonRelicBase
 {
     private const int ChargeMilestone = 7;
     private const int ExtraTurnChargeThreshold = 21;
@@ -168,7 +168,7 @@ public class VariantPersonSara : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillShatterStar>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     public void ReduceCooldownOne()

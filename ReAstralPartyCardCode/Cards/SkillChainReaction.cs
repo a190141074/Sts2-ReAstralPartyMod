@@ -13,7 +13,7 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonaSkillCardPool))]
+[RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillChainReaction : AstralPartyCardModel
 {
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
@@ -42,19 +42,19 @@ public class SkillChainReaction : AstralPartyCardModel
         if (Owner?.Creature?.CombatState == null)
             return;
 
-        foreach (var player in PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner))
+        foreach (var player in PersonMultiplayerEffectHelper.GetStableCombatPlayers(Owner))
         {
             if (player == Owner)
                 continue;
 
             var cardsToDraw = PileType.Hand.GetPile(player).Cards.Count < 4 ? 2m : 1m;
             var drawnCards =
-                await PersonaMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, cardsToDraw, player, this);
+                await PersonMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, cardsToDraw, player, this);
             await XiaoLeiAwakeningHelper.TryGrantAwakeningForGrantedCard(Owner, player, drawnCards.Count());
         }
 
         var bite = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillBite>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(bite, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(bite, true, CardPilePosition.Top, this);
     }
 }
 

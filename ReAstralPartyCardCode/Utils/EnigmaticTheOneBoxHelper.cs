@@ -99,7 +99,7 @@ internal static class EnigmaticTheOneBoxHelper
         if (existing != null && !existing.IsMelted)
             return existing;
 
-        await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<EnigmaticSpecialTheOneBox>());
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<EnigmaticSpecialTheOneBox>());
         return GetBox(owner);
     }
 

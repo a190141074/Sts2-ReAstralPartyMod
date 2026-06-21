@@ -64,7 +64,7 @@ internal static class BaseAbilityHelper
             return null;
 
         var createdCard = owner.Creature.CombatState.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, recipient);
-        await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
+        await PersonMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
             createdCard,
             CardPilePosition.Top,
             source);

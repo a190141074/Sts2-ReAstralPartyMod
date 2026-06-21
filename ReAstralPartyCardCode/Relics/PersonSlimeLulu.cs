@@ -20,7 +20,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonSlimeLulu : CooldownPersonaRelicBase
+public class PersonSlimeLulu : CooldownPersonRelicBase
 {
     private const int SlimeLuluBaseMaxCounter = 4;
 
@@ -176,6 +176,6 @@ public class PersonSlimeLulu : CooldownPersonaRelicBase
         Flash();
 
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillHealingSlime>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

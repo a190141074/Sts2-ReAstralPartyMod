@@ -24,7 +24,7 @@ using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
-public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
+public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
 {
     private const int StartingVariantInjectionChancePercent = 17;
     private const int AutomaticSelectionCountdownSeconds = 5;
@@ -51,7 +51,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
     {
         await originalTask;
         LobbyGameplaySettingsSync.MarkRunStarting();
-        StartingPersonaHostLaunchSync.Register();
+        StartingPersonHostLaunchSync.Register();
         DevConsoleCommandNotificationSync.Register();
         LogInfo("P002",
             $"Starting persona relic selection patch entered: seed={runState.Rng.StringSeed} players={runState.Players.Count}.");
@@ -121,7 +121,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
         LogInfo("P014",
             $"Starting persona selection overlay prepared from {sourceTag}: count={relicOptions.Count} runKey={runKey} displayMode={displayMode} assignmentMode={assignmentMode}.");
-        var screen = StartingPersonaRelicSelectionScreen.Create(
+        var screen = StartingPersonRelicSelectionScreen.Create(
             runState,
             relicOptions,
             displayMode,
@@ -251,11 +251,11 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
             LogInfo("P006B",
                 $"Granting Starting Initial Point to player {player.NetId} | gold_before={player.Gold}.");
-            await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(
+            await PersonMultiplayerEffectHelper.LoseGoldDeterministic(
                 StartingInitialPointGoldCost,
                 player,
                 GoldLossType.Spent);
-            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(player, ModelDb.Relic<TokenGoldInitialPoint>());
+            await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(player, ModelDb.Relic<TokenGoldInitialPoint>());
             LogInfo("P006C",
                 $"Granted Starting Initial Point to player {player.NetId} | gold_after={player.Gold}.");
         }
@@ -270,19 +270,19 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         {
             LogInfo("P006D",
                 $"Granting Ring of Seven Curses to player {player.NetId}.");
-            await PersonaMultiplayerEffectHelper.ObtainRelicDeterministic(player, ModelDb.Relic<EnigmaticSevenCurses>());
+            await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(player, ModelDb.Relic<EnigmaticSevenCurses>());
         }
     }
 
     private static bool IsOwnedPersonaRelic(RelicModel relic)
     {
-        return PersonaRelicRegistry.IsPersonaRelic(relic.CanonicalInstance ?? relic);
+        return PersonRelicRegistry.IsPersonaRelic(relic.CanonicalInstance ?? relic);
     }
 
     internal static IReadOnlyList<RelicModel> CreateOverlayRelicOptions(RunState runState)
     {
         var displayMode = ReAstralPartyModSettingsManager.GetStartingPersonaDisplayMode(runState);
-        return displayMode == StartingPersonaDisplayMode.Automatic
+        return displayMode == StartingPersonDisplayMode.Automatic
             ? CreateAutomaticStartingPersonaRelicOptions(runState, runState.Players.Count)
             : CreateStartingPersonaRelicOptions(runState);
     }
@@ -322,14 +322,14 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
     private static IReadOnlyList<RelicModel> CreateStartingPersonaRelicOptions(RunState runState)
     {
         var bannedPersonaRelicIds = ReAstralPartyModSettingsManager.GetBannedPersonaRelicIds(runState);
-        var allPersonaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelicsFiltered(bannedPersonaRelicIds)
+        var allPersonaRelics = PersonRelicRegistry.GetCanonicalPersonaRelicsFiltered(bannedPersonaRelicIds)
             .OrderBy(relic => relic.Id.Entry)
             .ToList();
 
         if (allPersonaRelics.Count == 0)
         {
             MainFile.Logger.Warn("ban list filtered all persona options; falling back to the full persona pool.");
-            allPersonaRelics = PersonaRelicRegistry.GetCanonicalPersonaRelics()
+            allPersonaRelics = PersonRelicRegistry.GetCanonicalPersonaRelics()
                 .OrderBy(relic => relic.Id.Entry)
                 .ToList();
         }
@@ -448,12 +448,12 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
             .Select(relic => relic.CanonicalInstance?.Id ?? relic.Id)
             .ToHashSet();
 
-        var pool = PersonaRelicRegistry.GetCanonicalPersonaRelicsFiltered(bannedPersonaRelicIds)
+        var pool = PersonRelicRegistry.GetCanonicalPersonaRelicsFiltered(bannedPersonaRelicIds)
             .Where(relic => !ownedPersonaRelicIds.Contains(relic.CanonicalInstance?.Id ?? relic.Id))
             .ToList();
         if (pool.Count == 0)
         {
-            pool = PersonaRelicRegistry.GetCanonicalPersonaRelicsFiltered(bannedPersonaRelicIds)
+            pool = PersonRelicRegistry.GetCanonicalPersonaRelicsFiltered(bannedPersonaRelicIds)
                 .ToList();
         }
 
@@ -472,7 +472,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         if (ReAstralPartyModSettingsManager.GetEnableAllVariantPersonas(runState))
         {
             var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
-            foreach (var variant in PersonaRelicRegistry.GetStartingBuiltInVariantPersonaRelics())
+            foreach (var variant in PersonRelicRegistry.GetStartingBuiltInVariantPersonaRelics())
             {
                 if (BannedRelicRegistry.IsBanned(bannedRelicIds, variant))
                     continue;
@@ -522,7 +522,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
 
         var result = source.ToList();
         var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
-        var forcedRelics = PersonaRelicRegistry.GetCanonicalVariantPersonaRelics()
+        var forcedRelics = PersonRelicRegistry.GetCanonicalVariantPersonaRelics()
             .Where(relic => !BannedRelicRegistry.IsBanned(bannedRelicIds, relic))
             .Where(IsForcedCompatVariantRelic)
             .Where(relic =>
@@ -567,7 +567,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         List<RelicModel> options)
     {
         var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
-        var builtInVariants = PersonaRelicRegistry.GetStartingBuiltInVariantPersonaRelics()
+        var builtInVariants = PersonRelicRegistry.GetStartingBuiltInVariantPersonaRelics()
             .Where(relic => !BannedRelicRegistry.IsBanned(bannedRelicIds, relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
@@ -597,7 +597,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         List<RelicModel> options)
     {
         var bannedRelicIds = ReAstralPartyModSettingsManager.GetBannedRelicIds(runState);
-        var allVariants = PersonaRelicRegistry.GetStartingBuiltInVariantPersonaRelics()
+        var allVariants = PersonRelicRegistry.GetStartingBuiltInVariantPersonaRelics()
             .Where(relic => !BannedRelicRegistry.IsBanned(bannedRelicIds, relic))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
             .ToList();
@@ -633,7 +633,7 @@ public sealed class StartingPersonaRelicSelectionPatch : IPatchMethod
         }
 
         LogInfo("P022",
-            $"Starting persona variant chain completed: totalOptions={options.Count} appended={appendedCount} variantCount={options.Count(PersonaRelicRegistry.IsVariantPersonaRelic)}.");
+            $"Starting persona variant chain completed: totalOptions={options.Count} appended={appendedCount} variantCount={options.Count(PersonRelicRegistry.IsVariantPersonaRelic)}.");
         return options;
     }
 

@@ -20,7 +20,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonPandaMeng : CooldownPersonaRelicBase
+public class PersonPandaMeng : CooldownPersonRelicBase
 {
     private const decimal MaxHpGainRatio = 0.4m;
     private const decimal SharedSupportAmount = 2m;
@@ -126,12 +126,12 @@ public class PersonPandaMeng : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillBigEater>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     private async Task EnsureDerivativeRelic()
     {
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativePandaMeng>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativePandaMeng>(Owner);
     }
 
     private async Task HandleSharedSupportPowerGain<TPower>(
@@ -150,9 +150,9 @@ public class PersonPandaMeng : CooldownPersonaRelicBase
         setObservedAmount(normalizedAmount);
         Flash();
 
-        await PersonaMultiplayerEffectHelper.RunAsDerivedSupportPower(async () =>
+        await PersonMultiplayerEffectHelper.RunAsDerivedSupportPower(async () =>
         {
-            foreach (var teammate in PersonaMultiplayerEffectHelper.GetStableCombatPlayers(Owner!)
+            foreach (var teammate in PersonMultiplayerEffectHelper.GetStableCombatPlayers(Owner!)
                          .Where(player => player != Owner)
                          .Where(player =>
                              player.Creature != null && player.Creature.Side == Owner!.Creature!.Side &&

@@ -38,7 +38,7 @@ public class TokenExclusiveLittleCarpDoll : AstralPartyRelicModel
     {
         if (Owner?.Creature == null || cardPlay.Card.Owner != Owner)
             return;
-        if (!PersonaRelicHelper.IsPersonaSkillCard(cardPlay.Card))
+        if (!PersonRelicHelper.IsPersonSkillCard(cardPlay.Card))
             return;
 
         Flash();

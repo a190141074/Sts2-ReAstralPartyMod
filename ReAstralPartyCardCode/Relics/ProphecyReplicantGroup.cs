@@ -139,7 +139,7 @@ public sealed class ProphecyReplicantGroup : AstralPartyRelicModel, IModRightCli
         if (owner.Gold < paidCost)
             return false;
 
-        await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(paidCost, owner, GoldLossType.Spent);
+        await PersonMultiplayerEffectHelper.LoseGoldDeterministic(paidCost, owner, GoldLossType.Spent);
         AstralParty_ProphecyReplicantGroupPaidActivationCount++;
         return true;
     }

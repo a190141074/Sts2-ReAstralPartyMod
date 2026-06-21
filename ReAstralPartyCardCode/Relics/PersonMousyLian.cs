@@ -17,7 +17,7 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonMousyLian : LegacyCooldownPersonaRelicBase
+public class PersonMousyLian : LegacyCooldownPersonRelicBase
 {
     [SavedProperty]
     public int AstralParty_PersonMousyLianCounter
@@ -72,6 +72,6 @@ public class PersonMousyLian : LegacyCooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillSaveMeMousy>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 }

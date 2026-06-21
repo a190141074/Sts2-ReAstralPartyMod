@@ -53,7 +53,7 @@ public sealed class CollectorsCardRewardFilterPatch : IPatchMethod
         {
             if (cardsList[index] is not CardCreationResult result)
                 continue;
-            if (PersonaSkillCardFilter.AllowNaturalObtain(result.Card, player.RunState))
+            if (PersonSkillCardFilter.AllowNaturalObtain(result.Card, player.RunState))
                 continue;
 
             cardsList.RemoveAt(index);

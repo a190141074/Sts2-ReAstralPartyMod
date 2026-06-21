@@ -103,7 +103,7 @@ public static class VigilCounterCombatHelper
         {
             cardToPlay = FindDrawPileAttack(owner, damageSource);
             if (cardToPlay != null)
-                await PersonaMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
+                await PersonMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
                     cardToPlay,
                     CardPilePosition.Top,
                     source);

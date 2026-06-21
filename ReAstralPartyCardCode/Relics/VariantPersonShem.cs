@@ -21,7 +21,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonShem : CooldownPersonaRelicBase
+public class VariantPersonShem : CooldownPersonRelicBase
 {
     private const decimal AttackDamageBonusPerEnemy = 0.15m;
 
@@ -208,7 +208,7 @@ public class VariantPersonShem : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillInnocentWish>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     private async Task EnsureAbyssWhisper()
@@ -216,7 +216,7 @@ public class VariantPersonShem : CooldownPersonaRelicBase
         if (Owner == null)
             return;
 
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeAbyssWhisper>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeAbyssWhisper>(Owner);
     }
 
     private bool RollHeadsForTurn()

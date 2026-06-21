@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonDefectBaby : PersonaRelicBase
+public class VariantPersonDefectBaby : PersonRelicBase
 {
     protected override string RelicId => "variant_person_defect_baby";
 
@@ -30,6 +30,6 @@ public class VariantPersonDefectBaby : PersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillNotYetActivated>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

@@ -236,7 +236,7 @@ public sealed class DreamEndlessMouthOfDestruction : AstralPartyEventModel
             return;
         }
 
-        await PersonaMultiplayerEffectHelper.LoseGoldDeterministic(cost, Owner, GoldLossType.Spent);
+        await PersonMultiplayerEffectHelper.LoseGoldDeterministic(cost, Owner, GoldLossType.Spent);
 
         var failureChance = GetFailureChancePercent(attemptNumber);
         var roll = await ResolveSyncedGameRoll(Owner, attemptNumber, "failure_roll", 1, 11);

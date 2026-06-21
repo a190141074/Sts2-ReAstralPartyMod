@@ -83,7 +83,7 @@ public class TokenGoldArcaneCodex : AstralPartyRelicModel
         InvokeDisplayAmountChanged();
 
         Flash();
-        await PersonaMultiplayerEffectHelper.CopyCardToHandOrRedirectLivingFolioAsync(
+        await PersonMultiplayerEffectHelper.CopyCardToHandOrRedirectLivingFolioAsync(
             Owner,
             cardPlay.Card,
             this,

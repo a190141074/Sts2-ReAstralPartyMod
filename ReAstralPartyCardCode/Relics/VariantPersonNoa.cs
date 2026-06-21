@@ -16,7 +16,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class VariantPersonNoa : CooldownPersonaRelicBase
+public class VariantPersonNoa : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_VariantPersonNoaCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_VariantPersonNoaPendingCombatStartCard { get; set; }
@@ -97,6 +97,6 @@ public class VariantPersonNoa : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillClearObstacle>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 }

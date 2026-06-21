@@ -18,7 +18,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool))]
-public class PersonNeedyGirl : CooldownPersonaRelicBase
+public class PersonNeedyGirl : CooldownPersonRelicBase
 {
     private const int StartingLoveStacks = 2;
     [SavedProperty] public int AstralParty_PersonNeedyGirlCounter { get; set; } = 1;
@@ -48,7 +48,7 @@ public class PersonNeedyGirl : CooldownPersonaRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        await PersonaMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeNeedyGirl>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeNeedyGirl>(Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -84,7 +84,7 @@ public class PersonNeedyGirl : CooldownPersonaRelicBase
 
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillEmotionalOverdose>(), Owner);
-        await PersonaMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
     private bool IsTrackedTarget(Creature target)
