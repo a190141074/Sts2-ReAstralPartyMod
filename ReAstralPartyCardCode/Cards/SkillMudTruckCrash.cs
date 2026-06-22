@@ -49,15 +49,12 @@ public class SkillMudTruckCrash : AstralPartyCardModel
         ArgumentNullException.ThrowIfNull(cardPlay.Target);
         ArgumentNullException.ThrowIfNull(Owner?.Creature);
 
-        await using var context = await AttackCommand.CreateContextAsync(CombatState!, choiceContext, this);
-        var primaryHits = (await CreatureCmd.Damage(
-            choiceContext,
-            cardPlay.Target,
-            DynamicVars.Damage.BaseValue,
-            ValueProp.Move,
-            this)).ToList();
+        var attackCmd = new AttackCommand(DynamicVars.Damage.BaseValue)
+            .FromCard(this)
+            .Targeting(cardPlay.Target);
+        await attackCmd.Execute(choiceContext);
+        var primaryHits = attackCmd.Results.SelectMany(static hit => hit).ToList();
 
-        context.AddHit(primaryHits);
         if (cardPlay.Target.IsAlive)
             await PowerCmd.Apply<FracturePower>(cardPlay.Target, FractureAmount, Owner.Creature, this, false);
 
@@ -75,13 +72,13 @@ public class SkillMudTruckCrash : AstralPartyCardModel
             return;
 
         var splashDamage = primaryHit.TotalDamage + primaryHit.OverkillDamage;
-        context.AddHit(await CreatureCmd.Damage(
+        await CreatureCmd.Damage(
             choiceContext,
             splashTargets,
             splashDamage,
             ValueProp.Unpowered | ValueProp.Move,
             Owner.Creature,
-            this));
+            this);
 
         foreach (var splashTarget in splashTargets.Where(enemy => enemy.IsAlive))
             await PowerCmd.Apply<FracturePower>(splashTarget, FractureAmount, Owner.Creature, this, false);
