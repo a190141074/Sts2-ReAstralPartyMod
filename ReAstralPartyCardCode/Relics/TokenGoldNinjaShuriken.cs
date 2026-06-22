@@ -39,7 +39,8 @@ public class TokenGoldNinjaShuriken : AstralPartyRelicModel
         if (!IsTrackedSkillDamage(target, amount, dealer, cardSource))
             return 0m;
 
-        return target?.GetPowerAmount<MarkLockPower>() ?? 0m;
+        var marks = target?.GetPowerAmount<MarkLockPower>() ?? 0m;
+        return StableNumericStateHelper.FloorDivisionToNonNegativeInt(marks, 2m);
     }
 
     private bool IsTrackedSkillDamage(Creature? target, decimal amount, Creature? dealer, CardModel? cardSource)

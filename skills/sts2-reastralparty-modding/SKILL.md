@@ -277,6 +277,8 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 优先复用 `ReAstralPartyCardCode\Utils\StableNumericStateHelper.cs`，不要在业务文件里散落重复的取整和序列化逻辑。
 - 不要给 `[SavedProperty]` 直接挂 `decimal`。
 - 不要把 `decimal` 直接作为需要持久化或奖励同步的字段形态。
+- 过程允许保留小数，但最终一旦落到“伤害/治疗/格挡/计数奖励”这类整数边界，默认先明确收口规则，再统一走 helper。
+- 像“每 3 层 +2”“每 5 点 +1”这类阈值文案，默认先把“满多少组”算成稳定整数，再乘单组收益；不要把倍率直接乘在原始层数上再试图事后兜底。
 
 ### `019e56fb...` 相关仓库经验
 

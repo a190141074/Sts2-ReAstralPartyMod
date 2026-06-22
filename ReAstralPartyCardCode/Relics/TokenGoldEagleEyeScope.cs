@@ -37,7 +37,9 @@ public class TokenGoldEagleEyeScope : AstralPartyRelicModel
             return 0m;
 
         var existingMarks = target?.GetPowerAmount<MarkLockPower>() ?? 0m;
-        return (existingMarks + 1m) * 2m;
+        var markedStacksAfterThisHit = existingMarks + 1m;
+        var bonusGroups = StableNumericStateHelper.FloorDivisionToNonNegativeInt(markedStacksAfterThisHit, 2m);
+        return bonusGroups * 2m;
     }
 
     public override async Task AfterDamageGiven(
