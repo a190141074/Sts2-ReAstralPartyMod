@@ -30,6 +30,8 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public bool EnableMoonPropRelics { get; set; } = true;
 
+    public bool EnableJewelryRelics { get; set; } = true;
+
     public bool EnableNeowExtraOption { get; set; } = true;
 
     public bool EnableLucidDream { get; set; } = true;
@@ -139,6 +141,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableMoonPropRelics = EnableMoonPropRelics,
+            EnableJewelryRelics = EnableJewelryRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
             EnableLucidDream = EnableLucidDream,
             EnableCollectorsCards = EnableCollectorsCards,
@@ -236,6 +239,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableEnigmaticSeriesEvents = lobbySnapshot?.EnableEnigmaticSeriesEvents ?? settings.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = lobbySnapshot?.EnableMoonPropShopSlots ?? settings.EnableMoonPropShopSlots,
             EnableMoonPropRelics = lobbySnapshot?.EnableMoonPropRelics ?? settings.EnableMoonPropRelics,
+            EnableJewelryRelics = lobbySnapshot?.EnableJewelryRelics ?? settings.EnableJewelryRelics,
             EnableNeowExtraOption = lobbySnapshot?.EnableNeowExtraOption ?? settings.EnableNeowExtraOption,
             EnableLucidDream = lobbySnapshot?.EnableLucidDream ?? settings.EnableLucidDream,
             EnableCollectorsCards = lobbySnapshot?.EnableCollectorsCards ?? settings.EnableCollectorsCards,
@@ -289,6 +293,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableEnigmaticSeriesEvents = true,
             EnableMoonPropShopSlots = true,
             EnableMoonPropRelics = true,
+            EnableJewelryRelics = true,
             EnableNeowExtraOption = true,
             EnableLucidDream = true,
             EnableCollectorsCards = true,
@@ -407,6 +412,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableEnigmaticSeriesEvents = lobbySnapshot.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = lobbySnapshot.EnableMoonPropShopSlots,
             EnableMoonPropRelics = lobbySnapshot.EnableMoonPropRelics,
+            EnableJewelryRelics = lobbySnapshot.EnableJewelryRelics,
             EnableNeowExtraOption = lobbySnapshot.EnableNeowExtraOption,
             EnableLucidDream = lobbySnapshot.EnableLucidDream,
             EnableCollectorsCards = lobbySnapshot.EnableCollectorsCards,

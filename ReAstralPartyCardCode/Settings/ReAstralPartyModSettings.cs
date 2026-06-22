@@ -90,6 +90,8 @@ public sealed class ReAstralPartyModSettings
 
         public bool EnableMoonPropRelics { get; set; } = true;
 
+        public bool EnableJewelryRelics { get; set; } = true;
+
         public bool EnableNeowExtraOption { get; set; } = true;
 
         public bool EnableLucidDream { get; set; } = true;
@@ -152,6 +154,7 @@ public sealed class ReAstralPartyModSettings
                 EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
                 EnableMoonPropShopSlots = EnableMoonPropShopSlots,
                 EnableMoonPropRelics = EnableMoonPropRelics,
+                EnableJewelryRelics = EnableJewelryRelics,
                 EnableNeowExtraOption = EnableNeowExtraOption,
                 EnableLucidDream = EnableLucidDream,
                 EnableCollectorsCards = EnableCollectorsCards,
@@ -214,6 +217,8 @@ public sealed class ReAstralPartyModSettings
     public bool EnableMoonPropShopSlots { get; set; } = true;
 
     public bool EnableMoonPropRelics { get; set; } = true;
+
+    public bool EnableJewelryRelics { get; set; } = true;
 
     public bool EnableNeowExtraOption { get; set; } = true;
 
@@ -368,6 +373,8 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableMoonPropShopSlots => ReadRuntime(settings => settings.EnableMoonPropShopSlots);
 
     public static bool EnableMoonPropRelics => ReadRuntime(settings => settings.EnableMoonPropRelics);
+
+    public static bool EnableJewelryRelics => ReadRuntime(settings => settings.EnableJewelryRelics);
 
     public static bool EnableNeowExtraOption => ReadRuntime(settings => settings.EnableNeowExtraOption);
 
@@ -621,6 +628,26 @@ public static partial class ReAstralPartyModSettingsManager
             return true;
 
         return EnableMoonPropRelics;
+    }
+
+    public static bool GetEnableJewelryRelics(IRunState? runState)
+    {
+        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.JewelryRelics))
+            return false;
+
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableJewelryRelics;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableJewelryRelics;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableJewelryRelics;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return true;
+
+        return EnableJewelryRelics;
     }
 
     public static bool GetEnableNeowExtraOption(IRunState? runState)
@@ -1608,6 +1635,23 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
+        var enableJewelryRelics = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableJewelryRelics;
+            },
+            (settings, value) =>
+            {
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableJewelryRelics = value);
+                ApplyRuntimeSettings(settings, "enable_jewelry_relics");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_jewelry_relics.label",
+                    value);
+            });
+
         var enableNeowExtraOption = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -2019,7 +2063,13 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label", "Enable Moon Relics"),
                     enableMoonPropRelics,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.description",
-                        "Control whether normal shop inventory can naturally roll Moon relics. This does not affect the extra Moon shop slots."))
+                        "Control whether Moon relics can appear in normal gameplay and the compendium for this run. If disabled, the extra Moon shop slots are also disabled."))
+                .AddToggle(
+                    "enable_jewelry_relics",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_jewelry_relics.label", "Enable Jewelry"),
+                    enableJewelryRelics,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_jewelry_relics.description",
+                        "Control whether Jewelry relics can appear in normal gameplay and the compendium for this run."))
                 .AddToggle(
                     "enable_neow_extra_option",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label", "Enable Neow Extra Option"),
@@ -2144,6 +2194,11 @@ public static partial class ReAstralPartyModSettingsManager
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.MoonPropRelics,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_jewelry_relics", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.JewelryRelics,
                         roomSurface: false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_neow_extra_option", () =>
                     AstralContentModeRegistry.GetAvailability(
@@ -2949,6 +3004,7 @@ public static partial class ReAstralPartyModSettingsManager
             EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = settings.EnableMoonPropShopSlots,
             EnableMoonPropRelics = settings.EnableMoonPropRelics,
+            EnableJewelryRelics = settings.EnableJewelryRelics,
             EnableNeowExtraOption = settings.EnableNeowExtraOption,
             EnableLucidDream = settings.EnableLucidDream,
             EnableCollectorsCards = settings.EnableCollectorsCards,
@@ -2976,6 +3032,7 @@ public static partial class ReAstralPartyModSettingsManager
             EnableEnigmaticSeriesEvents = false,
             EnableMoonPropShopSlots = false,
             EnableMoonPropRelics = false,
+            EnableJewelryRelics = false,
             EnableNeowExtraOption = false,
             EnableLucidDream = false,
             EnableCollectorsCards = false,
@@ -3020,6 +3077,7 @@ public static partial class ReAstralPartyModSettingsManager
         settings.EnableEnigmaticSeriesEvents = modpack.EnableEnigmaticSeriesEvents;
         settings.EnableMoonPropShopSlots = modpack.EnableMoonPropShopSlots;
         settings.EnableMoonPropRelics = modpack.EnableMoonPropRelics;
+        settings.EnableJewelryRelics = modpack.EnableJewelryRelics;
         settings.EnableNeowExtraOption = modpack.EnableNeowExtraOption;
         settings.EnableLucidDream = modpack.EnableLucidDream;
         settings.EnableCollectorsCards = modpack.EnableCollectorsCards;
@@ -3069,6 +3127,8 @@ public static partial class ReAstralPartyModSettingsManager
         public bool EnableMoonPropShopSlots { get; init; } = true;
 
         public bool EnableMoonPropRelics { get; init; } = true;
+
+        public bool EnableJewelryRelics { get; init; } = true;
 
         public bool EnableNeowExtraOption { get; init; } = true;
 
@@ -3180,6 +3240,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableEnigmaticSeriesEvents = scoped.EnableEnigmaticSeriesEvents,
                 EnableMoonPropShopSlots = scoped.EnableMoonPropShopSlots,
                 EnableMoonPropRelics = scoped.EnableMoonPropRelics,
+                EnableJewelryRelics = scoped.EnableJewelryRelics,
                 EnableNeowExtraOption = scoped.EnableNeowExtraOption,
                 EnableLucidDream = scoped.EnableLucidDream,
                 EnableCollectorsCards = scoped.EnableCollectorsCards,

@@ -6,6 +6,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -162,6 +163,9 @@ public static class PersonRelicRegistry
     {
         return source
             .Where(CompatContentGate.IsGameplayRelicAvailable)
+            .Where(relic => AstralRelicAvailabilityHelper.IsAllowedByContentMode(
+                ReAstralPartyModSettingsManager.GetCurrentContentMode(),
+                relic))
             .ToList();
     }
 

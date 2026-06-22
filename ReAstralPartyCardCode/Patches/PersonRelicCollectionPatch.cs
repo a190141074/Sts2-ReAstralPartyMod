@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using Godot;
 using HarmonyLib;
 using MegaCrit.Sts2.addons.mega_text;
@@ -17,7 +16,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 public static class PersonRelicCollectionPatch
 {
     private const string PersonaChestIconPath = "res://ReAstralPartyMod/images/potion/person_chest_choose.png";
-    private const string VariantPersonaIconPath = "res://ReAstralPartyMod/images/ui/variant_persona_relic_pool.png";
+    private const string VariantPersonaIconPath = "res://ReAstralPartyMod/images/ui/variant_person_relic_pool.png";
 
     private const string StarterHeaderZh = "初始：";
     private const string StarterHeaderZhBody = "角色们开始游戏时自身携带的遗物。";
@@ -60,6 +59,13 @@ public static class PersonRelicCollectionPatch
         AccessTools.Method(typeof(NRelicCollectionCategory), "LoadIcon", [typeof(Texture2D)])
         ?? throw new MissingMethodException(typeof(NRelicCollectionCategory).FullName, "LoadIcon");
 
+    private static readonly MethodInfo LoadRelicNodesMethod =
+        AccessTools.Method(
+            typeof(NRelicCollectionCategory),
+            "LoadRelicNodes",
+            [typeof(IEnumerable<RelicModel>), typeof(HashSet<RelicModel>), typeof(HashSet<RelicModel>)])
+        ?? throw new MissingMethodException(typeof(NRelicCollectionCategory).FullName, "LoadRelicNodes");
+
     private static string? _starterHeaderTemplate;
     private static Texture2D? _personaChestIcon;
     private static Texture2D? _variantPersonaIcon;
@@ -94,7 +100,9 @@ public static class PersonRelicCollectionPatch
         if (collection.Relics.Any(PersonRelicRegistry.IsPersonaRelic))
             return;
 
-        var personaRelics = PersonRelicRegistry.GetCanonicalPersonaRelics();
+        var personaRelics = RelicCollectionVisibilityFilterHelper.FilterForCompendium(
+            PersonRelicRegistry.GetCanonicalPersonaRelics(),
+            "starter_person_subcategory");
         if (personaRelics.Count == 0)
             return;
 
@@ -128,7 +136,9 @@ public static class PersonRelicCollectionPatch
         if (collection.Relics.Any(PersonRelicRegistry.IsVariantPersonaRelic))
             return;
 
-        var variantPersonaRelics = PersonRelicRegistry.GetCanonicalVariantPersonaRelics();
+        var variantPersonaRelics = RelicCollectionVisibilityFilterHelper.FilterForCompendium(
+            PersonRelicRegistry.GetCanonicalVariantPersonaRelics(),
+            "starter_variant_person_subcategory");
         if (variantPersonaRelics.Count == 0)
             return;
 

@@ -32,5 +32,13 @@ internal static class RelicGrabBagPopulateSeriesFilterPatch
 
             grabBag.Remove(relic);
         }
+
+        foreach (var relic in BannedRelicRegistry.GetCanonicalBannableRelics())
+        {
+            if (AstralRelicAvailabilityHelper.IsRelicEnabledForRun(runState, relic))
+                continue;
+
+            grabBag.Remove(relic);
+        }
     }
 }

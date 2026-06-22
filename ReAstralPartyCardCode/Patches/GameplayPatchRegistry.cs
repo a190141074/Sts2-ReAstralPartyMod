@@ -465,6 +465,8 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<MoonPropEulogyZeroObtainPatch>();
         patcher.RegisterPatch<ProphecySoulDevourRunDeckRemovalPatch>();
         patcher.RegisterPatch<ProphecySoulDevourSmithRestSitePatch>();
+        patcher.RegisterPatch<RelicCollectionAddRelicsFilterPatch>();
+        patcher.RegisterPatch<RelicCollectionLoadRelicNodesFilterPatch>();
         patcher.RegisterPatch<MoonPropShopCreateInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopInitializeInventoryPatch>();
         patcher.RegisterPatch<MoonPropShopStackPurchasePatch>();

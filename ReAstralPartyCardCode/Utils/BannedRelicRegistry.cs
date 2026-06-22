@@ -1,6 +1,7 @@
 using MegaCrit.Sts2.Core.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -116,6 +117,9 @@ public static class BannedRelicRegistry
 
         return relics
             .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
+            .Where(relic => AstralRelicAvailabilityHelper.IsAllowedByContentMode(
+                ReAstralPartyModSettingsManager.GetCurrentContentMode(),
+                relic))
             .Where(CompatContentGate.IsGameplayRelicAvailable)
             .OrderBy(relic => (relic.CanonicalInstance?.Id ?? relic.Id).Entry, StringComparer.Ordinal)
             .ToList();

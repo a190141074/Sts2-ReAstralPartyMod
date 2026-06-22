@@ -82,6 +82,8 @@ internal static class MoonPropShopExtraRelicsHelper
     {
         if (inventory == null || player == null)
             return;
+        if (!ReAstralPartyModSettingsManager.GetEnableMoonPropRelics(player.RunState))
+            return;
         if (!ReAstralPartyModSettingsManager.GetEnableMoonPropShopSlots(player.RunState))
             return;
         if (PatchedInventories.TryGetValue(inventory, out _))
@@ -132,6 +134,8 @@ internal static class MoonPropShopExtraRelicsHelper
 
     public static void EnsureMoonPropRelicSlots(NMerchantInventory merchantInventory, MerchantInventory inventory)
     {
+        if (!ReAstralPartyModSettingsManager.GetEnableMoonPropRelics(inventory.Player?.RunState))
+            return;
         if (!ReAstralPartyModSettingsManager.GetEnableMoonPropShopSlots(inventory.Player?.RunState))
             return;
         if (IsFakeMerchantInventory(merchantInventory))

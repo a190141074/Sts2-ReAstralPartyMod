@@ -108,6 +108,8 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public bool EnableMoonPropRelics { get; set; } = true;
 
+    public bool EnableJewelryRelics { get; set; } = true;
+
     public bool EnableNeowExtraOption { get; set; } = true;
 
     public bool EnableLucidDream { get; set; } = true;
@@ -194,6 +196,7 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableMoonPropRelics = EnableMoonPropRelics,
+            EnableJewelryRelics = EnableJewelryRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
             EnableLucidDream = EnableLucidDream,
             EnableCollectorsCards = EnableCollectorsCards,
@@ -236,6 +239,7 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableEnigmaticSeriesEvents = ReAstralPartyModSettingsManager.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = ReAstralPartyModSettingsManager.EnableMoonPropShopSlots,
             EnableMoonPropRelics = ReAstralPartyModSettingsManager.EnableMoonPropRelics,
+            EnableJewelryRelics = ReAstralPartyModSettingsManager.EnableJewelryRelics,
             EnableNeowExtraOption = ReAstralPartyModSettingsManager.EnableNeowExtraOption,
             EnableLucidDream = ReAstralPartyModSettingsManager.EnableLucidDream,
             EnableCollectorsCards = ReAstralPartyModSettingsManager.EnableCollectorsCards,
@@ -542,7 +546,7 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 17;
+    private const int SchemaVersion = 18;
 
     public AstralContentMode CurrentContentMode { get; set; }
     public bool EnableStartingInitialPoint { get; set; }
@@ -553,6 +557,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public bool EnableEnigmaticSeriesEvents { get; set; }
     public bool EnableMoonPropShopSlots { get; set; } = true;
     public bool EnableMoonPropRelics { get; set; } = true;
+    public bool EnableJewelryRelics { get; set; } = true;
     public bool EnableNeowExtraOption { get; set; }
     public bool EnableLucidDream { get; set; } = true;
     public bool EnableCollectorsCards { get; set; } = true;
@@ -591,6 +596,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableEnigmaticSeriesEvents = snapshot.EnableEnigmaticSeriesEvents;
         EnableMoonPropShopSlots = snapshot.EnableMoonPropShopSlots;
         EnableMoonPropRelics = snapshot.EnableMoonPropRelics;
+        EnableJewelryRelics = snapshot.EnableJewelryRelics;
         EnableNeowExtraOption = snapshot.EnableNeowExtraOption;
         EnableLucidDream = snapshot.EnableLucidDream;
         EnableCollectorsCards = snapshot.EnableCollectorsCards;
@@ -636,6 +642,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteBool(EnableEnigmaticSeriesEvents);
         writer.WriteBool(EnableMoonPropShopSlots);
         writer.WriteBool(EnableMoonPropRelics);
+        writer.WriteBool(EnableJewelryRelics);
         writer.WriteBool(EnableNeowExtraOption);
         writer.WriteBool(EnableLucidDream);
         writer.WriteBool(EnableCollectorsCards);
@@ -691,12 +698,24 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             throw new InvalidOperationException($"{MainFile.ModId} received unsupported lobby gameplay snapshot schema {schemaVersion}.");
         }
 
-        if (schemaVersion >= 16)
+        if (schemaVersion >= 18)
         {
             EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
             EnableMoonPropRelics = reader.ReadBool();
+            EnableJewelryRelics = reader.ReadBool();
+            EnableNeowExtraOption = reader.ReadBool();
+            EnableLucidDream = reader.ReadBool();
+            EnableCollectorsCards = reader.ReadBool();
+        }
+        else if (schemaVersion >= 16)
+        {
+            EnableDreamSeriesEvents = reader.ReadBool();
+            EnableEnigmaticSeriesEvents = reader.ReadBool();
+            EnableMoonPropShopSlots = reader.ReadBool();
+            EnableMoonPropRelics = reader.ReadBool();
+            EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
             EnableLucidDream = reader.ReadBool();
             EnableCollectorsCards = reader.ReadBool();
@@ -707,6 +726,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
             EnableMoonPropRelics = true;
+            EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
             EnableLucidDream = reader.ReadBool();
             EnableCollectorsCards = reader.ReadBool();
@@ -717,6 +737,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
             EnableMoonPropRelics = true;
+            EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
             EnableLucidDream = reader.ReadBool();
             EnableCollectorsCards = true;
@@ -727,6 +748,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
             EnableMoonPropRelics = true;
+            EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
             EnableLucidDream = true;
             EnableCollectorsCards = true;
@@ -737,6 +759,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = true;
             EnableMoonPropRelics = true;
+            EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
             EnableLucidDream = true;
             EnableCollectorsCards = true;
@@ -747,6 +770,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableEnigmaticSeriesEvents = true;
             EnableMoonPropShopSlots = true;
             EnableMoonPropRelics = true;
+            EnableJewelryRelics = true;
             EnableNeowExtraOption = true;
             EnableLucidDream = true;
             EnableCollectorsCards = true;
@@ -878,6 +902,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableMoonPropRelics = EnableMoonPropRelics,
+            EnableJewelryRelics = EnableJewelryRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
             EnableLucidDream = EnableLucidDream,
             EnableCollectorsCards = EnableCollectorsCards,
