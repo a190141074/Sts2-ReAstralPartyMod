@@ -14,6 +14,7 @@ using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.HonkaiFlameChasers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.ManosabaLin;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
 using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
@@ -70,6 +71,7 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
         await GrantStartingInitialPointIfEnabledAsync(runState);
         await GrantStartingRingOfSevenCursesIfEnabledAsync(runState);
         LogInfo("P007", "Starting persona relic selection run bootstrap completed; Neow ready-page flow will handle the actual persona selection entry.");
+        await TryTriggerHonkaiFlameChasersFallbackAsync(runState);
     }
 
     internal static async Task<bool> OpenSelectionOverlayAsync(
@@ -211,6 +213,53 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
         }
 
         await Task.Yield();
+    }
+
+    private static async Task TryTriggerHonkaiFlameChasersFallbackAsync(RunState runState)
+    {
+        if (!HonkaiFlameChasersCompat.IsLoaded())
+            return;
+
+        var runKey = GetRunKey(runState);
+        var netService = RunManager.Instance?.NetService;
+        var netMode = netService?.Type.ToString() ?? "None";
+        var isHost = netService == null
+                     || netService.Type is NetGameType.None or NetGameType.Singleplayer
+                     || LobbyGameplayNetRoleHelper.GetCurrentRole(netService) == LobbyGameplayNetRole.Host;
+
+        for (var attempt = 0; attempt < 6; attempt++)
+        {
+            if (StartingPersonNeowReadyFlow.WasReadyPageInjected(runKey))
+            {
+                MainFile.Logger.Info(
+                    $"[ReAstralPartyMod] hfc persona fallback skipped because ready-page already injected | runKey={runKey} isHost={isHost} netMode={netMode} hfcLoaded=True readyPageInjected=True.");
+                return;
+            }
+
+            await WaitForNextProcessFrameAsync();
+        }
+
+        var readyPageInjected = StartingPersonNeowReadyFlow.WasReadyPageInjected(runKey);
+        var shouldFallback = HonkaiFlameChasersCompat.ShouldUseStartingPersonaFallback(runState, out var gateReason);
+        MainFile.Logger.Info(
+            $"[ReAstralPartyMod] hfc persona fallback check | runKey={runKey} isHost={isHost} netMode={netMode} hfcLoaded=True readyPageInjected={readyPageInjected} personaGateReason={gateReason}.");
+        if (!shouldFallback)
+        {
+            MainFile.Logger.Info(
+                $"[ReAstralPartyMod] hfc persona fallback skipped because persona gate closed | runKey={runKey} isHost={isHost} netMode={netMode} hfcLoaded=True readyPageInjected={readyPageInjected} personaGateReason={gateReason}.");
+            return;
+        }
+
+        if (!isHost)
+        {
+            MainFile.Logger.Info(
+                $"[ReAstralPartyMod] hfc persona fallback skipped on client while waiting for host launch | runKey={runKey} isHost={isHost} netMode={netMode} hfcLoaded=True readyPageInjected={readyPageInjected} personaGateReason={gateReason}.");
+            return;
+        }
+
+        MainFile.Logger.Warn(
+            $"[ReAstralPartyMod] hfc persona fallback opening overlay | runKey={runKey} isHost={isHost} netMode={netMode} hfcLoaded=True readyPageInjected={readyPageInjected} personaGateReason={gateReason}.");
+        await StartingPersonNeowReadyFlow.TriggerCompatFallbackLaunchAsync(runState, "hfc_start_run_fallback");
     }
 
     internal static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)

@@ -14,7 +14,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 public class ProblemStudentPower : AstralPartyPowerModel
 {
     private const decimal DexterityBonus = 4m;
-    private const decimal ExtraDamageTaken = 2m;
+    private const decimal ExtraDamageTaken = 6m;
 
     public override PowerType Type => PowerType.Debuff;
 

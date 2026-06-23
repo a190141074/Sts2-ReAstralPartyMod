@@ -38,6 +38,7 @@ internal static class StartingPersonNeowReadyFlow
     private static readonly Dictionary<string, Task<bool>> SelectionTasksByRun = [];
     private static readonly Dictionary<string, List<string>> LaunchPayloadsByRun = [];
     private static readonly HashSet<string> LaunchingRunKeys = [];
+    private static readonly HashSet<string> ReadyPageInjectedRunKeys = [];
     private static readonly MethodInfo? SetEventStateMethod = AccessTools.Method(
         typeof(EventModel),
         "SetEventState",
@@ -68,6 +69,14 @@ internal static class StartingPersonNeowReadyFlow
         bool Restored = false);
 
     internal static bool IsInternalNeowRefreshActive => InternalNeowRefreshDepth.Value > 0;
+
+    internal static bool WasReadyPageInjected(string runKey)
+    {
+        lock (SyncLock)
+        {
+            return ReadyPageInjectedRunKeys.Contains(runKey);
+        }
+    }
 
     internal static bool TryRestoreCachedNeowOptionsBeforeRemoteChoice(uint optionIndex, ulong senderId)
     {
@@ -118,6 +127,7 @@ internal static class StartingPersonNeowReadyFlow
                 runState,
                 originalOptions,
                 neow.Description ?? neow.InitialDescription);
+            ReadyPageInjectedRunKeys.Add(runKey);
         }
 
         var readyOptions = new[]
@@ -332,6 +342,24 @@ internal static class StartingPersonNeowReadyFlow
         }
     }
 
+    internal static async Task TriggerCompatFallbackLaunchAsync(RunState runState, string sourceTag)
+    {
+        ArgumentNullException.ThrowIfNull(runState);
+
+        var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
+        var serializedRelicOptionIds = CreateSerializedLaunchPayload(runState);
+        CacheLaunchPayload(runState, serializedRelicOptionIds);
+
+        var netService = RunManager.Instance?.NetService;
+        if (netService?.Type == NetGameType.Client)
+            return;
+
+        if (netService?.Type == NetGameType.Host)
+            StartingPersonHostLaunchSync.BroadcastLaunch(runState, serializedRelicOptionIds);
+
+        await HandleReadyLaunchAsync(runKey, sourceTag, serializedRelicOptionIds);
+    }
+
     private static async Task<bool> RunSelectionTaskAsync(
         RunState runState,
         string runKey,
@@ -380,6 +408,7 @@ internal static class StartingPersonNeowReadyFlow
                 LaunchingRunKeys.Remove(runKey);
                 SelectionTasksByRun.Remove(runKey);
                 LaunchPayloadsByRun.Remove(runKey);
+                ReadyPageInjectedRunKeys.Remove(runKey);
             }
         }
     }

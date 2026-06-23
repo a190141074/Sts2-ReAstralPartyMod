@@ -6,6 +6,7 @@ internal static class OptionalModCompatRegistry
 {
     private static readonly IReadOnlyList<OptionalCompatModInfo> SupportedMods =
     [
+        new("HonkaiFlameChasers", "崩坏·逐火十三英桀", null),
         new("Windchaser", "逐风者", "https://steamcommunity.com/sharedfiles/filedetails/?id=3747509821"),
         new("ManosabaLin", "魔女审判", "https://steamcommunity.com/sharedfiles/filedetails/?id=3747637918")
     ];
