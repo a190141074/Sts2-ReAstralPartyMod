@@ -1,0 +1,192 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using MegaCrit.Sts2.Core.CardSelection;
+using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Gold;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Localization;
+using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.CardPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+
+namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
+
+[RegisterCard(typeof(PersonSkillCardPool))]
+public sealed class SkillRemoteStore : AstralPartyCardModel
+{
+    private const int CardPrice = 10;
+
+    private static readonly LocString SelectionPrompt =
+        new("cards", "RE_ASTRAL_PARTY_MOD_CARD_SKILL_REMOTE_STORE.select_prompt");
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        [AstralKeywords.AstralUnique];
+
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
+
+    public SkillRemoteStore() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
+    {
+    }
+
+    protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        RecordTelemetryOnPlay();
+        var owner = Owner;
+        var combatState = owner?.Creature?.CombatState;
+        var runState = owner?.RunState;
+        if (owner == null || combatState == null || runState == null)
+            return;
+
+        var candidates = RemoteStoreCardHelper.BuildDeterministicOffer(owner, Id.Entry);
+        if (candidates.Count == 0)
+            return;
+
+        var maxSelectable = Math.Min(
+            candidates.Count,
+            StableNumericStateHelper.FloorDivisionToNonNegativeInt(owner.Gold, CardPrice));
+        if (maxSelectable <= 0)
+            return;
+
+        var displayOptions = RemoteStoreCardHelper.CreateDisplayOptions(owner, candidates);
+        var prefs = new CardSelectorPrefs(SelectionPrompt, 0, maxSelectable)
+        {
+            Cancelable = true
+        };
+
+        var selectedCards = (await CardSelectCmd.FromSimpleGrid(choiceContext, displayOptions, owner, prefs))
+            .Select(card => card.CanonicalInstance ?? card)
+            .GroupBy(card => card.Id)
+            .Select(group => group.First())
+            .ToList();
+        if (selectedCards.Count == 0)
+            return;
+
+        var totalCost = selectedCards.Count * CardPrice;
+        await PersonMultiplayerEffectHelper.LoseGoldDeterministic(totalCost, owner, GoldLossType.Spent);
+
+        foreach (var selectedCard in selectedCards)
+        {
+            var freshCard = combatState.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, owner);
+            await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(freshCard, true, CardPilePosition.Top, this);
+        }
+    }
+}
+
+internal static class RemoteStoreCardHelper
+{
+    private static readonly Type[] ColorlessPoolTypes =
+    [
+        typeof(ColorlessCardPool)
+    ];
+
+    public static IReadOnlyList<CardModel> BuildDeterministicOffer(MegaCrit.Sts2.Core.Entities.Players.Player owner, string contextId)
+    {
+        var ownedIds = new HashSet<ModelId>();
+        var offers = new List<CardModel>(5);
+
+        TryAddOffer(offers, ownedIds, GetCharacterPoolCandidates(owner, CardType.Skill), owner, contextId, "skill");
+        TryAddOffer(offers, ownedIds, GetCharacterPoolCandidates(owner, CardType.Power), owner, contextId, "power");
+        TryAddOffer(offers, ownedIds, GetColorlessCandidates(owner), owner, contextId, "colorless");
+        TryAddOffer(offers, ownedIds, GetCharacterPoolCandidates(owner, CardType.Attack), owner, contextId, "attack_1");
+        TryAddOffer(offers, ownedIds, GetCharacterPoolCandidates(owner, CardType.Attack), owner, contextId, "attack_2");
+
+        return offers;
+    }
+
+    public static IReadOnlyList<CardModel> CreateDisplayOptions(
+        MegaCrit.Sts2.Core.Entities.Players.Player owner,
+        IReadOnlyList<CardModel> candidates)
+    {
+        var displayOptions = new List<CardModel>(candidates.Count);
+        foreach (var candidate in candidates)
+        {
+            var displayCard = (candidate.CanonicalInstance ?? candidate).ToMutable();
+            displayCard.Owner = owner;
+            displayOptions.Add(displayCard);
+        }
+
+        return displayOptions;
+    }
+
+    private static void TryAddOffer(
+        ICollection<CardModel> offers,
+        ISet<ModelId> excludedIds,
+        IEnumerable<CardModel> candidates,
+        MegaCrit.Sts2.Core.Entities.Players.Player owner,
+        string contextId,
+        string slotKey)
+    {
+        var ordered = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
+                CanonicalDistinct(candidates)
+                    .Where(card => !excludedIds.Contains(GetCanonicalId(card))),
+                static card => GetCanonicalId(card).Entry,
+                MainFile.ModId,
+                nameof(SkillRemoteStore),
+                contextId,
+                owner.RunState?.Rng.StringSeed ?? "<null_seed>",
+                owner.NetId,
+                owner.RunState?.CurrentActIndex ?? -1,
+                owner.RunState?.TotalFloor ?? -1,
+                slotKey)
+            .ToList();
+        var selected = ordered.FirstOrDefault();
+        if (selected == null)
+            return;
+
+        offers.Add(selected);
+        excludedIds.Add(GetCanonicalId(selected));
+    }
+
+    private static IEnumerable<CardModel> GetCharacterPoolCandidates(
+        MegaCrit.Sts2.Core.Entities.Players.Player owner,
+        CardType requiredType)
+    {
+        return owner.Character.CardPool
+            .GetUnlockedCards(owner.UnlockState, owner.RunState.CardMultiplayerConstraint)
+            .Where(card => card.Type == requiredType)
+            .Where(IsEligibleRemoteStoreCard);
+    }
+
+    private static IEnumerable<CardModel> GetColorlessCandidates(MegaCrit.Sts2.Core.Entities.Players.Player owner)
+    {
+        return ModelDb.AllCardPools
+            .Where(pool => ColorlessPoolTypes.Any(type => type.IsInstanceOfType(pool)))
+            .SelectMany(pool => pool.GetUnlockedCards(owner.UnlockState, owner.RunState.CardMultiplayerConstraint))
+            .Where(IsEligibleRemoteStoreCard);
+    }
+
+    private static IEnumerable<CardModel> CanonicalDistinct(IEnumerable<CardModel> cards)
+    {
+        return cards
+            .GroupBy(GetCanonicalId)
+            .Select(group => group.First());
+    }
+
+    private static bool IsEligibleRemoteStoreCard(CardModel card)
+    {
+        if (card.Type is CardType.Status or CardType.Curse)
+            return false;
+        if (card.Rarity == CardRarity.Token)
+            return false;
+        if (!card.ShouldShowInCardLibrary)
+            return false;
+        if (!IsBaseGameCard(card))
+            return false;
+
+        return card.EnergyCost.CostsX || card.EnergyCost.GetResolved() >= 1m;
+    }
+
+    private static bool IsBaseGameCard(CardModel card)
+    {
+        return card.GetType().Assembly == typeof(CardModel).Assembly;
+    }
+
+    private static ModelId GetCanonicalId(CardModel card)
+    {
+        return (card.CanonicalInstance ?? card).Id;
+    }
+}

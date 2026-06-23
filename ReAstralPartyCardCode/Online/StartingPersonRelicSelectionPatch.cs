@@ -331,9 +331,10 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
     internal static IReadOnlyList<RelicModel> CreateOverlayRelicOptions(RunState runState)
     {
         var displayMode = ReAstralPartyModSettingsManager.GetStartingPersonaDisplayMode(runState);
-        return displayMode == StartingPersonDisplayMode.Automatic
+        var options = displayMode == StartingPersonDisplayMode.Automatic
             ? CreateAutomaticStartingPersonaRelicOptions(runState, runState.Players.Count)
             : CreateStartingPersonaRelicOptions(runState);
+        return ApplyStartingPersonDoppelgangerMutualExclusion(runState, options);
     }
 
     internal static IReadOnlyList<RelicModel> ResolveRelicOptionsFromSerializedIds(
@@ -705,6 +706,72 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
     {
         return (relic.CanonicalInstance ?? relic) is VariantPersonWindchaserThePlaneswalker or VariantPersonManosabaLinHiro;
     }
+
+    private static IReadOnlyList<RelicModel> ApplyStartingPersonDoppelgangerMutualExclusion(
+        RunState runState,
+        IReadOnlyList<RelicModel> source)
+    {
+        if (ReAstralPartyModSettingsManager.GetEnableAllPersonas(runState))
+            return source;
+
+        var conflictingStems = source
+            .Select(relic =>
+            {
+                var entry = (relic.CanonicalInstance?.Id ?? relic.Id).Entry;
+                return TryGetPersonDoppelgangerInfo(entry, out var stem, out var isDoppelganger)
+                    ? new PersonDoppelgangerInfo(entry, stem, isDoppelganger)
+                    : (PersonDoppelgangerInfo?)null;
+            })
+            .Where(static info => info != null)
+            .Select(static info => info!.Value)
+            .GroupBy(static info => info.Stem, StringComparer.Ordinal)
+            .Where(static group => group.Any(info => info.IsDoppelganger) && group.Any(info => !info.IsDoppelganger))
+            .Select(static group => group.Key)
+            .ToHashSet(StringComparer.Ordinal);
+        if (conflictingStems.Count == 0)
+            return source;
+
+        var filtered = new List<RelicModel>(source.Count);
+        var chosenEntriesByStem = new Dictionary<string, string>(StringComparer.Ordinal);
+        foreach (var relic in source)
+        {
+            var entry = (relic.CanonicalInstance?.Id ?? relic.Id).Entry;
+            if (!TryGetPersonDoppelgangerInfo(entry, out var stem, out _) || !conflictingStems.Contains(stem))
+            {
+                filtered.Add(relic);
+                continue;
+            }
+
+            if (!chosenEntriesByStem.TryGetValue(stem, out var chosenEntry))
+            {
+                chosenEntriesByStem[stem] = entry;
+                filtered.Add(relic);
+                continue;
+            }
+
+            if (string.Equals(chosenEntry, entry, StringComparison.Ordinal))
+                filtered.Add(relic);
+        }
+
+        return filtered;
+    }
+
+    private static bool TryGetPersonDoppelgangerInfo(string entry, out string stem, out bool isDoppelganger)
+    {
+        if (!entry.StartsWith("person_", StringComparison.Ordinal))
+        {
+            stem = string.Empty;
+            isDoppelganger = false;
+            return false;
+        }
+
+        const string suffix = "_doppelganger";
+        isDoppelganger = entry.EndsWith(suffix, StringComparison.Ordinal);
+        stem = isDoppelganger ? entry[..^suffix.Length] : entry;
+        return true;
+    }
+
+    private readonly record struct PersonDoppelgangerInfo(string Entry, string Stem, bool IsDoppelganger);
 
     internal static string GetRunKey(RunState runState)
     {

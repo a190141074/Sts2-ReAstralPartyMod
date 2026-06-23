@@ -476,6 +476,10 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<MoonPropShopFreePurchaseCardPatch>();
         patcher.RegisterPatch<MoonPropShopFreePurchasePotionPatch>();
         patcher.RegisterPatch<MoonPropShopFreePurchaseRemovalPatch>();
+        patcher.RegisterPatch<ProprietressDoppelgangerShopRelicPurchasePatch>();
+        patcher.RegisterPatch<ProprietressDoppelgangerShopCardPurchasePatch>();
+        patcher.RegisterPatch<ProprietressDoppelgangerShopPotionPurchasePatch>();
+        patcher.RegisterPatch<ProprietressDoppelgangerShopRemovalPurchasePatch>();
         patcher.RegisterPatch<PunitiveJudgmentHandEntryPatch>();
         patcher.RegisterPatch<StokovStarterRelicUpgradePatch>();
     }

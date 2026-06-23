@@ -146,7 +146,9 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - 不先猜 UI 延迟、动画时序或展示层问题
 - 人格选择 / `StartingPerson*` / `StartingPersona*` / Neow ready-page / host-launch / persona overlay / remote choice pre-restore` 默认属于仓库高危区：
   - 能不动就不动；这条链默认按坏味道很重的历史屎山处理，不要把它当普通 UI / 同步功能随手重构
+  - 只要用户已经明确表达“尽量不要碰 / 能不动就不动 / 先查问题”，默认停在日志取证和根因定位；除非用户随后明确说“执行 / 修改 / 实现”，否则不要擅自动这条链
   - 没有明确根因和双端日志验证时，不要轻易改
+  - 如果最新带时间戳日志还没有稳定复现当前症状，不要拿历史 `godot.log` 噪音、旧异常或“看起来像点击层问题”的猜测直接下手改 `StartingPersonRelicSelectionScreen`
   - 任何改动后至少一起核对：
     - 主机 `host_local_click optionPayloadCount`
     - 客机 `host_broadcast optionPayloadCount`
@@ -181,6 +183,7 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
     - 先怀疑是否能在外围绕开
     - 先怀疑是否能只补单点 helper / guard / payload 透传
     - 不要因为看起来命名乱、职责散，就立刻做结构性清理
+  - 如果用户已经撤回某次人格选择相关修改，后续默认先按“撤回后的现状”重新取证；不要把已撤回方案当成既成前提继续推进
 - 隐藏 beta 立绘：
   - 先看 `godot*.log` 的实时设置
   - 再看资源目录是否真有对应 `_beta` 文件
