@@ -9,7 +9,6 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Extensions;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
-using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Map;
 using MegaCrit.Sts2.Core.Models;
@@ -27,9 +26,9 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public class PersonJunkBot : CooldownPersonRelicBase
 {
-    private const int MarkedCombatCount = 16;
+    private const int BaseMarkedCombatCountPerAct = 7;
+    private const int MarkedCombatCountPerPlayer = 2;
     private const int KillsPerWeaponFrameStack = 2;
-    private const string JunkBotMapSalt = "PersonJunkBot";
 
     [SavedProperty] public int AstralParty_PersonJunkBotCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonJunkBotPendingCombatStartCard { get; set; }
@@ -92,18 +91,27 @@ public class PersonJunkBot : CooldownPersonRelicBase
     {
         await base.AfterObtained();
         await EnsureWeaponFrameRelic();
-        InitializeMarkedCombatsForCurrentAct(true);
+        ResetMarkedCombatsForCurrentAct();
+        ReapplyMarkedRoomsToMap(Owner?.RunState?.Map);
+        JunkBotQuestIconHelper.RefreshCurrentMapScreenIfNeeded(Owner?.RunState as RunState);
     }
 
     public override async Task AfterActEntered()
     {
         await base.AfterActEntered();
-        InitializeMarkedCombatsForCurrentAct(true);
+        ResetMarkedCombatsForCurrentAct();
+        ReapplyMarkedRoomsToMap(Owner?.RunState?.Map);
+        JunkBotQuestIconHelper.RefreshCurrentMapScreenIfNeeded(Owner?.RunState as RunState);
     }
 
     public override ActMap ModifyGeneratedMapLate(IRunState runState, ActMap map, int actIndex)
     {
         return AddMarkedRooms(map);
+    }
+
+    public void ReapplyMarkedRoomsToMap(ActMap? map)
+    {
+        AddMarkedRooms(map);
     }
 
     public override Task AfterDamageGiven(
@@ -156,39 +164,16 @@ public class PersonJunkBot : CooldownPersonRelicBase
             .ObtainDerivativeRelicIfMissing<PersonalityDerivativeZ3000WeaponFrame>(Owner);
     }
 
-    private void InitializeMarkedCombatsForCurrentAct(bool forceRefresh = false)
+    private void ResetMarkedCombatsForCurrentAct()
     {
         var runState = Owner?.RunState;
         if (runState == null)
             return;
-        if (!forceRefresh
-            && AstralParty_PersonJunkBotMarkedCoordsSet
-            && AstralParty_PersonJunkBotMarkedActIndex == runState.CurrentActIndex)
-            return;
 
         AstralParty_PersonJunkBotMarkedActIndex = runState.CurrentActIndex;
-        var map = runState.Map;
-        if (map == null)
-            return;
-
-        var candidates = map
-            .GetAllMapPoints()
-            .Where(static p =>
-            {
-                var pointType = p.PointType;
-                return pointType is MapPointType.Monster or MapPointType.Elite;
-            })
-            .Where(p => !p.Quests.Any(q => q is PersonJunkBot))
-            .ToList();
-
-        var rng = new Rng((uint)((int)runState.Rng.Seed + (int)Owner!.NetId +
-                                 StringHelper.GetDeterministicHashCode(JunkBotMapSalt)));
-        candidates.UnstableShuffle(rng);
-
-        var selected = candidates.Take(Math.Min(MarkedCombatCount, candidates.Count)).ToList();
-        AstralParty_PersonJunkBotMarkedCoordCols = selected.Select(p => p.coord.col).ToArray();
-        AstralParty_PersonJunkBotMarkedCoordRows = selected.Select(p => p.coord.row).ToArray();
-        AstralParty_PersonJunkBotMarkedCoordsSet = true;
+        AstralParty_PersonJunkBotMarkedCoordsSet = false;
+        AstralParty_PersonJunkBotMarkedCoordCols = [];
+        AstralParty_PersonJunkBotMarkedCoordRows = [];
     }
 
     private ActMap AddMarkedRooms(ActMap? map)
@@ -199,30 +184,57 @@ public class PersonJunkBot : CooldownPersonRelicBase
             return map;
 
         var markedCoords = GetMarkedCoords();
-        if (markedCoords == null)
-            return map;
-
-        var invalidCoords = markedCoords.Any(coord =>
-            !map.HasPoint(coord)
-            || map.GetPoint(coord) is not { } point
-            || point.PointType is not (MapPointType.Monster or MapPointType.Elite));
-        if (invalidCoords)
+        var shouldRegenerate = markedCoords == null;
+        if (markedCoords != null)
         {
-            InitializeMarkedCombatsForCurrentAct(true);
-            markedCoords = GetMarkedCoords() ?? [];
+            shouldRegenerate = !markedCoords.TrueForAll(coord =>
+                map.HasPoint(coord)
+                && map.GetPoint(coord) is { } point
+                && point.PointType is MapPointType.Monster or MapPointType.Elite);
         }
 
-        if (markedCoords.Count == 0)
-            return map;
+        if (shouldRegenerate)
+        {
+            var rng = new Rng(Owner, Id);
+            var candidates = map
+                .GetAllMapPoints()
+                .Where(static p =>
+                {
+                    var pointType = p.PointType;
+                    return pointType is MapPointType.Monster or MapPointType.Elite;
+                })
+                .Where(p => !p.Quests.Any(q => q is PersonJunkBot))
+                .ToList();
+            candidates.UnstableShuffle(rng);
 
-        foreach (var coord in markedCoords)
+            var selected = candidates.Take(Math.Min(GetMarkedCombatCount(), candidates.Count)).ToList();
+            AstralParty_PersonJunkBotMarkedCoordCols = selected.Select(p => p.coord.col).ToArray();
+            AstralParty_PersonJunkBotMarkedCoordRows = selected.Select(p => p.coord.row).ToArray();
+            AstralParty_PersonJunkBotMarkedCoordsSet = true;
+
+            foreach (var point in selected)
+                if (!point.Quests.Any(q => q is PersonJunkBot))
+                    point.AddQuest(this);
+
+            return map;
+        }
+
+        foreach (var coord in markedCoords!)
         {
             var point = map.GetPoint(coord);
-            if (point != null && !point.Quests.Any(q => q is PersonJunkBot))
+            if (point == null)
+                throw new InvalidOperationException($"Loaded a junk bot map with coordinate {coord}, but the generated map does not contain that coordinate!");
+            if (!point.Quests.Any(q => q is PersonJunkBot))
                 point.AddQuest(this);
         }
 
         return map;
+    }
+
+    private int GetMarkedCombatCount()
+    {
+        var playerCount = Math.Max(Owner?.RunState?.Players.Count ?? 1, 1);
+        return BaseMarkedCombatCountPerAct + playerCount * MarkedCombatCountPerPlayer;
     }
 
     private bool IsCurrentCombatMarked()

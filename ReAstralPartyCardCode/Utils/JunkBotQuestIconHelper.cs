@@ -21,6 +21,9 @@ public static class JunkBotQuestIconHelper
     private static readonly AccessTools.FieldRef<NMapPointHistoryEntry, RunHistoryPlayer?> PlayerField =
         AccessTools.FieldRefAccess<NMapPointHistoryEntry, RunHistoryPlayer?>("_player");
 
+    private static readonly AccessTools.FieldRef<NMapScreen, RunState?> MapScreenRunStateField =
+        AccessTools.FieldRefAccess<NMapScreen, RunState?>("_runState");
+
     private static bool _loadLogged;
 
     public static string IconPath => QuestIconPath;
@@ -60,7 +63,55 @@ public static class JunkBotQuestIconHelper
         }
 
         questIcon.Texture = texture;
+        questIcon.Visible = true;
         return true;
+    }
+
+    public static int ReapplyMarkedQuestsAndIcons(NMapScreen mapScreen)
+    {
+        var runState = MapScreenRunStateField(mapScreen);
+        if (runState == null)
+            return 0;
+
+        foreach (var player in runState.Players)
+            player.GetRelic<PersonJunkBot>()?.ReapplyMarkedRoomsToMap(runState.Map);
+
+        var appliedCount = 0;
+        foreach (var child in mapScreen.FindChildren("*", nameof(NNormalMapPoint), true, false))
+        {
+            if (child is not NNormalMapPoint mapPointNode)
+                continue;
+
+            if (TryApplyMapQuestIcon(mapPointNode, false))
+                appliedCount++;
+        }
+
+        return appliedCount;
+    }
+
+    public static void RefreshCurrentMapScreenIfNeeded(RunState? runState)
+    {
+        if (runState == null)
+            return;
+
+        var mapScreen = NMapScreen.Instance;
+        if (mapScreen == null)
+            return;
+        if (MapScreenRunStateField(mapScreen) != runState)
+            return;
+
+        ReapplyMarkedQuestsAndIcons(mapScreen);
+        RefreshMapPointVisuals(mapScreen);
+    }
+
+    public static void RefreshMapPointVisuals(NMapScreen mapScreen)
+    {
+        var mapPointDictionaryField = AccessTools.Field(typeof(NMapScreen), "_mapPointDictionary");
+        if (mapPointDictionaryField?.GetValue(mapScreen) is not IDictionary<MapCoord, NMapPoint> mapPointDictionary)
+            return;
+
+        foreach (var mapPoint in mapPointDictionary.Values)
+            mapPoint.RefreshVisualsInstantly();
     }
 
     public static bool HasJunkBotCompletedQuest(NMapPointHistoryEntry entry)

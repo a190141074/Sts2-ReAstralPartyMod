@@ -8,15 +8,7 @@ public static class JunkBotQuestIconMapScreenPatch
 {
     public static void Postfix(NMapScreen __instance)
     {
-        var appliedCount = 0;
-        foreach (var child in __instance.FindChildren("*", nameof(NNormalMapPoint), true, false))
-        {
-            if (child is not NNormalMapPoint mapPointNode)
-                continue;
-
-            if (JunkBotQuestIconHelper.TryApplyMapQuestIcon(mapPointNode, false))
-                appliedCount++;
-        }
+        var appliedCount = JunkBotQuestIconHelper.ReapplyMarkedQuestsAndIcons(__instance);
 
         if (appliedCount > 0)
             MainFile.Logger.Info(

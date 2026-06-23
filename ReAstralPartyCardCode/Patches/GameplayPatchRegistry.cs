@@ -569,6 +569,16 @@ internal static class GameplayDynamicPatchCatalog
             description: "UI patch: allow single-use Speed Roller flight to open the next row's map points",
             patchId: "speed_roller_flight_travelability");
         builder.AddMethod(
+            typeof(NMapScreen),
+            "RecalculateTravelability",
+            Type.EmptyTypes,
+            postfix: DynamicPatchBuilder.FromMethod(
+                typeof(JunkBotQuestIconTravelabilityPatch),
+                nameof(JunkBotQuestIconTravelabilityPatch.Postfix)),
+            isCritical: false,
+            description: "UI patch: re-apply Junk Bot quest markers after travelability recalculation",
+            patchId: "junk_bot_quest_icon_travelability");
+        builder.AddMethod(
             typeof(NNormalMapPoint),
             "_Ready",
             Type.EmptyTypes,
@@ -578,6 +588,16 @@ internal static class GameplayDynamicPatchCatalog
             isCritical: false,
             description: "UI patch: replace Junk Bot quest markers with the custom map icon",
             patchId: "junk_bot_quest_icon_map");
+        builder.AddMethod(
+            typeof(NNormalMapPoint),
+            "RefreshMarkedIconVisibility",
+            Type.EmptyTypes,
+            postfix: DynamicPatchBuilder.FromMethod(
+                typeof(JunkBotQuestIconMarkedVisibilityPatch),
+                nameof(JunkBotQuestIconMarkedVisibilityPatch.Postfix)),
+            isCritical: false,
+            description: "UI patch: keep Junk Bot custom quest icon aligned with native marked-icon refresh",
+            patchId: "junk_bot_quest_icon_marked_visibility");
         TryRegisterJunkBotMapScreenPatch(builder);
         builder.AddMethod(
             typeof(MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen.NMapPointHistoryEntry),
