@@ -358,7 +358,8 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool EnableExtremeMode => ReadRuntime(settings => settings.EnableExtremeMode);
 
-    public static bool EnableStartingInitialPoint => ReadRuntime(settings => settings.EnableStartingInitialPoint);
+    public static bool EnableStartingInitialPoint =>
+        IsStartingInitialPointAllowed(null) && ReadRuntime(settings => settings.EnableStartingInitialPoint);
 
     public static bool EnableStartingAstralRelicStore => ReadRuntime(settings => settings.EnableStartingAstralRelicStore);
 
@@ -740,6 +741,9 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool GetEnableStartingInitialPoint(IRunState? runState)
     {
+        if (!IsStartingInitialPointAllowed(runState))
+            return false;
+
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableStartingInitialPoint;
 
@@ -753,6 +757,11 @@ public static partial class ReAstralPartyModSettingsManager
             return false;
 
         return EnableStartingInitialPoint;
+    }
+
+    public static bool IsStartingInitialPointAllowed(IRunState? runState)
+    {
+        return !GetBannedRelicIds(runState).Contains(ModelDb.GetId<TokenGoldInitialPoint>());
     }
 
     public static bool GetEnableStartingAstralRelicStore(IRunState? runState)
@@ -1505,7 +1514,7 @@ public static partial class ReAstralPartyModSettingsManager
             settings =>
             {
                 EnsureContentModeSettingsInitialized(settings);
-                return GetScopedSettingsForCurrentMode(settings).EnableStartingInitialPoint;
+                return IsStartingInitialPointAllowed(null) && GetScopedSettingsForCurrentMode(settings).EnableStartingInitialPoint;
             },
             (settings, value) =>
             {
@@ -2165,6 +2174,7 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.description",
                         "Choose whether runs use two random expansions, all expansions, or no expansion series at all."),
                     ModSettingsChoicePresentation.Dropdown)
+                .WithEntryEnabledWhen("enable_starting_initial_point", () => IsStartingInitialPointAllowed(null))
                 .WithEntryEnabledWhen("enable_variant_personas", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
@@ -2830,6 +2840,12 @@ public static partial class ReAstralPartyModSettingsManager
         {
             settings.BannedRelicIds = serialized;
             settings.BannedPersonaRelicIds = [.. serialized];
+            if (serialized.Contains(ModelDb.GetId<TokenGoldInitialPoint>().ToString(), StringComparer.Ordinal))
+            {
+                settings.EnableStartingInitialPoint = false;
+                settings.VanillaModeSettings.EnableStartingInitialPoint = false;
+                settings.ModpackModeSettings.EnableStartingInitialPoint = false;
+            }
         }, "banned_relics");
     }
 
@@ -3232,7 +3248,7 @@ public static partial class ReAstralPartyModSettingsManager
                 BannedRelicIds = DeserializeModelIdSet(ResolveBannedRelicIds(settings)),
                 CurrentContentMode = AstralContentModeRegistry.NormalizeMode(settings.CurrentContentMode),
                 EnableExtremeMode = scoped.EnableExtremeMode,
-                EnableStartingInitialPoint = scoped.EnableStartingInitialPoint,
+                EnableStartingInitialPoint = IsStartingInitialPointAllowed(null) && scoped.EnableStartingInitialPoint,
                 EnableStartingAstralRelicStore = scoped.EnableStartingAstralRelicStore,
                 EnableStartingRingOfSevenCurses = scoped.EnableStartingRingOfSevenCurses,
                 EnableStartingPersonSelection = scoped.EnableStartingPersonSelection,

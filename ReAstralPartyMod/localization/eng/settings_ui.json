@@ -8,6 +8,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.description": "These options apply globally across all profiles: Starting Initial Point defaults to off, while starting persona selection defaults to on.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label": "Enable Starting Initial Point",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description": "At run start, every player automatically obtains Initial Point and loses 1 Gold.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.disabled_hint": "Starting Initial Point is banned, so this run cannot enable the starting Initial Point toggle.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.label": "Enable Astral Relic Store",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.description": "Control whether the first actual event pull in Act 2 is replaced with Astral Relic Store.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.content_mode.vanilla.title": "Vanilla Mode",

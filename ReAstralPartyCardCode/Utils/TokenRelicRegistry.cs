@@ -123,7 +123,8 @@ public static class TokenRelicRegistry
 
     private static readonly HashSet<ModelId> ExcludedFromRandomTokenPools =
     [
-        ModelDb.GetId<TokenEternalStarlight>()
+        ModelDb.GetId<TokenEternalStarlight>(),
+        ModelDb.GetId<TokenGoldInitialPoint>()
     ];
 
     private static readonly HashSet<ModelId> SeriesTokenRelicIds = SeriesTokenRelicTypes

@@ -8,7 +8,7 @@ public sealed class LucidDreamWildnessPower : AstralPartyPowerModel
 
     public override PowerStackType StackType => PowerStackType.None;
 
-    public override int DisplayAmount => 0;
+    public override int DisplayAmount => (int)Amount;
 
-    protected override bool IsVisibleInternal => false;
+    protected override bool IsVisibleInternal => true;
 }

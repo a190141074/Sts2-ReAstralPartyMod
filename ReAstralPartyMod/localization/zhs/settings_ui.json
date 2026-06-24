@@ -8,6 +8,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.gameplay.description": "以下设置对所有档位全局生效：自带【初始点】默认关闭，人格选择默认开启。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label": "开启自带【初始点】",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description": "开局时所有玩家自动获得【初始点】，并各自失去 1 金币。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.disabled_hint": "由于【初始点】已被 ban，无法开启开局自带初始点。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.label": "开启指定【筹码商店】",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.description": "控制第二幕第一次实际事件抽取时，是否替换为【筹码商店】。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.content_mode.vanilla.title": "原版模式",
