@@ -6,7 +6,7 @@ public sealed class LucidDreamWildnessPower : AstralPartyPowerModel
 {
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.None;
+    public override PowerStackType StackType => PowerStackType.Counter;
 
     public override int DisplayAmount => (int)Amount;
 

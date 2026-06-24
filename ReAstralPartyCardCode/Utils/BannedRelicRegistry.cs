@@ -17,6 +17,10 @@ public enum BannedRelicCategory
 public static class BannedRelicRegistry
 {
     private static readonly IReadOnlyList<RelicModel> AllAstralRelics = BuildAllAstralRelics();
+    private static readonly HashSet<ModelId> NonBannableRelicIds =
+    [
+        ModelDb.GetId<TokenGoldInitialPoint>()
+    ];
 
     private static readonly IReadOnlyList<RelicModel> PersonalityDerivativeRelics = AllAstralRelics
         .Where(IsPersonalityDerivativeRelicInternal)
@@ -27,6 +31,7 @@ public static class BannedRelicRegistry
         .ToHashSet();
 
     private static readonly IReadOnlyList<RelicModel> OtherRelics = AllAstralRelics
+        .Where(IsBannableRelicInternal)
         .Where(relic => !PersonRelicRegistry.IsPersonaRelic(relic))
         .Where(relic => !PersonRelicRegistry.IsVariantPersonaRelic(relic))
         .Where(relic => !IsPersonalityDerivativeRelicInternal(relic))
@@ -38,7 +43,7 @@ public static class BannedRelicRegistry
         .. PersonRelicRegistry.GetCanonicalPersonaRelics(),
         .. PersonRelicRegistry.GetCanonicalVariantPersonaRelics(),
         .. PersonalityDerivativeRelics,
-        .. TokenRelicRegistry.GetCanonicalTokenRelics(),
+        .. TokenRelicRegistry.GetCanonicalTokenRelics().Where(IsBannableRelicInternal),
         .. OtherRelics
     ];
 
@@ -63,7 +68,9 @@ public static class BannedRelicRegistry
             BannedRelicCategory.Persona => PersonRelicRegistry.GetCanonicalPersonaRelics(),
             BannedRelicCategory.VariantPersona => PersonRelicRegistry.GetCanonicalVariantPersonaRelics(),
             BannedRelicCategory.PersonalityDerivative => PersonalityDerivativeRelics,
-            BannedRelicCategory.Token => TokenRelicRegistry.GetCanonicalTokenRelics(),
+            BannedRelicCategory.Token => TokenRelicRegistry.GetCanonicalTokenRelics()
+                .Where(IsBannableRelicInternal)
+                .ToList(),
             BannedRelicCategory.Other => OtherRelics,
             _ => []
         };
@@ -103,6 +110,12 @@ public static class BannedRelicRegistry
     {
         var id = relic.CanonicalInstance?.Id ?? relic.Id;
         return id.Entry.Contains("_PERSONALITY_DERIVATIVE_", StringComparison.Ordinal);
+    }
+
+    private static bool IsBannableRelicInternal(RelicModel relic)
+    {
+        var id = relic.CanonicalInstance?.Id ?? relic.Id;
+        return !NonBannableRelicIds.Contains(id);
     }
 
     private static IReadOnlyList<RelicModel> BuildAllAstralRelics()

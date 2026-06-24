@@ -359,7 +359,7 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableExtremeMode => ReadRuntime(settings => settings.EnableExtremeMode);
 
     public static bool EnableStartingInitialPoint =>
-        IsStartingInitialPointAllowed(null) && ReadRuntime(settings => settings.EnableStartingInitialPoint);
+        ReadRuntime(settings => settings.EnableStartingInitialPoint);
 
     public static bool EnableStartingAstralRelicStore => ReadRuntime(settings => settings.EnableStartingAstralRelicStore);
 
@@ -466,12 +466,14 @@ public static partial class ReAstralPartyModSettingsManager
         {
             var settings = RitsuLibFramework.GetDataStore(MainFile.ModId).Get<ReAstralPartyModSettings>(SettingsKey);
             EnsureContentModeSettingsInitialized(settings);
+            SanitizeNonBannableRelicIds(settings);
             return settings;
         }
         catch
         {
             var settings = new ReAstralPartyModSettings();
             EnsureContentModeSettingsInitialized(settings);
+            SanitizeNonBannableRelicIds(settings);
             return settings;
         }
     }
@@ -741,9 +743,6 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool GetEnableStartingInitialPoint(IRunState? runState)
     {
-        if (!IsStartingInitialPointAllowed(runState))
-            return false;
-
         if (TryGetRunSnapshot(runState, out var snapshot))
             return snapshot.EnableStartingInitialPoint;
 
@@ -761,7 +760,7 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool IsStartingInitialPointAllowed(IRunState? runState)
     {
-        return !GetBannedRelicIds(runState).Contains(ModelDb.GetId<TokenGoldInitialPoint>());
+        return true;
     }
 
     public static bool GetEnableStartingAstralRelicStore(IRunState? runState)
@@ -1373,7 +1372,7 @@ public static partial class ReAstralPartyModSettingsManager
     public static IReadOnlySet<ModelId> GetBannedPersonaRelicIds(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
-            return DeserializeModelIdSet(snapshot.BannedRelicIdsSerialized);
+            return DeserializeModelIdSet(SanitizeSerializedBannedRelicIds(snapshot.BannedRelicIdsSerialized));
 
         if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
             return localFallback.BannedRelicIds;
@@ -1395,6 +1394,7 @@ public static partial class ReAstralPartyModSettingsManager
             return;
 
         bool migratedDefaultBannedRelics = false;
+        bool sanitizedNonBannableRelics = false;
         using (RitsuLibFramework.BeginModDataRegistration(MainFile.ModId))
         {
             var store = RitsuLibFramework.GetDataStore(MainFile.ModId);
@@ -1417,8 +1417,9 @@ public static partial class ReAstralPartyModSettingsManager
 
             var settings = store.Get<ReAstralPartyModSettings>(SettingsKey);
             migratedDefaultBannedRelics = EnsureDefaultBannedRelicIdsInitialized(settings);
+            sanitizedNonBannableRelics = SanitizeNonBannableRelicIds(settings);
             ApplyRuntimeSettings(settings, "register");
-            if (migratedDefaultBannedRelics)
+            if (migratedDefaultBannedRelics || sanitizedNonBannableRelics)
                 store.Save(SettingsKey);
         }
 
@@ -1514,7 +1515,7 @@ public static partial class ReAstralPartyModSettingsManager
             settings =>
             {
                 EnsureContentModeSettingsInitialized(settings);
-                return IsStartingInitialPointAllowed(null) && GetScopedSettingsForCurrentMode(settings).EnableStartingInitialPoint;
+                return GetScopedSettingsForCurrentMode(settings).EnableStartingInitialPoint;
             },
             (settings, value) =>
             {
@@ -2174,7 +2175,6 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.description",
                         "Choose whether runs use two random expansions, all expansions, or no expansion series at all."),
                     ModSettingsChoicePresentation.Dropdown)
-                .WithEntryEnabledWhen("enable_starting_initial_point", () => IsStartingInitialPointAllowed(null))
                 .WithEntryEnabledWhen("enable_variant_personas", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
@@ -2574,6 +2574,7 @@ public static partial class ReAstralPartyModSettingsManager
             var settings = store.Get<ReAstralPartyModSettings>(SettingsKey);
             EnsureContentModeSettingsInitialized(settings);
             mutator(settings);
+            SanitizeNonBannableRelicIds(settings);
             ApplyRuntimeSettings(settings, reason);
             store.Save(SettingsKey);
         }
@@ -2831,6 +2832,7 @@ public static partial class ReAstralPartyModSettingsManager
     {
         var serialized = bannedRelicIds
             .Where(static id => id != ModelId.none)
+            .Where(static id => id != ModelDb.GetId<TokenGoldInitialPoint>())
             .Select(static id => id.ToString())
             .Distinct(StringComparer.Ordinal)
             .OrderBy(static id => id, StringComparer.Ordinal)
@@ -2840,12 +2842,6 @@ public static partial class ReAstralPartyModSettingsManager
         {
             settings.BannedRelicIds = serialized;
             settings.BannedPersonaRelicIds = [.. serialized];
-            if (serialized.Contains(ModelDb.GetId<TokenGoldInitialPoint>().ToString(), StringComparer.Ordinal))
-            {
-                settings.EnableStartingInitialPoint = false;
-                settings.VanillaModeSettings.EnableStartingInitialPoint = false;
-                settings.ModpackModeSettings.EnableStartingInitialPoint = false;
-            }
         }, "banned_relics");
     }
 
@@ -2878,9 +2874,9 @@ public static partial class ReAstralPartyModSettingsManager
     private static IEnumerable<string>? ResolveBannedRelicIds(ReAstralPartyModSettings settings)
     {
         if (settings.BannedRelicIds is { Count: > 0 })
-            return settings.BannedRelicIds;
+            return SanitizeSerializedBannedRelicIds(settings.BannedRelicIds);
 
-        return settings.BannedPersonaRelicIds;
+        return SanitizeSerializedBannedRelicIds(settings.BannedPersonaRelicIds);
     }
 
     private static bool EnsureDefaultBannedRelicIdsInitialized(ReAstralPartyModSettings settings)
@@ -2905,6 +2901,50 @@ public static partial class ReAstralPartyModSettingsManager
         MainFile.Logger.Info(
             $"{MainFile.ModId} default banned relics initialized: count={settings.BannedRelicIds.Count}, contains_beads={containsBeads}, beads_id={beadsId}");
         return true;
+    }
+
+    internal static List<string> SanitizeSerializedBannedRelicIds(IEnumerable<string>? serializedIds)
+    {
+        var initialPointRelicId = ModelDb.GetId<TokenGoldInitialPoint>().ToString();
+        return (serializedIds ?? [])
+            .Where(static id => !string.IsNullOrWhiteSpace(id))
+            .Where(id => !string.Equals(id, initialPointRelicId, StringComparison.Ordinal))
+            .Distinct(StringComparer.Ordinal)
+            .OrderBy(static id => id, StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private static bool SanitizeNonBannableRelicIds(ReAstralPartyModSettings settings)
+    {
+        var sanitized = SanitizeSerializedBannedRelicIds(ResolveStoredBannedRelicIds(settings));
+        var changed = false;
+
+        if (!HasSameSerializedIds(settings.BannedRelicIds, sanitized))
+        {
+            settings.BannedRelicIds = [.. sanitized];
+            changed = true;
+        }
+
+        if (!HasSameSerializedIds(settings.BannedPersonRelicIds, sanitized))
+        {
+            settings.BannedPersonRelicIds = [.. sanitized];
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    private static IEnumerable<string>? ResolveStoredBannedRelicIds(ReAstralPartyModSettings settings)
+    {
+        if (settings.BannedRelicIds is { Count: > 0 })
+            return settings.BannedRelicIds;
+
+        return settings.BannedPersonaRelicIds;
+    }
+
+    private static bool HasSameSerializedIds(IEnumerable<string>? current, IReadOnlyList<string> expected)
+    {
+        return SanitizeSerializedBannedRelicIds(current).SequenceEqual(expected, StringComparer.Ordinal);
     }
 
     private static string GetRelicDisplayName(RelicModel relic)
@@ -2988,6 +3028,7 @@ public static partial class ReAstralPartyModSettingsManager
     private static void EnsureContentModeSettingsInitialized(ReAstralPartyModSettings settings)
     {
         EnsureDefaultBannedRelicIdsInitialized(settings);
+        SanitizeNonBannableRelicIds(settings);
 
         if (settings.ContentModeSettingsInitialized)
             return;
@@ -3248,7 +3289,7 @@ public static partial class ReAstralPartyModSettingsManager
                 BannedRelicIds = DeserializeModelIdSet(ResolveBannedRelicIds(settings)),
                 CurrentContentMode = AstralContentModeRegistry.NormalizeMode(settings.CurrentContentMode),
                 EnableExtremeMode = scoped.EnableExtremeMode,
-                EnableStartingInitialPoint = IsStartingInitialPointAllowed(null) && scoped.EnableStartingInitialPoint,
+                EnableStartingInitialPoint = scoped.EnableStartingInitialPoint,
                 EnableStartingAstralRelicStore = scoped.EnableStartingAstralRelicStore,
                 EnableStartingRingOfSevenCurses = scoped.EnableStartingRingOfSevenCurses,
                 EnableStartingPersonSelection = scoped.EnableStartingPersonSelection,

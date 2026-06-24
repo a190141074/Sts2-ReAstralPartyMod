@@ -335,8 +335,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.description": "Displays your current total stable bonus damage for Skill cards.",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "Displays your current total stable bonus damage for Skill cards.",
   "RE_ASTRAL_PARTY_MOD_POWER_LUCID_DREAM_WILDNESS_POWER.title": "Wildness",
-  "RE_ASTRAL_PARTY_MOD_POWER_LUCID_DREAM_WILDNESS_POWER.description": "Increase damage, Block gain, and Max HP by the percentage shown.",
-  "RE_ASTRAL_PARTY_MOD_POWER_LUCID_DREAM_WILDNESS_POWER.smartDescription": "Increase damage, Block gain, and Max HP by the percentage shown.",
+  "RE_ASTRAL_PARTY_MOD_POWER_LUCID_DREAM_WILDNESS_POWER.description": "Increase damage, Block gain, and Max HP percentage by an amount equal to this power's stacks.",
+  "RE_ASTRAL_PARTY_MOD_POWER_LUCID_DREAM_WILDNESS_POWER.smartDescription": "Increase damage, Block gain, and Max HP percentage by an amount equal to this power's stacks.",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.title": "Process",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.description": "At combat end, convert stacks into [gold]Steps[/gold] for [relic]Persona: Bionic Jasmine Beta[/relic].\nIf you own [relic]Initial Point[/relic] at [blue]1[/blue] or [blue]3[/blue] stars, gain an extra [blue]1[/blue] or [blue]3[/blue] steps.",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "At combat end, convert stacks into [gold]Steps[/gold] for [relic]Persona: Bionic Jasmine Beta[/relic]. [relic]Initial Point[/relic] adds [blue]1[/blue]/[blue]3[/blue] extra steps at [blue]1[/blue]/[blue]3[/blue] stars."

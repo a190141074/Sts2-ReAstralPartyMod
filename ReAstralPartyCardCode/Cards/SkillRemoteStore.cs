@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -41,79 +42,98 @@ public sealed class SkillRemoteStore : AstralPartyCardModel
         if (owner == null || combatState == null || runState == null)
             return;
 
-        var candidates = RemoteStoreCardHelper.BuildDeterministicOffer(owner, Id.Entry);
-        if (candidates.Count == 0)
+        var offers = RemoteStoreCardHelper.BuildDeterministicOffer(owner, Id.Entry);
+        if (offers.Count == 0)
             return;
 
         var maxSelectable = Math.Min(
-            candidates.Count,
+            offers.Count,
             StableNumericStateHelper.FloorDivisionToNonNegativeInt(owner.Gold, CardPrice));
         if (maxSelectable <= 0)
             return;
 
-        var displayOptions = RemoteStoreCardHelper.CreateDisplayOptions(owner, candidates);
+        var displayOptions = RemoteStoreCardHelper.CreateDisplayOptions(owner, offers);
         var prefs = new CardSelectorPrefs(SelectionPrompt, 0, maxSelectable)
         {
             Cancelable = true
         };
 
-        var selectedCards = (await CardSelectCmd.FromSimpleGrid(choiceContext, displayOptions, owner, prefs))
-            .Select(card => card.CanonicalInstance ?? card)
-            .GroupBy(card => card.Id)
-            .Select(group => group.First())
+        var selectedOffers = (await CardSelectCmd.FromSimpleGrid(choiceContext, displayOptions, owner, prefs))
+            .Select(RemoteStoreCardHelper.ResolveSelectedOffer)
+            .Where(static offer => offer != null)
+            .Cast<RemoteStoreCardOffer>()
             .ToList();
-        if (selectedCards.Count == 0)
+        if (selectedOffers.Count == 0)
             return;
 
-        var totalCost = selectedCards.Count * CardPrice;
+        var totalCost = selectedOffers.Count * CardPrice;
         await PersonMultiplayerEffectHelper.LoseGoldDeterministic(totalCost, owner, GoldLossType.Spent);
 
-        foreach (var selectedCard in selectedCards)
+        foreach (var selectedOffer in selectedOffers)
         {
-            var freshCard = combatState.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, owner);
+            var freshCard = combatState.CreateCard(selectedOffer.CanonicalCard.CanonicalInstance ?? selectedOffer.CanonicalCard, owner);
             await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(freshCard, true, CardPilePosition.Top, this);
         }
     }
 }
 
+internal sealed record RemoteStoreCardOffer(string SlotKey, CardModel CanonicalCard);
+
 internal static class RemoteStoreCardHelper
 {
+    private const string DemonFormEntry = "DEMON_FORM";
+
     private static readonly Type[] ColorlessPoolTypes =
     [
         typeof(ColorlessCardPool)
     ];
 
-    public static IReadOnlyList<CardModel> BuildDeterministicOffer(MegaCrit.Sts2.Core.Entities.Players.Player owner, string contextId)
+    private static readonly Dictionary<CardModel, RemoteStoreCardOffer> DisplayOptionMap = new(ReferenceEqualityComparer.Instance);
+
+    public static IReadOnlyList<RemoteStoreCardOffer> BuildDeterministicOffer(MegaCrit.Sts2.Core.Entities.Players.Player owner, string contextId)
     {
         var ownedIds = new HashSet<ModelId>();
-        var offers = new List<CardModel>(5);
+        var offers = new List<RemoteStoreCardOffer>(10);
 
+        TryAddOffer(offers, ownedIds, GetCharacterPoolCandidates(owner, CardType.Attack), owner, contextId, "attack");
         TryAddOffer(offers, ownedIds, GetCharacterPoolCandidates(owner, CardType.Skill), owner, contextId, "skill");
         TryAddOffer(offers, ownedIds, GetCharacterPoolCandidates(owner, CardType.Power), owner, contextId, "power");
         TryAddOffer(offers, ownedIds, GetColorlessCandidates(owner), owner, contextId, "colorless");
-        TryAddOffer(offers, ownedIds, GetCharacterPoolCandidates(owner, CardType.Attack), owner, contextId, "attack_1");
-        TryAddOffer(offers, ownedIds, GetCharacterPoolCandidates(owner, CardType.Attack), owner, contextId, "attack_2");
+        TryAddOffer(offers, ownedIds, GetBaseAbilityCandidates(owner), owner, contextId, "base_ability");
+        AddFixedOffer(offers, ResolveDemonForm(), "demon_form_1");
+        AddFixedOffer(offers, ResolveDemonForm(), "demon_form_2");
+        AddFixedOffer(offers, ResolveDemonForm(), "demon_form_3");
+        AddFixedOffer(offers, ResolveDemonForm(), "demon_form_4");
+        AddFixedOffer(offers, ResolveDemonForm(), "demon_form_5");
 
         return offers;
     }
 
     public static IReadOnlyList<CardModel> CreateDisplayOptions(
         MegaCrit.Sts2.Core.Entities.Players.Player owner,
-        IReadOnlyList<CardModel> candidates)
+        IReadOnlyList<RemoteStoreCardOffer> offers)
     {
-        var displayOptions = new List<CardModel>(candidates.Count);
-        foreach (var candidate in candidates)
+        DisplayOptionMap.Clear();
+
+        var displayOptions = new List<CardModel>(offers.Count);
+        foreach (var offer in offers)
         {
-            var displayCard = (candidate.CanonicalInstance ?? candidate).ToMutable();
+            var displayCard = (offer.CanonicalCard.CanonicalInstance ?? offer.CanonicalCard).ToMutable();
             displayCard.Owner = owner;
+            DisplayOptionMap[displayCard] = offer;
             displayOptions.Add(displayCard);
         }
 
         return displayOptions;
     }
 
+    public static RemoteStoreCardOffer? ResolveSelectedOffer(CardModel selectedCard)
+    {
+        return DisplayOptionMap.GetValueOrDefault(selectedCard);
+    }
+
     private static void TryAddOffer(
-        ICollection<CardModel> offers,
+        ICollection<RemoteStoreCardOffer> offers,
         ISet<ModelId> excludedIds,
         IEnumerable<CardModel> candidates,
         MegaCrit.Sts2.Core.Entities.Players.Player owner,
@@ -137,8 +157,19 @@ internal static class RemoteStoreCardHelper
         if (selected == null)
             return;
 
-        offers.Add(selected);
+        offers.Add(new RemoteStoreCardOffer(slotKey, selected.CanonicalInstance ?? selected));
         excludedIds.Add(GetCanonicalId(selected));
+    }
+
+    private static void AddFixedOffer(
+        ICollection<RemoteStoreCardOffer> offers,
+        CardModel? canonicalCard,
+        string slotKey)
+    {
+        if (canonicalCard == null)
+            return;
+
+        offers.Add(new RemoteStoreCardOffer(slotKey, canonicalCard.CanonicalInstance ?? canonicalCard));
     }
 
     private static IEnumerable<CardModel> GetCharacterPoolCandidates(
@@ -157,6 +188,25 @@ internal static class RemoteStoreCardHelper
             .Where(pool => ColorlessPoolTypes.Any(type => type.IsInstanceOfType(pool)))
             .SelectMany(pool => pool.GetUnlockedCards(owner.UnlockState, owner.RunState.CardMultiplayerConstraint))
             .Where(IsEligibleRemoteStoreCard);
+    }
+
+    private static IEnumerable<CardModel> GetBaseAbilityCandidates(MegaCrit.Sts2.Core.Entities.Players.Player owner)
+    {
+        return BaseAbilityCardRegistry.GetCandidateTypes(owner)
+            .Select(type => ModelDb.GetById<CardModel>(ModelDb.GetId(type)))
+            .Where(static card => card != null)
+            .Select(static card => card.CanonicalInstance ?? card);
+    }
+
+    private static CardModel? ResolveDemonForm()
+    {
+        if (!OptionalModModelResolver.TryFindCardByEntry(DemonFormEntry, out var card))
+        {
+            MainFile.Logger.Warn($"[{MainFile.ModId}] SkillRemoteStore could not resolve fixed remote store card '{DemonFormEntry}'.");
+            return null;
+        }
+
+        return card.CanonicalInstance ?? card;
     }
 
     private static IEnumerable<CardModel> CanonicalDistinct(IEnumerable<CardModel> cards)

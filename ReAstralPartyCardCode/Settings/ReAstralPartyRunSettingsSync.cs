@@ -270,12 +270,13 @@ internal static class ReAstralPartyRunSettingsSync
             EnableLucidDreamPitchBlackImpulse = lobbySnapshot?.EnableLucidDreamPitchBlackImpulse ?? false,
             EnableLucidDreamBubblePotionOfDreams = lobbySnapshot?.EnableLucidDreamBubblePotionOfDreams ?? false,
             EnableLucidDreamHarmlessWhisper = lobbySnapshot?.EnableLucidDreamHarmlessWhisper ?? false,
-            BannedRelicIdsSerialized = [.. (settings.BannedRelicIds.Count > 0
-                ? settings.BannedRelicIds
-                : settings.BannedPersonaRelicIds ?? [])
-                .Where(static id => !string.IsNullOrWhiteSpace(id))
-                .Distinct(StringComparer.Ordinal)
-                .OrderBy(static id => id, StringComparer.Ordinal)]
+            BannedRelicIdsSerialized =
+            [
+                .. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(
+                    settings.BannedRelicIds.Count > 0
+                        ? settings.BannedRelicIds
+                        : settings.BannedPersonaRelicIds)
+            ]
         };
     }
 
@@ -440,12 +441,13 @@ internal static class ReAstralPartyRunSettingsSync
             EnableLucidDreamPitchBlackImpulse = lobbySnapshot.EnableLucidDreamPitchBlackImpulse,
             EnableLucidDreamBubblePotionOfDreams = lobbySnapshot.EnableLucidDreamBubblePotionOfDreams,
             EnableLucidDreamHarmlessWhisper = lobbySnapshot.EnableLucidDreamHarmlessWhisper,
-            BannedRelicIdsSerialized = [.. (settings.BannedRelicIds.Count > 0
-                ? settings.BannedRelicIds
-                : settings.BannedPersonaRelicIds ?? [])
-                .Where(static id => !string.IsNullOrWhiteSpace(id))
-                .Distinct(StringComparer.Ordinal)
-                .OrderBy(static id => id, StringComparer.Ordinal)]
+            BannedRelicIdsSerialized =
+            [
+                .. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(
+                    settings.BannedRelicIds.Count > 0
+                        ? settings.BannedRelicIds
+                        : settings.BannedPersonaRelicIds)
+            ]
         };
         return true;
     }

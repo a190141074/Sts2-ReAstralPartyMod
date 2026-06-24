@@ -853,17 +853,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         {
             var role = GetCurrentRoleForUi();
             var isEditable = IsEditableByLocalPlayer(role);
-            var initialPointAllowed = ReAstralPartyModSettingsManager.IsStartingInitialPointAllowed(null);
-            if (!initialPointAllowed && snapshot.EnableStartingInitialPoint)
-            {
-                snapshot.EnableStartingInitialPoint = false;
-                if (isEditable)
-                {
-                    LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(localSnapshot =>
-                        localSnapshot.EnableStartingInitialPoint = false);
-                    LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
-                }
-            }
             var currentMode = AstralContentModeRegistry.NormalizeMode(snapshot.CurrentContentMode);
             var isVanillaMode = currentMode == AstralContentMode.Vanilla;
             var personaSelectionEnabled = snapshot.EnableStartingPersonaSelection;
@@ -873,10 +862,9 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 snapshot.NeowExtraOptionSelectionMode);
             if (_startingInitialPointToggle != null)
             {
-                var effectiveEnabled = snapshot.EnableStartingInitialPoint && initialPointAllowed;
-                _startingInitialPointToggle.ButtonPressed = effectiveEnabled;
-                _startingInitialPointToggle.Disabled = !isEditable || !initialPointAllowed;
-                _startingInitialPointToggle.Text = effectiveEnabled ? "ON" : "OFF";
+                _startingInitialPointToggle.ButtonPressed = snapshot.EnableStartingInitialPoint;
+                _startingInitialPointToggle.Disabled = !isEditable;
+                _startingInitialPointToggle.Text = snapshot.EnableStartingInitialPoint ? "ON" : "OFF";
             }
 
             if (_startingAstralRelicStoreToggle != null)
@@ -1031,8 +1019,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                     lines.Add(GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.disabled_hint"));
                 if (!snapshot.EnableNeowExtraOption)
                     lines.Add(GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.disabled_hint"));
-                if (!initialPointAllowed)
-                    lines.Add(GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.disabled_hint"));
                 _footerLabel.Text = string.Join("\n", lines);
             }
 
@@ -1179,8 +1165,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private void OnEnableStartingInitialPointToggled(bool value)
     {
         if (_suppressUiEvents
-            || !IsEditableByLocalPlayer(GetCurrentRoleForUi())
-            || !ReAstralPartyModSettingsManager.IsStartingInitialPointAllowed(null))
+            || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingInitialPoint = value);
