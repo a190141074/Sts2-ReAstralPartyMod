@@ -71,6 +71,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.title": "治愈黏液",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.description": "获得{HalfLifeHealPower:diff()}层[gold]治愈[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.smartDescription": "获得{HalfLifeHealPower:diff()}层[gold]治愈[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME_DOPPELGANGER.title": "治愈黏液β",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME_DOPPELGANGER.description": "指定一名友方单位。其获得[blue]3[/blue]层[gold]治愈[/gold]，并使其手牌中随机[blue]1[/blue]张未附魔且耗能不低于[blue]1[/blue]的牌获得[gold]迷你史莱姆[/gold]附魔。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUMMON_RAIN.title": "唤雨",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUMMON_RAIN.description": "所有友方单位获得[blue]1[/blue]层[gold]雨泽[/gold]和[blue]10[/blue]层[gold]水缠[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SAVE_ME_MOUSY.title": "鼠鼠救我",
@@ -247,4 +249,3 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ENERGY_OVERLOAD.title": "能量过载",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ENERGY_OVERLOAD.description": "临时[green]敏捷[/green]-[blue]2[/blue]。\n[gold]进程[/gold]+[blue]3[/blue]。"
 }
-

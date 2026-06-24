@@ -71,6 +71,8 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.title": "治愈黏液",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.description": "{HalfLifeHealPower:diff()} [power]治愈[/power] をゲインします。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.smartDescription": "{HalfLifeHealPower:diff()} [power]治愈[/power] をゲインします。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME_DOPPELGANGER.title": "治愈黏液β",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME_DOPPELGANGER.description": "味方[blue]1[/blue]体を選ぶ。対象は[blue]3[/blue]層の[gold]治愈[/gold]を得て、その手札の中から未付魔かつコスト[blue]1[/blue]以上のカード[blue]1[/blue]枚がランダムで[gold]迷你史莱姆[/gold]付魔を得る。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUMMON_RAIN.title": "唤雨",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SUMMON_RAIN.description": "生存しているプレイヤー側の全ユニットは[blue]1[/blue]層の[gold]雨泽[/gold]と[blue]10[/blue]層の[gold]水缠[/gold]を得る。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SAVE_ME_MOUSY.title": "鼠鼠救我",

@@ -363,6 +363,21 @@ internal static class GameplayStaticPatchCatalog
                 false,
                 "Gameplay patch: record sacred faith permanent instance growth after kills"),
             new ModPatchInfo(
+                "mini_lulu_enchantment_should_receive_hooks_patch",
+                typeof(CardModel),
+                nameof(CardModel.ShouldReceiveCombatHooks),
+                typeof(MiniLuluEnchantmentShouldReceiveCombatHooksPatch),
+                false,
+                "Gameplay patch: force cards with Mini Lulu to receive combat hooks",
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
+                "mini_lulu_enchantment_after_card_played_patch",
+                typeof(AbstractModel),
+                nameof(CardModel.AfterCardPlayed),
+                typeof(MiniLuluEnchantmentAfterCardPlayedPatch),
+                false,
+                "Gameplay patch: resolve Mini Lulu post-play healing"),
+            new ModPatchInfo(
                 "tetra_warforge_enchantment_should_receive_hooks_patch",
                 typeof(CardModel),
                 nameof(CardModel.ShouldReceiveCombatHooks),
