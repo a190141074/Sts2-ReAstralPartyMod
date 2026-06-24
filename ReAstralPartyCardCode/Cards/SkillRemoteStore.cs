@@ -28,7 +28,7 @@ public sealed class SkillRemoteStore : AstralPartyCardModel
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
-    public SkillRemoteStore() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
+    public SkillRemoteStore() : base(0, CardType.Skill, CardRarity.Rare, TargetType.Self)
     {
     }
 

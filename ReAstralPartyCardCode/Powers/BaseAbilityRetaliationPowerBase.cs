@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
@@ -11,12 +12,16 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 public abstract class BaseAbilityRetaliationPowerBase : AstralPartyPowerModel
 {
+    private sealed record PendingRetaliation(
+        PowerModel Power,
+        decimal Amount,
+        Creature Target);
+
     private sealed class Data
     {
-        public bool IsReflecting;
-        public PowerModel? PendingPower;
-        public decimal PendingAmount;
-        public Creature? PendingApplier;
+        public bool IsRedirecting;
+        public bool IsProcessing;
+        public Queue<PendingRetaliation> PendingRetaliations { get; } = new();
     }
 
     public override PowerType Type => PowerType.Buff;
@@ -45,77 +50,77 @@ public abstract class BaseAbilityRetaliationPowerBase : AstralPartyPowerModel
             return false;
 
         var data = GetInternalData<Data>();
-        if (data.IsReflecting)
+        if (data.IsRedirecting)
+            return false;
+        if (applier == null || !applier.IsAlive || applier == Owner)
             return false;
 
-        data.PendingPower = GetCanonicalPower(canonicalPower);
-        data.PendingAmount = amount;
-        data.PendingApplier = applier;
-        return false;
+        var retaliationTarget = ResolveRetaliationTarget(applier);
+        if (retaliationTarget == null || !retaliationTarget.IsAlive || retaliationTarget == Owner)
+            return false;
+
+        var pendingPower = GetCanonicalPower(canonicalPower);
+        if (pendingPower == null)
+            return false;
+
+        data.PendingRetaliations.Enqueue(new PendingRetaliation(
+            pendingPower,
+            amount,
+            retaliationTarget));
+        SchedulePendingRetaliations(data);
+        modifiedAmount = 0m;
+        return true;
     }
 
-    public override async Task AfterPowerAmountChanged(
-        PowerModel power,
-        decimal amount,
-        Creature? applier,
-        CardModel? cardSource)
+    private void SchedulePendingRetaliations(Data data)
     {
-        var data = GetInternalData<Data>();
-        if (data.IsReflecting)
+        if (data.IsProcessing)
             return;
-        if (data.PendingPower == null || data.PendingAmount <= 0m)
-            return;
-        if (power != data.PendingPower && power != this)
-            return;
-        if (data.PendingApplier == null || !data.PendingApplier.IsAlive || data.PendingApplier == Owner)
-        {
-            ClearPending(data);
-            return;
-        }
-        if (applier != data.PendingApplier && applier != null)
-        {
-            ClearPending(data);
-            return;
-        }
 
-        var target = ResolveRetaliationTarget(data.PendingApplier);
-        if (target == null || !target.IsAlive)
-        {
-            ClearPending(data);
-            return;
-        }
+        data.IsProcessing = true;
+        TaskHelper.RunSafely(ProcessPendingRetaliationsAsync(data));
+    }
 
-        var pendingPower = GetCanonicalPower(data.PendingPower);
-        var pendingAmount = data.PendingAmount;
-        var pendingApplier = data.PendingApplier;
-        if (pendingPower == null || pendingAmount <= 0m || pendingApplier == null)
-        {
-            ClearPending(data);
-            return;
-        }
-
-        data.IsReflecting = true;
+    private async Task ProcessPendingRetaliationsAsync(Data data)
+    {
         try
         {
-            Flash();
-            await PowerCmd.ModifyAmount(this, -1m, Owner, null, true);
-            await PowerCmd.Apply(pendingPower.ToMutable(), target, pendingAmount, Owner, cardSource, false);
+            await Task.Yield();
+
+            while (data.PendingRetaliations.Count > 0)
+            {
+                if (Owner == null || !Owner.IsAlive || Amount <= 0m)
+                {
+                    data.PendingRetaliations.Clear();
+                    return;
+                }
+
+                var pending = data.PendingRetaliations.Dequeue();
+                if (!pending.Target.IsAlive)
+                    continue;
+
+                data.IsRedirecting = true;
+                try
+                {
+                    Flash();
+                    await PowerCmd.ModifyAmount(this, -1m, Owner, null, true);
+                    await PowerCmd.Apply(pending.Power.ToMutable(), pending.Target, pending.Amount, Owner, null, false);
+                }
+                finally
+                {
+                    data.IsRedirecting = false;
+                }
+            }
         }
         finally
         {
-            data.IsReflecting = false;
-            ClearPending(data);
+            data.IsProcessing = false;
+            if (data.PendingRetaliations.Count > 0)
+                SchedulePendingRetaliations(data);
         }
     }
 
     protected abstract Creature? ResolveRetaliationTarget(Creature source);
-
-    private static void ClearPending(Data data)
-    {
-        data.PendingPower = null;
-        data.PendingAmount = 0m;
-        data.PendingApplier = null;
-    }
 
     private static PowerModel? GetCanonicalPower(PowerModel? power)
     {

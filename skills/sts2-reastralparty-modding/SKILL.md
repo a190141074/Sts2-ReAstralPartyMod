@@ -78,6 +78,10 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - 先确认变量由哪条 `LocString` / `SmartDescription` / helper 注入
   - 不要在文案里随意新增仓库当前不会注值的占位符
   - 变量名与花括号结构在中英日三语里保持一致，避免只改某一语种
+- 本仓库本地化默认走务实风格：
+  - 优先保留玩家一眼能懂的核心效果，不擅自扩写成“解释实现过程”的长句
+  - 如果用户已经给出更短口径，默认直接贴用户口径，不自作主张补“正层数”“取消这次获得”这类实现细节
+  - 只有当省略后会直接改变规则理解时，才补最小必要限定
 
 ### 新异格 / 新人格 / 成套内容
 
@@ -178,6 +182,30 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
     - 不要在每个 holder `Initialize(...)` 后立刻 `RefreshPlayerVotes()`
     - 不要在 holder 全部建完但真实选择/投票上下文还没稳定前强刷 `RefreshVotes(false)`
     - 如果这里命中 `PlayerVotedForRelic` 越界，优先先停掉早期 vote refresh，再决定是否补更窄 gate
+  - 如果需求是“`集体准备` 只有房主能开启人格选择”，默认优先把门禁收在 `StartingPersonNeowReadyFlow`：
+    - host / singleplayer 才允许 ready option 真正触发 `OnReadyChosenAsync(...)`
+    - client 侧可以保留 ready-page 展示，但要在 `ApplyLocalReadyOptionUi(...)` 里做本地不可交互处理
+    - 不要让 client 通过本地点击直接打开 overlay；实际启动应继续走 `StartingPersonHostLaunchSync.BroadcastLaunch(...)` + `HandleReadyLaunchAsync(...)`
+  - 如果需求是“背景底图不能丢”，先查 `StartingPersonRelicSelectionScreen` 自己的背景链，而不是先加延迟：
+    - 这个 overlay 已经同时依赖 `UseSharedBackstop => true`
+    - 并且会在 `BuildStaticUi()` 里挂一张全屏 `Background` TextureRect
+    - 先核对 `AfterOverlayOpened/Shown/Hidden/Closed` 期间是否被别的 UI rebuild 或 visibility 链打断，再决定要不要碰动画/布局
+  - 如果需求是“玩家选择后遗物下面要出现对应头像，像宝箱房那样”，默认优先复用 `NTreasureRoomRelicHolder.VoteContainer` 这条现成显示链：
+    - 先让 holder 本身维护正确的“哪个玩家投了哪个 relic”
+    - 再让 `PlayerVotedForRelic` / `RefreshPlayerVotes` 去负责头像显示
+    - 不要先自定义再叠一层手写头像 UI，否则容易和原 vote 容器、联机刷新、结果动画互相打架
+  - 如果需求是“鼠标放在人格上要正常出 relic 信息”，优先把 hover 绑在 holder/control 本体上，并直接复用 `relic.HoverTips`：
+    - 参考仓库里 `GroupedRelicSelectionScreen`、`RefreshableTokenRelicSelectionScreen`
+    - 用 `NHoverTipSet.CreateAndShow(owner, relic.HoverTips, HoverTip.GetHoverTipAlignment(owner))`
+    - 不要只给 icon 子节点绑 hover，否则焦点、手柄和整块点击区域很容易不一致
+  - 如果需求是“所有人都选完后才触发结算”，先查提交链是否被 UI 症状误判：
+    - `StartingPersonRelicSelectionScreen.CollectSelectionsAsync()` 的多人路径应等 `_multiplayerCommitSource`
+    - `MaybeCommitSelections()` 只应由 authority / host 在 `AreAllSelectionsSubmitted()` 为真后发最终 commit
+    - 如果表面看起来像“提前结算”，先核对是谁提前写入了 committed snapshot，不要先怀疑结果动画本身
+  - 起始人格联机稳定性默认按“两段式”检查：
+    - 第一段是 ready-page / host-launch payload 是否一致
+    - 第二段是 overlay 内 `selection update -> final commit -> ApplyCommittedSelections(...)` 是否只走一遍
+    - 如果用户描述是“显示不全 / 有人先结算 / 有人没看到头像”，先分清是 payload 分叉、vote 容器没刷，还是 final commit 提前触发
   - 对人格选择链，`Asset not cached` 往往只是噪音；若同时存在 `PlayerVotedForRelic` / `Index was out of range` / `P132A`，默认先修越界链，再讨论资源
   - 只要用户没有明确要求动这条链，默认避免顺手“顺便整理 / 顺便统一 / 顺便优化”：
     - 先怀疑是否能在外围绕开

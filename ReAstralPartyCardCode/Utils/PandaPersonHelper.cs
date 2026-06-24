@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -84,26 +85,75 @@ internal static class PandaPersonaHelper
 
     public static bool HasAttackIntent(Creature creature)
     {
-        var intent = TryReadIntentObject(creature);
-        return intent != null && intent.GetType().Name.Contains("Attack", StringComparison.OrdinalIgnoreCase);
+        return TryReadAttackIntentSummary(creature).hasAttackIntent;
     }
 
     private static decimal TryReadAttackIntentDamage(Creature creature)
     {
-        var intent = TryReadIntentObject(creature);
+        return TryReadAttackIntentSummary(creature).totalDamage;
+    }
+
+    private static (bool hasAttackIntent, decimal totalDamage) TryReadAttackIntentSummary(Creature creature)
+    {
+        var nextMoveIntents = creature.Monster?.NextMove?.Intents;
+        if (nextMoveIntents != null)
+        {
+            var totalDamage = 0m;
+            var hasAttackIntent = false;
+            foreach (var intent in nextMoveIntents)
+            {
+                if (!IsAttackIntent(intent))
+                    continue;
+
+                hasAttackIntent = true;
+                var damage = ReadNumericMember(intent, DamageMemberNames);
+                if (damage <= 0m)
+                    continue;
+
+                var hitCount = Math.Max(1, (int)ReadNumericMember(intent, HitCountMemberNames));
+                totalDamage += damage * hitCount;
+            }
+
+            if (hasAttackIntent)
+                return (true, totalDamage);
+        }
+
+        var intentObject = TryReadIntentObject(creature);
+        if (!IsAttackIntent(intentObject))
+            return (false, 0m);
+
+        var fallbackDamage = ReadNumericMember(intentObject!, DamageMemberNames);
+        if (fallbackDamage <= 0m)
+            return (true, 0m);
+
+        var fallbackHitCount = Math.Max(1, (int)ReadNumericMember(intentObject!, HitCountMemberNames));
+        return (true, fallbackDamage * fallbackHitCount);
+    }
+
+    private static bool IsAttackIntent(object? intent)
+    {
         if (intent == null)
-            return 0m;
+            return false;
+
+        if (intent is MultiAttackIntent)
+            return true;
 
         var intentType = intent.GetType();
-        if (!intentType.Name.Contains("Attack", StringComparison.OrdinalIgnoreCase))
-            return 0m;
+        if (intentType.Name.Contains("Attack", StringComparison.OrdinalIgnoreCase))
+            return true;
 
         var damage = ReadNumericMember(intent, DamageMemberNames);
-        if (damage <= 0m)
-            return 0m;
+        if (damage > 0m)
+            return true;
 
-        var hitCount = Math.Max(1, (int)ReadNumericMember(intent, HitCountMemberNames));
-        return damage * hitCount;
+        foreach (var memberName in HitCountMemberNames)
+        {
+            var value = ReadMemberValue(intent, memberName);
+            if (TryConvertToDecimal(value, out var numericValue) && numericValue > 0m)
+                return true;
+        }
+
+        return false;
     }
 
     private static object? TryReadIntentObject(object source)
