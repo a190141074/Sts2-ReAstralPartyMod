@@ -56,6 +56,8 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 
 - 先看 `logs\saves\mod_data\DevMode\instances\*\session.log`
 - 再看 `logs\godot*.log`
+- 官方 `zhs` 风格只作为后续新写或重写文案时的参考基线，不自动回刷当前仓库已有文本。
+- 如果用户明确说“先不使用”“只总结”“不要回刷现有文本”，则这类工作只更新 skill / glossary 规则，不修改 `ReAstralPartyMod/localization/*`。
 - 先分流，再修：
   - `GetRawText: Key '...title/description/...' not found`
     - 这是缺 key、ID 不匹配、写错 table、或 locale 回退。
@@ -82,6 +84,11 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - 优先保留玩家一眼能懂的核心效果，不擅自扩写成“解释实现过程”的长句
   - 如果用户已经给出更短口径，默认直接贴用户口径，不自作主张补“正层数”“取消这次获得”这类实现细节
   - 只有当省略后会直接改变规则理解时，才补最小必要限定
+- 参考官方 `zhs` 风格时，默认额外遵守这些边界：
+  - 官方风格解决的是句式、术语、标签克制和玩家阅读顺序，不自动覆盖仓库既定世界观命名
+  - 如果仓库已有明确前缀、玩法名或用户指定口径，仓库口径优先
+  - 如果官方习惯写法与仓库既定术语冲突，先记入 glossary 或 skill，再单独确认，不直接替换现有内容
+  - 复用官方高频表达时，仍要遵守本仓库现有规则：标签结构跨语种对齐、不要新增未注值占位符、默认务实短句
 
 ### 新异格 / 新人格 / 成套内容
 
