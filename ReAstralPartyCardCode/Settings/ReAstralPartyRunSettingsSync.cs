@@ -226,85 +226,86 @@ internal static class ReAstralPartyRunSettingsSync
 
     private static ReAstralPartyRunSettingsSnapshot CreateLocalSnapshot()
     {
-        var settings = ReAstralPartyModSettingsManager.ReadLocalSettings();
+        var snapshot = CreateRuntimeSnapshot();
         LobbyGameplaySettingsSync.TryGetSnapshot(out var lobbySnapshot);
-        return new ReAstralPartyRunSettingsSnapshot
-        {
-            CurrentContentMode = ReAstralPartyModSettingsManager.GetCurrentContentMode(),
-            EnableStartingInitialPoint = lobbySnapshot?.EnableStartingInitialPoint ?? settings.EnableStartingInitialPoint,
-            EnableStartingAstralRelicStore = lobbySnapshot?.EnableStartingAstralRelicStore ?? ReAstralPartyModSettingsManager.EnableStartingAstralRelicStore,
-            EnableStartingRingOfSevenCurses = lobbySnapshot?.EnableStartingRingOfSevenCurses ?? settings.EnableStartingRingOfSevenCurses,
-            EnableStartingPersonaSelection = lobbySnapshot?.EnableStartingPersonaSelection ?? settings.EnableStartingPersonaSelection,
-            EnableDreamSeriesEvents = lobbySnapshot?.EnableDreamSeriesEvents ?? settings.EnableDreamSeriesEvents,
-            EnableEnigmaticSeriesEvents = lobbySnapshot?.EnableEnigmaticSeriesEvents ?? settings.EnableEnigmaticSeriesEvents,
-            EnableMoonPropShopSlots = lobbySnapshot?.EnableMoonPropShopSlots ?? settings.EnableMoonPropShopSlots,
-            EnableMoonPropRelics = lobbySnapshot?.EnableMoonPropRelics ?? settings.EnableMoonPropRelics,
-            EnableJewelryRelics = lobbySnapshot?.EnableJewelryRelics ?? settings.EnableJewelryRelics,
-            EnableNeowExtraOption = lobbySnapshot?.EnableNeowExtraOption ?? settings.EnableNeowExtraOption,
-            EnableLucidDream = lobbySnapshot?.EnableLucidDream ?? settings.EnableLucidDream,
-            EnableCollectorsCards = lobbySnapshot?.EnableCollectorsCards ?? settings.EnableCollectorsCards,
-            NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-                lobbySnapshot?.EnableStartingRingOfSevenCurses ?? settings.EnableStartingRingOfSevenCurses,
-                lobbySnapshot?.NeowExtraOptionSelectionMode ?? settings.NeowExtraOptionSelectionMode),
-            EnableAllPersonas = lobbySnapshot?.EnableAllPersonas ?? settings.EnableAllPersonas,
-            EnableVariantPersonas = lobbySnapshot?.EnableVariantPersonas ?? settings.EnableVariantPersonas,
-            EnableAllVariantPersonas = lobbySnapshot?.EnableAllVariantPersonas ?? settings.EnableAllVariantPersonas,
-            StartingPersonMode = lobbySnapshot?.StartingPersonMode
-                                  ?? ReAstralPartyModSettingsManager.ResolveStartingPersonaMode(settings),
-            TokenSeriesMode = lobbySnapshot?.TokenSeriesMode
-                              ?? ReAstralPartyModSettingsManager.ResolveTokenSeriesMode(settings),
-            EnableExtremeMode = lobbySnapshot?.EnableExtremeMode ?? settings.EnableExtremeMode,
-            EnablePureAngelMode = settings.EnablePureAngelMode,
-            EnableLucidDreamFalseLifeline = lobbySnapshot?.EnableLucidDreamFalseLifeline ?? false,
-            EnableLucidDreamSmoothSailing = lobbySnapshot?.EnableLucidDreamSmoothSailing ?? false,
-            EnableLucidDreamFishScalesMalice = lobbySnapshot?.EnableLucidDreamFishScalesMalice ?? false,
-            EnableLucidDreamSevereWoundOneMalice = lobbySnapshot?.EnableLucidDreamSevereWoundOneMalice ?? false,
-            EnableLucidDreamSevereWoundTwoMalice = lobbySnapshot?.EnableLucidDreamSevereWoundTwoMalice ?? false,
-            EnableLucidDreamMadLifeMalice = lobbySnapshot?.EnableLucidDreamMadLifeMalice ?? false,
-            EnableLucidDreamSwampOfFateMalice = lobbySnapshot?.EnableLucidDreamSwampOfFateMalice ?? false,
-            EnableLucidDreamOverpopulationMalice = lobbySnapshot?.EnableLucidDreamOverpopulationMalice ?? false,
-            EnableLucidDreamCautiousJellyfishMalice = lobbySnapshot?.EnableLucidDreamCautiousJellyfishMalice ?? false,
-            EnableLucidDreamFaceDeathWithComposure = lobbySnapshot?.EnableLucidDreamFaceDeathWithComposure ?? false,
-            EnableLucidDreamWildness = lobbySnapshot?.EnableLucidDreamWildness ?? false,
-            EnableLucidDreamWildnessPhantom = lobbySnapshot?.EnableLucidDreamWildnessPhantom ?? false,
-            EnableLucidDreamPitchBlackImpulse = lobbySnapshot?.EnableLucidDreamPitchBlackImpulse ?? false,
-            EnableLucidDreamBubblePotionOfDreams = lobbySnapshot?.EnableLucidDreamBubblePotionOfDreams ?? false,
-            EnableLucidDreamHarmlessWhisper = lobbySnapshot?.EnableLucidDreamHarmlessWhisper ?? false,
-            BannedRelicIdsSerialized =
-            [
-                .. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(
-                    settings.BannedRelicIds.Count > 0
-                        ? settings.BannedRelicIds
-                        : settings.BannedPersonaRelicIds)
-            ]
-        };
+        if (lobbySnapshot == null)
+            return snapshot;
+
+        snapshot.CurrentContentMode = lobbySnapshot.CurrentContentMode;
+        snapshot.EnableStartingInitialPoint = lobbySnapshot.EnableStartingInitialPoint;
+        snapshot.EnableStartingAstralRelicStore = lobbySnapshot.EnableStartingAstralRelicStore;
+        snapshot.EnableStartingRingOfSevenCurses = lobbySnapshot.EnableStartingRingOfSevenCurses;
+        snapshot.EnableStartingPersonaSelection = lobbySnapshot.EnableStartingPersonaSelection;
+        snapshot.EnableDreamSeriesEvents = lobbySnapshot.EnableDreamSeriesEvents;
+        snapshot.EnableEnigmaticSeriesEvents = lobbySnapshot.EnableEnigmaticSeriesEvents;
+        snapshot.EnableMoonPropShopSlots = lobbySnapshot.EnableMoonPropShopSlots;
+        snapshot.EnableMoonPropRelics = lobbySnapshot.EnableMoonPropRelics;
+        snapshot.EnableJewelryRelics = lobbySnapshot.EnableJewelryRelics;
+        snapshot.EnableNeowExtraOption = lobbySnapshot.EnableNeowExtraOption;
+        snapshot.EnableLucidDream = lobbySnapshot.EnableLucidDream;
+        snapshot.EnableCollectorsCards = lobbySnapshot.EnableCollectorsCards;
+        snapshot.NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+            lobbySnapshot.EnableStartingRingOfSevenCurses,
+            lobbySnapshot.NeowExtraOptionSelectionMode);
+        snapshot.EnableAllPersonas = lobbySnapshot.EnableAllPersonas;
+        snapshot.EnableVariantPersons = lobbySnapshot.EnableVariantPersons;
+        snapshot.EnableAllVariantPersons = lobbySnapshot.EnableAllVariantPersons;
+        snapshot.StartingPersonMode = lobbySnapshot.StartingPersonMode;
+        snapshot.TokenSeriesMode = lobbySnapshot.TokenSeriesMode;
+        snapshot.EnableExtremeMode = lobbySnapshot.EnableExtremeMode;
+        snapshot.EnableLucidDreamFalseLifeline = lobbySnapshot.EnableLucidDreamFalseLifeline;
+        snapshot.EnableLucidDreamSmoothSailing = lobbySnapshot.EnableLucidDreamSmoothSailing;
+        snapshot.EnableLucidDreamFishScalesMalice = lobbySnapshot.EnableLucidDreamFishScalesMalice;
+        snapshot.EnableLucidDreamSevereWoundOneMalice = lobbySnapshot.EnableLucidDreamSevereWoundOneMalice;
+        snapshot.EnableLucidDreamSevereWoundTwoMalice = lobbySnapshot.EnableLucidDreamSevereWoundTwoMalice;
+        snapshot.EnableLucidDreamMadLifeMalice = lobbySnapshot.EnableLucidDreamMadLifeMalice;
+        snapshot.EnableLucidDreamSwampOfFateMalice = lobbySnapshot.EnableLucidDreamSwampOfFateMalice;
+        snapshot.EnableLucidDreamOverpopulationMalice = lobbySnapshot.EnableLucidDreamOverpopulationMalice;
+        snapshot.EnableLucidDreamCautiousJellyfishMalice = lobbySnapshot.EnableLucidDreamCautiousJellyfishMalice;
+        snapshot.EnableLucidDreamFaceDeathWithComposure = lobbySnapshot.EnableLucidDreamFaceDeathWithComposure;
+        snapshot.EnableLucidDreamWildness = lobbySnapshot.EnableLucidDreamWildness;
+        snapshot.EnableLucidDreamWildnessPhantom = lobbySnapshot.EnableLucidDreamWildnessPhantom;
+        snapshot.EnableLucidDreamPitchBlackImpulse = lobbySnapshot.EnableLucidDreamPitchBlackImpulse;
+        snapshot.EnableLucidDreamBubblePotionOfDreams = lobbySnapshot.EnableLucidDreamBubblePotionOfDreams;
+        snapshot.EnableLucidDreamHarmlessWhisper = lobbySnapshot.EnableLucidDreamHarmlessWhisper;
+        snapshot.BannedRelicIdsSerialized = [.. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(
+            lobbySnapshot.BannedRelicIdsSerialized)]
+        ;
+        return snapshot;
     }
 
     private static ReAstralPartyRunSettingsSnapshot CreateSafeSnapshot()
     {
+        return CreateRuntimeSnapshot();
+    }
+
+    private static ReAstralPartyRunSettingsSnapshot CreateRuntimeSnapshot()
+    {
         return new ReAstralPartyRunSettingsSnapshot
         {
-            CurrentContentMode = AstralContentMode.Vanilla,
-            EnableExtremeMode = false,
-            EnableStartingInitialPoint = false,
-            EnableStartingAstralRelicStore = true,
-            EnableStartingRingOfSevenCurses = false,
-            EnableStartingPersonaSelection = true,
-            EnableDreamSeriesEvents = true,
-            EnableEnigmaticSeriesEvents = true,
-            EnableMoonPropShopSlots = true,
-            EnableMoonPropRelics = true,
-            EnableJewelryRelics = true,
-            EnableNeowExtraOption = true,
-            EnableLucidDream = true,
-            EnableCollectorsCards = true,
-            NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom,
-            EnableAllPersonas = false,
-            EnableVariantPersonas = true,
-            EnableAllVariantPersonas = false,
-            StartingPersonMode = StartingPersonMode.Standard,
-            TokenSeriesMode = TokenSeriesMode.RandomTwo,
-            EnablePureAngelMode = false,
+            CurrentContentMode = ReAstralPartyModSettingsManager.GetCurrentContentMode(),
+            EnableExtremeMode = ReAstralPartyModSettingsManager.EnableExtremeMode,
+            EnableStartingInitialPoint = ReAstralPartyModSettingsManager.EnableStartingInitialPoint,
+            EnableStartingAstralRelicStore = ReAstralPartyModSettingsManager.EnableStartingAstralRelicStore,
+            EnableStartingRingOfSevenCurses = ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
+            EnableStartingPersonaSelection = ReAstralPartyModSettingsManager.EnableStartingPersonaSelection,
+            EnableDreamSeriesEvents = ReAstralPartyModSettingsManager.EnableDreamSeriesEvents,
+            EnableEnigmaticSeriesEvents = ReAstralPartyModSettingsManager.EnableEnigmaticSeriesEvents,
+            EnableMoonPropShopSlots = ReAstralPartyModSettingsManager.EnableMoonPropShopSlots,
+            EnableMoonPropRelics = ReAstralPartyModSettingsManager.EnableMoonPropRelics,
+            EnableJewelryRelics = ReAstralPartyModSettingsManager.EnableJewelryRelics,
+            EnableNeowExtraOption = ReAstralPartyModSettingsManager.EnableNeowExtraOption,
+            EnableLucidDream = ReAstralPartyModSettingsManager.EnableLucidDream,
+            EnableCollectorsCards = ReAstralPartyModSettingsManager.EnableCollectorsCards,
+            NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+                ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
+                ReAstralPartyModSettingsManager.NeowExtraOptionSelectionMode),
+            EnableAllPersonas = ReAstralPartyModSettingsManager.EnableAllPersonas,
+            EnableVariantPersons = ReAstralPartyModSettingsManager.EnableVariantPersons,
+            EnableAllVariantPersons = ReAstralPartyModSettingsManager.EnableAllVariantPersons,
+            StartingPersonMode = ReAstralPartyModSettingsManager.ConfiguredStartingPersonaMode,
+            TokenSeriesMode = ReAstralPartyModSettingsManager.TokenSeriesMode,
+            EnablePureAngelMode = ReAstralPartyModSettingsManager.EnablePureAngelMode,
             EnableLucidDreamFalseLifeline = false,
             EnableLucidDreamSmoothSailing = false,
             EnableLucidDreamFishScalesMalice = false,
@@ -547,3 +548,5 @@ internal static class ReAstralPartyRunSettingsSync
         }
     }
 }
+
+

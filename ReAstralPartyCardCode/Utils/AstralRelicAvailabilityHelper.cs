@@ -45,7 +45,7 @@ public static class AstralRelicAvailabilityHelper
             return false;
         if (BannedRelicRegistry.IsBanned(ReAstralPartyModSettingsManager.GetBannedRelicIds(runState), relic))
             return false;
-        if (runState != null && !IsAllowedByContentMode(runState, relic))
+        if (!IsAllowedByContentMode(runState, relic))
             return false;
         if (IsMoonPropRelic(relic) && !ReAstralPartyModSettingsManager.GetEnableMoonPropRelics(runState))
             return false;

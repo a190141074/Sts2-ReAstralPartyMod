@@ -569,6 +569,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_stone_flux_pauldron.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_transcendence.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_living_folio.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\person_mascot_girl_mimi_doppelganger.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_solid_state_time.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_z3000_weapon_frame.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_kawaii_angel.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_needy_girl.png"/>

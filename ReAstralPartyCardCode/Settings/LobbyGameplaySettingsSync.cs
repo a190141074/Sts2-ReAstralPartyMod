@@ -304,7 +304,7 @@ internal static class LobbyGameplaySettingsSync
 
     public static LobbyGameplaySettingsSnapshot BuildDefaultSnapshot()
     {
-        return new LobbyGameplaySettingsSnapshot();
+        return BuildFallbackSnapshot();
     }
 
     public static LobbyGameplaySettingsSnapshot BuildFallbackSnapshot()

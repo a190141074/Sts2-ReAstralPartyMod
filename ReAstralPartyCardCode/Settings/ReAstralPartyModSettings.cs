@@ -1418,8 +1418,9 @@ public static partial class ReAstralPartyModSettingsManager
             var settings = store.Get<ReAstralPartyModSettings>(SettingsKey);
             migratedDefaultBannedRelics = EnsureDefaultBannedRelicIdsInitialized(settings);
             sanitizedNonBannableRelics = SanitizeNonBannableRelicIds(settings);
+            var normalizedCurrentModeSettings = NormalizeCurrentModeScopedSettings(settings);
             ApplyRuntimeSettings(settings, "register");
-            if (migratedDefaultBannedRelics || sanitizedNonBannableRelics)
+            if (migratedDefaultBannedRelics || sanitizedNonBannableRelics || normalizedCurrentModeSettings)
                 store.Save(SettingsKey);
         }
 
@@ -3031,12 +3032,16 @@ public static partial class ReAstralPartyModSettingsManager
         SanitizeNonBannableRelicIds(settings);
 
         if (settings.ContentModeSettingsInitialized)
+        {
+            NormalizeCurrentModeScopedSettings(settings);
             return;
+        }
 
         settings.ModpackModeSettings = BuildModeScopedSettingsFromLegacy(settings);
         settings.VanillaModeSettings = BuildVanillaModeDefaults();
         settings.CurrentContentMode = ResolveInitialContentMode(settings);
         settings.ContentModeSettingsInitialized = true;
+        NormalizeCurrentModeScopedSettings(settings);
     }
 
     private static AstralContentMode ResolveInitialContentMode(ReAstralPartyModSettings settings)
@@ -3081,7 +3086,7 @@ public static partial class ReAstralPartyModSettingsManager
         return new ReAstralPartyModSettings.AstralModeScopedGameplaySettings
         {
             EnableExtremeMode = false,
-            EnableStartingInitialPoint = false,
+            EnableStartingInitialPoint = true,
             EnableStartingAstralRelicStore = true,
             EnableStartingRingOfSevenCurses = false,
             EnableStartingPersonSelection = true,
@@ -3144,6 +3149,45 @@ public static partial class ReAstralPartyModSettingsManager
         settings.EnableAllVariantPersons = modpack.EnableAllVariantPersons;
         settings.StartingPersonMode = modpack.StartingPersonMode;
         settings.TokenSeriesMode = modpack.TokenSeriesMode;
+    }
+
+    private static bool NormalizeCurrentModeScopedSettings(ReAstralPartyModSettings settings)
+    {
+        var mode = AstralContentModeRegistry.NormalizeMode(settings.CurrentContentMode);
+        if (mode != AstralContentMode.Vanilla)
+            return false;
+
+        var vanilla = settings.VanillaModeSettings ??= BuildVanillaModeDefaults();
+        var defaults = BuildVanillaModeDefaults();
+        var changed = false;
+
+        changed |= SetIfDifferent(vanilla.EnableDreamSeriesEvents, defaults.EnableDreamSeriesEvents, value => vanilla.EnableDreamSeriesEvents = value);
+        changed |= SetIfDifferent(vanilla.EnableEnigmaticSeriesEvents, defaults.EnableEnigmaticSeriesEvents, value => vanilla.EnableEnigmaticSeriesEvents = value);
+        changed |= SetIfDifferent(vanilla.EnableMoonPropShopSlots, defaults.EnableMoonPropShopSlots, value => vanilla.EnableMoonPropShopSlots = value);
+        changed |= SetIfDifferent(vanilla.EnableMoonPropRelics, defaults.EnableMoonPropRelics, value => vanilla.EnableMoonPropRelics = value);
+        changed |= SetIfDifferent(vanilla.EnableJewelryRelics, defaults.EnableJewelryRelics, value => vanilla.EnableJewelryRelics = value);
+        changed |= SetIfDifferent(vanilla.EnableNeowExtraOption, defaults.EnableNeowExtraOption, value => vanilla.EnableNeowExtraOption = value);
+        changed |= SetIfDifferent(vanilla.EnableLucidDream, defaults.EnableLucidDream, value => vanilla.EnableLucidDream = value);
+        changed |= SetIfDifferent(vanilla.EnableCollectorsCards, defaults.EnableCollectorsCards, value => vanilla.EnableCollectorsCards = value);
+        changed |= SetIfDifferent(
+            vanilla.NeowExtraOptionSelectionMode,
+            defaults.NeowExtraOptionSelectionMode,
+            value => vanilla.NeowExtraOptionSelectionMode = value);
+        changed |= SetIfDifferent(vanilla.EnableVariantPersons, defaults.EnableVariantPersons, value => vanilla.EnableVariantPersons = value);
+        changed |= SetIfDifferent(vanilla.EnableAllVariantPersons, defaults.EnableAllVariantPersons, value => vanilla.EnableAllVariantPersons = value);
+        changed |= SetIfDifferent(vanilla.EnableStartingRingOfSevenCurses, defaults.EnableStartingRingOfSevenCurses, value => vanilla.EnableStartingRingOfSevenCurses = value);
+
+        return changed;
+    }
+
+    private static bool SetIfDifferent<T>(T current, T expected, Action<T> setter)
+        where T : notnull
+    {
+        if (EqualityComparer<T>.Default.Equals(current, expected))
+            return false;
+
+        setter(expected);
+        return true;
     }
 
     private sealed class LocalRuntimeSettings

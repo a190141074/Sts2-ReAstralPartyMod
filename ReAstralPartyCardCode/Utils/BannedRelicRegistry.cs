@@ -38,15 +38,6 @@ public static class BannedRelicRegistry
         .Where(relic => !TokenRelicRegistry.IsTokenRelic(relic))
         .ToList();
 
-    private static readonly IReadOnlyList<RelicModel> CanonicalBannableRelics =
-    [
-        .. PersonRelicRegistry.GetCanonicalPersonaRelics(),
-        .. PersonRelicRegistry.GetCanonicalVariantPersonaRelics(),
-        .. PersonalityDerivativeRelics,
-        .. TokenRelicRegistry.GetCanonicalTokenRelics().Where(IsBannableRelicInternal),
-        .. OtherRelics
-    ];
-
     public static IReadOnlyList<BannedRelicCategory> Categories { get; } =
     [
         BannedRelicCategory.Persona,
@@ -58,12 +49,18 @@ public static class BannedRelicRegistry
 
     public static IReadOnlyList<RelicModel> GetCanonicalBannableRelics()
     {
-        return CanonicalBannableRelics;
+        return FilterForCurrentMode([
+            .. PersonRelicRegistry.GetCanonicalPersonaRelics(),
+            .. PersonRelicRegistry.GetCanonicalVariantPersonaRelics(),
+            .. PersonalityDerivativeRelics,
+            .. TokenRelicRegistry.GetCanonicalTokenRelics().Where(IsBannableRelicInternal),
+            .. OtherRelics
+        ]);
     }
 
     public static IReadOnlyList<RelicModel> GetCanonicalRelics(BannedRelicCategory category)
     {
-        return category switch
+        return FilterForCurrentMode(category switch
         {
             BannedRelicCategory.Persona => PersonRelicRegistry.GetCanonicalPersonaRelics(),
             BannedRelicCategory.VariantPersona => PersonRelicRegistry.GetCanonicalVariantPersonaRelics(),
@@ -73,7 +70,7 @@ public static class BannedRelicRegistry
                 .ToList(),
             BannedRelicCategory.Other => OtherRelics,
             _ => []
-        };
+        });
     }
 
     public static bool IsBanned(IReadOnlySet<ModelId>? bannedRelicIds, RelicModel? relic)
@@ -118,6 +115,16 @@ public static class BannedRelicRegistry
         return !NonBannableRelicIds.Contains(id);
     }
 
+    private static IReadOnlyList<RelicModel> FilterForCurrentMode(IEnumerable<RelicModel> relics)
+    {
+        return AstralRelicAvailabilityHelper.FilterVisibleRelics(
+            bannedRelicIds: null,
+            ReAstralPartyModSettingsManager.GetCurrentContentMode(),
+            ReAstralPartyModSettingsManager.GetEnableMoonPropRelics(null),
+            ReAstralPartyModSettingsManager.GetEnableJewelryRelics(null),
+            relics);
+    }
+
     private static IReadOnlyList<RelicModel> BuildAllAstralRelics()
     {
         var relics = DeterministicTypeCatalog
@@ -130,9 +137,6 @@ public static class BannedRelicRegistry
 
         return relics
             .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
-            .Where(relic => AstralRelicAvailabilityHelper.IsAllowedByContentMode(
-                ReAstralPartyModSettingsManager.GetCurrentContentMode(),
-                relic))
             .Where(CompatContentGate.IsGameplayRelicAvailable)
             .OrderBy(relic => (relic.CanonicalInstance?.Id ?? relic.Id).Entry, StringComparer.Ordinal)
             .ToList();
