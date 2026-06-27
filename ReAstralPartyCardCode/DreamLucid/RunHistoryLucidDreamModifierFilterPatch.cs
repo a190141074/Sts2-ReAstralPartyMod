@@ -2,28 +2,42 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.Screens.MainMenu;
 using MegaCrit.Sts2.Core.Platform;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 
-[HarmonyPatch(typeof(RunHistoryUtilities), nameof(RunHistoryUtilities.CreateRunHistoryEntry))]
-public static class RunHistoryLucidDreamModifierFilterPatch
+internal static class RunHistoryModifierVisibilityFilterPatch
 {
-    public static void Prefix(SerializableRun run, bool victory, bool isAbandoned, PlatformType platformType)
+    [HarmonyPatch(typeof(RunHistoryUtilities), nameof(RunHistoryUtilities.CreateRunHistoryEntry))]
+    [HarmonyPostfix]
+    public static void Postfix(SerializableRun run, bool victory, bool isAbandoned, PlatformType platformType)
     {
         if (run?.Modifiers == null || run.Modifiers.Count == 0)
             return;
 
-        var filteredModifiers = run.Modifiers
-            .Where(static modifier => modifier.Id != ModelDb.Modifier<LucidDreamMaliceModifier>().Id)
+        var filteredModifiers = ModifierDisplayVisibilityHelper
+            .FilterVisibleModifiers(run.Modifiers)
             .ToList();
 
         if (filteredModifiers.Count == run.Modifiers.Count)
             return;
 
         run.Modifiers = filteredModifiers;
+    }
+}
+
+[HarmonyPatch(typeof(NCustomRunModifiersList), "GetAllModifiers")]
+internal static class CustomRunModifiersListVisibilityFilterPatch
+{
+    [HarmonyPostfix]
+    public static void Postfix(ref IEnumerable<ModifierModel> __result)
+    {
+        __result = ModifierDisplayVisibilityHelper.FilterVisibleModifiers(__result);
     }
 }

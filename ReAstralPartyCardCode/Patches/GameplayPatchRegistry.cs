@@ -439,13 +439,20 @@ internal static class GameplayStaticPatchCatalog
                 "Gameplay patch: remove unopened special token series relics from random relic grab bags at run setup",
                 [typeof(Player), typeof(MegaCrit.Sts2.Core.Random.Rng)]),
             new ModPatchInfo(
-                "run_history_lucid_dream_modifier_filter_patch",
+                "run_history_modifier_visibility_filter_patch",
                 typeof(RunHistoryUtilities),
                 nameof(RunHistoryUtilities.CreateRunHistoryEntry),
-                typeof(RunHistoryLucidDreamModifierFilterPatch),
+                typeof(RunHistoryModifierVisibilityFilterPatch),
                 false,
-                "Gameplay patch: keep Lucid Dream runtime modifiers out of run-history modifier displays",
-                [typeof(SerializableRun), typeof(bool), typeof(bool), typeof(MegaCrit.Sts2.Core.Platform.PlatformType)])
+                "Gameplay patch: keep hidden runtime modifiers out of run-history modifier displays",
+                [typeof(SerializableRun), typeof(bool), typeof(bool), typeof(MegaCrit.Sts2.Core.Platform.PlatformType)]),
+            new ModPatchInfo(
+                "custom_run_modifiers_list_visibility_filter_patch",
+                typeof(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NCustomRunModifiersList),
+                "GetAllModifiers",
+                typeof(CustomRunModifiersListVisibilityFilterPatch),
+                false,
+                "Gameplay patch: hide hidden runtime modifiers from the custom run modifier list")
         ]);
 
         patcher.RegisterPatch<PersonSkillNaturalObtainFilterPatch>();
