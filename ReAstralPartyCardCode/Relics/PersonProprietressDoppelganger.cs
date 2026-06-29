@@ -36,7 +36,7 @@ public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
         set => AstralParty_PersonProprietressDoppelgangerPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 2;
+    protected override int BaseMaxCounter => 3;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

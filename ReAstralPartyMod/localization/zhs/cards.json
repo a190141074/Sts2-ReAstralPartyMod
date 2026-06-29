@@ -138,7 +138,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_WEAKNESS_ANALYSIS_CHOOSE_DODGE.description": "进入[gold]闪避[/gold]姿态。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.title": "授予火花",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_GRANT_SPARK.description": "从[blue]3[/blue]张已升级的[gold]逐风者法术书[/gold]卡牌中选择[blue]1[/blue]张加入手牌。",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NOT_YET_ACTIVATED.title": "尚未启动",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NOT_YET_ACTIVATED.title": "那是因为我还没有启动！",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_NOT_YET_ACTIVATED.description": "将[blue]1[/blue]张[gold]创造性AI[/gold]和[blue]1[/blue]张[gold]子程序[/gold]加入手牌，其耗能-[blue]1[/blue]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FATE_FIREWOOD_STICK.title": "命运烧火棍",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FATE_FIREWOOD_STICK.description": "选择[gold]仁[/gold]或[gold]义[/gold]加入手牌。消耗。",
