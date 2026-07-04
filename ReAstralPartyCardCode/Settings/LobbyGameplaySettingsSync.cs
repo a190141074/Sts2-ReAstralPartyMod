@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Multiplayer.Game.Lobby;
@@ -100,7 +100,6 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public bool EnableStartingPersonSelection { get; set; } = true;
 
-    public bool EnableDreamSeriesEvents { get; set; } = true;
 
     public bool EnableEnigmaticSeriesEvents { get; set; } = true;
 
@@ -112,7 +111,6 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public bool EnableNeowExtraOption { get; set; } = true;
 
-    public bool EnableLucidDream { get; set; } = true;
 
     public bool EnableCollectorsCards { get; set; } = true;
 
@@ -131,27 +129,12 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
 
-    public bool EnableLucidDreamFishScalesMalice { get; set; }
-    public bool EnableLucidDreamFalseLifeline { get; set; }
-    public bool EnableLucidDreamSmoothSailing { get; set; }
 
-    public bool EnableLucidDreamSevereWoundOneMalice { get; set; }
 
-    public bool EnableLucidDreamSevereWoundTwoMalice { get; set; }
 
-    public bool EnableLucidDreamMadLifeMalice { get; set; }
 
-    public bool EnableLucidDreamSwampOfFateMalice { get; set; }
 
-    public bool EnableLucidDreamOverpopulationMalice { get; set; }
 
-    public bool EnableLucidDreamCautiousJellyfishMalice { get; set; }
-    public bool EnableLucidDreamFaceDeathWithComposure { get; set; }
-    public bool EnableLucidDreamWildness { get; set; }
-    public bool EnableLucidDreamWildnessPhantom { get; set; }
-    public bool EnableLucidDreamPitchBlackImpulse { get; set; }
-    public bool EnableLucidDreamBubblePotionOfDreams { get; set; }
-    public bool EnableLucidDreamHarmlessWhisper { get; set; }
 
     public bool EnableStartingPersonaSelection
     {
@@ -192,13 +175,11 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
-            EnableDreamSeriesEvents = EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableMoonPropRelics = EnableMoonPropRelics,
             EnableJewelryRelics = EnableJewelryRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
-            EnableLucidDream = EnableLucidDream,
             EnableCollectorsCards = EnableCollectorsCards,
             NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode,
             EnableAllPersonas = EnableAllPersonas,
@@ -207,21 +188,6 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableExtremeMode = EnableExtremeMode,
             StartingPersonMode = StartingPersonMode,
             TokenSeriesMode = TokenSeriesMode,
-            EnableLucidDreamFishScalesMalice = EnableLucidDreamFishScalesMalice,
-            EnableLucidDreamFalseLifeline = EnableLucidDreamFalseLifeline,
-            EnableLucidDreamSmoothSailing = EnableLucidDreamSmoothSailing,
-            EnableLucidDreamSevereWoundOneMalice = EnableLucidDreamSevereWoundOneMalice,
-            EnableLucidDreamSevereWoundTwoMalice = EnableLucidDreamSevereWoundTwoMalice,
-            EnableLucidDreamMadLifeMalice = EnableLucidDreamMadLifeMalice,
-            EnableLucidDreamSwampOfFateMalice = EnableLucidDreamSwampOfFateMalice,
-            EnableLucidDreamOverpopulationMalice = EnableLucidDreamOverpopulationMalice,
-            EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice,
-            EnableLucidDreamFaceDeathWithComposure = EnableLucidDreamFaceDeathWithComposure,
-            EnableLucidDreamWildness = EnableLucidDreamWildness,
-            EnableLucidDreamWildnessPhantom = EnableLucidDreamWildnessPhantom,
-            EnableLucidDreamPitchBlackImpulse = EnableLucidDreamPitchBlackImpulse,
-            EnableLucidDreamBubblePotionOfDreams = EnableLucidDreamBubblePotionOfDreams,
-            EnableLucidDreamHarmlessWhisper = EnableLucidDreamHarmlessWhisper,
             BannedRelicIdsSerialized = [.. BannedRelicIdsSerialized]
         };
     }
@@ -235,13 +201,11 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableStartingAstralRelicStore = ReAstralPartyModSettingsManager.EnableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = ReAstralPartyModSettingsManager.EnableStartingPersonaSelection,
-            EnableDreamSeriesEvents = ReAstralPartyModSettingsManager.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = ReAstralPartyModSettingsManager.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = ReAstralPartyModSettingsManager.EnableMoonPropShopSlots,
             EnableMoonPropRelics = ReAstralPartyModSettingsManager.EnableMoonPropRelics,
             EnableJewelryRelics = ReAstralPartyModSettingsManager.EnableJewelryRelics,
             EnableNeowExtraOption = ReAstralPartyModSettingsManager.EnableNeowExtraOption,
-            EnableLucidDream = ReAstralPartyModSettingsManager.EnableLucidDream,
             EnableCollectorsCards = ReAstralPartyModSettingsManager.EnableCollectorsCards,
             NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
                 ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
@@ -337,8 +301,7 @@ internal static class LobbyGameplaySettingsSync
             _currentSnapshot = updated.Clone();
         }
 
-        MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot updated: content_mode={updated.CurrentContentMode}, start_initial_point={updated.EnableStartingInitialPoint}, start_astral_relic_store={updated.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={updated.EnableStartingRingOfSevenCurses}, start_persona_selection={updated.EnableStartingPersonaSelection}, dream_series={updated.EnableDreamSeriesEvents}, enigmatic_series={updated.EnableEnigmaticSeriesEvents}, moon_shop_slots={updated.EnableMoonPropShopSlots}, moon_relics={updated.EnableMoonPropRelics}, neow_extra_option={updated.EnableNeowExtraOption}, lucid_dream={updated.EnableLucidDream}, neow_extra_selection={updated.NeowExtraOptionSelectionMode}, all_personas={updated.EnableAllPersonas}, variants_enabled={updated.EnableVariantPersonas}, all_variants={updated.EnableAllVariantPersonas}, extreme_mode={updated.EnableExtremeMode}, persona_mode={updated.StartingPersonMode}, token_series={updated.TokenSeriesMode}, banned_relics={updated.BannedRelicIdsSerialized.Count}");
+        MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay snapshot updated.");
         SnapshotChanged?.Invoke(updated.Clone());
     }
 
@@ -356,8 +319,7 @@ internal static class LobbyGameplaySettingsSync
             return;
 
         netService.SendMessage(new AstralLobbyGameplaySettingsSnapshotMessage(snapshot));
-        MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot broadcast by host: content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, moon_relics={snapshot.EnableMoonPropRelics}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonMode}, token_series={snapshot.TokenSeriesMode}, banned_relics={snapshot.BannedRelicIdsSerialized.Count}");
+        MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay snapshot broadcast by host.");
     }
 
     public static void RequestSnapshotFromHost()
@@ -460,7 +422,6 @@ internal static class LobbyGameplaySettingsSync
             var hostNetId = LobbyGameplayNetRoleHelper.GetHostNetId(netService);
             if (hostNetId == 0UL || senderId != hostNetId)
             {
-                ReportLucidDreamSnapshotRejected(senderId, hostNetId, message);
                 MainFile.Logger.Warn(
                     $"{MainFile.ModId} lobby gameplay snapshot rejected from non-host sender {senderId} (expected_host={hostNetId}).");
                 return;
@@ -469,8 +430,7 @@ internal static class LobbyGameplaySettingsSync
 
         var snapshot = message.ToSnapshot();
         SetSnapshotInternal(snapshot, $"remote_snapshot_from_{senderId}", true);
-        MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot received from {senderId}: content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, moon_relics={snapshot.EnableMoonPropRelics}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonMode}, token_series={snapshot.TokenSeriesMode}, banned_relics={snapshot.BannedRelicIdsSerialized.Count}");
+        MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay snapshot received from {senderId}.");
     }
 
     private static void HandleRequestMessage(AstralLobbyGameplaySettingsRequestMessage message, ulong senderId)
@@ -499,8 +459,7 @@ internal static class LobbyGameplaySettingsSync
             _currentSnapshot = snapshot.Clone();
         }
 
-        MainFile.Logger.Info(
-            $"{MainFile.ModId} lobby gameplay snapshot stored ({reason}): content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_ring_of_seven_curses={snapshot.EnableStartingRingOfSevenCurses}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, moon_relics={snapshot.EnableMoonPropRelics}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonMode}, token_series={snapshot.TokenSeriesMode}, banned_relics={snapshot.BannedRelicIdsSerialized.Count}");
+        MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay snapshot stored ({reason}).");
         if (invokeEvent)
             SnapshotChanged?.Invoke(snapshot.Clone());
     }
@@ -519,40 +478,6 @@ internal static class LobbyGameplaySettingsSync
         netService.UnregisterMessageHandler<AstralLobbyGameplaySettingsRequestMessage>(HandleRequestMessage);
     }
 
-    private static void ReportLucidDreamSnapshotRejected(
-        ulong senderId,
-        ulong expectedHostNetId,
-        AstralLobbyGameplaySettingsSnapshotMessage message)
-    {
-        if (!HasAnyLucidDreamFlags(message))
-            return;
-
-        AstralNotificationService.ShowDiagnosticWarning(
-            AstralNotificationModule.Multiplayer,
-            AstralNotificationArea.NeowDiagnostics,
-            211,
-            $"收到非房主来源的清醒梦房间设置同步，已拒绝应用。\n发送者：{senderId}\n预期房主：{expectedHostNetId}",
-            "清醒梦同步异常");
-    }
-
-    private static bool HasAnyLucidDreamFlags(AstralLobbyGameplaySettingsSnapshotMessage message)
-    {
-        return message.EnableLucidDreamFishScalesMalice
-               || message.EnableLucidDreamFalseLifeline
-               || message.EnableLucidDreamSmoothSailing
-               || message.EnableLucidDreamSevereWoundOneMalice
-               || message.EnableLucidDreamSevereWoundTwoMalice
-               || message.EnableLucidDreamMadLifeMalice
-               || message.EnableLucidDreamSwampOfFateMalice
-               || message.EnableLucidDreamOverpopulationMalice
-               || message.EnableLucidDreamCautiousJellyfishMalice
-               || message.EnableLucidDreamFaceDeathWithComposure
-               || message.EnableLucidDreamWildness
-               || message.EnableLucidDreamWildnessPhantom
-               || message.EnableLucidDreamPitchBlackImpulse
-               || message.EnableLucidDreamBubblePotionOfDreams
-               || message.EnableLucidDreamHarmlessWhisper;
-    }
 }
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
@@ -564,13 +489,11 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public bool EnableStartingAstralRelicStore { get; set; } = true;
     public bool EnableStartingRingOfSevenCurses { get; set; }
     public bool EnableStartingPersonaSelection { get; set; }
-    public bool EnableDreamSeriesEvents { get; set; }
     public bool EnableEnigmaticSeriesEvents { get; set; }
     public bool EnableMoonPropShopSlots { get; set; } = true;
     public bool EnableMoonPropRelics { get; set; } = true;
     public bool EnableJewelryRelics { get; set; } = true;
     public bool EnableNeowExtraOption { get; set; }
-    public bool EnableLucidDream { get; set; } = true;
     public bool EnableCollectorsCards { get; set; } = true;
     public NeowExtraOptionSelectionMode NeowExtraOptionSelectionMode { get; set; }
     public bool EnableAllPersonas { get; set; }
@@ -579,21 +502,6 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public bool EnableExtremeMode { get; set; }
     public StartingPersonMode StartingPersonMode { get; set; }
     public TokenSeriesMode TokenSeriesMode { get; set; }
-    public bool EnableLucidDreamFishScalesMalice { get; set; }
-    public bool EnableLucidDreamFalseLifeline { get; set; }
-    public bool EnableLucidDreamSmoothSailing { get; set; }
-    public bool EnableLucidDreamSevereWoundOneMalice { get; set; }
-    public bool EnableLucidDreamSevereWoundTwoMalice { get; set; }
-    public bool EnableLucidDreamMadLifeMalice { get; set; }
-    public bool EnableLucidDreamSwampOfFateMalice { get; set; }
-    public bool EnableLucidDreamOverpopulationMalice { get; set; }
-    public bool EnableLucidDreamCautiousJellyfishMalice { get; set; }
-    public bool EnableLucidDreamFaceDeathWithComposure { get; set; }
-    public bool EnableLucidDreamWildness { get; set; }
-    public bool EnableLucidDreamWildnessPhantom { get; set; }
-    public bool EnableLucidDreamPitchBlackImpulse { get; set; }
-    public bool EnableLucidDreamBubblePotionOfDreams { get; set; }
-    public bool EnableLucidDreamHarmlessWhisper { get; set; }
     public List<string> BannedRelicIdsSerialized { get; set; }
 
     public AstralLobbyGameplaySettingsSnapshotMessage(LobbyGameplaySettingsSnapshot snapshot)
@@ -603,13 +511,11 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableStartingAstralRelicStore = snapshot.EnableStartingAstralRelicStore;
         EnableStartingRingOfSevenCurses = snapshot.EnableStartingRingOfSevenCurses;
         EnableStartingPersonaSelection = snapshot.EnableStartingPersonaSelection;
-        EnableDreamSeriesEvents = snapshot.EnableDreamSeriesEvents;
         EnableEnigmaticSeriesEvents = snapshot.EnableEnigmaticSeriesEvents;
         EnableMoonPropShopSlots = snapshot.EnableMoonPropShopSlots;
         EnableMoonPropRelics = snapshot.EnableMoonPropRelics;
         EnableJewelryRelics = snapshot.EnableJewelryRelics;
         EnableNeowExtraOption = snapshot.EnableNeowExtraOption;
-        EnableLucidDream = snapshot.EnableLucidDream;
         EnableCollectorsCards = snapshot.EnableCollectorsCards;
         NeowExtraOptionSelectionMode = snapshot.NeowExtraOptionSelectionMode;
         EnableAllPersonas = snapshot.EnableAllPersonas;
@@ -618,21 +524,6 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableExtremeMode = snapshot.EnableExtremeMode;
         StartingPersonMode = snapshot.StartingPersonMode;
         TokenSeriesMode = snapshot.TokenSeriesMode;
-        EnableLucidDreamFishScalesMalice = snapshot.EnableLucidDreamFishScalesMalice;
-        EnableLucidDreamFalseLifeline = snapshot.EnableLucidDreamFalseLifeline;
-        EnableLucidDreamSmoothSailing = snapshot.EnableLucidDreamSmoothSailing;
-        EnableLucidDreamSevereWoundOneMalice = snapshot.EnableLucidDreamSevereWoundOneMalice;
-        EnableLucidDreamSevereWoundTwoMalice = snapshot.EnableLucidDreamSevereWoundTwoMalice;
-        EnableLucidDreamMadLifeMalice = snapshot.EnableLucidDreamMadLifeMalice;
-        EnableLucidDreamSwampOfFateMalice = snapshot.EnableLucidDreamSwampOfFateMalice;
-        EnableLucidDreamOverpopulationMalice = snapshot.EnableLucidDreamOverpopulationMalice;
-        EnableLucidDreamCautiousJellyfishMalice = snapshot.EnableLucidDreamCautiousJellyfishMalice;
-        EnableLucidDreamFaceDeathWithComposure = snapshot.EnableLucidDreamFaceDeathWithComposure;
-        EnableLucidDreamWildness = snapshot.EnableLucidDreamWildness;
-        EnableLucidDreamWildnessPhantom = snapshot.EnableLucidDreamWildnessPhantom;
-        EnableLucidDreamPitchBlackImpulse = snapshot.EnableLucidDreamPitchBlackImpulse;
-        EnableLucidDreamBubblePotionOfDreams = snapshot.EnableLucidDreamBubblePotionOfDreams;
-        EnableLucidDreamHarmlessWhisper = snapshot.EnableLucidDreamHarmlessWhisper;
         BannedRelicIdsSerialized =
         [
             .. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(snapshot.BannedRelicIdsSerialized)
@@ -652,13 +543,11 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteBool(EnableStartingAstralRelicStore);
         writer.WriteBool(EnableStartingRingOfSevenCurses);
         writer.WriteBool(EnableStartingPersonaSelection);
-        writer.WriteBool(EnableDreamSeriesEvents);
         writer.WriteBool(EnableEnigmaticSeriesEvents);
         writer.WriteBool(EnableMoonPropShopSlots);
         writer.WriteBool(EnableMoonPropRelics);
         writer.WriteBool(EnableJewelryRelics);
         writer.WriteBool(EnableNeowExtraOption);
-        writer.WriteBool(EnableLucidDream);
         writer.WriteBool(EnableCollectorsCards);
         writer.WriteEnum(NeowExtraOptionSelectionMode);
         writer.WriteBool(EnableAllPersonas);
@@ -667,21 +556,6 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteBool(EnableExtremeMode);
         writer.WriteEnum(StartingPersonMode);
         writer.WriteEnum(TokenSeriesMode);
-        writer.WriteBool(EnableLucidDreamFishScalesMalice);
-        writer.WriteBool(EnableLucidDreamFalseLifeline);
-        writer.WriteBool(EnableLucidDreamSmoothSailing);
-        writer.WriteBool(EnableLucidDreamSevereWoundOneMalice);
-        writer.WriteBool(EnableLucidDreamSevereWoundTwoMalice);
-        writer.WriteBool(EnableLucidDreamMadLifeMalice);
-        writer.WriteBool(EnableLucidDreamSwampOfFateMalice);
-        writer.WriteBool(EnableLucidDreamOverpopulationMalice);
-        writer.WriteBool(EnableLucidDreamCautiousJellyfishMalice);
-        writer.WriteBool(EnableLucidDreamFaceDeathWithComposure);
-        writer.WriteBool(EnableLucidDreamWildness);
-        writer.WriteBool(EnableLucidDreamWildnessPhantom);
-        writer.WriteBool(EnableLucidDreamPitchBlackImpulse);
-        writer.WriteBool(EnableLucidDreamBubblePotionOfDreams);
-        writer.WriteBool(EnableLucidDreamHarmlessWhisper);
         writer.WriteInt(BannedRelicIdsSerialized.Count);
         foreach (var bannedRelicId in BannedRelicIdsSerialized)
             writer.WriteString(bannedRelicId);
@@ -714,79 +588,65 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
 
         if (schemaVersion >= 18)
         {
-            EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
             EnableMoonPropRelics = reader.ReadBool();
             EnableJewelryRelics = reader.ReadBool();
             EnableNeowExtraOption = reader.ReadBool();
-            EnableLucidDream = reader.ReadBool();
             EnableCollectorsCards = reader.ReadBool();
         }
         else if (schemaVersion >= 16)
         {
-            EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
             EnableMoonPropRelics = reader.ReadBool();
             EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
-            EnableLucidDream = reader.ReadBool();
             EnableCollectorsCards = reader.ReadBool();
         }
         else if (schemaVersion >= 15)
         {
-            EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
             EnableMoonPropRelics = true;
             EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
-            EnableLucidDream = reader.ReadBool();
             EnableCollectorsCards = reader.ReadBool();
         }
         else if (schemaVersion >= 12)
         {
-            EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
             EnableMoonPropRelics = true;
             EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
-            EnableLucidDream = reader.ReadBool();
             EnableCollectorsCards = true;
         }
         else if (schemaVersion >= 11)
         {
-            EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = reader.ReadBool();
             EnableMoonPropRelics = true;
             EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
-            EnableLucidDream = true;
             EnableCollectorsCards = true;
         }
         else if (schemaVersion >= 3)
         {
-            EnableDreamSeriesEvents = reader.ReadBool();
             EnableEnigmaticSeriesEvents = reader.ReadBool();
             EnableMoonPropShopSlots = true;
             EnableMoonPropRelics = true;
             EnableJewelryRelics = true;
             EnableNeowExtraOption = reader.ReadBool();
-            EnableLucidDream = true;
             EnableCollectorsCards = true;
         }
         else
         {
-            EnableDreamSeriesEvents = true;
             EnableEnigmaticSeriesEvents = true;
             EnableMoonPropShopSlots = true;
             EnableMoonPropRelics = true;
             EnableJewelryRelics = true;
             EnableNeowExtraOption = true;
-            EnableLucidDream = true;
             EnableCollectorsCards = true;
         }
 
@@ -818,75 +678,15 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
 
         if (schemaVersion >= 7)
         {
-            EnableLucidDreamFishScalesMalice = reader.ReadBool();
-            EnableLucidDreamFalseLifeline = reader.ReadBool();
-            EnableLucidDreamSmoothSailing = reader.ReadBool();
-            EnableLucidDreamSevereWoundOneMalice = reader.ReadBool();
-            EnableLucidDreamSevereWoundTwoMalice = reader.ReadBool();
-            EnableLucidDreamMadLifeMalice = reader.ReadBool();
-            EnableLucidDreamSwampOfFateMalice = reader.ReadBool();
-            EnableLucidDreamOverpopulationMalice = reader.ReadBool();
-            EnableLucidDreamCautiousJellyfishMalice = reader.ReadBool();
-            EnableLucidDreamFaceDeathWithComposure = reader.ReadBool();
-            EnableLucidDreamWildness = reader.ReadBool();
-            EnableLucidDreamWildnessPhantom = reader.ReadBool();
-            EnableLucidDreamPitchBlackImpulse = reader.ReadBool();
-            EnableLucidDreamBubblePotionOfDreams = reader.ReadBool();
-            EnableLucidDreamHarmlessWhisper = reader.ReadBool();
         }
         else if (schemaVersion >= 6)
         {
-            EnableLucidDreamFishScalesMalice = reader.ReadBool();
-            EnableLucidDreamFalseLifeline = reader.ReadBool();
-            EnableLucidDreamSmoothSailing = reader.ReadBool();
-            EnableLucidDreamSevereWoundOneMalice = reader.ReadBool();
-            EnableLucidDreamSevereWoundTwoMalice = reader.ReadBool();
-            EnableLucidDreamMadLifeMalice = reader.ReadBool();
-            EnableLucidDreamSwampOfFateMalice = reader.ReadBool();
-            EnableLucidDreamOverpopulationMalice = reader.ReadBool();
-            EnableLucidDreamCautiousJellyfishMalice = reader.ReadBool();
-            EnableLucidDreamFaceDeathWithComposure = reader.ReadBool();
-            EnableLucidDreamWildness = reader.ReadBool();
-            EnableLucidDreamWildnessPhantom = false;
-            EnableLucidDreamPitchBlackImpulse = reader.ReadBool();
-            EnableLucidDreamBubblePotionOfDreams = reader.ReadBool();
-            EnableLucidDreamHarmlessWhisper = reader.ReadBool();
         }
         else if (schemaVersion >= 4)
         {
-            EnableLucidDreamFishScalesMalice = reader.ReadBool();
-            EnableLucidDreamFalseLifeline = false;
-            EnableLucidDreamSmoothSailing = false;
-            EnableLucidDreamSevereWoundOneMalice = reader.ReadBool();
-            EnableLucidDreamSevereWoundTwoMalice = reader.ReadBool();
-            EnableLucidDreamMadLifeMalice = reader.ReadBool();
-            EnableLucidDreamSwampOfFateMalice = reader.ReadBool();
-            EnableLucidDreamOverpopulationMalice = reader.ReadBool();
-            EnableLucidDreamCautiousJellyfishMalice = reader.ReadBool();
-            EnableLucidDreamFaceDeathWithComposure = false;
-            EnableLucidDreamWildness = false;
-            EnableLucidDreamWildnessPhantom = false;
-            EnableLucidDreamPitchBlackImpulse = false;
-            EnableLucidDreamBubblePotionOfDreams = false;
-            EnableLucidDreamHarmlessWhisper = false;
         }
         else
         {
-            EnableLucidDreamFishScalesMalice = false;
-            EnableLucidDreamFalseLifeline = false;
-            EnableLucidDreamSmoothSailing = false;
-            EnableLucidDreamSevereWoundOneMalice = false;
-            EnableLucidDreamSevereWoundTwoMalice = false;
-            EnableLucidDreamMadLifeMalice = false;
-            EnableLucidDreamSwampOfFateMalice = false;
-            EnableLucidDreamOverpopulationMalice = false;
-            EnableLucidDreamCautiousJellyfishMalice = false;
-            EnableLucidDreamFaceDeathWithComposure = false;
-            EnableLucidDreamWildness = false;
-            EnableLucidDreamWildnessPhantom = false;
-            EnableLucidDreamPitchBlackImpulse = false;
-            EnableLucidDreamBubblePotionOfDreams = false;
-            EnableLucidDreamHarmlessWhisper = false;
         }
 
         if (schemaVersion >= 17)
@@ -912,13 +712,11 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
-            EnableDreamSeriesEvents = EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableMoonPropRelics = EnableMoonPropRelics,
             EnableJewelryRelics = EnableJewelryRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
-            EnableLucidDream = EnableLucidDream,
             EnableCollectorsCards = EnableCollectorsCards,
             NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode,
             EnableAllPersonas = EnableAllPersonas,
@@ -927,21 +725,6 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableExtremeMode = EnableExtremeMode,
             StartingPersonMode = StartingPersonMode,
             TokenSeriesMode = TokenSeriesMode,
-            EnableLucidDreamFishScalesMalice = EnableLucidDreamFishScalesMalice,
-            EnableLucidDreamFalseLifeline = EnableLucidDreamFalseLifeline,
-            EnableLucidDreamSmoothSailing = EnableLucidDreamSmoothSailing,
-            EnableLucidDreamSevereWoundOneMalice = EnableLucidDreamSevereWoundOneMalice,
-            EnableLucidDreamSevereWoundTwoMalice = EnableLucidDreamSevereWoundTwoMalice,
-            EnableLucidDreamMadLifeMalice = EnableLucidDreamMadLifeMalice,
-            EnableLucidDreamSwampOfFateMalice = EnableLucidDreamSwampOfFateMalice,
-            EnableLucidDreamOverpopulationMalice = EnableLucidDreamOverpopulationMalice,
-            EnableLucidDreamCautiousJellyfishMalice = EnableLucidDreamCautiousJellyfishMalice,
-            EnableLucidDreamFaceDeathWithComposure = EnableLucidDreamFaceDeathWithComposure,
-            EnableLucidDreamWildness = EnableLucidDreamWildness,
-            EnableLucidDreamWildnessPhantom = EnableLucidDreamWildnessPhantom,
-            EnableLucidDreamPitchBlackImpulse = EnableLucidDreamPitchBlackImpulse,
-            EnableLucidDreamBubblePotionOfDreams = EnableLucidDreamBubblePotionOfDreams,
-            EnableLucidDreamHarmlessWhisper = EnableLucidDreamHarmlessWhisper,
             BannedRelicIdsSerialized =
             [
                 .. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(BannedRelicIdsSerialized)

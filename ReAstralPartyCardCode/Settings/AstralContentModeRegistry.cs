@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -20,14 +20,12 @@ public enum AstralGameplaySettingKey
     ExtremeMode = 6,
     VariantPersonas = 7,
     AllVariantPersonas = 8,
-    DreamSeriesEvents = 9,
     EnigmaticSeriesEvents = 10,
     MoonPropShopSlots = 11,
     MoonPropRelics = 12,
     JewelryRelics = 13,
     NeowExtraOption = 14,
     NeowExtraOptionSelectionMode = 15,
-    LucidDream = 16,
     StartingRingOfSevenCurses = 17,
     CollectorsCards = 18
 }
@@ -132,13 +130,6 @@ public static class AstralContentModeRegistry
             AstralModeAvailability.LockedVisible,
             AstralModeAvailability.Hidden),
         new(
-            AstralGameplaySettingKey.DreamSeriesEvents,
-            "enable_dream_series_events",
-            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label",
-            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.description",
-            AstralModeAvailability.LockedVisible,
-            AstralModeAvailability.Hidden),
-        new(
             AstralGameplaySettingKey.EnigmaticSeriesEvents,
             "enable_enigmatic_series_events",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.label",
@@ -178,13 +169,6 @@ public static class AstralContentModeRegistry
             "neow_extra_option_selection_mode",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.label",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.description",
-            AstralModeAvailability.LockedVisible,
-            AstralModeAvailability.Hidden),
-        new(
-            AstralGameplaySettingKey.LucidDream,
-            "enable_lucid_dream",
-            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label",
-            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.description",
             AstralModeAvailability.LockedVisible,
             AstralModeAvailability.Hidden),
         new(

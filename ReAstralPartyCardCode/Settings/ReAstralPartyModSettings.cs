@@ -25,14 +25,11 @@ public enum TokenSeriesMode
 public enum NeowExtraOptionSelectionMode
 {
     DefaultRandom = 0,
-    DreamFaceTheShadow = 1,
-    RingOfSevenCurses = 2,
-    AbsoluteForm = 3,
-    ProphecySoulDevour = 4,
-    ProphecyReplicantGroup = 5,
-    DreamCoinExplosion = 6,
-    DreamDisintegrationClaw = 7,
-    TetraWarforge = 8
+    RingOfSevenCurses = 1,
+    AbsoluteForm = 2,
+    ProphecySoulDevour = 3,
+    ProphecyReplicantGroup = 4,
+    TetraWarforge = 5
 }
 
 public enum StartingPersonDisplayMode
@@ -82,8 +79,6 @@ public sealed class ReAstralPartyModSettings
 
         public bool EnableStartingPersonSelection { get; set; } = true;
 
-        public bool EnableDreamSeriesEvents { get; set; } = true;
-
         public bool EnableEnigmaticSeriesEvents { get; set; } = true;
 
         public bool EnableMoonPropShopSlots { get; set; } = true;
@@ -93,8 +88,6 @@ public sealed class ReAstralPartyModSettings
         public bool EnableJewelryRelics { get; set; } = true;
 
         public bool EnableNeowExtraOption { get; set; } = true;
-
-        public bool EnableLucidDream { get; set; } = true;
 
         public bool EnableCollectorsCards { get; set; } = true;
 
@@ -150,13 +143,11 @@ public sealed class ReAstralPartyModSettings
                 EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
                 EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
                 EnableStartingPersonSelection = EnableStartingPersonSelection,
-                EnableDreamSeriesEvents = EnableDreamSeriesEvents,
                 EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
                 EnableMoonPropShopSlots = EnableMoonPropShopSlots,
                 EnableMoonPropRelics = EnableMoonPropRelics,
                 EnableJewelryRelics = EnableJewelryRelics,
                 EnableNeowExtraOption = EnableNeowExtraOption,
-                EnableLucidDream = EnableLucidDream,
                 EnableCollectorsCards = EnableCollectorsCards,
                 NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode,
                 EnableAllPersons = EnableAllPersons,
@@ -210,8 +201,6 @@ public sealed class ReAstralPartyModSettings
 
     public bool EnableStartingPersonSelection { get; set; } = true;
 
-    public bool EnableDreamSeriesEvents { get; set; } = true;
-
     public bool EnableEnigmaticSeriesEvents { get; set; } = true;
 
     public bool EnableMoonPropShopSlots { get; set; } = true;
@@ -221,8 +210,6 @@ public sealed class ReAstralPartyModSettings
     public bool EnableJewelryRelics { get; set; } = true;
 
     public bool EnableNeowExtraOption { get; set; } = true;
-
-    public bool EnableLucidDream { get; set; } = true;
 
     public bool EnableCollectorsCards { get; set; } = true;
 
@@ -367,8 +354,6 @@ public static partial class ReAstralPartyModSettingsManager
 
     public static bool EnableStartingPersonSelection => ReadRuntime(settings => settings.EnableStartingPersonSelection);
 
-    public static bool EnableDreamSeriesEvents => ReadRuntime(settings => settings.EnableDreamSeriesEvents);
-
     public static bool EnableEnigmaticSeriesEvents => ReadRuntime(settings => settings.EnableEnigmaticSeriesEvents);
 
     public static bool EnableMoonPropShopSlots => ReadRuntime(settings => settings.EnableMoonPropShopSlots);
@@ -378,8 +363,6 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableJewelryRelics => ReadRuntime(settings => settings.EnableJewelryRelics);
 
     public static bool EnableNeowExtraOption => ReadRuntime(settings => settings.EnableNeowExtraOption);
-
-    public static bool EnableLucidDream => ReadRuntime(settings => settings.EnableLucidDream);
 
     public static bool EnableCollectorsCards => ReadRuntime(settings => settings.EnableCollectorsCards);
 
@@ -553,26 +536,6 @@ public static partial class ReAstralPartyModSettingsManager
         return EnableVariantPersonas;
     }
 
-    public static bool GetEnableDreamSeriesEvents(IRunState? runState)
-    {
-        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.DreamSeriesEvents))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableDreamSeriesEvents;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableDreamSeriesEvents;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableDreamSeriesEvents;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return true;
-
-        return EnableDreamSeriesEvents;
-    }
-
     public static bool GetEnableEnigmaticSeriesEvents(IRunState? runState)
     {
         if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.EnigmaticSeriesEvents))
@@ -671,26 +634,6 @@ public static partial class ReAstralPartyModSettingsManager
             return true;
 
         return EnableNeowExtraOption;
-    }
-
-    public static bool GetEnableLucidDream(IRunState? runState)
-    {
-        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.LucidDream))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDream;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDream;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDream;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return true;
-
-        return EnableLucidDream;
     }
 
     public static bool GetEnableCollectorsCards(IRunState? runState)
@@ -853,421 +796,6 @@ public static partial class ReAstralPartyModSettingsManager
             return false;
 
         return EnableExtremeMode;
-    }
-
-    public static bool GetEnableLucidDreamFalseLifeline(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamFalseLifeline;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamFalseLifeline;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamFalseLifeline;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamSmoothSailing(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamSmoothSailing;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamSmoothSailing;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamSmoothSailing;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamFishScalesMalice(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamFishScalesMalice;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamFishScalesMalice;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamFishScalesMalice;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamSevereWoundOneMalice(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamSevereWoundOneMalice;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamSevereWoundOneMalice;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamSevereWoundOneMalice;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamSevereWoundTwoMalice(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamSevereWoundTwoMalice;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamSevereWoundTwoMalice;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamSevereWoundTwoMalice;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamMadLifeMalice(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamMadLifeMalice;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamMadLifeMalice;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamMadLifeMalice;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamSwampOfFateMalice(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamSwampOfFateMalice;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamSwampOfFateMalice;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamSwampOfFateMalice;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamOverpopulationMalice(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamOverpopulationMalice;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamOverpopulationMalice;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamOverpopulationMalice;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamCautiousJellyfishMalice(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamCautiousJellyfishMalice;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamCautiousJellyfishMalice;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamCautiousJellyfishMalice;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamFaceDeathWithComposure(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamFaceDeathWithComposure;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamFaceDeathWithComposure;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamFaceDeathWithComposure;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamWildness(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamWildness;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamWildness;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamWildness;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamWildnessPhantom(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamWildnessPhantom;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamWildnessPhantom;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamWildnessPhantom;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamPitchBlackImpulse(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamPitchBlackImpulse;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamPitchBlackImpulse;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamPitchBlackImpulse;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamBubblePotionOfDreams(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamBubblePotionOfDreams;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamBubblePotionOfDreams;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamBubblePotionOfDreams;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool GetEnableLucidDreamHarmlessWhisper(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamHarmlessWhisper;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamHarmlessWhisper;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamHarmlessWhisper;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool HasAnyLucidDreamBenevolenceEnabled(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableLucidDreamFalseLifeline
-                   || snapshot.EnableLucidDreamSmoothSailing;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableLucidDreamFalseLifeline
-                   || lobbySnapshot.EnableLucidDreamSmoothSailing;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableLucidDreamFalseLifeline
-                   || localFallback.EnableLucidDreamSmoothSailing;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool HasAnyLucidDreamMaliceEnabled(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-        {
-            return snapshot.EnableLucidDreamFishScalesMalice
-                   || snapshot.EnableLucidDreamSevereWoundOneMalice
-                   || snapshot.EnableLucidDreamSevereWoundTwoMalice
-                   || snapshot.EnableLucidDreamMadLifeMalice
-                   || snapshot.EnableLucidDreamSwampOfFateMalice
-                   || snapshot.EnableLucidDreamOverpopulationMalice
-                   || snapshot.EnableLucidDreamCautiousJellyfishMalice;
-        }
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-        {
-            return lobbySnapshot.EnableLucidDreamFishScalesMalice
-                   || lobbySnapshot.EnableLucidDreamSevereWoundOneMalice
-                   || lobbySnapshot.EnableLucidDreamSevereWoundTwoMalice
-                   || lobbySnapshot.EnableLucidDreamMadLifeMalice
-                   || lobbySnapshot.EnableLucidDreamSwampOfFateMalice
-                   || lobbySnapshot.EnableLucidDreamOverpopulationMalice
-                   || lobbySnapshot.EnableLucidDreamCautiousJellyfishMalice;
-        }
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-        {
-            return localFallback.EnableLucidDreamFishScalesMalice
-                   || localFallback.EnableLucidDreamSevereWoundOneMalice
-                   || localFallback.EnableLucidDreamSevereWoundTwoMalice
-                   || localFallback.EnableLucidDreamMadLifeMalice
-                   || localFallback.EnableLucidDreamSwampOfFateMalice
-                   || localFallback.EnableLucidDreamOverpopulationMalice
-                   || localFallback.EnableLucidDreamCautiousJellyfishMalice;
-        }
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool HasAnyLucidDreamChaosEnabled(IRunState? runState)
-    {
-        if (!GetEnableLucidDream(runState))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-        {
-            return snapshot.EnableLucidDreamFaceDeathWithComposure
-                   || snapshot.EnableLucidDreamWildness
-                   || snapshot.EnableLucidDreamWildnessPhantom
-                   || snapshot.EnableLucidDreamPitchBlackImpulse
-                   || snapshot.EnableLucidDreamBubblePotionOfDreams
-                   || snapshot.EnableLucidDreamHarmlessWhisper;
-        }
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-        {
-            return lobbySnapshot.EnableLucidDreamFaceDeathWithComposure
-                   || lobbySnapshot.EnableLucidDreamWildness
-                   || lobbySnapshot.EnableLucidDreamWildnessPhantom
-                   || lobbySnapshot.EnableLucidDreamPitchBlackImpulse
-                   || lobbySnapshot.EnableLucidDreamBubblePotionOfDreams
-                   || lobbySnapshot.EnableLucidDreamHarmlessWhisper;
-        }
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-        {
-            return localFallback.EnableLucidDreamFaceDeathWithComposure
-                   || localFallback.EnableLucidDreamWildness
-                   || localFallback.EnableLucidDreamWildnessPhantom
-                   || localFallback.EnableLucidDreamPitchBlackImpulse
-                   || localFallback.EnableLucidDreamBubblePotionOfDreams
-                   || localFallback.EnableLucidDreamHarmlessWhisper;
-        }
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return false;
-
-        return false;
-    }
-
-    public static bool HasAnyLucidDreamEnabled(IRunState? runState)
-    {
-        return HasAnyLucidDreamBenevolenceEnabled(runState)
-               || HasAnyLucidDreamMaliceEnabled(runState)
-               || HasAnyLucidDreamChaosEnabled(runState);
     }
 
     public static bool GetEnableDuplicatePersonas(IRunState? runState)
@@ -1578,23 +1106,6 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
-        var enableDreamSeriesEvents = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
-            MainFile.ModId,
-            SettingsKey,
-            settings =>
-            {
-                EnsureContentModeSettingsInitialized(settings);
-                return GetScopedSettingsForCurrentMode(settings).EnableDreamSeriesEvents;
-            },
-            (settings, value) =>
-            {
-                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableDreamSeriesEvents = value);
-                ApplyRuntimeSettings(settings, "enable_dream_series_events");
-                ShowBoolSettingToast(
-                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label",
-                    value);
-            });
-
         var enableEnigmaticSeriesEvents = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
             SettingsKey,
@@ -1677,23 +1188,6 @@ public static partial class ReAstralPartyModSettingsManager
                 ApplyRuntimeSettings(settings, "enable_neow_extra_option");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.label",
-                    value);
-            });
-
-        var enableLucidDream = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
-            MainFile.ModId,
-            SettingsKey,
-            settings =>
-            {
-                EnsureContentModeSettingsInitialized(settings);
-                return GetScopedSettingsForCurrentMode(settings).EnableLucidDream;
-            },
-            (settings, value) =>
-            {
-                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableLucidDream = value);
-                ApplyRuntimeSettings(settings, "enable_lucid_dream");
-                ShowBoolSettingToast(
-                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label",
                     value);
             });
 
@@ -2052,12 +1546,6 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.description",
                         "Control whether variant personas can appear during the starting persona selection for this run."))
                 .AddToggle(
-                    "enable_dream_series_events",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.label", "Enable Dream Series Events"),
-                    enableDreamSeriesEvents,
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_dream_series_events.description",
-                        "Enable Dream-prefixed Astral event content for this run."))
-                .AddToggle(
                     "enable_enigmatic_series_events",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.label", "Enable Enigmatic Series Content"),
                     enableEnigmaticSeriesEvents,
@@ -2087,12 +1575,6 @@ public static partial class ReAstralPartyModSettingsManager
                     enableNeowExtraOption,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_extra_option.description",
                         "Enable Astral's extra randomized fourth Neow option at run start."))
-                .AddToggle(
-                    "enable_lucid_dream",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.label", "Enable Lucid Dream"),
-                    enableLucidDream,
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_lucid_dream.description",
-                        "Control whether the Lucid Dream panels are shown in the room and whether Lucid Dream effects are active for this run."))
                 .AddToggle(
                     "enable_collectors_cards",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.label", "Enable Collectors Cards"),
@@ -2186,11 +1668,6 @@ public static partial class ReAstralPartyModSettingsManager
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.AllVariantPersonas,
                         roomSurface: false) == AstralModeAvailability.Editable)
-                .WithEntryEnabledWhen("enable_dream_series_events", () =>
-                    AstralContentModeRegistry.GetAvailability(
-                        GetCurrentContentMode(),
-                        AstralGameplaySettingKey.DreamSeriesEvents,
-                        roomSurface: false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_enigmatic_series_events", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
@@ -2220,11 +1697,6 @@ public static partial class ReAstralPartyModSettingsManager
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.NeowExtraOptionSelectionMode,
-                        roomSurface: false) == AstralModeAvailability.Editable)
-                .WithEntryEnabledWhen("enable_lucid_dream", () =>
-                    AstralContentModeRegistry.GetAvailability(
-                        GetCurrentContentMode(),
-                        AstralGameplaySettingKey.LucidDream,
                         roomSurface: false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_collectors_cards", () =>
                     AstralContentModeRegistry.GetAvailability(
@@ -2595,7 +2067,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, dream_series={snapshot.EnableDreamSeriesEvents}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, lucid_dream={snapshot.EnableLucidDream}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_persona_selection={snapshot.EnableStartingPersonaSelection}, enigmatic_series={snapshot.EnableEnigmaticSeriesEvents}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersonas}, variants_enabled={snapshot.EnableVariantPersonas}, all_variants={snapshot.EnableAllVariantPersonas}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -2780,13 +2252,10 @@ public static partial class ReAstralPartyModSettingsManager
         return mode switch
         {
             NeowExtraOptionSelectionMode.DefaultRandom => "Default",
-            NeowExtraOptionSelectionMode.DreamFaceTheShadow => "Face the Shadow",
             NeowExtraOptionSelectionMode.RingOfSevenCurses => "Ring of Seven Curses",
             NeowExtraOptionSelectionMode.AbsoluteForm => "Absolute Form",
             NeowExtraOptionSelectionMode.ProphecySoulDevour => "Prophecy: Soul Devour",
             NeowExtraOptionSelectionMode.ProphecyReplicantGroup => "Mid Prophecy: Endless Cloning",
-            NeowExtraOptionSelectionMode.DreamCoinExplosion => "Dream: Coin Explosion",
-            NeowExtraOptionSelectionMode.DreamDisintegrationClaw => "Dream: Disintegration Claw",
             NeowExtraOptionSelectionMode.TetraWarforge => "Tetra: Warforge",
             _ => "Default"
         };
@@ -2798,8 +2267,6 @@ public static partial class ReAstralPartyModSettingsManager
         {
             NeowExtraOptionSelectionMode.DefaultRandom =>
                 "Use the current deterministic random selection from the available candidate pool.",
-            NeowExtraOptionSelectionMode.DreamFaceTheShadow =>
-                "Force every player's extra Neow option to be Face the Shadow.",
             NeowExtraOptionSelectionMode.RingOfSevenCurses =>
                 "Force every player's extra Neow option to be Ring of Seven Curses.",
             NeowExtraOptionSelectionMode.AbsoluteForm =>
@@ -2808,10 +2275,6 @@ public static partial class ReAstralPartyModSettingsManager
                 "Force every player's extra Neow option to be Prophecy: Soul Devour.",
             NeowExtraOptionSelectionMode.ProphecyReplicantGroup =>
                 "Force every player's extra Neow option to be Mid Prophecy: Endless Cloning.",
-            NeowExtraOptionSelectionMode.DreamCoinExplosion =>
-                "Force every player's extra Neow option to be Dream: Coin Explosion.",
-            NeowExtraOptionSelectionMode.DreamDisintegrationClaw =>
-                "Force every player's extra Neow option to be Dream: Disintegration Claw.",
             NeowExtraOptionSelectionMode.TetraWarforge =>
                 "Force every player's extra Neow option to be Tetra: Warforge.",
             _ =>
@@ -3062,13 +2525,11 @@ public static partial class ReAstralPartyModSettingsManager
             EnableStartingAstralRelicStore = settings.EnableStartingAstralRelicStore,
             EnableStartingRingOfSevenCurses = settings.EnableStartingRingOfSevenCurses,
             EnableStartingPersonSelection = settings.EnableStartingPersonSelection,
-            EnableDreamSeriesEvents = settings.EnableDreamSeriesEvents,
             EnableEnigmaticSeriesEvents = settings.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = settings.EnableMoonPropShopSlots,
             EnableMoonPropRelics = settings.EnableMoonPropRelics,
             EnableJewelryRelics = settings.EnableJewelryRelics,
             EnableNeowExtraOption = settings.EnableNeowExtraOption,
-            EnableLucidDream = settings.EnableLucidDream,
             EnableCollectorsCards = settings.EnableCollectorsCards,
             NeowExtraOptionSelectionMode = NormalizeNeowExtraOptionSelectionMode(
                 settings.EnableStartingRingOfSevenCurses,
@@ -3090,13 +2551,11 @@ public static partial class ReAstralPartyModSettingsManager
             EnableStartingAstralRelicStore = true,
             EnableStartingRingOfSevenCurses = false,
             EnableStartingPersonSelection = true,
-            EnableDreamSeriesEvents = false,
             EnableEnigmaticSeriesEvents = false,
             EnableMoonPropShopSlots = false,
             EnableMoonPropRelics = false,
             EnableJewelryRelics = false,
             EnableNeowExtraOption = false,
-            EnableLucidDream = false,
             EnableCollectorsCards = false,
             NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom,
             EnableAllPersons = false,
@@ -3135,13 +2594,11 @@ public static partial class ReAstralPartyModSettingsManager
         settings.EnableStartingAstralRelicStore = modpack.EnableStartingAstralRelicStore;
         settings.EnableStartingRingOfSevenCurses = modpack.EnableStartingRingOfSevenCurses;
         settings.EnableStartingPersonSelection = modpack.EnableStartingPersonSelection;
-        settings.EnableDreamSeriesEvents = modpack.EnableDreamSeriesEvents;
         settings.EnableEnigmaticSeriesEvents = modpack.EnableEnigmaticSeriesEvents;
         settings.EnableMoonPropShopSlots = modpack.EnableMoonPropShopSlots;
         settings.EnableMoonPropRelics = modpack.EnableMoonPropRelics;
         settings.EnableJewelryRelics = modpack.EnableJewelryRelics;
         settings.EnableNeowExtraOption = modpack.EnableNeowExtraOption;
-        settings.EnableLucidDream = modpack.EnableLucidDream;
         settings.EnableCollectorsCards = modpack.EnableCollectorsCards;
         settings.NeowExtraOptionSelectionMode = modpack.NeowExtraOptionSelectionMode;
         settings.EnableAllPersons = modpack.EnableAllPersons;
@@ -3161,13 +2618,11 @@ public static partial class ReAstralPartyModSettingsManager
         var defaults = BuildVanillaModeDefaults();
         var changed = false;
 
-        changed |= SetIfDifferent(vanilla.EnableDreamSeriesEvents, defaults.EnableDreamSeriesEvents, value => vanilla.EnableDreamSeriesEvents = value);
         changed |= SetIfDifferent(vanilla.EnableEnigmaticSeriesEvents, defaults.EnableEnigmaticSeriesEvents, value => vanilla.EnableEnigmaticSeriesEvents = value);
         changed |= SetIfDifferent(vanilla.EnableMoonPropShopSlots, defaults.EnableMoonPropShopSlots, value => vanilla.EnableMoonPropShopSlots = value);
         changed |= SetIfDifferent(vanilla.EnableMoonPropRelics, defaults.EnableMoonPropRelics, value => vanilla.EnableMoonPropRelics = value);
         changed |= SetIfDifferent(vanilla.EnableJewelryRelics, defaults.EnableJewelryRelics, value => vanilla.EnableJewelryRelics = value);
         changed |= SetIfDifferent(vanilla.EnableNeowExtraOption, defaults.EnableNeowExtraOption, value => vanilla.EnableNeowExtraOption = value);
-        changed |= SetIfDifferent(vanilla.EnableLucidDream, defaults.EnableLucidDream, value => vanilla.EnableLucidDream = value);
         changed |= SetIfDifferent(vanilla.EnableCollectorsCards, defaults.EnableCollectorsCards, value => vanilla.EnableCollectorsCards = value);
         changed |= SetIfDifferent(
             vanilla.NeowExtraOptionSelectionMode,
@@ -3221,8 +2676,6 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnableStartingPersonSelection { get; init; } = true;
 
-        public bool EnableDreamSeriesEvents { get; init; } = true;
-
         public bool EnableEnigmaticSeriesEvents { get; init; } = true;
 
         public bool EnableMoonPropShopSlots { get; init; } = true;
@@ -3232,8 +2685,6 @@ public static partial class ReAstralPartyModSettingsManager
         public bool EnableJewelryRelics { get; init; } = true;
 
         public bool EnableNeowExtraOption { get; init; } = true;
-
-        public bool EnableLucidDream { get; init; } = true;
 
         public bool EnableCollectorsCards { get; init; } = true;
 
@@ -3278,36 +2729,6 @@ public static partial class ReAstralPartyModSettingsManager
 
         public bool EnablePureAngelMode { get; init; } = true;
 
-        public bool EnableLucidDreamFalseLifeline { get; init; }
-
-        public bool EnableLucidDreamSmoothSailing { get; init; }
-
-        public bool EnableLucidDreamFishScalesMalice { get; init; }
-
-        public bool EnableLucidDreamSevereWoundOneMalice { get; init; }
-
-        public bool EnableLucidDreamSevereWoundTwoMalice { get; init; }
-
-        public bool EnableLucidDreamMadLifeMalice { get; init; }
-
-        public bool EnableLucidDreamSwampOfFateMalice { get; init; }
-
-        public bool EnableLucidDreamOverpopulationMalice { get; init; }
-
-        public bool EnableLucidDreamCautiousJellyfishMalice { get; init; }
-
-        public bool EnableLucidDreamFaceDeathWithComposure { get; init; }
-
-        public bool EnableLucidDreamWildness { get; init; }
-
-        public bool EnableLucidDreamWildnessPhantom { get; init; }
-
-        public bool EnableLucidDreamPitchBlackImpulse { get; init; }
-
-        public bool EnableLucidDreamBubblePotionOfDreams { get; init; }
-
-        public bool EnableLucidDreamHarmlessWhisper { get; init; }
-
         public LobbyPanelStateSnapshot LobbyPanelState { get; init; } = new();
 
         public IReadOnlySet<ModelId> BannedPersonaRelicIds => BannedPersonRelicIds;
@@ -3337,13 +2758,11 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableStartingAstralRelicStore = scoped.EnableStartingAstralRelicStore,
                 EnableStartingRingOfSevenCurses = scoped.EnableStartingRingOfSevenCurses,
                 EnableStartingPersonSelection = scoped.EnableStartingPersonSelection,
-                EnableDreamSeriesEvents = scoped.EnableDreamSeriesEvents,
                 EnableEnigmaticSeriesEvents = scoped.EnableEnigmaticSeriesEvents,
                 EnableMoonPropShopSlots = scoped.EnableMoonPropShopSlots,
                 EnableMoonPropRelics = scoped.EnableMoonPropRelics,
                 EnableJewelryRelics = scoped.EnableJewelryRelics,
                 EnableNeowExtraOption = scoped.EnableNeowExtraOption,
-                EnableLucidDream = scoped.EnableLucidDream,
                 EnableCollectorsCards = scoped.EnableCollectorsCards,
                 NeowExtraOptionSelectionMode = scoped.NeowExtraOptionSelectionMode,
                 EnableAllPersons = scoped.EnableAllPersons,
@@ -3365,21 +2784,6 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableNeowDiagnosticsNotifications = settings.EnableNeowDiagnosticsNotifications,
                 TokenSeriesMode = scoped.TokenSeriesMode,
                 EnablePureAngelMode = settings.EnablePureAngelMode,
-                EnableLucidDreamFalseLifeline = false,
-                EnableLucidDreamSmoothSailing = false,
-                EnableLucidDreamFishScalesMalice = false,
-                EnableLucidDreamSevereWoundOneMalice = false,
-                EnableLucidDreamSevereWoundTwoMalice = false,
-                EnableLucidDreamMadLifeMalice = false,
-                EnableLucidDreamSwampOfFateMalice = false,
-                EnableLucidDreamOverpopulationMalice = false,
-                EnableLucidDreamCautiousJellyfishMalice = false,
-                EnableLucidDreamFaceDeathWithComposure = false,
-                EnableLucidDreamWildness = false,
-                EnableLucidDreamWildnessPhantom = false,
-                EnableLucidDreamPitchBlackImpulse = false,
-                EnableLucidDreamBubblePotionOfDreams = false,
-                EnableLucidDreamHarmlessWhisper = false,
                 LobbyPanelState = new LobbyPanelStateSnapshot
                 {
                     IsCollapsed = settings.LobbyPanelState?.IsCollapsed ?? false,

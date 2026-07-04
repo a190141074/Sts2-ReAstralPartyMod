@@ -33,6 +33,19 @@ public class DodgeStancePower : AstralPartyPowerModel
         return new Data();
     }
 
+    public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
+    {
+        await base.AfterApplied(applier, cardSource);
+
+        var ownerPlayer = Owner?.Player;
+        if (Owner == null || ownerPlayer == null)
+            return;
+
+        await MosesCombatHelper.EnsureNodeCarrier(ownerPlayer);
+        var currentNode = MosesCombatHelper.RollDodgeNodeValue(ownerPlayer, this);
+        await PowerCmd.SetAmount<MosesNodePower>(Owner, currentNode, Owner, cardSource);
+    }
+
     public override decimal ModifyHpLostBeforeOstyLate(
         Creature target,
         decimal amount,

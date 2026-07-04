@@ -596,7 +596,7 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_EYE.flavor": "它看着前方，也看着那些不该被看见的路。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_ROD.title": "【末影棍】",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_ROD.description": "· 用于[gold]神秘合成[/gold]的独特素材。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_ROD.flavor": "像把星轨和位移一同拧成了一截硬骨。", 
+  "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_SYNTHESIS_ENDER_ROD.flavor": "像把星轨和位移一同拧成了一截硬骨。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_EARTH_HEART.title": "【大地之心】",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_EARTH_HEART.description": "· 用于[gold]神秘合成[/gold]的独特素材。",
   "RE_ASTRAL_PARTY_MOD_RELIC_ENIGMATIC_EARTH_HEART.flavor": "摸上去没有跳动，却比活物还沉。",
@@ -700,12 +700,6 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.description": "· 拾起时，从你的牌组中选择[blue]2[/blue]张牌，附魔[gold]战争铸造[/gold]。\n· 现在你可以在[gold]休息处[/gold]进行[gold]战争铸造[/gold]。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.flavor": "它投出的不是影像，而是另一种作战结构。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TETRA_HOLO_SPHERE.select_prompt": "选择要附魔【战争铸造】的牌",
-  "RE_ASTRAL_PARTY_MOD_RELIC_DREAM_COIN_EXPLOSION.title": "【梦境·硬币爆炸】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_DREAM_COIN_EXPLOSION.description": "· 每当你打出攻击牌时，若当前金币不足本次消耗，则不触发。\n· 否则先消耗当前所持[gold]金币[/gold]的[blue]1%[/blue]，向上取整且至少为[blue]1[/blue]。\n· 然后抛掷硬币：若为[gold]正面[/gold]，对该攻击牌首个命中的敌人追加[blue]2^(净正面层数-1)[/blue]伤害；若为[gold]反面[/gold]，则只累计[gold]反面[/gold]层数并用于抵消[gold]正面[/gold]。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_DREAM_COIN_EXPLOSION.flavor": "硬币从来不站在你这边.",
-  "RE_ASTRAL_PARTY_MOD_RELIC_DREAM_DISINTEGRATION_CLAW.title": "【梦境·分解之爪】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_DREAM_DISINTEGRATION_CLAW.description": "· 名字中有“[gold]打击[/gold]”的卡牌会额外造成[blue]34%[/blue]/[blue]44%[/blue]/[blue]54%[/blue]伤害并回复[blue]12%[/blue]/[blue]15%[/blue]/[blue]18%[/blue]生命。\n· 若当前为[red]Boss[/red]房战斗，则本次额外伤害与回复量翻倍。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_DREAM_DISINTEGRATION_CLAW.flavor": "原理十分简单——分解与重组。将从目标体内分离出的力量，完美循环并融合进自己的身躯，真是高效啊。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.selectionScreenHeader": "发现初级预言",
   "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.selectionScreenSubtitle": "选择[blue]1[/blue]项初级预言。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.selectionScreenRefresh": "刷新（消耗[gold]{0}[/gold]金币，当前[gold]{1}[/gold]）",
@@ -835,5 +829,4 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.title": "【异格：二阶堂希罗】",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.description": "· 你的回合开始时，将[blue]1[/blue]张[gold]命运的烧火棍[/gold]加入手中；若你手中已拥有它，则改为为其中[blue]1[/blue]张附加[blue]1[/blue]次[gold]重放[/gold]。\n· 你的[gold]魔女化[/gold]每跨过[blue]100[/blue]层，重复上述发牌效果[blue]1[/blue]次。\n· 当其他友方玩家受到伤害时，你获得[blue]10[/blue]层[gold]魔女化[/gold]。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_MANOSABA_LIN_HIRO.flavor": "我很讨厌你。你存在于这个世界上，本就是个错误。"
-
 }

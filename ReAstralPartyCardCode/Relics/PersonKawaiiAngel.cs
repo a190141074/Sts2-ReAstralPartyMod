@@ -21,6 +21,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public class PersonKawaiiAngel : CooldownPersonRelicBase
 {
+    private static int _activeFanApplications;
+
     [SavedProperty] public int AstralParty_PersonKawaiiAngelCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonKawaiiAngelPendingCombatStartCard { get; set; }
 
@@ -78,6 +80,8 @@ public class PersonKawaiiAngel : CooldownPersonRelicBase
     {
         if (Owner?.Creature == null)
             return;
+        if (_activeFanApplications > 0)
+            return;
         if (target.Side == Owner.Creature.Side || target.IsDead)
             return;
         if (result.UnblockedDamage <= 0)
@@ -115,6 +119,14 @@ public class PersonKawaiiAngel : CooldownPersonRelicBase
             return;
 
         Flash();
-        await PowerCmd.Apply<FanPower>(enemy, 1m, Owner.Creature, source, false);
+        _activeFanApplications++;
+        try
+        {
+            await PowerCmd.Apply<FanPower>(enemy, 1m, Owner.Creature, source, false);
+        }
+        finally
+        {
+            _activeFanApplications = Math.Max(0, _activeFanApplications - 1);
+        }
     }
 }

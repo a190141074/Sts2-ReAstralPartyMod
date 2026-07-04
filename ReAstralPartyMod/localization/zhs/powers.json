@@ -334,9 +334,6 @@
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.title": "技能增幅",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.description": "显示你当前持有的稳定技能牌增幅总值。",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "显示你当前持有的稳定技能牌增幅总值。",
-  "RE_ASTRAL_PARTY_MOD_POWER_LUCID_DREAM_WILDNESS_POWER.title": "野性·猎手化",
-  "RE_ASTRAL_PARTY_MOD_POWER_LUCID_DREAM_WILDNESS_POWER.description": "提高等同于层数的[gold]伤害[/gold]、[gold]格挡[/gold]收益与[gold]最大生命[/gold]百分比。",
-  "RE_ASTRAL_PARTY_MOD_POWER_LUCID_DREAM_WILDNESS_POWER.smartDescription": "提高等同于层数的[gold]伤害[/gold]、[gold]格挡[/gold]收益与[gold]最大生命[/gold]百分比。",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.title": "进程",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.description": "在战斗结束时，根据层数转化为【人格：绿油油β】的[gold]步数[/gold]。\n若你持有【初始点】且其当前为[blue]1[/blue]/[blue]3[/blue]星，结算时额外+[blue]1[/blue]/[blue]3[/blue]步。",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "战斗结束时，按层数转化为【人格：绿油油β】的[gold]步数[/gold]；【初始点】在[blue]1[/blue]/[blue]3[/blue]星时额外+[blue]1[/blue]/[blue]3[/blue]步。"

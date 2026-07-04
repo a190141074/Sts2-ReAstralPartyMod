@@ -31,7 +31,6 @@ using STS2RitsuLib.Combat.HandSize;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Models;
-using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
@@ -182,14 +181,6 @@ internal static class GameplayStaticPatchCatalog
                 "UI patch: move the enigmatic synthesis formula button to the left of the map button",
                 [typeof(IRunState)]),
             new ModPatchInfo(
-                "top_bar_portrait_tip_lucid_dream_malice_patch",
-                typeof(MegaCrit.sts2.Core.Nodes.TopBar.NTopBarPortraitTip),
-                "OnFocus",
-                typeof(NTopBarPortraitTipLucidDreamMalicePatch),
-                false,
-                "UI patch: append enabled lucid dream malice entries to the in-run ascension portrait hover tip",
-                []),
-            new ModPatchInfo(
                 "event_option_locked_hover_focus_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
                 "OnFocus",
@@ -203,49 +194,6 @@ internal static class GameplayStaticPatchCatalog
                 typeof(EventOptionLockedHoverUnfocusPatch),
                 false,
                 "UI patch: clean up hover tips for locked event options"),
-            new ModPatchInfo(
-                "neow_face_the_shadow_icon_patch",
-                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
-                "_Ready",
-                typeof(NeowDreamFaceTheShadowIconPatch),
-                false,
-                "UI patch: attach the Face the Shadow icon"),
-            new ModPatchInfo(
-                "dream_endless_mouth_of_destruction_option_ui_patch",
-                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
-                "_Ready",
-                typeof(DreamEndlessMouthOfDestructionOptionUiPatch),
-                false,
-                "UI patch: render the Dream Endless Mouth of Destruction info option as a non-interactable display button"),
-            new ModPatchInfo(
-                "dream_endless_mouth_of_destruction_info_option_focus_patch",
-                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
-                "OnFocus",
-                typeof(DreamEndlessMouthOfDestructionInfoOptionFocusPatch),
-                false,
-                "UI patch: suppress hover/focus interactions for the Dream Endless Mouth of Destruction info option"),
-            new ModPatchInfo(
-                "dream_endless_mouth_of_destruction_info_option_unfocus_patch",
-                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
-                "OnUnfocus",
-                typeof(DreamEndlessMouthOfDestructionInfoOptionUnfocusPatch),
-                false,
-                "UI patch: suppress hover cleanup interactions for the Dream Endless Mouth of Destruction info option"),
-            new ModPatchInfo(
-                "dream_endless_mouth_of_destruction_info_option_release_patch",
-                typeof(MegaCrit.Sts2.Core.Nodes.Events.NEventOptionButton),
-                "OnRelease",
-                typeof(DreamEndlessMouthOfDestructionInfoOptionReleasePatch),
-                false,
-                "UI patch: swallow direct activation of the Dream Endless Mouth of Destruction info option"),
-            new ModPatchInfo(
-                "dream_endless_mouth_of_destruction_info_option_event_room_guard_patch",
-                typeof(MegaCrit.Sts2.Core.Nodes.Rooms.NEventRoom),
-                "OptionButtonClicked",
-                typeof(DreamEndlessMouthOfDestructionInfoOptionEventRoomGuardPatch),
-                false,
-                "UI patch: prevent event-room activation of the Dream Endless Mouth of Destruction info option",
-                [typeof(EventOption), typeof(int)]),
             new ModPatchInfo(
                 "multiplayer_relic_animation_safety_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Relics.NRelicInventoryHolder),
@@ -462,7 +410,6 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<CreatureHealMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureHealEnigmaticSynthesisCursedScrollPatch>();
         patcher.RegisterPatch<CreatureHealDorothyWarmPatch>();
-        patcher.RegisterPatch<CreatureDamageLucidDreamPitchBlackImpulsePatch>();
         patcher.RegisterPatch<CreatureSetCurrentHpMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureGainMaxHpMoonPropShapedGlassPatch>();
         patcher.RegisterPatch<CreatureLoseMaxHpMoonPropShapedGlassPatch>();

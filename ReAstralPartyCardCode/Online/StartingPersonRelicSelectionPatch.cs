@@ -17,7 +17,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.HonkaiFlameChasers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.ManosabaLin;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
-using ReAstralPartyMod.ReAstralPartyCardCode.DreamLucid;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -67,7 +66,6 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
         LogInfo("P005", "Starting persona relic selection waiting for run settings sync.");
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         LogInfo("P006", "Starting persona relic selection finished run settings sync.");
-        LucidDreamMaliceModifierInstaller.EnsureInstalledForNewRun(runState);
         await GrantStartingInitialPointIfEnabledAsync(runState);
         await GrantStartingRingOfSevenCursesIfEnabledAsync(runState);
         LogInfo("P007", "Starting persona relic selection run bootstrap completed; Neow ready-page flow will handle the actual persona selection entry.");

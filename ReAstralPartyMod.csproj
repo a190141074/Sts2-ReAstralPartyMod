@@ -206,8 +206,6 @@
 		<Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png.import"/>
 		<Content Include="ReAstralPartyMod\images\events\astral_relic_store.png"/>
 		<Content Include="ReAstralPartyMod\images\events\astral_relic_store.png.import"/>
-		<Content Include="ReAstralPartyMod\images\events\dream_sparkling_and_purifying_well.png"/>
-		<Content Include="ReAstralPartyMod\images\events\dream_sparkling_and_purifying_well.png.import"/>
 		<Content Include="ReAstralPartyMod\images\events\vial_episode_store.png"/>
 		<Content Include="ReAstralPartyMod\images\potion\candy_big_brain_gummy.png"/>
 		<Content Include="ReAstralPartyMod\images\potion\candy_big_brain_gummy.png.import"/>
@@ -549,10 +547,6 @@
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_beads_of_fealty.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\prophecy_replicant_group.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\prophecy_replicant_group.png.import"/>
-		<Content Include="ReAstralPartyMod\images\relic\dream_coin_explosion.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\dream_coin_explosion.png.import"/>
-		<Content Include="ReAstralPartyMod\images\relic\dream_disintegration_claw.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\dream_disintegration_claw.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_egocentrism.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_eulogy_zero.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\enigmatic_special_the_one_box.png"/>
@@ -591,8 +585,6 @@
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\enigmatic_synthesis_formula.png"/>
-		<Content Include="ReAstralPartyMod\images\ui\dream_lucid\dream_lucid_choice.png"/>
-		<Content Include="ReAstralPartyMod\images\ui\dream_lucid\dream_lucid_choice.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png.import"/>
 		<Content Include="ReAstralPartyMod\localization\eng\ancients.json" />
