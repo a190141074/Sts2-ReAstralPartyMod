@@ -7,7 +7,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Events;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
-using ReAstralPartyMod.ReAstralPartyCardCode.Rewards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -37,7 +36,6 @@ public class MainFile
         // so keywords must be registered before assembly auto-discovery runs.
         AstralKeywords.RegisterAll();
         AstralCardTags.RegisterAll();
-        EnigmaticRewardRegistry.RegisterAll();
         StokovStarterBundleHelper.RegisterAll();
         SavedPropertyGovernance.LogGovernanceSummary(assembly);
         SavedPropertyCacheBootstrap.ScheduleVerification(assembly);
@@ -55,7 +53,6 @@ public class MainFile
         AstralChoiceProtocol.LogStartupDiagnostics();
         AstralNetPhaseGuard.LogStartupDiagnostics();
         RewardContextPolicy.LogStartupDiagnostics();
-        EnigmaticUniqueMaterialRewardSync.Register();
 
         var buildMarker = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                           ?? assembly.GetName().Version?.ToString()

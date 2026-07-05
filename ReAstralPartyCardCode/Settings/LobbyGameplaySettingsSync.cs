@@ -96,12 +96,7 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public bool EnableStartingAstralRelicStore { get; set; } = true;
 
-    public bool EnableStartingRingOfSevenCurses { get; set; }
-
     public bool EnableStartingPersonSelection { get; set; } = true;
-
-
-    public bool EnableEnigmaticSeriesEvents { get; set; } = true;
 
     public bool EnableMoonPropShopSlots { get; set; } = true;
 
@@ -173,9 +168,7 @@ public sealed class LobbyGameplaySettingsSnapshot
             CurrentContentMode = CurrentContentMode,
             EnableStartingInitialPoint = EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
-            EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
-            EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableMoonPropRelics = EnableMoonPropRelics,
             EnableJewelryRelics = EnableJewelryRelics,
@@ -199,16 +192,13 @@ public sealed class LobbyGameplaySettingsSnapshot
             CurrentContentMode = ReAstralPartyModSettingsManager.GetCurrentContentMode(),
             EnableStartingInitialPoint = ReAstralPartyModSettingsManager.EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = ReAstralPartyModSettingsManager.EnableStartingAstralRelicStore,
-            EnableStartingRingOfSevenCurses = ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = ReAstralPartyModSettingsManager.EnableStartingPersonaSelection,
-            EnableEnigmaticSeriesEvents = ReAstralPartyModSettingsManager.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = ReAstralPartyModSettingsManager.EnableMoonPropShopSlots,
             EnableMoonPropRelics = ReAstralPartyModSettingsManager.EnableMoonPropRelics,
             EnableJewelryRelics = ReAstralPartyModSettingsManager.EnableJewelryRelics,
             EnableNeowExtraOption = ReAstralPartyModSettingsManager.EnableNeowExtraOption,
             EnableCollectorsCards = ReAstralPartyModSettingsManager.EnableCollectorsCards,
             NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-                ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
                 ReAstralPartyModSettingsManager.NeowExtraOptionSelectionMode),
             EnableAllPersonas = ReAstralPartyModSettingsManager.EnableAllPersonas,
             EnableVariantPersonas = ReAstralPartyModSettingsManager.EnableVariantPersonas,
@@ -296,7 +286,6 @@ internal static class LobbyGameplaySettingsSync
             mutator(updated);
             SanitizeSnapshot(updated);
             updated.NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-                updated.EnableStartingRingOfSevenCurses,
                 updated.NeowExtraOptionSelectionMode);
             _currentSnapshot = updated.Clone();
         }
@@ -482,14 +471,12 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 18;
+    private const int SchemaVersion = 19;
 
     public AstralContentMode CurrentContentMode { get; set; }
     public bool EnableStartingInitialPoint { get; set; }
     public bool EnableStartingAstralRelicStore { get; set; } = true;
-    public bool EnableStartingRingOfSevenCurses { get; set; }
     public bool EnableStartingPersonaSelection { get; set; }
-    public bool EnableEnigmaticSeriesEvents { get; set; }
     public bool EnableMoonPropShopSlots { get; set; } = true;
     public bool EnableMoonPropRelics { get; set; } = true;
     public bool EnableJewelryRelics { get; set; } = true;
@@ -509,9 +496,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         CurrentContentMode = snapshot.CurrentContentMode;
         EnableStartingInitialPoint = snapshot.EnableStartingInitialPoint;
         EnableStartingAstralRelicStore = snapshot.EnableStartingAstralRelicStore;
-        EnableStartingRingOfSevenCurses = snapshot.EnableStartingRingOfSevenCurses;
         EnableStartingPersonaSelection = snapshot.EnableStartingPersonaSelection;
-        EnableEnigmaticSeriesEvents = snapshot.EnableEnigmaticSeriesEvents;
         EnableMoonPropShopSlots = snapshot.EnableMoonPropShopSlots;
         EnableMoonPropRelics = snapshot.EnableMoonPropRelics;
         EnableJewelryRelics = snapshot.EnableJewelryRelics;
@@ -541,9 +526,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteEnum(CurrentContentMode);
         writer.WriteBool(EnableStartingInitialPoint);
         writer.WriteBool(EnableStartingAstralRelicStore);
-        writer.WriteBool(EnableStartingRingOfSevenCurses);
         writer.WriteBool(EnableStartingPersonaSelection);
-        writer.WriteBool(EnableEnigmaticSeriesEvents);
         writer.WriteBool(EnableMoonPropShopSlots);
         writer.WriteBool(EnableMoonPropRelics);
         writer.WriteBool(EnableJewelryRelics);
@@ -564,143 +547,33 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public void Deserialize(PacketReader reader)
     {
         var schemaVersion = reader.ReadInt();
-        if (schemaVersion >= 14)
-        {
-            var rawMode = reader.ReadEnum<AstralContentMode>();
-            CurrentContentMode = AstralContentModeRegistry.NormalizeMode(rawMode);
-            EnableStartingInitialPoint = reader.ReadBool();
-            EnableStartingAstralRelicStore = reader.ReadBool();
-            EnableStartingRingOfSevenCurses = reader.ReadBool();
-            EnableStartingPersonaSelection = reader.ReadBool();
-        }
-        else if (schemaVersion >= 10)
-        {
-            CurrentContentMode = AstralContentMode.Vanilla;
-            EnableStartingInitialPoint = reader.ReadBool();
-            EnableStartingAstralRelicStore = true;
-            EnableStartingRingOfSevenCurses = reader.ReadBool();
-            EnableStartingPersonaSelection = reader.ReadBool();
-        }
-        else
-        {
+        if (schemaVersion != SchemaVersion)
             throw new InvalidOperationException($"{MainFile.ModId} received unsupported lobby gameplay snapshot schema {schemaVersion}.");
-        }
 
-        if (schemaVersion >= 18)
-        {
-            EnableEnigmaticSeriesEvents = reader.ReadBool();
-            EnableMoonPropShopSlots = reader.ReadBool();
-            EnableMoonPropRelics = reader.ReadBool();
-            EnableJewelryRelics = reader.ReadBool();
-            EnableNeowExtraOption = reader.ReadBool();
-            EnableCollectorsCards = reader.ReadBool();
-        }
-        else if (schemaVersion >= 16)
-        {
-            EnableEnigmaticSeriesEvents = reader.ReadBool();
-            EnableMoonPropShopSlots = reader.ReadBool();
-            EnableMoonPropRelics = reader.ReadBool();
-            EnableJewelryRelics = true;
-            EnableNeowExtraOption = reader.ReadBool();
-            EnableCollectorsCards = reader.ReadBool();
-        }
-        else if (schemaVersion >= 15)
-        {
-            EnableEnigmaticSeriesEvents = reader.ReadBool();
-            EnableMoonPropShopSlots = reader.ReadBool();
-            EnableMoonPropRelics = true;
-            EnableJewelryRelics = true;
-            EnableNeowExtraOption = reader.ReadBool();
-            EnableCollectorsCards = reader.ReadBool();
-        }
-        else if (schemaVersion >= 12)
-        {
-            EnableEnigmaticSeriesEvents = reader.ReadBool();
-            EnableMoonPropShopSlots = reader.ReadBool();
-            EnableMoonPropRelics = true;
-            EnableJewelryRelics = true;
-            EnableNeowExtraOption = reader.ReadBool();
-            EnableCollectorsCards = true;
-        }
-        else if (schemaVersion >= 11)
-        {
-            EnableEnigmaticSeriesEvents = reader.ReadBool();
-            EnableMoonPropShopSlots = reader.ReadBool();
-            EnableMoonPropRelics = true;
-            EnableJewelryRelics = true;
-            EnableNeowExtraOption = reader.ReadBool();
-            EnableCollectorsCards = true;
-        }
-        else if (schemaVersion >= 3)
-        {
-            EnableEnigmaticSeriesEvents = reader.ReadBool();
-            EnableMoonPropShopSlots = true;
-            EnableMoonPropRelics = true;
-            EnableJewelryRelics = true;
-            EnableNeowExtraOption = reader.ReadBool();
-            EnableCollectorsCards = true;
-        }
-        else
-        {
-            EnableEnigmaticSeriesEvents = true;
-            EnableMoonPropShopSlots = true;
-            EnableMoonPropRelics = true;
-            EnableJewelryRelics = true;
-            EnableNeowExtraOption = true;
-            EnableCollectorsCards = true;
-        }
-
-        if (schemaVersion >= 5)
-        {
-            var rawMode = reader.ReadEnum<NeowExtraOptionSelectionMode>();
-            NeowExtraOptionSelectionMode = Enum.IsDefined(typeof(NeowExtraOptionSelectionMode), rawMode)
-                ? rawMode
-                : NeowExtraOptionSelectionMode.DefaultRandom;
-        }
-        else
-        {
-            NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom;
-        }
+        var rawMode = reader.ReadEnum<AstralContentMode>();
+        CurrentContentMode = AstralContentModeRegistry.NormalizeMode(rawMode);
+        EnableStartingInitialPoint = reader.ReadBool();
+        EnableStartingAstralRelicStore = reader.ReadBool();
+        EnableStartingPersonaSelection = reader.ReadBool();
+        EnableMoonPropShopSlots = reader.ReadBool();
+        EnableMoonPropRelics = reader.ReadBool();
+        EnableJewelryRelics = reader.ReadBool();
+        EnableNeowExtraOption = reader.ReadBool();
+        EnableCollectorsCards = reader.ReadBool();
+        var rawNeowMode = reader.ReadEnum<NeowExtraOptionSelectionMode>();
+        NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(rawNeowMode);
 
         EnableAllPersonas = reader.ReadBool();
-        if (schemaVersion >= 13)
-        {
-            EnableVariantPersonas = reader.ReadBool();
-        }
-        else
-        {
-            EnableVariantPersonas = true;
-        }
+        EnableVariantPersonas = reader.ReadBool();
         EnableAllVariantPersonas = reader.ReadBool();
         EnableExtremeMode = reader.ReadBool();
         StartingPersonMode = reader.ReadEnum<StartingPersonMode>();
         TokenSeriesMode = reader.ReadEnum<TokenSeriesMode>();
-
-        if (schemaVersion >= 7)
-        {
-        }
-        else if (schemaVersion >= 6)
-        {
-        }
-        else if (schemaVersion >= 4)
-        {
-        }
-        else
-        {
-        }
-
-        if (schemaVersion >= 17)
-        {
-            var count = reader.ReadInt();
-            var bannedRelicIds = new List<string>(count);
-            for (var index = 0; index < count; index++)
-                bannedRelicIds.Add(reader.ReadString());
-            BannedRelicIdsSerialized = bannedRelicIds;
-        }
-        else
-        {
-            BannedRelicIdsSerialized = [];
-        }
+        var count = reader.ReadInt();
+        var bannedRelicIds = new List<string>(count);
+        for (var index = 0; index < count; index++)
+            bannedRelicIds.Add(reader.ReadString());
+        BannedRelicIdsSerialized = bannedRelicIds;
     }
 
     public LobbyGameplaySettingsSnapshot ToSnapshot()
@@ -710,9 +583,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             CurrentContentMode = CurrentContentMode,
             EnableStartingInitialPoint = EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
-            EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
-            EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableMoonPropRelics = EnableMoonPropRelics,
             EnableJewelryRelics = EnableJewelryRelics,

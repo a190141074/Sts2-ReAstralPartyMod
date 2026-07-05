@@ -67,7 +67,6 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         LogInfo("P006", "Starting persona relic selection finished run settings sync.");
         await GrantStartingInitialPointIfEnabledAsync(runState);
-        await GrantStartingRingOfSevenCursesIfEnabledAsync(runState);
         LogInfo("P007", "Starting persona relic selection run bootstrap completed; Neow ready-page flow will handle the actual persona selection entry.");
         await TryTriggerHonkaiFlameChasersFallbackAsync(runState);
     }
@@ -305,19 +304,6 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
             await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(player, ModelDb.Relic<TokenGoldInitialPoint>());
             LogInfo("P006C",
                 $"Granted Starting Initial Point to player {player.NetId} | gold_after={player.Gold}.");
-        }
-    }
-
-    private static async Task GrantStartingRingOfSevenCursesIfEnabledAsync(RunState runState)
-    {
-        if (!ReAstralPartyModSettingsManager.GetEnableStartingRingOfSevenCurses(runState))
-            return;
-
-        foreach (var player in runState.Players)
-        {
-            LogInfo("P006D",
-                $"Granting Ring of Seven Curses to player {player.NetId}.");
-            await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(player, ModelDb.Relic<EnigmaticSevenCurses>());
         }
     }
 

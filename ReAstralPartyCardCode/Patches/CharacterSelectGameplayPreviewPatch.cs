@@ -163,9 +163,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private readonly Dictionary<Control, IReadOnlyList<IHoverTip>> _hoverTipsByControl = [];
     private CheckButton? _startingInitialPointToggle;
     private CheckButton? _startingAstralRelicStoreToggle;
-    private CheckButton? _startingRingOfSevenCursesToggle;
     private CheckButton? _startingPersonaSelectionToggle;
-    private CheckButton? _enigmaticSeriesEventsToggle;
     private CheckButton? _moonPropShopSlotsToggle;
     private CheckButton? _moonPropRelicsToggle;
     private CheckButton? _jewelryRelicsToggle;
@@ -353,11 +351,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             out _startingAstralRelicStoreToggle,
             OnEnableStartingAstralRelicStoreToggled));
         body.AddChild(BuildBooleanRow(
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label"),
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.description"),
-            out _startingRingOfSevenCursesToggle,
-            OnEnableStartingRingOfSevenCursesToggled));
-        body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description"),
             out _startingPersonaSelectionToggle,
@@ -367,11 +360,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.description"),
             out _variantPersonasToggle,
             OnEnableVariantPersonasToggled));
-        body.AddChild(BuildBooleanRow(
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.label"),
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.description"),
-            out _enigmaticSeriesEventsToggle,
-            OnEnableEnigmaticSeriesEventsToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description"),
@@ -835,7 +823,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             var personaSelectionEnabled = snapshot.EnableStartingPersonaSelection;
             var variantPersonasEnabled = snapshot.EnableVariantPersonas;
             var normalizedNeowSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-                snapshot.EnableStartingRingOfSevenCurses,
                 snapshot.NeowExtraOptionSelectionMode);
             if (_startingInitialPointToggle != null)
             {
@@ -851,14 +838,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _startingAstralRelicStoreToggle.Text = snapshot.EnableStartingAstralRelicStore ? "ON" : "OFF";
             }
 
-            if (_startingRingOfSevenCursesToggle != null)
-            {
-                _startingRingOfSevenCursesToggle.ButtonPressed = snapshot.EnableStartingRingOfSevenCurses;
-                _startingRingOfSevenCursesToggle.Disabled = !isEditable;
-                _startingRingOfSevenCursesToggle.Text = snapshot.EnableStartingRingOfSevenCurses ? "ON" : "OFF";
-                SetRowVisible(_startingRingOfSevenCursesToggle, !isVanillaMode);
-            }
-
             if (_startingPersonaSelectionToggle != null)
             {
                 _startingPersonaSelectionToggle.ButtonPressed = snapshot.EnableStartingPersonaSelection;
@@ -872,14 +851,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _variantPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled;
                 _variantPersonasToggle.Text = snapshot.EnableVariantPersonas ? "ON" : "OFF";
                 SetRowVisible(_variantPersonasToggle, !isVanillaMode);
-            }
-
-            if (_enigmaticSeriesEventsToggle != null)
-            {
-                _enigmaticSeriesEventsToggle.ButtonPressed = snapshot.EnableEnigmaticSeriesEvents;
-                _enigmaticSeriesEventsToggle.Disabled = !isEditable;
-                _enigmaticSeriesEventsToggle.Text = snapshot.EnableEnigmaticSeriesEvents ? "ON" : "OFF";
-                SetRowVisible(_enigmaticSeriesEventsToggle, !isVanillaMode);
             }
 
             if (_moonPropShopSlotsToggle != null)
@@ -924,7 +895,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
             if (_neowExtraOptionSelectionModeOption != null)
             {
-                RebuildNeowExtraOptionSelectionModeItems(snapshot.EnableStartingRingOfSevenCurses);
+                RebuildNeowExtraOptionSelectionModeItems();
                 _neowExtraOptionSelectionModeOption.Select(
                     IndexOfVisibleNeowExtraOptionSelectionMode(normalizedNeowSelectionMode));
                 _neowExtraOptionSelectionModeOption.Disabled = !isEditable || !snapshot.EnableNeowExtraOption;
@@ -1054,9 +1025,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         CallDeferred(nameof(ApplySnapshotDeferred), Variant.From((int)snapshot.CurrentContentMode),
             Variant.From(snapshot.EnableStartingInitialPoint),
             Variant.From(snapshot.EnableStartingAstralRelicStore),
-            Variant.From(snapshot.EnableStartingRingOfSevenCurses),
             Variant.From(snapshot.EnableStartingPersonaSelection),
-            Variant.From(snapshot.EnableEnigmaticSeriesEvents), Variant.From(snapshot.EnableMoonPropShopSlots),
+            Variant.From(snapshot.EnableMoonPropShopSlots),
             Variant.From(snapshot.EnableMoonPropRelics), Variant.From(snapshot.EnableJewelryRelics), Variant.From(snapshot.EnableNeowExtraOption),
             Variant.From(snapshot.EnableCollectorsCards),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
@@ -1064,8 +1034,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From((int)snapshot.StartingPersonMode), Variant.From((int)snapshot.TokenSeriesMode));
     }
 
-    private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint, bool enableStartingAstralRelicStore, bool enableStartingRingOfSevenCurses, bool enableStartingPersonaSelection,
-        bool enableEnigmaticSeriesEvents, bool enableMoonPropShopSlots,
+    private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint, bool enableStartingAstralRelicStore, bool enableStartingPersonaSelection,
+        bool enableMoonPropShopSlots,
         bool enableMoonPropRelics, bool enableJewelryRelics, bool enableNeowExtraOption,
         bool enableCollectorsCards,
         int neowExtraOptionSelectionMode,
@@ -1078,9 +1048,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 : AstralContentMode.Vanilla,
             EnableStartingInitialPoint = enableStartingInitialPoint,
             EnableStartingAstralRelicStore = enableStartingAstralRelicStore,
-            EnableStartingRingOfSevenCurses = enableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = enableStartingPersonaSelection,
-            EnableEnigmaticSeriesEvents = enableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = enableMoonPropShopSlots,
             EnableMoonPropRelics = enableMoonPropRelics,
             EnableJewelryRelics = enableJewelryRelics,
@@ -1139,23 +1107,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 
-    private void OnEnableStartingRingOfSevenCursesToggled(bool value)
-    {
-        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
-            return;
-
-        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableStartingRingOfSevenCurses = value);
-        if (value)
-        {
-            LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot =>
-            {
-                if (snapshot.NeowExtraOptionSelectionMode == NeowExtraOptionSelectionMode.RingOfSevenCurses)
-                    snapshot.NeowExtraOptionSelectionMode = NeowExtraOptionSelectionMode.DefaultRandom;
-            });
-        }
-        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
-    }
-
     private void OnEnableStartingPersonaSelectionToggled(bool value)
     {
         if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
@@ -1171,15 +1122,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableVariantPersonas = value);
-        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
-    }
-
-    private void OnEnableEnigmaticSeriesEventsToggled(bool value)
-    {
-        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
-            return;
-
-        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableEnigmaticSeriesEvents = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 
@@ -1237,7 +1179,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
         var selectedMode = _visibleNeowExtraOptionSelectionModes[(int)selectedIndex];
         selectedMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-            LobbyGameplaySettingsSync.TryGetSnapshot(out var currentSnapshot) && currentSnapshot.EnableStartingRingOfSevenCurses,
             selectedMode);
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(
             snapshot => snapshot.NeowExtraOptionSelectionMode = selectedMode);
@@ -1321,7 +1262,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         return 0;
     }
 
-    private void RebuildNeowExtraOptionSelectionModeItems(bool enableStartingRingOfSevenCurses)
+    private void RebuildNeowExtraOptionSelectionModeItems()
     {
         if (_neowExtraOptionSelectionModeOption == null)
             return;
@@ -1331,9 +1272,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
         foreach (var mode in NeowExtraOptionSelectionModes)
         {
-            if (enableStartingRingOfSevenCurses && mode == NeowExtraOptionSelectionMode.RingOfSevenCurses)
-                continue;
-
             _visibleNeowExtraOptionSelectionModes.Add(mode);
             _neowExtraOptionSelectionModeOption.AddItem(
                 ReAstralPartyModSettingsManager.GetNeowExtraOptionSelectionModeTitle(mode),

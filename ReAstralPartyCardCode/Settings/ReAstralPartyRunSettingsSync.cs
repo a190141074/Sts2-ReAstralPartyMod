@@ -18,12 +18,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public bool EnableStartingAstralRelicStore { get; set; } = true;
 
-    public bool EnableStartingRingOfSevenCurses { get; set; }
-
     public bool EnableStartingPersonSelection { get; set; } = true;
-
-
-    public bool EnableEnigmaticSeriesEvents { get; set; } = true;
 
     public bool EnableMoonPropShopSlots { get; set; } = true;
 
@@ -118,9 +113,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
             EnableExtremeMode = EnableExtremeMode,
             EnableStartingInitialPoint = EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
-            EnableStartingRingOfSevenCurses = EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
-            EnableEnigmaticSeriesEvents = EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = EnableMoonPropShopSlots,
             EnableMoonPropRelics = EnableMoonPropRelics,
             EnableJewelryRelics = EnableJewelryRelics,
@@ -200,16 +193,13 @@ internal static class ReAstralPartyRunSettingsSync
         snapshot.CurrentContentMode = lobbySnapshot.CurrentContentMode;
         snapshot.EnableStartingInitialPoint = lobbySnapshot.EnableStartingInitialPoint;
         snapshot.EnableStartingAstralRelicStore = lobbySnapshot.EnableStartingAstralRelicStore;
-        snapshot.EnableStartingRingOfSevenCurses = lobbySnapshot.EnableStartingRingOfSevenCurses;
         snapshot.EnableStartingPersonaSelection = lobbySnapshot.EnableStartingPersonaSelection;
-        snapshot.EnableEnigmaticSeriesEvents = lobbySnapshot.EnableEnigmaticSeriesEvents;
         snapshot.EnableMoonPropShopSlots = lobbySnapshot.EnableMoonPropShopSlots;
         snapshot.EnableMoonPropRelics = lobbySnapshot.EnableMoonPropRelics;
         snapshot.EnableJewelryRelics = lobbySnapshot.EnableJewelryRelics;
         snapshot.EnableNeowExtraOption = lobbySnapshot.EnableNeowExtraOption;
         snapshot.EnableCollectorsCards = lobbySnapshot.EnableCollectorsCards;
         snapshot.NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-            lobbySnapshot.EnableStartingRingOfSevenCurses,
             lobbySnapshot.NeowExtraOptionSelectionMode);
         snapshot.EnableAllPersonas = lobbySnapshot.EnableAllPersonas;
         snapshot.EnableVariantPersons = lobbySnapshot.EnableVariantPersons;
@@ -236,16 +226,13 @@ internal static class ReAstralPartyRunSettingsSync
             EnableExtremeMode = ReAstralPartyModSettingsManager.EnableExtremeMode,
             EnableStartingInitialPoint = ReAstralPartyModSettingsManager.EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = ReAstralPartyModSettingsManager.EnableStartingAstralRelicStore,
-            EnableStartingRingOfSevenCurses = ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = ReAstralPartyModSettingsManager.EnableStartingPersonaSelection,
-            EnableEnigmaticSeriesEvents = ReAstralPartyModSettingsManager.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = ReAstralPartyModSettingsManager.EnableMoonPropShopSlots,
             EnableMoonPropRelics = ReAstralPartyModSettingsManager.EnableMoonPropRelics,
             EnableJewelryRelics = ReAstralPartyModSettingsManager.EnableJewelryRelics,
             EnableNeowExtraOption = ReAstralPartyModSettingsManager.EnableNeowExtraOption,
             EnableCollectorsCards = ReAstralPartyModSettingsManager.EnableCollectorsCards,
             NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-                ReAstralPartyModSettingsManager.EnableStartingRingOfSevenCurses,
                 ReAstralPartyModSettingsManager.NeowExtraOptionSelectionMode),
             EnableAllPersonas = ReAstralPartyModSettingsManager.EnableAllPersonas,
             EnableVariantPersons = ReAstralPartyModSettingsManager.EnableVariantPersons,
@@ -338,16 +325,13 @@ internal static class ReAstralPartyRunSettingsSync
             EnableExtremeMode = lobbySnapshot.EnableExtremeMode,
             EnableStartingInitialPoint = lobbySnapshot.EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = lobbySnapshot.EnableStartingAstralRelicStore,
-            EnableStartingRingOfSevenCurses = lobbySnapshot.EnableStartingRingOfSevenCurses,
             EnableStartingPersonaSelection = lobbySnapshot.EnableStartingPersonaSelection,
-            EnableEnigmaticSeriesEvents = lobbySnapshot.EnableEnigmaticSeriesEvents,
             EnableMoonPropShopSlots = lobbySnapshot.EnableMoonPropShopSlots,
             EnableMoonPropRelics = lobbySnapshot.EnableMoonPropRelics,
             EnableJewelryRelics = lobbySnapshot.EnableJewelryRelics,
             EnableNeowExtraOption = lobbySnapshot.EnableNeowExtraOption,
             EnableCollectorsCards = lobbySnapshot.EnableCollectorsCards,
             NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-                lobbySnapshot.EnableStartingRingOfSevenCurses,
                 lobbySnapshot.NeowExtraOptionSelectionMode),
             EnableAllPersonas = lobbySnapshot.EnableAllPersonas,
             EnableVariantPersonas = lobbySnapshot.EnableVariantPersonas,

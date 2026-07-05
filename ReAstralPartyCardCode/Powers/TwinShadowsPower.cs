@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
@@ -28,7 +29,7 @@ public class TwinShadowsPower : AstralPartyPowerModel
             return;
 
         Flash();
-        using (SevenCursesDebuffProtectionHelper.EnterDebuffDamageContext())
+        using (DebuffDamageContextHelper.Enter())
             await CreatureCmd.Damage(
                 new ThrowingPlayerChoiceContext(),
                 Owner,

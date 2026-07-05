@@ -20,13 +20,11 @@ public enum AstralGameplaySettingKey
     ExtremeMode = 6,
     VariantPersonas = 7,
     AllVariantPersonas = 8,
-    EnigmaticSeriesEvents = 10,
     MoonPropShopSlots = 11,
     MoonPropRelics = 12,
     JewelryRelics = 13,
     NeowExtraOption = 14,
     NeowExtraOptionSelectionMode = 15,
-    StartingRingOfSevenCurses = 17,
     CollectorsCards = 18
 }
 
@@ -130,13 +128,6 @@ public static class AstralContentModeRegistry
             AstralModeAvailability.LockedVisible,
             AstralModeAvailability.Hidden),
         new(
-            AstralGameplaySettingKey.EnigmaticSeriesEvents,
-            "enable_enigmatic_series_events",
-            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.label",
-            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_enigmatic_series_events.description",
-            AstralModeAvailability.LockedVisible,
-            AstralModeAvailability.Hidden),
-        new(
             AstralGameplaySettingKey.MoonPropShopSlots,
             "enable_moon_prop_shop_slots",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label",
@@ -176,13 +167,6 @@ public static class AstralContentModeRegistry
             "enable_collectors_cards",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.label",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_collectors_cards.description",
-            AstralModeAvailability.LockedVisible,
-            AstralModeAvailability.Hidden),
-        new(
-            AstralGameplaySettingKey.StartingRingOfSevenCurses,
-            "enable_starting_ring_of_seven_curses",
-            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.label",
-            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_ring_of_seven_curses.description",
             AstralModeAvailability.LockedVisible,
             AstralModeAvailability.Hidden)
     ];

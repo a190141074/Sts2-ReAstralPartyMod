@@ -49,11 +49,6 @@ public sealed class DevConsoleUltimateChargeCommandPatch : IPatchMethod
                 MainFile.Logger.Info("Registered dev console command: rapultchargehand");
             }
 
-            if (!commands.Contains(RapEtheriumIngotConsoleCmd.CommandName))
-            {
-                commands[RapEtheriumIngotConsoleCmd.CommandName] = new RapEtheriumIngotConsoleCmd();
-                MainFile.Logger.Info("Registered dev console command: rapingot");
-            }
         }
         catch (Exception ex)
         {

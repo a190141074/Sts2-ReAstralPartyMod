@@ -48,8 +48,9 @@ public class MoonPropFragileCrown : MoonPropStackableRelicBase
         if (!IsTrackedOutboundDamage(dealer, target, result.TotalDamage, cardSource))
             return;
 
-        var didTrigger = RingOfSevenCursesHelper.RollPermille(
-            TriggerPermille,
+        var didTrigger = DeterministicMultiplayerChoiceHelper.RollDeterministically(
+            0,
+            1000,
             MainFile.ModId,
             RelicId,
             nameof(AfterDamageGiven),
@@ -59,7 +60,7 @@ public class MoonPropFragileCrown : MoonPropStackableRelicBase
             Owner?.NetId,
             target.ModelId.ToString(),
             cardSource?.Id.Entry ?? "<none>",
-            AstralParty_MoonPropFragileCrownRollCounter++);
+            AstralParty_MoonPropFragileCrownRollCounter++) < TriggerPermille;
         if (!didTrigger || Owner?.Creature == null)
             return;
 

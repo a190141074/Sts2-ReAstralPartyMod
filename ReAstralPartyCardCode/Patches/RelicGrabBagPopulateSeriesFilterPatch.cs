@@ -2,7 +2,6 @@ using HarmonyLib;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Runs;
-using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
@@ -17,7 +16,6 @@ internal static class RelicGrabBagPopulateSeriesFilterPatch
             return;
 
         RemoveLockedSeriesRelics(__instance, player.RunState);
-        CursedScrollGrabBagHelper.Normalize(__instance, player);
         AstralNeowDiagnosticHelper.ReportGrabBagRaritySnapshot(__instance, player);
     }
 

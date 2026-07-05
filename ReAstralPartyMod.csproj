@@ -549,8 +549,6 @@
 		<Content Include="ReAstralPartyMod\images\relic\prophecy_replicant_group.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_egocentrism.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_eulogy_zero.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\enigmatic_special_the_one_box.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\enigmatic_special_the_one_box.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_hellfire_tincture.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_hellfire_tincture.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\moon_prop_focused_convergence.png"/>
@@ -584,7 +582,6 @@
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_big.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png.import"/>
-		<Content Include="ReAstralPartyMod\images\ui\enigmatic_synthesis_formula.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png.import"/>
 		<Content Include="ReAstralPartyMod\localization\eng\ancients.json" />

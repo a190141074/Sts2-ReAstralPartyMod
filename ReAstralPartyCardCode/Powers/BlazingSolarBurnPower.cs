@@ -37,7 +37,7 @@ public class BlazingSolarBurnPower : AstralPartyPowerModel
         var damageDealer = Applier ?? Owner;
 
         // Force the 6-arg CreatureCmd.Damage overload; the 5-arg cardSource overload crashes on null in this runtime.
-        using (SevenCursesDebuffProtectionHelper.EnterDebuffDamageContext())
+        using (DebuffDamageContextHelper.Enter())
             await CreatureCmd.Damage(
                 new ThrowingPlayerChoiceContext(),
                 Owner,

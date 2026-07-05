@@ -32,7 +32,7 @@ public class PassingBombPower : AstralPartyPowerModel
         if (roll == 1)
         {
             var damage = 9m + (decimal)Math.Pow(2d, (double)Amount);
-            using (SevenCursesDebuffProtectionHelper.EnterDebuffDamageContext())
+            using (DebuffDamageContextHelper.Enter())
                 await CreatureCmd.Damage(choiceContext, Owner, damage, ValueProp.Unpowered, Applier, null);
             return;
         }

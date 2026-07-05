@@ -22,8 +22,6 @@ internal static class NeowOptionInjectionHelper
 {
     private const string CandidatePoolVersion = "v1";
     private static readonly object SyncLock = new();
-    private const string RingOfSevenCursesTextKey =
-        "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.RING_OF_SEVEN_CURSES";
     private const string AbsoluteFormTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.ABSOLUTE_FORM";
     private const string ProphecySoulDevourTextKey =
@@ -32,8 +30,6 @@ internal static class NeowOptionInjectionHelper
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_REPLICANT_GROUP";
     private const string TetraWarforgeTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.TETRA_WARFORGE";
-    private const string RingOfSevenCursesIconPath =
-        "res://ReAstralPartyMod/images/relic/enigmatic_seven_curses.png";
     private const string AbsoluteFormIconPath =
         "res://ReAstralPartyMod/images/powers/absolute_form_power.png";
     private const string ProphecySoulDevourIconPath =
@@ -65,12 +61,6 @@ internal static class NeowOptionInjectionHelper
 
     private static readonly IReadOnlyList<NeowOptionCandidateDefinition> CandidateDefinitions =
     [
-        new(
-            "ring_of_seven_curses",
-            RingOfSevenCursesTextKey,
-            RingOfSevenCursesIconPath,
-            CreateRingOfSevenCursesHoverTips,
-            ChooseRingOfSevenCurses),
         new(
             "absolute_form",
             AbsoluteFormTextKey,
@@ -214,18 +204,7 @@ internal static class NeowOptionInjectionHelper
         if (!ReAstralPartyModSettingsManager.GetEnableNeowExtraOption(runState))
             return [];
 
-        var eligible = new List<NeowOptionCandidateDefinition>(CandidateDefinitions.Count);
-        foreach (var candidate in CandidateDefinitions)
-        {
-            if (string.Equals(candidate.StableKey, "ring_of_seven_curses", StringComparison.Ordinal)
-                && (!ReAstralPartyModSettingsManager.GetEnableEnigmaticSeriesEvents(runState)
-                    || ReAstralPartyModSettingsManager.GetEnableStartingRingOfSevenCurses(runState)))
-                continue;
-
-            eligible.Add(candidate);
-        }
-
-        return eligible;
+        return CandidateDefinitions;
     }
 
     private static string GetRunKey(RunState? runState, Player? owner)
@@ -234,16 +213,6 @@ internal static class NeowOptionInjectionHelper
             return StartingPersonRelicSelectionPatch.GetRunKey(runState);
 
         return $"{owner?.RunState?.Rng.StringSeed ?? "<null_seed>"}|{owner?.NetId.ToString() ?? "<null_owner>"}";
-    }
-
-    private static async Task ChooseRingOfSevenCurses(AncientEventModel ancient)
-    {
-        var owner = ancient.Owner
-                    ?? throw new InvalidOperationException(
-                        "Neow had no owner when Ring of Seven Curses was chosen.");
-
-        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, ModelDb.Relic<EnigmaticSevenCurses>());
-        CompleteAncient(ancient);
     }
 
     private static async Task ChooseAbsoluteForm(AncientEventModel ancient)
@@ -326,11 +295,6 @@ internal static class NeowOptionInjectionHelper
             throw new InvalidOperationException("Failed to resolve AncientEventModel.Done via reflection.");
 
         DoneMethod.Invoke(ancient, null);
-    }
-
-    private static IReadOnlyList<IHoverTip> CreateRingOfSevenCursesHoverTips()
-    {
-        return [.. HoverTipFactory.FromRelic<EnigmaticSevenCurses>()];
     }
 
     private static IReadOnlyList<IHoverTip> CreateAbsoluteFormHoverTips()
