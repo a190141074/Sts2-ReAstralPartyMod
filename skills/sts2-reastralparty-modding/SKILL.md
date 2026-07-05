@@ -235,6 +235,13 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - 房间玩法面板 / lobby snapshot
   - run snapshot
   - 运行时 getter / installer / patch 读取
+- 把仓库里的玩法设置或功能面板拆到独立模组时，也继续按这 4 层做迁移清单；不要因为新模组里面板已经能显示，就判定迁移完成。
+- 尤其是原本带 host-only 编辑门禁的面板，必须先迁：
+  - 房主角色识别
+  - lobby 观察与注册
+  - host 初始 snapshot 建立
+  - 点击后的保存回写
+- 否则常见结果就是：独立模组面板能挂上去，但 `OnTogglePressed(...)` 一直因为角色未就绪或 snapshot 未建立而 silent no-op。
 - 只改其中一层通常不够；如果用户说“增加玩法设置”或“房间同步”，默认一起检查：
   - `ReAstralPartyModSettings`
   - 设置页注册
@@ -242,6 +249,11 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - `LobbyGameplaySettingsSync`
   - `ReAstralPartyRunSettingsSync`
   - `ReAstralPartyModSettingsManager` getter
+- 对独立拆分后的验收，不要停在“build 成功”或“面板看得见”；默认额外确认：
+  - 独立模组自己的 `settings.json` 点击后确实变化
+  - 房主与客户端看到同一份 lobby / run snapshot
+  - 游戏目录里实际加载的是本轮 DLL / PCK
+  - 原 `ReAstralPartyMod` 已不再注入旧面板、旧 patch、旧资源路径
 - `原版模式 / 整合包模式` 下，优先把玩法项的可编辑/锁定/隐藏语义集中放进 `AstralContentModeRegistry`，不要把 mode 判断散在每个 toggle 和业务 patch 里。
 - 明确区分“玩法设置”和“通用设置”：
   - 玩法设置可以做 mode-scoped 双份配置
