@@ -164,8 +164,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private CheckButton? _startingInitialPointToggle;
     private CheckButton? _startingAstralRelicStoreToggle;
     private CheckButton? _startingPersonaSelectionToggle;
-    private CheckButton? _moonPropShopSlotsToggle;
-    private CheckButton? _moonPropRelicsToggle;
     private CheckButton? _jewelryRelicsToggle;
     private CheckButton? _neowExtraOptionToggle;
     private CheckButton? _collectorsCardsToggle;
@@ -360,16 +358,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.description"),
             out _variantPersonasToggle,
             OnEnableVariantPersonasToggled));
-        body.AddChild(BuildBooleanRow(
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label"),
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description"),
-            out _moonPropShopSlotsToggle,
-            OnEnableMoonPropShopSlotsToggled));
-        body.AddChild(BuildBooleanRow(
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label"),
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.description"),
-            out _moonPropRelicsToggle,
-            OnEnableMoonPropRelicsToggled));
         body.AddChild(BuildBooleanRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_jewelry_relics.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_jewelry_relics.description"),
@@ -853,22 +841,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 SetRowVisible(_variantPersonasToggle, !isVanillaMode);
             }
 
-            if (_moonPropShopSlotsToggle != null)
-            {
-                _moonPropShopSlotsToggle.ButtonPressed = snapshot.EnableMoonPropShopSlots;
-                _moonPropShopSlotsToggle.Disabled = !isEditable || !snapshot.EnableMoonPropRelics;
-                _moonPropShopSlotsToggle.Text = snapshot.EnableMoonPropShopSlots ? "ON" : "OFF";
-                SetRowVisible(_moonPropShopSlotsToggle, !isVanillaMode);
-            }
-
-            if (_moonPropRelicsToggle != null)
-            {
-                _moonPropRelicsToggle.ButtonPressed = snapshot.EnableMoonPropRelics;
-                _moonPropRelicsToggle.Disabled = !isEditable;
-                _moonPropRelicsToggle.Text = snapshot.EnableMoonPropRelics ? "ON" : "OFF";
-                SetRowVisible(_moonPropRelicsToggle, !isVanillaMode);
-            }
-
             if (_jewelryRelicsToggle != null)
             {
                 _jewelryRelicsToggle.ButtonPressed = snapshot.EnableJewelryRelics;
@@ -1026,8 +998,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From(snapshot.EnableStartingInitialPoint),
             Variant.From(snapshot.EnableStartingAstralRelicStore),
             Variant.From(snapshot.EnableStartingPersonaSelection),
-            Variant.From(snapshot.EnableMoonPropShopSlots),
-            Variant.From(snapshot.EnableMoonPropRelics), Variant.From(snapshot.EnableJewelryRelics), Variant.From(snapshot.EnableNeowExtraOption),
+            Variant.From(snapshot.EnableJewelryRelics), Variant.From(snapshot.EnableNeowExtraOption),
             Variant.From(snapshot.EnableCollectorsCards),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
             Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableVariantPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
@@ -1035,8 +1006,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     }
 
     private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint, bool enableStartingAstralRelicStore, bool enableStartingPersonaSelection,
-        bool enableMoonPropShopSlots,
-        bool enableMoonPropRelics, bool enableJewelryRelics, bool enableNeowExtraOption,
+        bool enableJewelryRelics, bool enableNeowExtraOption,
         bool enableCollectorsCards,
         int neowExtraOptionSelectionMode,
         bool enableAllPersonas, bool enableVariantPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
@@ -1049,8 +1019,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             EnableStartingInitialPoint = enableStartingInitialPoint,
             EnableStartingAstralRelicStore = enableStartingAstralRelicStore,
             EnableStartingPersonaSelection = enableStartingPersonaSelection,
-            EnableMoonPropShopSlots = enableMoonPropShopSlots,
-            EnableMoonPropRelics = enableMoonPropRelics,
             EnableJewelryRelics = enableJewelryRelics,
             EnableNeowExtraOption = enableNeowExtraOption,
             EnableCollectorsCards = enableCollectorsCards,
@@ -1122,29 +1090,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             return;
 
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableVariantPersonas = value);
-        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
-    }
-
-    private void OnEnableMoonPropShopSlotsToggled(bool value)
-    {
-        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
-            return;
-
-        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableMoonPropShopSlots = value);
-        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
-    }
-
-    private void OnEnableMoonPropRelicsToggled(bool value)
-    {
-        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
-            return;
-
-        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot =>
-        {
-            snapshot.EnableMoonPropRelics = value;
-            if (!value)
-                snapshot.EnableMoonPropShopSlots = false;
-        });
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

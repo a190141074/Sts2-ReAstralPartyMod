@@ -20,10 +20,6 @@ public sealed class ReAstralPartyRunSettingsSnapshot
 
     public bool EnableStartingPersonSelection { get; set; } = true;
 
-    public bool EnableMoonPropShopSlots { get; set; } = true;
-
-    public bool EnableMoonPropRelics { get; set; } = true;
-
     public bool EnableJewelryRelics { get; set; } = true;
 
     public bool EnableNeowExtraOption { get; set; } = true;
@@ -114,8 +110,6 @@ public sealed class ReAstralPartyRunSettingsSnapshot
             EnableStartingInitialPoint = EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
-            EnableMoonPropShopSlots = EnableMoonPropShopSlots,
-            EnableMoonPropRelics = EnableMoonPropRelics,
             EnableJewelryRelics = EnableJewelryRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
             EnableCollectorsCards = EnableCollectorsCards,
@@ -194,8 +188,6 @@ internal static class ReAstralPartyRunSettingsSync
         snapshot.EnableStartingInitialPoint = lobbySnapshot.EnableStartingInitialPoint;
         snapshot.EnableStartingAstralRelicStore = lobbySnapshot.EnableStartingAstralRelicStore;
         snapshot.EnableStartingPersonaSelection = lobbySnapshot.EnableStartingPersonaSelection;
-        snapshot.EnableMoonPropShopSlots = lobbySnapshot.EnableMoonPropShopSlots;
-        snapshot.EnableMoonPropRelics = lobbySnapshot.EnableMoonPropRelics;
         snapshot.EnableJewelryRelics = lobbySnapshot.EnableJewelryRelics;
         snapshot.EnableNeowExtraOption = lobbySnapshot.EnableNeowExtraOption;
         snapshot.EnableCollectorsCards = lobbySnapshot.EnableCollectorsCards;
@@ -227,8 +219,6 @@ internal static class ReAstralPartyRunSettingsSync
             EnableStartingInitialPoint = ReAstralPartyModSettingsManager.EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = ReAstralPartyModSettingsManager.EnableStartingAstralRelicStore,
             EnableStartingPersonaSelection = ReAstralPartyModSettingsManager.EnableStartingPersonaSelection,
-            EnableMoonPropShopSlots = ReAstralPartyModSettingsManager.EnableMoonPropShopSlots,
-            EnableMoonPropRelics = ReAstralPartyModSettingsManager.EnableMoonPropRelics,
             EnableJewelryRelics = ReAstralPartyModSettingsManager.EnableJewelryRelics,
             EnableNeowExtraOption = ReAstralPartyModSettingsManager.EnableNeowExtraOption,
             EnableCollectorsCards = ReAstralPartyModSettingsManager.EnableCollectorsCards,
@@ -326,8 +316,6 @@ internal static class ReAstralPartyRunSettingsSync
             EnableStartingInitialPoint = lobbySnapshot.EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = lobbySnapshot.EnableStartingAstralRelicStore,
             EnableStartingPersonaSelection = lobbySnapshot.EnableStartingPersonaSelection,
-            EnableMoonPropShopSlots = lobbySnapshot.EnableMoonPropShopSlots,
-            EnableMoonPropRelics = lobbySnapshot.EnableMoonPropRelics,
             EnableJewelryRelics = lobbySnapshot.EnableJewelryRelics,
             EnableNeowExtraOption = lobbySnapshot.EnableNeowExtraOption,
             EnableCollectorsCards = lobbySnapshot.EnableCollectorsCards,

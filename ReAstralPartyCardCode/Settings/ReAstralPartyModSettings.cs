@@ -57,15 +57,6 @@ public sealed class ReAstralPartyModSettings
 {
     // Settings defaults are initialized before content registration, so banned relic defaults
     // must not resolve ids from ModelDb here.
-    internal static readonly string[] DefaultBannedRelicIds =
-    [
-        "RELIC.RE_ASTRAL_PARTY_MOD_RELIC_MOON_PROP_BEADS_OF_FEALTY"
-    ];
-
-    internal const string LegacyMoonPropBeadsOfFealtyRelicId = "RELIC.MOON_PROP_BEADS_OF_FEALTY";
-
-    public bool DefaultBannedRelicsInitialized { get; set; }
-
     public sealed class AstralModeScopedGameplaySettings
     {
         public bool EnableExtremeMode { get; set; }
@@ -75,10 +66,6 @@ public sealed class ReAstralPartyModSettings
         public bool EnableStartingAstralRelicStore { get; set; } = true;
 
         public bool EnableStartingPersonSelection { get; set; } = true;
-
-        public bool EnableMoonPropShopSlots { get; set; } = true;
-
-        public bool EnableMoonPropRelics { get; set; } = true;
 
         public bool EnableJewelryRelics { get; set; } = true;
 
@@ -137,8 +124,6 @@ public sealed class ReAstralPartyModSettings
                 EnableStartingInitialPoint = EnableStartingInitialPoint,
                 EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
                 EnableStartingPersonSelection = EnableStartingPersonSelection,
-                EnableMoonPropShopSlots = EnableMoonPropShopSlots,
-                EnableMoonPropRelics = EnableMoonPropRelics,
                 EnableJewelryRelics = EnableJewelryRelics,
                 EnableNeowExtraOption = EnableNeowExtraOption,
                 EnableCollectorsCards = EnableCollectorsCards,
@@ -165,10 +150,10 @@ public sealed class ReAstralPartyModSettings
         public float Height { get; set; } = 520f;
     }
 
-    public List<string> BannedRelicIds { get; set; } = [.. DefaultBannedRelicIds];
+    public List<string> BannedRelicIds { get; set; } = [];
 
     // Legacy field kept so older settings.json files still load cleanly.
-    public List<string>? BannedPersonRelicIds { get; set; } = [.. DefaultBannedRelicIds];
+    public List<string>? BannedPersonRelicIds { get; set; } = [];
 
     public List<string>? BannedPersonaRelicIds
     {
@@ -191,10 +176,6 @@ public sealed class ReAstralPartyModSettings
     public bool EnableStartingAstralRelicStore { get; set; } = true;
 
     public bool EnableStartingPersonSelection { get; set; } = true;
-
-    public bool EnableMoonPropShopSlots { get; set; } = true;
-
-    public bool EnableMoonPropRelics { get; set; } = true;
 
     public bool EnableJewelryRelics { get; set; } = true;
 
@@ -340,10 +321,6 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableStartingAstralRelicStore => ReadRuntime(settings => settings.EnableStartingAstralRelicStore);
 
     public static bool EnableStartingPersonSelection => ReadRuntime(settings => settings.EnableStartingPersonSelection);
-
-    public static bool EnableMoonPropShopSlots => ReadRuntime(settings => settings.EnableMoonPropShopSlots);
-
-    public static bool EnableMoonPropRelics => ReadRuntime(settings => settings.EnableMoonPropRelics);
 
     public static bool EnableJewelryRelics => ReadRuntime(settings => settings.EnableJewelryRelics);
 
@@ -519,46 +496,6 @@ public static partial class ReAstralPartyModSettingsManager
             return true;
 
         return EnableVariantPersonas;
-    }
-
-    public static bool GetEnableMoonPropShopSlots(IRunState? runState)
-    {
-        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.MoonPropShopSlots))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableMoonPropShopSlots;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableMoonPropShopSlots;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableMoonPropShopSlots;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return true;
-
-        return EnableMoonPropShopSlots;
-    }
-
-    public static bool GetEnableMoonPropRelics(IRunState? runState)
-    {
-        if (!IsGameplaySettingEnabledForMode(runState, AstralGameplaySettingKey.MoonPropRelics))
-            return false;
-
-        if (TryGetRunSnapshot(runState, out var snapshot))
-            return snapshot.EnableMoonPropRelics;
-
-        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
-            return lobbySnapshot.EnableMoonPropRelics;
-
-        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
-            return localFallback.EnableMoonPropRelics;
-
-        if (ShouldUseSafeGameplayFallback(runState))
-            return true;
-
-        return EnableMoonPropRelics;
     }
 
     public static bool GetEnableJewelryRelics(IRunState? runState)
@@ -859,7 +796,6 @@ public static partial class ReAstralPartyModSettingsManager
         if (_registered)
             return;
 
-        bool migratedDefaultBannedRelics = false;
         bool sanitizedNonBannableRelics = false;
         using (RitsuLibFramework.BeginModDataRegistration(MainFile.ModId))
         {
@@ -882,11 +818,10 @@ public static partial class ReAstralPartyModSettingsManager
                     });
 
             var settings = store.Get<ReAstralPartyModSettings>(SettingsKey);
-            migratedDefaultBannedRelics = EnsureDefaultBannedRelicIdsInitialized(settings);
             sanitizedNonBannableRelics = SanitizeNonBannableRelicIds(settings);
             var normalizedCurrentModeSettings = NormalizeCurrentModeScopedSettings(settings);
             ApplyRuntimeSettings(settings, "register");
-            if (migratedDefaultBannedRelics || sanitizedNonBannableRelics || normalizedCurrentModeSettings)
+            if (sanitizedNonBannableRelics || normalizedCurrentModeSettings)
                 store.Save(SettingsKey);
         }
 
@@ -1041,40 +976,6 @@ public static partial class ReAstralPartyModSettingsManager
                 ApplyRuntimeSettings(settings, "enable_variant_personas");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.label",
-                    value);
-            });
-
-        var enableMoonPropShopSlots = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
-            MainFile.ModId,
-            SettingsKey,
-            settings =>
-            {
-                EnsureContentModeSettingsInitialized(settings);
-                return GetScopedSettingsForCurrentMode(settings).EnableMoonPropShopSlots;
-            },
-            (settings, value) =>
-            {
-                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableMoonPropShopSlots = value);
-                ApplyRuntimeSettings(settings, "enable_moon_prop_shop_slots");
-                ShowBoolSettingToast(
-                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label",
-                    value);
-            });
-
-        var enableMoonPropRelics = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
-            MainFile.ModId,
-            SettingsKey,
-            settings =>
-            {
-                EnsureContentModeSettingsInitialized(settings);
-                return GetScopedSettingsForCurrentMode(settings).EnableMoonPropRelics;
-            },
-            (settings, value) =>
-            {
-                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableMoonPropRelics = value);
-                ApplyRuntimeSettings(settings, "enable_moon_prop_relics");
-                ShowBoolSettingToast(
-                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label",
                     value);
             });
 
@@ -1435,18 +1336,6 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_variant_personas.description",
                         "Control whether variant personas can appear during the starting persona selection for this run."))
                 .AddToggle(
-                    "enable_moon_prop_shop_slots",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.label", "Enable Moon Shop Slots"),
-                    enableMoonPropShopSlots,
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_shop_slots.description",
-                        "Control whether shops always add three extra Moon relic slots below the normal inventory."))
-                .AddToggle(
-                    "enable_moon_prop_relics",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.label", "Enable Moon Relics"),
-                    enableMoonPropRelics,
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_moon_prop_relics.description",
-                        "Control whether Moon relics can appear in normal gameplay and the compendium for this run. If disabled, the extra Moon shop slots are also disabled."))
-                .AddToggle(
                     "enable_jewelry_relics",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_jewelry_relics.label", "Enable Jewelry"),
                     enableJewelryRelics,
@@ -1550,16 +1439,6 @@ public static partial class ReAstralPartyModSettingsManager
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.AllVariantPersonas,
-                        roomSurface: false) == AstralModeAvailability.Editable)
-                .WithEntryEnabledWhen("enable_moon_prop_shop_slots", () =>
-                    AstralContentModeRegistry.GetAvailability(
-                        GetCurrentContentMode(),
-                        AstralGameplaySettingKey.MoonPropShopSlots,
-                        roomSurface: false) == AstralModeAvailability.Editable)
-                .WithEntryEnabledWhen("enable_moon_prop_relics", () =>
-                    AstralContentModeRegistry.GetAvailability(
-                        GetCurrentContentMode(),
-                        AstralGameplaySettingKey.MoonPropRelics,
                         roomSurface: false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_jewelry_relics", () =>
                     AstralContentModeRegistry.GetAvailability(
@@ -1940,7 +1819,7 @@ public static partial class ReAstralPartyModSettingsManager
         }
 
         MainFile.Logger.Info(
-            $"{MainFile.ModId} local runtime settings updated ({reason}): content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_persona_selection={snapshot.EnableStartingPersonSelection}, moon_shop_slots={snapshot.EnableMoonPropShopSlots}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersons}, variants_enabled={snapshot.EnableVariantPersons}, all_variants={snapshot.EnableAllVariantPersons}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
+            $"{MainFile.ModId} local runtime settings updated ({reason}): content_mode={snapshot.CurrentContentMode}, start_initial_point={snapshot.EnableStartingInitialPoint}, start_astral_relic_store={snapshot.EnableStartingAstralRelicStore}, start_persona_selection={snapshot.EnableStartingPersonSelection}, neow_extra_option={snapshot.EnableNeowExtraOption}, neow_extra_selection={snapshot.NeowExtraOptionSelectionMode}, all_personas={snapshot.EnableAllPersons}, variants_enabled={snapshot.EnableVariantPersons}, all_variants={snapshot.EnableAllVariantPersons}, extreme_mode={snapshot.EnableExtremeMode}, persona_mode={snapshot.StartingPersonMode}, token_series={snapshot.TokenSeriesMode}, pure_angel={snapshot.EnablePureAngelMode}, lobby_panel_collapsed={snapshot.LobbyPanelState.IsCollapsed}, lobby_panel_pos=({snapshot.LobbyPanelState.PositionX},{snapshot.LobbyPanelState.PositionY}), lobby_panel_size=({snapshot.LobbyPanelState.Width},{snapshot.LobbyPanelState.Height}), banned_relics={snapshot.BannedRelicIds.Count}, play_recommendation={snapshot.EnablePlayRecommendation}, route_recommendation={snapshot.EnableRouteRecommendation}, token_recommendation={snapshot.EnableTokenRecommendation}, auto_phrase={snapshot.EnableAutoPhrase}, telemetry={snapshot.EnableTelemetry}");
     }
 
     internal static StartingPersonMode ResolveStartingPersonaMode(ReAstralPartyModSettings settings)
@@ -2212,36 +2091,13 @@ public static partial class ReAstralPartyModSettingsManager
         return SanitizeSerializedBannedRelicIds(settings.BannedPersonaRelicIds);
     }
 
-    private static bool EnsureDefaultBannedRelicIdsInitialized(ReAstralPartyModSettings settings)
-    {
-        var beadsId = ReAstralPartyModSettings.DefaultBannedRelicIds[0];
-        var serialized = new HashSet<string>(
-            (ResolveBannedRelicIds(settings) ?? [])
-            .Where(static id => !string.IsNullOrWhiteSpace(id)),
-            StringComparer.Ordinal);
-
-        var containsLegacyBeads = serialized.Remove(ReAstralPartyModSettings.LegacyMoonPropBeadsOfFealtyRelicId);
-        if (settings.DefaultBannedRelicsInitialized && !containsLegacyBeads)
-            return false;
-
-        foreach (var relicId in ReAstralPartyModSettings.DefaultBannedRelicIds)
-            serialized.Add(relicId);
-
-        settings.BannedRelicIds = [.. serialized.OrderBy(static id => id, StringComparer.Ordinal)];
-        settings.BannedPersonaRelicIds = [.. settings.BannedRelicIds];
-        settings.DefaultBannedRelicsInitialized = true;
-        var containsBeads = settings.BannedRelicIds.Contains(beadsId, StringComparer.Ordinal);
-        MainFile.Logger.Info(
-            $"{MainFile.ModId} default banned relics initialized: count={settings.BannedRelicIds.Count}, contains_beads={containsBeads}, beads_id={beadsId}");
-        return true;
-    }
-
     internal static List<string> SanitizeSerializedBannedRelicIds(IEnumerable<string>? serializedIds)
     {
         var initialPointRelicId = ModelDb.GetId<TokenGoldInitialPoint>().ToString();
         return (serializedIds ?? [])
             .Where(static id => !string.IsNullOrWhiteSpace(id))
             .Where(id => !string.Equals(id, initialPointRelicId, StringComparison.Ordinal))
+            .Where(id => !id.Contains("MOON_PROP", StringComparison.Ordinal))
             .Distinct(StringComparer.Ordinal)
             .OrderBy(static id => id, StringComparer.Ordinal)
             .ToList();
@@ -2360,7 +2216,6 @@ public static partial class ReAstralPartyModSettingsManager
 
     private static void EnsureContentModeSettingsInitialized(ReAstralPartyModSettings settings)
     {
-        EnsureDefaultBannedRelicIdsInitialized(settings);
         SanitizeNonBannableRelicIds(settings);
 
         if (settings.ContentModeSettingsInitialized)
@@ -2393,8 +2248,6 @@ public static partial class ReAstralPartyModSettingsManager
             EnableStartingInitialPoint = settings.EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = settings.EnableStartingAstralRelicStore,
             EnableStartingPersonSelection = settings.EnableStartingPersonSelection,
-            EnableMoonPropShopSlots = settings.EnableMoonPropShopSlots,
-            EnableMoonPropRelics = settings.EnableMoonPropRelics,
             EnableJewelryRelics = settings.EnableJewelryRelics,
             EnableNeowExtraOption = settings.EnableNeowExtraOption,
             EnableCollectorsCards = settings.EnableCollectorsCards,
@@ -2416,8 +2269,6 @@ public static partial class ReAstralPartyModSettingsManager
             EnableStartingInitialPoint = true,
             EnableStartingAstralRelicStore = true,
             EnableStartingPersonSelection = true,
-            EnableMoonPropShopSlots = false,
-            EnableMoonPropRelics = false,
             EnableJewelryRelics = false,
             EnableNeowExtraOption = false,
             EnableCollectorsCards = false,
@@ -2457,8 +2308,6 @@ public static partial class ReAstralPartyModSettingsManager
         settings.EnableStartingInitialPoint = modpack.EnableStartingInitialPoint;
         settings.EnableStartingAstralRelicStore = modpack.EnableStartingAstralRelicStore;
         settings.EnableStartingPersonSelection = modpack.EnableStartingPersonSelection;
-        settings.EnableMoonPropShopSlots = modpack.EnableMoonPropShopSlots;
-        settings.EnableMoonPropRelics = modpack.EnableMoonPropRelics;
         settings.EnableJewelryRelics = modpack.EnableJewelryRelics;
         settings.EnableNeowExtraOption = modpack.EnableNeowExtraOption;
         settings.EnableCollectorsCards = modpack.EnableCollectorsCards;
@@ -2480,8 +2329,6 @@ public static partial class ReAstralPartyModSettingsManager
         var defaults = BuildVanillaModeDefaults();
         var changed = false;
 
-        changed |= SetIfDifferent(vanilla.EnableMoonPropShopSlots, defaults.EnableMoonPropShopSlots, value => vanilla.EnableMoonPropShopSlots = value);
-        changed |= SetIfDifferent(vanilla.EnableMoonPropRelics, defaults.EnableMoonPropRelics, value => vanilla.EnableMoonPropRelics = value);
         changed |= SetIfDifferent(vanilla.EnableJewelryRelics, defaults.EnableJewelryRelics, value => vanilla.EnableJewelryRelics = value);
         changed |= SetIfDifferent(vanilla.EnableNeowExtraOption, defaults.EnableNeowExtraOption, value => vanilla.EnableNeowExtraOption = value);
         changed |= SetIfDifferent(vanilla.EnableCollectorsCards, defaults.EnableCollectorsCards, value => vanilla.EnableCollectorsCards = value);
@@ -2533,10 +2380,6 @@ public static partial class ReAstralPartyModSettingsManager
         public bool EnableStartingAstralRelicStore { get; init; } = true;
 
         public bool EnableStartingPersonSelection { get; init; } = true;
-
-        public bool EnableMoonPropShopSlots { get; init; } = true;
-
-        public bool EnableMoonPropRelics { get; init; } = true;
 
         public bool EnableJewelryRelics { get; init; } = true;
 
@@ -2613,8 +2456,6 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableStartingInitialPoint = scoped.EnableStartingInitialPoint,
                 EnableStartingAstralRelicStore = scoped.EnableStartingAstralRelicStore,
                 EnableStartingPersonSelection = scoped.EnableStartingPersonSelection,
-                EnableMoonPropShopSlots = scoped.EnableMoonPropShopSlots,
-                EnableMoonPropRelics = scoped.EnableMoonPropRelics,
                 EnableJewelryRelics = scoped.EnableJewelryRelics,
                 EnableNeowExtraOption = scoped.EnableNeowExtraOption,
                 EnableCollectorsCards = scoped.EnableCollectorsCards,

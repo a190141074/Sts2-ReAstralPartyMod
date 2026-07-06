@@ -120,7 +120,6 @@ public static class BannedRelicRegistry
         return AstralRelicAvailabilityHelper.FilterVisibleRelics(
             bannedRelicIds: null,
             ReAstralPartyModSettingsManager.GetCurrentContentMode(),
-            ReAstralPartyModSettingsManager.GetEnableMoonPropRelics(null),
             ReAstralPartyModSettingsManager.GetEnableJewelryRelics(null),
             relics);
     }
@@ -133,25 +132,10 @@ public static class BannedRelicRegistry
             .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
             .ToList();
 
-        TryAppendCanonicalRelic<MoonPropBeadsOfFealty>(relics);
-
         return relics
             .DistinctBy(relic => relic.CanonicalInstance?.Id ?? relic.Id)
             .Where(CompatContentGate.IsGameplayRelicAvailable)
             .OrderBy(relic => (relic.CanonicalInstance?.Id ?? relic.Id).Entry, StringComparer.Ordinal)
             .ToList();
-    }
-
-    private static void TryAppendCanonicalRelic<TRelic>(ICollection<RelicModel> relics)
-        where TRelic : RelicModel
-    {
-        try
-        {
-            relics.Add(ModelDb.Relic<TRelic>());
-        }
-        catch
-        {
-            // Keep the registry usable even if a specific relic failed to register.
-        }
     }
 }

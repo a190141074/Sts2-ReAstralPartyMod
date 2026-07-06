@@ -98,10 +98,6 @@ public sealed class LobbyGameplaySettingsSnapshot
 
     public bool EnableStartingPersonSelection { get; set; } = true;
 
-    public bool EnableMoonPropShopSlots { get; set; } = true;
-
-    public bool EnableMoonPropRelics { get; set; } = true;
-
     public bool EnableJewelryRelics { get; set; } = true;
 
     public bool EnableNeowExtraOption { get; set; } = true;
@@ -169,8 +165,6 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableStartingInitialPoint = EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
-            EnableMoonPropShopSlots = EnableMoonPropShopSlots,
-            EnableMoonPropRelics = EnableMoonPropRelics,
             EnableJewelryRelics = EnableJewelryRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
             EnableCollectorsCards = EnableCollectorsCards,
@@ -193,8 +187,6 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableStartingInitialPoint = ReAstralPartyModSettingsManager.EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = ReAstralPartyModSettingsManager.EnableStartingAstralRelicStore,
             EnableStartingPersonaSelection = ReAstralPartyModSettingsManager.EnableStartingPersonaSelection,
-            EnableMoonPropShopSlots = ReAstralPartyModSettingsManager.EnableMoonPropShopSlots,
-            EnableMoonPropRelics = ReAstralPartyModSettingsManager.EnableMoonPropRelics,
             EnableJewelryRelics = ReAstralPartyModSettingsManager.EnableJewelryRelics,
             EnableNeowExtraOption = ReAstralPartyModSettingsManager.EnableNeowExtraOption,
             EnableCollectorsCards = ReAstralPartyModSettingsManager.EnableCollectorsCards,
@@ -471,14 +463,12 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 19;
+    private const int SchemaVersion = 20;
 
     public AstralContentMode CurrentContentMode { get; set; }
     public bool EnableStartingInitialPoint { get; set; }
     public bool EnableStartingAstralRelicStore { get; set; } = true;
     public bool EnableStartingPersonaSelection { get; set; }
-    public bool EnableMoonPropShopSlots { get; set; } = true;
-    public bool EnableMoonPropRelics { get; set; } = true;
     public bool EnableJewelryRelics { get; set; } = true;
     public bool EnableNeowExtraOption { get; set; }
     public bool EnableCollectorsCards { get; set; } = true;
@@ -497,8 +487,6 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableStartingInitialPoint = snapshot.EnableStartingInitialPoint;
         EnableStartingAstralRelicStore = snapshot.EnableStartingAstralRelicStore;
         EnableStartingPersonaSelection = snapshot.EnableStartingPersonaSelection;
-        EnableMoonPropShopSlots = snapshot.EnableMoonPropShopSlots;
-        EnableMoonPropRelics = snapshot.EnableMoonPropRelics;
         EnableJewelryRelics = snapshot.EnableJewelryRelics;
         EnableNeowExtraOption = snapshot.EnableNeowExtraOption;
         EnableCollectorsCards = snapshot.EnableCollectorsCards;
@@ -527,8 +515,6 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteBool(EnableStartingInitialPoint);
         writer.WriteBool(EnableStartingAstralRelicStore);
         writer.WriteBool(EnableStartingPersonaSelection);
-        writer.WriteBool(EnableMoonPropShopSlots);
-        writer.WriteBool(EnableMoonPropRelics);
         writer.WriteBool(EnableJewelryRelics);
         writer.WriteBool(EnableNeowExtraOption);
         writer.WriteBool(EnableCollectorsCards);
@@ -555,8 +541,6 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableStartingInitialPoint = reader.ReadBool();
         EnableStartingAstralRelicStore = reader.ReadBool();
         EnableStartingPersonaSelection = reader.ReadBool();
-        EnableMoonPropShopSlots = reader.ReadBool();
-        EnableMoonPropRelics = reader.ReadBool();
         EnableJewelryRelics = reader.ReadBool();
         EnableNeowExtraOption = reader.ReadBool();
         EnableCollectorsCards = reader.ReadBool();
@@ -584,8 +568,6 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableStartingInitialPoint = EnableStartingInitialPoint,
             EnableStartingAstralRelicStore = EnableStartingAstralRelicStore,
             EnableStartingPersonaSelection = EnableStartingPersonaSelection,
-            EnableMoonPropShopSlots = EnableMoonPropShopSlots,
-            EnableMoonPropRelics = EnableMoonPropRelics,
             EnableJewelryRelics = EnableJewelryRelics,
             EnableNeowExtraOption = EnableNeowExtraOption,
             EnableCollectorsCards = EnableCollectorsCards,

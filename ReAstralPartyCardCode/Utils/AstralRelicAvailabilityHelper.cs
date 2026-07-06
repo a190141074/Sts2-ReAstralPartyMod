@@ -1,7 +1,6 @@
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
-using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
@@ -24,11 +23,6 @@ public static class AstralRelicAvailabilityHelper
         ModelDb.GetId<JewelryWorldTears>()
     ];
 
-    public static bool IsMoonPropRelic(RelicModel? relic)
-    {
-        return MoonPropShopExtraRelicsHelper.IsMoonPropRelic(relic);
-    }
-
     public static bool IsJewelryRelic(RelicModel? relic)
     {
         if (relic == null)
@@ -46,8 +40,6 @@ public static class AstralRelicAvailabilityHelper
         if (BannedRelicRegistry.IsBanned(ReAstralPartyModSettingsManager.GetBannedRelicIds(runState), relic))
             return false;
         if (!IsAllowedByContentMode(runState, relic))
-            return false;
-        if (IsMoonPropRelic(relic) && !ReAstralPartyModSettingsManager.GetEnableMoonPropRelics(runState))
             return false;
         if (IsJewelryRelic(relic) && !ReAstralPartyModSettingsManager.GetEnableJewelryRelics(runState))
             return false;
@@ -71,7 +63,6 @@ public static class AstralRelicAvailabilityHelper
         return FilterVisibleRelics(
             bannedRelicIds,
             mode,
-            enableMoonPropRelics: mode != AstralContentMode.Vanilla,
             enableJewelryRelics: mode != AstralContentMode.Vanilla,
             relics);
     }
@@ -79,7 +70,6 @@ public static class AstralRelicAvailabilityHelper
     public static IReadOnlyList<RelicModel> FilterVisibleRelics(
         IReadOnlySet<ModelId>? bannedRelicIds,
         AstralContentMode mode,
-        bool enableMoonPropRelics,
         bool enableJewelryRelics,
         IEnumerable<RelicModel> relics)
     {
@@ -87,7 +77,6 @@ public static class AstralRelicAvailabilityHelper
             .Where(CompatContentGate.IsGameplayRelicAvailable)
             .Where(relic => !BannedRelicRegistry.IsBanned(bannedRelicIds, relic))
             .Where(relic => IsAllowedByContentMode(mode, relic))
-            .Where(relic => !IsMoonPropRelic(relic) || enableMoonPropRelics)
             .Where(relic => !IsJewelryRelic(relic) || enableJewelryRelics)
             .DistinctBy(GetCanonicalRelicId)
             .ToList();

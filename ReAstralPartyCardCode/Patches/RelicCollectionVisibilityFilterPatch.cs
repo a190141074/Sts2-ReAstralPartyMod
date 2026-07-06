@@ -21,7 +21,6 @@ internal static class RelicCollectionVisibilityFilterHelper
         var filtered = AstralRelicAvailabilityHelper.FilterVisibleRelics(
             bannedIds,
             mode,
-            ReAstralPartyModSettingsManager.GetEnableMoonPropRelics(null),
             ReAstralPartyModSettingsManager.GetEnableJewelryRelics(null),
             relics);
 
