@@ -1,34 +1,41 @@
 using System.Threading;
-using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Creatures;
-using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
-internal static class SkillPointAuthorizationHelper
+internal static class PointPowerAuthorizationHelper
 {
     private sealed class Scope
     {
         public required Creature Target { get; init; }
+        public required Type PowerType { get; init; }
         public required RelicModel SourceRelic { get; init; }
     }
 
     private static readonly AsyncLocal<Scope?> CurrentScope = new();
 
-    public static bool IsAuthorizedPositiveGrant(Creature? target)
+    public static bool IsAuthorizedPositiveGrant(Creature? target, Type powerType)
     {
         var scope = CurrentScope.Value;
-        return target != null && scope != null && ReferenceEquals(scope.Target, target);
+        return target != null
+               && scope != null
+               && ReferenceEquals(scope.Target, target)
+               && scope.PowerType == powerType;
     }
 
-    public static async Task RunAuthorizedGrant(Creature target, RelicModel sourceRelic, Func<Task> action)
+    public static async Task RunAuthorizedGrant(
+        Creature target,
+        RelicModel sourceRelic,
+        Type powerType,
+        Func<Task> action)
     {
         var previousScope = CurrentScope.Value;
         CurrentScope.Value = new Scope
         {
             Target = target,
-            SourceRelic = sourceRelic
+            SourceRelic = sourceRelic,
+            PowerType = powerType
         };
 
         try
