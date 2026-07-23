@@ -309,8 +309,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.description": "現在持っている安定したスキルカード増幅の合計値を表示します。",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_AMPLIFICATION_DISPLAY_POWER.smartDescription": "現在持っている安定したスキルカード増幅の合計値を表示します。",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_POINT_POWER.title": "スキルポイント",
-  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_POINT_POWER.description": "エネルギーが技能牌を使うのに足りない時、この能力の層数を不足分のエネルギーとして補えます。\n自分のターン終了時、すべての層を取り除きます。",
-  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_POINT_POWER.smartDescription": "エネルギー不足で技能牌を使えない時、不足分だけ補えます。ターン終了時に取り除きます。",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_POINT_POWER.description": "[gold]技能牌[/gold]を使う時、エネルギーより先にこの能力の層数を消費します。\n自分のターン終了時、すべての層を取り除きます。",
+  "RE_ASTRAL_PARTY_MOD_POWER_SKILL_POINT_POWER.smartDescription": "[gold]技能牌[/gold]を使う時、エネルギーより先にこの層数を消費します。ターン終了時に取り除きます。",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.title": "進程",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.description": "戦闘終了時、層数に応じて【人格：グリーンβ】の[gold]歩数[/gold]へ変換する。\n【初始点】を所持し現在が[blue]1[/blue]/[blue]3[/blue]星なら、精算時に追加で[blue]1[/blue]/[blue]3[/blue]歩を得る。",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "戦闘終了時、層数を【人格：グリーンβ】の[gold]歩数[/gold]へ変換する。【初始点】が[blue]1[/blue]/[blue]3[/blue]星なら追加で[blue]1[/blue]/[blue]3[/blue]歩。"
