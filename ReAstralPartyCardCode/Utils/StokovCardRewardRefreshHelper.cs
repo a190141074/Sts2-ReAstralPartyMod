@@ -22,9 +22,15 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 internal static class StokovCardRewardRefreshHelper
 {
     private sealed class EligibleRewardMarker;
+    private sealed class RerollState
+    {
+        public int Count;
+    }
+
     private const int CostPreviewCardCount = 3;
 
     private static readonly ConditionalWeakTable<CardReward, EligibleRewardMarker> EligibleRewards = new();
+    private static readonly ConditionalWeakTable<CardReward, RerollState> RerollStates = new();
     private static readonly PropertyInfo? OptionsProperty =
         AccessTools.Property(typeof(CardReward), "Options");
     private static readonly FieldInfo? CardsField =
@@ -49,6 +55,7 @@ internal static class StokovCardRewardRefreshHelper
 
             reward.CanReroll = true;
             EligibleRewards.GetValue(reward, static _ => new EligibleRewardMarker());
+            RerollStates.GetValue(reward, static _ => new RerollState());
             markedOne = true;
             modified = true;
         }
@@ -97,6 +104,7 @@ internal static class StokovCardRewardRefreshHelper
     {
         if (CardsField == null || HasBeenRerolledField == null)
         {
+            AdvanceRerollCount(reward);
             reward.Reroll();
             reward.CanReroll = true;
             return Task.CompletedTask;
@@ -109,10 +117,35 @@ internal static class StokovCardRewardRefreshHelper
         if (CardsField.GetValue(reward) is IList cardsList)
             cardsList.Clear();
 
+        AdvanceRerollCount(reward);
         reward.CanReroll = true;
         reward.Populate();
         reward.CanReroll = true;
         return Task.CompletedTask;
+    }
+
+    internal static int GetRerollCountFor(Player player, CardCreationOptions options)
+    {
+        if (options.Source != CardCreationSource.Encounter)
+            return 0;
+
+        foreach (var reward in RerollStates)
+        {
+            if (reward.Key.Player != player)
+                continue;
+            if (!ReferenceEquals(OptionsProperty?.GetValue(reward.Key), options))
+                continue;
+
+            return reward.Value.Count;
+        }
+
+        return 0;
+    }
+
+    private static void AdvanceRerollCount(CardReward reward)
+    {
+        var state = RerollStates.GetValue(reward, static _ => new RerollState());
+        state.Count++;
     }
 
     private static void RecordSkippedCards(CardReward reward, IReadOnlyList<CardModel> cards)

@@ -44,6 +44,7 @@ public sealed class PersonMascotGirlMimiDoppelganger : PersonRelicBase
         if (candidates.Count == 0)
             return false;
 
+        var rerollCount = StokovCardRewardRefreshHelper.GetRerollCountFor(player, options);
         var selected = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
                 candidates,
                 static card => (card.CanonicalInstance?.Id ?? card.Id).Entry,
@@ -54,7 +55,8 @@ public sealed class PersonMascotGirlMimiDoppelganger : PersonRelicBase
                 player.RunState?.CurrentActIndex ?? -1,
                 player.RunState?.TotalFloor ?? -1,
                 player.NetId,
-                rewardCards.Count)
+                rewardCards.Count,
+                rerollCount)
             .FirstOrDefault();
         if (selected == null)
             return false;
