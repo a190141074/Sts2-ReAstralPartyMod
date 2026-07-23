@@ -35,12 +35,13 @@ public class TokenExclusiveLittleSnakeDoll : AstralPartyRelicModel
         Creature? dealer,
         CardModel? cardSource)
     {
-        if (Owner?.Creature == null || target != Owner.Creature)
+        var ownerCreature = Owner?.Creature;
+        if (ownerCreature == null || target != ownerCreature)
             return;
-        if (result.TotalDamage <= 0m)
+        if (result.UnblockedDamage <= 0m)
             return;
 
         Flash();
-        await PowerCmd.Apply<ReversedScalesPower>(Owner.Creature, 1m, Owner.Creature, cardSource, false);
+        await PowerCmd.Apply<ReversedScalesPower>(ownerCreature, 1m, ownerCreature, cardSource, false);
     }
 }

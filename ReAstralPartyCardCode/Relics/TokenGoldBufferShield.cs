@@ -15,7 +15,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenGoldBufferShield : AstralPartyRelicModel
 {
-    private const decimal HealAmount = 1m;
+    private const decimal HealAmount = 2m;
     private const decimal StarLightAmount = 3m;
 
     public override RelicRarity Rarity => RelicRarity.Rare;
@@ -40,8 +40,6 @@ public class TokenGoldBufferShield : AstralPartyRelicModel
         if (ownerCreature == null)
             return;
         if (!IsOwnedByTarget(target, ownerCreature))
-            return;
-        if (result.UnblockedDamage <= 0m)
             return;
         if (dealer == null || dealer.Side == ownerCreature.Side)
             return;
