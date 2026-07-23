@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -21,18 +22,16 @@ public class TokenExclusiveInfiniteSnake : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        AstralKeywords.CreateHoverTip(AstralKeywords.AstralDragonPalaceSeriesId)
+        AstralKeywords.CreateHoverTip(AstralKeywords.AstralDragonPalaceSeriesId),
+        HoverTipFactory.FromPower<SkillPointPower>()
     ];
-
-    public override decimal ModifyMaxEnergy(Player player, decimal amount)
-    {
-        return player == Owner ? amount + 1m : amount;
-    }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
-        if (player != Owner)
+        if (player != Owner || Owner?.Creature == null)
             return;
+
+        await SkillPointPower.GrantFromRelic(Owner.Creature, 1m, this);
 
         var handPile = PileType.Hand.GetPile(Owner);
         var cardsToDraw = 8 - handPile.Cards.Count;
