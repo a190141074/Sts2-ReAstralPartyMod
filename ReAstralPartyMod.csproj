@@ -393,6 +393,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_atm.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_bank_card_general.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_bank_card_general.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_blue_battle_book_basic.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_blue_battle_book_basic.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_boxing_glove_general.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_boxing_glove_general.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_die10.png"/>
@@ -478,6 +480,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_art_knife_sharp.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_bank_card_premium.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_bank_card_premium.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_gold_battle_book_mid.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_gold_battle_book_mid.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_big_stew_bowl.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_big_stew_bowl.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_boxing_glove_premium.png"/>

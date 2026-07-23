@@ -7,10 +7,8 @@ using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
-using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -18,8 +16,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class TokenGoldMotorcycleHelmetPremium : AstralPartyRelicModel
 {
     private const decimal CombatStartReversedScales = 2m;
-    private const decimal CombatStartDexterity = 1m;
-    private const decimal BlockPerTurn = 2m;
+    private const decimal DefendPointPerTurn = 1m;
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -28,7 +25,7 @@ public class TokenGoldMotorcycleHelmetPremium : AstralPartyRelicModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<ReversedScalesHolographicPower>(),
-        HoverTipFactory.FromPower<DexterityPower>()
+        HoverTipFactory.FromPower<DefendPointPower>()
     ];
 
     public override async Task BeforeCombatStart()
@@ -45,7 +42,6 @@ public class TokenGoldMotorcycleHelmetPremium : AstralPartyRelicModel
             null,
             false
         );
-        await PowerCmd.Apply<DexterityPower>(Owner.Creature, CombatStartDexterity, Owner.Creature, null);
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -54,6 +50,6 @@ public class TokenGoldMotorcycleHelmetPremium : AstralPartyRelicModel
             return;
 
         Flash();
-        await CreatureCmd.GainBlock(Owner.Creature, BlockPerTurn, ValueProp.Move, null);
+        await DefendPointPower.GrantFromRelic(Owner.Creature, DefendPointPerTurn, this);
     }
 }

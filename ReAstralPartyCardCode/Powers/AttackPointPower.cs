@@ -2,6 +2,7 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
@@ -27,6 +28,21 @@ public sealed class AttackPointPower : CardPointPowerBase
     protected override bool QualifiesForPointSpend(CardModel card)
     {
         return WarforgeEnchantmentHelper.CountsAsAttack(card);
+    }
+
+    protected override decimal GetMinimumCostAfterPriorityPointSpend(CardModel card)
+    {
+        var player = Owner?.Player;
+        if (player == null || !WarforgeEnchantmentHelper.CountsAsAttack(card))
+            return 0m;
+
+        if (player.GetRelic<TokenGoldBattleBookMid>() != null)
+            return TokenGoldBattleBookMid.AttackPointMinimumCost;
+
+        if (player.GetRelic<TokenBlueBattleBookBasic>() != null)
+            return TokenBlueBattleBookBasic.AttackPointMinimumCost;
+
+        return 0m;
     }
 
     internal static Task GrantFromRelic(Creature target, decimal amount, RelicModel sourceRelic)

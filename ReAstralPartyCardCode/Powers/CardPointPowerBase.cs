@@ -45,6 +45,11 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
 
     protected abstract decimal LastAcceptedAmount { get; set; }
 
+    protected virtual decimal GetMinimumCostAfterPriorityPointSpend(CardModel card)
+    {
+        return 0m;
+    }
+
     protected override object InitInternalData()
     {
         return new Data();
@@ -82,7 +87,7 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
     {
         modifiedCost = originalCost;
 
-        if (!CanModifyPointCost(card))
+        if (!CanPreviewPointCost(card))
             return false;
         if (!ReferenceEquals(CardPointPowerResolver.ResolveHighestPriorityPointPower(Owner, card), this))
             return false;
@@ -90,6 +95,7 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
         if (!TryGetPriorityPointModifiedCost(
                 originalCost,
                 Amount,
+                GetMinimumCostAfterPriorityPointSpend(card),
                 out modifiedCost,
                 out var pointAmountToSpend))
         {
@@ -122,7 +128,7 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
 
     public override Task BeforeCardPlayed(CardPlay cardPlay)
     {
-        if (!CanModifyPointCost(cardPlay.Card))
+        if (!CanTrackPlayedCard(cardPlay.Card))
             return Task.CompletedTask;
         if (!ReferenceEquals(CardPointPowerResolver.ResolveHighestPriorityPointPower(Owner, cardPlay.Card), this))
             return Task.CompletedTask;
@@ -131,7 +137,10 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
         if (pointAmountToSpend <= 0m)
         {
             var totalCost = GetPrePointResolvedCost(cardPlay.Card);
-            pointAmountToSpend = CalculatePriorityPointSpend(totalCost, Amount);
+            pointAmountToSpend = CalculatePriorityPointSpend(
+                totalCost,
+                Amount,
+                GetMinimumCostAfterPriorityPointSpend(cardPlay.Card));
         }
 
         if (pointAmountToSpend <= 0m)
@@ -150,10 +159,18 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (Owner?.Player?.PlayerCombatState == null || cardPlay.Card.Owner != Owner.Player)
+        if (!CanTrackPlayedCard(cardPlay.Card))
             return;
 
         var spentPointAmount = ConsumePendingPointSpend(cardPlay.Card);
+        if (spentPointAmount <= 0m &&
+            ReferenceEquals(CardPointPowerResolver.ResolveHighestPriorityPointPower(Owner, cardPlay.Card), this))
+        {
+            spentPointAmount = CalculatePriorityPointSpend(
+                GetPrePointResolvedCost(cardPlay.Card),
+                Amount,
+                GetMinimumCostAfterPriorityPointSpend(cardPlay.Card));
+        }
         if (spentPointAmount <= 0m)
             return;
 
@@ -203,6 +220,7 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
     protected static bool TryGetPriorityPointModifiedCost(
         decimal originalCost,
         decimal availablePointAmount,
+        decimal minimumCostAfterPointSpend,
         out decimal modifiedCost,
         out decimal pointAmountToSpend)
     {
@@ -211,8 +229,11 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
         if (originalCost <= 0m || availablePointAmount <= 0m)
             return false;
 
-        pointAmountToSpend = CalculatePriorityPointSpend(originalCost, availablePointAmount);
-        modifiedCost = Math.Max(0m, originalCost - pointAmountToSpend);
+        pointAmountToSpend = CalculatePriorityPointSpend(
+            originalCost,
+            availablePointAmount,
+            minimumCostAfterPointSpend);
+        modifiedCost = Math.Max(Math.Max(0m, minimumCostAfterPointSpend), originalCost - pointAmountToSpend);
         return modifiedCost != originalCost;
     }
 
@@ -236,9 +257,21 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
 
     protected static decimal CalculatePriorityPointSpend(decimal totalCost, decimal availablePointAmount)
     {
-        return totalCost <= 0m || availablePointAmount <= 0m
+        return CalculatePriorityPointSpend(totalCost, availablePointAmount, 0m);
+    }
+
+    protected static decimal CalculatePriorityPointSpend(
+        decimal totalCost,
+        decimal availablePointAmount,
+        decimal minimumCostAfterPointSpend)
+    {
+        if (totalCost <= 0m || availablePointAmount <= 0m)
+            return 0m;
+
+        var maximumSpend = Math.Max(0m, totalCost - Math.Max(0m, minimumCostAfterPointSpend));
+        return maximumSpend <= 0m
             ? 0m
-            : Math.Min(totalCost, availablePointAmount);
+            : Math.Min(maximumSpend, availablePointAmount);
     }
 
     protected static decimal GetPrePointResolvedCost(CardModel card)
@@ -249,13 +282,21 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
         return Math.Max(0m, card.EnergyCost.GetWithModifiers(CostModifiers.Local));
     }
 
-    private bool CanModifyPointCost(CardModel card)
+    private bool CanPreviewPointCost(CardModel card)
+    {
+        if (!CanTrackPlayedCard(card))
+            return false;
+        if (card.Pile?.Type != PileType.Hand)
+            return false;
+
+        return true;
+    }
+
+    private bool CanTrackPlayedCard(CardModel card)
     {
         if (Owner?.Player?.PlayerCombatState == null)
             return false;
         if (card.Owner != Owner.Player)
-            return false;
-        if (card.Pile?.Type != PileType.Hand)
             return false;
         if (card.EnergyCost.CostsX)
             return false;

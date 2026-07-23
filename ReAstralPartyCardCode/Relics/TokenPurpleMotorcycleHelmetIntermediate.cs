@@ -8,15 +8,14 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
-using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenPurpleMotorcycleHelmetIntermediate : AstralPartyRelicModel
 {
-    private const decimal CombatStartReversedScales = 2m;
-    private const decimal BlockPerTurn = 1m;
+    private const decimal CombatStartReversedScales = 1m;
+    private const decimal DefendPointPerTurn = 1m;
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
@@ -24,7 +23,8 @@ public class TokenPurpleMotorcycleHelmetIntermediate : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<ReversedScalesHolographicPower>()
+        HoverTipFactory.FromPower<ReversedScalesHolographicPower>(),
+        HoverTipFactory.FromPower<DefendPointPower>()
     ];
 
     public override async Task BeforeCombatStart()
@@ -49,6 +49,6 @@ public class TokenPurpleMotorcycleHelmetIntermediate : AstralPartyRelicModel
             return;
 
         Flash();
-        await CreatureCmd.GainBlock(Owner.Creature, BlockPerTurn, ValueProp.Move, null);
+        await DefendPointPower.GrantFromRelic(Owner.Creature, DefendPointPerTurn, this);
     }
 }
