@@ -233,7 +233,10 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
             originalCost,
             availablePointAmount,
             minimumCostAfterPointSpend);
-        modifiedCost = Math.Max(Math.Max(0m, minimumCostAfterPointSpend), originalCost - pointAmountToSpend);
+        if (pointAmountToSpend <= 0m)
+            return false;
+
+        modifiedCost = originalCost - pointAmountToSpend;
         return modifiedCost != originalCost;
     }
 
