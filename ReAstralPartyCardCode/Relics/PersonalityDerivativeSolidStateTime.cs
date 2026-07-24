@@ -12,6 +12,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
@@ -81,13 +82,9 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
         if (!SolidStateTimeHelper.TryGetTrackedDeckPowerCard(Owner, cardPlay.Card, out var deckCard) || deckCard == null)
             return;
 
-        var canonical = deckCard.CanonicalInstance ?? deckCard;
-        var modelId = SolidStateTimeHelper.GetRecordModelId(canonical);
-        var record = GetOrCreateRecord(modelId, deckCard.CurrentUpgradeLevel);
-
-        record.UpgradeLevel = Math.Max(record.UpgradeLevel, deckCard.CurrentUpgradeLevel);
+        var record = GetOrCreateRecord(deckCard);
         record.LastTouchedSequence = ++AstralParty_PersonalityDerivativeSolidStateTimeTouchSequence;
-        AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId = record.ModelId;
+        AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId = SolidStateTimeHelper.GetRecordStateKey(record);
 
         var gain = SolidStateTimeHelper.GetWeightedProgressGain(
             AstralParty_PersonalityDerivativeSolidStateTimeWeightedRecordEventsConsumed);
@@ -102,8 +99,7 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
             record.Progress = 0;
 
             await EventDeckCardHelper.RemoveCardFromRunDeck(Owner, deckCard, false);
-            if (ReferenceEquals(cardPlay.Card, deckCard) || ReferenceEquals(cardPlay.Card.CanonicalInstance, canonical))
-                await SolidStateTimeHelper.RemoveCardFromCombatPiles(cardPlay.Card);
+            await SolidStateTimeHelper.RemoveCardFromCombatPiles(cardPlay.Card);
         }
 
         Flash();
@@ -146,9 +142,7 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
                     continue;
                 }
 
-                playbackCard.SetToFreeThisTurn();
-                await CardCmd.AutoPlay(choiceContext, playbackCard, target, AutoPlayType.Default, false, true);
-                await SolidStateTimeHelper.RemoveCardFromCombatPiles(playbackCard);
+                await SolidStateTimeHelper.PlayStoredPowerDirectly(choiceContext, playbackCard, target);
             }
         }
     }
@@ -160,13 +154,13 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
         foreach (var record in _records
                      .OrderByDescending(static record => record.Completions)
                      .ThenByDescending(static record => record.LastTouchedSequence)
-                     .ThenBy(static record => record.ModelId, StringComparer.Ordinal))
+            .ThenBy(static record => record.ModelId, StringComparer.Ordinal))
         {
-            var canonical = SolidStateTimeHelper.TryGetCanonicalCard(record.ModelId);
-            if (canonical == null)
+            var previewCard = SolidStateTimeHelper.CreatePreviewCard(record);
+            if (previewCard == null)
                 continue;
 
-            yield return BuildEntryHoverTip(canonical, record);
+            yield return BuildEntryHoverTip(previewCard, record);
         }
     }
 
@@ -192,7 +186,7 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
             GD.Load<Texture2D>(PackedIconPath));
     }
 
-    private HoverTip BuildEntryHoverTip(CardModel canonicalCard, SolidStateTimeRecord record)
+    private HoverTip BuildEntryHoverTip(CardModel previewCard, SolidStateTimeRecord record)
     {
         var bodyTemplate = new LocString("relics", $"{Id.Entry}.entry_description").GetRawText();
         var body = string.Format(
@@ -202,11 +196,11 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
             record.NextThreshold);
         return new HoverTip(
             new LocString("relics", $"{Id.Entry}.stats_title"),
-            $"{canonicalCard.Title}\n{body}",
+            $"{previewCard.Title}\n{body}",
             GD.Load<Texture2D>(PackedIconPath))
         {
             IsInstanced = true,
-            Id = $"{Id.Entry}:{record.ModelId}:{record.Completions}:{record.Progress}:{record.NextThreshold}"
+            Id = $"{Id.Entry}:{SolidStateTimeHelper.GetRecordStateKey(record)}:{record.Completions}:{record.Progress}:{record.NextThreshold}"
         };
     }
 
@@ -215,6 +209,14 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
         if (!string.IsNullOrWhiteSpace(AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId))
         {
             var primary = _records.FirstOrDefault(record =>
+                string.Equals(
+                    SolidStateTimeHelper.GetRecordStateKey(record),
+                    AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId,
+                    StringComparison.Ordinal));
+            if (primary != null)
+                return primary;
+
+            primary = _records.FirstOrDefault(record =>
                 string.Equals(record.ModelId, AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId, StringComparison.Ordinal));
             if (primary != null)
                 return primary;
@@ -226,16 +228,18 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
             .FirstOrDefault();
     }
 
-    private SolidStateTimeRecord GetOrCreateRecord(string modelId, int upgradeLevel)
+    private SolidStateTimeRecord GetOrCreateRecord(CardModel deckCard)
     {
-        var existing = _records.FirstOrDefault(record => string.Equals(record.ModelId, modelId, StringComparison.Ordinal));
+        var existing = _records.FirstOrDefault(record => SolidStateTimeHelper.MatchesRecordState(record, deckCard));
         if (existing != null)
             return existing;
 
         var created = new SolidStateTimeRecord
         {
-            ModelId = modelId,
-            UpgradeLevel = upgradeLevel,
+            ModelId = SolidStateTimeHelper.GetRecordModelId(deckCard),
+            UpgradeLevel = deckCard.CurrentUpgradeLevel,
+            MadScienceCardType = deckCard is MadScience madScience ? (int)madScience.TinkerTimeType : null,
+            MadScienceRider = deckCard is MadScience madScienceWithRider ? (int)madScienceWithRider.TinkerTimeRider : null,
             NextThreshold = SolidStateTimeHelper.GetThresholdForCompletionIndex(0),
             LastTouchedSequence = ++AstralParty_PersonalityDerivativeSolidStateTimeTouchSequence
         };
