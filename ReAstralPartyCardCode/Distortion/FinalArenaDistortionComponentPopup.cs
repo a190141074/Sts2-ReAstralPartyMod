@@ -1,4 +1,5 @@
 using Godot;
+using MegaCrit.Sts2.addons.mega_text;
 using MegaCrit.Sts2.Core.ControllerInput;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
@@ -14,13 +15,15 @@ internal static partial class FinalArenaDistortionComponentPopup
 
     public static void Open(IRunState runState)
     {
-        if (!FinalArenaSeriesHelper.TryGetActiveComponents(runState, out var components) || components.Count == 0)
+        if (!FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.HumanAiDuel) &&
+            !FinalArenaSeriesHelper.TryGetActiveComponents(runState, out _))
             return;
         if (NModalContainer.Instance == null)
             return;
 
         NModalContainer.Instance.Clear();
-        NModalContainer.Instance.Add(new FinalArenaDistortionComponentPopupPanel(components));
+        NModalContainer.Instance.Add(new FinalArenaDistortionComponentPopupPanel(
+            FinalArenaSeriesHelper.GetAllComponentsInDisplayOrder()));
         NModalContainer.Instance.ShowBackstop();
     }
 
@@ -137,7 +140,7 @@ internal static partial class FinalArenaDistortionComponentPopup
                 28,
                 new Color(0.98f, 0.89f, 0.53f)));
             titleBox.AddChild(CreateLabel(
-                "右键列表展示当前已激活的全部畸变组件。",
+                "右键列表展示全部畸变组件。",
                 15,
                 new Color(0.84f, 0.87f, 0.93f, 0.92f)));
 
@@ -158,7 +161,7 @@ internal static partial class FinalArenaDistortionComponentPopup
 
         private Control BuildSummaryCard()
         {
-            var body = new LocString("relics", $"{HoverTipRoot}.description").GetRawText();
+            var body = new LocString("relics", $"{HoverTipRoot}.description").GetFormattedText();
             return BuildCard(
                 new LocString("relics", $"{HoverTipRoot}.title").GetRawText(),
                 body,
@@ -191,8 +194,8 @@ internal static partial class FinalArenaDistortionComponentPopup
                     $"{HoverTipRoot}.{FinalArenaSeriesHelper.GetLocStem(component)}.title");
                 title.Add("Difficulty", FinalArenaSeriesHelper.GetDifficulty(component));
                 var description = new LocString("relics",
-                    $"{HoverTipRoot}.{FinalArenaSeriesHelper.GetLocStem(component)}.description").GetRawText();
-                list.AddChild(BuildCard(title.GetRawText(), description, new Color(0.13f, 0.17f, 0.24f, 0.98f)));
+                    $"{HoverTipRoot}.{FinalArenaSeriesHelper.GetLocStem(component)}.description").GetFormattedText();
+                list.AddChild(BuildCard(title.GetFormattedText(), description, new Color(0.13f, 0.17f, 0.24f, 0.98f)));
             }
 
             return scroll;
@@ -227,7 +230,7 @@ internal static partial class FinalArenaDistortionComponentPopup
             margin.AddChild(box);
 
             box.AddChild(CreateLabel(title, 20, new Color(0.97f, 0.94f, 0.86f)));
-            box.AddChild(CreateLabel(description, 16, new Color(0.86f, 0.88f, 0.93f, 0.96f), true));
+            box.AddChild(CreateRichText(description, 16, new Color(0.86f, 0.88f, 0.93f, 0.96f)));
             return card;
         }
 
@@ -244,6 +247,53 @@ internal static partial class FinalArenaDistortionComponentPopup
             label.AddThemeFontSizeOverride("font_size", fontSize);
             label.AddThemeColorOverride("font_color", color);
             return label;
+        }
+
+        private static MegaRichTextLabel CreateRichText(string text, int fontSize, Color color)
+        {
+            var label = new MegaRichTextLabel
+            {
+                BbcodeEnabled = true,
+                FitContent = true,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                AutowrapMode = TextServer.AutowrapMode.WordSmart,
+                MouseFilter = MouseFilterEnum.Ignore,
+                SizeFlagsHorizontal = SizeFlags.ExpandFill,
+                SizeFlagsVertical = SizeFlags.ShrinkBegin,
+                MaxFontSize = fontSize,
+                MinFontSize = fontSize,
+                CustomMinimumSize = new Vector2(0f, fontSize * 3.5f)
+            };
+            ApplyDefaultMegaRichTextTheme(label);
+            label.AddThemeColorOverride("default_color", color);
+            label.AddThemeColorOverride("font_shadow_color", new Color(0f, 0f, 0f, 0f));
+            label.AddThemeConstantOverride("shadow_offset_x", 0);
+            label.AddThemeConstantOverride("shadow_offset_y", 0);
+            label.SetTextAutoSize(text);
+            return label;
+        }
+
+        private static void ApplyDefaultMegaRichTextTheme(MegaRichTextLabel label)
+        {
+            var font = label.GetThemeDefaultFont();
+            if (font != null)
+            {
+                label.AddThemeFontOverride("normal_font", font);
+                label.AddThemeFontOverride("bold_font", font);
+                label.AddThemeFontOverride("italics_font", font);
+                label.AddThemeFontOverride("bold_italics_font", font);
+                label.AddThemeFontOverride("mono_font", font);
+            }
+
+            var fontSize = label.GetThemeDefaultFontSize();
+            if (fontSize <= 0)
+                return;
+
+            label.AddThemeFontSizeOverride("normal_font_size", fontSize);
+            label.AddThemeFontSizeOverride("bold_font_size", fontSize);
+            label.AddThemeFontSizeOverride("italics_font_size", fontSize);
+            label.AddThemeFontSizeOverride("bold_italics_font_size", fontSize);
+            label.AddThemeFontSizeOverride("mono_font_size", fontSize);
         }
 
         private static StyleBoxFlat CreatePanelStyle(Color bg, int radius)

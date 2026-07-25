@@ -170,6 +170,11 @@ public static class FinalArenaSeriesHelper
         return TryGetActiveComponents(runState, out var components) && components.Contains(component);
     }
 
+    public static IReadOnlyList<FinalArenaDistortionComponent> GetAllComponentsInDisplayOrder()
+    {
+        return Enum.GetValues<FinalArenaDistortionComponent>();
+    }
+
     public static IReadOnlyList<IHoverTip> BuildDistortionHoverTips(IRunState? runState, Texture2D? icon)
     {
         if (!TryGetActiveComponents(runState, out var components))
