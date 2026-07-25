@@ -31,6 +31,7 @@ public class MainFile
 
         RitsuLibFramework.EnsureGodotScriptsRegistered(assembly, Logger);
         ReAstralPartyModSettingsManager.Register();
+        TokenSeriesAvailabilityHelper.Register();
         FinalArenaSeriesHelper.Register();
 
         // Current content still references minted CardKeyword values while models materialize,

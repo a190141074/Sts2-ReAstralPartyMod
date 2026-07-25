@@ -5,12 +5,18 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
+using STS2RitsuLib;
+using STS2RitsuLib.RunData;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class TokenSeriesAvailabilityHelper
 {
     public const string RunSelectionKey = "ReAstralPartyMod.OpenTokenSeries";
+    private const string ManualOverrideKey = "manual_open_token_series";
+
+    private static RunSavedData<TokenSeriesManualOverrideRunData> _manualOverrideRunData = null!;
+    private static bool _registered;
 
     public enum TokenSeries
     {
@@ -116,11 +122,68 @@ public static class TokenSeriesAvailabilityHelper
         [ModelDb.GetId<TokenExclusiveStunGun>()] = "【电击枪】"
     };
 
+    private static readonly Dictionary<string, TokenSeries> SeriesAliases =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["dreamship"] = TokenSeries.Dreamship,
+            ["dream_ship"] = TokenSeries.Dreamship,
+            ["梦想号"] = TokenSeries.Dreamship,
+            ["series_dreamship"] = TokenSeries.Dreamship,
+            ["spiritfestival"] = TokenSeries.SpiritFestival,
+            ["spirit_festival"] = TokenSeries.SpiritFestival,
+            ["御魂庆典"] = TokenSeries.SpiritFestival,
+            ["series_spirit_festival"] = TokenSeries.SpiritFestival,
+            ["watertown"] = TokenSeries.WaterTown,
+            ["water_town"] = TokenSeries.WaterTown,
+            ["水乡古镇"] = TokenSeries.WaterTown,
+            ["series_water_town"] = TokenSeries.WaterTown,
+            ["magicacademy"] = TokenSeries.MagicAcademy,
+            ["magic_academy"] = TokenSeries.MagicAcademy,
+            ["魔法学院"] = TokenSeries.MagicAcademy,
+            ["series_magic_academy"] = TokenSeries.MagicAcademy,
+            ["dragonpalace"] = TokenSeries.DragonPalace,
+            ["dragon_palace"] = TokenSeries.DragonPalace,
+            ["龙宫游乐园"] = TokenSeries.DragonPalace,
+            ["series_dragon_palace"] = TokenSeries.DragonPalace,
+            ["ghostalley"] = TokenSeries.GhostAlley,
+            ["ghost_alley"] = TokenSeries.GhostAlley,
+            ["幽魂暗巷"] = TokenSeries.GhostAlley,
+            ["series_ghost_alley"] = TokenSeries.GhostAlley,
+            ["finalarena"] = TokenSeries.FinalArena,
+            ["final_arena"] = TokenSeries.FinalArena,
+            ["决赛大赛场"] = TokenSeries.FinalArena,
+            ["series_final_arena"] = TokenSeries.FinalArena
+        };
+
+    public static void Register()
+    {
+        if (_registered)
+            return;
+
+        using (RitsuLibFramework.BeginModDataRegistration(MainFile.ModId))
+        {
+            _manualOverrideRunData = RitsuLibFramework
+                .GetRunSavedDataStore(MainFile.ModId)
+                .Register(
+                    ManualOverrideKey,
+                    static () => new TokenSeriesManualOverrideRunData(),
+                    new RunSavedDataOptions
+                    {
+                        WritePolicy = RunSavedDataWritePolicy.WhenNonDefault
+                    });
+        }
+
+        _registered = true;
+    }
+
     public static bool TryGetState(IRunState? runState, out TokenSeriesAvailabilityState state)
     {
         state = default;
         if (runState == null)
             return false;
+
+        if (TryGetManualOverrideState(runState, out state))
+            return true;
 
         var tokenSeriesMode = ReAstralPartyModSettingsManager.GetTokenSeriesMode(runState);
 
@@ -148,10 +211,67 @@ public static class TokenSeriesAvailabilityHelper
             return false;
 
         var rolledSeries = new[] { AllSeries[rolls[0]], AllSeries[rolls[1]] };
-        state = rolledSeries.Contains(TokenSeries.FinalArena)
-            ? new TokenSeriesAvailabilityState([TokenSeries.FinalArena])
-            : new TokenSeriesAvailabilityState(rolledSeries).Normalize();
+        state = NormalizeSeries(rolledSeries);
         return true;
+    }
+
+    public static IReadOnlyList<TokenSeries> GetMutableOpenSeriesForCommand(RunState runState)
+    {
+        if (TryGetState(runState, out var state))
+            return state.OpenSeries.ToArray();
+
+        return [];
+    }
+
+    public static void SetManualOpenSeries(RunState runState, IEnumerable<TokenSeries> openSeries)
+    {
+        if (!_registered)
+            Register();
+
+        var state = NormalizeSeries(openSeries);
+        _manualOverrideRunData.Set(runState, new TokenSeriesManualOverrideRunData
+        {
+            IsOverrideActive = true,
+            OpenSeries = state.OpenSeries.Select(static series => series.ToString()).ToList()
+        });
+    }
+
+    public static bool TryParseSeries(string? input, out TokenSeries series)
+    {
+        series = default;
+        var normalized = NormalizeSeriesInput(input);
+        if (string.IsNullOrWhiteSpace(normalized))
+            return false;
+
+        if (SeriesAliases.TryGetValue(normalized, out series))
+            return true;
+
+        return Enum.TryParse(normalized, true, out series) && Enum.IsDefined(series);
+    }
+
+    public static string BuildSeriesListSummary(IReadOnlyList<TokenSeries> openSeries)
+    {
+        if (openSeries.Count == 0)
+            return "open_token_series=[]";
+
+        var sections = openSeries
+            .Select((series, index) => $"Extension{index + 1}={ResolveSeriesTitle(series)}")
+            .ToArray();
+        return $"open_token_series=[{string.Join(" | ", sections)}]";
+    }
+
+    public static IReadOnlyList<string> GetSeriesCompletionAliases()
+    {
+        return
+        [
+            "dreamship",
+            "spirit_festival",
+            "water_town",
+            "magic_academy",
+            "dragon_palace",
+            "ghost_alley",
+            "final_arena"
+        ];
     }
 
     public static string BuildDebugSummary(IRunState? runState)
@@ -165,6 +285,30 @@ public static class TokenSeriesAvailabilityHelper
             .ToArray();
         var seed = runState?.Rng.StringSeed ?? "<null>";
         return $"open_token_series=[{string.Join(" | ", sections)}] seed={seed}";
+    }
+
+    private static bool TryGetManualOverrideState(IRunState runState, out TokenSeriesAvailabilityState state)
+    {
+        state = default;
+        if (runState is not RunState concreteRunState)
+            return false;
+
+        if (!_registered)
+            Register();
+
+        if (!_manualOverrideRunData.TryGet(concreteRunState, out var runData) ||
+            runData?.IsOverrideActive != true)
+            return false;
+
+        var openSeries = new List<TokenSeries>();
+        foreach (var serializedSeries in runData.OpenSeries)
+        {
+            if (TryParseSeries(serializedSeries, out var series))
+                openSeries.Add(series);
+        }
+
+        state = NormalizeSeries(openSeries);
+        return true;
     }
 
     public static bool IsSeriesTokenRelic(RelicModel relic)
@@ -230,6 +374,34 @@ public static class TokenSeriesAvailabilityHelper
     {
         return STS2RitsuLib.Content.ModContentRegistry.GetQualifiedKeywordId(MainFile.ModId,
             SeriesKeywordStemBySeries[series]);
+    }
+
+    private static TokenSeriesAvailabilityState NormalizeSeries(IEnumerable<TokenSeries> openSeries)
+    {
+        var distinct = openSeries
+            .Where(static series => Enum.IsDefined(series))
+            .Distinct()
+            .ToArray();
+        if (distinct.Contains(TokenSeries.FinalArena))
+            return new TokenSeriesAvailabilityState([TokenSeries.FinalArena]);
+
+        return new TokenSeriesAvailabilityState(distinct).Normalize();
+    }
+
+    private static string NormalizeSeriesInput(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return string.Empty;
+
+        var normalized = input.Trim()
+            .Replace("【", string.Empty)
+            .Replace("】", string.Empty)
+            .Replace("系列·", string.Empty)
+            .Replace("系列-", string.Empty)
+            .Replace("系列_", string.Empty)
+            .Replace("-", "_")
+            .Replace(" ", "_");
+        return normalized;
     }
 
     private static string ResolveSeriesTitle(TokenSeries series)
@@ -313,4 +485,11 @@ public static class TokenSeriesAvailabilityHelper
                 .ToArray());
         }
     }
+}
+
+internal sealed class TokenSeriesManualOverrideRunData
+{
+    public bool IsOverrideActive { get; set; }
+
+    public List<string> OpenSeries { get; set; } = [];
 }

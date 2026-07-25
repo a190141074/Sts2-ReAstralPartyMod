@@ -68,7 +68,7 @@ public static partial class NTopBarOpenTokenSeriesPatch
     private sealed partial class TokenSeriesTopBarIcon : Control
     {
         private readonly IRunState _runState;
-        private IReadOnlyList<IHoverTip> _hoverTips = [];
+        private Texture2D? _icon;
 
         public TokenSeriesTopBarIcon(IRunState runState)
         {
@@ -101,7 +101,7 @@ public static partial class NTopBarOpenTokenSeriesPatch
             };
             AddChild(textureRect);
 
-            _hoverTips = TokenSeriesAvailabilityHelper.BuildHoverTips(_runState, textureRect.Texture);
+            _icon = textureRect.Texture;
 
             Connect(Control.SignalName.MouseEntered, Callable.From(OnMouseEntered));
             Connect(Control.SignalName.MouseExited, Callable.From(OnMouseExited));
@@ -109,10 +109,11 @@ public static partial class NTopBarOpenTokenSeriesPatch
 
         private void OnMouseEntered()
         {
-            if (_hoverTips.Count == 0)
+            var hoverTips = TokenSeriesAvailabilityHelper.BuildHoverTips(_runState, _icon);
+            if (hoverTips.Count == 0)
                 return;
 
-            var tip = NHoverTipSet.CreateAndShow(this, _hoverTips);
+            var tip = NHoverTipSet.CreateAndShow(this, hoverTips);
             if (tip == null)
                 return;
 

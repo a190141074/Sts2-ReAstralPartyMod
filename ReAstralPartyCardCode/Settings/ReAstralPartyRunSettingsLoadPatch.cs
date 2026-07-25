@@ -30,6 +30,7 @@ public sealed class ReAstralPartyRunSettingsLoadPatch : IPatchMethod
             return;
 
         DevConsoleCommandNotificationSync.Register();
+        AstralDlcOverrideSync.Register();
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         await FinalArenaSeriesHelper.GrantStunGunIfNeeded(runState);
     }
