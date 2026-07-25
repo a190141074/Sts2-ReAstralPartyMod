@@ -392,11 +392,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.description"),
             out _allVariantPersonasToggle,
             OnEnableAllVariantPersonasToggled));
-        body.AddChild(BuildBooleanRow(
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label"),
-            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.description"),
-            out _extremeModeToggle,
-            OnEnableExtremeModeToggled));
         body.AddChild(BuildEnumRow(
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.label"),
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.description"),
@@ -418,6 +413,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.description"),
             out _mechTideModeToggle,
             OnEnableMechTideModeToggled));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.description"),
+            out _extremeModeToggle,
+            OnEnableExtremeModeToggled));
 
         var spacer = new Control
         {

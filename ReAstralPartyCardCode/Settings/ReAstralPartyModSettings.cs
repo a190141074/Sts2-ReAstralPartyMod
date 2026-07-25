@@ -1413,12 +1413,6 @@ public static partial class ReAstralPartyModSettingsManager
                     enableAllVariantPersonas,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_all_variant_personas.description",
                         "At run start, append all built-in variant personas to the starting persona list. Requires the Variant Personas master switch to stay enabled. Linked crossover variants are excluded. Changes apply to new runs only."))
-                .AddToggle(
-                    "enable_extreme_mode",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label", "Enable Extreme Mode"),
-                    enableExtremeMode,
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.description",
-                        "If combat is not won by the end of the player-side turn 16, that combat immediately counts as a loss."))
                 .AddEnumChoice(
                     "starting_persona_mode",
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.label",
@@ -1475,6 +1469,12 @@ public static partial class ReAstralPartyModSettingsManager
                     enableMechTideMode,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.description",
                         "Force this run to open only the Final Arena expansion series."))
+                .AddToggle(
+                    "enable_extreme_mode",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.label", "Enable Extreme Mode"),
+                    enableExtremeMode,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_extreme_mode.description",
+                        "If combat is not won by the end of the player-side turn 16, that combat immediately counts as a loss."))
                 .WithEntryEnabledWhen("enable_variant_personas", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),

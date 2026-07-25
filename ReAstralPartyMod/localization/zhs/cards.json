@@ -117,7 +117,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TRUE_ME.title": "真正的我",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TRUE_ME.description": "指定一名玩家。双方回复[blue]1[/blue]点生命，获得[blue]1[/blue]点临时[red]力量[/red]。\n若[gold]温暖[/gold]≥[blue]5[/blue]层，消耗全部[gold]温暖[/gold]，本回合额外获得等同于当前[green]敏捷[/green]的临时[red]力量[/red]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SHATTER_STAR.title": "断星",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SHATTER_STAR.description": "造成[blue]21[/blue]点伤害。每层[gold]充能[/gold]使伤害提高[blue]7.7%[/blue]。\n若击杀目标，人格冷却-[blue]1[/blue]回合并尝试[gold]再动[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SHATTER_STAR.description": "造成[blue]21[/blue]点伤害。每层[gold]充能[/gold]使伤害提高[blue]7.7%[/blue]。\n若击杀目标，人格遗物冷却-[blue]1[/blue]回合并尝试[gold]再动[/gold]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_DIVINE_PUNISHMENT.title": "神罚",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_DIVINE_PUNISHMENT.description": "获得{energyPrefix:energyIcons(1)}。\n若全场玩家[gold]神子[/gold]总和≥[blue]8[/blue]，所有玩家额外获得{energyPrefix:energyIcons(1)}并驱散至多[blue]2[/blue]个负面状态。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_INNOCENT_WISH.title": "无垢之愿",

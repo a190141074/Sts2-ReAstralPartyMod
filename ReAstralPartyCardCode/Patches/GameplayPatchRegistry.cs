@@ -267,6 +267,14 @@ internal static class GameplayStaticPatchCatalog
                 "Gameplay patch: prevent manual play of high-cost Attack cards while Variant Person Twelve Flowers Cup is active",
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
+                "final_arena_overload_is_playable_patch",
+                typeof(CardModel),
+                "IsPlayable",
+                typeof(FinalArenaOverloadIsPlayablePatch),
+                false,
+                "Gameplay patch: prevent manual play after the ninth card each turn while Final Arena Overload is active",
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
                 "card_model_paranoid_after_current_hp_changed_patch",
                 typeof(AbstractModel),
                 nameof(CardModel.AfterCurrentHpChanged),

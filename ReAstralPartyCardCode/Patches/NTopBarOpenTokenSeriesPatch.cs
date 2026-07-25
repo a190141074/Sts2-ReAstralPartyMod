@@ -177,7 +177,10 @@ public static partial class NTopBarOpenTokenSeriesPatch
             }
 
             if (iconName == "DistortionIcon")
-                ShowHoverTips(FinalArenaSeriesHelper.BuildDistortionHoverTips(_runState, _distortionIcon), 56f);
+            {
+                NHoverTipSet.Remove(this);
+                FinalArenaDistortionComponentPopup.Open(_runState);
+            }
             else
                 ShowHoverTips(TokenSeriesAvailabilityHelper.BuildHoverTips(_runState, _seriesIcon), 0f);
 

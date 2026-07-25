@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using MegaCrit.Sts2.Core.CardSelection;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Commands.Builders;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
@@ -15,12 +16,13 @@ using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+using STS2RitsuLib.Combat.AttackHits;
 using STS2RitsuLib.Interop.AutoRegistration;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 
 [RegisterGoodModifier]
-public sealed class FinalArenaDistortionComponentModifier : ModifierModel
+public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAttackHitHookListener
 {
     private static readonly ConditionalWeakTable<FinalArenaDistortionComponentModifier, Data> RuntimeData = [];
 
@@ -30,7 +32,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
     private const decimal SeasicknessPoison = 2m;
     private const decimal PirateKingsOrderStacks = 1m;
     private const decimal PirateKingsOrderHeal = 3m;
-    private const decimal GaleReversedScales = 1m;
+    private const decimal GaleReversedScales = 2m;
     private const decimal WideAreaMarkStacks = 3m;
     private const decimal RobberyStunTurns = 1m;
     private const decimal RefereeStatLoss = 2m;
@@ -43,6 +45,8 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
     private const int MysteriousTreasureInterval = 5;
     private const int ArbitrageFloorInterval = 3;
     private const decimal ArbitragePercent = 0.10m;
+    private const int OverloadMaxCardsPerTurn = 9;
+    private const decimal OverloadTemporaryDexterityLoss = 1m;
 
     private enum RefereePenaltyStat
     {
@@ -59,6 +63,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
         public int CardsPlayed;
         public bool SeasicknessTriggered;
         public bool GaleTriggered;
+        public bool OverloadPersonaSkillTriggered;
         public bool CopyLowTriggered;
         public bool CopyHighTriggered;
         public int FlashOfInsightTriggers;
@@ -69,14 +74,10 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
         public bool TriggerRainstorm;
         public bool TriggerSeasickness;
         public bool TriggerGale;
+        public bool TriggerOverloadPersonaSkill;
         public bool TriggerCopyLow;
         public bool TriggerCopyHigh;
         public int HandCountBeforePlay;
-    }
-
-    private sealed class EnemyTurnPlayerState
-    {
-        public bool TookRealDamage;
     }
 
     private sealed class EnergyDisorderEntry
@@ -89,11 +90,10 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
     {
         public Dictionary<ulong, TurnPlayerState> TurnStates { get; } = [];
         public Dictionary<CardModel, PendingCardFlags> PendingCardFlags { get; } = [];
-        public Dictionary<ulong, EnemyTurnPlayerState> EnemyTurnPlayerStates { get; } = [];
+        public Dictionary<AttackCommand, HashSet<ulong>> PendingDexterityCounterTargets { get; } = [];
         public List<EnergyDisorderEntry> EnergyDisorderEntries { get; } = [];
         public Dictionary<ulong, int> PendingPreciseSelectionDrawCounts { get; } = [];
         public Dictionary<ulong, int> PendingPreciseSelectionTurnSeeds { get; } = [];
-        public bool TrackingEnemyTurn;
     }
 
     public override bool ShouldReceiveCombatHooks => true;
@@ -156,14 +156,20 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
         if (RunState == null)
             return Task.CompletedTask;
 
-        if (side == CombatSide.Enemy)
-        {
-            ResetEnemyTurnTracking();
-            if (FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.PirateKingsOrder))
-                return HealEnemiesIfBossIntentIsNonAttack();
-        }
+        if (side == CombatSide.Enemy &&
+            FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.PirateKingsOrder))
+            return HealEnemiesIfBossIntentIsNonAttack();
 
         return Task.CompletedTask;
+    }
+
+    public override decimal ModifyMaxEnergy(Player player, decimal amount)
+    {
+        if (RunState == null ||
+            !FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Overload))
+            return amount;
+
+        return amount + 1m;
     }
 
     public override decimal ModifyHandDraw(Player player, decimal amount)
@@ -283,6 +289,13 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
             }
         }
 
+        if (!state.OverloadPersonaSkillTriggered &&
+            PersonRelicHelper.IsPersonSkillCard(cardPlay.Card))
+        {
+            state.OverloadPersonaSkillTriggered = true;
+            pending.TriggerOverloadPersonaSkill = true;
+        }
+
         if (!state.GaleTriggered && pending.HandCountBeforePlay >= 10)
         {
             state.GaleTriggered = true;
@@ -323,7 +336,21 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
             RunState != null &&
             FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Gale))
         {
-            PersonRelicHelper.AdvanceCooldownRelics(player, 1);
+            FinalArenaPersonaCooldownAdjustmentHelper.AdvanceCooldownRelicsFromDistortion(player, 1);
+        }
+
+        if (pending?.TriggerOverloadPersonaSkill == true &&
+            RunState != null &&
+            FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Overload) &&
+            PersonRelicHelper.IsPersonSkillCard(cardPlay.Card))
+        {
+            await AstralTemporaryDexterityPower.Apply(
+                player.Creature,
+                -OverloadTemporaryDexterityLoss,
+                this,
+                player.Creature,
+                cardPlay.Card,
+                true);
         }
 
         if (pending?.TriggerCopyLow == true &&
@@ -406,24 +433,6 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
         return modifiedCost != originalCost;
     }
 
-    public override async Task AfterDamageReceived(
-        PlayerChoiceContext choiceContext,
-        Creature target,
-        DamageResult result,
-        ValueProp props,
-        Creature? dealer,
-        CardModel? cardSource)
-    {
-        var data = GetData();
-        if (!data.TrackingEnemyTurn || target.Player == null || target.Side != CombatSide.Player)
-            return;
-
-        if (result.UnblockedDamage > 0m)
-            GetEnemyTurnPlayerState(target.Player).TookRealDamage = true;
-
-        await Task.CompletedTask;
-    }
-
     public override async Task AfterSideTurnEnd(
         PlayerChoiceContext choiceContext,
         CombatSide side,
@@ -433,12 +442,6 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
         if (combatState == null)
             return;
 
-        if (side == CombatSide.Enemy)
-        {
-            await ResolveDexterityCounter(combatState);
-            GetData().TrackingEnemyTurn = false;
-        }
-
         if (RunState != null && FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Thundercloud))
             await ResolveThundercloud(choiceContext, combatState);
 
@@ -447,6 +450,41 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
             foreach (var player in participants.Select(static creature => creature.Player).Where(static player => player != null))
                 ClearEnergyDisorderEntriesForPlayer(player);
         }
+    }
+
+    public async Task AfterAttackHit(AttackHitContext context)
+    {
+        if (RunState == null ||
+            !FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Dexterity) ||
+            context.Dealer?.Side != CombatSide.Enemy ||
+            context.Results.Count == 0)
+            return;
+
+        var pendingTargets = GetOrCreatePendingDexterityCounterTargets(context.Attack);
+        for (var i = 0; i < context.Results.Count && i < context.Targets.Count; i++)
+        {
+            var target = context.Targets[i];
+            if (target.Player == null || target.Side != CombatSide.Player)
+                continue;
+
+            var result = context.Results[i];
+            if (result.TotalDamage > result.UnblockedDamage)
+                pendingTargets.Add(target.Player.NetId);
+        }
+
+        if (context.HitNumber < context.TotalHitCount)
+            return;
+
+        foreach (var playerNetId in pendingTargets.OrderBy(static netId => netId))
+        {
+            var player = GetStablePlayers().FirstOrDefault(candidate => candidate.NetId == playerNetId);
+            if (player?.Creature == null || player.Creature.IsDead)
+                continue;
+
+            await PowerCmd.Apply<CounterPower>(player.Creature, 1m, player.Creature, null, false);
+        }
+
+        GetData().PendingDexterityCounterTargets.Remove(context.Attack);
     }
 
     public override Task AfterRoomEntered(AbstractRoom room)
@@ -557,26 +595,6 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
         GetData().TurnStates[player.NetId] = new TurnPlayerState();
     }
 
-    private void ResetEnemyTurnTracking()
-    {
-        var data = GetData();
-        data.TrackingEnemyTurn = true;
-        data.EnemyTurnPlayerStates.Clear();
-        foreach (var player in GetStablePlayers())
-            data.EnemyTurnPlayerStates[player.NetId] = new EnemyTurnPlayerState();
-    }
-
-    private EnemyTurnPlayerState GetEnemyTurnPlayerState(Player player)
-    {
-        var states = GetData().EnemyTurnPlayerStates;
-        if (states.TryGetValue(player.NetId, out var existing))
-            return existing;
-
-        existing = new EnemyTurnPlayerState();
-        states[player.NetId] = existing;
-        return existing;
-    }
-
     private PendingCardFlags? ConsumePendingCardFlags(CardModel card)
     {
         var pending = GetData().PendingCardFlags;
@@ -584,6 +602,17 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
             return null;
 
         return flags;
+    }
+
+    private HashSet<ulong> GetOrCreatePendingDexterityCounterTargets(AttackCommand attack)
+    {
+        var pendingTargets = GetData().PendingDexterityCounterTargets;
+        if (pendingTargets.TryGetValue(attack, out var existing))
+            return existing;
+
+        existing = [];
+        pendingTargets[attack] = existing;
+        return existing;
     }
 
     private void ApplyEnergyDisorderForCurrentHand(Player player, int globalTurnCounter)
@@ -786,22 +815,6 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
             await CreatureCmdCompat.Damage(choiceContext, creature!, ThundercloudDamage, ValueProp.Move, null, null);
     }
 
-    private async Task ResolveDexterityCounter(CombatState combatState)
-    {
-        foreach (var player in GetStablePlayers())
-        {
-            var creature = player.Creature;
-            if (creature == null || creature.IsDead)
-                continue;
-
-            var state = GetEnemyTurnPlayerState(player);
-            if (creature.Block <= 0m && state.TookRealDamage)
-                continue;
-
-            await PowerCmd.Apply<CounterPower>(creature, 1m, creature, null, false);
-        }
-    }
-
     private async Task GrantArbitrageGold(int intervals)
     {
         foreach (var player in GetStablePlayers())
@@ -979,13 +992,29 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
         var data = GetData();
         data.TurnStates.Clear();
         data.PendingCardFlags.Clear();
+        data.PendingDexterityCounterTargets.Clear();
         foreach (var entry in data.EnergyDisorderEntries)
             entry.Card.InvokeEnergyCostChanged();
         data.EnergyDisorderEntries.Clear();
-        data.EnemyTurnPlayerStates.Clear();
         data.PendingPreciseSelectionDrawCounts.Clear();
         data.PendingPreciseSelectionTurnSeeds.Clear();
-        data.TrackingEnemyTurn = false;
+    }
+
+    internal int GetCardsPlayedThisTurn(Player player)
+    {
+        return GetOrCreateTurnState(player).CardsPlayed;
+    }
+
+    internal static bool ShouldBlockOverloadManualPlay(CardModel? card)
+    {
+        var owner = card?.Owner;
+        if (owner?.Creature?.CombatState == null ||
+            owner.RunState is not MegaCrit.Sts2.Core.Runs.RunState runState ||
+            !FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.Overload))
+            return false;
+
+        var modifier = runState.Modifiers.OfType<FinalArenaDistortionComponentModifier>().FirstOrDefault();
+        return modifier != null && modifier.GetCardsPlayedThisTurn(owner) >= OverloadMaxCardsPerTurn;
     }
 
     private static int FindCardIndex(IReadOnlyList<CardModel> cards, CardModel target)
