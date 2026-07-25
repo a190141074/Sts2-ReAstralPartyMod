@@ -13,7 +13,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
  * 红温警告
  * 所有玩家获�?活力
  */
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 10)]
 public class EventRedHeatWarning : AstralPartyCardModel
 {

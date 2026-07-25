@@ -10,7 +10,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 12)]
 public class EventThunderApproaches : AstralPartyCardModel
 {

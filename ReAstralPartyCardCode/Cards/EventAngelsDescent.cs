@@ -12,7 +12,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
  * 蒸蛋事件�? * 对全场单位恢复生命�? */
 
 // 加入哪个卡池
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 0)]
 public class EventAngelsDescent : AstralPartyCardModel
 {

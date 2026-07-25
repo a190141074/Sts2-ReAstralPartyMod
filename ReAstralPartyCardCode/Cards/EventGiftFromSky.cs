@@ -13,7 +13,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 // 5. 天降之物：给所有友方单位抽牌并获得星光
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 7)]
 public class EventGiftFromSky : AstralPartyCardModel
 {

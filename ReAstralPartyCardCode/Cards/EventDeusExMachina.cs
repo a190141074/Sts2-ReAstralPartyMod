@@ -12,7 +12,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 /*
  * 天降神兵
  * 从所有的事件�?除了机械降神)选择一张事件卡，打出两�? */
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 2)]
 public class EventDeusExMachina : AstralPartyCardModel
 {

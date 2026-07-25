@@ -9,7 +9,6 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 100)]
 public class EventsConcealingInvestigationA : AstralPartyCardModel
 {

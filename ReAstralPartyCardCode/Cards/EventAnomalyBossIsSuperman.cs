@@ -9,7 +9,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 205)]
 public class EventAnomalyBossIsSuperman : AstralPartyCardModel
 {

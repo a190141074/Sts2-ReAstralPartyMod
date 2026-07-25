@@ -8,7 +8,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 201)]
 public class EventAnomalyBugAgain : AstralPartyCardModel
 {

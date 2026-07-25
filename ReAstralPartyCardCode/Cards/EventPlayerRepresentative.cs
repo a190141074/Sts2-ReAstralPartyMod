@@ -16,7 +16,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
  * 触发者立刻进行一次骰�? * 4~6你获�?星光，其他玩家获�?星光
  * 1~3你受�?伤害，其他玩家受�?伤害
  */
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 9)]
 public class EventPlayerRepresentative : AstralPartyCardModel
 {

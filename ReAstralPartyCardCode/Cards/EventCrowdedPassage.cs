@@ -14,7 +14,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 // 4. 拥挤通道：给所有友方单位上一层缓�?易伤
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 1)]
 public class EventCrowdedPassage : AstralPartyCardModel
 {

@@ -12,7 +12,6 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 /*
  * 食品安全：全场单位获得中�? */
-[RegisterCard(typeof(EventCardPool))]
 [RegisterCard(typeof(AstralEventCardPool), Order = 5)]
 public class EventFoodSafety : AstralPartyCardModel
 {
