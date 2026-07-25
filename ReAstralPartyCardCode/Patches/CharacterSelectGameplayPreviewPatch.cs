@@ -171,6 +171,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private CheckButton? _variantPersonasToggle;
     private CheckButton? _allVariantPersonasToggle;
     private CheckButton? _extremeModeToggle;
+    private CheckButton? _mechTideModeToggle;
     private OptionButton? _startingPersonaModeOption;
     private OptionButton? _neowExtraOptionSelectionModeOption;
     private OptionButton? _tokenSeriesModeOption;
@@ -412,6 +413,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             ReAstralPartyModSettingsManager.GetTokenSeriesModeDescription,
             out _tokenSeriesModeOption,
             OnTokenSeriesModeSelected));
+        body.AddChild(BuildBooleanRow(
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.label"),
+            GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.description"),
+            out _mechTideModeToggle,
+            OnEnableMechTideModeToggled));
 
         var spacer = new Control
         {
@@ -908,6 +914,13 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 _tokenSeriesModeOption.Disabled = !isEditable;
             }
 
+            if (_mechTideModeToggle != null)
+            {
+                _mechTideModeToggle.ButtonPressed = snapshot.EnableMechTideMode;
+                _mechTideModeToggle.Disabled = !isEditable;
+                _mechTideModeToggle.Text = snapshot.EnableMechTideMode ? "ON" : "OFF";
+            }
+
             if (_footerLabel != null)
             {
                 var footer = role switch
@@ -1002,14 +1015,16 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From(snapshot.EnableCollectorsCards),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
             Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableVariantPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
-            Variant.From((int)snapshot.StartingPersonMode), Variant.From((int)snapshot.TokenSeriesMode));
+            Variant.From((int)snapshot.StartingPersonMode), Variant.From((int)snapshot.TokenSeriesMode),
+            Variant.From(snapshot.EnableMechTideMode));
     }
 
     private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint, bool enableStartingAstralRelicStore, bool enableStartingPersonaSelection,
         bool enableJewelryRelics, bool enableNeowExtraOption,
         bool enableCollectorsCards,
         int neowExtraOptionSelectionMode,
-        bool enableAllPersonas, bool enableVariantPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode)
+        bool enableAllPersonas, bool enableVariantPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode,
+        bool enableMechTideMode)
     {
         ApplySnapshotToUi(new LobbyGameplaySettingsSnapshot
         {
@@ -1034,7 +1049,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 : StartingPersonMode.Standard,
             TokenSeriesMode = Enum.IsDefined(typeof(TokenSeriesMode), tokenSeriesMode)
                 ? (TokenSeriesMode)tokenSeriesMode
-                : TokenSeriesMode.RandomTwo
+                : TokenSeriesMode.RandomTwo,
+            EnableMechTideMode = enableMechTideMode
         });
     }
 
@@ -1171,6 +1187,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
         var selectedMode = TokenSeriesModes[selectedIndex];
         LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.TokenSeriesMode = selectedMode);
+        LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
+    }
+
+    private void OnEnableMechTideModeToggled(bool value)
+    {
+        if (_suppressUiEvents || !IsEditableByLocalPlayer(GetCurrentRoleForUi()))
+            return;
+
+        LobbyGameplaySettingsSync.UpdateLocalLobbySnapshot(snapshot => snapshot.EnableMechTideMode = value);
         LobbyGameplaySettingsSync.BroadcastCurrentSnapshot();
     }
 

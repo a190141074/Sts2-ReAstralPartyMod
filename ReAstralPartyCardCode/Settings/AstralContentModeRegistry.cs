@@ -16,6 +16,7 @@ public enum AstralGameplaySettingKey
     StartingPersonaSelection = 2,
     StartingPersonMode = 3,
     TokenSeriesMode = 4,
+    MechTideMode = 16,
     AllPersonas = 5,
     ExtremeMode = 6,
     VariantPersonas = 7,
@@ -95,6 +96,13 @@ public static class AstralContentModeRegistry
             "token_series_mode",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.label",
             "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.description",
+            AstralModeAvailability.Editable,
+            AstralModeAvailability.Editable),
+        new(
+            AstralGameplaySettingKey.MechTideMode,
+            "enable_mech_tide_mode",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.label",
+            "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.description",
             AstralModeAvailability.Editable,
             AstralModeAvailability.Editable),
         new(

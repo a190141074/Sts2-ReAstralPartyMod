@@ -380,9 +380,11 @@ public static class FinalArenaSeriesHelper
             obtainedNow = true;
         }
 
-        stunGun.AstralParty_TokenExclusiveStunGunMindStacks = obtainedNow
-            ? StunGunInitialMind
-            : Math.Max(stunGun.AstralParty_TokenExclusiveStunGunMindStacks, StunGunInitialMind);
+        if (obtainedNow)
+            stunGun.AstralParty_TokenExclusiveStunGunMindStacks = StunGunInitialMind;
+        else
+            stunGun.EnsureMinimumMindStacks(StunGunInitialMind);
+
         stunGun.NotifyDisplayAmountChanged();
 
         if (player.Creature?.CombatState != null)

@@ -116,6 +116,8 @@ public sealed class ReAstralPartyModSettings
 
         public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
 
+        public bool EnableMechTideMode { get; set; }
+
         public AstralModeScopedGameplaySettings Clone()
         {
             return new AstralModeScopedGameplaySettings
@@ -132,7 +134,8 @@ public sealed class ReAstralPartyModSettings
                 EnableVariantPersons = EnableVariantPersons,
                 EnableAllVariantPersons = EnableAllVariantPersons,
                 StartingPersonMode = StartingPersonMode,
-                TokenSeriesMode = TokenSeriesMode
+                TokenSeriesMode = TokenSeriesMode,
+                EnableMechTideMode = EnableMechTideMode
             };
         }
     }
@@ -286,6 +289,7 @@ public sealed class ReAstralPartyModSettings
     public bool? EnableAllTokenSeries { get; set; }
 
     public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
+    public bool EnableMechTideMode { get; set; }
 
     public bool EnablePureAngelMode { get; set; } = true;
 
@@ -335,6 +339,7 @@ public static partial class ReAstralPartyModSettingsManager
         ReadRuntime(settings => settings.StartingPersonMode);
 
     public static TokenSeriesMode TokenSeriesMode => ReadRuntime(settings => settings.TokenSeriesMode);
+    public static bool EnableMechTideMode => ReadRuntime(settings => settings.EnableMechTideMode);
 
     public static bool EnablePureAngelMode => ReadRuntime(settings => settings.EnablePureAngelMode);
 
@@ -758,6 +763,23 @@ public static partial class ReAstralPartyModSettingsManager
         return TokenSeriesMode;
     }
 
+    public static bool GetEnableMechTideMode(IRunState? runState)
+    {
+        if (TryGetRunSnapshot(runState, out var snapshot))
+            return snapshot.EnableMechTideMode;
+
+        if (TryGetLobbyGameplaySnapshot(out var lobbySnapshot))
+            return lobbySnapshot.EnableMechTideMode;
+
+        if (TryGetLocalAuthorityGameplayFallback(runState, out var localFallback))
+            return localFallback.EnableMechTideMode;
+
+        if (ShouldUseSafeGameplayFallback(runState))
+            return false;
+
+        return EnableMechTideMode;
+    }
+
     public static bool GetEnablePureAngelMode(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
@@ -1100,6 +1122,23 @@ public static partial class ReAstralPartyModSettingsManager
                 ShowTokenSeriesModeToast(value);
             });
 
+        var enableMechTideMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
+            MainFile.ModId,
+            SettingsKey,
+            settings =>
+            {
+                EnsureContentModeSettingsInitialized(settings);
+                return GetScopedSettingsForCurrentMode(settings).EnableMechTideMode;
+            },
+            (settings, value) =>
+            {
+                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableMechTideMode = value);
+                ApplyRuntimeSettings(settings, "enable_mech_tide_mode");
+                ShowBoolSettingToast(
+                    "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.label",
+                    value);
+            });
+
         var startingPersonaMode = ModSettingsBindings.Global<ReAstralPartyModSettings, StartingPersonMode>(
             MainFile.ModId,
             SettingsKey,
@@ -1430,10 +1469,21 @@ public static partial class ReAstralPartyModSettingsManager
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.description",
                         "Choose whether runs use two random expansions, all expansions, or no expansion series at all."),
                     ModSettingsChoicePresentation.Dropdown)
+                .AddToggle(
+                    "enable_mech_tide_mode",
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.label", "Enable Mech Tide Mode"),
+                    enableMechTideMode,
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.description",
+                        "Force this run to open only the Final Arena expansion series."))
                 .WithEntryEnabledWhen("enable_variant_personas", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.VariantPersonas,
+                        roomSurface: false) == AstralModeAvailability.Editable)
+                .WithEntryEnabledWhen("enable_mech_tide_mode", () =>
+                    AstralContentModeRegistry.GetAvailability(
+                        GetCurrentContentMode(),
+                        AstralGameplaySettingKey.MechTideMode,
                         roomSurface: false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_all_variant_personas", () =>
                     AstralContentModeRegistry.GetAvailability(
@@ -2257,7 +2307,8 @@ public static partial class ReAstralPartyModSettingsManager
             EnableVariantPersons = settings.EnableVariantPersons,
             EnableAllVariantPersons = settings.EnableAllVariantPersons,
             StartingPersonMode = ResolveStartingPersonaMode(settings),
-            TokenSeriesMode = ResolveTokenSeriesModeCore(settings)
+            TokenSeriesMode = ResolveTokenSeriesModeCore(settings),
+            EnableMechTideMode = settings.EnableMechTideMode
         };
     }
 
@@ -2277,7 +2328,8 @@ public static partial class ReAstralPartyModSettingsManager
             EnableVariantPersons = false,
             EnableAllVariantPersons = false,
             StartingPersonMode = StartingPersonMode.Standard,
-            TokenSeriesMode = TokenSeriesMode.RandomTwo
+            TokenSeriesMode = TokenSeriesMode.RandomTwo,
+            EnableMechTideMode = false
         };
     }
 
@@ -2317,6 +2369,7 @@ public static partial class ReAstralPartyModSettingsManager
         settings.EnableAllVariantPersons = modpack.EnableAllVariantPersons;
         settings.StartingPersonMode = modpack.StartingPersonMode;
         settings.TokenSeriesMode = modpack.TokenSeriesMode;
+        settings.EnableMechTideMode = modpack.EnableMechTideMode;
     }
 
     private static bool NormalizeCurrentModeScopedSettings(ReAstralPartyModSettings settings)
@@ -2338,6 +2391,7 @@ public static partial class ReAstralPartyModSettingsManager
             value => vanilla.NeowExtraOptionSelectionMode = value);
         changed |= SetIfDifferent(vanilla.EnableVariantPersons, defaults.EnableVariantPersons, value => vanilla.EnableVariantPersons = value);
         changed |= SetIfDifferent(vanilla.EnableAllVariantPersons, defaults.EnableAllVariantPersons, value => vanilla.EnableAllVariantPersons = value);
+        changed |= SetIfDifferent(vanilla.EnableMechTideMode, defaults.EnableMechTideMode, value => vanilla.EnableMechTideMode = value);
 
         return changed;
     }
@@ -2425,6 +2479,7 @@ public static partial class ReAstralPartyModSettingsManager
         public bool EnableNeowDiagnosticsNotifications { get; init; } = true;
 
         public TokenSeriesMode TokenSeriesMode { get; init; } = TokenSeriesMode.RandomTwo;
+        public bool EnableMechTideMode { get; init; }
 
         public bool EnablePureAngelMode { get; init; } = true;
 
@@ -2448,8 +2503,8 @@ public static partial class ReAstralPartyModSettingsManager
         {
             EnsureContentModeSettingsInitialized(settings);
             var scoped = GetScopedSettingsForCurrentMode(settings);
-            return new LocalRuntimeSettings
-            {
+        return new LocalRuntimeSettings
+        {
                 BannedRelicIds = DeserializeModelIdSet(ResolveBannedRelicIds(settings)),
                 CurrentContentMode = AstralContentModeRegistry.NormalizeMode(settings.CurrentContentMode),
                 EnableExtremeMode = scoped.EnableExtremeMode,
@@ -2478,6 +2533,7 @@ public static partial class ReAstralPartyModSettingsManager
                 EnableTokenRelicNotifications = settings.EnableTokenRelicNotifications,
                 EnableNeowDiagnosticsNotifications = settings.EnableNeowDiagnosticsNotifications,
                 TokenSeriesMode = scoped.TokenSeriesMode,
+                EnableMechTideMode = scoped.EnableMechTideMode,
                 EnablePureAngelMode = settings.EnablePureAngelMode,
                 LobbyPanelState = new LobbyPanelStateSnapshot
                 {

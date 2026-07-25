@@ -119,6 +119,7 @@ public sealed class LobbyGameplaySettingsSnapshot
     public StartingPersonMode StartingPersonMode { get; set; } = StartingPersonMode.Standard;
 
     public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
+    public bool EnableMechTideMode { get; set; }
 
 
 
@@ -175,6 +176,7 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableExtremeMode = EnableExtremeMode,
             StartingPersonMode = StartingPersonMode,
             TokenSeriesMode = TokenSeriesMode,
+            EnableMechTideMode = EnableMechTideMode,
             BannedRelicIdsSerialized = [.. BannedRelicIdsSerialized]
         };
     }
@@ -198,6 +200,7 @@ public sealed class LobbyGameplaySettingsSnapshot
             EnableExtremeMode = ReAstralPartyModSettingsManager.EnableExtremeMode,
             StartingPersonMode = ReAstralPartyModSettingsManager.ConfiguredStartingPersonaMode,
             TokenSeriesMode = ReAstralPartyModSettingsManager.TokenSeriesMode,
+            EnableMechTideMode = ReAstralPartyModSettingsManager.EnableMechTideMode,
             BannedRelicIdsSerialized = [.. ReAstralPartyModSettingsManager.GetBannedRelicIds(null)
                 .Where(static id => id != ModelId.none)
                 .Select(static id => id.ToString())
@@ -463,7 +466,7 @@ internal static class LobbyGameplaySettingsSync
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 20;
+    private const int SchemaVersion = 21;
 
     public AstralContentMode CurrentContentMode { get; set; }
     public bool EnableStartingInitialPoint { get; set; }
@@ -479,6 +482,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     public bool EnableExtremeMode { get; set; }
     public StartingPersonMode StartingPersonMode { get; set; }
     public TokenSeriesMode TokenSeriesMode { get; set; }
+    public bool EnableMechTideMode { get; set; }
     public List<string> BannedRelicIdsSerialized { get; set; }
 
     public AstralLobbyGameplaySettingsSnapshotMessage(LobbyGameplaySettingsSnapshot snapshot)
@@ -497,6 +501,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableExtremeMode = snapshot.EnableExtremeMode;
         StartingPersonMode = snapshot.StartingPersonMode;
         TokenSeriesMode = snapshot.TokenSeriesMode;
+        EnableMechTideMode = snapshot.EnableMechTideMode;
         BannedRelicIdsSerialized =
         [
             .. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(snapshot.BannedRelicIdsSerialized)
@@ -525,6 +530,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         writer.WriteBool(EnableExtremeMode);
         writer.WriteEnum(StartingPersonMode);
         writer.WriteEnum(TokenSeriesMode);
+        writer.WriteBool(EnableMechTideMode);
         writer.WriteInt(BannedRelicIdsSerialized.Count);
         foreach (var bannedRelicId in BannedRelicIdsSerialized)
             writer.WriteString(bannedRelicId);
@@ -553,6 +559,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableExtremeMode = reader.ReadBool();
         StartingPersonMode = reader.ReadEnum<StartingPersonMode>();
         TokenSeriesMode = reader.ReadEnum<TokenSeriesMode>();
+        EnableMechTideMode = reader.ReadBool();
         var count = reader.ReadInt();
         var bannedRelicIds = new List<string>(count);
         for (var index = 0; index < count; index++)
@@ -578,6 +585,7 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
             EnableExtremeMode = EnableExtremeMode,
             StartingPersonMode = StartingPersonMode,
             TokenSeriesMode = TokenSeriesMode,
+            EnableMechTideMode = EnableMechTideMode,
             BannedRelicIdsSerialized =
             [
                 .. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(BannedRelicIdsSerialized)

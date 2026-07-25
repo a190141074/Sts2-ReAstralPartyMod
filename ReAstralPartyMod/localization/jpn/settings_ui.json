@@ -112,6 +112,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all.description": "このビューローはすべての拡張シリーズをアクティブにします。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled": "拡張機能を無効にする",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled.description": "このビューローは拡張シリーズをアクティベートしません。",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.label": "智械狂潮モード",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.description": "有効にすると、このラウンドの拡張シリーズは【シリーズ・決賽大賽場】だけになります。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_host": "現在の部屋にのみ有効",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_client": "ホストによって制御され、現在のルームでのみ有効です",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.hover_title": "【スターエンジン・遊び方設定】",

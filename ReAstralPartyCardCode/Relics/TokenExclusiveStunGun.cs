@@ -21,8 +21,9 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class TokenExclusiveStunGun : AstralPartyRelicModel
 {
     private const decimal MindOnEliteKill = 1m;
+    private const int MinimumMindStacks = 1;
 
-    [SavedProperty] public int AstralParty_TokenExclusiveStunGunMindStacks { get; set; }
+    [SavedProperty] public int AstralParty_TokenExclusiveStunGunMindStacks { get; set; } = MinimumMindStacks;
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
@@ -30,10 +31,24 @@ public class TokenExclusiveStunGun : AstralPartyRelicModel
 
     public override bool ShowCounter => true;
 
-    public override int DisplayAmount => AstralParty_TokenExclusiveStunGunMindStacks;
+    public override int DisplayAmount => GetNormalizedMindStacks();
 
     internal void NotifyDisplayAmountChanged()
     {
+        InvokeDisplayAmountChanged();
+    }
+
+    internal int GetNormalizedMindStacks()
+    {
+        return Math.Max(AstralParty_TokenExclusiveStunGunMindStacks, MinimumMindStacks);
+    }
+
+    internal void EnsureMinimumMindStacks(int minimumMindStacks = MinimumMindStacks)
+    {
+        if (AstralParty_TokenExclusiveStunGunMindStacks >= minimumMindStacks)
+            return;
+
+        AstralParty_TokenExclusiveStunGunMindStacks = minimumMindStacks;
         InvokeDisplayAmountChanged();
     }
 
@@ -47,9 +62,10 @@ public class TokenExclusiveStunGun : AstralPartyRelicModel
 
     public override async Task BeforeCombatStart()
     {
-        if (Owner?.Creature == null || AstralParty_TokenExclusiveStunGunMindStacks <= 0)
+        if (Owner?.Creature == null)
             return;
 
+        EnsureMinimumMindStacks();
         Flash();
         await PowerCmd.Apply<MindPower>(
             Owner.Creature,
@@ -76,7 +92,7 @@ public class TokenExclusiveStunGun : AstralPartyRelicModel
         if (Owner.Creature.CombatState?.Encounter?.RoomType != RoomType.Elite)
             return;
 
-        AstralParty_TokenExclusiveStunGunMindStacks++;
+        AstralParty_TokenExclusiveStunGunMindStacks = GetNormalizedMindStacks() + 1;
         Flash();
         InvokeDisplayAmountChanged();
         await PowerCmd.Apply<MindPower>(Owner.Creature, MindOnEliteKill, Owner.Creature, cardSource, false);

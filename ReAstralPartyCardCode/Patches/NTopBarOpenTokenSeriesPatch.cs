@@ -139,6 +139,7 @@ public static partial class NTopBarOpenTokenSeriesPatch
             iconRoot.AddChild(textureRect);
             iconRoot.Connect(Control.SignalName.MouseEntered, Callable.From(onMouseEntered));
             iconRoot.Connect(Control.SignalName.MouseExited, Callable.From(onMouseExited));
+            iconRoot.GuiInput += @event => OnIconGuiInput(@event, name);
 
             if (name == "SeriesIcon")
                 _seriesIcon = texture;
@@ -161,6 +162,26 @@ public static partial class NTopBarOpenTokenSeriesPatch
         private void OnMouseExited()
         {
             NHoverTipSet.Remove(this);
+        }
+
+        private void OnIconGuiInput(InputEvent @event, string iconName)
+        {
+            if (@event is not InputEventMouseButton
+                {
+                    ButtonIndex: MouseButton.Right,
+                    Pressed: true,
+                    DoubleClick: false
+                })
+            {
+                return;
+            }
+
+            if (iconName == "DistortionIcon")
+                ShowHoverTips(FinalArenaSeriesHelper.BuildDistortionHoverTips(_runState, _distortionIcon), 56f);
+            else
+                ShowHoverTips(TokenSeriesAvailabilityHelper.BuildHoverTips(_runState, _seriesIcon), 0f);
+
+            AcceptEvent();
         }
 
         private void ShowHoverTips(IReadOnlyList<IHoverTip> hoverTips, float xOffset)

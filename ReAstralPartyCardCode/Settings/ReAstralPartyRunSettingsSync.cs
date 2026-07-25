@@ -39,6 +39,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
     public StartingPersonMode StartingPersonMode { get; set; } = StartingPersonMode.Standard;
 
     public TokenSeriesMode TokenSeriesMode { get; set; } = TokenSeriesMode.RandomTwo;
+    public bool EnableMechTideMode { get; set; }
 
     public bool EnablePureAngelMode { get; set; } = true;
 
@@ -119,6 +120,7 @@ public sealed class ReAstralPartyRunSettingsSnapshot
             EnableAllVariantPersonas = EnableAllVariantPersonas,
             StartingPersonMode = StartingPersonMode,
             TokenSeriesMode = TokenSeriesMode,
+            EnableMechTideMode = EnableMechTideMode,
             EnablePureAngelMode = EnablePureAngelMode,
             BannedRelicIdsSerialized = [.. BannedRelicIdsSerialized]
         };
@@ -198,6 +200,7 @@ internal static class ReAstralPartyRunSettingsSync
         snapshot.EnableAllVariantPersons = lobbySnapshot.EnableAllVariantPersons;
         snapshot.StartingPersonMode = lobbySnapshot.StartingPersonMode;
         snapshot.TokenSeriesMode = lobbySnapshot.TokenSeriesMode;
+        snapshot.EnableMechTideMode = lobbySnapshot.EnableMechTideMode;
         snapshot.EnableExtremeMode = lobbySnapshot.EnableExtremeMode;
         snapshot.BannedRelicIdsSerialized = [.. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(
             lobbySnapshot.BannedRelicIdsSerialized)]
@@ -229,6 +232,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableAllVariantPersons = ReAstralPartyModSettingsManager.EnableAllVariantPersons,
             StartingPersonMode = ReAstralPartyModSettingsManager.ConfiguredStartingPersonaMode,
             TokenSeriesMode = ReAstralPartyModSettingsManager.TokenSeriesMode,
+            EnableMechTideMode = ReAstralPartyModSettingsManager.EnableMechTideMode,
             EnablePureAngelMode = ReAstralPartyModSettingsManager.EnablePureAngelMode,
             BannedRelicIdsSerialized = [.. ReAstralPartyModSettingsManager.GetBannedRelicIds(null)
                 .Where(static id => id != MegaCrit.Sts2.Core.Models.ModelId.none)
@@ -326,6 +330,7 @@ internal static class ReAstralPartyRunSettingsSync
             EnableAllVariantPersonas = lobbySnapshot.EnableAllVariantPersonas,
             StartingPersonMode = lobbySnapshot.StartingPersonMode,
             TokenSeriesMode = lobbySnapshot.TokenSeriesMode,
+            EnableMechTideMode = lobbySnapshot.EnableMechTideMode,
             EnablePureAngelMode = settings.EnablePureAngelMode,
             BannedRelicIdsSerialized =
             [

@@ -112,6 +112,8 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all.description": "Enable every expansion series for this room.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled": "Disable Expansions",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled.description": "Disable all expansion series for this room.",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.label": "Enable Mech Tide Mode",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.description": "When enabled, force this run to use only the Final Arena expansion series.",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_host": "Applies to this room only",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_client": "Controlled by the host, applies to this room only",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.hover_title": "[Astral Gameplay Settings]",

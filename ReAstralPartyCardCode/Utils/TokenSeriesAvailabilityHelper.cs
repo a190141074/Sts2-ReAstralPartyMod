@@ -182,6 +182,12 @@ public static class TokenSeriesAvailabilityHelper
         if (runState == null)
             return false;
 
+        if (ReAstralPartyModSettingsManager.GetEnableMechTideMode(runState))
+        {
+            state = new TokenSeriesAvailabilityState([TokenSeries.FinalArena]);
+            return true;
+        }
+
         if (TryGetManualOverrideState(runState, out state))
             return true;
 
