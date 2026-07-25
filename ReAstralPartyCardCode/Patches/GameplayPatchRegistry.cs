@@ -434,6 +434,7 @@ internal static class GameplayDeferredPatchCatalog
 {
     public static void RegisterAll(ModPatcher patcher)
     {
+        patcher.RegisterPatch<ReAstralPartyRunSettingsStartPatch>();
         patcher.RegisterPatch<StartingPersonRelicSelectionPatch>();
         patcher.RegisterPatches(
         [

@@ -69,17 +69,8 @@ public static class JunkBotQuestIconHelper
 
     public static int ReapplyMarkedQuestsAndIcons(NMapScreen mapScreen)
     {
-        if (!GodotObject.IsInstanceValid(mapScreen))
-            return 0;
-
         var runState = MapScreenRunStateField(mapScreen);
         if (runState == null)
-            return 0;
-        if (runState.Map == null)
-            return 0;
-        if (mapScreen.GetTree() == null)
-            return 0;
-        if (!runState.Players.Any(player => player.GetRelic<PersonJunkBot>() != null))
             return 0;
 
         foreach (var player in runState.Players)
@@ -115,11 +106,6 @@ public static class JunkBotQuestIconHelper
 
     public static void RefreshMapPointVisuals(NMapScreen mapScreen)
     {
-        if (!GodotObject.IsInstanceValid(mapScreen))
-            return;
-        if (mapScreen.GetTree() == null)
-            return;
-
         var mapPointDictionaryField = AccessTools.Field(typeof(NMapScreen), "_mapPointDictionary");
         if (mapPointDictionaryField?.GetValue(mapScreen) is not IDictionary<MapCoord, NMapPoint> mapPointDictionary)
             return;

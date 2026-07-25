@@ -129,6 +129,11 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 
 - 对联机或战斗异常，先抓最早的硬错误，再区分是否还伴随 checksum divergence。
 - 不要拿分叉症状代替根因。
+- 默认优先看“最新带时间戳日志里的第一条硬错误”，不要先被外层 async 包装栈、后续连锁报错或滚动 `godot.log` 里的旧噪音带跑。
+- 如果故障是在某轮最近修改之后才出现，默认先沿“最近改动链”排查；除非最新日志里的更早硬错误已经明确指向别处，否则不要优先翻旧系统。
+- 启动期的 topbar / hover / summary / debug display 不是“无害 UI”：只要它们在 `_Ready`、`Initialize`、run bootstrap 或 map/topbar 初始化阶段执行，就按主流程代码处理，任何 `ModelDb` / 本地化 /资源读取都必须允许安全失败。
+- 做内容迁移、删包或拆独立模组后，默认一起复核“运行时注册表 + 系列映射表 + topbar/hover/debug summary + fallback 文案表”；不要只删玩法入口，遗漏展示链中的旧 `ModelId`。
+- 如果沿错误方向做了试探性修改，一旦最新日志证明根因不在那条链上，就应立即回退这部分无关改动，再收口到真正相关的最近改动链；不要把误判修补继续留在工作树里。
 - 战斗 hook 里只要遍历目标集合时可能造成击杀、移除、融化、power 移除、队列改写，就优先怀疑 live collection mutation。
 - 默认先快照再结算，不要边遍历边调用可能改集合的命令。
 

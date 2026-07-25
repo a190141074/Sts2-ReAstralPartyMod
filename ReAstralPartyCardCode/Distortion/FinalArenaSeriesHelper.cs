@@ -122,6 +122,26 @@ public static class FinalArenaSeriesHelper
             FinalArenaDistortionComponentSync.BroadcastState(runState);
     }
 
+    public static bool EnsureInitializedForUi(
+        RunState runState,
+        bool allowGenerateIfMissing = true)
+    {
+        if (!IsFinalArenaOpen(runState))
+            return false;
+
+        var runData = GetOrCreateRunData(runState);
+        if (TryDeserializeComponents(runData.ComponentsJson, out var components) && components.Count > 0)
+            return true;
+
+        if (!allowGenerateIfMissing)
+            return false;
+
+        components = GenerateComponents(runState);
+        runData.ComponentsJson = SerializeComponents(components);
+        _runData.Set(runState, runData);
+        return true;
+    }
+
     public static bool TryGetActiveComponents(
         IRunState? runState,
         out IReadOnlyList<FinalArenaDistortionComponent> components)

@@ -344,9 +344,19 @@ public static class TokenSeriesAvailabilityHelper
 
     public static IReadOnlyList<RelicModel> GetSeriesRelics(TokenSeries series)
     {
-        return RelicIdsBySeries.TryGetValue(series, out var relicIds)
-            ? relicIds.Select(ModelDb.GetById<RelicModel>).ToList()
-            : [];
+        if (!RelicIdsBySeries.TryGetValue(series, out var relicIds))
+            return [];
+
+        var relics = new List<RelicModel>(relicIds.Count);
+        foreach (var relicId in relicIds)
+        {
+            if (!TryResolveSeriesRelic(relicId, series, out var relic))
+                continue;
+
+            relics.Add(relic);
+        }
+
+        return relics;
     }
 
     public static IReadOnlyList<IHoverTip> BuildHoverTips(IRunState? runState, Texture2D? icon)
@@ -427,9 +437,23 @@ public static class TokenSeriesAvailabilityHelper
 
     private static IReadOnlyList<string> GetSeriesRelicTitles(TokenSeries series)
     {
-        return GetSeriesRelics(series)
-            .Select(ResolveRelicTitle)
-            .ToList();
+        if (!RelicIdsBySeries.TryGetValue(series, out var relicIds))
+            return [];
+
+        var titles = new List<string>(relicIds.Count);
+        foreach (var relicId in relicIds)
+        {
+            if (TryResolveSeriesRelic(relicId, series, out var relic))
+            {
+                titles.Add(ResolveRelicTitle(relic));
+                continue;
+            }
+
+            if (FallbackRelicTitles.TryGetValue(relicId, out var fallbackTitle))
+                titles.Add(fallbackTitle);
+        }
+
+        return titles;
     }
 
     private static HoverTip BuildSeriesHoverTip(TokenSeries series, int extensionIndex, Texture2D? icon)
@@ -473,6 +497,22 @@ public static class TokenSeriesAvailabilityHelper
         return FallbackRelicTitles.TryGetValue(relicId, out var fallback)
             ? fallback
             : relicId.Entry;
+    }
+
+    private static bool TryResolveSeriesRelic(ModelId relicId, TokenSeries series, out RelicModel relic)
+    {
+        try
+        {
+            relic = ModelDb.GetById<RelicModel>(relicId);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            relic = null!;
+            MainFile.Logger.Warn(
+                $"Open token series skipped missing relic model | series={series} relicId={relicId.Entry} error={ex.Message}");
+            return false;
+        }
     }
 
     public readonly record struct TokenSeriesAvailabilityState(IReadOnlyList<TokenSeries> OpenSeries)
