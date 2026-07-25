@@ -4,6 +4,7 @@ using MegaCrit.Sts2.Core.DevConsole.ConsoleCommands;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -129,7 +130,7 @@ public sealed class AstralDlcConsoleCmd : AbstractConsoleCmd
         try
         {
             if (openSeries.Contains(TokenSeriesAvailabilityHelper.TokenSeries.FinalArena))
-                await FinalArenaSeriesHelper.GrantStunGunIfNeeded(runState);
+                await FinalArenaSeriesHelper.EnsureInitializedAndAppliedAsync(runState, true, true);
         }
         catch (Exception ex)
         {

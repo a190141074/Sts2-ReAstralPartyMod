@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 using ReAstralPartyMod.ReAstralPartyCardCode.RestSite;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -123,6 +124,9 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
 
     private int GetCurrentAscensionCost()
     {
+        if (FinalArenaSeriesHelper.ShouldKeepInitialPointCostMinimum(Owner?.RunState))
+            return FirstAscensionCost;
+
         return AstralParty_TokenGoldInitialPointAscensionCount switch
         {
             0 => FirstAscensionCost,

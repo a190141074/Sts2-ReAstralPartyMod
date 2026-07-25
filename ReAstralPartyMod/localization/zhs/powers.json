@@ -343,5 +343,14 @@
   "RE_ASTRAL_PARTY_MOD_POWER_MIND_POWER.smartDescription": "层数大于[blue]3[/blue]时，[red]力量[/red]+[blue]2[/blue]，[green]敏捷[/green]+[blue]2[/blue]。",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.title": "进程",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.description": "在战斗结束时，根据层数转化为【人格：绿油油β】的[gold]步数[/gold]。\n若你持有【初始点】且其当前为[blue]1[/blue]/[blue]3[/blue]星，结算时额外+[blue]1[/blue]/[blue]3[/blue]步。",
-  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "战斗结束时，按层数转化为【人格：绿油油β】的[gold]步数[/gold]；【初始点】在[blue]1[/blue]/[blue]3[/blue]星时额外+[blue]1[/blue]/[blue]3[/blue]步。"
+  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "战斗结束时，按层数转化为【人格：绿油油β】的[gold]步数[/gold]；【初始点】在[blue]1[/blue]/[blue]3[/blue]星时额外+[blue]1[/blue]/[blue]3[/blue]步。",
+  "RE_ASTRAL_PARTY_MOD_POWER_PIRATE_KINGS_ORDER_POWER.title": "海盗王的号令",
+  "RE_ASTRAL_PARTY_MOD_POWER_PIRATE_KINGS_ORDER_POWER.description": "造成伤害+[blue]1[/blue]，受到伤害-[blue]1[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_POWER_PIRATE_KINGS_ORDER_POWER.smartDescription": "造成伤害+[blue]1[/blue]，受到伤害-[blue]1[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_POWER_TREASURE_BUCKET_POWER.title": "宝藏桶",
+  "RE_ASTRAL_PARTY_MOD_POWER_TREASURE_BUCKET_POWER.description": "首次受到致命伤害时，立刻回复[blue]5[/blue]点生命，获得[blue]99[/blue]层[gold]无实体[/gold]，并无法再获得格挡。\n击杀此单位的玩家会在战斗结束后的奖励中额外获得[blue]1[/blue]个随机筹码。",
+  "RE_ASTRAL_PARTY_MOD_POWER_TREASURE_BUCKET_POWER.smartDescription": "首次受到致命伤害时，回复[blue]5[/blue]点生命，获得[blue]99[/blue]层[gold]无实体[/gold]并无法再获得格挡。击杀者会在战后额外获得[blue]1[/blue]个随机筹码。",
+  "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.title": "接力棒",
+  "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.description": "获得[blue]2[/blue]点临时[red]力量[/red]、[blue]2[/blue]点临时[green]敏捷[/green]和[blue]2[/blue]点格挡。\n下个玩家回合开始时，将此效果转移给下一序号的玩家。",
+  "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.smartDescription": "获得[blue]2[/blue]点临时[red]力量[/red]、[blue]2[/blue]点临时[green]敏捷[/green]和[blue]2[/blue]点格挡；下个玩家回合开始时转移给下一序号玩家。"
 }

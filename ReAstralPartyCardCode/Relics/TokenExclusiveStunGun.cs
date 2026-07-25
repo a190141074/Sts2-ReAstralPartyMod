@@ -32,6 +32,11 @@ public class TokenExclusiveStunGun : AstralPartyRelicModel
 
     public override int DisplayAmount => AstralParty_TokenExclusiveStunGunMindStacks;
 
+    internal void NotifyDisplayAmountChanged()
+    {
+        InvokeDisplayAmountChanged();
+    }
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<MindPower>(),

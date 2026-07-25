@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
 using MegaCrit.Sts2.Core.Nodes.HoverTips;
 using MegaCrit.Sts2.Core.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 using ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -68,21 +69,57 @@ public static partial class NTopBarOpenTokenSeriesPatch
     private sealed partial class TokenSeriesTopBarIcon : Control
     {
         private readonly IRunState _runState;
-        private Texture2D? _icon;
+        private Texture2D? _seriesIcon;
+        private Texture2D? _distortionIcon;
 
         public TokenSeriesTopBarIcon(IRunState runState)
         {
             _runState = runState;
-            CustomMinimumSize = new Vector2(56f, 80f);
-            Size = new Vector2(56f, 80f);
-            MouseFilter = MouseFilterEnum.Stop;
+            var hasDistortionIcon = FinalArenaSeriesHelper.TryGetActiveComponents(_runState, out _);
+            var width = hasDistortionIcon ? 112f : 56f;
+            CustomMinimumSize = new Vector2(width, 80f);
+            Size = new Vector2(width, 80f);
+            MouseFilter = MouseFilterEnum.Ignore;
         }
 
         public override void _Ready()
         {
+            AddChild(CreateIconNode(
+                "SeriesIcon",
+                0f,
+                ResourceLoader.Load<Texture2D>("res://ReAstralPartyMod/images/astral_token.png"),
+                onMouseEntered: OnSeriesMouseEntered,
+                onMouseExited: OnMouseExited));
+
+            if (FinalArenaSeriesHelper.TryGetActiveComponents(_runState, out _))
+            {
+                AddChild(CreateIconNode(
+                    "DistortionIcon",
+                    56f,
+                    ResourceLoader.Load<Texture2D>("res://ReAstralPartyMod/images/ui/distortion_component_logo.png"),
+                    onMouseEntered: OnDistortionMouseEntered,
+                    onMouseExited: OnMouseExited));
+            }
+        }
+
+        private Control CreateIconNode(
+            string name,
+            float left,
+            Texture2D? texture,
+            Action onMouseEntered,
+            Action onMouseExited)
+        {
+            var iconRoot = new Control
+            {
+                Name = name,
+                Position = new Vector2(left, 0f),
+                Size = new Vector2(56f, 80f),
+                CustomMinimumSize = new Vector2(56f, 80f),
+                MouseFilter = MouseFilterEnum.Stop
+            };
             var textureRect = new TextureRect
             {
-                Name = "Icon",
+                Name = $"{name}_Texture",
                 CustomMinimumSize = new Vector2(48f, 48f),
                 MouseFilter = MouseFilterEnum.Ignore,
                 ExpandMode = TextureRect.ExpandModeEnum.FitWidthProportional,
@@ -97,19 +134,37 @@ public static partial class NTopBarOpenTokenSeriesPatch
                 OffsetBottom = 21f,
                 GrowHorizontal = GrowDirection.Both,
                 GrowVertical = GrowDirection.Both,
-                Texture = ResourceLoader.Load<Texture2D>("res://ReAstralPartyMod/images/astral_token.png")
+                Texture = texture
             };
-            AddChild(textureRect);
+            iconRoot.AddChild(textureRect);
+            iconRoot.Connect(Control.SignalName.MouseEntered, Callable.From(onMouseEntered));
+            iconRoot.Connect(Control.SignalName.MouseExited, Callable.From(onMouseExited));
 
-            _icon = textureRect.Texture;
+            if (name == "SeriesIcon")
+                _seriesIcon = texture;
+            else
+                _distortionIcon = texture;
 
-            Connect(Control.SignalName.MouseEntered, Callable.From(OnMouseEntered));
-            Connect(Control.SignalName.MouseExited, Callable.From(OnMouseExited));
+            return iconRoot;
         }
 
-        private void OnMouseEntered()
+        private void OnSeriesMouseEntered()
         {
-            var hoverTips = TokenSeriesAvailabilityHelper.BuildHoverTips(_runState, _icon);
+            ShowHoverTips(TokenSeriesAvailabilityHelper.BuildHoverTips(_runState, _seriesIcon), 0f);
+        }
+
+        private void OnDistortionMouseEntered()
+        {
+            ShowHoverTips(FinalArenaSeriesHelper.BuildDistortionHoverTips(_runState, _distortionIcon), 56f);
+        }
+
+        private void OnMouseExited()
+        {
+            NHoverTipSet.Remove(this);
+        }
+
+        private void ShowHoverTips(IReadOnlyList<IHoverTip> hoverTips, float xOffset)
+        {
             if (hoverTips.Count == 0)
                 return;
 
@@ -117,12 +172,7 @@ public static partial class NTopBarOpenTokenSeriesPatch
             if (tip == null)
                 return;
 
-            tip.GlobalPosition = GlobalPosition + new Vector2(0f, Size.Y + 20f);
-        }
-
-        private void OnMouseExited()
-        {
-            NHoverTipSet.Remove(this);
+            tip.GlobalPosition = GlobalPosition + new Vector2(xOffset, Size.Y + 20f);
         }
     }
 }

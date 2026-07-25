@@ -343,5 +343,14 @@
   "RE_ASTRAL_PARTY_MOD_POWER_MIND_POWER.smartDescription": "Above [blue]3[/blue] stacks, gain [blue]2[/blue] [red]Strength[/red] and [blue]2[/blue] [green]Dexterity[/green].",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.title": "Process",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.description": "At combat end, convert stacks into [gold]Steps[/gold] for [relic]Persona: Bionic Jasmine Beta[/relic].\nIf you own [relic]Initial Point[/relic] at [blue]1[/blue] or [blue]3[/blue] stars, gain an extra [blue]1[/blue] or [blue]3[/blue] steps.",
-  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "At combat end, convert stacks into [gold]Steps[/gold] for [relic]Persona: Bionic Jasmine Beta[/relic]. [relic]Initial Point[/relic] adds [blue]1[/blue]/[blue]3[/blue] extra steps at [blue]1[/blue]/[blue]3[/blue] stars."
+  "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "At combat end, convert stacks into [gold]Steps[/gold] for [relic]Persona: Bionic Jasmine Beta[/relic]. [relic]Initial Point[/relic] adds [blue]1[/blue]/[blue]3[/blue] extra steps at [blue]1[/blue]/[blue]3[/blue] stars.",
+  "RE_ASTRAL_PARTY_MOD_POWER_PIRATE_KINGS_ORDER_POWER.title": "Pirate King's Order",
+  "RE_ASTRAL_PARTY_MOD_POWER_PIRATE_KINGS_ORDER_POWER.description": "Deal [blue]+1[/blue] damage and take [blue]-1[/blue] damage.",
+  "RE_ASTRAL_PARTY_MOD_POWER_PIRATE_KINGS_ORDER_POWER.smartDescription": "Deal [blue]+1[/blue] damage and take [blue]-1[/blue] damage.",
+  "RE_ASTRAL_PARTY_MOD_POWER_TREASURE_BUCKET_POWER.title": "Treasure Bucket",
+  "RE_ASTRAL_PARTY_MOD_POWER_TREASURE_BUCKET_POWER.description": "The first time this unit would take lethal damage, it immediately heals [blue]5[/blue] HP, gains [blue]99[/blue] [power]Intangible[/power], and can no longer gain Block.\nThe player who kills it gains [blue]1[/blue] extra random token reward after combat.",
+  "RE_ASTRAL_PARTY_MOD_POWER_TREASURE_BUCKET_POWER.smartDescription": "The first lethal hit heals [blue]5[/blue] HP, grants [blue]99[/blue] [power]Intangible[/power], and prevents future Block gain. The killer gains [blue]1[/blue] extra random token after combat.",
+  "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.title": "Baton",
+  "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.description": "Gain [blue]2[/blue] temporary [red]Strength[/red], [blue]2[/blue] temporary [green]Dexterity[/green], and [blue]2[/blue] Block.\nAt the start of the next player's turn, transfer this effect to the next player in stable order.",
+  "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.smartDescription": "Gain [blue]2[/blue] temporary [red]Strength[/red], [blue]2[/blue] temporary [green]Dexterity[/green], and [blue]2[/blue] Block; transfer it at the next player's turn start."
 }

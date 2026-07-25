@@ -31,6 +31,7 @@ using STS2RitsuLib.Combat.HandSize;
 using STS2RitsuLib.Patching.Core;
 using STS2RitsuLib.Patching.Builders;
 using STS2RitsuLib.Patching.Models;
+using ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 
@@ -417,6 +418,8 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<ProphecySoulDevourSmithRestSitePatch>();
         patcher.RegisterPatch<RelicCollectionAddRelicsFilterPatch>();
         patcher.RegisterPatch<RelicCollectionLoadRelicNodesFilterPatch>();
+        patcher.RegisterPatch<CreatureGainBlockTreasureBucketPatch>();
+        patcher.RegisterPatch<PlayerLoseGoldUnexpectedWealthPatch>();
         patcher.RegisterPatch<ProprietressDoppelgangerShopRelicPurchasePatch>();
         patcher.RegisterPatch<ProprietressDoppelgangerShopCardPurchasePatch>();
         patcher.RegisterPatch<ProprietressDoppelgangerShopPotionPurchasePatch>();

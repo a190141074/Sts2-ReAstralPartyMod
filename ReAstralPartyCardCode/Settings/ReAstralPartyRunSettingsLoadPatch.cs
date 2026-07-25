@@ -1,6 +1,7 @@
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Patching.Models;
@@ -31,7 +32,13 @@ public sealed class ReAstralPartyRunSettingsLoadPatch : IPatchMethod
 
         DevConsoleCommandNotificationSync.Register();
         AstralDlcOverrideSync.Register();
+        FinalArenaDistortionComponentSync.Register();
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
-        await FinalArenaSeriesHelper.GrantStunGunIfNeeded(runState);
+
+        var netRole = LobbyGameplayNetRoleHelper.GetCurrentRole();
+        if (netRole == LobbyGameplayNetRole.Client)
+            await FinalArenaSeriesHelper.EnsureInitializedAndAppliedAsync(runState, false, false);
+        else
+            await FinalArenaSeriesHelper.EnsureInitializedAndAppliedAsync(runState, true, true);
     }
 }
