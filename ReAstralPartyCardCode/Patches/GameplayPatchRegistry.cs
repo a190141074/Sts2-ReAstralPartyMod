@@ -518,16 +518,6 @@ internal static class GameplayDynamicPatchCatalog
             description: "UI patch: allow single-use Speed Roller flight to open the next row's map points",
             patchId: "speed_roller_flight_travelability");
         builder.AddMethod(
-            typeof(NMapScreen),
-            "RecalculateTravelability",
-            Type.EmptyTypes,
-            postfix: DynamicPatchBuilder.FromMethod(
-                typeof(JunkBotQuestIconTravelabilityPatch),
-                nameof(JunkBotQuestIconTravelabilityPatch.Postfix)),
-            isCritical: false,
-            description: "UI patch: re-apply Junk Bot quest markers after travelability recalculation",
-            patchId: "junk_bot_quest_icon_travelability");
-        builder.AddMethod(
             typeof(NNormalMapPoint),
             "_Ready",
             Type.EmptyTypes,
@@ -547,7 +537,6 @@ internal static class GameplayDynamicPatchCatalog
             isCritical: false,
             description: "UI patch: keep Junk Bot custom quest icon aligned with native marked-icon refresh",
             patchId: "junk_bot_quest_icon_marked_visibility");
-        TryRegisterJunkBotMapScreenPatch(builder);
         builder.AddMethod(
             typeof(MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen.NMapPointHistoryEntry),
             nameof(MegaCrit.Sts2.Core.Nodes.Screens.RunHistoryScreen.NMapPointHistoryEntry.SetPlayer),
@@ -560,25 +549,6 @@ internal static class GameplayDynamicPatchCatalog
             patchId: "junk_bot_quest_icon_history");
         TryRegisterNeowDiagnosticsPatches(builder);
         CharacterSelectGameplayPreviewPatchRegistrar.TryRegister(builder);
-    }
-
-    private static void TryRegisterJunkBotMapScreenPatch(DynamicPatchBuilder builder)
-    {
-        var postfix = DynamicPatchBuilder.FromMethod(
-            typeof(JunkBotQuestIconMapScreenPatch),
-            nameof(JunkBotQuestIconMapScreenPatch.Postfix));
-
-        var target = AccessTools.DeclaredMethod(
-            typeof(NMapScreen),
-            "SetMap",
-            [typeof(MegaCrit.Sts2.Core.Map.ActMap), typeof(uint), typeof(bool)]);
-        if (target != null)
-            builder.Add(
-                target,
-                postfix: postfix,
-                isCritical: false,
-                description: "UI patch: re-apply Junk Bot quest markers after map screen refresh",
-                patchId: "junk_bot_quest_icon_map_screen_refresh");
     }
 
     private static void TryRegisterNeowDiagnosticsPatches(DynamicPatchBuilder builder)

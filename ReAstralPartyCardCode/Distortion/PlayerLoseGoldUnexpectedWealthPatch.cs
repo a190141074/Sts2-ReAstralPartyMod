@@ -48,6 +48,6 @@ public sealed class PlayerLoseGoldUnexpectedWealthPatch : IPatchMethod
         if (roll >= 30)
             return;
 
-        await PlayerCmd.GainGold(8m, player);
+        await PlayerCmd.GainGold(16m, player);
     }
 }

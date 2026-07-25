@@ -21,6 +21,46 @@ public sealed class AstralDlcConsoleCmd : AbstractConsoleCmd
     public override bool IsNetworked => false;
     public override bool DebugOnly => false;
 
+    public override CompletionResult GetArgumentCompletions(Player? player, string[] args)
+    {
+        var runState = RunManager.Instance?.DebugOnlyGetState() as RunState;
+        var openSeries = runState == null
+            ? []
+            : TokenSeriesAvailabilityHelper.GetMutableOpenSeriesForCommand(runState);
+        var seriesAliases = TokenSeriesAvailabilityHelper.GetSeriesCompletionAliases();
+
+        if (args.Length <= 1)
+        {
+            var partial = args.Length == 0 ? string.Empty : args[0];
+            var candidates = new[] { "add", "remove", "replace" }
+                .Concat(seriesAliases)
+                .Distinct(StringComparer.OrdinalIgnoreCase);
+            return CompleteArgument(candidates, [], partial, CompletionType.Subcommand);
+        }
+
+        var action = args[0];
+        return action.ToLowerInvariant() switch
+        {
+            "add" => CompleteArgument(seriesAliases, [action], GetPartialArg(args, 1), CompletionType.Argument),
+            "remove" => CompleteArgument(
+                Enumerable.Range(1, openSeries.Count).Select(static index => index.ToString()),
+                [action],
+                GetPartialArg(args, 1),
+                CompletionType.Argument),
+            "replace" when args.Length <= 2 => CompleteArgument(
+                Enumerable.Range(1, openSeries.Count).Select(static index => index.ToString()),
+                [action],
+                GetPartialArg(args, 1),
+                CompletionType.Argument),
+            "replace" => CompleteArgument(
+                seriesAliases,
+                [action, args[1]],
+                GetPartialArg(args, 2),
+                CompletionType.Argument),
+            _ => base.GetArgumentCompletions(player, args)
+        };
+    }
+
     public override CmdResult Process(Player? issuingPlayer, string[] args)
     {
         var runState = RunManager.Instance?.DebugOnlyGetState() as RunState;
@@ -158,5 +198,10 @@ public sealed class AstralDlcConsoleCmd : AbstractConsoleCmd
     private static string BuildUsage()
     {
         return "Usage: astraldlc add <series> | astraldlc remove <index> | astraldlc replace <index> <series> | astraldlc <series>";
+    }
+
+    private static string GetPartialArg(string[] args, int index)
+    {
+        return args.Length > index ? args[index] : string.Empty;
     }
 }

@@ -461,6 +461,9 @@ internal static class AstralTelemetry
 
     public static void RecordObtainedToken(Player owner, RelicModel relic)
     {
+        if (owner == null || relic == null)
+            return;
+
         if (owner.RunState is not RunState runState)
             return;
 
@@ -468,12 +471,19 @@ internal static class AstralTelemetry
         if (!TokenRelicRegistry.IsTokenRelic(canonicalRelic))
             return;
 
-        var state = GetOrCreateRunState(runState);
+        var runKey = GetRunKey(runState);
+        var relicId = GetRelicId(canonicalRelic);
+        if (string.IsNullOrWhiteSpace(relicId))
+            return;
+
         lock (StateLock)
         {
+            if (!ActiveRuns.TryGetValue(runKey, out var state))
+                return;
+
             if (state.PlayerStates.TryGetValue(owner.NetId, out var playerState))
             {
-                playerState.ObtainedTokenIds.Add(GetRelicId(canonicalRelic));
+                playerState.ObtainedTokenIds.Add(relicId);
                 PersistRunStateLocked(state);
             }
         }
@@ -671,7 +681,7 @@ internal static class AstralTelemetry
             state.PlayerStates[player.NetId] = new PlayerTelemetryState
             {
                 Slot = GetPlayerSlot(runState, player),
-                Character = player.Character.Id.Entry
+                Character = player.Character?.Id?.Entry ?? "<unknown>"
             };
 
         return state;
@@ -847,13 +857,14 @@ internal static class AstralTelemetry
         var playerCount = runState.Players.Count;
         var characters = string.Join(
             ",",
-            runState.Players.Select(static player => player.Character.Id.Entry ?? "<unknown>"));
+            runState.Players.Select(static player => player.Character?.Id?.Entry ?? "<unknown>"));
         return $"{seed}|a{ascension}|p{playerCount}|{characters}";
     }
 
     private static string GetRelicId(RelicModel relic)
     {
-        return (relic.CanonicalInstance?.Id ?? relic.Id).Entry;
+        var id = relic.CanonicalInstance?.Id ?? relic.Id;
+        return id?.Entry ?? string.Empty;
     }
 
     private static string GetModVersion()

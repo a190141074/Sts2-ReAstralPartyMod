@@ -93,7 +93,6 @@ public class PersonJunkBot : CooldownPersonRelicBase
         await EnsureWeaponFrameRelic();
         ResetMarkedCombatsForCurrentAct();
         ReapplyMarkedRoomsToMap(Owner?.RunState?.Map);
-        JunkBotQuestIconHelper.RefreshCurrentMapScreenIfNeeded(Owner?.RunState as RunState);
     }
 
     public override async Task AfterActEntered()
@@ -101,7 +100,6 @@ public class PersonJunkBot : CooldownPersonRelicBase
         await base.AfterActEntered();
         ResetMarkedCombatsForCurrentAct();
         ReapplyMarkedRoomsToMap(Owner?.RunState?.Map);
-        JunkBotQuestIconHelper.RefreshCurrentMapScreenIfNeeded(Owner?.RunState as RunState);
     }
 
     public override ActMap ModifyGeneratedMapLate(IRunState runState, ActMap map, int actIndex)

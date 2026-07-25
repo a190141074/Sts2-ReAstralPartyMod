@@ -625,9 +625,9 @@
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.human_ai_duel.title": "【人机对决（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.human_ai_duel.description": "すべてのプレイヤーは[blue]1[/blue]層の[gold]心智[/gold]を得て、筹码[gold]电击枪[/gold]を獲得する。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_1.title": "【裁判的关注1（{Difficulty}）】",
-  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_1.description": "戦闘中、プレイヤーターンが[blue]3[/blue]回進むごとに、ランダムなプレイヤー[blue]1[/blue]人が一時[green]敏捷[/green]-[blue]2[/blue]を受ける。",
+  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_1.description": "戦闘中、プレイヤーターンが[blue]3[/blue]回進むごとに、ランダムなプレイヤー[blue]1[/blue]人が一時[red]敏捷[/red]-[blue]2[/blue]を受ける。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_2.title": "【裁判的关注2（{Difficulty}）】",
-  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_2.description": "戦闘中、プレイヤーターンが[blue]3[/blue]回進むごとに、ランダムなプレイヤー[blue]1[/blue]人とランダムな非Boss敵[blue]1[/blue]体が、それぞれ一時[green]敏捷[/green]-[blue]2[/blue]または一時[red]力量[/red]-[blue]2[/blue]を受ける。",
+  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_2.description": "戦闘中、プレイヤーターンが[blue]3[/blue]回進むごとに、ランダムなプレイヤー[blue]1[/blue]人とランダムな非Boss敵[blue]1[/blue]体が、同時に一時[red]敏捷[/red]-[blue]2[/blue]または一時[red]力量[/red]-[blue]2[/blue]を受ける。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.pirate_kings_order.title": "【海盗王的号令（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.pirate_kings_order.description": "Bossと精英敵は[blue]1[/blue]層の[gold]海盗王的号令[/gold]を持って戦闘を開始する。\n各ターン開始時、Bossの意図が攻撃でなければ、すべての敵は[blue]3[/blue]点回復する。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.thundercloud.title": "【雷云（{Difficulty}）】",
@@ -658,7 +658,7 @@
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.mysterious_treasure.title": "【神秘宝藏（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.mysterious_treasure.description": "次の戦闘で、ランダムな非Boss敵[blue]1[/blue]体が[gold]宝藏桶[/gold]を得る。その後は[blue]5[/blue]戦闘ごとに再び発動する。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.unexpected_wealth.title": "【意外之财（{Difficulty}）】",
-  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.unexpected_wealth.description": "ゴールドを使う時、[blue]30%[/blue]の確率で[gold]8[/gold]ゴールドを得る。",
+  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.unexpected_wealth.description": "ゴールドを使う時、[blue]30%[/blue]の確率で[gold]16[/gold]ゴールドを得る。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.baton.title": "【接力棒（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.baton.description": "戦闘開始時、序号が最初のプレイヤーは[gold]接力棒[/gold]を得る。"
 }

@@ -44,6 +44,12 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
     private const int ArbitrageFloorInterval = 3;
     private const decimal ArbitragePercent = 0.10m;
 
+    private enum RefereePenaltyStat
+    {
+        Dexterity,
+        Strength
+    }
+
     private static readonly LocString PreciseSelectionPrompt =
         new("relics", "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.precise_selection.select_prompt");
 
@@ -673,13 +679,12 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
         if (FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.RefereeAttentionTwo))
         {
             var combatState = GetCombatState();
+            var refereePenaltyStat = RollRefereeAttentionTwoPenaltyStat(player, globalTurnCounter);
             var randomPlayer = GetDeterministicRandomPlayer("referee_attention_2_player", player, globalTurnCounter);
             if (randomPlayer?.Creature != null)
                 await ApplyDeterministicTemporaryStatPenalty(
                     randomPlayer.Creature,
-                    "referee_attention_2_player_stat",
-                    player,
-                    globalTurnCounter);
+                    refereePenaltyStat);
 
             var enemy = combatState == null
                 ? null
@@ -687,28 +692,28 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
             if (enemy != null)
                 await ApplyDeterministicTemporaryStatPenalty(
                     enemy,
-                    "referee_attention_2_enemy_stat",
-                    player,
-                    globalTurnCounter);
+                    refereePenaltyStat);
         }
     }
 
-    private async Task ApplyDeterministicTemporaryStatPenalty(
-        Creature target,
-        string context,
-        Player player,
-        int globalTurnCounter)
+    private RefereePenaltyStat RollRefereeAttentionTwoPenaltyStat(Player player, int globalTurnCounter)
     {
         var useDexterity = DeterministicMultiplayerChoiceHelper.RollDeterministically(
             0,
             2,
             MainFile.ModId,
-            context,
+            "referee_attention_2_shared_stat",
             RunState?.Rng.StringSeed,
             player.NetId,
-            globalTurnCounter,
-            BuildCreatureStableKey(target)) == 0;
-        if (useDexterity)
+            globalTurnCounter) == 0;
+        return useDexterity ? RefereePenaltyStat.Dexterity : RefereePenaltyStat.Strength;
+    }
+
+    private async Task ApplyDeterministicTemporaryStatPenalty(
+        Creature target,
+        RefereePenaltyStat penaltyStat)
+    {
+        if (penaltyStat == RefereePenaltyStat.Dexterity)
             await AstralTemporaryDexterityPower.Apply(target, -RefereeStatLoss, this, null, null, true);
         else
             await AstralTemporaryStrengthPower.Apply(target, -RefereeStatLoss, this, null, null, true);
@@ -720,16 +725,11 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel
         if (candidates.Count == 0)
             return;
 
-        var prefs = new CardSelectorPrefs(PreciseSelectionPrompt, 1, 1)
-        {
-            Cancelable = true
-        };
-
-        var selected = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayerGrid(
+        var selected = await DeterministicMultiplayerChoiceHelper.SelectCanonicalCardForPlayer(
             choiceContext,
             player,
             candidates,
-            prefs,
+            true,
             $"precise_selection|{globalTurnCounter}");
         if (selected == null)
             return;

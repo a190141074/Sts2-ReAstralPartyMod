@@ -361,17 +361,28 @@ public static class FinalArenaSeriesHelper
 
     private static async Task GrantHumanAiDuelStunGun(Player player)
     {
+        if (player == null)
+            return;
+
+        var obtainedNow = false;
         var stunGun = player.GetRelic<TokenExclusiveStunGun>();
         if (stunGun == null)
         {
             var canonical = ModelDb.Relic<TokenExclusiveStunGun>().CanonicalInstance
                             ?? ModelDb.Relic<TokenExclusiveStunGun>();
-            stunGun = (TokenExclusiveStunGun)await RelicCmd.Obtain(canonical.ToMutable(), player);
-            AstralTelemetry.RecordObtainedToken(player, stunGun);
+            stunGun = await RelicCmd.Obtain(canonical.ToMutable(), player) as TokenExclusiveStunGun;
+            if (stunGun == null)
+            {
+                MainFile.Logger.Warn("[FinalArena] HumanAiDuel failed to obtain TokenExclusiveStunGun during startup bootstrap.");
+                return;
+            }
+
+            obtainedNow = true;
         }
 
-        stunGun.AstralParty_TokenExclusiveStunGunMindStacks =
-            Math.Max(stunGun.AstralParty_TokenExclusiveStunGunMindStacks, StunGunInitialMind);
+        stunGun.AstralParty_TokenExclusiveStunGunMindStacks = obtainedNow
+            ? StunGunInitialMind
+            : Math.Max(stunGun.AstralParty_TokenExclusiveStunGunMindStacks, StunGunInitialMind);
         stunGun.NotifyDisplayAmountChanged();
 
         if (player.Creature?.CombatState != null)
