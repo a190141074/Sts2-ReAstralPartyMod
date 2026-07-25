@@ -279,6 +279,7 @@
 		<Content Include="ReAstralPartyMod\images\powers\mark_lock_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\mixed_cocktails_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\mixed_cocktails_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\mind_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\modification_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\modification_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\mouse_shield_power.png"/>
@@ -461,6 +462,7 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_piercing_gun.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_psychedelic_seafood_soup.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_psychedelic_seafood_soup.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_stun_gun.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_storm_talisman.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_storm_talisman.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_timer.png"/>

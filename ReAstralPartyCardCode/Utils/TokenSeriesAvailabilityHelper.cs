@@ -19,7 +19,8 @@ public static class TokenSeriesAvailabilityHelper
         WaterTown,
         MagicAcademy,
         DragonPalace,
-        GhostAlley
+        GhostAlley,
+        FinalArena
     }
 
     private static readonly TokenSeries[] AllSeries =
@@ -29,7 +30,8 @@ public static class TokenSeriesAvailabilityHelper
         TokenSeries.WaterTown,
         TokenSeries.MagicAcademy,
         TokenSeries.DragonPalace,
-        TokenSeries.GhostAlley
+        TokenSeries.GhostAlley,
+        TokenSeries.FinalArena
     ];
 
     private static readonly Dictionary<TokenSeries, string> SeriesKeywordStemBySeries = new()
@@ -39,7 +41,8 @@ public static class TokenSeriesAvailabilityHelper
         [TokenSeries.WaterTown] = "ASTRAL_WATER_TOWN_SERIES",
         [TokenSeries.MagicAcademy] = "ASTRAL_MAGIC_ACADEMY_SERIES",
         [TokenSeries.DragonPalace] = "ASTRAL_DRAGON_PALACE_SERIES",
-        [TokenSeries.GhostAlley] = "ASTRAL_GHOST_ALLEY_SET"
+        [TokenSeries.GhostAlley] = "ASTRAL_GHOST_ALLEY_SET",
+        [TokenSeries.FinalArena] = "ASTRAL_FINAL_ARENA_SERIES"
     };
 
     private static readonly Dictionary<TokenSeries, IReadOnlyList<ModelId>> RelicIdsBySeries = new()
@@ -79,6 +82,10 @@ public static class TokenSeriesAvailabilityHelper
         [
             ModelDb.GetId<TokenExclusiveCandyMembershipCard>(),
             ModelDb.GetId<TokenExclusiveTimer>()
+        ],
+        [TokenSeries.FinalArena] =
+        [
+            ModelDb.GetId<TokenExclusiveStunGun>()
         ]
     };
 
@@ -105,7 +112,8 @@ public static class TokenSeriesAvailabilityHelper
         [ModelDb.GetId<TokenExclusivePsychedelicSeafoodSoup>()] = "【迷幻海鲜汤】",
         [ModelDb.GetId<TokenExclusiveStormTalisman>()] = "【惊涛御守】",
         [ModelDb.GetId<TokenExclusiveCandyMembershipCard>()] = "【糖果会员卡】",
-        [ModelDb.GetId<TokenExclusiveTimer>()] = "【计时器】"
+        [ModelDb.GetId<TokenExclusiveTimer>()] = "【计时器】",
+        [ModelDb.GetId<TokenExclusiveStunGun>()] = "【电击枪】"
     };
 
     public static bool TryGetState(IRunState? runState, out TokenSeriesAvailabilityState state)
@@ -139,8 +147,10 @@ public static class TokenSeriesAvailabilityHelper
         if (rolls.Count < 2)
             return false;
 
-        state = new TokenSeriesAvailabilityState(
-            [AllSeries[rolls[0]], AllSeries[rolls[1]]]).Normalize();
+        var rolledSeries = new[] { AllSeries[rolls[0]], AllSeries[rolls[1]] };
+        state = rolledSeries.Contains(TokenSeries.FinalArena)
+            ? new TokenSeriesAvailabilityState([TokenSeries.FinalArena])
+            : new TokenSeriesAvailabilityState(rolledSeries).Normalize();
         return true;
     }
 
@@ -238,6 +248,7 @@ public static class TokenSeriesAvailabilityHelper
             TokenSeries.MagicAcademy => "【系列·魔法学院】",
             TokenSeries.DragonPalace => "【系列·龙宫游乐园】",
             TokenSeries.GhostAlley => "【系列·幽魂暗巷】",
+            TokenSeries.FinalArena => "【系列·决赛大赛场】",
             _ => series.ToString()
         };
     }

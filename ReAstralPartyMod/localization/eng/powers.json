@@ -338,6 +338,9 @@
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_POINT_POWER.title": "Skill Point",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_POINT_POWER.description": "When you play a Skill card, spend stacks of this Power before spending Energy.\nRemove all stacks at the end of your turn.",
   "RE_ASTRAL_PARTY_MOD_POWER_SKILL_POINT_POWER.smartDescription": "When you play a Skill card, spend these stacks before spending Energy. Remove it at end of turn.",
+  "RE_ASTRAL_PARTY_MOD_POWER_MIND_POWER.title": "Mind",
+  "RE_ASTRAL_PARTY_MOD_POWER_MIND_POWER.description": "While this has more than [blue]3[/blue] stacks, gain [blue]2[/blue] [red]Strength[/red] and [blue]2[/blue] [green]Dexterity[/green].",
+  "RE_ASTRAL_PARTY_MOD_POWER_MIND_POWER.smartDescription": "Above [blue]3[/blue] stacks, gain [blue]2[/blue] [red]Strength[/red] and [blue]2[/blue] [green]Dexterity[/green].",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.title": "Process",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.description": "At combat end, convert stacks into [gold]Steps[/gold] for [relic]Persona: Bionic Jasmine Beta[/relic].\nIf you own [relic]Initial Point[/relic] at [blue]1[/blue] or [blue]3[/blue] stars, gain an extra [blue]1[/blue] or [blue]3[/blue] steps.",
   "RE_ASTRAL_PARTY_MOD_POWER_PASSIVE_POWER.smartDescription": "At combat end, convert stacks into [gold]Steps[/gold] for [relic]Persona: Bionic Jasmine Beta[/relic]. [relic]Initial Point[/relic] adds [blue]1[/blue]/[blue]3[/blue] extra steps at [blue]1[/blue]/[blue]3[/blue] stars."

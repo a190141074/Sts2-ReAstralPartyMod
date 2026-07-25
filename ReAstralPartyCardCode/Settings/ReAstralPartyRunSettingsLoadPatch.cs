@@ -2,6 +2,7 @@ using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -30,5 +31,6 @@ public sealed class ReAstralPartyRunSettingsLoadPatch : IPatchMethod
 
         DevConsoleCommandNotificationSync.Register();
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
+        await FinalArenaSeriesHelper.GrantStunGunIfNeeded(runState);
     }
 }

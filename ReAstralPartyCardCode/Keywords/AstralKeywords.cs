@@ -26,6 +26,7 @@ public static class AstralKeywords
         AstralMagicAcademySeriesStem,
         AstralDragonPalaceSeriesStem,
         AstralGhostAlleySetStem,
+        AstralFinalArenaSeriesStem,
         AstralCollectionStem,
         AstralUniqueStem,
         AstralUniqueMaterialStem,
@@ -55,6 +56,7 @@ public static class AstralKeywords
     public const string AstralMagicAcademySeriesStem = "ASTRAL_MAGIC_ACADEMY_SERIES";
     public const string AstralDragonPalaceSeriesStem = "ASTRAL_DRAGON_PALACE_SERIES";
     public const string AstralGhostAlleySetStem = "ASTRAL_GHOST_ALLEY_SET";
+    public const string AstralFinalArenaSeriesStem = "ASTRAL_FINAL_ARENA_SERIES";
     public const string AstralCollectionStem = "ASTRAL_COLLECTION";
     public const string AstralUniqueStem = "ASTRAL_UNIQUE";
     public const string AstralUniqueMaterialStem = "ASTRAL_UNIQUE_MATERIAL";
@@ -81,6 +83,7 @@ public static class AstralKeywords
     public static string AstralMagicAcademySeriesId => GetId(AstralMagicAcademySeriesStem);
     public static string AstralDragonPalaceSeriesId => GetId(AstralDragonPalaceSeriesStem);
     public static string AstralGhostAlleySetId => GetId(AstralGhostAlleySetStem);
+    public static string AstralFinalArenaSeriesId => GetId(AstralFinalArenaSeriesStem);
     public static string AstralCollectionId => GetId(AstralCollectionStem);
     public static string AstralUniqueId => GetId(AstralUniqueStem);
     public static string AstralUniqueMaterialId => GetId(AstralUniqueMaterialStem);
@@ -107,6 +110,7 @@ public static class AstralKeywords
     public static CardKeyword AstralMagicAcademySeries => GetKeyword(AstralMagicAcademySeriesStem);
     public static CardKeyword AstralDragonPalaceSeries => GetKeyword(AstralDragonPalaceSeriesStem);
     public static CardKeyword AstralGhostAlleySet => GetKeyword(AstralGhostAlleySetStem);
+    public static CardKeyword AstralFinalArenaSeries => GetKeyword(AstralFinalArenaSeriesStem);
     public static CardKeyword AstralCollection => GetKeyword(AstralCollectionStem);
     public static CardKeyword AstralUnique => GetKeyword(AstralUniqueStem);
     public static CardKeyword AstralUniqueMaterial => GetKeyword(AstralUniqueMaterialStem);
