@@ -36,8 +36,7 @@ public static class TokenSeriesAvailabilityHelper
         TokenSeries.WaterTown,
         TokenSeries.MagicAcademy,
         TokenSeries.DragonPalace,
-        TokenSeries.GhostAlley,
-        TokenSeries.FinalArena
+        TokenSeries.GhostAlley
     ];
 
     private static readonly Dictionary<TokenSeries, string> SeriesKeywordStemBySeries = new()
@@ -250,9 +249,12 @@ public static class TokenSeriesAvailabilityHelper
             return false;
 
         if (SeriesAliases.TryGetValue(normalized, out series))
-            return true;
+            return series != TokenSeries.FinalArena;
 
-        return Enum.TryParse(normalized, true, out series) && Enum.IsDefined(series);
+        if (!Enum.TryParse(normalized, true, out series) || !Enum.IsDefined(series))
+            return false;
+
+        return series != TokenSeries.FinalArena;
     }
 
     public static string BuildSeriesListSummary(IReadOnlyList<TokenSeries> openSeries)
@@ -275,8 +277,7 @@ public static class TokenSeriesAvailabilityHelper
             "water_town",
             "magic_academy",
             "dragon_palace",
-            "ghost_alley",
-            "final_arena"
+            "ghost_alley"
         ];
     }
 
@@ -398,10 +399,8 @@ public static class TokenSeriesAvailabilityHelper
             .Where(static series => Enum.IsDefined(series))
             .Distinct()
             .ToArray();
-        if (distinct.Contains(TokenSeries.FinalArena))
-            return new TokenSeriesAvailabilityState([TokenSeries.FinalArena]);
-
-        return new TokenSeriesAvailabilityState(distinct).Normalize();
+        return new TokenSeriesAvailabilityState(
+            distinct.Where(static series => series != TokenSeries.FinalArena).ToArray()).Normalize();
     }
 
     private static string NormalizeSeriesInput(string? input)

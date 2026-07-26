@@ -319,7 +319,13 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             RunState != null &&
             FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Rainstorm))
         {
-            await CreatureCmdCompat.Damage(choiceContext, player.Creature, RainstormSelfDamage, ValueProp.Move, player.Creature, null);
+            await CreatureCmdCompat.Damage(
+                choiceContext,
+                player.Creature,
+                RainstormSelfDamage,
+                ValueProp.Unblockable | ValueProp.Unpowered,
+                player.Creature,
+                null);
             await AstralTemporaryStrengthPower.Apply(player.Creature, RainstormTemporaryStrength, this, player.Creature, null, true);
         }
 
@@ -623,7 +629,9 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
 
         foreach (var card in hand)
         {
-            if (!WarforgeEnchantmentHelper.CountsAsAttack(card) || card.EnergyCost.CostsX)
+            if (!WarforgeEnchantmentHelper.CountsAsAttack(card) ||
+                card.EnergyCost.CostsX ||
+                BaseStarterCardReplacementHelper.IsBaseStrike(player, card))
                 continue;
 
             var randomizedCost = DeterministicMultiplayerChoiceHelper.RollDeterministically(

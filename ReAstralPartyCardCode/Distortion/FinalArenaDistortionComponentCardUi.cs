@@ -14,6 +14,7 @@ internal static partial class FinalArenaDistortionComponentCardUi
     private const string HoverTipRoot = "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT";
     private static readonly Vector2 CardSize = new(596f, 475f);
     private static readonly Vector2 LogoSize = new(147f, 147f);
+    private static readonly Vector2 DifficultyIconSize = new(78f, 30f);
     private static readonly Regex WrappedTitlePattern = WrappedTitleRegex();
     private static Font? _displayFont;
     private static bool _fontLoadAttempted;
@@ -87,11 +88,15 @@ internal static partial class FinalArenaDistortionComponentCardUi
         title.AddThemeConstantOverride("outline_size", 5);
         card.AddChild(title);
 
-        var difficulty = BuildHeaderLabel(model.DifficultyText, 24, Colors.White);
-        difficulty.Position = new Vector2(482f, 43f);
-        difficulty.Size = new Vector2(78f, 30f);
-        difficulty.HorizontalAlignment = HorizontalAlignment.Center;
-        difficulty.VerticalAlignment = VerticalAlignment.Center;
+        var difficulty = new TextureRect
+        {
+            Texture = ResourceLoader.Load<Texture2D>(GetDifficultyIconPath(model.Difficulty)),
+            Position = new Vector2(482f, 1f),
+            Size = DifficultyIconSize,
+            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+            StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            MouseFilter = Control.MouseFilterEnum.Ignore
+        };
         card.AddChild(difficulty);
 
         var description = BuildDescription(model.Description);
@@ -170,7 +175,7 @@ internal static partial class FinalArenaDistortionComponentCardUi
         label.AddThemeColorOverride("font_shadow_color", new Color(0f, 0.18f, 0.22f, 0.82f));
         label.AddThemeConstantOverride("shadow_offset_x", 2);
         label.AddThemeConstantOverride("shadow_offset_y", 2);
-        label.SetTextAutoSize(description);
+        label.SetTextAutoSize(ForceDisplayFont(description));
         return label;
     }
 
@@ -183,15 +188,30 @@ internal static partial class FinalArenaDistortionComponentCardUi
         var difficulty = FinalArenaSeriesHelper.GetDifficulty(component);
         return new ComponentDisplayModel(
             match.Success ? match.Groups["name"].Value : fullTitle,
-            FormatDifficulty(difficulty),
+            difficulty,
             new LocString("relics",
                 $"{HoverTipRoot}.{FinalArenaSeriesHelper.GetLocStem(component)}.description").GetFormattedText(),
             GetIconId(component));
     }
 
-    private static string FormatDifficulty(int difficulty)
+    private static string GetDifficultyIconPath(int difficulty)
     {
-        return difficulty > 0 ? $"+{difficulty}" : difficulty.ToString();
+        var fileName = difficulty switch
+        {
+            0 => "diff_0",
+            -1 => "diff_negative_1",
+            -2 => "diff_negative_2",
+            1 => "diff_positive_1",
+            2 => "diff_positive_2",
+            _ => "diff_0"
+        };
+        return $"res://ReAstralPartyMod/images/distortion/{fileName}.png";
+    }
+
+    internal static Texture2D? LoadComponentIcon(FinalArenaDistortionComponent component)
+    {
+        var iconId = GetIconId(component);
+        return iconId.HasValue ? ResourceLoader.Load<Texture2D>(GetIconPath(iconId.Value)) : null;
     }
 
     private static int? GetIconId(FinalArenaDistortionComponent component)
@@ -225,6 +245,11 @@ internal static partial class FinalArenaDistortionComponentCardUi
     private static string GetIconPath(int iconId)
     {
         return $"res://ReAstralPartyMod/images/distortion/UT_Mutator_{iconId}.png";
+    }
+
+    private static string ForceDisplayFont(string text)
+    {
+        return $"[font={FontPath}]{text}[/font]";
     }
 
     private static void ApplyFont(Label label, int fontSize, Color color)
@@ -278,7 +303,7 @@ internal static partial class FinalArenaDistortionComponentCardUi
 
     private sealed record ComponentDisplayModel(
         string Name,
-        string DifficultyText,
+        int Difficulty,
         string Description,
         int? IconId);
 }

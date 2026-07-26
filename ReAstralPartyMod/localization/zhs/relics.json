@@ -655,7 +655,7 @@
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.seasickness.title": "【晕船（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.seasickness.description": "回合内首次打出第[blue]8[/blue]张牌时，令[blue]1[/blue]名随机玩家获得[blue]2[/blue]层[gold]中毒[/gold]，此目标可以为空。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.energy_disorder.title": "【能量紊乱（{Difficulty}）】",
-  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.energy_disorder.description": "玩家回合开始时，手牌中的所有攻击牌费用会临时随机变为[blue]0[/blue]到[blue]3[/blue]。离开手牌或打出后恢复正常。",
+  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.energy_disorder.description": "回合开始时，手牌中所有[gold]攻击牌[/gold]费用会在[blue]0[/blue]-[blue]3[/blue]之间随机变化。离手后恢复正常。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.copy_card.title": "【复制卡牌（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.copy_card.description": "每回合第一次在手牌数量不大于[blue]3[/blue]时使用技能牌，获得这张技能牌的附带[gold]消耗[/gold]复制品。\n每回合第一次在手牌数量不小于[blue]6[/blue]时使用技能牌，使用后随机弃置[blue]1[/blue]张手牌。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.wide_area_mark.title": "【广域标记（{Difficulty}）】",

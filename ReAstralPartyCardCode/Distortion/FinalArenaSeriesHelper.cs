@@ -191,10 +191,11 @@ public static class FinalArenaSeriesHelper
         {
             var title = new LocString("relics", $"{HoverTipRoot}.{GetLocStem(component)}.title");
             title.Add("Difficulty", GetDifficulty(component));
+            var componentIcon = FinalArenaDistortionComponentCardUi.LoadComponentIcon(component) ?? icon;
             tips.Add(new HoverTip(
                 title,
                 new LocString("relics", $"{HoverTipRoot}.{GetLocStem(component)}.description"),
-                icon)
+                componentIcon)
             {
                 Id = $"reastralparty.final_arena_distortion_component.{component}",
                 IsInstanced = true

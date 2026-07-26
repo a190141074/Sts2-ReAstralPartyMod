@@ -114,7 +114,7 @@
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_all.description": "本局启用全部拓展系列。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled": "禁用拓展",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.token_series_mode.option_disabled.description": "本局不启用任何拓展系列。",
-  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.label": "智械狂潮模式",
+  "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.label": "【智械狂潮】模式",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_mech_tide_mode.description": "开启后，强制指定拓展包为【系列·决赛大赛场】，并开启【畸变组件】系统。",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_host": "仅当前房间生效",
   "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_client": "由房主控制，仅当前房间生效",
