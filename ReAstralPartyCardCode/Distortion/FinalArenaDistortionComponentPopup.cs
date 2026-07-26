@@ -10,6 +10,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 internal static partial class FinalArenaDistortionComponentPopup
 {
     private const string IconPath = "res://ReAstralPartyMod/images/ui/distortion_component_logo.png";
+    private const string CloseButtonPath = "res://ReAstralPartyMod/images/distortion/distortion_close.png";
     private const string HoverTipRoot = "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT";
 
     public static void Open(IRunState runState)
@@ -17,22 +18,28 @@ internal static partial class FinalArenaDistortionComponentPopup
         if (!FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.HumanAiDuel) &&
             !FinalArenaSeriesHelper.TryGetActiveComponents(runState, out _))
             return;
+        FinalArenaSeriesHelper.TryGetActiveComponents(runState, out var activeComponents);
         if (NModalContainer.Instance == null)
             return;
 
         NModalContainer.Instance.Clear();
         NModalContainer.Instance.Add(new FinalArenaDistortionComponentPopupPanel(
-            FinalArenaSeriesHelper.GetAllComponentsInDisplayOrder()));
+            FinalArenaSeriesHelper.GetAllComponentsInDisplayOrder(),
+            activeComponents));
         NModalContainer.Instance.ShowBackstop();
     }
 
     private sealed partial class FinalArenaDistortionComponentPopupPanel : Control, IScreenContext
     {
         private readonly IReadOnlyList<FinalArenaDistortionComponent> _components;
+        private readonly IReadOnlySet<FinalArenaDistortionComponent> _activeComponents;
 
-        public FinalArenaDistortionComponentPopupPanel(IReadOnlyList<FinalArenaDistortionComponent> components)
+        public FinalArenaDistortionComponentPopupPanel(
+            IReadOnlyList<FinalArenaDistortionComponent> components,
+            IReadOnlyList<FinalArenaDistortionComponent> activeComponents)
         {
             _components = components;
+            _activeComponents = activeComponents.ToHashSet();
         }
 
         public Control? DefaultFocusedControl { get; private set; }
@@ -142,12 +149,14 @@ internal static partial class FinalArenaDistortionComponentPopup
                 15,
                 new Color(0.84f, 0.87f, 0.93f, 0.92f)));
 
-            var close = new Button
+            var close = new TextureButton
             {
-                Text = "关闭",
                 FocusMode = FocusModeEnum.All,
                 MouseFilter = MouseFilterEnum.Stop,
-                CustomMinimumSize = new Vector2(124f, 42f),
+                CustomMinimumSize = new Vector2(119f, 67f),
+                TextureNormal = ResourceLoader.Load<Texture2D>(CloseButtonPath),
+                TextureHover = ResourceLoader.Load<Texture2D>(CloseButtonPath),
+                TexturePressed = ResourceLoader.Load<Texture2D>(CloseButtonPath),
                 SizeFlagsHorizontal = SizeFlags.ShrinkEnd
             };
             close.Pressed += Close;
@@ -168,7 +177,7 @@ internal static partial class FinalArenaDistortionComponentPopup
                 VerticalScrollMode = ScrollContainer.ScrollMode.Auto
             };
 
-            scroll.AddChild(FinalArenaDistortionComponentCardUi.BuildComponentGrid(_components));
+            scroll.AddChild(FinalArenaDistortionComponentCardUi.BuildComponentGrid(_components, _activeComponents));
             return scroll;
         }
 

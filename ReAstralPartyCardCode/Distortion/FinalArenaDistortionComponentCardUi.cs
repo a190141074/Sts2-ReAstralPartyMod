@@ -13,11 +13,14 @@ internal static partial class FinalArenaDistortionComponentCardUi
 
     private const string HoverTipRoot = "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT";
     private static readonly Vector2 CardSize = new(596f, 475f);
+    private static readonly Vector2 LogoSize = new(147f, 147f);
     private static readonly Regex WrappedTitlePattern = WrappedTitleRegex();
     private static Font? _displayFont;
     private static bool _fontLoadAttempted;
 
-    public static GridContainer BuildComponentGrid(IReadOnlyList<FinalArenaDistortionComponent> components)
+    public static GridContainer BuildComponentGrid(
+        IReadOnlyList<FinalArenaDistortionComponent> components,
+        IReadOnlySet<FinalArenaDistortionComponent>? activeComponents = null)
     {
         var grid = new GridContainer
         {
@@ -28,6 +31,24 @@ internal static partial class FinalArenaDistortionComponentCardUi
         };
         grid.AddThemeConstantOverride("h_separation", 18);
         grid.AddThemeConstantOverride("v_separation", 18);
+
+        if (activeComponents is { Count: > 0 })
+        {
+            foreach (var component in components.Where(activeComponents.Contains))
+                grid.AddChild(BuildComponentCard(component));
+
+            var inactiveComponents = components.Where(component => !activeComponents.Contains(component)).ToList();
+            if (grid.GetChildCount() > 0 && inactiveComponents.Count > 0)
+            {
+                grid.AddChild(BuildSpacerCell());
+                grid.AddChild(BuildSpacerCell());
+            }
+
+            foreach (var component in inactiveComponents)
+                grid.AddChild(BuildComponentCard(component));
+
+            return grid;
+        }
 
         foreach (var component in components)
             grid.AddChild(BuildComponentCard(component));
@@ -79,11 +100,12 @@ internal static partial class FinalArenaDistortionComponentCardUi
         description.CustomMinimumSize = new Vector2(430f, 190f);
         card.AddChild(description);
 
+        var logoPosition = new Vector2(424f, 303f);
         var logoBase = new TextureRect
         {
             Texture = ResourceLoader.Load<Texture2D>(LogoBasePath),
-            Position = new Vector2(460f, 332f),
-            Size = new Vector2(118f, 118f),
+            Position = logoPosition,
+            Size = LogoSize,
             ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
             StretchMode = TextureRect.StretchModeEnum.Scale,
             MouseFilter = Control.MouseFilterEnum.Ignore
@@ -105,6 +127,17 @@ internal static partial class FinalArenaDistortionComponentCardUi
         }
 
         return card;
+    }
+
+    private static Control BuildSpacerCell()
+    {
+        return new Control
+        {
+            CustomMinimumSize = new Vector2(CardSize.X, 24f),
+            MouseFilter = Control.MouseFilterEnum.Ignore,
+            SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter,
+            SizeFlagsVertical = Control.SizeFlags.ShrinkBegin
+        };
     }
 
     public static Label BuildHeaderLabel(string text, int fontSize, Color color)
@@ -211,6 +244,7 @@ internal static partial class FinalArenaDistortionComponentCardUi
         var font = LoadDisplayFont() ?? label.GetThemeDefaultFont();
         if (font != null)
         {
+            label.AddThemeFontOverride("font", font);
             label.AddThemeFontOverride("normal_font", font);
             label.AddThemeFontOverride("bold_font", font);
             label.AddThemeFontOverride("italics_font", font);
@@ -218,6 +252,7 @@ internal static partial class FinalArenaDistortionComponentCardUi
             label.AddThemeFontOverride("mono_font", font);
         }
 
+        label.AddThemeFontSizeOverride("font_size", fontSize);
         label.AddThemeFontSizeOverride("normal_font_size", fontSize);
         label.AddThemeFontSizeOverride("bold_font_size", fontSize);
         label.AddThemeFontSizeOverride("italics_font_size", fontSize);
