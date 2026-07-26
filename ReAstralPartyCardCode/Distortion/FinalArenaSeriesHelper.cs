@@ -117,7 +117,6 @@ public static class FinalArenaSeriesHelper
             _runData.Set(runState, runData);
         }
 
-        FinalArenaDistortionComponentModifierInstaller.EnsureInstalled(runState, loadedRun: true);
         await ApplyOneTimeComponents(runState, runData, components);
 
         if (broadcastIfHost)
@@ -246,6 +245,13 @@ public static class FinalArenaSeriesHelper
         runData.ArbitrageLastFloor = arbitrageLastFloor;
         runData.GlobalPlayerTurnCounter = globalPlayerTurnCounter;
         _runData.Set(runState, runData);
+    }
+
+    public static void EnsureCombatModifierInstalled(RunState? runState)
+    {
+        if (runState == null || !TryGetActiveComponents(runState, out _))
+            return;
+
         FinalArenaDistortionComponentModifierInstaller.EnsureInstalled(runState, loadedRun: true);
     }
 

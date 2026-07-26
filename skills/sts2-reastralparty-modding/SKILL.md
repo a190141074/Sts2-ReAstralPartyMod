@@ -132,6 +132,7 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 默认优先看“最新带时间戳日志里的第一条硬错误”，不要先被外层 async 包装栈、后续连锁报错或滚动 `godot.log` 里的旧噪音带跑。
 - 如果故障是在某轮最近修改之后才出现，默认先沿“最近改动链”排查；除非最新日志里的更早硬错误已经明确指向别处，否则不要优先翻旧系统。
 - 启动期的 topbar / hover / summary / debug display 不是“无害 UI”：只要它们在 `_Ready`、`Initialize`、run bootstrap 或 map/topbar 初始化阶段执行，就按主流程代码处理，任何 `ModelDb` / 本地化 /资源读取都必须允许安全失败。
+- 普通 `ModifierModel` 不是无害运行时载体：只要进入 `RunState.Modifiers`，原版 Neow 就会按 modifier run 处理，导致普通 Neow 遗物选项不生成。不要在 `StartRun`、run bootstrap、Neow ready-page 或初始事件生成前安装隐藏 modifier。
 - 做内容迁移、删包或拆独立模组后，默认一起复核“运行时注册表 + 系列映射表 + topbar/hover/debug summary + fallback 文案表”；不要只删玩法入口，遗漏展示链中的旧 `ModelId`。
 - 如果沿错误方向做了试探性修改，一旦最新日志证明根因不在那条链上，就应立即回退这部分无关改动，再收口到真正相关的最近改动链；不要把误判修补继续留在工作树里。
 - 战斗 hook 里只要遍历目标集合时可能造成击杀、移除、融化、power 移除、队列改写，就优先怀疑 live collection mutation。
@@ -177,6 +178,7 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
 - 起始人格 / Neow restore 问题：
   - 先查状态恢复和重建链，例如 `StartingPersonaNeowReadyFlow`、`StartingPersonaRelicSelectionScreen`、`SetInitialEventState(...)`
   - 不先猜 UI 延迟、动画时序或展示层问题
+  - 如果 Neow 普通遗物选项消失，优先检查是否有我方隐藏/调试/全局玩法 `ModifierModel` 过早加入 `RunState.Modifiers`；原版 `Neow.GenerateInitialOptions()` 会用 `RunState.Modifiers.Count <= 0` 决定是否走普通遗物分支
 - 人格选择 / `StartingPerson*` / `StartingPersona*` / Neow ready-page / host-launch / persona overlay / remote choice pre-restore` 默认属于仓库高危区：
   - 能不动就不动；这条链默认按坏味道很重的历史屎山处理，不要把它当普通 UI / 同步功能随手重构
   - 只要用户已经明确表达“尽量不要碰 / 能不动就不动 / 先查问题”，默认停在日志取证和根因定位；除非用户随后明确说“执行 / 修改 / 实现”，否则不要擅自动这条链
@@ -341,6 +343,7 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - 不进常规 modifier UI
   - 不进结算展示
 - 这条尤其适用于清醒梦、梦境模式、只用于保存本局状态的隐藏效果载体；可见 UI 与运行时持有层应分开设计。
+- 但是普通 modifier 会影响 Neow/开局流程。需要 run-scoped 全局战斗效果时，优先用 `RunSavedData` 保存状态，再用具体 hook/patch 在战斗、房间或奖励入口读取；只有确认时机已晚于 Neow 普通选项生成，才允许把隐藏 modifier 装进 `RunState.Modifiers`。
 
 ### Decimal 边界
 

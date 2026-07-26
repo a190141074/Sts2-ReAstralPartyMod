@@ -428,6 +428,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<RelicCollectionLoadRelicNodesFilterPatch>();
         patcher.RegisterPatch<CreatureGainBlockTreasureBucketPatch>();
         patcher.RegisterPatch<PlayerLoseGoldUnexpectedWealthPatch>();
+        patcher.RegisterPatch<FinalArenaDistortionCombatRoomPatch>();
         patcher.RegisterPatch<ProprietressDoppelgangerShopRelicPurchasePatch>();
         patcher.RegisterPatch<ProprietressDoppelgangerShopCardPurchasePatch>();
         patcher.RegisterPatch<ProprietressDoppelgangerShopPotionPurchasePatch>();
