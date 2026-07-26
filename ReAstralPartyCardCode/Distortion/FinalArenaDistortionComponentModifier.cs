@@ -552,7 +552,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
 
         foreach (var player in GetStablePlayers())
             if (player.Creature != null && !player.Creature.IsDead)
-                await CreatureCmd.Stun(player.Creature);
+                await PowerCmd.Apply<RingingPower>(player.Creature, RobberyStunTurns, player.Creature, null, false);
     }
 
     private async Task ApplyToAllCreatures(CombatState combatState, Func<Creature, Task> action)
