@@ -31,6 +31,10 @@ public class ReversedScalesHolographicPower : AstralPartyPowerModel
         if (dealer == null || dealer.Side == Owner?.Side)
             return amount;
 
-        return Math.Max(amount - Amount * DamageReductionPerStack, 0m);
+        var reducedAmount = amount - Amount * DamageReductionPerStack;
+        if (Owner?.Player == null)
+            return Math.Max(reducedAmount, 1m);
+
+        return Math.Max(reducedAmount, 0m);
     }
 }
