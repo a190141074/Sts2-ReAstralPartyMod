@@ -1,5 +1,4 @@
 using Godot;
-using MegaCrit.Sts2.addons.mega_text;
 using MegaCrit.Sts2.Core.ControllerInput;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Nodes.CommonUi;
@@ -79,7 +78,7 @@ internal static partial class FinalArenaDistortionComponentPopup
 
             var outer = new PanelContainer
             {
-                CustomMinimumSize = new Vector2(980f, 620f),
+                CustomMinimumSize = new Vector2(1320f, 1080f),
                 MouseFilter = MouseFilterEnum.Stop,
                 SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
                 SizeFlagsVertical = SizeFlags.ShrinkCenter
@@ -104,7 +103,6 @@ internal static partial class FinalArenaDistortionComponentPopup
             margin.AddChild(root);
 
             root.AddChild(BuildHeader());
-            root.AddChild(BuildSummaryCard());
             root.AddChild(BuildComponentList());
         }
 
@@ -159,15 +157,6 @@ internal static partial class FinalArenaDistortionComponentPopup
             return row;
         }
 
-        private Control BuildSummaryCard()
-        {
-            var body = new LocString("relics", $"{HoverTipRoot}.description").GetFormattedText();
-            return BuildCard(
-                new LocString("relics", $"{HoverTipRoot}.title").GetRawText(),
-                body,
-                new Color(0.2f, 0.26f, 0.38f, 0.98f));
-        }
-
         private Control BuildComponentList()
         {
             var scroll = new ScrollContainer
@@ -179,59 +168,8 @@ internal static partial class FinalArenaDistortionComponentPopup
                 VerticalScrollMode = ScrollContainer.ScrollMode.Auto
             };
 
-            var list = new VBoxContainer
-            {
-                MouseFilter = MouseFilterEnum.Ignore,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                SizeFlagsVertical = SizeFlags.ExpandFill
-            };
-            list.AddThemeConstantOverride("separation", 12);
-            scroll.AddChild(list);
-
-            foreach (var component in _components)
-            {
-                var title = new LocString("relics",
-                    $"{HoverTipRoot}.{FinalArenaSeriesHelper.GetLocStem(component)}.title");
-                title.Add("Difficulty", FinalArenaSeriesHelper.GetDifficulty(component));
-                var description = new LocString("relics",
-                    $"{HoverTipRoot}.{FinalArenaSeriesHelper.GetLocStem(component)}.description").GetFormattedText();
-                list.AddChild(BuildCard(title.GetFormattedText(), description, new Color(0.13f, 0.17f, 0.24f, 0.98f)));
-            }
-
+            scroll.AddChild(FinalArenaDistortionComponentCardUi.BuildComponentGrid(_components));
             return scroll;
-        }
-
-        private static Control BuildCard(string title, string description, Color background)
-        {
-            var card = new PanelContainer
-            {
-                MouseFilter = MouseFilterEnum.Ignore,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                CustomMinimumSize = new Vector2(0f, 0f)
-            };
-            card.AddThemeStyleboxOverride("panel", CreatePanelStyle(background, 14));
-
-            var margin = new MarginContainer
-            {
-                MouseFilter = MouseFilterEnum.Ignore
-            };
-            margin.AddThemeConstantOverride("margin_left", 16);
-            margin.AddThemeConstantOverride("margin_top", 14);
-            margin.AddThemeConstantOverride("margin_right", 16);
-            margin.AddThemeConstantOverride("margin_bottom", 14);
-            card.AddChild(margin);
-
-            var box = new VBoxContainer
-            {
-                MouseFilter = MouseFilterEnum.Ignore,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill
-            };
-            box.AddThemeConstantOverride("separation", 6);
-            margin.AddChild(box);
-
-            box.AddChild(CreateLabel(title, 20, new Color(0.97f, 0.94f, 0.86f)));
-            box.AddChild(CreateRichText(description, 16, new Color(0.86f, 0.88f, 0.93f, 0.96f)));
-            return card;
         }
 
         private static Label CreateLabel(string text, int fontSize, Color color, bool wrap = false)
@@ -244,56 +182,12 @@ internal static partial class FinalArenaDistortionComponentPopup
             };
             if (wrap)
                 label.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+            var displayFont = ResourceLoader.Load<Font>(FinalArenaDistortionComponentCardUi.FontPath);
+            if (displayFont != null)
+                label.AddThemeFontOverride("font", displayFont);
             label.AddThemeFontSizeOverride("font_size", fontSize);
             label.AddThemeColorOverride("font_color", color);
             return label;
-        }
-
-        private static MegaRichTextLabel CreateRichText(string text, int fontSize, Color color)
-        {
-            var label = new MegaRichTextLabel
-            {
-                BbcodeEnabled = true,
-                FitContent = true,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                MouseFilter = MouseFilterEnum.Ignore,
-                SizeFlagsHorizontal = SizeFlags.ExpandFill,
-                SizeFlagsVertical = SizeFlags.ShrinkBegin,
-                MaxFontSize = fontSize,
-                MinFontSize = fontSize,
-                CustomMinimumSize = new Vector2(0f, fontSize * 3.5f)
-            };
-            ApplyDefaultMegaRichTextTheme(label);
-            label.AddThemeColorOverride("default_color", color);
-            label.AddThemeColorOverride("font_shadow_color", new Color(0f, 0f, 0f, 0f));
-            label.AddThemeConstantOverride("shadow_offset_x", 0);
-            label.AddThemeConstantOverride("shadow_offset_y", 0);
-            label.SetTextAutoSize(text);
-            return label;
-        }
-
-        private static void ApplyDefaultMegaRichTextTheme(MegaRichTextLabel label)
-        {
-            var font = label.GetThemeDefaultFont();
-            if (font != null)
-            {
-                label.AddThemeFontOverride("normal_font", font);
-                label.AddThemeFontOverride("bold_font", font);
-                label.AddThemeFontOverride("italics_font", font);
-                label.AddThemeFontOverride("bold_italics_font", font);
-                label.AddThemeFontOverride("mono_font", font);
-            }
-
-            var fontSize = label.GetThemeDefaultFontSize();
-            if (fontSize <= 0)
-                return;
-
-            label.AddThemeFontSizeOverride("normal_font_size", fontSize);
-            label.AddThemeFontSizeOverride("bold_font_size", fontSize);
-            label.AddThemeFontSizeOverride("italics_font_size", fontSize);
-            label.AddThemeFontSizeOverride("bold_italics_font_size", fontSize);
-            label.AddThemeFontSizeOverride("mono_font_size", fontSize);
         }
 
         private static StyleBoxFlat CreatePanelStyle(Color bg, int radius)
