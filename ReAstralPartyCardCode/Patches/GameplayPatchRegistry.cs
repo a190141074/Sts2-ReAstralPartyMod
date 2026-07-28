@@ -435,6 +435,8 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<ProprietressDoppelgangerShopRemovalPurchasePatch>();
         patcher.RegisterPatch<PunitiveJudgmentHandEntryPatch>();
         patcher.RegisterPatch<StokovStarterRelicUpgradePatch>();
+        patcher.RegisterPatch<MerchantNaturalRelicCreateInventoryPatch>();
+        patcher.RegisterPatch<MerchantNaturalRelicInitializeInventoryPatch>();
     }
 
 }

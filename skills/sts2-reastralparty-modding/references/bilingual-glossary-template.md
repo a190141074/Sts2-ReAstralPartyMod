@@ -97,7 +97,6 @@
 | 【红石粉】 | Enigmatic Redstone Dust | `EnigmaticRedstoneDust` |
 | 【神秘遗物·七重泽】 | Enigmatic Seven Blessings | `EnigmaticSevenBlessings` |
 | 【神秘遗物·七重咒】 | Enigmatic Seven Curses | `EnigmaticSevenCurses` |
-| 【战利品一体化盒】 | Enigmatic Special The One Box | `EnigmaticSpecialTheOneBox` |
 | 【神秘遗物·无尽贪婪契约】 | Enigmatic Synthesis Avarice Scroll | `EnigmaticSynthesisAvariceScroll` |
 | 【烈焰粉】 | Enigmatic Synthesis Blaze Powder | `EnigmaticSynthesisBlazePowder` |
 | 【寰宇之心】 | Enigmatic Synthesis Cosmic Heart | `EnigmaticSynthesisCosmicHeart` |
