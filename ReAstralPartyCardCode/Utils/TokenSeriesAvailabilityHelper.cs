@@ -90,7 +90,9 @@ public static class TokenSeriesAvailabilityHelper
         ],
         [TokenSeries.FinalArena] =
         [
-            ModelDb.GetId<TokenExclusiveStunGun>()
+            ModelDb.GetId<TokenExclusiveFitnessTracker>(),
+            ModelDb.GetId<TokenExclusiveStunGun>(),
+            ModelDb.GetId<TokenExclusiveTimePocketWatch>()
         ]
     };
 
@@ -118,7 +120,9 @@ public static class TokenSeriesAvailabilityHelper
         [ModelDb.GetId<TokenExclusiveStormTalisman>()] = "【惊涛御守】",
         [ModelDb.GetId<TokenExclusiveCandyMembershipCard>()] = "【糖果会员卡】",
         [ModelDb.GetId<TokenExclusiveTimer>()] = "【计时器】",
-        [ModelDb.GetId<TokenExclusiveStunGun>()] = "【电击枪】"
+        [ModelDb.GetId<TokenExclusiveFitnessTracker>()] = "【运动手环】",
+        [ModelDb.GetId<TokenExclusiveStunGun>()] = "【电击枪】",
+        [ModelDb.GetId<TokenExclusiveTimePocketWatch>()] = "【时间怀表】"
     };
 
     private static readonly Dictionary<string, TokenSeries> SeriesAliases =
