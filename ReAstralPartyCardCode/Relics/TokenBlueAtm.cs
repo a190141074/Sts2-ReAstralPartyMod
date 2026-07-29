@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -47,8 +48,9 @@ public class TokenBlueAtm : AstralPartyRelicModel
         if (amount <= 0m)
             return false;
 
-        modifiedAmount += 1m;
-        _pendingSelfStarLight += 1;
+        var extraAmount = GetExtraStarLightAmount();
+        modifiedAmount += extraAmount;
+        _pendingSelfStarLight += extraAmount;
         Flash();
         return true;
     }
@@ -77,7 +79,10 @@ public class TokenBlueAtm : AstralPartyRelicModel
         if (amount <= 0m)
             return;
 
-        _pendingSelfStarLight--;
+        var pendingSelfStarLight = _pendingSelfStarLight;
+        _pendingSelfStarLight = 0;
+        if (pendingSelfStarLight <= 0)
+            return;
 
         _isResolvingAtm = true;
         try
@@ -85,7 +90,7 @@ public class TokenBlueAtm : AstralPartyRelicModel
             await PowerCmd.Apply(
                 ModelDb.Power<StarLightPower>().ToMutable(),
                 Owner.Creature,
-                1m,
+                pendingSelfStarLight,
                 Owner.Creature,
                 null,
                 false
@@ -100,5 +105,11 @@ public class TokenBlueAtm : AstralPartyRelicModel
     private void ResetPendingState()
     {
         _pendingSelfStarLight = 0;
+    }
+
+    private int GetExtraStarLightAmount()
+    {
+        var roundNumber = Owner?.Creature?.CombatState?.RoundNumber ?? 0;
+        return roundNumber > 0 && roundNumber % 3 == 0 ? 2 : 1;
     }
 }

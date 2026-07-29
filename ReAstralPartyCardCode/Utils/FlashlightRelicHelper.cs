@@ -15,6 +15,11 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class FlashlightRelicHelper
 {
+    public static bool HasExposure(Creature target)
+    {
+        return target.HasPower<ExposurePower>();
+    }
+
     public static bool ShouldHandleSharedSet(RelicModel relic)
     {
         var owner = relic.Owner;
@@ -37,7 +42,7 @@ public static class FlashlightRelicHelper
 
     public static async Task TryGrantEternalStarlightOnKill(Player owner, Creature target)
     {
-        if (!target.HasPower<ExposurePower>())
+        if (!HasExposure(target))
             return;
 
         await TokenEternalStarlight.GrantStacks(owner, 1);

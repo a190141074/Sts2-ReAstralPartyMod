@@ -60,7 +60,7 @@ public static class CyberKittyCombatHelper
         return attackCard;
     }
 
-    public static async Task<CardModel?> DiscardLeftmostAttackAndUpgradeForCombat(
+    public static async Task<CardModel?> DiscardLeftmostAttack(
         PlayerChoiceContext choiceContext,
         Player owner)
     {
@@ -73,29 +73,7 @@ public static class CyberKittyCombatHelper
             return null;
 
         await CardCmd.Discard(choiceContext, leftmostAttack);
-        CardCmd.Upgrade(leftmostAttack);
         return leftmostAttack;
-    }
-
-    public static CardModel? UpgradeRandomAttackForCombat(Player owner)
-    {
-        var playerCombatState = owner.PlayerCombatState;
-        if (playerCombatState == null)
-            return null;
-
-        var selected = PersonMultiplayerEffectHelper.SelectRandomUpgradeableCombatCard(
-            owner,
-            WarforgeEnchantmentHelper.CountsAsAttack,
-            owner.RunState.Rng.CombatCardSelection);
-        var fallback = selected ?? PersonMultiplayerEffectHelper.SelectRandomUpgradeableCombatCard(
-            owner,
-            _ => true,
-            owner.RunState.Rng.CombatCardSelection);
-        if (fallback == null)
-            return null;
-
-        CardCmd.Upgrade(fallback);
-        return fallback;
     }
 
     private static CardModel? FindPreferredAttackCard(Player owner)

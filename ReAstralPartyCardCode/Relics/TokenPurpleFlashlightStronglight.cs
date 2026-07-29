@@ -21,7 +21,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class TokenPurpleFlashlightStronglight : AstralPartyRelicModel
 {
     private const int MinTrackedAttackCost = 1;
-    private const int CardsPerTrigger = 3;
+    private const int CardsPerTrigger = 4;
+    private const int EternalStarlightPerDamageBonus = 14;
 
     [SavedProperty] public int AstralParty_TokenPurpleFlashlightStronglightHitProgress { get; set; }
 
@@ -99,5 +100,30 @@ public class TokenPurpleFlashlightStronglight : AstralPartyRelicModel
             Owner.Creature,
             cardPlay.Card,
             false);
+    }
+
+    public override decimal ModifyDamageAdditive(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
+    {
+        if (Owner?.Creature == null || dealer != Owner.Creature)
+            return 0m;
+        if (target == null || target.Side == Owner.Creature.Side)
+            return 0m;
+        if (amount <= 0m)
+            return 0m;
+        if (cardSource?.Type != CardType.Attack)
+            return 0m;
+
+        return GetAttackDamageBonus();
+    }
+
+    private int GetAttackDamageBonus()
+    {
+        var eternalStarlight = Owner?.GetRelic<TokenEternalStarlight>()?.GetStacks() ?? 0;
+        return eternalStarlight / EternalStarlightPerDamageBonus;
     }
 }

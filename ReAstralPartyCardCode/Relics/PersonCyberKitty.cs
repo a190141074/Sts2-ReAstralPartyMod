@@ -22,7 +22,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class PersonCyberKitty : CooldownPersonRelicBase
 {
     private const int PassiveTemporaryStatAmount = 1;
-    private const int NodeThreshold = 3;
+    private const int EliteOrBossTemporaryStatAmount = 2;
+    private const int NodeThreshold = 2;
 
     [SavedProperty] public int AstralParty_PersonCyberKittyCounter { get; set; } = 1;
 
@@ -95,10 +96,14 @@ public class PersonCyberKitty : CooldownPersonRelicBase
         if (nodeAmount <= NodeThreshold)
             return;
 
+        var temporaryStatAmount = IsEliteOrBossEncounter()
+            ? EliteOrBossTemporaryStatAmount
+            : PassiveTemporaryStatAmount;
+
         Flash();
-        await AstralTemporaryStrengthPower.Apply(Owner.Creature, PassiveTemporaryStatAmount, this, Owner.Creature, null,
+        await AstralTemporaryStrengthPower.Apply(Owner.Creature, temporaryStatAmount, this, Owner.Creature, null,
             true);
-        await AstralTemporaryDexterityPower.Apply(Owner.Creature, PassiveTemporaryStatAmount, this, Owner.Creature,
+        await AstralTemporaryDexterityPower.Apply(Owner.Creature, temporaryStatAmount, this, Owner.Creature,
             null, true);
         await CyberKittyCombatHelper.GainRandomAttackCardDiscounted(choiceContext, Owner, this);
     }
@@ -125,12 +130,7 @@ public class PersonCyberKitty : CooldownPersonRelicBase
         AstralParty_PersonCyberKittyTriggeredThisTurn = true;
         Flash();
 
-        var discardedAttack =
-            await CyberKittyCombatHelper.DiscardLeftmostAttackAndUpgradeForCombat(choiceContext, Owner);
-        if (discardedAttack != null)
-            return;
-
-        CyberKittyCombatHelper.UpgradeRandomAttackForCombat(Owner);
+        await CyberKittyCombatHelper.DiscardLeftmostAttack(choiceContext, Owner);
     }
 
     protected override Task BeforeAdvanceCounterAfterCombatEnd(CombatRoom room)
@@ -148,5 +148,11 @@ public class PersonCyberKitty : CooldownPersonRelicBase
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillRemoteIntrusion>(), Owner);
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+    }
+
+    private bool IsEliteOrBossEncounter()
+    {
+        var roomType = Owner?.Creature?.CombatState?.Encounter?.RoomType;
+        return roomType is RoomType.Elite or RoomType.Boss;
     }
 }

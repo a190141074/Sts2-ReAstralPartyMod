@@ -18,7 +18,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenBlueFlashlightGeneral : AstralPartyRelicModel
 {
-    private const decimal HealOnKill = 4m;
+    private const decimal HealOnKill = 2m;
 
     public override RelicRarity Rarity => RelicRarity.Common;
 
@@ -56,6 +56,8 @@ public class TokenBlueFlashlightGeneral : AstralPartyRelicModel
         if (target.Side == Owner.Creature.Side)
             return;
         if (!result.WasTargetKilled)
+            return;
+        if (!FlashlightRelicHelper.HasExposure(target))
             return;
 
         Flash();

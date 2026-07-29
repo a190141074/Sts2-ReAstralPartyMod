@@ -47,6 +47,9 @@ internal static class StartingPersonNeowReadyFlow
         typeof(AncientEventModel),
         "SetInitialEventState",
         [typeof(bool)]);
+    private static readonly FieldInfo? RunStateModifiersBackingField = AccessTools.Field(
+        typeof(RunState),
+        "<Modifiers>k__BackingField");
     private static readonly MethodInfo? EventRoomSetupLayoutMethod =
         AccessTools.Method(typeof(NEventRoom), "SetupLayout");
     private static readonly MethodInfo? EventRoomRefreshEventStateMethod =
@@ -67,6 +70,10 @@ internal static class StartingPersonNeowReadyFlow
         IReadOnlyList<EventOption> OriginalOptions,
         LocString OriginalDescription,
         bool Restored = false);
+
+    private sealed record TemporaryNeowModifierFilterState(
+        IReadOnlyList<ModifierModel> OriginalModifiers,
+        int FilteredCount);
 
     internal static bool IsInternalNeowRefreshActive => InternalNeowRefreshDepth.Value > 0;
 
@@ -564,7 +571,15 @@ internal static class StartingPersonNeowReadyFlow
 
         try
         {
-            SetInitialEventStateMethod.Invoke(neow, [false]);
+            var modifierFilterState = ApplyTemporaryNeowModifierFilter(neow, state.RunKey, reason);
+            try
+            {
+                SetInitialEventStateMethod.Invoke(neow, [false]);
+            }
+            finally
+            {
+                RestoreTemporaryNeowModifierFilter(neow, modifierFilterState, state.RunKey, reason);
+            }
             var rebuiltOptionCount = neow.CurrentOptions?.Count ?? 0;
             var cachedOptionCount = state.OriginalOptions.Count;
             if (rebuiltOptionCount < cachedOptionCount)
@@ -584,6 +599,48 @@ internal static class StartingPersonNeowReadyFlow
                 $"[StartingPersonNeowReadyFlow] Failed to rebuild Neow initial option page; falling back to cached options | runKey={state.RunKey} reason={reason}: {ex}");
             RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached");
         }
+    }
+
+    private static TemporaryNeowModifierFilterState? ApplyTemporaryNeowModifierFilter(Neow neow, string runKey, string reason)
+    {
+        if (RunStateModifiersBackingField == null)
+            throw new InvalidOperationException("Failed to resolve RunState.Modifiers backing field for Neow rebuild filtering.");
+        if (neow.Owner?.RunState is not RunState runState)
+            return null;
+
+        var originalModifiers = runState.Modifiers;
+        var filteredModifiers = originalModifiers
+            .Where(modifier => modifier.GenerateNeowOption(neow) != null)
+            .ToList();
+        if (filteredModifiers.Count == originalModifiers.Count)
+        {
+            MainFile.Logger.Info(
+                $"[StartingPersonNeowReadyFlow] Neow rebuild modifier filter skipped | runKey={runKey} reason={reason} before={originalModifiers.Count}.");
+            return null;
+        }
+
+        RunStateModifiersBackingField.SetValue(runState, filteredModifiers);
+        MainFile.Logger.Info(
+            $"[StartingPersonNeowReadyFlow] Neow rebuild modifier filter applied | runKey={runKey} reason={reason} before={originalModifiers.Count} after={filteredModifiers.Count}.");
+        return new TemporaryNeowModifierFilterState(originalModifiers, filteredModifiers.Count);
+    }
+
+    private static void RestoreTemporaryNeowModifierFilter(
+        Neow neow,
+        TemporaryNeowModifierFilterState? state,
+        string runKey,
+        string reason)
+    {
+        if (state == null)
+            return;
+        if (RunStateModifiersBackingField == null)
+            throw new InvalidOperationException("Failed to resolve RunState.Modifiers backing field for Neow rebuild filtering.");
+        if (neow.Owner?.RunState is not RunState runState)
+            return;
+
+        RunStateModifiersBackingField.SetValue(runState, state.OriginalModifiers);
+        MainFile.Logger.Info(
+            $"[StartingPersonNeowReadyFlow] Neow rebuild modifier filter restored | runKey={runKey} reason={reason} restored={state.OriginalModifiers.Count} filtered={state.FilteredCount}.");
     }
 
     private static void RestoreCachedStateOrFinish(Neow neow, ReadyPageState state, string reason)
