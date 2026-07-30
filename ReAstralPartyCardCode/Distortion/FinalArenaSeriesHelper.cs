@@ -145,6 +145,30 @@ public static class FinalArenaSeriesHelper
         return true;
     }
 
+    public static IReadOnlyList<FinalArenaDistortionComponent> RegenerateComponents(RunState runState)
+    {
+        if (!IsFinalArenaOpen(runState))
+            throw new InvalidOperationException("Final Arena is not open.");
+
+        var existingRunData = GetOrCreateRunData(runState);
+        var components = GenerateComponents(runState, Guid.NewGuid().ToString("N"));
+        var runData = new FinalArenaSeriesRunData
+        {
+            ComponentsJson = SerializeComponents(components),
+            HumanAiDuelApplied = existingRunData.HumanAiDuelApplied,
+            RobberyGoldGranted = false,
+            ThreeThousandAstrolabeGoldGranted = false,
+            RobberyNextCombatStunPending = false,
+            MysteriousTreasureInitialized = false,
+            MysteriousTreasureNextCombatPending = false,
+            MysteriousTreasureCombatCounter = 0,
+            ArbitrageLastFloor = -1,
+            GlobalPlayerTurnCounter = 0
+        };
+        _runData.Set(runState, runData);
+        return components;
+    }
+
     public static bool TryGetActiveComponents(
         IRunState? runState,
         out IReadOnlyList<FinalArenaDistortionComponent> components)
@@ -421,9 +445,13 @@ public static class FinalArenaSeriesHelper
                state.OpenSeries.Contains(TokenSeriesAvailabilityHelper.TokenSeries.FinalArena);
     }
 
-    private static IReadOnlyList<FinalArenaDistortionComponent> GenerateComponents(RunState runState)
+    private static IReadOnlyList<FinalArenaDistortionComponent> GenerateComponents(
+        RunState runState,
+        string? seedSuffix = null)
     {
-        var seed = runState.Rng.StringSeed;
+        var seed = string.IsNullOrWhiteSpace(seedSuffix)
+            ? runState.Rng.StringSeed
+            : $"{runState.Rng.StringSeed}:{seedSuffix}";
         var attentionIndex = DeterministicMultiplayerChoiceHelper.RollDeterministically(
             0,
             RequiredAttentionComponents.Length,

@@ -46,6 +46,7 @@ public sealed class DevConsoleUltimateChargeCommandPatch : IPatchMethod
 
             RegisterCommand(commands, RapUltChargeHandConsoleCmd.CommandName, new RapUltChargeHandConsoleCmd());
             RegisterCommand(commands, AstralDlcConsoleCmd.CommandName, new AstralDlcConsoleCmd());
+            RegisterCommand(commands, AstralMutatorConsoleCmd.CommandName, new AstralMutatorConsoleCmd());
 
         }
         catch (Exception ex)
