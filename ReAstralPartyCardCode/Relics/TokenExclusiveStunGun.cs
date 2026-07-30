@@ -14,16 +14,16 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenExclusiveStunGun : AstralPartyRelicModel
 {
-    private const decimal MindOnEliteKill = 1m;
-    private const int MinimumMindStacks = 1;
+    private const int MindOnEliteKill = 1;
 
-    [SavedProperty] public int AstralParty_TokenExclusiveStunGunMindStacks { get; set; } = MinimumMindStacks;
+    [SavedProperty] public int AstralParty_TokenExclusiveStunGunMindStacks { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
@@ -31,24 +31,10 @@ public class TokenExclusiveStunGun : AstralPartyRelicModel
 
     public override bool ShowCounter => true;
 
-    public override int DisplayAmount => GetNormalizedMindStacks();
+    public override int DisplayAmount => StunGunMindSyncHelper.GetRecordedMindStacks(this);
 
     internal void NotifyDisplayAmountChanged()
     {
-        InvokeDisplayAmountChanged();
-    }
-
-    internal int GetNormalizedMindStacks()
-    {
-        return Math.Max(AstralParty_TokenExclusiveStunGunMindStacks, MinimumMindStacks);
-    }
-
-    internal void EnsureMinimumMindStacks(int minimumMindStacks = MinimumMindStacks)
-    {
-        if (AstralParty_TokenExclusiveStunGunMindStacks >= minimumMindStacks)
-            return;
-
-        AstralParty_TokenExclusiveStunGunMindStacks = minimumMindStacks;
         InvokeDisplayAmountChanged();
     }
 
@@ -65,14 +51,8 @@ public class TokenExclusiveStunGun : AstralPartyRelicModel
         if (Owner?.Creature == null)
             return;
 
-        EnsureMinimumMindStacks();
         Flash();
-        await PowerCmd.Apply<MindPower>(
-            Owner.Creature,
-            AstralParty_TokenExclusiveStunGunMindStacks,
-            Owner.Creature,
-            null,
-            false);
+        await StunGunMindSyncHelper.ApplyRecordedMindAtCombatStart(this);
     }
 
     public override async Task AfterDamageGiven(
@@ -92,9 +72,7 @@ public class TokenExclusiveStunGun : AstralPartyRelicModel
         if (Owner.Creature.CombatState?.Encounter?.RoomType != RoomType.Elite)
             return;
 
-        AstralParty_TokenExclusiveStunGunMindStacks = GetNormalizedMindStacks() + 1;
         Flash();
-        InvokeDisplayAmountChanged();
-        await PowerCmd.Apply<MindPower>(Owner.Creature, MindOnEliteKill, Owner.Creature, cardSource, false);
+        await StunGunMindSyncHelper.AdjustRecordedMindStacks(this, MindOnEliteKill, Owner.Creature, cardSource);
     }
 }

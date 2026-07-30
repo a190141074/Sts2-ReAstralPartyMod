@@ -396,14 +396,9 @@ public static class FinalArenaSeriesHelper
         }
 
         if (obtainedNow)
-            stunGun.AstralParty_TokenExclusiveStunGunMindStacks = StunGunInitialMind;
-        else
-            stunGun.EnsureMinimumMindStacks(StunGunInitialMind);
-
-        stunGun.NotifyDisplayAmountChanged();
-
-        if (player.Creature?.CombatState != null)
-            await PowerCmd.Apply<MindPower>(player.Creature, StunGunInitialMind, player.Creature, null, false);
+            await StunGunMindSyncHelper.SetRecordedMindStacks(stunGun, StunGunInitialMind, player.Creature, null);
+        else if (StunGunMindSyncHelper.GetRecordedMindStacks(stunGun) < StunGunInitialMind)
+            await StunGunMindSyncHelper.SetRecordedMindStacks(stunGun, StunGunInitialMind, player.Creature, null);
     }
 
     private static bool IsFinalArenaOpen(IRunState? runState)

@@ -440,6 +440,7 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_Eternal_Starlight.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_ancient_wand.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_ancient_wand.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_adaptive_core.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_boutique_sword_shield.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_boutique_sword_shield.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_bronze_gong.png"/>
@@ -452,12 +453,15 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_cursed_sword.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_dreamship_model.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_dreamship_model.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_entertainment_terminal.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_fitness_tracker.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_infinite_snake.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_infinite_snake.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_little_carp_doll.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_little_carp_doll.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_little_snake_doll.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_little_snake_doll.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_original_consciousness.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_piercing_gun.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_piercing_gun.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_psychedelic_seafood_soup.png"/>
@@ -465,6 +469,7 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_stun_gun.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_storm_talisman.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_storm_talisman.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_time_pocket_watch.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_timer.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_timer.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_exclusive_trident.png"/>
@@ -498,6 +503,7 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_extra_battery.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_flashlight_flashburst.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_flashlight_flashburst.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_gold_flying_star.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_handheld_fan_large.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_handheld_fan_large.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_magic_quiver.png"/>
@@ -532,6 +538,7 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_boxing_glove_intermediate.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_flashlight_stronglight.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_flashlight_stronglight.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_purple_flying_star.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_friendship_badge.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_friendship_badge.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_members_reference_premium.png"/>

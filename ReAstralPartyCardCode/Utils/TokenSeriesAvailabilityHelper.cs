@@ -90,7 +90,10 @@ public static class TokenSeriesAvailabilityHelper
         ],
         [TokenSeries.FinalArena] =
         [
+            ModelDb.GetId<TokenExclusiveAdaptiveCore>(),
+            ModelDb.GetId<TokenExclusiveEntertainmentTerminal>(),
             ModelDb.GetId<TokenExclusiveFitnessTracker>(),
+            ModelDb.GetId<TokenExclusiveOriginalConsciousness>(),
             ModelDb.GetId<TokenExclusiveStunGun>(),
             ModelDb.GetId<TokenExclusiveTimePocketWatch>()
         ]
@@ -121,6 +124,9 @@ public static class TokenSeriesAvailabilityHelper
         [ModelDb.GetId<TokenExclusiveCandyMembershipCard>()] = "【糖果会员卡】",
         [ModelDb.GetId<TokenExclusiveTimer>()] = "【计时器】",
         [ModelDb.GetId<TokenExclusiveFitnessTracker>()] = "【运动手环】",
+        [ModelDb.GetId<TokenExclusiveAdaptiveCore>()] = "【适应核心】",
+        [ModelDb.GetId<TokenExclusiveEntertainmentTerminal>()] = "【娱乐终端】",
+        [ModelDb.GetId<TokenExclusiveOriginalConsciousness>()] = "【原初意识】",
         [ModelDb.GetId<TokenExclusiveStunGun>()] = "【电击枪】",
         [ModelDb.GetId<TokenExclusiveTimePocketWatch>()] = "【时间怀表】"
     };
