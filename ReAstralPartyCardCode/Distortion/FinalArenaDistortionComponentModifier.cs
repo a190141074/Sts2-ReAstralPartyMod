@@ -5,6 +5,7 @@ using MegaCrit.Sts2.Core.Commands.Builders;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Merchant;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -170,6 +171,15 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             return amount;
 
         return amount + 1m;
+    }
+
+    public override decimal ModifyMerchantPrice(Player player, MerchantEntry entry, decimal originalPrice)
+    {
+        if (RunState == null ||
+            !FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.ThreeThousandAstrolabe))
+            return originalPrice;
+
+        return originalPrice * 7m;
     }
 
     public override decimal ModifyHandDraw(Player player, decimal amount)

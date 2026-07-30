@@ -69,6 +69,7 @@ internal static class FinalArenaDistortionComponentSync
             message.GetComponents(),
             message.HumanAiDuelApplied,
             message.RobberyGoldGranted,
+            message.ThreeThousandAstrolabeGoldGranted,
             message.RobberyNextCombatPending,
             message.MysteriousTreasureInitialized,
             message.MysteriousTreasureNextCombatPending,
@@ -80,7 +81,7 @@ internal static class FinalArenaDistortionComponentSync
 
 internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 1;
+    private const int SchemaVersion = 2;
 
     private List<FinalArenaDistortionComponent> _components;
 
@@ -91,6 +92,7 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         _components = [.. components];
         HumanAiDuelApplied = runData.HumanAiDuelApplied;
         RobberyGoldGranted = runData.RobberyGoldGranted;
+        ThreeThousandAstrolabeGoldGranted = runData.ThreeThousandAstrolabeGoldGranted;
         RobberyNextCombatPending = runData.RobberyNextCombatStunPending;
         MysteriousTreasureInitialized = runData.MysteriousTreasureInitialized;
         MysteriousTreasureNextCombatPending = runData.MysteriousTreasureNextCombatPending;
@@ -101,6 +103,7 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
 
     public bool HumanAiDuelApplied { get; private set; }
     public bool RobberyGoldGranted { get; private set; }
+    public bool ThreeThousandAstrolabeGoldGranted { get; private set; }
     public bool RobberyNextCombatPending { get; private set; }
     public bool MysteriousTreasureInitialized { get; private set; }
     public bool MysteriousTreasureNextCombatPending { get; private set; }
@@ -127,6 +130,7 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
 
         writer.WriteBool(HumanAiDuelApplied);
         writer.WriteBool(RobberyGoldGranted);
+        writer.WriteBool(ThreeThousandAstrolabeGoldGranted);
         writer.WriteBool(RobberyNextCombatPending);
         writer.WriteBool(MysteriousTreasureInitialized);
         writer.WriteBool(MysteriousTreasureNextCombatPending);
@@ -152,6 +156,7 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
 
         HumanAiDuelApplied = reader.ReadBool();
         RobberyGoldGranted = reader.ReadBool();
+        ThreeThousandAstrolabeGoldGranted = reader.ReadBool();
         RobberyNextCombatPending = reader.ReadBool();
         MysteriousTreasureInitialized = reader.ReadBool();
         MysteriousTreasureNextCombatPending = reader.ReadBool();

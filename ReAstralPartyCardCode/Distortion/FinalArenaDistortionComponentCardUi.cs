@@ -201,6 +201,7 @@ internal static partial class FinalArenaDistortionComponentCardUi
             0 => "diff_0",
             -1 => "diff_negative_1",
             -2 => "diff_negative_2",
+            -3 => "diff_negative_3",
             1 => "diff_positive_1",
             2 => "diff_positive_2",
             _ => "diff_0"
@@ -221,6 +222,7 @@ internal static partial class FinalArenaDistortionComponentCardUi
             FinalArenaDistortionComponent.HumanAiDuel => 60112,
             FinalArenaDistortionComponent.RefereeAttentionOne => 60151,
             FinalArenaDistortionComponent.RefereeAttentionTwo => 60152,
+            FinalArenaDistortionComponent.ThreeThousandAstrolabe => 70001,
             FinalArenaDistortionComponent.PirateKingsOrder => 60015,
             FinalArenaDistortionComponent.Thundercloud => 60013,
             FinalArenaDistortionComponent.Rainstorm => 60007,

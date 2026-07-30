@@ -667,6 +667,8 @@
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_1.description": "In combat, every [blue]3[/blue] player turns, one random player loses [blue]2[/blue] temporary [red]Dexterity[/red].",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_2.title": "[Referee Attention 2 ({Difficulty})]",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_2.description": "In combat, every [blue]3[/blue] player turns, one random player and one random non-Boss enemy both lose either [blue]2[/blue] temporary [red]Dexterity[/red] or [blue]2[/blue] temporary [red]Strength[/red].",
+  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.three_thousand_astrolabe.title": "[Three Thousand Astrolabe ({Difficulty})]",
+  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.three_thousand_astrolabe.description": "Merchant prices are fixed at [blue]700%[/blue] and are unaffected by any relic discount effects. All players gain [gold]3000[/gold] Gold.",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.pirate_kings_order.title": "[Pirate King's Order ({Difficulty})]",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.pirate_kings_order.description": "Bosses and Elites start with [blue]1[/blue] [power]Pirate King's Order[/power].\nAt the start of each turn, if the Boss is not intending to attack, all enemies heal [blue]3[/blue] HP.",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.thundercloud.title": "[Thundercloud ({Difficulty})]",

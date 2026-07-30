@@ -22,6 +22,7 @@ public enum FinalArenaDistortionComponent
     HumanAiDuel,
     RefereeAttentionOne,
     RefereeAttentionTwo,
+    ThreeThousandAstrolabe,
     PirateKingsOrder,
     Thundercloud,
     Rainstorm,
@@ -55,6 +56,7 @@ public static class FinalArenaSeriesHelper
 
     private static readonly FinalArenaDistortionComponent[] OptionalComponents =
     [
+        FinalArenaDistortionComponent.ThreeThousandAstrolabe,
         FinalArenaDistortionComponent.PirateKingsOrder,
         FinalArenaDistortionComponent.Thundercloud,
         FinalArenaDistortionComponent.Rainstorm,
@@ -228,6 +230,7 @@ public static class FinalArenaSeriesHelper
         IReadOnlyList<FinalArenaDistortionComponent> components,
         bool humanAiDuelApplied,
         bool robberyGoldGranted,
+        bool threeThousandAstrolabeGoldGranted,
         bool robberyNextCombatPending,
         bool mysteriousTreasureInitialized,
         bool mysteriousTreasureNextCombatPending,
@@ -239,6 +242,7 @@ public static class FinalArenaSeriesHelper
         runData.ComponentsJson = SerializeComponents(components);
         runData.HumanAiDuelApplied = humanAiDuelApplied;
         runData.RobberyGoldGranted = robberyGoldGranted;
+        runData.ThreeThousandAstrolabeGoldGranted = threeThousandAstrolabeGoldGranted;
         runData.RobberyNextCombatStunPending = robberyNextCombatPending;
         runData.MysteriousTreasureInitialized = mysteriousTreasureInitialized;
         runData.MysteriousTreasureNextCombatPending = mysteriousTreasureNextCombatPending;
@@ -320,6 +324,7 @@ public static class FinalArenaSeriesHelper
             FinalArenaDistortionComponent.HumanAiDuel => 0,
             FinalArenaDistortionComponent.RefereeAttentionOne => -1,
             FinalArenaDistortionComponent.RefereeAttentionTwo => -2,
+            FinalArenaDistortionComponent.ThreeThousandAstrolabe => -3,
             FinalArenaDistortionComponent.PirateKingsOrder => -2,
             FinalArenaDistortionComponent.Thundercloud => -2,
             FinalArenaDistortionComponent.Rainstorm => -1,
@@ -361,6 +366,15 @@ public static class FinalArenaSeriesHelper
 
             runData.RobberyGoldGranted = true;
             runData.RobberyNextCombatStunPending = true;
+        }
+
+        if (components.Contains(FinalArenaDistortionComponent.ThreeThousandAstrolabe) &&
+            !runData.ThreeThousandAstrolabeGoldGranted)
+        {
+            foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+                await PlayerCmd.GainGold(3000m, player);
+
+            runData.ThreeThousandAstrolabeGoldGranted = true;
         }
 
         if (components.Contains(FinalArenaDistortionComponent.MysteriousTreasure) &&
@@ -515,6 +529,7 @@ public static class FinalArenaSeriesHelper
             FinalArenaDistortionComponent.HumanAiDuel => "human_ai_duel",
             FinalArenaDistortionComponent.RefereeAttentionOne => "referee_attention_1",
             FinalArenaDistortionComponent.RefereeAttentionTwo => "referee_attention_2",
+            FinalArenaDistortionComponent.ThreeThousandAstrolabe => "three_thousand_astrolabe",
             FinalArenaDistortionComponent.PirateKingsOrder => "pirate_kings_order",
             FinalArenaDistortionComponent.Thundercloud => "thundercloud",
             FinalArenaDistortionComponent.Rainstorm => "rainstorm",
@@ -542,6 +557,7 @@ public sealed class FinalArenaSeriesRunData
     public string ComponentsJson { get; set; } = string.Empty;
     public bool HumanAiDuelApplied { get; set; }
     public bool RobberyGoldGranted { get; set; }
+    public bool ThreeThousandAstrolabeGoldGranted { get; set; }
     public bool RobberyNextCombatStunPending { get; set; }
     public bool MysteriousTreasureInitialized { get; set; }
     public bool MysteriousTreasureNextCombatPending { get; set; }
