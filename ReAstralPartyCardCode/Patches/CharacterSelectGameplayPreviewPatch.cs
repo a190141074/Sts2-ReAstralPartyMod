@@ -717,7 +717,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             _requestRetryAccumulator = 0d;
             _secondsSinceSnapshotUpdate = 0d;
             _hasReceivedSnapshotForCurrentSession = false;
-            MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview observed lobby change; role={role} hostNetId={LobbyGameplayNetRoleHelper.GetHostNetId(lobby)} localNetId={lobby?.LocalPlayer.id ?? 0UL} players={lobby?.Players.Count ?? 0}.");
+            MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview observed lobby change; role={role} hostNetId={LobbyGameplayNetRoleHelper.GetHostNetId(lobby)} localNetId={LobbyGameplayNetRoleHelper.GetLocalNetId(lobby)} players={lobby?.Players.Count ?? 0}.");
         }
 
         if (netServiceChanged)

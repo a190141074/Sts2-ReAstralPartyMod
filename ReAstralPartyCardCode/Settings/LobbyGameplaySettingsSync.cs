@@ -28,7 +28,7 @@ internal static class LobbyGameplayNetRoleHelper
             return GetCurrentRole();
 
         var hostNetId = GetHostNetId(lobby);
-        var localNetId = lobby.LocalPlayer.id;
+        var localNetId = GetLocalNetId(lobby);
         if (hostNetId != 0UL && localNetId != 0UL)
             return localNetId == hostNetId ? LobbyGameplayNetRole.Host : LobbyGameplayNetRole.Client;
 
@@ -83,6 +83,20 @@ internal static class LobbyGameplayNetRoleHelper
             return 0UL;
 
         return clientService.NetClient?.HostNetId ?? 0UL;
+    }
+
+    public static ulong GetLocalNetId(StartRunLobby? lobby)
+    {
+        if (lobby == null)
+            return GetLocalNetId();
+
+        return lobby.NetService?.NetId ?? 0UL;
+    }
+
+    public static ulong GetLocalNetId(INetGameService? netService = null)
+    {
+        netService ??= RunManager.Instance?.NetService;
+        return netService?.NetId ?? 0UL;
     }
 }
 

@@ -56,6 +56,20 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - 先确认“入口是否注册正确”，再写内容代码。很多“卡牌没出现”“遗物没加载”本质上是初始化或依赖问题。
 - 先做最小可运行切片：入口、依赖、1 个内容类型、本地化、图标或场景路径，然后再扩展复杂联动。
 - 当概念已明确，但 public 接口名、override 面、参数名、返回值语义还不确定时，先查运行时 `STS2-RitsuLib.xml`，再决定是否下钻 `RitsuLib-code`。
+- 不要把“看到更高版本 compat 目录”误判成“当前游戏就在跑那个版本”：
+  - 先看最新 `release_info.json`、带时间戳日志、以及实际加载的 `STS2-RitsuLib.dll` / `lib\<game-version>\STS2-RitsuLib.dll` 路径
+  - 再决定当前 runtime 是 `0.107.1` 还是别的分支
+- 大厅 / 角色选择 / lobby snapshot 相关代码不要继续直接依赖 `StartRunLobby.LocalPlayer`：
+  - 优先用 `lobby.NetService.NetId` 作为本地 netId
+  - 用 `lobby.Players` 推导 host/player 列表
+  - 把“本地玩家 / 房主 / 客户端”判断收口到 helper，不要每个功能链各写一份旧 API
+- 如果 multiplayer 类型名或签名漂移，例如 `LobbyPlayer`、`StartRunLobbyPlayer`、`StartRunLobby.LocalPlayer` 这类面突然失效：
+  - 同时检查当前仓库代码和 `RitsuLib-code`
+  - 不要只修业务模组，遗漏底层 lobby staging / run data sync
+- 对 `SavedAttachedState`、反射枚举字段、type discovery 这类启动链：
+  - 默认容忍 `FieldType` / `PropertyType` 的类型加载失败
+  - 日志要写清具体 owner type、field/property 名和失败类型
+  - 不要让一个过时 multiplayer 类型引用把整条 discovery 链直接炸掉
 - 当前游戏 API `0.105+` 分支默认把 manifest 当成新版口径处理：`min_game_version` 必填；依赖优先写对象形态并补 `min_version`，不要继续沿用旧字符串依赖数组。
 - 对 Harmony / patcher 直连原生方法时，不要只按旧代码记忆写 patch 形参；参数名也要对照运行时 `sts2.xml` 或反编译确认，例如 `choiceContext` 不能随手写成 `context`。
 - 遇到 hook/时机选择问题，不要凭感觉选最宽的入口；先看 `timing-map.md`，再决定是模型 override、RitsuLib lifecycle event，还是更窄的仓库 base/helper。
@@ -70,6 +84,9 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 - 对依赖本地化、UI 节点树或延后初始化对象的 patch，优先考虑 required patcher + deferred patcher 分层；延迟 patch 要和明确初始化条件绑定。
 - 多阶段复杂玩法链若有来源、目标、交付方式、bonus/fallback 等多维状态，优先增加一个窄 `...ExecutionContext` / `...ResolveContext` 收口，而不是直接扩成大框架。
 - 构建 warning 不是纯样式噪音；若它暴露空引用、不安全重载、可空边界失真，默认按潜在 runtime 薄弱点处理。
+- 区分“代码没编过”和“编过了，但 manifest/后处理步骤炸了”：
+  - 如果主 DLL 已成功产出，只是 manifest generation 或导出后处理失败，不要先误判成 API 改动没对上
+  - 需要验证 compat DLL 时，可以临时跳过 manifest generation，再单独核对实际运行时加载路径里的 DLL 是否已经更新
 - 对选择、生成、抽取类 API，默认接受“空结果/数量不符即安全返回”的保守语义，不要强行继续结算。
 
 ## 官方 `zhs` 本地化风格参考
@@ -206,11 +223,18 @@ description: Build or modify Slay the Spire 2 mods that use RitsuLib as a requir
 1. 先检查入口：`[ModInitializer]`、`EnsureGodotScriptsRegistered`、`RegisterModAssembly`
 2. 再检查 manifest：`min_game_version`、`dependencies` 写法、依赖最低版本
 3. 再检查运行时 `STS2-RitsuLib.dll` / `STS2-RitsuLib.xml` 与 `sts2.dll` / `sts2.xml` 是否都在、是否和本地引用链一致
+   - 需要时再额外核对实际加载的是 Workshop loader 根目录 DLL，还是 `lib\<game-version>\STS2-RitsuLib.dll` 变体
 4. 再检查 `csproj`：RitsuLib、`sts2.dll`、`0Harmony.dll` 引用路径
 5. 再检查本地化、图片、场景路径
 6. 如果是 patch apply 失败，先对照运行时 XML / 反编译确认 target 签名与 patch 形参名，再怀疑逻辑本身
 7. 如果核心问题是“该挂哪一种时机”，回到 `timing-map.md`
 8. 最后才看更宽的 Harmony 重写或别的分支行为
+
+如果本机 `RitsuLib-code` 构建只在 manifest generation 这类后处理步骤失败，而你这轮只是要验证 compat DLL 或 runtime 签名：
+
+1. 先让主 DLL 编出来，必要时临时加 `-p:RitsuLibSkipManifestGeneration=true`
+2. 再确认输出的目标分支是不是当前 runtime 对应的 `lib\0.107.1\STS2-RitsuLib.dll` 之类实际加载路径
+3. 最后再用最新日志核对游戏是否真的加载了这份 DLL，而不是旧副本
 
 如果任务已经进入“需要高频实机复现或快速验证”的阶段，再补看：
 
