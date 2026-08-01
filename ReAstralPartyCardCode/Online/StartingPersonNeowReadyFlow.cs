@@ -69,6 +69,7 @@ internal static class StartingPersonNeowReadyFlow
         RunState RunState,
         IReadOnlyList<EventOption> OriginalOptions,
         LocString OriginalDescription,
+        StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind CachedPageKind,
         bool Restored = false);
 
     private sealed record TemporaryNeowModifierFilterState(
@@ -125,16 +126,22 @@ internal static class StartingPersonNeowReadyFlow
                 return;
 
             var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
-            var originalOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
-                neow,
-                neow.CurrentOptions,
-                "ready_page_cache");
+            var cachedPageKind = StartingPersonaExternalNeowCompatHelper.ResolveCachedPageKind(neow);
+            var originalOptions = cachedPageKind == StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
+                ? (neow.CurrentOptions?.ToList() ?? [])
+                : NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
+                    neow,
+                    neow.CurrentOptions,
+                    "ready_page_cache");
             ReadyPages[neow] = new ReadyPageState(
                 runKey,
                 runState,
                 originalOptions,
-                neow.Description ?? neow.InitialDescription);
+                neow.Description ?? neow.InitialDescription,
+                cachedPageKind);
             ReadyPageInjectedRunKeys.Add(runKey);
+            MainFile.Logger.Info(
+                $"[StartingPersonNeowReadyFlow] Cached Neow page before ready-page injection | runKey={runKey} pageKind={StartingPersonaExternalNeowCompatHelper.DescribePageKind(cachedPageKind)} compatSource={StartingPersonaExternalNeowCompatHelper.DescribeDetectedSource()} optionCount={originalOptions.Count}.");
         }
 
         var readyOptions = new[]
@@ -394,9 +401,9 @@ internal static class StartingPersonNeowReadyFlow
                 overrideRelicOptions.Count > 0 ? overrideRelicOptions : null);
             if (opened)
             {
-                RebuildInitialOptionsForRun(runKey, "post_selection_rebuild");
+                var usedExternalRestore = RestoreOrRebuildInitialOptionsForRun(runKey, "post_selection_rebuild");
                 MainFile.Logger.Info(
-                    $"[StartingPersonNeowReadyFlow] Rebuilt Neow initial page after persona overlay | runKey={runKey} source={sourceTag}.");
+                    $"[StartingPersonNeowReadyFlow] Closed persona overlay and restored Neow page | runKey={runKey} source={sourceTag} restoreStrategy={(usedExternalRestore ? "restore_cached_external_page" : "default_rebuild_or_cached_fallback")}.");
             }
             else
             {
@@ -510,7 +517,7 @@ internal static class StartingPersonNeowReadyFlow
             RestoreOriginalOptionsOrFinish(neow, reason);
     }
 
-    private static void RebuildInitialOptionsForRun(string runKey, string reason)
+    private static bool RestoreOrRebuildInitialOptionsForRun(string runKey, string reason)
     {
         List<Neow> neowsToRebuild;
         lock (SyncLock)
@@ -521,8 +528,11 @@ internal static class StartingPersonNeowReadyFlow
                 .ToList();
         }
 
+        var usedExternalRestore = false;
         foreach (var neow in neowsToRebuild)
-            RebuildInitialOptionsOrFallback(neow, reason);
+            usedExternalRestore |= RebuildInitialOptionsOrFallback(neow, reason);
+
+        return usedExternalRestore;
     }
 
     private static void RestoreOriginalOptionsOrFinish(Neow neow, string reason)
@@ -554,19 +564,27 @@ internal static class StartingPersonNeowReadyFlow
             $"[StartingPersonNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
     }
 
-    private static void RebuildInitialOptionsOrFallback(Neow neow, string reason)
+    private static bool RebuildInitialOptionsOrFallback(Neow neow, string reason)
     {
         ReadyPageState? state;
         lock (SyncLock)
         {
             if (!ReadyPages.Remove(neow, out state))
-                return;
+                return false;
+        }
+
+        if (state.CachedPageKind == StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage)
+        {
+            MainFile.Logger.Info(
+                $"[StartingPersonNeowReadyFlow] External Seven Curses Neow compat hit | runKey={state.RunKey} reason={reason} compatSource={StartingPersonaExternalNeowCompatHelper.DescribeDetectedSource()} restoreStrategy=restore_cached_external_page.");
+            RestoreCachedStateOrFinish(neow, state, $"{reason}:restore_cached_external_page");
+            return true;
         }
 
         if (SetInitialEventStateMethod == null)
         {
             RestoreCachedStateOrFinish(neow, state, $"{reason}:missing_set_initial_event_state");
-            return;
+            return false;
         }
 
         try
@@ -587,7 +605,7 @@ internal static class StartingPersonNeowReadyFlow
                 MainFile.Logger.Warn(
                     $"[StartingPersonNeowReadyFlow] Rebuilt Neow initial option page produced fewer options than the cached page; falling back to cached options | runKey={state.RunKey} reason={reason} rebuilt={rebuiltOptionCount} cached={cachedOptionCount}.");
                 RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached_after_short_rebuild");
-                return;
+                return false;
             }
 
             MainFile.Logger.Info(
@@ -599,6 +617,8 @@ internal static class StartingPersonNeowReadyFlow
                 $"[StartingPersonNeowReadyFlow] Failed to rebuild Neow initial option page; falling back to cached options | runKey={state.RunKey} reason={reason}: {ex}");
             RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached");
         }
+
+        return false;
     }
 
     private static TemporaryNeowModifierFilterState? ApplyTemporaryNeowModifierFilter(Neow neow, string runKey, string reason)
@@ -645,10 +665,12 @@ internal static class StartingPersonNeowReadyFlow
 
     private static void RestoreCachedStateOrFinish(Neow neow, ReadyPageState state, string reason)
     {
-        var restoredOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
-            neow,
-            state.OriginalOptions,
-            "ready_page_restore");
+        var restoredOptions = state.CachedPageKind == StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
+            ? state.OriginalOptions
+            : NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
+                neow,
+                state.OriginalOptions,
+                "ready_page_restore");
         if (restoredOptions.Count == 0)
         {
             neow.StartPreFinished();
@@ -662,7 +684,7 @@ internal static class StartingPersonNeowReadyFlow
 
         SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
         MainFile.Logger.Info(
-            $"[StartingPersonNeowReadyFlow] Restored cached Neow option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
+            $"[StartingPersonNeowReadyFlow] Restored cached Neow option page | runKey={state.RunKey} reason={reason} pageKind={StartingPersonaExternalNeowCompatHelper.DescribePageKind(state.CachedPageKind)} optionCount={restoredOptions.Count}.");
     }
 
     private static async Task RefreshRestoredNeowUiAsync(RunState runState, string runKey, string stage)
