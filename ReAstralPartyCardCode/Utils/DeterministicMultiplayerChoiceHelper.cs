@@ -570,6 +570,10 @@ public static class DeterministicMultiplayerChoiceHelper
         if (screen == null)
             return null;
 
+        var overlayStack = await WaitForOverlayStackAsync();
+        if (overlayStack != null)
+            overlayStack.Push(screen);
+
         if (LocalContext.IsMe(player))
             foreach (var relic in options)
                 SaveManager.Instance?.MarkRelicAsSeen(relic);

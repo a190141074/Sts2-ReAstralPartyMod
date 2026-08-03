@@ -670,7 +670,7 @@
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.three_thousand_astrolabe.title": "【三千星盘（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.three_thousand_astrolabe.description": "商店的价格固定为[blue]700%[/blue]，不会受到任何遗物的折扣效果影响。所有玩家获得[gold]3000[/gold]金币。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.chaos_flood.title": "【混沌洪流（{Difficulty}）】",
-  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.chaos_flood.description": "取消人格选择，改为在地图阶段二时，药水栏上限+2，并获得2份【人格宝箱】。",
+  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.chaos_flood.description": "取消[gold]人格选择[/gold]，改为在[gold]地图阶段二[/gold]时，[gold]药水栏上限[/gold]+[blue]2[/blue]，并获得[blue]2[/blue]份[gold]【人格宝箱】[/gold]。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.pirate_kings_order.title": "【海盗王的号令（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.pirate_kings_order.description": "BOSS与精英敌人自带[blue]1[/blue]层[gold]海盗王的号令[/gold]。\n每回合开始时，若BOSS的意图非[gold]攻击[/gold]，则全体敌人回复[blue]3[/blue]点生命。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.thundercloud.title": "【雷云（{Difficulty}）】",

@@ -35,7 +35,7 @@ public static partial class NTopBarOpenTokenSeriesPatch
             return;
         }
 
-        HideAstralRelicStoreModifierIcons(modifiers, runState);
+        HideInternalModifierIcons(modifiers, runState);
 
         var iconRoot = new TokenSeriesTopBarIcon(runState)
         {
@@ -45,9 +45,9 @@ public static partial class NTopBarOpenTokenSeriesPatch
         modifiers.Visible = true;
     }
 
-    private static void HideAstralRelicStoreModifierIcons(Control modifiers, IRunState runState)
+    private static void HideInternalModifierIcons(Control modifiers, IRunState runState)
     {
-        if (!runState.Modifiers.Any(static modifier => modifier is AstralRelicStoreFirstEventModifier))
+        if (!runState.Modifiers.Any(ModifierDisplayVisibilityHelper.IsHiddenModifier))
             return;
 
         var hiddenCount = 0;
@@ -63,7 +63,7 @@ public static partial class NTopBarOpenTokenSeriesPatch
         }
 
         if (hiddenCount > 0)
-            MainFile.Logger.Info($"Top bar hid {hiddenCount} modifier icon node(s) for AstralRelicStoreFirstEventModifier.");
+            MainFile.Logger.Info($"Top bar hid {hiddenCount} internal modifier icon node(s).");
     }
 
     private sealed partial class TokenSeriesTopBarIcon : Control
