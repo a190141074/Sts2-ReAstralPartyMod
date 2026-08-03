@@ -68,6 +68,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         public bool CopyLowTriggered;
         public bool CopyHighTriggered;
         public int FlashOfInsightTriggers;
+        public int FlashOfInsightRolls;
     }
 
     private sealed class PendingCardFlags
@@ -237,8 +238,11 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             await TriggerRefereeAttention(player, globalTurnCounter);
     }
 
-    public override async Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool wasFlushed)
+    public override async Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool fromHandDraw)
     {
+        if (!fromHandDraw)
+            return;
+
         var owner = card.Owner;
         if (owner == null)
             return;
@@ -258,6 +262,14 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
 
         data.PendingPreciseSelectionDrawCounts.Remove(owner.NetId);
         data.PendingPreciseSelectionTurnSeeds.Remove(owner.NetId);
+
+        if (choiceContext is ThrowingPlayerChoiceContext)
+        {
+            MainFile.Logger.Warn(
+                $"[FinalArena] PreciseSelection skipped because player {owner.NetId} received a noninteractive choice context.");
+            return;
+        }
+
         await ResolvePreciseSelection(choiceContext, owner, turnSeed);
     }
 
@@ -343,7 +355,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             RunState != null &&
             FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Seasickness))
         {
-            var poisonTarget = GetDeterministicRandomPlayerOrNull("seasickness", player, GetPlayerTurnSequenceSeed(player));
+            var poisonTarget = GetDeterministicRandomPlayerOrNull("seasickness", player, GetCurrentGlobalPlayerTurnCounter());
             if (poisonTarget?.Creature != null)
                 await PowerCmd.Apply<PoisonPower>(poisonTarget.Creature, SeasicknessPoison, player.Creature, cardPlay.Card, false);
         }
@@ -417,8 +429,9 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             "flash_of_insight",
             RunState.Rng.StringSeed,
             card.Owner.NetId,
+            GetCurrentGlobalPlayerTurnCounter(),
             (card.CanonicalInstance?.Id ?? card.Id).Entry,
-            state.FlashOfInsightTriggers,
+            state.FlashOfInsightRolls++,
             card.Owner.PlayerCombatState?.Hand?.Cards.Count ?? 0);
         if (roll >= FlashOfInsightCopyChance)
             return;
@@ -864,6 +877,8 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             "copy_card_discard",
             RunState?.Rng.StringSeed,
             player.NetId,
+            GetCurrentGlobalPlayerTurnCounter(),
+            (cardSource.CanonicalInstance?.Id ?? cardSource.Id).Entry,
             handCards.Count);
         if (chosen == null)
             return;
@@ -943,10 +958,13 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             candidates.Count);
     }
 
-    private int GetPlayerTurnSequenceSeed(Player player)
+    private int GetCurrentGlobalPlayerTurnCounter()
     {
-        var state = GetOrCreateTurnState(player);
-        return state.CardsPlayed;
+        if (RunState == null ||
+            !FinalArenaSeriesHelper.TryGetRunDataSnapshot(RunState, out _, out var runData))
+            return 0;
+
+        return Math.Max(0, runData.GlobalPlayerTurnCounter);
     }
 
     private string BuildCardStableKey(CardModel card, string pileTag)
