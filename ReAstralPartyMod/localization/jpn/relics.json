@@ -651,6 +651,8 @@
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.referee_attention_2.description": "戦闘中、プレイヤーターンが[blue]3[/blue]回進むごとに、ランダムなプレイヤー[blue]1[/blue]人とランダムな非Boss敵[blue]1[/blue]体が、同時に一時[red]敏捷[/red]-[blue]2[/blue]または一時[red]力量[/red]-[blue]2[/blue]を受ける。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.three_thousand_astrolabe.title": "【三千星盘（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.three_thousand_astrolabe.description": "ショップ価格は[blue]700%[/blue]で固定され、いかなる遺物の割引効果も受けない。すべてのプレイヤーは[gold]3000[/gold]ゴールドを得る。",
+  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.chaos_flood.title": "【混沌洪流（{Difficulty}）】",
+  "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.chaos_flood.description": "人格選択を取り消し、Act 2に入るとポーション所持上限が[blue]2[/blue]増加し、[blue]2[/blue]個の人格宝箱を得る。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.pirate_kings_order.title": "【海盗王的号令（{Difficulty}）】",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.pirate_kings_order.description": "Bossと精英敵は[blue]1[/blue]層の[gold]海盗王的号令[/gold]を持って戦闘を開始する。\n各ターン開始時、Bossの意図が攻撃でなければ、すべての敵は[blue]3[/blue]点回復する。",
   "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT.thundercloud.title": "【雷云（{Difficulty}）】",

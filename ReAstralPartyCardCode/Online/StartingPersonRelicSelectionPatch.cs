@@ -17,6 +17,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Core;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.HonkaiFlameChasers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.ManosabaLin;
 using ReAstralPartyMod.ReAstralPartyCardCode.Compat.Windchaser;
+using ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -261,6 +262,12 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
 
     internal static bool ShouldOpenStartingPersonaRelicSelection(RunState runState, out string reason)
     {
+        if (FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.ChaosFlood))
+        {
+            reason = "starting persona selection cancelled by ChaosFlood distortion component";
+            return false;
+        }
+
         if (!ReAstralPartyModSettingsManager.GetEnableStartingPersonaSelection(runState))
         {
             reason = "starting persona selection disabled by gameplay settings";

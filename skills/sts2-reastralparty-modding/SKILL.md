@@ -336,6 +336,14 @@ description: Repo overlay for `B:\Documents\re-astral-party-mod` on top of `sts2
   - `D:\Steam\steamapps\common\Slay the Spire 2\mods\ReAstralPartyMod\ReAstralPartyMod.dll`
   - 如果游戏目录仍是旧 DLL，就不要用新日志之外的现象来评价本轮修复是否生效
 
+### FinalArena 人机对决
+
+- 【人机对决】的固定语义是：每位玩家先获得【电击枪】，再让该实际持有遗物的记录心智 `+1`；电击枪计数器就是记录心智，禁止再用“初始层数至少为 1”的常量补偿替代这条链。
+- 发放必须走 `PersonMultiplayerEffectHelper.ObtainRelicDeterministic(...)`，随后用 `player.GetRelic<TokenExclusiveStunGun>()` 重新取得实际实例；不得对 `RelicCmd.Obtain(...)` 返回值做强转后直接作为成功依据。
+- 只有 `StunGunMindSyncHelper.AdjustRecordedMindStacks(..., +1, ...)` 使层数从 `N` 变为 `N+1` 后，才能记录该玩家已完成。遗物取得失败、实例未解析或层数未改变时，不能写全局完成状态，后续初始化必须可重试。
+- `FinalArenaSeriesRunData` 与状态包对这条效果必须按 `Player.NetId` 保存/同步“已完成玩家”和 host 确认的最终心智层数；client 收到后用 `SetRecordedMindStacks(...)` 幂等收敛到目标值，不能以“层数至少为 1”猜测是否已执行。
+- 旧存档若只有历史全局完成位：已有电击枪且记录心智大于 `0` 的玩家视为已按旧补偿完成；无电击枪或层数为 `0` 的玩家必须取消完成推定并补发。
+
 ### 隐藏运行时载体
 
 - 这个仓库里，若某个玩法用隐藏 modifier 或等价运行时组件更稳定，可以采用，但默认要求：

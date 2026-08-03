@@ -2,6 +2,7 @@ using System.Text.Json;
 using Godot;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Potions;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Localization;
@@ -9,6 +10,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
+using ReAstralPartyMod.ReAstralPartyCardCode.Potions;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
@@ -24,6 +26,7 @@ public enum FinalArenaDistortionComponent
     RefereeAttentionOne,
     RefereeAttentionTwo,
     ThreeThousandAstrolabe,
+    ChaosFlood,
     PirateKingsOrder,
     Thundercloud,
     Rainstorm,
@@ -56,6 +59,7 @@ public static class FinalArenaSeriesHelper
     private static readonly FinalArenaDistortionComponent[] OptionalComponents =
     [
         FinalArenaDistortionComponent.ThreeThousandAstrolabe,
+        FinalArenaDistortionComponent.ChaosFlood,
         FinalArenaDistortionComponent.PirateKingsOrder,
         FinalArenaDistortionComponent.Thundercloud,
         FinalArenaDistortionComponent.Rainstorm,
@@ -95,6 +99,8 @@ public static class FinalArenaSeriesHelper
                         WritePolicy = RunSavedDataWritePolicy.WhenNonDefault
                     });
         }
+
+        RitsuLibFramework.SubscribeLifecycle<ActEnteredEvent>(OnActEntered, replayCurrentState: false);
 
         _registered = true;
     }
@@ -157,6 +163,9 @@ public static class FinalArenaSeriesHelper
             HumanAiDuelApplied = existingRunData.HumanAiDuelApplied,
             HumanAiDuelGrantedPlayerNetIds = [.. existingRunData.HumanAiDuelGrantedPlayerNetIds],
             HumanAiDuelRecordedMindStacks = new(existingRunData.HumanAiDuelRecordedMindStacks),
+            ChaosFloodAppliedPlayerNetIds = [],
+            ChaosFloodTargetMaxPotionCounts = [],
+            ChaosFloodTargetPersonChestCounts = [],
             RobberyGoldGranted = false,
             ThreeThousandAstrolabeGoldGranted = false,
             RobberyNextCombatStunPending = false,
@@ -256,6 +265,9 @@ public static class FinalArenaSeriesHelper
         bool humanAiDuelApplied,
         IReadOnlyList<ulong> humanAiDuelGrantedPlayerNetIds,
         IReadOnlyDictionary<ulong, int> humanAiDuelRecordedMindStacks,
+        IReadOnlyList<ulong> chaosFloodAppliedPlayerNetIds,
+        IReadOnlyDictionary<ulong, int> chaosFloodTargetMaxPotionCounts,
+        IReadOnlyDictionary<ulong, int> chaosFloodTargetPersonChestCounts,
         bool robberyGoldGranted,
         bool threeThousandAstrolabeGoldGranted,
         bool robberyNextCombatPending,
@@ -273,6 +285,14 @@ public static class FinalArenaSeriesHelper
             .OrderBy(static netId => netId)
             .ToList();
         runData.HumanAiDuelRecordedMindStacks = humanAiDuelRecordedMindStacks
+            .ToDictionary(entry => entry.Key, entry => Math.Max(0, entry.Value));
+        runData.ChaosFloodAppliedPlayerNetIds = chaosFloodAppliedPlayerNetIds
+            .Distinct()
+            .OrderBy(static netId => netId)
+            .ToList();
+        runData.ChaosFloodTargetMaxPotionCounts = chaosFloodTargetMaxPotionCounts
+            .ToDictionary(entry => entry.Key, entry => Math.Max(0, entry.Value));
+        runData.ChaosFloodTargetPersonChestCounts = chaosFloodTargetPersonChestCounts
             .ToDictionary(entry => entry.Key, entry => Math.Max(0, entry.Value));
         runData.RobberyGoldGranted = robberyGoldGranted;
         runData.ThreeThousandAstrolabeGoldGranted = threeThousandAstrolabeGoldGranted;
@@ -358,6 +378,7 @@ public static class FinalArenaSeriesHelper
             FinalArenaDistortionComponent.RefereeAttentionOne => -1,
             FinalArenaDistortionComponent.RefereeAttentionTwo => -2,
             FinalArenaDistortionComponent.ThreeThousandAstrolabe => -3,
+            FinalArenaDistortionComponent.ChaosFlood => 3,
             FinalArenaDistortionComponent.PirateKingsOrder => -2,
             FinalArenaDistortionComponent.Thundercloud => -2,
             FinalArenaDistortionComponent.Rainstorm => -1,
@@ -438,6 +459,13 @@ public static class FinalArenaSeriesHelper
             runData.MysteriousTreasureCombatCounter = 0;
         }
 
+        if (components.Contains(FinalArenaDistortionComponent.ChaosFlood) &&
+            runState.CurrentActIndex == 1 &&
+            LobbyGameplayNetRoleHelper.GetCurrentRole() != LobbyGameplayNetRole.Client)
+        {
+            await ApplyChaosFloodForPlayersAsync(runState, runData);
+        }
+
         _runData.Set(runState, runData);
     }
 
@@ -457,6 +485,125 @@ public static class FinalArenaSeriesHelper
 
             await SetHumanAiDuelMindTarget(player, targetMind);
         }
+    }
+
+    internal static async Task ReconcileSyncedChaosFloodAsync(
+        RunState runState,
+        IReadOnlyList<ulong> appliedPlayerNetIds,
+        IReadOnlyDictionary<ulong, int> targetMaxPotionCounts,
+        IReadOnlyDictionary<ulong, int> targetPersonChestCounts)
+    {
+        if (!HasComponent(runState, FinalArenaDistortionComponent.ChaosFlood))
+            return;
+
+        foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+        {
+            if (!appliedPlayerNetIds.Contains(player.NetId) ||
+                !targetMaxPotionCounts.TryGetValue(player.NetId, out var targetMaxPotionCount) ||
+                !targetPersonChestCounts.TryGetValue(player.NetId, out var targetPersonChestCount))
+                continue;
+
+            var maxBefore = player.MaxPotionCount;
+            if (maxBefore < targetMaxPotionCount)
+                player.AddToMaxPotionCount(targetMaxPotionCount - maxBefore);
+
+            var chestBefore = CountPersonChests(player);
+            while (CountPersonChests(player) < targetPersonChestCount)
+            {
+                var procured = await PotionCmd.TryToProcure(
+                    ModelDb.Potion<PersonChestChoose>().ToMutable(),
+                    player,
+                    -1);
+                if (procured == null)
+                    break;
+            }
+
+            MainFile.Logger.Info(
+                $"[FinalArena] ChaosFlood sync reconcile | player={player.NetId} max_before={maxBefore} max_target={targetMaxPotionCount} max_after={player.MaxPotionCount} chests_before={chestBefore} chests_target={targetPersonChestCount} chests_after={CountPersonChests(player)}.");
+        }
+    }
+
+    private static void OnActEntered(ActEnteredEvent actEnteredEvent)
+    {
+        if (actEnteredEvent.CurrentActIndex != 1 || actEnteredEvent.RunState is not RunState runState)
+            return;
+
+        _ = ApplyChaosFloodOnActEnteredAsync(runState);
+    }
+
+    private static async Task ApplyChaosFloodOnActEnteredAsync(RunState runState)
+    {
+        if (!HasComponent(runState, FinalArenaDistortionComponent.ChaosFlood) ||
+            LobbyGameplayNetRoleHelper.GetCurrentRole() == LobbyGameplayNetRole.Client)
+            return;
+
+        var runData = GetOrCreateRunData(runState);
+        MainFile.Logger.Info(
+            $"[FinalArena] ChaosFlood Act 2 entered | act_index={runState.CurrentActIndex} players={runState.Players.Count}.");
+        await ApplyChaosFloodForPlayersAsync(runState, runData);
+        FinalArenaDistortionComponentSync.BroadcastState(runState);
+    }
+
+    private static async Task ApplyChaosFloodForPlayersAsync(RunState runState, FinalArenaSeriesRunData runData)
+    {
+        foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+        {
+            if (runData.ChaosFloodAppliedPlayerNetIds.Contains(player.NetId))
+                continue;
+
+            var maxBefore = player.MaxPotionCount;
+            var chestBefore = CountPersonChests(player);
+            var targetMaxPotionCount = runData.ChaosFloodTargetMaxPotionCounts.TryGetValue(
+                player.NetId,
+                out var savedMaxPotionCount)
+                ? savedMaxPotionCount
+                : maxBefore + 2;
+            var targetPersonChestCount = runData.ChaosFloodTargetPersonChestCounts.TryGetValue(
+                player.NetId,
+                out var savedPersonChestCount)
+                ? savedPersonChestCount
+                : chestBefore + 2;
+
+            runData.ChaosFloodTargetMaxPotionCounts[player.NetId] = targetMaxPotionCount;
+            runData.ChaosFloodTargetPersonChestCounts[player.NetId] = targetPersonChestCount;
+            if (player.MaxPotionCount < targetMaxPotionCount)
+                player.AddToMaxPotionCount(targetMaxPotionCount - player.MaxPotionCount);
+            while (CountPersonChests(player) < targetPersonChestCount)
+            {
+                var procured = await PotionCmd.TryToProcure(
+                    ModelDb.Potion<PersonChestChoose>().ToMutable(),
+                    player,
+                    -1);
+                if (procured == null)
+                    break;
+            }
+
+            var chestAfter = CountPersonChests(player);
+            if (player.MaxPotionCount < targetMaxPotionCount || chestAfter < targetPersonChestCount)
+            {
+                MainFile.Logger.Warn(
+                    $"[FinalArena] ChaosFlood grant incomplete | player={player.NetId} max_before={maxBefore} max_target={targetMaxPotionCount} max_after={player.MaxPotionCount} chests_before={chestBefore} chests_target={targetPersonChestCount} chests_after={chestAfter}.");
+                continue;
+            }
+
+            runData.ChaosFloodTargetMaxPotionCounts[player.NetId] = targetMaxPotionCount;
+            runData.ChaosFloodTargetPersonChestCounts[player.NetId] = targetPersonChestCount;
+            runData.ChaosFloodAppliedPlayerNetIds.Add(player.NetId);
+            MainFile.Logger.Info(
+                $"[FinalArena] ChaosFlood grant complete | player={player.NetId} max_before={maxBefore} max_after={player.MaxPotionCount} chests_before={chestBefore} chests_after={chestAfter}.");
+        }
+
+        runData.ChaosFloodAppliedPlayerNetIds = runData.ChaosFloodAppliedPlayerNetIds
+            .Distinct()
+            .OrderBy(static netId => netId)
+            .ToList();
+        _runData.Set(runState, runData);
+    }
+
+    private static int CountPersonChests(Player player)
+    {
+        return player.Potions.Count(potion =>
+            potion is PersonChestChoose || potion.CanonicalInstance is PersonChestChoose);
     }
 
     private static void MigrateLegacyHumanAiDuelState(
@@ -681,6 +828,7 @@ public static class FinalArenaSeriesHelper
             FinalArenaDistortionComponent.RefereeAttentionOne => "referee_attention_1",
             FinalArenaDistortionComponent.RefereeAttentionTwo => "referee_attention_2",
             FinalArenaDistortionComponent.ThreeThousandAstrolabe => "three_thousand_astrolabe",
+            FinalArenaDistortionComponent.ChaosFlood => "chaos_flood",
             FinalArenaDistortionComponent.PirateKingsOrder => "pirate_kings_order",
             FinalArenaDistortionComponent.Thundercloud => "thundercloud",
             FinalArenaDistortionComponent.Rainstorm => "rainstorm",
@@ -709,6 +857,9 @@ public sealed class FinalArenaSeriesRunData
     public bool HumanAiDuelApplied { get; set; }
     public List<ulong> HumanAiDuelGrantedPlayerNetIds { get; set; } = [];
     public Dictionary<ulong, int> HumanAiDuelRecordedMindStacks { get; set; } = [];
+    public List<ulong> ChaosFloodAppliedPlayerNetIds { get; set; } = [];
+    public Dictionary<ulong, int> ChaosFloodTargetMaxPotionCounts { get; set; } = [];
+    public Dictionary<ulong, int> ChaosFloodTargetPersonChestCounts { get; set; } = [];
     public bool RobberyGoldGranted { get; set; }
     public bool ThreeThousandAstrolabeGoldGranted { get; set; }
     public bool RobberyNextCombatStunPending { get; set; }

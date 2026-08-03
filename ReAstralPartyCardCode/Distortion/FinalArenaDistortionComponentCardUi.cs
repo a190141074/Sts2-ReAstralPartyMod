@@ -204,6 +204,7 @@ internal static partial class FinalArenaDistortionComponentCardUi
             -3 => "diff_negative_3",
             1 => "diff_positive_1",
             2 => "diff_positive_2",
+            3 => "diff_positive_3",
             _ => "diff_0"
         };
         return $"res://ReAstralPartyMod/images/distortion/{fileName}.png";
@@ -223,6 +224,7 @@ internal static partial class FinalArenaDistortionComponentCardUi
             FinalArenaDistortionComponent.RefereeAttentionOne => 60151,
             FinalArenaDistortionComponent.RefereeAttentionTwo => 60152,
             FinalArenaDistortionComponent.ThreeThousandAstrolabe => 70001,
+            FinalArenaDistortionComponent.ChaosFlood => 70002,
             FinalArenaDistortionComponent.PirateKingsOrder => 60015,
             FinalArenaDistortionComponent.Thundercloud => 60013,
             FinalArenaDistortionComponent.Rainstorm => 60007,
