@@ -64,26 +64,52 @@ internal static class FinalArenaDistortionComponentSync
         if (RunManager.Instance?.DebugOnlyGetState() is not RunState runState)
             return;
 
-        FinalArenaSeriesHelper.ApplySyncedComponents(
-            runState,
-            message.GetComponents(),
-            message.HumanAiDuelApplied,
-            message.RobberyGoldGranted,
-            message.ThreeThousandAstrolabeGoldGranted,
-            message.RobberyNextCombatPending,
-            message.MysteriousTreasureInitialized,
-            message.MysteriousTreasureNextCombatPending,
-            message.MysteriousTreasureCombatCounter,
-            message.ArbitrageLastFloor,
-            message.GlobalPlayerTurnCounter);
+        _ = ApplyHostStateAsync(runState, message);
+    }
+
+    private static async Task ApplyHostStateAsync(
+        RunState runState,
+        FinalArenaDistortionComponentMessage message)
+    {
+        try
+        {
+            FinalArenaSeriesHelper.ApplySyncedComponents(
+                runState,
+                message.GetComponents(),
+                message.HumanAiDuelApplied,
+                message.GetHumanAiDuelGrantedPlayerNetIds(),
+                message.GetHumanAiDuelRecordedMindStacks(),
+                message.RobberyGoldGranted,
+                message.ThreeThousandAstrolabeGoldGranted,
+                message.RobberyNextCombatPending,
+                message.MysteriousTreasureInitialized,
+                message.MysteriousTreasureNextCombatPending,
+                message.MysteriousTreasureCombatCounter,
+                message.ArbitrageLastFloor,
+                message.GlobalPlayerTurnCounter);
+
+            var grantedPlayerNetIds = message.GetHumanAiDuelGrantedPlayerNetIds();
+            MainFile.Logger.Info(
+                $"[FinalArenaDistortionComponentSync] Applied host state | components={string.Join(',', message.GetComponents())} human_ai_duel_grants=[{string.Join(',', grantedPlayerNetIds)}].");
+            await FinalArenaSeriesHelper.ReconcileSyncedHumanAiDuelAsync(
+                runState,
+                grantedPlayerNetIds,
+                message.GetHumanAiDuelRecordedMindStacks());
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Error($"[FinalArenaDistortionComponentSync] Failed to apply host state: {ex}");
+        }
     }
 }
 
 internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 2;
+    private const int SchemaVersion = 3;
 
     private List<FinalArenaDistortionComponent> _components;
+    private List<ulong> _humanAiDuelGrantedPlayerNetIds;
+    private Dictionary<ulong, int> _humanAiDuelRecordedMindStacks;
 
     public FinalArenaDistortionComponentMessage(
         IReadOnlyList<FinalArenaDistortionComponent> components,
@@ -91,6 +117,8 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
     {
         _components = [.. components];
         HumanAiDuelApplied = runData.HumanAiDuelApplied;
+        _humanAiDuelGrantedPlayerNetIds = [.. runData.HumanAiDuelGrantedPlayerNetIds];
+        _humanAiDuelRecordedMindStacks = new(runData.HumanAiDuelRecordedMindStacks);
         RobberyGoldGranted = runData.RobberyGoldGranted;
         ThreeThousandAstrolabeGoldGranted = runData.ThreeThousandAstrolabeGoldGranted;
         RobberyNextCombatPending = runData.RobberyNextCombatStunPending;
@@ -121,6 +149,16 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         return _components ?? [];
     }
 
+    public IReadOnlyList<ulong> GetHumanAiDuelGrantedPlayerNetIds()
+    {
+        return _humanAiDuelGrantedPlayerNetIds ?? [];
+    }
+
+    public IReadOnlyDictionary<ulong, int> GetHumanAiDuelRecordedMindStacks()
+    {
+        return _humanAiDuelRecordedMindStacks ?? new Dictionary<ulong, int>();
+    }
+
     public void Serialize(PacketWriter writer)
     {
         writer.WriteInt(SchemaVersion);
@@ -129,6 +167,15 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
             writer.WriteEnum(component);
 
         writer.WriteBool(HumanAiDuelApplied);
+        writer.WriteInt((_humanAiDuelGrantedPlayerNetIds ?? []).Count);
+        foreach (var playerNetId in _humanAiDuelGrantedPlayerNetIds ?? [])
+            writer.WriteULong(playerNetId);
+        writer.WriteInt((_humanAiDuelRecordedMindStacks ?? []).Count);
+        foreach (var entry in (_humanAiDuelRecordedMindStacks ?? new Dictionary<ulong, int>()).OrderBy(entry => entry.Key))
+        {
+            writer.WriteULong(entry.Key);
+            writer.WriteInt(entry.Value);
+        }
         writer.WriteBool(RobberyGoldGranted);
         writer.WriteBool(ThreeThousandAstrolabeGoldGranted);
         writer.WriteBool(RobberyNextCombatPending);
@@ -155,6 +202,15 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         }
 
         HumanAiDuelApplied = reader.ReadBool();
+        var grantedCount = reader.ReadInt();
+        _humanAiDuelGrantedPlayerNetIds = new List<ulong>(Math.Max(0, grantedCount));
+        for (var i = 0; i < grantedCount; i++)
+            _humanAiDuelGrantedPlayerNetIds.Add(reader.ReadULong());
+
+        var recordedMindCount = reader.ReadInt();
+        _humanAiDuelRecordedMindStacks = new Dictionary<ulong, int>(Math.Max(0, recordedMindCount));
+        for (var i = 0; i < recordedMindCount; i++)
+            _humanAiDuelRecordedMindStacks[reader.ReadULong()] = reader.ReadInt();
         RobberyGoldGranted = reader.ReadBool();
         ThreeThousandAstrolabeGoldGranted = reader.ReadBool();
         RobberyNextCombatPending = reader.ReadBool();

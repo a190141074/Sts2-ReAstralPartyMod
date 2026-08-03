@@ -11,6 +11,7 @@ using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib;
 using STS2RitsuLib.RunData;
@@ -46,8 +47,6 @@ public static class FinalArenaSeriesHelper
 {
     private const string DistortionComponentsKey = "final_arena_distortion_components";
     private const string HoverTipRoot = "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT";
-    private const int StunGunInitialMind = 1;
-
     private static readonly FinalArenaDistortionComponent[] RequiredAttentionComponents =
     [
         FinalArenaDistortionComponent.RefereeAttentionOne,
@@ -156,6 +155,8 @@ public static class FinalArenaSeriesHelper
         {
             ComponentsJson = SerializeComponents(components),
             HumanAiDuelApplied = existingRunData.HumanAiDuelApplied,
+            HumanAiDuelGrantedPlayerNetIds = [.. existingRunData.HumanAiDuelGrantedPlayerNetIds],
+            HumanAiDuelRecordedMindStacks = new(existingRunData.HumanAiDuelRecordedMindStacks),
             RobberyGoldGranted = false,
             ThreeThousandAstrolabeGoldGranted = false,
             RobberyNextCombatStunPending = false,
@@ -253,6 +254,8 @@ public static class FinalArenaSeriesHelper
         RunState runState,
         IReadOnlyList<FinalArenaDistortionComponent> components,
         bool humanAiDuelApplied,
+        IReadOnlyList<ulong> humanAiDuelGrantedPlayerNetIds,
+        IReadOnlyDictionary<ulong, int> humanAiDuelRecordedMindStacks,
         bool robberyGoldGranted,
         bool threeThousandAstrolabeGoldGranted,
         bool robberyNextCombatPending,
@@ -265,6 +268,12 @@ public static class FinalArenaSeriesHelper
         var runData = GetOrCreateRunData(runState);
         runData.ComponentsJson = SerializeComponents(components);
         runData.HumanAiDuelApplied = humanAiDuelApplied;
+        runData.HumanAiDuelGrantedPlayerNetIds = humanAiDuelGrantedPlayerNetIds
+            .Distinct()
+            .OrderBy(static netId => netId)
+            .ToList();
+        runData.HumanAiDuelRecordedMindStacks = humanAiDuelRecordedMindStacks
+            .ToDictionary(entry => entry.Key, entry => Math.Max(0, entry.Value));
         runData.RobberyGoldGranted = robberyGoldGranted;
         runData.ThreeThousandAstrolabeGoldGranted = threeThousandAstrolabeGoldGranted;
         runData.RobberyNextCombatStunPending = robberyNextCombatPending;
@@ -375,12 +384,32 @@ public static class FinalArenaSeriesHelper
         FinalArenaSeriesRunData runData,
         IReadOnlyList<FinalArenaDistortionComponent> components)
     {
-        if (components.Contains(FinalArenaDistortionComponent.HumanAiDuel) && !runData.HumanAiDuelApplied)
+        if (components.Contains(FinalArenaDistortionComponent.HumanAiDuel) &&
+            LobbyGameplayNetRoleHelper.GetCurrentRole() != LobbyGameplayNetRole.Client)
         {
-            foreach (var player in runState.Players.OrderBy(static player => player.NetId))
-                await GrantHumanAiDuelStunGun(player);
+            MigrateLegacyHumanAiDuelState(runState, runData);
 
-            runData.HumanAiDuelApplied = true;
+            foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+            {
+                if (runData.HumanAiDuelGrantedPlayerNetIds.Contains(player.NetId) &&
+                    runData.HumanAiDuelRecordedMindStacks.ContainsKey(player.NetId))
+                    continue;
+
+                var recordedMind = await GrantHumanAiDuelStunGun(player);
+                if (!recordedMind.HasValue)
+                    continue;
+
+                runData.HumanAiDuelGrantedPlayerNetIds.Add(player.NetId);
+                runData.HumanAiDuelRecordedMindStacks[player.NetId] = recordedMind.Value;
+            }
+
+            runData.HumanAiDuelGrantedPlayerNetIds = runData.HumanAiDuelGrantedPlayerNetIds
+                .Distinct()
+                .OrderBy(static netId => netId)
+                .ToList();
+            runData.HumanAiDuelApplied = runState.Players.All(player =>
+                runData.HumanAiDuelGrantedPlayerNetIds.Contains(player.NetId) &&
+                runData.HumanAiDuelRecordedMindStacks.ContainsKey(player.NetId));
         }
 
         if (components.Contains(FinalArenaDistortionComponent.Robbery) && !runData.RobberyGoldGranted)
@@ -412,31 +441,125 @@ public static class FinalArenaSeriesHelper
         _runData.Set(runState, runData);
     }
 
-    private static async Task GrantHumanAiDuelStunGun(Player player)
+    internal static async Task ReconcileSyncedHumanAiDuelAsync(
+        RunState runState,
+        IReadOnlyList<ulong> grantedPlayerNetIds,
+        IReadOnlyDictionary<ulong, int> recordedMindStacks)
     {
-        if (player == null)
+        if (!HasComponent(runState, FinalArenaDistortionComponent.HumanAiDuel))
             return;
 
-        var obtainedNow = false;
+        foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+        {
+            if (!grantedPlayerNetIds.Contains(player.NetId) ||
+                !recordedMindStacks.TryGetValue(player.NetId, out var targetMind))
+                continue;
+
+            await SetHumanAiDuelMindTarget(player, targetMind);
+        }
+    }
+
+    private static void MigrateLegacyHumanAiDuelState(
+        RunState runState,
+        FinalArenaSeriesRunData runData)
+    {
+        if (!runData.HumanAiDuelApplied ||
+            runData.HumanAiDuelRecordedMindStacks.Count > 0)
+            return;
+
+        foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+        {
+            var stunGun = player.GetRelic<TokenExclusiveStunGun>();
+            var recordedMind = StunGunMindSyncHelper.GetRecordedMindStacks(stunGun);
+            if (stunGun == null || recordedMind <= 0)
+                continue;
+
+            runData.HumanAiDuelGrantedPlayerNetIds.Add(player.NetId);
+            runData.HumanAiDuelRecordedMindStacks[player.NetId] = recordedMind;
+        }
+
+        runData.HumanAiDuelGrantedPlayerNetIds = runData.HumanAiDuelGrantedPlayerNetIds
+            .Distinct()
+            .OrderBy(static netId => netId)
+            .ToList();
+        runData.HumanAiDuelApplied = runState.Players.All(player =>
+            runData.HumanAiDuelGrantedPlayerNetIds.Contains(player.NetId) &&
+            runData.HumanAiDuelRecordedMindStacks.ContainsKey(player.NetId));
+    }
+
+    private static async Task<int?> GrantHumanAiDuelStunGun(Player player)
+    {
+        if (player == null)
+            return null;
+
         var stunGun = player.GetRelic<TokenExclusiveStunGun>();
         if (stunGun == null)
         {
-            var canonical = ModelDb.Relic<TokenExclusiveStunGun>().CanonicalInstance
-                            ?? ModelDb.Relic<TokenExclusiveStunGun>();
-            stunGun = await RelicCmd.Obtain(canonical.ToMutable(), player) as TokenExclusiveStunGun;
-            if (stunGun == null)
+            try
             {
-                MainFile.Logger.Warn("[FinalArena] HumanAiDuel failed to obtain TokenExclusiveStunGun during startup bootstrap.");
-                return;
+                await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(
+                    player,
+                    ModelDb.Relic<TokenExclusiveStunGun>());
+            }
+            catch (Exception ex)
+            {
+                MainFile.Logger.Warn(
+                    $"[FinalArena] HumanAiDuel stun gun obtain failed | player={player.NetId} error={ex.Message}.");
+                return null;
             }
 
-            obtainedNow = true;
+            stunGun = player.GetRelic<TokenExclusiveStunGun>();
+            if (stunGun == null)
+            {
+                MainFile.Logger.Warn(
+                    $"[FinalArena] HumanAiDuel stun gun obtain did not resolve | player={player.NetId}.");
+                return null;
+            }
         }
 
-        if (obtainedNow)
-            await StunGunMindSyncHelper.SetRecordedMindStacks(stunGun, StunGunInitialMind, player.Creature, null);
-        else if (StunGunMindSyncHelper.GetRecordedMindStacks(stunGun) < StunGunInitialMind)
-            await StunGunMindSyncHelper.SetRecordedMindStacks(stunGun, StunGunInitialMind, player.Creature, null);
+        var mindBefore = StunGunMindSyncHelper.GetRecordedMindStacks(stunGun);
+        var adjusted = await StunGunMindSyncHelper.AdjustRecordedMindStacks(
+            stunGun,
+            1,
+            player.Creature,
+            null);
+        var mindAfter = StunGunMindSyncHelper.GetRecordedMindStacks(stunGun);
+        MainFile.Logger.Info(
+            $"[FinalArena] HumanAiDuel grant | player={player.NetId} mind_before={mindBefore} mind_after={mindAfter} adjusted={adjusted}.");
+        return adjusted && mindAfter == mindBefore + 1 ? mindAfter : null;
+    }
+
+    private static async Task<bool> SetHumanAiDuelMindTarget(Player player, int targetMind)
+    {
+        var stunGun = player.GetRelic<TokenExclusiveStunGun>();
+        if (stunGun == null)
+        {
+            try
+            {
+                await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(
+                    player,
+                    ModelDb.Relic<TokenExclusiveStunGun>());
+            }
+            catch (Exception ex)
+            {
+                MainFile.Logger.Warn(
+                    $"[FinalArena] HumanAiDuel sync obtain failed | player={player.NetId} error={ex.Message}.");
+                return false;
+            }
+
+            stunGun = player.GetRelic<TokenExclusiveStunGun>();
+        }
+
+        var before = StunGunMindSyncHelper.GetRecordedMindStacks(stunGun);
+        var adjusted = await StunGunMindSyncHelper.SetRecordedMindStacks(
+            stunGun,
+            targetMind,
+            player.Creature,
+            null);
+        var after = StunGunMindSyncHelper.GetRecordedMindStacks(stunGun);
+        MainFile.Logger.Info(
+            $"[FinalArena] HumanAiDuel sync reconcile | player={player.NetId} mind_before={before} mind_target={targetMind} mind_after={after} adjusted={adjusted}.");
+        return adjusted && after == targetMind;
     }
 
     private static bool IsFinalArenaOpen(IRunState? runState)
@@ -584,6 +707,8 @@ public sealed class FinalArenaSeriesRunData
 {
     public string ComponentsJson { get; set; } = string.Empty;
     public bool HumanAiDuelApplied { get; set; }
+    public List<ulong> HumanAiDuelGrantedPlayerNetIds { get; set; } = [];
+    public Dictionary<ulong, int> HumanAiDuelRecordedMindStacks { get; set; } = [];
     public bool RobberyGoldGranted { get; set; }
     public bool ThreeThousandAstrolabeGoldGranted { get; set; }
     public bool RobberyNextCombatStunPending { get; set; }
