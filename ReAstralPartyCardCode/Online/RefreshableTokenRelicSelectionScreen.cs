@@ -47,6 +47,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private readonly string _probabilityText;
     private readonly string _bottomPrompt;
     private readonly bool _showRerollControls;
+    private readonly float _optionScale;
     private int _remainingRerolls;
 
     private VBoxContainer _rootContainer = null!;
@@ -73,7 +74,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         string probabilityText,
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc,
         bool showRerollControls,
-        string bottomPrompt)
+        string bottomPrompt,
+        float optionScale)
     {
         _owner = owner;
         _runState = (RunState)owner.RunState;
@@ -85,6 +87,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _rerollFunc = rerollFunc;
         _showRerollControls = showRerollControls;
         _bottomPrompt = bottomPrompt;
+        _optionScale = optionScale;
 
         Name = nameof(RefreshableTokenRelicSelectionScreen);
         SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
@@ -105,7 +108,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc)
     {
         return new RefreshableTokenRelicSelectionScreen(owner, options, rerollCount, title, subtitlePrefix,
-            probabilityText, rerollFunc, true, title);
+            probabilityText, rerollFunc, true, title, 1f);
     }
 
     public static RefreshableTokenRelicSelectionScreen CreateDirect(
@@ -123,7 +126,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             string.Empty,
             static (currentOptions, _, _) => currentOptions,
             false,
-            prompt);
+            prompt,
+            1.5f);
     }
 
     public Task<RefreshableTokenRelicSelectionResult> WaitForResult()
@@ -246,7 +250,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             SizeFlagsVertical = SizeFlags.ShrinkCenter,
             Alignment = BoxContainer.AlignmentMode.Center
         };
-        selectionRow.AddThemeConstantOverride("separation", 16);
+        selectionRow.AddThemeConstantOverride("separation", (int)(16f * _optionScale));
 
         _holderContainer = new GridContainer
         {
@@ -255,8 +259,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
             SizeFlagsVertical = SizeFlags.ShrinkCenter
         };
-        _holderContainer.AddThemeConstantOverride("h_separation", 20);
-        _holderContainer.AddThemeConstantOverride("v_separation", 18);
+        _holderContainer.AddThemeConstantOverride("h_separation", (int)(20f * _optionScale));
+        _holderContainer.AddThemeConstantOverride("v_separation", (int)(18f * _optionScale));
         _rootContainer.AddChild(new Control
         {
             SizeFlagsVertical = SizeFlags.ExpandFill,
@@ -372,7 +376,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             var optionPanel = new PanelContainer
             {
                 Name = $"RefreshableTokenOptionPanel_{index}",
-                CustomMinimumSize = new Vector2(OptionWidth, OptionHeight),
+                CustomMinimumSize = new Vector2(OptionWidth * _optionScale, OptionHeight * _optionScale),
                 SizeFlagsVertical = SizeFlags.ShrinkCenter,
                 MouseFilter = MouseFilterEnum.Ignore
             };
@@ -382,7 +386,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             var cardRoot = new Control
             {
                 Name = $"RefreshableTokenOption_{index}",
-                CustomMinimumSize = new Vector2(OptionWidth, OptionHeight),
+                CustomMinimumSize = new Vector2(OptionWidth * _optionScale, OptionHeight * _optionScale),
                 MouseFilter = MouseFilterEnum.Pass
             };
             optionPanel.AddChild(cardRoot);
@@ -390,7 +394,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             var holderButton = new Button
             {
                 Name = $"RefreshableTokenRelicHolder_{index}",
-                CustomMinimumSize = new Vector2(OptionWidth, OptionHeight),
+                CustomMinimumSize = new Vector2(OptionWidth * _optionScale, OptionHeight * _optionScale),
                 Flat = true,
                 MouseFilter = MouseFilterEnum.Stop,
                 FocusMode = FocusModeEnum.All
@@ -413,7 +417,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             titleBar.OffsetLeft = 0f;
             titleBar.OffsetTop = 0f;
             titleBar.OffsetRight = 0f;
-            titleBar.OffsetBottom = 48f;
+            titleBar.OffsetBottom = 48f * _optionScale;
             cardRoot.AddChild(titleBar);
 
             var title = new Label
@@ -424,7 +428,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
                 AutowrapMode = TextServer.AutowrapMode.WordSmart
             };
             title.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-            ApplyUniformTitleTheme(title);
+            ApplyUniformTitleTheme(title, _optionScale);
             titleBar.AddChild(title);
 
             var iconCenter = new CenterContainer
@@ -433,16 +437,17 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             };
             iconCenter.SetAnchorsAndOffsetsPreset(LayoutPreset.TopWide);
             iconCenter.OffsetLeft = 0f;
-            iconCenter.OffsetTop = 56f;
+            var iconVerticalOffset = _showRerollControls ? 0f : IconSize * _optionScale * 0.3f;
+            iconCenter.OffsetTop = 56f * _optionScale + iconVerticalOffset;
             iconCenter.OffsetRight = 0f;
-            iconCenter.OffsetBottom = 218f;
+            iconCenter.OffsetBottom = 218f * _optionScale + iconVerticalOffset;
             holderButton.AddChild(iconCenter);
 
-            var relicBaseTexture = CreateRelicBaseTexture(relic, IconBaseSize);
+            var relicBaseTexture = CreateRelicBaseTexture(relic, IconBaseSize * _optionScale);
             if (relicBaseTexture != null)
                 iconCenter.AddChild(relicBaseTexture);
 
-            var relicTexture = CreateRelicTexture(relic, IconSize);
+            var relicTexture = CreateRelicTexture(relic, IconSize * _optionScale);
             iconCenter.AddChild(relicTexture);
 
             var descriptionPanel = new PanelContainer
@@ -451,10 +456,10 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
                 MouseFilter = MouseFilterEnum.Ignore
             };
             descriptionPanel.SetAnchorsAndOffsetsPreset(LayoutPreset.BottomWide);
-            descriptionPanel.OffsetLeft = 12f;
-            descriptionPanel.OffsetTop = -154f;
-            descriptionPanel.OffsetRight = -12f;
-            descriptionPanel.OffsetBottom = -8f;
+            descriptionPanel.OffsetLeft = 12f * _optionScale;
+            descriptionPanel.OffsetTop = (_showRerollControls ? -154f : -132f) * _optionScale;
+            descriptionPanel.OffsetRight = -12f * _optionScale;
+            descriptionPanel.OffsetBottom = -8f * _optionScale;
             descriptionPanel.AddThemeStyleboxOverride("panel", CreateDescriptionPanelStyle());
             cardRoot.AddChild(descriptionPanel);
 
@@ -462,8 +467,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             {
                 HorizontalAlignment = HorizontalAlignment.Left,
                 AutowrapMode = TextServer.AutowrapMode.WordSmart,
-                MaxFontSize = 18,
-                MinFontSize = 14,
+                MaxFontSize = (int)(18f * _optionScale),
+                MinFontSize = (int)(14f * _optionScale),
                 MouseFilter = MouseFilterEnum.Ignore,
                 BbcodeEnabled = true
             };
@@ -485,7 +490,9 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             _seenOptionIds.Add(relic.CanonicalInstance?.Id ?? relic.Id);
         }
 
-        _holderContainer.Columns = ResolveOptionColumns(_options.Count);
+        _holderContainer.Columns = _showRerollControls
+            ? ResolveOptionColumns(_options.Count)
+            : Math.Min(4, Math.Max(1, _options.Count));
         ConfigureHolderFocusNeighbors();
     }
 
@@ -661,9 +668,9 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         }
     }
 
-    private static void ApplyUniformTitleTheme(Label label)
+    private static void ApplyUniformTitleTheme(Label label, float scale)
     {
-        label.AddThemeFontSizeOverride("font_size", 22);
+        label.AddThemeFontSizeOverride("font_size", (int)(22f * scale));
         label.AddThemeColorOverride("font_color", new Color(1f, 0.86f, 0.2f));
         label.AddThemeColorOverride("font_shadow_color", new Color(0f, 0f, 0f, 0.55f));
         label.AddThemeConstantOverride("shadow_offset_x", 1);
