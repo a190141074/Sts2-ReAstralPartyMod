@@ -45,6 +45,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private readonly int _startingRerolls;
     private readonly string _subtitlePrefix;
     private readonly string _probabilityText;
+    private readonly string _bottomPrompt;
+    private readonly bool _showRerollControls;
     private int _remainingRerolls;
 
     private VBoxContainer _rootContainer = null!;
@@ -69,7 +71,9 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         string title,
         string subtitlePrefix,
         string probabilityText,
-        Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc)
+        Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc,
+        bool showRerollControls,
+        string bottomPrompt)
     {
         _owner = owner;
         _runState = (RunState)owner.RunState;
@@ -79,6 +83,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _subtitlePrefix = subtitlePrefix;
         _probabilityText = probabilityText;
         _rerollFunc = rerollFunc;
+        _showRerollControls = showRerollControls;
+        _bottomPrompt = bottomPrompt;
 
         Name = nameof(RefreshableTokenRelicSelectionScreen);
         SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
@@ -99,7 +105,25 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc)
     {
         return new RefreshableTokenRelicSelectionScreen(owner, options, rerollCount, title, subtitlePrefix,
-            probabilityText, rerollFunc);
+            probabilityText, rerollFunc, true, title);
+    }
+
+    public static RefreshableTokenRelicSelectionScreen CreateDirect(
+        Player owner,
+        IReadOnlyList<RelicModel> options,
+        string title,
+        string prompt)
+    {
+        return new RefreshableTokenRelicSelectionScreen(
+            owner,
+            options,
+            0,
+            title,
+            string.Empty,
+            string.Empty,
+            static (currentOptions, _, _) => currentOptions,
+            false,
+            prompt);
     }
 
     public Task<RefreshableTokenRelicSelectionResult> WaitForResult()
@@ -182,6 +206,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _infoLabel.OffsetTop = 28f;
         _infoLabel.OffsetLeft = -540f;
         _infoLabel.OffsetRight = -40f;
+        _infoLabel.Visible = _showRerollControls;
         AddChild(_infoLabel);
 
         _probabilityLabel = new Label
@@ -196,6 +221,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _probabilityLabel.OffsetTop = 56f;
         _probabilityLabel.OffsetLeft = -540f;
         _probabilityLabel.OffsetRight = -40f;
+        _probabilityLabel.Visible = _showRerollControls;
         AddChild(_probabilityLabel);
 
         _rootContainer = new VBoxContainer
@@ -245,12 +271,15 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             CustomMinimumSize = new Vector2(0f, 8f)
         });
 
-        selectionRow.AddChild(new Control
+        if (_showRerollControls)
         {
-            Name = "LeftBalanceSpacer",
-            CustomMinimumSize = new Vector2(40f, 0f),
-            MouseFilter = MouseFilterEnum.Ignore
-        });
+            selectionRow.AddChild(new Control
+            {
+                Name = "LeftBalanceSpacer",
+                CustomMinimumSize = new Vector2(40f, 0f),
+                MouseFilter = MouseFilterEnum.Ignore
+            });
+        }
         selectionRow.AddChild(_holderContainer);
 
         _rerollButton = new Button
@@ -296,7 +325,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         rerollColumn.AddChild(rerollCenter);
         rerollColumn.AddChild(new Control
             { SizeFlagsVertical = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore });
-        selectionRow.AddChild(rerollColumn);
+        if (_showRerollControls)
+            selectionRow.AddChild(rerollColumn);
 
         var bottomPromptPanel = new PanelContainer
         {
@@ -312,7 +342,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
 
         _bottomPromptLabel = new Label
         {
-            Text = title,
+            Text = _bottomPrompt,
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center,
             ThemeTypeVariation = "HeaderMedium",
@@ -470,7 +500,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
 
     private void OnRerollPressed()
     {
-        if (_choiceLocked || _remainingRerolls <= 0)
+        if (!_showRerollControls || _choiceLocked || _remainingRerolls <= 0)
             return;
 
         var rerollOrdinal = _rerollHistory.Count;
@@ -530,6 +560,9 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
 
     private void UpdateSubtitle()
     {
+        if (!_showRerollControls)
+            return;
+
         _rerollButton.Text = $"刷新\nx{_remainingRerolls}";
         _infoLabel.Text = $"{_subtitlePrefix}{_remainingRerolls}";
         _rerollButton.Disabled = _choiceLocked || _remainingRerolls <= 0;
@@ -550,17 +583,22 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             var downIndex = i + columns < holders.Count ? i + columns : -1;
 
             holders[i].FocusNeighborTop = holders[upIndex].GetPath();
-            holders[i].FocusNeighborBottom = _rerollButton.GetPath();
+            holders[i].FocusNeighborBottom = downIndex >= 0
+                ? holders[downIndex].GetPath()
+                : _showRerollControls
+                    ? _rerollButton.GetPath()
+                    : holders[i].GetPath();
             holders[i].FocusNeighborLeft = holders[leftIndex].GetPath();
             holders[i].FocusNeighborRight = holders[rightIndex].GetPath();
 
-            if (downIndex >= 0)
-                holders[i].FocusNeighborBottom = holders[downIndex].GetPath();
         }
 
-        _rerollButton.FocusNeighborTop = holders[0].GetPath();
-        _rerollButton.FocusNeighborLeft = holders[^1].GetPath();
-        _rerollButton.FocusNeighborRight = holders[0].GetPath();
+        if (_showRerollControls)
+        {
+            _rerollButton.FocusNeighborTop = holders[0].GetPath();
+            _rerollButton.FocusNeighborLeft = holders[^1].GetPath();
+            _rerollButton.FocusNeighborRight = holders[0].GetPath();
+        }
     }
 
     private static int IndexOfRelic(IReadOnlyList<RelicModel> relics, RelicModel relic)

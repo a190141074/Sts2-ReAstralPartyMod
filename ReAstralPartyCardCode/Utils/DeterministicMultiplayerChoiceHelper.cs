@@ -89,6 +89,63 @@ public static class DeterministicMultiplayerChoiceHelper
         return remoteRelic;
     }
 
+    public static async Task<RelicModel?> SelectOverlayRelicForPlayer(
+        Player player,
+        IReadOnlyList<RelicModel> options,
+        string title,
+        string prompt,
+        string context)
+    {
+        ArgumentNullException.ThrowIfNull(player);
+        ArgumentNullException.ThrowIfNull(options);
+
+        var runManager = RunManager.Instance;
+        var gameType = runManager.NetService.Type;
+        if (gameType is NetGameType.Singleplayer or NetGameType.None)
+            return await ShowLocalDirectRelicSelection(player, options, title, prompt);
+
+        var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
+        if (synchronizer == null)
+            return await ShowLocalDirectRelicSelection(player, options, title, prompt);
+
+        var sessionKey = BuildSessionKey(AstralChoiceKind.RelicSelection, player, context);
+        var choiceId = synchronizer.ReserveChoiceId(player);
+        if (IsLocalPlayer(runManager, player))
+        {
+            var selectedRelic = await ShowLocalDirectRelicSelection(player, options, title, prompt);
+            var selectedIndex = selectedRelic == null ? -1 : IndexOfRelic(options, selectedRelic);
+            synchronizer.SyncLocalChoice(
+                player,
+                choiceId,
+                AstralChoiceProtocol.CreateIndexedEnvelope(
+                    AstralChoiceKind.RelicSelection,
+                    (RunState?)player.RunState,
+                    sessionKey,
+                    0,
+                    [selectedIndex]));
+            AstralTelemetry.RecordTokenChoice(player, context, options, selectedRelic, 0);
+            Log.Info(
+                $"[{MainFile.ModId}] Synced local overlay relic choice: context={context} player={player.NetId} choiceId={choiceId} index={selectedIndex}");
+            return selectedRelic;
+        }
+
+        var remoteChoice = await WaitForRemoteIndexedEnvelope(
+            synchronizer,
+            player,
+            choiceId,
+            AstralChoiceKind.RelicSelection,
+            (RunState?)player.RunState,
+            sessionKey,
+            context);
+        var remotePayload = remoteChoice?.Payload ?? [];
+        var remoteIndex = remotePayload.Count > 0 ? remotePayload[0] : -1;
+        var remoteRelic = remoteIndex >= 0 && remoteIndex < options.Count ? options[remoteIndex] : null;
+        AstralTelemetry.RecordTokenChoice(player, context, options, remoteRelic, 0);
+        Log.Info(
+            $"[{MainFile.ModId}] Received remote overlay relic choice: context={context} player={player.NetId} choiceId={choiceId} index={remoteIndex}");
+        return remoteRelic;
+    }
+
     public static async Task<RelicModel?> SelectGroupedRelicForPlayer(
         Player player,
         IReadOnlyList<RelicModel> options,
@@ -570,16 +627,35 @@ public static class DeterministicMultiplayerChoiceHelper
         if (screen == null)
             return null;
 
-        var overlayStack = await WaitForOverlayStackAsync();
-        if (overlayStack != null)
-            overlayStack.Push(screen);
-
         if (LocalContext.IsMe(player))
             foreach (var relic in options)
                 SaveManager.Instance?.MarkRelicAsSeen(relic);
 
         var selectedRelics = await screen.RelicsSelected() ?? [];
         return selectedRelics.FirstOrDefault();
+    }
+
+    private static async Task<RelicModel?> ShowLocalDirectRelicSelection(
+        Player player,
+        IReadOnlyList<RelicModel> options,
+        string title,
+        string prompt)
+    {
+        var overlayStack = await WaitForOverlayStackAsync();
+        if (overlayStack == null)
+            return null;
+
+        if (LocalContext.IsMe(player))
+            foreach (var relic in options)
+                SaveManager.Instance?.MarkRelicAsSeen(relic);
+
+        var screen = RefreshableTokenRelicSelectionScreen.CreateDirect(player, options, title, prompt);
+        overlayStack.Push(screen);
+        var result = await screen.WaitForResult();
+        screen.Close();
+        await screen.WaitUntilClosedAsync();
+        await WaitForOverlaySettleFramesAsync(2);
+        return result.SelectedRelic;
     }
 
     private static async Task<RelicModel?> ShowLocalGroupedRelicSelection(

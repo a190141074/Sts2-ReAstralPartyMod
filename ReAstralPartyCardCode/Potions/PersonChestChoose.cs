@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
@@ -60,14 +59,12 @@ public class PersonChestChoose : AstralPartyPotionModel
                 Owner.NetId)
             .ToList();
 
-        // Override the generic relic picker banner so the player sees a persona-specific title here.
-        using var _ = RelicSelectionHeaderContext.Push(
-            new LocString("potions", $"{Id.Entry}.selectionScreenHeader").GetRawText());
-
-        // Show canonical relics in the picker, then grant a mutable copy of the chosen relic.
-        var selectedRelic = await DeterministicMultiplayerChoiceHelper.SelectRelicForPlayer(
+        // This is an owned overlay screen, so it can be safely opened above the map and removed on close.
+        var selectedRelic = await DeterministicMultiplayerChoiceHelper.SelectOverlayRelicForPlayer(
             Owner,
             relicOptions,
+            new LocString("potions", $"{Id.Entry}.selectionScreenHeader").GetRawText(),
+            new LocString("potions", $"{Id.Entry}.selectionScreenPrompt").GetRawText(),
             $"{Id.Entry}.use");
         if (selectedRelic == null)
             return;
