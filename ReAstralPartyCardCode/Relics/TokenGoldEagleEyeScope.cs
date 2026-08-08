@@ -17,6 +17,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenGoldEagleEyeScope : AstralPartyRelicModel
 {
+    private readonly Dictionary<CardModel, Creature> _pursuitTargetsByCard = [];
+
     public override RelicRarity Rarity => RelicRarity.Rare;
 
     public override bool ShouldReceiveCombatHooks => true;
@@ -25,22 +27,6 @@ public class TokenGoldEagleEyeScope : AstralPartyRelicModel
     [
         HoverTipFactory.FromPower<MarkLockPower>()
     ];
-
-    public override decimal ModifyDamageAdditive(
-        Creature? target,
-        decimal amount,
-        ValueProp props,
-        Creature? dealer,
-        CardModel? cardSource)
-    {
-        if (!IsTrackedAttack(target, amount, dealer, cardSource))
-            return 0m;
-
-        var existingMarks = target?.GetPowerAmount<MarkLockPower>() ?? 0m;
-        var markedStacksAfterThisHit = existingMarks + 1m;
-        var bonusGroups = StableNumericStateHelper.FloorDivisionToNonNegativeInt(markedStacksAfterThisHit, 2m);
-        return bonusGroups * 2m;
-    }
 
     public override async Task AfterDamageGiven(
         PlayerChoiceContext choiceContext,
@@ -56,6 +42,29 @@ public class TokenGoldEagleEyeScope : AstralPartyRelicModel
             return;
 
         await PowerCmd.Apply<MarkLockPower>(target, 1m, Owner?.Creature, cardSource, false);
+
+        _pursuitTargetsByCard.TryAdd(cardSource!, target);
+    }
+
+    public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
+    {
+        if (!_pursuitTargetsByCard.Remove(cardPlay.Card, out var target))
+            return;
+        if (Owner?.Creature == null || !target.IsAlive)
+            return;
+
+        var markedStacks = target.GetPowerAmount<MarkLockPower>();
+        var pursuitDamage = StableNumericStateHelper.FloorDivisionToNonNegativeInt(markedStacks, 2m) * 2m;
+        if (pursuitDamage <= 0m)
+            return;
+
+        await CreatureCmd.Damage(
+            choiceContext,
+            target,
+            pursuitDamage,
+            ValueProp.Unpowered,
+            Owner?.Creature,
+            null);
     }
 
     private bool IsTrackedAttack(Creature? target, decimal amount, Creature? dealer, CardModel? cardSource)
@@ -70,7 +79,9 @@ public class TokenGoldEagleEyeScope : AstralPartyRelicModel
             return false;
         if (cardSource?.Owner != Owner)
             return false;
+        if (!FlashlightRelicHelper.IsTrackedAttackCard(Owner, cardSource, 1))
+            return false;
 
-        return WarforgeEnchantmentHelper.CountsAsAttack(cardSource);
+        return true;
     }
 }

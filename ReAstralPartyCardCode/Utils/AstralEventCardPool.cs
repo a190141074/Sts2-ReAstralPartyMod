@@ -13,6 +13,7 @@ public static class AstralEventCardCatalog
     [
         ModelDb.Card<EventAngelsDescent>(),
         ModelDb.Card<EventCrowdedPassage>(),
+        ModelDb.Card<EventCrowdedPassageCard>(),
         ModelDb.Card<EventDeusExMachina>(),
         ModelDb.Card<EventEquality>(),
         ModelDb.Card<EventFightFun>(),
@@ -50,6 +51,8 @@ public static class AstralEventCardCatalog
         ModelDb.GetId<EventsConcealingInvestigationD>()
     ];
 
+    private static readonly ModelId DeusExMachinaCardId = ModelDb.GetId<EventDeusExMachina>();
+
     public static List<CardModel> CreateEventCards(params Type[] excludedTypes)
     {
         HashSet<Type> excludedTypeSet = excludedTypes.Length == 0 ? [] : [..excludedTypes];
@@ -76,6 +79,9 @@ public static class AstralEventCardCatalog
     public static List<CardModel> CreateStableTroubleMakerCardsForPlayer(Player owner, CardModel sourceCard, int count)
     {
         var cards = CreateEventCards();
+
+        if (owner.Creature?.CombatState?.RoundNumber <= 5)
+            cards.RemoveAll(card => (card.CanonicalInstance?.Id ?? card.Id) == DeusExMachinaCardId);
 
         if (RelicOwnershipHelper.HasRelic<PersonPoisonedApple>(owner))
             cards.AddRange(CreateInvestigationCards());

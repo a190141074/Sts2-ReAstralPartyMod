@@ -12,7 +12,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillTroubleMaker : AstralPartyCardModel
 {
-    private int _cardsToShow = 3;
+    private int _cardsToShow = 2;
 
     public override CardMultiplayerConstraint MultiplayerConstraint => CardMultiplayerConstraint.MultiplayerOnly;
 
