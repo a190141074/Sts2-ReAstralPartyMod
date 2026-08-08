@@ -2,6 +2,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.title": "麻烦制造者",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.description": "2 つのランダムな 事件牌 を表示します。 1を選んでプレイしてください。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.select_prompt": "再生する 事件牌 を選択してください",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.spectator_prompt": "チームメイトがイベントカードを選択しています",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ANOMALY_MAKER.title": "异常制造者",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ANOMALY_MAKER.description": "2 つのランダムな異常イベントを表示します。 1を選んでプレイしてください。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_ANOMALY_BIG_LUCK.title": "吃我大吉吧！",

@@ -216,7 +216,8 @@ public static class DeterministicMultiplayerChoiceHelper
         Player player,
         IReadOnlyList<CardModel> options,
         bool canSkip,
-        string context)
+        string context,
+        bool showRemoteSpectator = false)
     {
         ArgumentNullException.ThrowIfNull(choiceContext);
         ArgumentNullException.ThrowIfNull(player);
@@ -258,14 +259,40 @@ public static class DeterministicMultiplayerChoiceHelper
                 return canonicalChoice;
             }
 
-            var remoteChoice = await WaitForRemoteIndexedEnvelope(
-                synchronizer,
-                player,
-                choiceId,
-                AstralChoiceKind.CanonicalCardSelection,
-                (RunState?)player.RunState,
-                sessionKey,
-                context);
+            TroubleMakerSpectatorCardSelectionScreen? spectatorScreen = null;
+            if (showRemoteSpectator)
+            {
+                var overlayStack = await WaitForOverlayStackAsync();
+                if (overlayStack != null)
+                {
+                    spectatorScreen = TroubleMakerSpectatorCardSelectionScreen.Create(player, options);
+                    overlayStack.Push(spectatorScreen);
+                    Log.Info(
+                        $"[{MainFile.ModId}] Opened Trouble Maker spectator selection: context={context} player={player.NetId} choiceId={choiceId} options={options.Count}.");
+                }
+            }
+
+            RemoteIndexedChoiceEnvelope? remoteChoice;
+            try
+            {
+                remoteChoice = await WaitForRemoteIndexedEnvelope(
+                    synchronizer,
+                    player,
+                    choiceId,
+                    AstralChoiceKind.CanonicalCardSelection,
+                    (RunState?)player.RunState,
+                    sessionKey,
+                    context);
+            }
+            finally
+            {
+                if (spectatorScreen != null)
+                {
+                    spectatorScreen.Close();
+                    Log.Info(
+                        $"[{MainFile.ModId}] Closed Trouble Maker spectator selection: context={context} player={player.NetId} choiceId={choiceId}.");
+                }
+            }
             var remotePayload = remoteChoice?.Payload ?? [];
 
             var remoteIndex = remotePayload.Count > 0 ? remotePayload[0] : -1;

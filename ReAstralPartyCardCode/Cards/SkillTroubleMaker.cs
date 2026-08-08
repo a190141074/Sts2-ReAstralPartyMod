@@ -47,7 +47,8 @@ public class SkillTroubleMaker : AstralPartyCardModel
             Owner,
             offeredCards,
             false,
-            $"{Id.Entry}.play");
+            $"{Id.Entry}.play",
+            true);
 
         if (selectedCard == null) return;
 

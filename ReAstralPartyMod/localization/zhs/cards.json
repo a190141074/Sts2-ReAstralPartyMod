@@ -2,6 +2,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.title": "麻烦制造者",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.description": "展示[blue]2[/blue]张随机事件牌，选择[blue]1[/blue]张立即发动。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.select_prompt": "选择[blue]1[/blue]张事件牌发动",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TROUBLE_MAKER.spectator_prompt": "队友正在选择事件牌",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ANOMALY_MAKER.title": "异常制造者",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ANOMALY_MAKER.description": "展示[blue]2[/blue]张随机[gold]异常事件[/gold]牌，选择[blue]1[/blue]张立即发动。",
   "RE_ASTRAL_PARTY_MOD_CARD_EVENT_ANOMALY_BIG_LUCK.title": "吃我大吉吧",
