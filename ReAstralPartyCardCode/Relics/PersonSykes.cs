@@ -28,7 +28,6 @@ public sealed class PersonSykes : CooldownPersonRelicBase
 
     private readonly HashSet<Creature> _abyssalErosionTargetsThisCard = [];
     private CardModel? _trackedAbyssalErosionCard;
-    private bool _abyssalErosionAppliedToFirstTarget;
 
     protected override int CounterValue
     {
@@ -119,18 +118,8 @@ public sealed class PersonSykes : CooldownPersonRelicBase
         if (!ReferenceEquals(_trackedAbyssalErosionCard, cardSource))
             TrackAbyssalErosionCard(cardSource);
 
-        if (cardSource.TargetType == TargetType.AllEnemies)
-        {
-            if (!_abyssalErosionTargetsThisCard.Add(target))
-                return;
-        }
-        else
-        {
-            if (_abyssalErosionAppliedToFirstTarget)
-                return;
-
-            _abyssalErosionAppliedToFirstTarget = true;
-        }
+        if (!_abyssalErosionTargetsThisCard.Add(target))
+            return;
 
         await PowerCmd.Apply<AbyssalErosionMarkPower>(target, 1m, Owner.Creature, cardSource, false);
     }
@@ -161,13 +150,11 @@ public sealed class PersonSykes : CooldownPersonRelicBase
     {
         _trackedAbyssalErosionCard = card;
         _abyssalErosionTargetsThisCard.Clear();
-        _abyssalErosionAppliedToFirstTarget = false;
     }
 
     private void ResetAbyssalErosionTracking()
     {
         _trackedAbyssalErosionCard = null;
         _abyssalErosionTargetsThisCard.Clear();
-        _abyssalErosionAppliedToFirstTarget = false;
     }
 }
