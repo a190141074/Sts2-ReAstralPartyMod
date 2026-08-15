@@ -19,10 +19,13 @@ public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
 {
     private const int GoldPerDamageBonusPercent = 30;
     private const int MaxDamageBonusPercent = 200;
+    private const int EternalStarlightPerAct = 10;
+    private const int MaximumEternalStarlightActs = 3;
 
     [SavedProperty] public int AstralParty_PersonProprietressDoppelgangerCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonProprietressDoppelgangerPendingCombatStartCard { get; set; }
     [SavedProperty] public int AstralParty_PersonProprietressDoppelgangerSpentGoldForDamage { get; set; }
+    [SavedProperty] public int AstralParty_PersonProprietressDoppelgangerLastEternalStarlightActIndex { get; set; } = -1;
 
     protected override int CounterValue
     {
@@ -53,10 +56,16 @@ public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
     {
         await base.AfterObtained();
         AstralParty_PersonProprietressDoppelgangerSpentGoldForDamage = 0;
+        AstralParty_PersonProprietressDoppelgangerLastEternalStarlightActIndex = -1;
         InvokeDisplayAmountChanged();
 
-        if (Owner != null)
-            await TokenEternalStarlight.GrantStacks(Owner, 30);
+        await TryGrantEternalStarlightForCurrentAct();
+    }
+
+    public override async Task AfterActEntered()
+    {
+        await base.AfterActEntered();
+        await TryGrantEternalStarlightForCurrentAct();
     }
 
     public void RecordMerchantSpend(int spentGold)
@@ -102,5 +111,23 @@ public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
             AstralParty_PersonProprietressDoppelgangerSpentGoldForDamage / GoldPerDamageBonusPercent,
             0,
             MaxDamageBonusPercent);
+    }
+
+    private async Task TryGrantEternalStarlightForCurrentAct()
+    {
+        var owner = Owner;
+        var actIndex = owner?.RunState?.CurrentActIndex ?? -1;
+        if (owner == null
+            || actIndex < 0
+            || actIndex >= MaximumEternalStarlightActs
+            || actIndex <= AstralParty_PersonProprietressDoppelgangerLastEternalStarlightActIndex)
+            return;
+
+        AstralParty_PersonProprietressDoppelgangerLastEternalStarlightActIndex = actIndex;
+        Flash();
+        await TokenEternalStarlight.GrantStacks(
+            owner,
+            EternalStarlightPerAct,
+            bypassProprietressDoppelgangerPenalty: true);
     }
 }

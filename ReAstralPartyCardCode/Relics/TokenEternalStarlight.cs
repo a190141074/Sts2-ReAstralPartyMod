@@ -113,10 +113,15 @@ public class TokenEternalStarlight : AstralPartyRelicModel
         return AstralParty_TokenEternalStarlightStacks;
     }
 
-    public void AddStacks(int amount)
+    public void AddStacks(int amount, bool bypassProprietressDoppelgangerPenalty = false)
     {
         if (amount <= 0)
             return;
+
+        if (!bypassProprietressDoppelgangerPenalty
+            && Owner?.GetRelic<PersonProprietressDoppelganger>() != null
+            && amount >= 2)
+            amount /= 2;
 
         AstralParty_TokenEternalStarlightStacks += amount;
         Flash();
@@ -187,7 +192,10 @@ public class TokenEternalStarlight : AstralPartyRelicModel
         };
     }
 
-    public static async Task<TokenEternalStarlight?> GrantStacks(Player owner, int amount)
+    public static async Task<TokenEternalStarlight?> GrantStacks(
+        Player owner,
+        int amount,
+        bool bypassProprietressDoppelgangerPenalty = false)
     {
         if (amount <= 0)
             return owner.GetRelic<TokenEternalStarlight>();
@@ -200,7 +208,7 @@ public class TokenEternalStarlight : AstralPartyRelicModel
             relic = owner.GetRelic<TokenEternalStarlight>();
         }
 
-        relic?.AddStacks(amount);
+        relic?.AddStacks(amount, bypassProprietressDoppelgangerPenalty);
         return relic;
     }
 }
