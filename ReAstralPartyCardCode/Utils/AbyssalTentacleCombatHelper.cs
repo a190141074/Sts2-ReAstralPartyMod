@@ -9,7 +9,6 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.MonsterMoves.Intents;
 using MegaCrit.Sts2.Core.MonsterMoves.MonsterMoveStateMachine;
-using MegaCrit.Sts2.Core.Nodes.Combat;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
@@ -39,14 +38,7 @@ public sealed class AbyssalTentacleMonster : ModMonsterTemplate
 
     public override bool IsHealthBarVisible => false;
 
-    public override string? CustomVisualsPath => SceneHelper.GetScenePath("creature_visuals/fallback");
-
-    protected override NCreatureVisuals? TryCreateCreatureVisuals()
-    {
-        var osty = ModelDb.Monsters.FirstOrDefault(monster =>
-            string.Equals(monster.Id.Entry, "osty", StringComparison.OrdinalIgnoreCase));
-        return osty?.CreateVisuals();
-    }
+    public override string? CustomVisualsPath => SceneHelper.GetScenePath("creature_visuals/osty");
 
     protected override MonsterMoveStateMachine GenerateMoveStateMachine()
     {
@@ -175,8 +167,14 @@ public static class AbyssalTentacleCombatHelper
                 continue;
 
             var offset = GetOffset(model.AstralParty_AbyssalTentacleIndex);
+            var parent = node.GetParent();
+            if (parent == ownerNode.GetParent())
+                parent.MoveChild(node, Math.Max(0, ownerNode.GetIndex()));
+
             node.Show();
+            node.Modulate = Colors.White;
             node.Visuals.Show();
+            node.Visuals.Modulate = new Color(1f, 1f, 1f, 0.62f);
             node.Position = ownerNode.Position + offset;
             node.SetDefaultScaleTo(0.54f, 0f);
             node.ToggleIsInteractable(false);
