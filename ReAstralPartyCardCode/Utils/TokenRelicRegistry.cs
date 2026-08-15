@@ -63,6 +63,7 @@ public static class TokenRelicRegistry
         typeof(TokenGoldBankCardPremium),
         typeof(TokenGoldBigStewBowl),
         typeof(TokenGoldBoxingGlovePremium),
+        typeof(TokenGoldColorfulSprayCan),
         typeof(TokenGoldBufferShield),
         typeof(TokenGoldEagleEyeScope),
         typeof(TokenGoldExplorationSatellite),
