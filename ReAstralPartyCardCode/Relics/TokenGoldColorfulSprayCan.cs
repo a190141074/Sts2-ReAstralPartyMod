@@ -1,8 +1,10 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -29,6 +31,20 @@ public class TokenGoldColorfulSprayCan : AstralPartyRelicModel
     [
         HoverTipFactory.FromPower<MarkLockPower>()
     ];
+
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    {
+        if (player != Owner || Owner?.Creature?.CombatState == null)
+            return;
+
+        var enemy = Owner.RunState.Rng.CombatTargets.NextItem(
+            Owner.Creature.CombatState.GetOpponentsOf(Owner.Creature).Where(creature => creature.IsAlive));
+        if (enemy == null)
+            return;
+
+        Flash();
+        await PowerCmd.Apply<MarkLockPower>(enemy, 1m, Owner.Creature, null, false);
+    }
 
     public override async Task BeforeCardPlayed(CardPlay cardPlay)
     {
