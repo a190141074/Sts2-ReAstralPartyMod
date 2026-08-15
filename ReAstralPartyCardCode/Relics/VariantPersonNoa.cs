@@ -33,7 +33,7 @@ public class VariantPersonNoa : CooldownPersonRelicBase
         set => AstralParty_VariantPersonNoaPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 5;
+    protected override int BaseMaxCounter => 6;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

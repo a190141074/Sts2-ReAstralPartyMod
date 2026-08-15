@@ -39,7 +39,7 @@ public class VariantPersonLingYulin : CooldownPersonRelicBase
         set => AstralParty_VariantPersonLingYulinPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 4;
+    protected override int BaseMaxCounter => 5;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

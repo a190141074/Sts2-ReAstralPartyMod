@@ -35,7 +35,7 @@ public class VariantPersonSinkou : CooldownPersonRelicBase
         set => AstralParty_VariantPersonSinkouPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 5;
+    protected override int BaseMaxCounter => 6;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

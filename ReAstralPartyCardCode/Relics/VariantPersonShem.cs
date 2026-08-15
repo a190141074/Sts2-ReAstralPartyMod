@@ -49,7 +49,7 @@ public class VariantPersonShem : CooldownPersonRelicBase
         set => AstralParty_VariantPersonShemPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 5;
+    protected override int BaseMaxCounter => 6;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

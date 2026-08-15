@@ -52,7 +52,7 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase,
         set => AstralParty_PersonBionicJasmineDoppelgangerPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 4;
+    protected override int BaseMaxCounter => 5;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

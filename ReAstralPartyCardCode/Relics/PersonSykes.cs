@@ -41,7 +41,7 @@ public sealed class PersonSykes : CooldownPersonRelicBase
         set => AstralParty_PersonSykesPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 3;
+    protected override int BaseMaxCounter => 4;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

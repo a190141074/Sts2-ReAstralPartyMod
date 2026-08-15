@@ -36,7 +36,7 @@ public class VariantPersonYanxin : CooldownPersonRelicBase
         set => AstralParty_VariantPersonYanxinPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 5;
+    protected override int BaseMaxCounter => 6;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

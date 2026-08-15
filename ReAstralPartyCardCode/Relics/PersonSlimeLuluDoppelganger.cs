@@ -19,7 +19,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public class PersonSlimeLuluDoppelganger : CooldownPersonRelicBase
 {
-    private const int SlimeLuluDoppelgangerBaseMaxCounter = 4;
+    private const int SlimeLuluDoppelgangerBaseMaxCounter = 5;
     private const decimal TriggeredHealAmount = 1m;
     private const decimal TriggeredMucusAmount = 3m;
 

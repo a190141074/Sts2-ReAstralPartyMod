@@ -39,7 +39,7 @@ public sealed class VariantPersonWamdus : CooldownPersonRelicBase, IRelicExtraIc
         set => AstralParty_VariantPersonWamdusPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 3;
+    protected override int BaseMaxCounter => 4;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

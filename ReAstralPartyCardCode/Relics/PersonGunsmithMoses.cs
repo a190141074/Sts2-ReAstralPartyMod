@@ -34,7 +34,7 @@ public class PersonGunsmithMoses : CooldownPersonRelicBase
         set => AstralParty_PersonGunsmithMosesPendingCombatStartCard = value;
     }
 
-    protected override int BaseMaxCounter => 3;
+    protected override int BaseMaxCounter => 4;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
