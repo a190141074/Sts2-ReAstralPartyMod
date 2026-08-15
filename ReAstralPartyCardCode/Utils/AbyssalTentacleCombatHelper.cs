@@ -114,7 +114,7 @@ public static class AbyssalTentacleCombatHelper
         if (!tentacle.IsAlive || !target.IsAlive || tentacle.Monster is not AbyssalTentacleMonster model)
             return;
 
-        var damage = 1m + Math.Max(0m, target.GetPowerAmount<AbyssalErosionMarkPower>());
+        var damage = 1m + decimal.Floor(Math.Max(0m, target.GetPowerAmount<AbyssalErosionMarkPower>()) / 3m);
         using (BeginIsolatedDamage())
         {
             await DamageCmd.Attack(damage)

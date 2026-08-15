@@ -357,5 +357,5 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_REALM_POWER.title": "魔渊领域",
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_REALM_POWER.description": "魔渊触须会攻击该单位。",
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.title": "渊蚀印记",
-  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.description": "受到魔渊触须的伤害+[blue]1[/blue]。"
+  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.description": "每[blue]3[/blue]层使其受到魔渊触须的伤害+[blue]1[/blue]。"
 }

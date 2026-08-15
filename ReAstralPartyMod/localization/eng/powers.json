@@ -357,5 +357,5 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_REALM_POWER.title": "Abyssal Realm",
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_REALM_POWER.description": "Abyssal Tentacles attack this creature.",
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.title": "Abyssal Erosion Mark",
-  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.description": "Takes [blue]1[/blue] more damage from Abyssal Tentacles."
+  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.description": "For every [blue]3[/blue] stacks, takes [blue]1[/blue] more damage from Abyssal Tentacles."
 }

@@ -26,6 +26,10 @@ public sealed class PersonSykes : CooldownPersonRelicBase
     [SavedProperty] public int AstralParty_PersonSykesCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonSykesPendingCombatStartCard { get; set; }
 
+    private readonly HashSet<Creature> _abyssalErosionTargetsThisCard = [];
+    private CardModel? _trackedAbyssalErosionCard;
+    private bool _abyssalErosionAppliedToFirstTarget;
+
     protected override int CounterValue
     {
         get => AstralParty_PersonSykesCounter;
@@ -49,16 +53,24 @@ public sealed class PersonSykes : CooldownPersonRelicBase
         HoverTipFactory.FromCard<cards.SkillAbyssalTransformation>(),
         HoverTipFactory.FromPower<AbyssalRealmPower>(),
         HoverTipFactory.FromPower<AbyssalTentaclesPower>(),
-        HoverTipFactory.FromPower<AbyssalErosionMarkPower>(),
-        ReAstralPartyCardCode.Keywords.AstralKeywords.CreateHoverTip(
-            ReAstralPartyCardCode.Keywords.AstralKeywords.AstralEndId)
+        HoverTipFactory.FromPower<AbyssalErosionMarkPower>()
     ];
 
     public override Task BeforeCombatStart()
     {
+        ResetAbyssalErosionTracking();
         return Owner == null
             ? Task.CompletedTask
             : AbyssalTentacleCombatHelper.SummonAsync(Owner, null);
+    }
+
+    public override Task BeforeCardPlayed(CardPlay cardPlay)
+    {
+        if (cardPlay.Card.Owner != Owner || cardPlay.Card.Type != CardType.Attack)
+            return Task.CompletedTask;
+
+        TrackAbyssalErosionCard(cardPlay.Card);
+        return Task.CompletedTask;
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -104,11 +116,28 @@ public sealed class PersonSykes : CooldownPersonRelicBase
         if (cardSource?.Owner != Owner || cardSource.Type != CardType.Attack || result.TotalDamage <= 0m)
             return;
 
+        if (!ReferenceEquals(_trackedAbyssalErosionCard, cardSource))
+            TrackAbyssalErosionCard(cardSource);
+
+        if (cardSource.TargetType == TargetType.AllEnemies)
+        {
+            if (!_abyssalErosionTargetsThisCard.Add(target))
+                return;
+        }
+        else
+        {
+            if (_abyssalErosionAppliedToFirstTarget)
+                return;
+
+            _abyssalErosionAppliedToFirstTarget = true;
+        }
+
         await PowerCmd.Apply<AbyssalErosionMarkPower>(target, 1m, Owner.Creature, cardSource, false);
     }
 
     public override async Task AfterCombatEnd(CombatRoom room)
     {
+        ResetAbyssalErosionTracking();
         if (Owner?.Creature != null)
         {
             AbyssalTentacleCombatHelper.Cleanup(Owner);
@@ -126,5 +155,19 @@ public sealed class PersonSykes : CooldownPersonRelicBase
         var card = Owner.Creature.CombatState.CreateCard(
             ModelDb.Card<cards.SkillAbyssalTransformation>(), Owner);
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
+    }
+
+    private void TrackAbyssalErosionCard(CardModel card)
+    {
+        _trackedAbyssalErosionCard = card;
+        _abyssalErosionTargetsThisCard.Clear();
+        _abyssalErosionAppliedToFirstTarget = false;
+    }
+
+    private void ResetAbyssalErosionTracking()
+    {
+        _trackedAbyssalErosionCard = null;
+        _abyssalErosionTargetsThisCard.Clear();
+        _abyssalErosionAppliedToFirstTarget = false;
     }
 }
