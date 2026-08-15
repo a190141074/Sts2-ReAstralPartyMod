@@ -17,6 +17,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 public class FateWeakImprintPower : AstralPartyPowerModel
 {
     private const decimal BonusDamageTaken = 1m;
+    private const decimal BonusDamageTakenMultiplier = 0.15m;
     private const decimal MaxDuration = 2m;
 
     public override PowerType Type => PowerType.Debuff;
@@ -59,7 +60,7 @@ public class FateWeakImprintPower : AstralPartyPowerModel
         if (amount <= 0m)
             return 0m;
 
-        return BonusDamageTaken;
+        return BonusDamageTaken + amount * BonusDamageTakenMultiplier;
     }
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
