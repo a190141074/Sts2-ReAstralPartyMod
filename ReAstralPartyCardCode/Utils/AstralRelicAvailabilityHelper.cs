@@ -96,7 +96,8 @@ public static class AstralRelicAvailabilityHelper
         if (AstralContentModeRegistry.NormalizeMode(mode) != AstralContentMode.Vanilla)
             return true;
 
-        if (PersonRelicRegistry.IsPersonRelic(relic))
+        if (PersonRelicRegistry.IsPersonRelic(relic)
+            || PersonRelicRegistry.IsVariantPersonRelic(relic))
             return true;
         if (TokenRelicRegistry.IsTokenRelic(relic))
             return true;

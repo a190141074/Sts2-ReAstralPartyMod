@@ -814,6 +814,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             var isEditable = IsEditableByLocalPlayer(role);
             var currentMode = AstralContentModeRegistry.NormalizeMode(snapshot.CurrentContentMode);
             var isVanillaMode = currentMode == AstralContentMode.Vanilla;
+            var variantPersonasAvailability = AstralContentModeRegistry.GetAvailability(
+                currentMode,
+                AstralGameplaySettingKey.VariantPersonas,
+                roomSurface: true);
+            var allVariantPersonasAvailability = AstralContentModeRegistry.GetAvailability(
+                currentMode,
+                AstralGameplaySettingKey.AllVariantPersonas,
+                roomSurface: true);
             var personaSelectionEnabled = snapshot.EnableStartingPersonaSelection;
             var variantPersonasEnabled = snapshot.EnableVariantPersonas;
             var normalizedNeowSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
@@ -842,9 +850,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             if (_variantPersonasToggle != null)
             {
                 _variantPersonasToggle.ButtonPressed = snapshot.EnableVariantPersonas;
-                _variantPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled;
+                _variantPersonasToggle.Disabled = !isEditable
+                    || variantPersonasAvailability != AstralModeAvailability.Editable
+                    || !personaSelectionEnabled;
                 _variantPersonasToggle.Text = snapshot.EnableVariantPersonas ? "ON" : "OFF";
-                SetRowVisible(_variantPersonasToggle, !isVanillaMode);
+                SetRowVisible(_variantPersonasToggle, variantPersonasAvailability != AstralModeAvailability.Hidden);
             }
 
             if (_jewelryRelicsToggle != null)
@@ -890,9 +900,14 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             if (_allVariantPersonasToggle != null)
             {
                 _allVariantPersonasToggle.ButtonPressed = snapshot.EnableAllVariantPersonas;
-                _allVariantPersonasToggle.Disabled = !isEditable || !personaSelectionEnabled || !variantPersonasEnabled;
+                _allVariantPersonasToggle.Disabled = !isEditable
+                    || allVariantPersonasAvailability != AstralModeAvailability.Editable
+                    || !personaSelectionEnabled
+                    || !variantPersonasEnabled;
                 _allVariantPersonasToggle.Text = snapshot.EnableAllVariantPersonas ? "ON" : "OFF";
-                SetRowVisible(_allVariantPersonasToggle, !isVanillaMode);
+                SetRowVisible(
+                    _allVariantPersonasToggle,
+                    allVariantPersonasAvailability != AstralModeAvailability.Hidden);
             }
 
             if (_extremeModeToggle != null)

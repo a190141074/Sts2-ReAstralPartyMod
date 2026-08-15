@@ -151,7 +151,6 @@
   "RE_ASTRAL_PARTY_MOD_POWER_CUTE_IS_JUSTICE_POWER.smartDescription": "各スタックは [blue]1[/blue] [red]力量[/red] を許可します。",
   "RE_ASTRAL_PARTY_MOD_POWER_MIXED_COCKTAILS_POWER.title": "调制效果",
   "RE_ASTRAL_PARTY_MOD_POWER_MIXED_COCKTAILS_POWER.description": "この[card]ミックスカクテル[/card]は以下を付与しました:\n一時的な強さ：{TemporaryStrength}\n一時的な器用さ: {TemporaryDexterity}\n特別な器用さ: {Dexterity}\nヒーリング：{Heal}\nエネルギー: {Energy:energyIcons()}\nカードドロー：{Draw}\nブロック: {Block}",
-  "RE_ASTRAL_PARTY_MOD_POWER_MIXED_COCKTAILS_POWER.smartDescription": "この[card]ミックスカクテル[/card]は以下を付与しました:\n一時的な強さ：{TemporaryStrength}\n一時的な器用さ: {TemporaryDexterity}\n特別な器用さ: {Dexterity}\nヒーリング：{Heal}\nエネルギー: {Energy:energyIcons()}\nカードドロー：{Draw}\nブロック: {Block}",
   "RE_ASTRAL_PARTY_MOD_POWER_BOUNDARY_REINFORCEMENT_POWER.title": "边界强化",
   "RE_ASTRAL_PARTY_MOD_POWER_BOUNDARY_REINFORCEMENT_POWER.description": "持続時間は 2 回合 です。 回合 では何も行われません。获得 します。 获得してから下回合が始まるまでにダメージを受けなかった場合、その回合の開始時に获得 3 临时 [red]力量[/red]。その期間中にダメージを受けた場合は、この力を取り除きます。",
   "RE_ASTRAL_PARTY_MOD_POWER_BOUNDARY_REINFORCEMENT_POWER.smartDescription": "下回合 が始まるまですべてのダメージを回避した場合、获得 3 临时 [red]力量[/red]。それ以外の場合は、この権限を削除してください。",

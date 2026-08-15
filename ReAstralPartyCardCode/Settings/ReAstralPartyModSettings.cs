@@ -2389,8 +2389,6 @@ public static partial class ReAstralPartyModSettingsManager
             vanilla.NeowExtraOptionSelectionMode,
             defaults.NeowExtraOptionSelectionMode,
             value => vanilla.NeowExtraOptionSelectionMode = value);
-        changed |= SetIfDifferent(vanilla.EnableVariantPersons, defaults.EnableVariantPersons, value => vanilla.EnableVariantPersons = value);
-        changed |= SetIfDifferent(vanilla.EnableAllVariantPersons, defaults.EnableAllVariantPersons, value => vanilla.EnableAllVariantPersons = value);
         changed |= SetIfDifferent(vanilla.EnableMechTideMode, defaults.EnableMechTideMode, value => vanilla.EnableMechTideMode = value);
 
         return changed;

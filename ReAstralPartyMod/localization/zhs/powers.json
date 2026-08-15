@@ -157,7 +157,6 @@
   "RE_ASTRAL_PARTY_MOD_POWER_CUTE_IS_JUSTICE_POWER.smartDescription": "每层获得[blue]1[/blue]点[red]力量[/red]。",
   "RE_ASTRAL_PARTY_MOD_POWER_MIXED_COCKTAILS_POWER.title": "调制效果",
   "RE_ASTRAL_PARTY_MOD_POWER_MIXED_COCKTAILS_POWER.description": "本次[gold]调制饮料[/gold]提供的效果：\n临时力量：{TemporaryStrength}\n临时敏捷：{TemporaryDexterity}\n额外敏捷：{Dexterity}\n回复：{Heal}\n能量：{Energy:energyIcons()}\n抽牌：{Draw}\n格挡：{Block}",
-  "RE_ASTRAL_PARTY_MOD_POWER_MIXED_COCKTAILS_POWER.smartDescription": "本次[gold]调制饮料[/gold]提供的效果：\n临时力量：{TemporaryStrength}\n临时敏捷：{TemporaryDexterity}\n额外敏捷：{Dexterity}\n回复：{Heal}\n能量：{Energy:energyIcons()}\n抽牌：{Draw}\n格挡：{Block}",
   "RE_ASTRAL_PARTY_MOD_POWER_BOUNDARY_REINFORCEMENT_POWER.title": "边界强化",
   "RE_ASTRAL_PARTY_MOD_POWER_BOUNDARY_REINFORCEMENT_POWER.description": "持续2回合。获得的当回合没有效果。若从获得时起直到下一个自身回合开始前都未受到伤害，则在下一个自身回合开始时获得3点临时[red]力量[/red]。期间只要受到伤害，则移除此能力。",
   "RE_ASTRAL_PARTY_MOD_POWER_BOUNDARY_REINFORCEMENT_POWER.smartDescription": "若直到下一个自身回合开始前都未受到伤害，则在下一个自身回合开始时获得3点临时[red]力量[/red]；若期间受伤则移除此能力。",

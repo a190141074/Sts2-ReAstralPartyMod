@@ -663,6 +663,10 @@
 				IgnoreExitCode="true"
 				IgnoreStandardErrorWarningFormat="true"/>
 		<Error Condition="!Exists('$(PckOutputPath)')" Text="Godot export did not produce $(PckOutputPath)."/>
+		<Exec
+				WorkingDirectory="$(MSBuildProjectDirectory)"
+				Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\tools\ValidateExportResources.ps1&quot; -ProjectDir &quot;$(MSBuildProjectDirectory)&quot; -PckPath &quot;$(PckOutputPath)&quot;"
+				IgnoreStandardErrorWarningFormat="true"/>
 	</Target>
 
 	<Target Name="WarnMissingGodot" AfterTargets="Build" Condition="'$(RunPckExport)' == 'true' and '$(STS2_SKIP_PCK_EXPORT)' != '1' and !Exists('$(GodotEditorPath)')">

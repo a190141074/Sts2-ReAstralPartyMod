@@ -19,18 +19,22 @@ public sealed class PlayerLoseGoldUnexpectedWealthPatch : IPatchMethod
         return [new(typeof(PlayerCmd), nameof(PlayerCmd.LoseGold))];
     }
 
-    public static void Postfix(decimal amount, Player player, GoldLossType lossType, ref Task __result)
+    public static void Postfix(decimal amount, Player player, GoldLossType goldLossType, ref Task __result)
     {
-        __result = RunAfterLoseGold(__result, amount, player, lossType);
+        __result = RunAfterLoseGold(__result, amount, player, goldLossType);
     }
 
-    private static async Task RunAfterLoseGold(Task originalTask, decimal amount, Player player, GoldLossType lossType)
+    private static async Task RunAfterLoseGold(
+        Task originalTask,
+        decimal amount,
+        Player player,
+        GoldLossType goldLossType)
     {
         await originalTask;
 
         if (player?.RunState is not RunState runState)
             return;
-        if (lossType != GoldLossType.Spent || amount <= 0m)
+        if (goldLossType != GoldLossType.Spent || amount <= 0m)
             return;
         if (!FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.UnexpectedWealth))
             return;
