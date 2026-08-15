@@ -46,5 +46,7 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.title": "轨道炮",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.description": "当作为[gold]轨道轰炸素材[/gold]时：\n每张视为[blue]2[/blue]张卡。\n耗能计算视为[blue]3[/blue]点。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MIXED.title": "调制",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MIXED.description": "【攻击牌】临时[green]力量[/green]([blue]1[/blue])\n【防御牌】临时[green]敏捷[/green]([blue]1[/blue])\n【技能牌】[green]回复[/green]生命([blue]1[/blue])\n【能力牌】获得[green]能量[/green]([blue]1[/blue])\n【状态牌】[green]抽牌[/green]([blue]1[/blue])\n【诅咒牌】回复[green]生命[/green]([blue]1[/blue])，获得[green]格挡[/green]([blue]1[/blue])"
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MIXED.description": "【攻击牌】临时[green]力量[/green]([blue]1[/blue])\n【防御牌】临时[green]敏捷[/green]([blue]1[/blue])\n【技能牌】[green]回复[/green]生命([blue]1[/blue])\n【能力牌】获得[green]能量[/green]([blue]1[/blue])\n【状态牌】[green]抽牌[/green]([blue]1[/blue])\n【诅咒牌】回复[green]生命[/green]([blue]1[/blue])，获得[green]格挡[/green]([blue]1[/blue])",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.title": "终焉",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.description": "回合结束时，若在你的手牌中，自动打出。"
 }

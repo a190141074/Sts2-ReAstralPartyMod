@@ -351,5 +351,11 @@
   "RE_ASTRAL_PARTY_MOD_POWER_TREASURE_BUCKET_POWER.smartDescription": "The first lethal hit heals [blue]5[/blue] HP, grants [blue]99[/blue] [power]Intangible[/power], and prevents future Block gain. The killer gains [blue]1[/blue] extra random token after combat.",
   "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.title": "Baton",
   "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.description": "Gain [blue]2[/blue] temporary [red]Strength[/red], [blue]2[/blue] temporary [green]Dexterity[/green], and [blue]2[/blue] Block.\nAt the start of the next player's turn, transfer this effect to the next player in stable order.",
-  "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.smartDescription": "Gain [blue]2[/blue] temporary [red]Strength[/red], [blue]2[/blue] temporary [green]Dexterity[/green], and [blue]2[/blue] Block; transfer it at the next player's turn start."
+  "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.smartDescription": "Gain [blue]2[/blue] temporary [red]Strength[/red], [blue]2[/blue] temporary [green]Dexterity[/green], and [blue]2[/blue] Block; transfer it at the next player's turn start.",
+  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_TENTACLES_POWER.title": "Abyssal Tentacle",
+  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_TENTACLES_POWER.description": "Cannot take damage or become a normal attack target. Its attacks are affected only by [gold]Abyssal Erosion Mark[/gold].",
+  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_REALM_POWER.title": "Abyssal Realm",
+  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_REALM_POWER.description": "Abyssal Tentacles attack this creature.",
+  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.title": "Abyssal Erosion Mark",
+  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.description": "Takes [blue]1[/blue] more damage from Abyssal Tentacles."
 }

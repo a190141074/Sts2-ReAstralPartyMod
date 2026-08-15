@@ -46,5 +46,7 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.title": "レールガン",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_ORBITAL_BOMBARDMENT_MATERIAL.description": "[gold]軌道爆撃資材[/gold]として使用する場合:\n各カードは [blue]2[/blue] カードとみなされます。\nコスト計算は[blue]3[/blue]点とみなします。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MIXED.title": "変調",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MIXED.description": "【攻撃カード】一時的[green]パワー[/green]([blue]1[/blue])\n【防御カード】テンポラリ[green]敏捷[/green]([blue]1[/blue])\n[スキルカード][green]ライフを回復[/green]([blue]1[/blue])\n[アビリティカード] [green] エネルギーを獲得[/green] ([blue]1[/blue])\n【ステータスカード】[green]ドローカード[/green]([blue]1[/blue])\n[呪いカード][green]ライフ[/green]([blue]1[/blue])を回復、[green]ブロック[/green]([blue]1[/blue])を獲得"
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MIXED.description": "【攻撃カード】一時的[green]パワー[/green]([blue]1[/blue])\n【防御カード】テンポラリ[green]敏捷[/green]([blue]1[/blue])\n[スキルカード][green]ライフを回復[/green]([blue]1[/blue])\n[アビリティカード] [green] エネルギーを獲得[/green] ([blue]1[/blue])\n【ステータスカード】[green]ドローカード[/green]([blue]1[/blue])\n[呪いカード][green]ライフ[/green]([blue]1[/blue])を回復、[green]ブロック[/green]([blue]1[/blue])を獲得",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.title": "終焉",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.description": "ターン終了時、手札にあるなら自動でプレイする。"
 }

@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Daily;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.RestSite;
@@ -195,6 +196,28 @@ internal static class GameplayStaticPatchCatalog
                 false,
                 "UI patch: skip newly acquired relic animations when the inventory holder is no longer usable",
                 [typeof(Godot.Vector2?), typeof(Godot.Vector2?)]),
+            new ModPatchInfo(
+                "abyssal_tentacle_visual_entry_patch",
+                typeof(NCombatRoom),
+                nameof(NCombatRoom.AddCreature),
+                typeof(AbyssalTentacleVisualEntryPatch),
+                false,
+                "UI patch: position and hide interaction for Abyssal Tentacle pets after standard pet entry",
+                [typeof(Creature)]),
+            new ModPatchInfo(
+                "abyssal_tentacle_damage_additive_patch",
+                typeof(AbstractModel),
+                nameof(AbstractModel.ModifyDamageAdditive),
+                typeof(AbyssalTentacleDamageAdditivePatch),
+                false,
+                "Gameplay patch: isolate Abyssal Tentacle damage from additive modifiers"),
+            new ModPatchInfo(
+                "abyssal_tentacle_damage_multiplicative_patch",
+                typeof(AbstractModel),
+                nameof(AbstractModel.ModifyDamageMultiplicative),
+                typeof(AbyssalTentacleDamageMultiplicativePatch),
+                false,
+                "Gameplay patch: isolate Abyssal Tentacle damage from multiplicative modifiers"),
             new ModPatchInfo(
                 "attack_potion_warforge_compat_patch",
                 typeof(MegaCrit.Sts2.Core.Models.Potions.AttackPotion),

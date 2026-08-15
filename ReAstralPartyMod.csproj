@@ -557,6 +557,11 @@
 		<Content Include="ReAstralPartyMod\images\relic\prophecy_replicant_group.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_living_folio.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\person_mascot_girl_mimi_doppelganger.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\person_sykes.png"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_abyssal_transformation.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\abyssal_tentacles_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\abyssal_realm_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\abyssal_erosion_mark_power.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_solid_state_time.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_z3000_weapon_frame.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_kawaii_angel.png"/>
@@ -588,6 +593,7 @@
 		<Content Include="ReAstralPartyMod\localization\eng\events.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\modifiers.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\modifiers.json.block"/>
+		<Content Include="ReAstralPartyMod\localization\eng\monsters.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\potions.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\powers.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\relics.json"/>
@@ -602,6 +608,7 @@
 		<Content Include="ReAstralPartyMod\localization\jpn\events.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\modifiers.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\modifiers.json.block"/>
+		<Content Include="ReAstralPartyMod\localization\jpn\monsters.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\potions.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\powers.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\relics.json"/>
@@ -615,6 +622,7 @@
 		<Content Include="ReAstralPartyMod\localization\zhs\enchantments.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\events.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\modifiers.json"/>
+		<Content Include="ReAstralPartyMod\localization\zhs\monsters.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\potions.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\powers.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\relics.json"/>

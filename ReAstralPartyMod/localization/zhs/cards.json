@@ -236,5 +236,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.title": "超越次元",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_TRANSCEND_DIMENSIONS.description": "将手牌与弃牌堆洗入抽牌堆。抽[blue]5[/blue]张牌，获得{energyPrefix:energyIcons(5)}。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ENERGY_OVERLOAD.title": "能量过载",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ENERGY_OVERLOAD.description": "临时[green]敏捷[/green]-[blue]2[/blue]。\n[gold]进程[/gold]+[blue]3[/blue]。"
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ENERGY_OVERLOAD.description": "临时[green]敏捷[/green]-[blue]2[/blue]。\n[gold]进程[/gold]+[blue]3[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ABYSSAL_TRANSFORMATION.title": "魔域转化",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ABYSSAL_TRANSFORMATION.description": "对指定敌人施加[gold]魔渊领域[/gold]，使其[green]敏捷[/green]-[blue]2[/blue]。\n召唤[blue]1[/blue]根[gold]魔渊触须[/gold]，并激活所有魔渊触须。"
 }
