@@ -332,7 +332,7 @@
   "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.description": "[blue]2[/blue]点の一時[red]力量[/red]、[blue]2[/blue]点の一時[green]敏捷[/green]、[blue]2[/blue]点の格挡を得る。\n次のプレイヤーターン開始時、この効果を次の序号のプレイヤーへ移す。",
   "RE_ASTRAL_PARTY_MOD_POWER_BATON_POWER.smartDescription": "[blue]2[/blue]点の一時[red]力量[/red]、[blue]2[/blue]点の一時[green]敏捷[/green]、[blue]2[/blue]点の格挡を得る。次のプレイヤーターン開始時に次の序号のプレイヤーへ移る。",
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_TENTACLES_POWER.title": "魔淵触手",
-  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_TENTACLES_POWER.description": "ダメージを受けず、通常攻撃の対象にならない。攻撃は[gold]淵蝕印[/gold]の影響のみを受ける。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_TENTACLES_POWER.description": "1層ごとに[blue]1[/blue]本の魔淵触手を表す。魔淵触手はダメージを受けず、通常攻撃の対象にならない。攻撃は[gold]淵蝕印[/gold]の影響のみを受ける。",
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_REALM_POWER.title": "魔淵領域",
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_REALM_POWER.description": "魔淵触手がこのユニットを攻撃する。",
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.title": "淵蝕印",

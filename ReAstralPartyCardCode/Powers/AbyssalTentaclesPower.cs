@@ -10,7 +10,9 @@ public sealed class AbyssalTentaclesPower : AstralPartyPowerModel
 {
     public override PowerType Type => PowerType.Buff;
 
-    public override PowerStackType StackType => PowerStackType.None;
+    public override PowerStackType StackType => PowerStackType.Counter;
+
+    public override int DisplayAmount => Math.Max((int)Amount, 0);
 
     public override decimal ModifyHpLostBeforeOsty(
         Creature target,
@@ -19,11 +21,13 @@ public sealed class AbyssalTentaclesPower : AstralPartyPowerModel
         Creature? dealer,
         CardModel? cardSource)
     {
-        return target == Owner && amount > 0m ? 0m : amount;
+        return IsTentacleEntity && target == Owner && amount > 0m ? 0m : amount;
     }
 
     public override bool ShouldAllowTargeting(Creature target)
     {
-        return target != Owner;
+        return !IsTentacleEntity || target != Owner;
     }
+
+    private bool IsTentacleEntity => Owner?.Monster is ReAstralPartyMod.ReAstralPartyCardCode.Utils.AbyssalTentacleMonster;
 }

@@ -50,10 +50,7 @@ public sealed class AbyssalTentacleMonster : ModMonsterTemplate
 
 public static class AbyssalTentacleCombatHelper
 {
-    private const string AttackAnimation = "Attack";
-    private static readonly AsyncLocal<int> IsolatedDamageDepth = new();
-
-    public static bool IsIsolatedDamageActive => IsolatedDamageDepth.Value > 0;
+    private static readonly AsyncLocal<IsolatedDamageContext?> _isolatedDamageContext = new();
 
     public static async Task<Creature?> SummonAsync(Player owner, CardModel? source)
     {
@@ -68,6 +65,7 @@ public static class AbyssalTentacleCombatHelper
         await MegaCrit.Sts2.Core.Commands.CreatureCmd.SetMaxHp(tentacle, 1m);
         await MegaCrit.Sts2.Core.Commands.CreatureCmd.SetCurrentHp(tentacle, 1m);
         await PowerCmd.Apply<AbyssalTentaclesPower>(tentacle, 1m, owner.Creature, source, false);
+        await RefreshOwnerTentacleCountAsync(owner, source);
         PositionTentacles(owner);
         return tentacle;
     }
@@ -83,6 +81,7 @@ public static class AbyssalTentacleCombatHelper
 
     public static async Task ActivateAllAsync(PlayerChoiceContext choiceContext, Player owner, CardModel? source)
     {
+        await RefreshOwnerTentacleCountAsync(owner, source);
         foreach (var tentacle in GetLivingTentacles(owner).ToList())
         {
             var targets = CombatTargetOrdering.GetLivingOpponentsStable(owner.Creature)
@@ -103,18 +102,22 @@ public static class AbyssalTentacleCombatHelper
         Creature target,
         CardModel? source)
     {
-        if (!tentacle.IsAlive || !target.IsAlive || tentacle.Monster is not AbyssalTentacleMonster model)
+        if (!tentacle.IsAlive || !target.IsAlive || tentacle.Monster is not AbyssalTentacleMonster)
             return;
 
         var damage = 1m + decimal.Floor(Math.Max(0m, target.GetPowerAmount<AbyssalErosionMarkPower>()) / 3m);
-        using (BeginIsolatedDamage())
+        AnimateAttack(tentacle, target);
+        using (BeginIsolatedDamage(target, damage, owner.Creature, source))
         {
-            await DamageCmd.Attack(damage)
-                .FromMonster(model)
-                .Targeting(target)
-                .Unpowered()
-                .WithAttackerAnim(AttackAnimation, 0.18f, tentacle)
-                .Execute(choiceContext);
+            // A custom pet cannot complete Osty's built-in attacker animation await chain.
+            // Keep its visual lunge independent, then resolve damage through the normal creature command.
+            await MegaCrit.Sts2.Core.Commands.CreatureCmd.Damage(
+                choiceContext,
+                target,
+                damage,
+                ValueProp.Unpowered | ValueProp.SkipHurtAnim,
+                owner.Creature,
+                source);
         }
 
         if (target.IsAlive && target.GetPowerAmount<MegaCrit.Sts2.Core.Models.Powers.DexterityPower>() < 0m)
@@ -133,8 +136,12 @@ public static class AbyssalTentacleCombatHelper
         Callable.From(() => PositionTentaclesNow(owner)).CallDeferred();
     }
 
-    public static void Cleanup(Player owner)
+    public static async Task CleanupAsync(Player owner)
     {
+        var displayPower = owner.Creature.GetPower<AbyssalTentaclesPower>();
+        if (displayPower != null)
+            await PowerCmd.Remove(displayPower);
+
         var room = NCombatRoom.Instance;
         if (room == null)
             return;
@@ -149,6 +156,23 @@ public static class AbyssalTentacleCombatHelper
             node.IntentContainer.Visible = false;
             node.Hide();
         }
+    }
+
+    private static async Task RefreshOwnerTentacleCountAsync(Player owner, CardModel? source)
+    {
+        var count = GetLivingTentacles(owner).Count;
+        var displayPower = owner.Creature.GetPower<AbyssalTentaclesPower>();
+        if (count <= 0)
+        {
+            if (displayPower != null)
+                await PowerCmd.Remove(displayPower);
+            return;
+        }
+
+        if (displayPower?.Amount == count)
+            return;
+
+        await PowerCmd.SetAmount<AbyssalTentaclesPower>(owner.Creature, count, owner.Creature, source);
     }
 
     private static void PositionTentaclesNow(Player owner)
@@ -183,6 +207,32 @@ public static class AbyssalTentacleCombatHelper
         }
     }
 
+    private static void AnimateAttack(Creature tentacle, Creature target)
+    {
+        var room = NCombatRoom.Instance;
+        var tentacleNode = room?.GetCreatureNode(tentacle);
+        var targetNode = room?.GetCreatureNode(target);
+        if (tentacleNode == null || targetNode == null)
+            return;
+
+        var start = tentacleNode.Position;
+        var direction = targetNode.Position - start;
+        if (direction.LengthSquared() < 1f)
+        {
+            tentacleNode.AnimShake();
+            return;
+        }
+
+        var tween = tentacleNode.CreateTween();
+        var lunge = start + direction.Normalized() * 55f;
+        tween.TweenProperty(tentacleNode, "position", lunge, 0.08f)
+            .SetEase(Tween.EaseType.Out)
+            .SetTrans(Tween.TransitionType.Sine);
+        tween.TweenProperty(tentacleNode, "position", start, 0.14f)
+            .SetEase(Tween.EaseType.InOut)
+            .SetTrans(Tween.TransitionType.Sine);
+    }
+
     private static Vector2 GetOffset(int index)
     {
         var column = index % 4;
@@ -190,17 +240,49 @@ public static class AbyssalTentacleCombatHelper
         return new Vector2(92f + column * 66f, -72f + (column % 2) * 112f - row * 54f);
     }
 
-    private static IDisposable BeginIsolatedDamage()
+    public static bool IsIsolatedDamage(
+        Creature? target,
+        decimal amount,
+        Creature? dealer,
+        CardModel? cardSource)
     {
-        IsolatedDamageDepth.Value++;
-        return new IsolatedDamageScope();
+        var context = _isolatedDamageContext.Value;
+        return context != null
+               && ReferenceEquals(context.Target, target)
+               && ReferenceEquals(context.Dealer, dealer)
+               && ReferenceEquals(context.CardSource, cardSource)
+               && context.RawDamage == amount;
+    }
+
+    private static IDisposable BeginIsolatedDamage(
+        Creature target,
+        decimal rawDamage,
+        Creature dealer,
+        CardModel? cardSource)
+    {
+        var previous = _isolatedDamageContext.Value;
+        _isolatedDamageContext.Value = new IsolatedDamageContext(target, rawDamage, dealer, cardSource);
+        return new IsolatedDamageScope(previous);
     }
 
     private sealed class IsolatedDamageScope : IDisposable
     {
+        private readonly IsolatedDamageContext? _previous;
+
+        public IsolatedDamageScope(IsolatedDamageContext? previous)
+        {
+            _previous = previous;
+        }
+
         public void Dispose()
         {
-            IsolatedDamageDepth.Value = Math.Max(0, IsolatedDamageDepth.Value - 1);
+            _isolatedDamageContext.Value = _previous;
         }
     }
+
+    private sealed record IsolatedDamageContext(
+        Creature Target,
+        decimal RawDamage,
+        Creature Dealer,
+        CardModel? CardSource);
 }

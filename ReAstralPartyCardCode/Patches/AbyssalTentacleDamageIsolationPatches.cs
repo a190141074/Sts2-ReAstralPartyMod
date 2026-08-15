@@ -1,5 +1,8 @@
 using HarmonyLib;
+using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -8,13 +11,35 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 public static class AbyssalTentacleDamageAdditivePatch
 {
     [HarmonyPrefix]
-    public static bool Prefix(ref decimal __result)
+    public static bool Prefix(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource,
+        ref decimal __result)
     {
-        if (!AbyssalTentacleCombatHelper.IsIsolatedDamageActive)
+        if (!AbyssalTentacleCombatHelper.IsIsolatedDamage(target, amount, dealer, cardSource))
             return true;
 
         __result = 0m;
         return false;
+    }
+
+    [HarmonyFinalizer]
+    public static Exception? Finalizer(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource,
+        Exception? __exception,
+        ref decimal __result)
+    {
+        if (AbyssalTentacleCombatHelper.IsIsolatedDamage(target, amount, dealer, cardSource))
+            __result = 0m;
+
+        return __exception;
     }
 }
 
@@ -22,12 +47,34 @@ public static class AbyssalTentacleDamageAdditivePatch
 public static class AbyssalTentacleDamageMultiplicativePatch
 {
     [HarmonyPrefix]
-    public static bool Prefix(ref decimal __result)
+    public static bool Prefix(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource,
+        ref decimal __result)
     {
-        if (!AbyssalTentacleCombatHelper.IsIsolatedDamageActive)
+        if (!AbyssalTentacleCombatHelper.IsIsolatedDamage(target, amount, dealer, cardSource))
             return true;
 
         __result = 1m;
         return false;
+    }
+
+    [HarmonyFinalizer]
+    public static Exception? Finalizer(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource,
+        Exception? __exception,
+        ref decimal __result)
+    {
+        if (AbyssalTentacleCombatHelper.IsIsolatedDamage(target, amount, dealer, cardSource))
+            __result = 1m;
+
+        return __exception;
     }
 }

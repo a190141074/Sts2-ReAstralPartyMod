@@ -129,7 +129,7 @@ public sealed class PersonSykes : CooldownPersonRelicBase
         ResetAbyssalErosionTracking();
         if (Owner?.Creature != null)
         {
-            AbyssalTentacleCombatHelper.Cleanup(Owner);
+            await AbyssalTentacleCombatHelper.CleanupAsync(Owner);
         }
 
         await base.AfterCombatEnd(room);
