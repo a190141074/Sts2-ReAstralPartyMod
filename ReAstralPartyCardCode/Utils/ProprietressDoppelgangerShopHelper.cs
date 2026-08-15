@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Rooms;
@@ -9,36 +7,27 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class ProprietressDoppelgangerShopHelper
 {
-    private const decimal CommissionRatio = 0.20m;
+    private const decimal RefundRatio = 0.30m;
 
     public static bool IsEligibleMerchantPurchase(Player? buyer)
     {
         return buyer?.RunState?.CurrentRoom is MerchantRoom;
     }
 
-    public static async Task TryGrantCommissionAsync(Player? buyer, int spentGold)
+    public static async Task TryProcessPurchaseAsync(Player? buyer, int spentGold)
     {
         if (buyer == null || spentGold <= 0 || !IsEligibleMerchantPurchase(buyer))
             return;
 
-        var commission = StableNumericStateHelper.FloorToNonNegativeInt(spentGold * CommissionRatio);
-        if (commission <= 0)
+        var relic = buyer.GetRelic<PersonProprietressDoppelganger>();
+        if (relic == null)
             return;
 
-        foreach (var recipient in GetCommissionRecipients(buyer))
-        {
-            var relic = recipient.GetRelic<PersonProprietressDoppelganger>();
-            relic?.Flash();
-            await PersonMultiplayerEffectHelper.GainGoldDeterministic(commission, recipient);
-        }
-    }
+        relic.RecordMerchantSpend(spentGold);
+        relic.Flash();
 
-    private static IReadOnlyList<Player> GetCommissionRecipients(Player buyer)
-    {
-        return buyer.RunState.Players
-            .Where(player => player != buyer)
-            .Where(player => player.GetRelic<PersonProprietressDoppelganger>() != null)
-            .OrderBy(player => player.NetId)
-            .ToList();
+        var refund = StableNumericStateHelper.FloorToNonNegativeInt(spentGold * RefundRatio);
+        if (refund > 0)
+            await PersonMultiplayerEffectHelper.GainGoldDeterministic(refund, buyer);
     }
 }

@@ -13,7 +13,7 @@ internal static class ProprietressDoppelgangerShopPatchHelper
         if (!result.Item1 || inventory?.Player == null || result.Item2 <= 0)
             return result;
 
-        await ProprietressDoppelgangerShopHelper.TryGrantCommissionAsync(inventory.Player, result.Item2);
+        await ProprietressDoppelgangerShopHelper.TryProcessPurchaseAsync(inventory.Player, result.Item2);
         return result;
     }
 }
@@ -21,7 +21,7 @@ internal static class ProprietressDoppelgangerShopPatchHelper
 public sealed class ProprietressDoppelgangerShopRelicPurchasePatch : IPatchMethod
 {
     public static string PatchId => "proprietress_doppelganger_shop_relic_purchase";
-    public static string Description => "Grant Proprietress doppelganger commission after successful relic purchases";
+    public static string Description => "Process Proprietress doppelganger bonuses after successful relic purchases";
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
@@ -38,7 +38,7 @@ public sealed class ProprietressDoppelgangerShopRelicPurchasePatch : IPatchMetho
 public sealed class ProprietressDoppelgangerShopCardPurchasePatch : IPatchMethod
 {
     public static string PatchId => "proprietress_doppelganger_shop_card_purchase";
-    public static string Description => "Grant Proprietress doppelganger commission after successful card purchases";
+    public static string Description => "Process Proprietress doppelganger bonuses after successful card purchases";
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
@@ -55,7 +55,7 @@ public sealed class ProprietressDoppelgangerShopCardPurchasePatch : IPatchMethod
 public sealed class ProprietressDoppelgangerShopPotionPurchasePatch : IPatchMethod
 {
     public static string PatchId => "proprietress_doppelganger_shop_potion_purchase";
-    public static string Description => "Grant Proprietress doppelganger commission after successful potion purchases";
+    public static string Description => "Process Proprietress doppelganger bonuses after successful potion purchases";
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
@@ -72,7 +72,7 @@ public sealed class ProprietressDoppelgangerShopPotionPurchasePatch : IPatchMeth
 public sealed class ProprietressDoppelgangerShopRemovalPurchasePatch : IPatchMethod
 {
     public static string PatchId => "proprietress_doppelganger_shop_removal_purchase";
-    public static string Description => "Grant Proprietress doppelganger commission after successful card removal purchases";
+    public static string Description => "Process Proprietress doppelganger bonuses after successful card removal purchases";
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()

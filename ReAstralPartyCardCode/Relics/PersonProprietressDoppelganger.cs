@@ -1,14 +1,14 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Entities.Merchant;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
-using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
@@ -17,12 +17,12 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(EventRelicPool))]
 public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
 {
-    private const decimal InterestPerFloorRatio = 0.035m;
-    private const decimal OtherPlayerPriceIncreaseRatio = 0.10m;
+    private const int GoldPerDamageBonusPercent = 30;
+    private const int MaxDamageBonusPercent = 200;
 
     [SavedProperty] public int AstralParty_PersonProprietressDoppelgangerCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonProprietressDoppelgangerPendingCombatStartCard { get; set; }
-    [SavedProperty] public int AstralParty_PersonProprietressDoppelgangerLastProcessedTotalFloor { get; set; } = -1;
+    [SavedProperty] public int AstralParty_PersonProprietressDoppelgangerSpentGoldForDamage { get; set; }
 
     protected override int CounterValue
     {
@@ -40,6 +40,10 @@ public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
+    public override bool ShowCounter => true;
+
+    public override int DisplayAmount => GetDamageBonusPercent();
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillRemoteStore>()
@@ -48,45 +52,38 @@ public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonProprietressDoppelgangerLastProcessedTotalFloor = Owner?.RunState?.TotalFloor ?? -1;
+        AstralParty_PersonProprietressDoppelgangerSpentGoldForDamage = 0;
+        InvokeDisplayAmountChanged();
+
+        if (Owner != null)
+            await TokenEternalStarlight.GrantStacks(Owner, 30);
     }
 
-    public override Task AfterRoomEntered(AbstractRoom room)
+    public void RecordMerchantSpend(int spentGold)
     {
-        var owner = Owner;
-        var runState = owner?.RunState;
-        if (owner == null || runState == null)
-            return Task.CompletedTask;
+        if (spentGold <= 0 || GetDamageBonusPercent() >= MaxDamageBonusPercent)
+            return;
 
-        var currentFloor = runState.TotalFloor;
-        if (AstralParty_PersonProprietressDoppelgangerLastProcessedTotalFloor < 0)
-        {
-            AstralParty_PersonProprietressDoppelgangerLastProcessedTotalFloor = currentFloor;
-            return Task.CompletedTask;
-        }
-
-        var climbedFloors = Math.Max(0, currentFloor - AstralParty_PersonProprietressDoppelgangerLastProcessedTotalFloor);
-        AstralParty_PersonProprietressDoppelgangerLastProcessedTotalFloor = currentFloor;
-        if (climbedFloors <= 0)
-            return Task.CompletedTask;
-
-        var totalPartyGold = runState.Players.Sum(player => player.Gold);
-        var interest = StableNumericStateHelper.FloorToNonNegativeInt(totalPartyGold * InterestPerFloorRatio * climbedFloors);
-        if (interest <= 0)
-            return Task.CompletedTask;
-
-        Flash();
-        return PersonMultiplayerEffectHelper.GainGoldDeterministic(interest, owner);
+        var maxTrackedGold = MaxDamageBonusPercent * GoldPerDamageBonusPercent;
+        AstralParty_PersonProprietressDoppelgangerSpentGoldForDamage = Math.Min(
+            maxTrackedGold,
+            Math.Max(0, AstralParty_PersonProprietressDoppelgangerSpentGoldForDamage) + spentGold);
+        InvokeDisplayAmountChanged();
     }
 
-    public override decimal ModifyMerchantPrice(MegaCrit.Sts2.Core.Entities.Players.Player player, MerchantEntry entry, decimal originalPrice)
+    public override decimal ModifyDamageAdditive(
+        Creature? target,
+        decimal amount,
+        ValueProp props,
+        Creature? dealer,
+        CardModel? cardSource)
     {
-        if (Owner == null || player == Owner)
-            return originalPrice;
-        if (player.RunState?.CurrentRoom is not MerchantRoom)
-            return originalPrice;
+        if (Owner?.Creature == null || dealer != Owner.Creature)
+            return 0m;
+        if (target == null || target.Side == Owner.Creature.Side || amount <= 0m)
+            return 0m;
 
-        return originalPrice * (1m + OtherPlayerPriceIncreaseRatio);
+        return amount * GetDamageBonusPercent() / 100m;
     }
 
     protected override async Task GrantCooldownCard()
@@ -97,5 +94,13 @@ public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillRemoteStore>(), Owner);
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
+    }
+
+    private int GetDamageBonusPercent()
+    {
+        return Math.Clamp(
+            AstralParty_PersonProprietressDoppelgangerSpentGoldForDamage / GoldPerDamageBonusPercent,
+            0,
+            MaxDamageBonusPercent);
     }
 }
