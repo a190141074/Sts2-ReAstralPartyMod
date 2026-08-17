@@ -31,16 +31,30 @@ public class CollectorsCardYouHaveMeToo : AstralPartyCardModel
             return;
 
         var targetPlayer = cardPlay.Target!.Player!;
+        var roundNumber = Owner.Creature!.CombatState!.RoundNumber;
+        await BaseAbilityHelper.GrantDeterministicBaseAbilityToHand(
+            Owner,
+            Owner,
+            this,
+            MainFile.ModId,
+            Id.Entry,
+            "recipient",
+            Owner.RunState.Rng.StringSeed,
+            Owner.NetId,
+            Owner.NetId,
+            targetPlayer.NetId,
+            roundNumber);
         await BaseAbilityHelper.GrantDeterministicBaseAbilityToHand(
             Owner,
             targetPlayer,
             this,
             MainFile.ModId,
             Id.Entry,
-            "target",
+            "recipient",
             Owner.RunState.Rng.StringSeed,
             Owner.NetId,
             targetPlayer.NetId,
-            Owner.Creature!.CombatState!.RoundNumber);
+            targetPlayer.NetId,
+            roundNumber);
     }
 }
