@@ -236,7 +236,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ABYSSAL_TRANSFORMATION.title": "魔域転化",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ABYSSAL_TRANSFORMATION.description": "指定した敵に[gold]魔淵領域[/gold]を付与し、[green]敏捷[/green]-[blue]2[/blue]。\n[gold]魔淵触手[/gold]を[blue]1[/blue]本召喚し、すべての魔淵触手を起動する。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY_PLUS.title": "強者の憐憫",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY_PLUS.description": "他のプレイヤーを指定する。\n自分のデッキから最大[blue]4[/blue]枚を[gold]拒めない[/gold]付きで対象のデッキへ移す。\n[gold]永遠の星光[/gold]を[blue]2[/blue]得る。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY_PLUS.description": "他のプレイヤーを指定する。\n自分のデッキから最大[blue]4[/blue]枚を[gold]拒めない[/gold]付きで対象のデッキへ移す。\n[gold]永遠の星光[/gold]を[blue]1[/blue]得る。ちょうど[blue]4[/blue]枚を移した場合、代わりに[blue]2[/blue]得る。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY_PLUS.select_prompt": "最大[blue]4[/blue]枚を移す",
   "RE_ASTRAL_PARTY_MOD_CARD_HK_MAJESTY_OF_THE_HEAVENLY_KING.title": "天王の威厳",
   "RE_ASTRAL_PARTY_MOD_CARD_HK_MAJESTY_OF_THE_HEAVENLY_KING.description": "[gold]永遠の星光[/gold]に等しいダメージを与える。\n他の仲間全員は防御されなかったダメージに等しい[gold]星光[/gold]を得る。",

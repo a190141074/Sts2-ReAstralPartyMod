@@ -74,9 +74,9 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
             return;
 
         Flash();
-        await TokenEternalStarlight.GrantStacks(Owner, 1);
+        await PowerCmd.Apply<StarLightPower>(Owner.Creature, 1m, Owner.Creature, source as CardModel, false);
         MainFile.Logger.Info(
-            $"[VariantPersonShadowScion] card gain observed | owner={Owner.NetId} | recipient={recipient.NetId} | source={source?.GetType().Name ?? "<null>"}");
+            $"[VariantPersonShadowScion] card gain observed; granted Starlight | owner={Owner.NetId} | recipient={recipient.NetId} | source={source?.GetType().Name ?? "<null>"}");
     }
 
     protected override async Task GrantCooldownCard()

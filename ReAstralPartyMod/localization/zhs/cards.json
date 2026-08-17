@@ -240,7 +240,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ABYSSAL_TRANSFORMATION.title": "魔域转化",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_ABYSSAL_TRANSFORMATION.description": "对指定敌人施加[gold]魔渊领域[/gold]，使其[green]敏捷[/green]-[blue]2[/blue]。\n召唤[blue]1[/blue]根[gold]魔渊触须[/gold]，并激活所有魔渊触须。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY_PLUS.title": "强者怜悯",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY_PLUS.description": "指定一名其他玩家。\n选择自身牌组中至多[blue]4[/blue]张牌附加[gold]不容拒绝[/gold]转移至目标牌组。\n你获得[blue]2[/blue]点[gold]永恒星光[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY_PLUS.description": "指定一名其他玩家。\n选择自身牌组中至多[blue]4[/blue]张牌附加[gold]不容拒绝[/gold]转移至目标牌组。\n你获得[blue]1[/blue]点[gold]永恒星光[/gold]；若正好转移[blue]4[/blue]张牌，改为获得[blue]2[/blue]点。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY_PLUS.select_prompt": "选择至多[blue]4[/blue]张牌转移",
   "RE_ASTRAL_PARTY_MOD_CARD_HK_MAJESTY_OF_THE_HEAVENLY_KING.title": "天王之威",
   "RE_ASTRAL_PARTY_MOD_CARD_HK_MAJESTY_OF_THE_HEAVENLY_KING.description": "造成等同于[gold]永恒星光[/gold]的伤害。\n所有其他队友获得等同于未被格挡伤害的[gold]星光[/gold]。",

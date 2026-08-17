@@ -66,7 +66,8 @@ public sealed class SkillPowerfulPityPlus : AstralPartyCardModel
             successfulTransfers++;
         }
 
-        await TokenEternalStarlight.GrantStacks(owner, 2);
+        var eternalStarlightGranted = successfulTransfers == MaxSelectedCards ? 2 : 1;
+        await TokenEternalStarlight.GrantStacks(owner, eternalStarlightGranted);
         if (successfulTransfers == MaxSelectedCards)
             await PlayerCmd.GainEnergy(1m, target!);
 
@@ -74,7 +75,7 @@ public sealed class SkillPowerfulPityPlus : AstralPartyCardModel
             await FallenHeavenlyKingDeckHelper.ReplaceWithHeavenlyKingDeck(owner);
 
         MainFile.Logger.Info(
-            $"[SkillPowerfulPityPlus] transfer resolved | owner={owner.NetId} | target={target!.NetId} | selected={selectedCards.Count} | successful={successfulTransfers}");
+            $"[SkillPowerfulPityPlus] transfer resolved | owner={owner.NetId} | target={target!.NetId} | selected={selectedCards.Count} | successful={successfulTransfers} | eternal_starlight={eternalStarlightGranted}");
     }
 
     private static async Task<IReadOnlyList<CardModel>> SelectDeckCards(Player owner)
