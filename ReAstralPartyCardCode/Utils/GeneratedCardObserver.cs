@@ -43,6 +43,11 @@ public static class GeneratedCardObserver
 
     public static Task NotifyCardAddedToHand(CardModel card, AbstractModel? source = null)
     {
+        return NotifyCardGained(card, source);
+    }
+
+    public static Task NotifyCardGained(CardModel card, AbstractModel? source = null)
+    {
         EnsureCleanupHooksRegistered();
         return CardGainAttribution.RunWithSource(source, async () =>
         {
@@ -59,10 +64,12 @@ public static class GeneratedCardObserver
                 foreach (var player in recipient.Creature.CombatState.Players)
                 {
                     var relic = player.GetRelic<PersonShadowScion>();
-                    if (relic == null)
-                        continue;
+                    if (relic != null)
+                        await relic.HandleObservedCardGain(recipient, source);
 
-                    await relic.HandleObservedCardGain(recipient, source);
+                    var variantRelic = player.GetRelic<VariantPersonShadowScion>();
+                    if (variantRelic != null)
+                        await variantRelic.HandleObservedCardGain(recipient, source);
                 }
             }
             finally

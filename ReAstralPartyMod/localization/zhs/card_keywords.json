@@ -48,5 +48,7 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MIXED.title": "调制",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MIXED.description": "【攻击牌】临时[green]力量[/green]([blue]1[/blue])\n【防御牌】临时[green]敏捷[/green]([blue]1[/blue])\n【技能牌】[green]回复[/green]生命([blue]1[/blue])\n【能力牌】获得[green]能量[/green]([blue]1[/blue])\n【状态牌】[green]抽牌[/green]([blue]1[/blue])\n【诅咒牌】回复[green]生命[/green]([blue]1[/blue])，获得[green]格挡[/green]([blue]1[/blue])",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.title": "终焉",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.description": "回合结束时，若在你的手牌中，自动打出。"
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.description": "回合结束时，若在你的手牌中，自动打出。",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.title": "不容拒绝",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.description": "在手牌中打出或弃置时[gold]消耗[/gold]，获得[blue]3[/blue]点[gold]星光[/gold]。经历[blue]3[/blue]场战斗后从你的卡组移除；[gold]诅咒牌[/gold]需要额外经历[blue]2[/blue]场战斗。"
 }

@@ -73,21 +73,7 @@ internal static class EventDeckCardHelper
         if (!owner.RunState.ContainsCard(card))
             owner.RunState.AddCard(card, owner);
 
-        var result = await CardPileCmd.Add(card, PileType.Deck);
-        if (!result.success)
-        {
-            MainFile.Logger.Warn(
-                $"[EventDeckCardHelper] CardPileCmd.Add failed for '{card.Id.Entry}' owner {owner.NetId}.");
-            return false;
-        }
-
-        if (showPreview)
-            CardCmd.PreviewCardPileAdd(result, previewTime);
-
-        SaveManager.Instance?.MarkCardAsSeen(card.CanonicalInstance ?? card);
-        MainFile.Logger.Info(
-            $"[EventDeckCardHelper] Added card '{card.Id.Entry}' to run deck for owner {owner.NetId} | deckCount={owner.Deck?.Cards.Count ?? -1}.");
-        return true;
+        return await AddOwnedCardToRunDeckAsync(owner, card, showPreview, previewTime) != null;
     }
 
     public static void AddCardToRunDeckSafely(
@@ -99,19 +85,72 @@ internal static class EventDeckCardHelper
         TaskHelper.RunSafely(AddCardToRunDeckAsync(owner, card, showPreview, previewTime));
     }
 
+    public static async Task<CardModel?> TransferCardBetweenRunDecksAsync(
+        Player source,
+        Player target,
+        CardModel card)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(target);
+        ArgumentNullException.ThrowIfNull(card);
+
+        if (ReferenceEquals(source, target)
+            || source.RunState == null
+            || target.RunState == null
+            || !ReferenceEquals(card.Owner, source)
+            || !source.RunState.ContainsCard(card)
+            || card.Pile?.Type != PileType.Deck)
+        {
+            MainFile.Logger.Warn(
+                $"[EventDeckCardHelper] Refused run-deck transfer | source={source.NetId} | target={target.NetId} | card={card.Id.Entry} | owner={card.Owner?.NetId.ToString() ?? "<null>"} | pile={card.Pile?.Type.ToString() ?? "<null>"}.");
+            return null;
+        }
+
+        CardModel? transferredCard = null;
+        var sourceDeckBefore = source.Deck?.Cards.Count ?? -1;
+        var targetDeckBefore = target.Deck?.Cards.Count ?? -1;
+        try
+        {
+            // A card removed from a RunState cannot be attached to a different scope again.
+            // Rebuild the complete saved card state for the target before touching the source card.
+            transferredCard = target.RunState.LoadCard(card.ToSerializable(), target);
+            MainFile.Logger.Info(
+                $"[EventDeckCardHelper] Transfer target created | source={source.NetId} | target={target.NetId} | sourceCard={card.Id.Entry}#{card.GetHashCode()} | targetCard={transferredCard.Id.Entry}#{transferredCard.GetHashCode()} | sourceDeck={sourceDeckBefore} | targetDeck={targetDeckBefore}.");
+
+            transferredCard = await AddOwnedCardToRunDeckAsync(target, transferredCard, false);
+            if (transferredCard == null)
+                throw new InvalidOperationException("Target card was not added to the target deck.");
+
+            if (!await RemoveCardFromRunDeck(source, card, false))
+                throw new InvalidOperationException("Source card was not fully removed from its deck and run state.");
+
+            SaveManager.Instance?.MarkCardAsSeen(transferredCard.CanonicalInstance ?? transferredCard);
+            MainFile.Logger.Info(
+                $"[EventDeckCardHelper] Transfer completed | source={source.NetId} | target={target.NetId} | sourceCard={card.Id.Entry}#{card.GetHashCode()} | targetCard={transferredCard.Id.Entry}#{transferredCard.GetHashCode()} | sourceDeck={sourceDeckBefore}->{source.Deck?.Cards.Count ?? -1} | targetDeck={targetDeckBefore}->{target.Deck?.Cards.Count ?? -1}.");
+            return transferredCard;
+        }
+        catch (Exception exception)
+        {
+            MainFile.Logger.Error(
+                $"[EventDeckCardHelper] Run-deck transfer failed | source={source.NetId} | target={target.NetId} | card={card.Id.Entry}: {exception}");
+            await RemoveFailedTransferTargetAsync(target, transferredCard);
+            return null;
+        }
+    }
+
     public static async Task<bool> RemoveCardFromRunDeck(Player owner, CardModel card, bool showPreview = true)
     {
         ArgumentNullException.ThrowIfNull(owner);
         ArgumentNullException.ThrowIfNull(card);
 
         var beforeDeckCount = owner.Deck?.Cards.Count ?? -1;
-        var removed = false;
+        var removedFromDeck = false;
         if (card.Pile?.Type == PileType.Deck)
         {
             try
             {
                 await CardPileCmd.RemoveFromDeck(card, showPreview);
-                removed = true;
+                removedFromDeck = owner.Deck?.Cards.Contains(card) != true;
             }
             catch (Exception ex)
             {
@@ -120,12 +159,16 @@ internal static class EventDeckCardHelper
             }
         }
 
-        if (!removed)
+        if (!removedFromDeck)
         {
-            var removedFromPlayerDeck = TryRemoveCardFromPlayerDeck(owner, card);
-            var removedFromRunState = TryRemoveCardFromRunState(owner, card);
-            removed = removedFromPlayerDeck || removedFromRunState;
+            removedFromDeck = TryRemoveCardFromPlayerDeck(owner, card);
         }
+
+        var removedFromRunState = !owner.RunState?.ContainsCard(card) ?? true;
+        if (!removedFromRunState)
+            removedFromRunState = TryRemoveCardFromRunState(owner, card);
+
+        var removed = removedFromDeck && removedFromRunState;
 
         var afterDeckCount = owner.Deck?.Cards.Count ?? -1;
 
@@ -146,6 +189,25 @@ internal static class EventDeckCardHelper
     public static void RemoveCardFromRunDeckSafely(Player owner, CardModel card, bool showPreview = true)
     {
         TaskHelper.RunSafely(RemoveCardFromRunDeck(owner, card, showPreview));
+    }
+
+    private static async Task RemoveFailedTransferTargetAsync(Player target, CardModel? transferredCard)
+    {
+        if (transferredCard == null)
+            return;
+
+        try
+        {
+            await RemoveCardFromRunDeck(target, transferredCard, false);
+
+            MainFile.Logger.Warn(
+                $"[EventDeckCardHelper] Rolled back failed transfer target | target={target.NetId} | card={transferredCard.Id.Entry}#{transferredCard.GetHashCode()} | pile={transferredCard.Pile?.Type.ToString() ?? "<null>"}.");
+        }
+        catch (Exception rollbackException)
+        {
+            MainFile.Logger.Error(
+                $"[EventDeckCardHelper] Failed to roll back transfer target | target={target.NetId} | card={transferredCard.Id.Entry}#{transferredCard.GetHashCode()}: {rollbackException}");
+        }
     }
 
     private static object? ReadMemberValue(object source, MemberInfo member)
@@ -237,12 +299,57 @@ internal static class EventDeckCardHelper
             if (entry is not CardModel card)
                 continue;
 
-            if (card.Owner == null)
-                card.Owner = owner;
+            if (!ReferenceEquals(card.Owner, owner))
+            {
+                MainFile.Logger.Error(
+                    $"[EventDeckCardHelper] Ignored invalid deck card | owner={owner.NetId} | card={card.Id.Entry}#{card.GetHashCode()} | cardOwner={card.Owner?.NetId.ToString() ?? "<null>"}.");
+                continue;
+            }
 
             cards.Add(card);
         }
 
         return cards;
+    }
+
+    private static async Task<CardModel?> AddOwnedCardToRunDeckAsync(
+        Player owner,
+        CardModel card,
+        bool showPreview,
+        float previewTime = 2f)
+    {
+        if (owner.RunState == null
+            || owner.Deck == null
+            || !ReferenceEquals(card.Owner, owner)
+            || !owner.RunState.ContainsCard(card))
+        {
+            MainFile.Logger.Error(
+                $"[EventDeckCardHelper] Refused invalid run-deck add | owner={owner.NetId} | card={card.Id.Entry}#{card.GetHashCode()} | cardOwner={card.Owner?.NetId.ToString() ?? "<null>"} | inRunState={owner.RunState?.ContainsCard(card) == true}.");
+            return null;
+        }
+
+        var deckBefore = owner.Deck.Cards.Count;
+        var result = await CardPileCmd.Add(card, owner.Deck, CardPilePosition.Bottom, null, false);
+        var addedCard = result.cardAdded;
+        var inTargetDeck = result.success
+                            && ReferenceEquals(addedCard.Owner, owner)
+                            && owner.Deck.Cards.Contains(addedCard)
+                            && addedCard.Pile == owner.Deck;
+        if (!inTargetDeck)
+        {
+            MainFile.Logger.Error(
+                $"[EventDeckCardHelper] Run-deck add verification failed | owner={owner.NetId} | card={card.Id.Entry}#{card.GetHashCode()} | result={result.success} | resultCard={addedCard.Id.Entry}#{addedCard.GetHashCode()} | deck={deckBefore}->{owner.Deck.Cards.Count} | inTargetDeck={owner.Deck.Cards.Contains(addedCard)}.");
+            if (owner.RunState.ContainsCard(card) && card.Pile != owner.Deck)
+                owner.RunState.RemoveCard(card);
+            return null;
+        }
+
+        if (showPreview)
+            CardCmd.PreviewCardPileAdd(result, previewTime);
+
+        SaveManager.Instance?.MarkCardAsSeen(addedCard.CanonicalInstance ?? addedCard);
+        MainFile.Logger.Info(
+            $"[EventDeckCardHelper] Added verified run-deck card | owner={owner.NetId} | card={addedCard.Id.Entry}#{addedCard.GetHashCode()} | inRunState={owner.RunState.ContainsCard(addedCard)} | deck={deckBefore}->{owner.Deck.Cards.Count}.");
+        return addedCard;
     }
 }

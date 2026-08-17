@@ -35,6 +35,7 @@ public class MainFile
         ReAstralPartyModSettingsManager.Register();
         TokenSeriesAvailabilityHelper.Register();
         FinalArenaSeriesHelper.Register();
+        IrrefusableCardHelper.Register();
 
         // Current content still references minted CardKeyword values while models materialize,
         // so keywords must be registered before assembly auto-discovery runs.

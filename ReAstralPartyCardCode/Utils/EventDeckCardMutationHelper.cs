@@ -25,7 +25,16 @@ internal static class EventDeckCardMutationHelper
         Upgrade = 1,
         Downgrade = 2,
         Remove = 3,
-        Enchant = 4
+        Enchant = 4,
+        Transfer = 5
+    }
+
+    public static Task<IReadOnlyList<CardModel>> SynchronizeTransferSelection(
+        Player owner,
+        IReadOnlyList<CardModel> selectedCards,
+        string context)
+    {
+        return SynchronizeDeckCards(owner, selectedCards, DeckMutationKind.Transfer, context);
     }
 
     public static async Task Upgrade(Player owner, IReadOnlyList<CardModel> selectedCards, string context)
