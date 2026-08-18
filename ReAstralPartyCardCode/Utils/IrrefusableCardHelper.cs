@@ -1,17 +1,17 @@
-using System.Text.Json;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using STS2RitsuLib;
 using STS2RitsuLib.Content;
 using STS2RitsuLib.Models;
 using STS2RitsuLib.RunData;
+using STS2RitsuLib.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -20,6 +20,8 @@ internal static class IrrefusableCardHelper
     private const string RunDataKey = "irrefusable_cards";
     private const int StandardCombatsRemaining = 3;
     private const int CurseCombatsRemaining = StandardCombatsRemaining + 2;
+    private static readonly SavedAttachedState<CardModel, string> TransferId =
+        new($"{MainFile.ModId}_irrefusable_transfer_id", static () => string.Empty);
     private static readonly HashSet<CardModel> PlayedFromHand = [];
     private static readonly HashSet<CardModel> DiscardedFromHand = [];
     private static RunSavedData<IrrefusableRunData> _runData = null!;
@@ -42,36 +44,54 @@ internal static class IrrefusableCardHelper
         _registered = true;
     }
 
-    public static void MarkTransferredCard(Player target, CardModel card)
+    public static int QueueTransfers(Player source, Player target, IReadOnlyList<CardModel> cards)
     {
-        if (target.RunState is not RunState runState)
-            return;
-
-        if (!card.Keywords.Contains(AstralKeywords.Irrefusable))
-            CardCmd.ApplyKeyword(card, AstralKeywords.Irrefusable);
-
-        var deckCards = EventDeckCardHelper.GetRunDeckCards(target);
-        var index = deckCards.IndexOf(card);
-        if (index < 0)
-            return;
+        if (source.RunState is not RunState runState || ReferenceEquals(source, target))
+            return 0;
 
         var data = Get(runState);
-        data.Cards.RemoveAll(record => record.PlayerNetId == target.NetId && record.DeckIndex == index);
-        data.Cards.Add(new IrrefusableCardRecord
+        var queued = 0;
+        foreach (var card in cards.Distinct())
         {
-            PlayerNetId = target.NetId,
-            DeckIndex = index,
-            CardId = (card.CanonicalInstance ?? card).Id.ToString(),
-            UpgradeLevel = card.CurrentUpgradeLevel,
-            FloorAddedToDeck = card.FloorAddedToDeck ?? 0,
-            CombatsRemaining = card.Type == CardType.Curse
-                ? CurseCombatsRemaining
-                : StandardCombatsRemaining
-        });
-        _runData.Set(runState, data);
+            if (!ReferenceEquals(card.Owner, source)
+                || card.Pile?.Type != PileType.Deck
+                || source.Deck?.Cards.Contains(card) != true)
+            {
+                MainFile.Logger.Warn(
+                    $"[Irrefusable] queue rejected invalid source card | source={source.NetId} | target={target.NetId} | card={card.Id.Entry} | pile={card.Pile?.Type.ToString() ?? "<null>"}.");
+                continue;
+            }
 
-        MainFile.Logger.Info(
-            $"[Irrefusable] marked permanent target deck card; no combat copy created | owner={target.NetId} | card={card.Id.Entry}#{card.GetHashCode()} | deck_index={index} | deck_count={target.Deck?.Cards.Count ?? -1} | in_run_state={runState.ContainsCard(card)} | combats_remaining={data.Cards[^1].CombatsRemaining}");
+            var existingTransferId = TransferId.GetValueOrDefault(card, string.Empty);
+            if (!string.IsNullOrEmpty(existingTransferId)
+                && data.PendingTransfers.Any(record => record.TransferId == existingTransferId))
+            {
+                MainFile.Logger.Warn(
+                    $"[Irrefusable] queue skipped already-pending card | transfer={existingTransferId} | source={source.NetId} | card={card.Id.Entry}.");
+                continue;
+            }
+
+            RemoveExistingLifetimeRecord(data, source, card, existingTransferId);
+            if (!card.Keywords.Contains(AstralKeywords.Irrefusable))
+                card.AddKeyword(AstralKeywords.Irrefusable);
+
+            var transferId = $"{source.NetId}:{target.NetId}:{++data.NextTransferSequence}";
+            TransferId[card] = transferId;
+            data.PendingTransfers.Add(new IrrefusablePendingTransfer
+            {
+                TransferId = transferId,
+                SourcePlayerNetId = source.NetId,
+                TargetPlayerNetId = target.NetId,
+                Sequence = data.NextTransferSequence
+            });
+            queued++;
+
+            MainFile.Logger.Info(
+                $"[Irrefusable] queued transfer | transfer={transferId} | source={source.NetId} | target={target.NetId} | card={card.Id.Entry} | keyword={card.Keywords.Contains(AstralKeywords.Irrefusable)}.");
+        }
+
+        _runData.Set(runState, data);
+        return queued;
     }
 
     public static void TrackHandPileExit(CardModel card, PileType oldPileType)
@@ -90,9 +110,7 @@ internal static class IrrefusableCardHelper
         }
     }
 
-    public static async Task HandleCardPlayed(
-        PlayerChoiceContext choiceContext,
-        CardPlay cardPlay)
+    public static async Task HandleCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         var card = cardPlay.Card;
         if (!PlayedFromHand.Remove(card)
@@ -128,6 +146,14 @@ internal static class IrrefusableCardHelper
             return;
 
         var data = Get(runState);
+        foreach (var pending in data.PendingTransfers
+                     .OrderBy(record => record.Sequence)
+                     .ThenBy(record => record.TransferId, StringComparer.Ordinal)
+                     .ToList())
+        {
+            await ResolvePendingTransfer(runState, data, pending);
+        }
+
         foreach (var record in data.Cards.ToList())
         {
             record.CombatsRemaining--;
@@ -136,15 +162,187 @@ internal static class IrrefusableCardHelper
 
             var owner = runState.Players.FirstOrDefault(player => player.NetId == record.PlayerNetId);
             var card = owner == null ? null : ResolveDeckCard(owner, record);
-            if (owner != null && card != null)
-                await EventDeckCardHelper.RemoveCardFromRunDeck(owner, card, false);
-
+            var removed = owner != null && card != null && await RemoveDeckCardOfficial(owner, card, "expiry");
             data.Cards.Remove(record);
             MainFile.Logger.Info(
-                $"[Irrefusable] expired card | owner={record.PlayerNetId} | card={record.CardId} | removed={card != null}");
+                $"[Irrefusable] expired card | transfer={record.TransferId ?? "<legacy>"} | owner={record.PlayerNetId} | card={record.CardId} | removed={removed}.");
         }
 
         _runData.Set(runState, data);
+    }
+
+    private static async Task ResolvePendingTransfer(
+        RunState runState,
+        IrrefusableRunData data,
+        IrrefusablePendingTransfer pending)
+    {
+        var source = runState.Players.FirstOrDefault(player => player.NetId == pending.SourcePlayerNetId);
+        var target = runState.Players.FirstOrDefault(player => player.NetId == pending.TargetPlayerNetId);
+        if (source == null || target == null || ReferenceEquals(source, target))
+        {
+            MainFile.Logger.Warn(
+                $"[Irrefusable] transfer retry waiting for players | transfer={pending.TransferId} | source={pending.SourcePlayerNetId} | target={pending.TargetPlayerNetId}.");
+            return;
+        }
+
+        var sourceCard = FindDeckCardByTransferId(source, pending.TransferId);
+        var targetCard = FindDeckCardByTransferId(target, pending.TransferId);
+        if (targetCard != null)
+        {
+            if (sourceCard != null && !await RemoveDeckCardOfficial(source, sourceCard, "pending-completion"))
+            {
+                MainFile.Logger.Warn(
+                    $"[Irrefusable] transfer retry source removal failed | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId}.");
+                return;
+            }
+
+            await CompletePendingTransfer(data, pending, source, target, targetCard, sourceCard == null);
+            return;
+        }
+
+        if (sourceCard == null)
+        {
+            MainFile.Logger.Warn(
+                $"[Irrefusable] transfer retry source marker missing | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId}.");
+            return;
+        }
+
+        try
+        {
+            var createdTarget = runState.LoadCard(sourceCard.ToSerializable(), target);
+            var addResult = await CardPileCmd.Add(
+                createdTarget,
+                target.Deck,
+                CardPilePosition.Bottom,
+                null,
+                true);
+            if (!addResult.success
+                || !ReferenceEquals(addResult.cardAdded.Owner, target)
+                || target.Deck.Cards.Contains(addResult.cardAdded) != true
+                || addResult.cardAdded.Pile != target.Deck)
+            {
+                MainFile.Logger.Warn(
+                    $"[Irrefusable] transfer retry target add failed | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId} | result={addResult.success}.");
+                return;
+            }
+
+            targetCard = addResult.cardAdded;
+        }
+        catch (Exception exception)
+        {
+            MainFile.Logger.Error(
+                $"[Irrefusable] transfer retry target creation failed | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId}: {exception}");
+            return;
+        }
+
+        if (!await RemoveDeckCardOfficial(source, sourceCard, "transfer"))
+        {
+            if (targetCard != null)
+                await RemoveDeckCardOfficial(target, targetCard, "transfer-rollback");
+
+            MainFile.Logger.Warn(
+                $"[Irrefusable] transfer retry rolled back target after source removal failure | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId}.");
+            return;
+        }
+
+        await CompletePendingTransfer(data, pending, source, target, targetCard!, false);
+    }
+
+    private static async Task CompletePendingTransfer(
+        IrrefusableRunData data,
+        IrrefusablePendingTransfer pending,
+        Player source,
+        Player target,
+        CardModel targetCard,
+        bool alreadyApplied)
+    {
+        if (!targetCard.Keywords.Contains(AstralKeywords.Irrefusable))
+            targetCard.AddKeyword(AstralKeywords.Irrefusable);
+
+        TransferId[targetCard] = pending.TransferId;
+        EnsureLifetimeRecord(data, target, targetCard, pending.TransferId);
+        data.PendingTransfers.Remove(pending);
+
+        var sourceRelic = source.GetRelic<VariantPersonShadowScion>();
+        await CardGainAttribution.RunWithSource(sourceRelic, () =>
+            GeneratedCardObserver.NotifyCardGained(targetCard, sourceRelic));
+
+        if (EventDeckCardHelper.GetRunDeckCards(source).Count == 0)
+            await FallenHeavenlyKingDeckHelper.ReplaceWithHeavenlyKingDeck(source);
+
+        MainFile.Logger.Info(
+            $"[Irrefusable] transfer {(alreadyApplied ? "already applied" : "applied")} | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId} | card={targetCard.Id.Entry} | source_deck={source.Deck?.Cards.Count ?? -1} | target_deck={target.Deck?.Cards.Count ?? -1}.");
+    }
+
+    private static void EnsureLifetimeRecord(
+        IrrefusableRunData data,
+        Player target,
+        CardModel card,
+        string transferId)
+    {
+        if (data.Cards.Any(record => record.TransferId == transferId))
+            return;
+
+        data.Cards.Add(new IrrefusableCardRecord
+        {
+            TransferId = transferId,
+            PlayerNetId = target.NetId,
+            DeckIndex = EventDeckCardHelper.GetRunDeckCards(target).IndexOf(card),
+            CardId = (card.CanonicalInstance ?? card).Id.ToString(),
+            UpgradeLevel = card.CurrentUpgradeLevel,
+            FloorAddedToDeck = card.FloorAddedToDeck ?? 0,
+            CombatsRemaining = card.Type == CardType.Curse
+                ? CurseCombatsRemaining
+                : StandardCombatsRemaining
+        });
+    }
+
+    private static void RemoveExistingLifetimeRecord(
+        IrrefusableRunData data,
+        Player source,
+        CardModel card,
+        string existingTransferId)
+    {
+        if (!string.IsNullOrEmpty(existingTransferId))
+            data.Cards.RemoveAll(record => record.TransferId == existingTransferId);
+
+        data.Cards.RemoveAll(record =>
+            record.PlayerNetId == source.NetId
+            && string.IsNullOrEmpty(record.TransferId)
+            && MatchesLegacyCard(card, record));
+    }
+
+    private static CardModel? FindDeckCardByTransferId(Player owner, string transferId)
+    {
+        return EventDeckCardHelper.GetRunDeckCards(owner)
+            .FirstOrDefault(card => TransferId.GetValueOrDefault(card, string.Empty) == transferId);
+    }
+
+    private static async Task<bool> RemoveDeckCardOfficial(Player owner, CardModel card, string reason)
+    {
+        if (card.Pile?.Type != PileType.Deck)
+        {
+            MainFile.Logger.Warn(
+                $"[Irrefusable] official deck removal skipped non-deck card | reason={reason} | owner={owner.NetId} | card={card.Id.Entry} | pile={card.Pile?.Type.ToString() ?? "<null>"}.");
+            return false;
+        }
+
+        try
+        {
+            await CardPileCmd.RemoveFromDeck(card, false);
+            var removed = owner.Deck?.Cards.Contains(card) != true
+                          && owner.RunState?.ContainsCard(card) != true;
+            if (!removed)
+                MainFile.Logger.Warn(
+                    $"[Irrefusable] official deck removal verification failed | reason={reason} | owner={owner.NetId} | card={card.Id.Entry}.");
+            return removed;
+        }
+        catch (Exception exception)
+        {
+            MainFile.Logger.Error(
+                $"[Irrefusable] official deck removal failed | reason={reason} | owner={owner.NetId} | card={card.Id.Entry}: {exception}");
+            return false;
+        }
     }
 
     private static async Task ConsumeAndGrantStarlight(
@@ -174,17 +372,20 @@ internal static class IrrefusableCardHelper
     private static CardModel? ResolveDeckCard(Player owner, IrrefusableCardRecord record)
     {
         var cards = EventDeckCardHelper.GetRunDeckCards(owner);
+        if (!string.IsNullOrEmpty(record.TransferId))
+            return cards.FirstOrDefault(card => TransferId.GetValueOrDefault(card, string.Empty) == record.TransferId);
+
         if (record.DeckIndex >= 0 && record.DeckIndex < cards.Count)
         {
             var indexed = cards[record.DeckIndex];
-            if (Matches(indexed, record))
+            if (MatchesLegacyCard(indexed, record))
                 return indexed;
         }
 
-        return cards.FirstOrDefault(card => Matches(card, record));
+        return cards.FirstOrDefault(card => MatchesLegacyCard(card, record));
     }
 
-    private static bool Matches(CardModel card, IrrefusableCardRecord record)
+    private static bool MatchesLegacyCard(CardModel card, IrrefusableCardRecord record)
     {
         return string.Equals((card.CanonicalInstance ?? card).Id.ToString(), record.CardId,
                    StringComparison.Ordinal)
@@ -227,11 +428,22 @@ internal sealed class IrrefusableCardLifecycle : HookedSingletonModel
 
 internal sealed class IrrefusableRunData
 {
+    public int NextTransferSequence { get; set; }
+    public List<IrrefusablePendingTransfer> PendingTransfers { get; set; } = [];
     public List<IrrefusableCardRecord> Cards { get; set; } = [];
+}
+
+internal sealed class IrrefusablePendingTransfer
+{
+    public string TransferId { get; set; } = string.Empty;
+    public ulong SourcePlayerNetId { get; set; }
+    public ulong TargetPlayerNetId { get; set; }
+    public int Sequence { get; set; }
 }
 
 internal sealed class IrrefusableCardRecord
 {
+    public string? TransferId { get; set; }
     public ulong PlayerNetId { get; set; }
     public int DeckIndex { get; set; }
     public string CardId { get; set; } = string.Empty;

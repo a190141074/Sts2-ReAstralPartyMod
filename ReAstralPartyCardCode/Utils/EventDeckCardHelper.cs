@@ -85,59 +85,6 @@ internal static class EventDeckCardHelper
         TaskHelper.RunSafely(AddCardToRunDeckAsync(owner, card, showPreview, previewTime));
     }
 
-    public static async Task<CardModel?> TransferCardBetweenRunDecksAsync(
-        Player source,
-        Player target,
-        CardModel card)
-    {
-        ArgumentNullException.ThrowIfNull(source);
-        ArgumentNullException.ThrowIfNull(target);
-        ArgumentNullException.ThrowIfNull(card);
-
-        if (ReferenceEquals(source, target)
-            || source.RunState == null
-            || target.RunState == null
-            || !ReferenceEquals(card.Owner, source)
-            || !source.RunState.ContainsCard(card)
-            || card.Pile?.Type != PileType.Deck)
-        {
-            MainFile.Logger.Warn(
-                $"[EventDeckCardHelper] Refused run-deck transfer | source={source.NetId} | target={target.NetId} | card={card.Id.Entry} | owner={card.Owner?.NetId.ToString() ?? "<null>"} | pile={card.Pile?.Type.ToString() ?? "<null>"}.");
-            return null;
-        }
-
-        CardModel? transferredCard = null;
-        var sourceDeckBefore = source.Deck?.Cards.Count ?? -1;
-        var targetDeckBefore = target.Deck?.Cards.Count ?? -1;
-        try
-        {
-            // A card removed from a RunState cannot be attached to a different scope again.
-            // Rebuild the complete saved card state for the target before touching the source card.
-            transferredCard = target.RunState.LoadCard(card.ToSerializable(), target);
-            MainFile.Logger.Info(
-                $"[EventDeckCardHelper] Transfer target created | source={source.NetId} | target={target.NetId} | sourceCard={card.Id.Entry}#{card.GetHashCode()} | targetCard={transferredCard.Id.Entry}#{transferredCard.GetHashCode()} | sourceDeck={sourceDeckBefore} | targetDeck={targetDeckBefore}.");
-
-            transferredCard = await AddOwnedCardToRunDeckAsync(target, transferredCard, false);
-            if (transferredCard == null)
-                throw new InvalidOperationException("Target card was not added to the target deck.");
-
-            if (!await RemoveCardFromRunDeck(source, card, false))
-                throw new InvalidOperationException("Source card was not fully removed from its deck and run state.");
-
-            SaveManager.Instance?.MarkCardAsSeen(transferredCard.CanonicalInstance ?? transferredCard);
-            MainFile.Logger.Info(
-                $"[EventDeckCardHelper] Transfer completed | source={source.NetId} | target={target.NetId} | sourceCard={card.Id.Entry}#{card.GetHashCode()} | targetCard={transferredCard.Id.Entry}#{transferredCard.GetHashCode()} | sourceDeck={sourceDeckBefore}->{source.Deck?.Cards.Count ?? -1} | targetDeck={targetDeckBefore}->{target.Deck?.Cards.Count ?? -1}.");
-            return transferredCard;
-        }
-        catch (Exception exception)
-        {
-            MainFile.Logger.Error(
-                $"[EventDeckCardHelper] Run-deck transfer failed | source={source.NetId} | target={target.NetId} | card={card.Id.Entry}: {exception}");
-            await RemoveFailedTransferTargetAsync(target, transferredCard);
-            return null;
-        }
-    }
-
     public static async Task<bool> RemoveCardFromRunDeck(Player owner, CardModel card, bool showPreview = true)
     {
         ArgumentNullException.ThrowIfNull(owner);
@@ -189,25 +136,6 @@ internal static class EventDeckCardHelper
     public static void RemoveCardFromRunDeckSafely(Player owner, CardModel card, bool showPreview = true)
     {
         TaskHelper.RunSafely(RemoveCardFromRunDeck(owner, card, showPreview));
-    }
-
-    private static async Task RemoveFailedTransferTargetAsync(Player target, CardModel? transferredCard)
-    {
-        if (transferredCard == null)
-            return;
-
-        try
-        {
-            await RemoveCardFromRunDeck(target, transferredCard, false);
-
-            MainFile.Logger.Warn(
-                $"[EventDeckCardHelper] Rolled back failed transfer target | target={target.NetId} | card={transferredCard.Id.Entry}#{transferredCard.GetHashCode()} | pile={transferredCard.Pile?.Type.ToString() ?? "<null>"}.");
-        }
-        catch (Exception rollbackException)
-        {
-            MainFile.Logger.Error(
-                $"[EventDeckCardHelper] Failed to roll back transfer target | target={target.NetId} | card={transferredCard.Id.Entry}#{transferredCard.GetHashCode()}: {rollbackException}");
-        }
     }
 
     private static object? ReadMemberValue(object source, MemberInfo member)

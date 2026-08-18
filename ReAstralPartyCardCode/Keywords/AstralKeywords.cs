@@ -135,7 +135,13 @@ public static class AstralKeywords
 
         var registry = ModKeywordRegistry.For(MainFile.ModId);
         foreach (var stem in OwnedKeywordStems)
-            registry.RegisterCardKeywordOwnedByLocNamespace(stem);
+            registry.RegisterCardKeywordOwnedByLocNamespace(
+                stem,
+                iconPath: null,
+                cardDescriptionPlacement: stem == IrrefusableStem
+                    ? ModKeywordCardDescriptionPlacement.BeforeCardDescription
+                    : ModKeywordCardDescriptionPlacement.None,
+                includeInCardHoverTip: true);
 
         _registered = true;
     }

@@ -51,31 +51,15 @@ public sealed class SkillPowerfulPityPlus : AstralPartyCardModel
             owner,
             selectedCards,
             "skill_powerful_pity_plus");
-        var successfulTransfers = 0;
-        foreach (var card in selectedCards)
-        {
-            var transferredCard = await EventDeckCardHelper.TransferCardBetweenRunDecksAsync(owner, target!, card);
-            if (transferredCard == null)
-                continue;
+        var queuedTransfers = IrrefusableCardHelper.QueueTransfers(owner, target!, selectedCards);
 
-            await CardGainAttribution.RunWithSource(this, async () =>
-            {
-                IrrefusableCardHelper.MarkTransferredCard(target!, transferredCard);
-                await GeneratedCardObserver.NotifyCardGained(transferredCard, this);
-            });
-            successfulTransfers++;
-        }
-
-        var eternalStarlightGranted = successfulTransfers == MaxSelectedCards ? 2 : 1;
+        var eternalStarlightGranted = queuedTransfers == MaxSelectedCards ? 2 : 1;
         await TokenEternalStarlight.GrantStacks(owner, eternalStarlightGranted);
-        if (successfulTransfers == MaxSelectedCards)
+        if (queuedTransfers == MaxSelectedCards)
             await PlayerCmd.GainEnergy(1m, target!);
 
-        if (successfulTransfers > 0 && EventDeckCardHelper.GetRunDeckCards(owner).Count == 0)
-            await FallenHeavenlyKingDeckHelper.ReplaceWithHeavenlyKingDeck(owner);
-
         MainFile.Logger.Info(
-            $"[SkillPowerfulPityPlus] transfer resolved | owner={owner.NetId} | target={target!.NetId} | selected={selectedCards.Count} | successful={successfulTransfers} | eternal_starlight={eternalStarlightGranted}");
+            $"[SkillPowerfulPityPlus] transfer queued | owner={owner.NetId} | target={target!.NetId} | selected={selectedCards.Count} | queued={queuedTransfers} | eternal_starlight={eternalStarlightGranted}");
     }
 
     private static async Task<IReadOnlyList<CardModel>> SelectDeckCards(Player owner)
