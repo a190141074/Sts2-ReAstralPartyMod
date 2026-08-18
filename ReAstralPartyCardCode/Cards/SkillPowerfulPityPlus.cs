@@ -64,16 +64,22 @@ public sealed class SkillPowerfulPityPlus : AstralPartyCardModel
 
     private static async Task<IReadOnlyList<CardModel>> SelectDeckCards(Player owner)
     {
-        var deckCards = EventDeckCardHelper.GetRunDeckCards(owner);
-        if (deckCards.Count == 0)
+        var eligibleDeckCards = EventDeckCardHelper.GetRunDeckCards(owner)
+            .Where(card => !FallenHeavenlyKingDeckHelper.IsHeavenlyKingDeckCard(card))
+            .ToList();
+        if (eligibleDeckCards.Count == 0)
             return [];
 
-        var prefs = new CardSelectorPrefs(SelectionPrompt, 0, Math.Min(MaxSelectedCards, deckCards.Count))
+        var prefs = new CardSelectorPrefs(SelectionPrompt, 0, Math.Min(MaxSelectedCards, eligibleDeckCards.Count))
         {
             Cancelable = true,
             RequireManualConfirmation = true
         };
-        var selected = await CardSelectCmd.FromDeckGeneric(owner, prefs, static _ => true, null!);
+        var selected = await CardSelectCmd.FromDeckGeneric(
+            owner,
+            prefs,
+            static card => !FallenHeavenlyKingDeckHelper.IsHeavenlyKingDeckCard(card),
+            null!);
         return selected.Distinct().Take(MaxSelectedCards).ToList();
     }
 }

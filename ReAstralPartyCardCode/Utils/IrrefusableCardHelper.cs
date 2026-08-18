@@ -33,7 +33,6 @@ internal static class IrrefusableCardHelper
     private const string TransferActionKey = "irrefusable_pending_transfer_batch";
     private static readonly JsonSerializerOptions TransferSnapshotJsonOptions = new(JsonSerializerDefaults.Web);
     private static readonly HashSet<CardModel> PlayedFromHand = [];
-    private static readonly HashSet<CardModel> DiscardedFromHand = [];
     private static readonly RitsuLibManagedNetActionDescriptor<IrrefusableTransferActionPayload> TransferAction =
         new(
             MainFile.ModId,
@@ -79,6 +78,13 @@ internal static class IrrefusableCardHelper
             {
                 MainFile.Logger.Warn(
                     $"[Irrefusable] queue rejected invalid source card | source={source.NetId} | target={target.NetId} | card={card.Id.Entry} | pile={card.Pile?.Type.ToString() ?? "<null>"}.");
+                continue;
+            }
+
+            if (FallenHeavenlyKingDeckHelper.IsHeavenlyKingDeckCard(card))
+            {
+                MainFile.Logger.Info(
+                    $"[Irrefusable] queue rejected heavenly king deck card | source={source.NetId} | target={target.NetId} | card={card.Id.Entry}.");
                 continue;
             }
 
@@ -132,20 +138,24 @@ internal static class IrrefusableCardHelper
         return transfers.Count;
     }
 
-    public static void TrackHandPileExit(CardModel card, PileType oldPileType)
+    public static async Task HandleHandPileExit(CardModel card, PileType oldPileType)
     {
         if (!card.Keywords.Contains(AstralKeywords.Irrefusable) || oldPileType != PileType.Hand)
             return;
 
-        switch (card.Pile?.Type)
+        var destinationPile = card.Pile?.Type;
+        if (destinationPile == PileType.Hand)
+            return;
+
+        MainFile.Logger.Info(
+            $"[Irrefusable] hand exit detected | owner={card.Owner?.NetId.ToString() ?? "<null>"} | card={card.Id.Entry} | destination={destinationPile?.ToString() ?? "<none>"}.");
+        if (destinationPile == PileType.Play)
         {
-            case PileType.Play:
-                PlayedFromHand.Add(card);
-                break;
-            case PileType.Discard:
-                DiscardedFromHand.Add(card);
-                break;
+            PlayedFromHand.Add(card);
+            return;
         }
+
+        await ConsumeAndGrantStarlight(new ThrowingPlayerChoiceContext(), card, "left hand");
     }
 
     public static async Task HandleCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -159,26 +169,22 @@ internal static class IrrefusableCardHelper
         await ConsumeAndGrantStarlight(choiceContext, card, "played");
     }
 
-    public static async Task HandleCardDiscarded(PlayerChoiceContext choiceContext, CardModel card)
-    {
-        if (!DiscardedFromHand.Remove(card)
-            || !card.Keywords.Contains(AstralKeywords.Irrefusable)
-            || card.Owner?.Creature == null)
-            return;
-
-        await ConsumeAndGrantStarlight(choiceContext, card, "discarded");
-    }
-
     public static bool HasIrrefusableCard(Player? owner)
     {
         return owner != null && EventDeckCardHelper.GetRunDeckCards(owner)
             .Any(card => card.Keywords.Contains(AstralKeywords.Irrefusable));
     }
 
+    public static bool HasPendingTransferBatchForSource(RunState runState, ulong sourcePlayerNetId)
+    {
+        return Get(runState).PendingTransferBatches.Any(batch =>
+            batch.SourcePlayerNetId == sourcePlayerNetId
+            && batch.Transfers.Count > 0);
+    }
+
     public static Task HandleCombatEnd(CombatRoom room, RunState? runState)
     {
         PlayedFromHand.Clear();
-        DiscardedFromHand.Clear();
 
         if (runState == null)
             return Task.CompletedTask;
@@ -348,6 +354,39 @@ internal static class IrrefusableCardHelper
             return;
         }
 
+        var fallenHeavenlyKing = source.GetRelic<PersonalityDerivativeFallenHeavenlyKing>();
+        if (!batch.HeavenlyKingDeckReplacementPending
+            && fallenHeavenlyKing != null
+            && EventDeckCardHelper.GetRunDeckCards(source).Count == 0)
+        {
+            batch.HeavenlyKingDeckReplacementPending = true;
+            MainFile.Logger.Info(
+                $"[Irrefusable] heavenly deck replacement pending | batch={payload.BatchId} | source={source.NetId} | reason=source_deck_empty.");
+        }
+
+        if (batch.HeavenlyKingDeckReplacementPending)
+        {
+            if (fallenHeavenlyKing == null)
+            {
+                MainFile.Logger.Error(
+                    $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | reason=fallen_heavenly_king_derivative_missing.");
+                _runData.Set(runState, data);
+                return;
+            }
+
+            if (!await FallenHeavenlyKingDeckHelper.EnsureHeavenlyKingDeckAsync(source))
+            {
+                MainFile.Logger.Warn(
+                    $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | reason=heavenly_deck_replacement_incomplete.");
+                _runData.Set(runState, data);
+                return;
+            }
+
+            fallenHeavenlyKing.AstralParty_FallenHeavenlyKingDeckReplaced = true;
+            MainFile.Logger.Info(
+                $"[Irrefusable] heavenly deck replacement completed | batch={payload.BatchId} | source={source.NetId} | cards={source.Deck?.Cards.Count ?? -1}.");
+        }
+
         if (!batch.StarlightGranted)
         {
             source.GetRelic<VariantPersonShadowScion>()?.AccumulatePendingTransferredStarlight(batch.AppliedTransferIds.Count);
@@ -355,8 +394,6 @@ internal static class IrrefusableCardHelper
         }
 
         data.PendingTransferBatches.Remove(batch);
-        if (EventDeckCardHelper.GetRunDeckCards(source).Count == 0)
-            await FallenHeavenlyKingDeckHelper.ReplaceWithHeavenlyKingDeck(source);
         MainFile.Logger.Info(
             $"[Irrefusable] managed transfer batch applied | batch={payload.BatchId} | source={source.NetId} | target={target.NetId} | count={payload.Transfers.Count} | source_deck={source.Deck?.Cards.Count ?? -1} | target_deck={target.Deck?.Cards.Count ?? -1}.");
         _runData.Set(runState, data);
@@ -549,10 +586,12 @@ internal static class IrrefusableCardHelper
         if (owner?.Creature == null)
             return;
 
-        await CardCmd.Exhaust(choiceContext, card, false, false);
-        await TokenEternalStarlight.GrantStacks(owner, 3);
+        if (card.Pile?.Type != PileType.Exhaust)
+            await CardCmd.Exhaust(choiceContext, card, false, false);
+
+        await PowerCmd.Apply<StarLightPower>(owner.Creature, 3m, owner.Creature, card, false);
         MainFile.Logger.Info(
-            $"[Irrefusable] {trigger} from hand and exhausted | owner={owner.NetId} | card={card.Id.Entry}");
+            $"[Irrefusable] {trigger} resolved | owner={owner.NetId} | card={card.Id.Entry} | starlight=3.");
     }
 
     private static IrrefusableRunData Get(RunState runState)
@@ -582,13 +621,7 @@ internal sealed class IrrefusableCardLifecycle : HookedSingletonModel
         PileType oldPileType,
         AbstractModel? clonedBy)
     {
-        IrrefusableCardHelper.TrackHandPileExit(card, oldPileType);
-        return Task.CompletedTask;
-    }
-
-    public override Task AfterCardDiscarded(PlayerChoiceContext choiceContext, CardModel card)
-    {
-        return IrrefusableCardHelper.HandleCardDiscarded(choiceContext, card);
+        return IrrefusableCardHelper.HandleHandPileExit(card, oldPileType);
     }
 
     public override Task AfterCombatEnd(CombatRoom room)
@@ -621,6 +654,7 @@ internal sealed class IrrefusablePendingTransferBatch
     public ulong TargetPlayerNetId { get; set; }
     public List<IrrefusablePendingTransfer> Transfers { get; set; } = [];
     public List<string> AppliedTransferIds { get; set; } = [];
+    public bool HeavenlyKingDeckReplacementPending { get; set; }
     public bool StarlightGranted { get; set; }
 }
 

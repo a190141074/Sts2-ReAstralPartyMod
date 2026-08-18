@@ -50,5 +50,5 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.title": "終焉",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.description": "ターン終了時、手札にあるなら自動でプレイする。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.title": "拒めない",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.description": "手札から使用または捨てた時、[gold]消耗[/gold]し、[gold]星光[/gold]を[blue]3[/blue]得る。[blue]3[/blue]戦闘後にデッキから除去する。[gold]呪いカード[/gold]はさらに[blue]2[/blue]戦闘必要。"
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.description": "手札を離れた時、[gold]消耗[/gold]し、[gold]星光[/gold]を[blue]3[/blue]得る。[blue]3[/blue]戦闘後にデッキから除去する。[gold]呪いカード[/gold]はさらに[blue]2[/blue]戦闘必要。"
 }

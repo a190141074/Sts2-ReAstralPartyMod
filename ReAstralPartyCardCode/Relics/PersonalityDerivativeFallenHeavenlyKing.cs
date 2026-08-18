@@ -12,6 +12,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public sealed class PersonalityDerivativeFallenHeavenlyKing : AstralPartyRelicModel
 {
     [SavedProperty] public bool AstralParty_FallenHeavenlyKingInitialDeckCopied { get; set; }
+    [SavedProperty] public bool AstralParty_FallenHeavenlyKingDeckReplaced { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
     public override bool ShouldReceiveCombatHooks => true;
