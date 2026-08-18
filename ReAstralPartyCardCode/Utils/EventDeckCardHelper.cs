@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Reflection;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -272,7 +273,9 @@ internal static class EventDeckCardHelper
             return null;
         }
 
-        if (showPreview)
+        // The pile mutation is synchronized, but the official preview belongs only to the player
+        // whose deck received the card. Showing it to observers can leave their deck UI stale.
+        if (showPreview && LocalContext.IsMe(owner))
             CardCmd.PreviewCardPileAdd(result, previewTime);
 
         SaveManager.Instance?.MarkCardAsSeen(addedCard.CanonicalInstance ?? addedCard);
