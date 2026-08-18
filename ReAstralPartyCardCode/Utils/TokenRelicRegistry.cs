@@ -99,34 +99,6 @@ public static class TokenRelicRegistry
         typeof(TokenPurpleTastyCandy)
     ];
 
-    private static readonly Type[] SeriesTokenRelicTypes =
-    [
-        typeof(TokenBlueGiantAnchor),
-        typeof(TokenExclusiveAncientWand),
-        typeof(TokenExclusiveBoutiqueSwordShield),
-        typeof(TokenExclusiveBronzeGong),
-        typeof(TokenExclusiveCandyMembershipCard),
-        typeof(TokenExclusiveCrossedTwinCarp),
-        typeof(TokenExclusiveCursedSword),
-        typeof(TokenExclusiveDreamshipModel),
-        typeof(TokenExclusiveEntertainmentTerminal),
-        typeof(TokenExclusiveFitnessTracker),
-        typeof(TokenExclusiveInfiniteSnake),
-        typeof(TokenExclusiveLittleCarpDoll),
-        typeof(TokenExclusiveLittleSnakeDoll),
-        typeof(TokenExclusiveOriginalConsciousness),
-        typeof(TokenExclusivePiercingGun),
-        typeof(TokenExclusivePsychedelicSeafoodSoup),
-        typeof(TokenExclusiveAdaptiveCore),
-        typeof(TokenExclusiveStunGun),
-        typeof(TokenExclusiveStormTalisman),
-        typeof(TokenExclusiveTimePocketWatch),
-        typeof(TokenExclusiveTimer),
-        typeof(TokenExclusiveTrident),
-        typeof(TokenExclusiveVengeanceHalberd),
-        typeof(TokenExclusiveZuoTeaCake)
-    ];
-
     private static readonly IReadOnlyList<RelicModel> CanonicalTokenRelics = TokenRelicTypes
         .Select(type => ModelDb.GetById<RelicModel>(ModelDb.GetId(type)))
         .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
@@ -141,10 +113,6 @@ public static class TokenRelicRegistry
         ModelDb.GetId<TokenEternalStarlight>(),
         ModelDb.GetId<TokenGoldInitialPoint>()
     ];
-
-    private static readonly HashSet<ModelId> SeriesTokenRelicIds = SeriesTokenRelicTypes
-        .Select(ModelDb.GetId)
-        .ToHashSet();
 
     public static IReadOnlyList<RelicModel> GetCanonicalTokenRelics()
     {
@@ -214,8 +182,7 @@ public static class TokenRelicRegistry
 
     public static bool IsSeriesTokenRelic(RelicModel relic)
     {
-        var id = relic.CanonicalInstance?.Id ?? relic.Id;
-        return SeriesTokenRelicIds.Contains(id);
+        return TokenSeriesAvailabilityHelper.IsSeriesTokenRelic(relic);
     }
 
     public static bool IsDiceSeriesRelic(RelicModel relic)

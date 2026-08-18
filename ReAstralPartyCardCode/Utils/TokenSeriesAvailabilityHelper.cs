@@ -344,9 +344,11 @@ public static class TokenSeriesAvailabilityHelper
     {
         if (!IsSeriesTokenRelic(relic))
             return true;
-        if (!TryGetState(runState, out var state))
-            return false;
         if (!TryGetSeriesForRelic(relic, out var series))
+            return false;
+        if (series == TokenSeries.FinalArena)
+            return runState != null && ReAstralPartyModSettingsManager.GetEnableMechTideMode(runState);
+        if (!TryGetState(runState, out var state))
             return false;
 
         return state.OpenSeries.Contains(series);

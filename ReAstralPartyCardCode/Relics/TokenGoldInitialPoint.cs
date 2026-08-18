@@ -223,6 +223,7 @@ public class TokenGoldInitialPoint : AstralPartyRelicModel
         IReadOnlySet<ModelId> selectedIds)
     {
         return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(player.RunState, rarity)
+            .Where(relic => TokenSeriesAvailabilityHelper.IsRelicAvailableForRun(player.RunState, relic))
             .Where(relic => !selectedIds.Contains(TokenRewardSelectionHelper.GetCanonicalId(relic)))
             .Where(relic => IsValidRewardCandidate(player, relic, excludeOwned))
             .OrderBy(relic => relic.Id.Entry, StringComparer.Ordinal)
