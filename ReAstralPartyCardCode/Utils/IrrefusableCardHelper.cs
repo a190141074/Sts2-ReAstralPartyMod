@@ -219,14 +219,19 @@ internal static class IrrefusableCardHelper
             if (!addResult.success
                 || !ReferenceEquals(addResult.cardAdded.Owner, target)
                 || target.Deck.Cards.Contains(addResult.cardAdded) != true
-                || addResult.cardAdded.Pile != target.Deck)
+                || addResult.cardAdded.Pile != target.Deck
+                || addResult.cardAdded.HasBeenRemovedFromState)
             {
                 MainFile.Logger.Warn(
                     $"[Irrefusable] transfer retry target add failed | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId} | result={addResult.success}.");
+                if (createdTarget.Pile == null && !createdTarget.HasBeenRemovedFromState)
+                    createdTarget.RemoveFromState();
                 return;
             }
 
             targetCard = addResult.cardAdded;
+            MainFile.Logger.Info(
+                $"[Irrefusable] transfer target added | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId} | card={targetCard.Id.Entry} | target_in_deck={target.Deck.Cards.Contains(targetCard)} | target_in_run_state={target.RunState?.ContainsCard(targetCard) == true} | target_removed={targetCard.HasBeenRemovedFromState} | target_deck={target.Deck.Cards.Count}.");
         }
         catch (Exception exception)
         {
@@ -237,11 +242,8 @@ internal static class IrrefusableCardHelper
 
         if (!await RemoveDeckCardOfficial(source, sourceCard, "transfer"))
         {
-            if (targetCard != null)
-                await RemoveDeckCardOfficial(target, targetCard, "transfer-rollback");
-
             MainFile.Logger.Warn(
-                $"[Irrefusable] transfer retry rolled back target after source removal failure | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId}.");
+                $"[Irrefusable] transfer retry retained target after source removal failure | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId} | target_in_deck={target.Deck.Cards.Contains(targetCard!)}.");
             return;
         }
 
@@ -263,9 +265,12 @@ internal static class IrrefusableCardHelper
         EnsureLifetimeRecord(data, target, targetCard, pending.TransferId);
         data.PendingTransfers.Remove(pending);
 
-        var sourceRelic = source.GetRelic<VariantPersonShadowScion>();
-        await CardGainAttribution.RunWithSource(sourceRelic, () =>
-            GeneratedCardObserver.NotifyCardGained(targetCard, sourceRelic));
+        if (!alreadyApplied)
+        {
+            var sourceRelic = source.GetRelic<VariantPersonShadowScion>();
+            await CardGainAttribution.RunWithSource(sourceRelic, () =>
+                GeneratedCardObserver.NotifyCardGained(targetCard, sourceRelic));
+        }
 
         if (EventDeckCardHelper.GetRunDeckCards(source).Count == 0)
             await FallenHeavenlyKingDeckHelper.ReplaceWithHeavenlyKingDeck(source);
@@ -329,9 +334,12 @@ internal static class IrrefusableCardHelper
 
         try
         {
+            var sourceDeckBefore = owner.Deck?.Cards.Count ?? -1;
             await CardPileCmd.RemoveFromDeck(card, false);
             var removed = owner.Deck?.Cards.Contains(card) != true
-                          && owner.RunState?.ContainsCard(card) != true;
+                          && card.HasBeenRemovedFromState;
+            MainFile.Logger.Info(
+                $"[Irrefusable] official deck removal {(removed ? "succeeded" : "verification failed")} | reason={reason} | owner={owner.NetId} | card={card.Id.Entry} | deck={sourceDeckBefore}->{owner.Deck?.Cards.Count ?? -1} | in_deck={owner.Deck?.Cards.Contains(card) == true} | has_been_removed={card.HasBeenRemovedFromState} | in_run_state={owner.RunState?.ContainsCard(card) == true}.");
             if (!removed)
                 MainFile.Logger.Warn(
                     $"[Irrefusable] official deck removal verification failed | reason={reason} | owner={owner.NetId} | card={card.Id.Entry}.");
