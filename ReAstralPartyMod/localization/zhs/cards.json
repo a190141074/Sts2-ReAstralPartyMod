@@ -249,5 +249,5 @@
   "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KINGS_PRESENCE.title": "天王伴身",
   "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KINGS_PRESENCE.description": "全队获得等同于[gold]永恒星光[/gold]的[blue]格挡[/blue]。",
   "RE_ASTRAL_PARTY_MOD_CARD_HK_FALL_OF_THE_HEAVENLY_KING.title": "天王落",
-  "RE_ASTRAL_PARTY_MOD_CARD_HK_FALL_OF_THE_HEAVENLY_KING.description": "所有敌方最大生命值变为[blue]1[/blue]，并获得[blue]50[/blue]点[blue]格挡[/blue]。\n仅在[gold]不容拒绝[/gold]不存在时可以打出。\n你每实际支付[blue]1[/blue]点能量，此牌费用永久-[blue]1[/blue]。打出后从牌组移除。"
+  "RE_ASTRAL_PARTY_MOD_CARD_HK_FALL_OF_THE_HEAVENLY_KING.description": "所有敌方最大生命值变为[blue]1[/blue]，并获得[blue]50[/blue]点[blue]格挡[/blue]。"
 }

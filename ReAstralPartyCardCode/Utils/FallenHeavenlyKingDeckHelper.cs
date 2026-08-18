@@ -45,7 +45,6 @@ internal static class FallenHeavenlyKingDeckHelper
         }
 
         RitsuLibManagedNetActions.Register(ReplacementAction);
-        RitsuLibFramework.SubscribeLifecycle<CardRemovingEvent>(OnCardRemoving, replayCurrentState: false);
         RitsuLibFramework.SubscribeLifecycle<RoomEnteredEvent>(OnRoomEntered, replayCurrentState: false);
         RitsuLibFramework.SubscribeLifecycle<RunLoadedEvent>(OnRunLoaded, replayCurrentState: false);
         _registered = true;
@@ -123,21 +122,16 @@ internal static class FallenHeavenlyKingDeckHelper
         return true;
     }
 
-    private static void OnCardRemoving(CardRemovingEvent cardRemovingEvent)
+    public static void OnRunDeckRemovalCompleted(RunState runState, ulong ownerNetId)
     {
-        if (cardRemovingEvent.RunState is not RunState runState)
-            return;
-
-        var card = cardRemovingEvent.Card;
-        var owner = card.Owner;
+        var owner = runState.Players.FirstOrDefault(player => player.NetId == ownerNetId);
         if (owner == null
             || owner.Creature?.CombatState != null
-            || card.Pile?.Type != PileType.Deck
             || owner.GetRelic<PersonalityDerivativeFallenHeavenlyKing>() == null)
             return;
 
         var deckCards = EventDeckCardHelper.GetRunDeckCards(owner);
-        if (deckCards.Count != 1 || !ReferenceEquals(deckCards[0], card))
+        if (deckCards.Count != 0)
             return;
 
         if (IrrefusableCardHelper.HasPendingTransferBatchForSource(runState, owner.NetId))
@@ -153,10 +147,10 @@ internal static class FallenHeavenlyKingDeckHelper
             data.PendingOwnerNetIds.Add(owner.NetId);
             _replacementRunData.Set(runState, data);
             MainFile.Logger.Info(
-                $"[FallenHeavenlyKing] zero-deck replacement queued | owner={owner.NetId} | reason=outside_combat_last_deck_card_removing.");
+                $"[FallenHeavenlyKing] zero-deck replacement queued | owner={owner.NetId} | reason=outside_combat_deck_removed.");
         }
 
-        RequestPendingReplacementAction(runState, owner, "card_removing");
+        RequestPendingReplacementAction(runState, owner, "deck_removed");
     }
 
     private static void OnRoomEntered(RoomEnteredEvent roomEnteredEvent)

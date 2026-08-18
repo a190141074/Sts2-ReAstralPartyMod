@@ -445,6 +445,7 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<DevConsoleUltimateChargeCommandPatch>();
         patcher.RegisterPatch<ExtremeModeTurnLimitPatch>();
         patcher.RegisterPatch<RealmOfDeathDurationTickPatch>();
+        patcher.RegisterPatch<FallenHeavenlyKingDeckRemovalPatch>();
         patcher.RegisterPatch<ProphecySoulDevourRunDeckRemovalPatch>();
         patcher.RegisterPatch<ProphecySoulDevourSmithRestSitePatch>();
         patcher.RegisterPatch<RelicCollectionAddRelicsFilterPatch>();

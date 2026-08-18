@@ -3,6 +3,7 @@ using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
@@ -11,6 +12,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 public sealed class HkFallOfTheHeavenlyKing : AstralPartyCardModel
 {
     private const decimal EnemyBlock = 50m;
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralKeywords.FallenHeavenlyKing];
 
     protected override bool IsPlayable => Owner != null && !IrrefusableCardHelper.HasIrrefusableCard(Owner);
 

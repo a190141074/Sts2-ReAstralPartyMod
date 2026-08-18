@@ -36,7 +36,8 @@ public static class AstralKeywords
         AstralInvestigationProgressStem,
         AstralFusionClueStem,
         AstralEndStem,
-        IrrefusableStem
+        IrrefusableStem,
+        FallenHeavenlyKingStem
     ];
 
     private static bool _registered;
@@ -69,6 +70,7 @@ public static class AstralKeywords
     public const string AstralFusionClueStem = "ASTRAL_FUSION_CLUE";
     public const string AstralEndStem = "ASTRAL_END";
     public const string IrrefusableStem = "IRREFUSABLE";
+    public const string FallenHeavenlyKingStem = "FALLEN_HEAVENLY_KING";
 
     public static string AstralEventId => GetId(AstralEventStem);
     public static string AstralStepsId => GetId(AstralStepsStem);
@@ -98,6 +100,7 @@ public static class AstralKeywords
     public static string AstralFusionClueId => GetId(AstralFusionClueStem);
     public static string AstralEndId => GetId(AstralEndStem);
     public static string IrrefusableId => GetId(IrrefusableStem);
+    public static string FallenHeavenlyKingId => GetId(FallenHeavenlyKingStem);
 
     public static CardKeyword AstralEvent => GetKeyword(AstralEventStem);
     public static CardKeyword AstralSteps => GetKeyword(AstralStepsStem);
@@ -127,6 +130,7 @@ public static class AstralKeywords
     public static CardKeyword AstralFusionClue => GetKeyword(AstralFusionClueStem);
     public static CardKeyword AstralEnd => GetKeyword(AstralEndStem);
     public static CardKeyword Irrefusable => GetKeyword(IrrefusableStem);
+    public static CardKeyword FallenHeavenlyKing => GetKeyword(FallenHeavenlyKingStem);
 
     public static void RegisterAll()
     {
@@ -138,7 +142,7 @@ public static class AstralKeywords
             registry.RegisterCardKeywordOwnedByLocNamespace(
                 stem,
                 iconPath: null,
-                cardDescriptionPlacement: stem == IrrefusableStem
+                cardDescriptionPlacement: stem is IrrefusableStem or FallenHeavenlyKingStem
                     ? ModKeywordCardDescriptionPlacement.BeforeCardDescription
                     : ModKeywordCardDescriptionPlacement.None,
                 includeInCardHoverTip: true);

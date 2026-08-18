@@ -50,5 +50,7 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.title": "End",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.description": "At turn end, if this is in your hand, play it automatically.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.title": "Irrefusable",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.description": "When it leaves your hand, [gold]Exhaust[/gold] it and gain [blue]3[/blue] [gold]Starlight[/gold]. Remove it from your deck after [blue]3[/blue] combats; [gold]Curse[/gold] cards require [blue]2[/blue] additional combats."
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.description": "When it leaves your hand, [gold]Exhaust[/gold] it and gain [blue]3[/blue] [gold]Starlight[/gold]. Remove it from your deck after [blue]3[/blue] combats; [gold]Curse[/gold] cards require [blue]2[/blue] additional combats.",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_FALLEN_HEAVENLY_KING.title": "Fall of the Heavenly King",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_FALLEN_HEAVENLY_KING.description": "Can only be played while no [gold]Irrefusable[/gold] cards exist.\nFor each energy you actually spend, permanently reduce this card's cost by [blue]1[/blue].\nRemove it from your deck after playing."
 }
