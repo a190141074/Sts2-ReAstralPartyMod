@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using STS2RitsuLib;
 using STS2RitsuLib.Content;
@@ -29,7 +30,7 @@ internal static class IrrefusableCardHelper
     private const string RunDataKey = "irrefusable_cards";
     private const int StandardCombatsRemaining = 3;
     private const int CurseCombatsRemaining = StandardCombatsRemaining + 2;
-    private const string TransferActionKey = "irrefusable_pending_transfer";
+    private const string TransferActionKey = "irrefusable_pending_transfer_batch";
     private static readonly SavedAttachedState<CardModel, string> TransferId =
         new($"{MainFile.ModId}_irrefusable_transfer_id", static () => string.Empty);
     private static readonly HashSet<CardModel> PlayedFromHand = [];
@@ -70,7 +71,7 @@ internal static class IrrefusableCardHelper
             return 0;
 
         var data = Get(runState);
-        var queued = 0;
+        var transfers = new List<IrrefusablePendingTransfer>();
         foreach (var card in cards.Distinct())
         {
             if (!ReferenceEquals(card.Owner, source)
@@ -82,9 +83,10 @@ internal static class IrrefusableCardHelper
                 continue;
             }
 
-            var existingTransferId = TransferId.GetValueOrDefault(card, string.Empty);
+            TransferId.TryGetValue(card, out var existingTransferId);
+            existingTransferId ??= string.Empty;
             if (!string.IsNullOrEmpty(existingTransferId)
-                && data.PendingTransfers.Any(record => record.TransferId == existingTransferId))
+                && ContainsPendingTransfer(data, existingTransferId))
             {
                 MainFile.Logger.Warn(
                     $"[Irrefusable] queue skipped already-pending card | transfer={existingTransferId} | source={source.NetId} | card={card.Id.Entry}.");
@@ -98,7 +100,7 @@ internal static class IrrefusableCardHelper
             var transferId = $"{source.NetId}:{target.NetId}:{++data.NextTransferSequence}";
             TransferId[card] = transferId;
             var snapshot = card.ToSerializable();
-            data.PendingTransfers.Add(new IrrefusablePendingTransfer
+            transfers.Add(new IrrefusablePendingTransfer
             {
                 TransferId = transferId,
                 SourcePlayerNetId = source.NetId,
@@ -106,14 +108,23 @@ internal static class IrrefusableCardHelper
                 Sequence = data.NextTransferSequence,
                 CardSnapshot = snapshot
             });
-            queued++;
-
-            MainFile.Logger.Info(
-                $"[Irrefusable] queued transfer | transfer={transferId} | source={source.NetId} | target={target.NetId} | card={card.Id.Entry} | keyword={card.Keywords.Contains(AstralKeywords.Irrefusable)} | snapshot_saved=true.");
         }
 
+        if (transfers.Count == 0)
+            return 0;
+
+        var batch = new IrrefusablePendingTransferBatch
+        {
+            BatchId = $"{source.NetId}:{target.NetId}:{transfers[0].Sequence}",
+            SourcePlayerNetId = source.NetId,
+            TargetPlayerNetId = target.NetId,
+            Transfers = transfers
+        };
+        data.PendingTransferBatches.Add(batch);
         _runData.Set(runState, data);
-        return queued;
+        MainFile.Logger.Info(
+            $"[Irrefusable] queued transfer batch | batch={batch.BatchId} | source={source.NetId} | target={target.NetId} | count={transfers.Count} | transfers={string.Join(',', transfers.Select(transfer => transfer.TransferId))}.");
+        return transfers.Count;
     }
 
     public static void TrackHandPileExit(CardModel card, PileType oldPileType)
@@ -168,13 +179,13 @@ internal static class IrrefusableCardHelper
             return;
 
         var data = Get(runState);
-        foreach (var pending in data.PendingTransfers
-                     .OrderBy(record => record.Sequence)
-                     .ThenBy(record => record.TransferId, StringComparer.Ordinal)
+        MigrateLegacyPendingTransfers(data);
+        foreach (var batch in data.PendingTransferBatches
+                     .Where(batch => batch.Transfers.Count > 0)
+                     .OrderBy(batch => batch.Transfers.Min(transfer => transfer.Sequence))
+                     .ThenBy(batch => batch.BatchId, StringComparer.Ordinal)
                      .ToList())
-        {
-            QueuePendingTransferAction(runState, data, pending);
-        }
+            QueuePendingTransferBatchAction(runState, batch);
 
         foreach (var record in data.Cards.ToList())
         {
@@ -193,45 +204,71 @@ internal static class IrrefusableCardHelper
         _runData.Set(runState, data);
     }
 
-    private static void QueuePendingTransferAction(
-        RunState runState,
-        IrrefusableRunData data,
-        IrrefusablePendingTransfer pending)
+    public static async Task HandleBeforeCombatStart(RunState? runState)
     {
-        var source = runState.Players.FirstOrDefault(player => player.NetId == pending.SourcePlayerNetId);
-        if (source == null || pending.CardSnapshot == null)
+        if (runState == null)
+            return;
+
+        var data = Get(runState);
+        foreach (var grant in data.PendingStarlightGrants.ToList())
+        {
+            var owner = runState.Players.FirstOrDefault(player => player.NetId == grant.SourcePlayerNetId);
+            if (owner?.Creature == null)
+                continue;
+
+            var sourceRelic = owner.GetRelic<VariantPersonShadowScion>();
+            if (sourceRelic == null)
+            {
+                MainFile.Logger.Warn(
+                    $"[Irrefusable] discarded pending Starlight grant | batch={grant.BatchId} | owner={grant.SourcePlayerNetId} | reason=shadow_scion_missing.");
+                data.PendingStarlightGrants.Remove(grant);
+                continue;
+            }
+
+            await PowerCmd.Apply<StarLightPower>(owner.Creature, grant.Amount, owner.Creature, null, false);
+            data.PendingStarlightGrants.Remove(grant);
+            MainFile.Logger.Info(
+                $"[Irrefusable] granted deferred Starlight | batch={grant.BatchId} | owner={owner.NetId} | amount={grant.Amount}.");
+        }
+
+        _runData.Set(runState, data);
+    }
+
+    private static void QueuePendingTransferBatchAction(
+        RunState runState,
+        IrrefusablePendingTransferBatch batch)
+    {
+        var source = runState.Players.FirstOrDefault(player => player.NetId == batch.SourcePlayerNetId);
+        if (source == null || batch.Transfers.Count == 0 || batch.Transfers.Any(transfer => transfer.CardSnapshot == null))
         {
             MainFile.Logger.Warn(
-                $"[Irrefusable] transfer request retained | transfer={pending.TransferId} | reason={(source == null ? "source_missing" : "snapshot_missing")}.");
+                $"[Irrefusable] transfer batch retained | batch={batch.BatchId} | reason={(source == null ? "source_missing" : "snapshot_missing")}.");
             return;
         }
 
         if (!LocalContext.IsMe(source))
             return;
 
-        if (pending.ActionRequested)
-            return;
-
         var payload = new IrrefusableTransferActionPayload
         {
-            TransferId = pending.TransferId,
-            SourcePlayerNetId = pending.SourcePlayerNetId,
-            TargetPlayerNetId = pending.TargetPlayerNetId,
-            Sequence = pending.Sequence,
-            CardSnapshot = pending.CardSnapshot
+            BatchId = batch.BatchId,
+            SourcePlayerNetId = batch.SourcePlayerNetId,
+            TargetPlayerNetId = batch.TargetPlayerNetId,
+            Transfers = batch.Transfers
+                .OrderBy(transfer => transfer.Sequence)
+                .ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal)
+                .ToList()
         };
 
         if (!RitsuLibManagedNetActions.Request(RunManager.Instance, TransferAction, payload, source.NetId))
         {
             MainFile.Logger.Warn(
-                $"[Irrefusable] transfer request retained | transfer={pending.TransferId} | source={source.NetId} | target={pending.TargetPlayerNetId} | reason=managed_action_unavailable.");
+                $"[Irrefusable] transfer batch retained | batch={batch.BatchId} | source={source.NetId} | target={batch.TargetPlayerNetId} | reason=managed_action_unavailable.");
             return;
         }
 
-        pending.ActionRequested = true;
-        _runData.Set(runState, data);
         MainFile.Logger.Info(
-            $"[Irrefusable] managed transfer action requested | transfer={pending.TransferId} | source={source.NetId} | target={pending.TargetPlayerNetId} | sequence={pending.Sequence}.");
+            $"[Irrefusable] managed transfer batch requested | batch={batch.BatchId} | source={source.NetId} | target={batch.TargetPlayerNetId} | count={payload.Transfers.Count}.");
     }
 
     private static async Task ExecuteTransferAction(RitsuLibManagedNetActionContext<IrrefusableTransferActionPayload> context)
@@ -241,128 +278,133 @@ internal static class IrrefusableCardHelper
         if (runState == null)
         {
             MainFile.Logger.Warn(
-                $"[Irrefusable] managed transfer action retained | transfer={payload.TransferId} | reason=run_state_unavailable.");
+                $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | reason=run_state_unavailable.");
             return;
         }
 
         var data = Get(runState);
-        var pending = data.PendingTransfers.FirstOrDefault(record => record.TransferId == payload.TransferId);
-        if (pending == null)
+        MigrateLegacyPendingTransfers(data);
+        var batch = data.PendingTransferBatches.FirstOrDefault(record => record.BatchId == payload.BatchId);
+        if (batch == null)
         {
             MainFile.Logger.Info(
-                $"[Irrefusable] managed transfer action already settled | transfer={payload.TransferId} | source={payload.SourcePlayerNetId} | target={payload.TargetPlayerNetId}.");
+                $"[Irrefusable] managed transfer batch already settled | batch={payload.BatchId} | source={payload.SourcePlayerNetId} | target={payload.TargetPlayerNetId}.");
             return;
         }
 
-        pending.ActionRequested = false;
-        if (payload.SourcePlayerNetId != pending.SourcePlayerNetId
-            || payload.TargetPlayerNetId != pending.TargetPlayerNetId
-            || payload.Sequence != pending.Sequence
-            || payload.CardSnapshot == null)
+        if (payload.SourcePlayerNetId != batch.SourcePlayerNetId
+            || payload.TargetPlayerNetId != batch.TargetPlayerNetId
+            || payload.Transfers.Count != batch.Transfers.Count
+            || payload.Transfers.Any(transfer => transfer.CardSnapshot == null)
+            || !payload.Transfers.OrderBy(transfer => transfer.Sequence).Select(transfer => transfer.TransferId)
+                .SequenceEqual(batch.Transfers.OrderBy(transfer => transfer.Sequence).Select(transfer => transfer.TransferId)))
         {
             MainFile.Logger.Error(
-                $"[Irrefusable] managed transfer action retained | transfer={payload.TransferId} | reason=payload_mismatch.");
+                $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | reason=payload_mismatch.");
             _runData.Set(runState, data);
             return;
         }
 
-        var source = runState.Players.FirstOrDefault(player => player.NetId == pending.SourcePlayerNetId);
-        var target = runState.Players.FirstOrDefault(player => player.NetId == pending.TargetPlayerNetId);
+        var source = runState.Players.FirstOrDefault(player => player.NetId == batch.SourcePlayerNetId);
+        var target = runState.Players.FirstOrDefault(player => player.NetId == batch.TargetPlayerNetId);
         if (source == null || target == null || ReferenceEquals(source, target))
         {
             MainFile.Logger.Warn(
-                $"[Irrefusable] managed transfer action retained | transfer={payload.TransferId} | reason=player_missing | source={pending.SourcePlayerNetId} | target={pending.TargetPlayerNetId}.");
+                $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | reason=player_missing | source={batch.SourcePlayerNetId} | target={batch.TargetPlayerNetId}.");
             _runData.Set(runState, data);
             return;
         }
 
         MainFile.Logger.Info(
-            $"[Irrefusable] managed transfer action executing | transfer={payload.TransferId} | source={source.NetId} | target={target.NetId} | source_deck={source.Deck?.Cards.Count ?? -1} | target_deck={target.Deck?.Cards.Count ?? -1}.");
+            $"[Irrefusable] managed transfer batch executing | batch={payload.BatchId} | source={source.NetId} | target={target.NetId} | count={payload.Transfers.Count} | source_deck={source.Deck?.Cards.Count ?? -1} | target_deck={target.Deck?.Cards.Count ?? -1}.");
 
-        var sourceCard = FindDeckCardByTransferId(source, payload.TransferId);
-        var targetCard = FindDeckCardByTransferId(target, payload.TransferId);
-        if (targetCard == null && sourceCard == null)
+        foreach (var transfer in payload.Transfers.OrderBy(transfer => transfer.Sequence).ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal))
         {
-            MainFile.Logger.Warn(
-                $"[Irrefusable] managed transfer action retained | transfer={payload.TransferId} | reason=source_marker_missing.");
-            _runData.Set(runState, data);
-            return;
-        }
+            if (batch.AppliedTransferIds.Contains(transfer.TransferId))
+                continue;
 
-        try
-        {
-            if (targetCard == null)
+            var sourceCard = FindDeckCardByTransferId(source, transfer.TransferId);
+            var targetCard = FindDeckCardByTransferId(target, transfer.TransferId);
+            if (targetCard == null && sourceCard == null)
             {
-                var createdTarget = runState.LoadCard(payload.CardSnapshot, target);
-                var previewShown = LocalContext.IsMe(target);
-                if (!await EventDeckCardHelper.AddCardToRunDeckAsync(target, createdTarget, true))
-                {
-                    MainFile.Logger.Warn(
-                        $"[Irrefusable] managed transfer action retained | transfer={payload.TransferId} | reason=target_add_failed | preview_local={previewShown}.");
-                    _runData.Set(runState, data);
-                    return;
-                }
+                MainFile.Logger.Warn(
+                    $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | transfer={transfer.TransferId} | reason=source_marker_missing.");
+                _runData.Set(runState, data);
+                return;
+            }
 
-                targetCard = FindDeckCardByTransferId(target, payload.TransferId);
+            try
+            {
                 if (targetCard == null)
                 {
-                    MainFile.Logger.Error(
-                        $"[Irrefusable] managed transfer action retained | transfer={payload.TransferId} | reason=target_marker_missing_after_add.");
-                    _runData.Set(runState, data);
-                    return;
+                    var createdTarget = runState.LoadCard(transfer.CardSnapshot!, target);
+                    if (!await EventDeckCardHelper.AddCardToRunDeckAsync(target, createdTarget, true))
+                    {
+                        MainFile.Logger.Warn(
+                            $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | transfer={transfer.TransferId} | reason=target_add_failed.");
+                        _runData.Set(runState, data);
+                        return;
+                    }
+
+                    targetCard = FindDeckCardByTransferId(target, transfer.TransferId);
+                    if (targetCard == null)
+                    {
+                        MainFile.Logger.Error(
+                            $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | transfer={transfer.TransferId} | reason=target_marker_missing_after_add.");
+                        _runData.Set(runState, data);
+                        return;
+                    }
                 }
-
-                MainFile.Logger.Info(
-                    $"[Irrefusable] managed transfer target added | transfer={payload.TransferId} | target={target.NetId} | card={targetCard.Id.Entry} | preview_local={previewShown} | target_deck={target.Deck?.Cards.Count ?? -1}.");
             }
-        }
-        catch (Exception exception)
-        {
-            MainFile.Logger.Error(
-                $"[Irrefusable] managed transfer action retained | transfer={payload.TransferId} | reason=target_creation_failed | error={exception}");
-            _runData.Set(runState, data);
-            return;
+            catch (Exception exception)
+            {
+                MainFile.Logger.Error(
+                    $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | transfer={transfer.TransferId} | reason=target_creation_failed | error={exception}");
+                _runData.Set(runState, data);
+                return;
+            }
+
+            if (sourceCard != null && !await RemoveDeckCardOfficial(source, sourceCard, "managed-transfer"))
+            {
+                MainFile.Logger.Warn(
+                    $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | transfer={transfer.TransferId} | reason=source_remove_failed.");
+                _runData.Set(runState, data);
+                return;
+            }
+
+            if (!targetCard.Keywords.Contains(AstralKeywords.Irrefusable))
+                targetCard.AddKeyword(AstralKeywords.Irrefusable);
+
+            TransferId[targetCard] = transfer.TransferId;
+            EnsureLifetimeCapability(data, target, targetCard, transfer.TransferId);
+            batch.AppliedTransferIds.Add(transfer.TransferId);
+            if (sourceCard != null)
+                TransferId.Remove(sourceCard);
+            MainFile.Logger.Info(
+                $"[Irrefusable] managed transfer batch item applied | batch={payload.BatchId} | transfer={transfer.TransferId} | card={targetCard.Id.Entry} | source_deck={source.Deck?.Cards.Count ?? -1} | target_deck={target.Deck?.Cards.Count ?? -1}.");
         }
 
-        if (sourceCard != null && !await RemoveDeckCardOfficial(source, sourceCard, "managed-transfer"))
+        if (batch.AppliedTransferIds.Count != batch.Transfers.Count)
         {
             MainFile.Logger.Warn(
-                $"[Irrefusable] managed transfer action retained | transfer={payload.TransferId} | reason=source_remove_failed | source={source.NetId} | target={target.NetId}.");
+                $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | reason=incomplete | applied={batch.AppliedTransferIds.Count}/{batch.Transfers.Count}.");
             _runData.Set(runState, data);
             return;
         }
 
-        await CompletePendingTransfer(data, pending, source, target, targetCard, sourceCard == null);
-        _runData.Set(runState, data);
-    }
-
-    private static async Task CompletePendingTransfer(
-        IrrefusableRunData data,
-        IrrefusablePendingTransfer pending,
-        Player source,
-        Player target,
-        CardModel targetCard,
-        bool alreadyApplied)
-    {
-        if (!targetCard.Keywords.Contains(AstralKeywords.Irrefusable))
-            targetCard.AddKeyword(AstralKeywords.Irrefusable);
-
-        TransferId[targetCard] = pending.TransferId;
-        EnsureLifetimeCapability(data, target, targetCard, pending.TransferId);
-        data.PendingTransfers.Remove(pending);
-
-        if (!alreadyApplied)
+        data.PendingStarlightGrants.RemoveAll(grant => grant.BatchId == batch.BatchId);
+        data.PendingStarlightGrants.Add(new IrrefusablePendingStarlightGrant
         {
-            var sourceRelic = source.GetRelic<VariantPersonShadowScion>();
-            await CardGainAttribution.RunWithSource(sourceRelic, () =>
-                GeneratedCardObserver.NotifyCardGained(targetCard, sourceRelic));
-        }
-
+            BatchId = batch.BatchId,
+            SourcePlayerNetId = source.NetId,
+            Amount = batch.AppliedTransferIds.Count
+        });
+        data.PendingTransferBatches.Remove(batch);
         if (EventDeckCardHelper.GetRunDeckCards(source).Count == 0)
             await FallenHeavenlyKingDeckHelper.ReplaceWithHeavenlyKingDeck(source);
-
         MainFile.Logger.Info(
-            $"[Irrefusable] transfer {(alreadyApplied ? "already applied" : "applied")} | transfer={pending.TransferId} | source={source.NetId} | target={target.NetId} | card={targetCard.Id.Entry} | source_deck={source.Deck?.Cards.Count ?? -1} | target_deck={target.Deck?.Cards.Count ?? -1}.");
+            $"[Irrefusable] managed transfer batch applied | batch={payload.BatchId} | source={source.NetId} | target={target.NetId} | count={payload.Transfers.Count} | source_deck={source.Deck?.Cards.Count ?? -1} | target_deck={target.Deck?.Cards.Count ?? -1}.");
+        _runData.Set(runState, data);
     }
 
     private static void EnsureLifetimeCapability(
@@ -384,14 +426,21 @@ internal static class IrrefusableCardHelper
 
     private static byte[] SerializeTransferAction(IrrefusableTransferActionPayload payload)
     {
-        ArgumentNullException.ThrowIfNull(payload.CardSnapshot);
-
         var writer = new PacketWriter { WarnOnGrow = false };
-        WriteTransferString(writer, payload.TransferId, "transfer id");
+        WriteTransferString(writer, payload.BatchId, "batch id");
         writer.WriteULong(payload.SourcePlayerNetId);
         writer.WriteULong(payload.TargetPlayerNetId);
-        writer.WriteInt(payload.Sequence);
-        writer.Write(payload.CardSnapshot);
+        writer.WriteInt(payload.Transfers.Count);
+        EnsureTransferPayloadWithinLimit(writer);
+        foreach (var transfer in payload.Transfers.OrderBy(transfer => transfer.Sequence).ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal))
+        {
+            ArgumentNullException.ThrowIfNull(transfer.CardSnapshot);
+            WriteTransferString(writer, transfer.TransferId, "transfer id");
+            writer.WriteInt(transfer.Sequence);
+            writer.Write(transfer.CardSnapshot);
+            EnsureTransferPayloadWithinLimit(writer);
+        }
+
         EnsureTransferPayloadWithinLimit(writer);
         writer.ZeroByteRemainder();
         return [.. writer.Buffer.AsSpan(0, writer.BytePosition)];
@@ -401,14 +450,28 @@ internal static class IrrefusableCardHelper
     {
         var reader = new PacketReader();
         reader.Reset([.. payload]);
-        return new IrrefusableTransferActionPayload
+        var actionPayload = new IrrefusableTransferActionPayload
         {
-            TransferId = ReadTransferString(reader, "transfer id"),
+            BatchId = ReadTransferString(reader, "batch id"),
             SourcePlayerNetId = reader.ReadULong(),
-            TargetPlayerNetId = reader.ReadULong(),
-            Sequence = reader.ReadInt(),
-            CardSnapshot = reader.Read<SerializableCard>()
+            TargetPlayerNetId = reader.ReadULong()
         };
+
+        var count = reader.ReadInt();
+        if (count <= 0 || count > 4)
+            throw new InvalidOperationException($"Invalid Irrefusable transfer batch count: {count}.");
+
+        for (var index = 0; index < count; index++)
+        {
+            actionPayload.Transfers.Add(new IrrefusablePendingTransfer
+            {
+                TransferId = ReadTransferString(reader, "transfer id"),
+                Sequence = reader.ReadInt(),
+                CardSnapshot = reader.Read<SerializableCard>()
+            });
+        }
+
+        return actionPayload;
     }
 
     private static void WriteTransferString(PacketWriter writer, string value, string fieldName)
@@ -448,6 +511,46 @@ internal static class IrrefusableCardHelper
                 $"Irrefusable managed transfer payload exceeds {RitsuLibManagedNetActions.MaxPayloadBytes} bytes.");
     }
 
+    private static bool ContainsPendingTransfer(IrrefusableRunData data, string transferId)
+    {
+        return data.PendingTransfers.Any(record => record.TransferId == transferId)
+               || data.PendingTransferBatches.Any(batch => batch.Transfers.Any(record => record.TransferId == transferId));
+    }
+
+    private static void MigrateLegacyPendingTransfers(IrrefusableRunData data)
+    {
+        if (data.PendingTransfers.Count == 0)
+            return;
+
+        foreach (var group in data.PendingTransfers
+                     .Where(transfer => transfer.CardSnapshot != null)
+                     .GroupBy(transfer => (transfer.SourcePlayerNetId, transfer.TargetPlayerNetId))
+                     .OrderBy(group => group.Min(transfer => transfer.Sequence)))
+        {
+            var transfers = group.OrderBy(transfer => transfer.Sequence)
+                .ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal)
+                .ToList();
+            if (transfers.Count == 0)
+                continue;
+
+            var batchId = $"legacy:{group.Key.SourcePlayerNetId}:{group.Key.TargetPlayerNetId}:{transfers[0].Sequence}";
+            if (data.PendingTransferBatches.All(batch => batch.BatchId != batchId))
+            {
+                data.PendingTransferBatches.Add(new IrrefusablePendingTransferBatch
+                {
+                    BatchId = batchId,
+                    SourcePlayerNetId = group.Key.SourcePlayerNetId,
+                    TargetPlayerNetId = group.Key.TargetPlayerNetId,
+                    Transfers = transfers
+                });
+                MainFile.Logger.Info(
+                    $"[Irrefusable] migrated legacy pending transfers | batch={batchId} | count={transfers.Count}.");
+            }
+        }
+
+        data.PendingTransfers.Clear();
+    }
+
     private static void RemoveExistingLifetimeRecord(
         IrrefusableRunData data,
         Player source,
@@ -466,7 +569,7 @@ internal static class IrrefusableCardHelper
     private static CardModel? FindDeckCardByTransferId(Player owner, string transferId)
     {
         return EventDeckCardHelper.GetRunDeckCards(owner)
-            .FirstOrDefault(card => TransferId.GetValueOrDefault(card, string.Empty) == transferId);
+            .FirstOrDefault(card => TransferId.TryGetValue(card, out var value) && value == transferId);
     }
 
     private static async Task<bool> RemoveDeckCardOfficial(Player owner, CardModel card, string reason)
@@ -527,7 +630,7 @@ internal static class IrrefusableCardHelper
     {
         var cards = EventDeckCardHelper.GetRunDeckCards(owner);
         if (!string.IsNullOrEmpty(record.TransferId))
-            return cards.FirstOrDefault(card => TransferId.GetValueOrDefault(card, string.Empty) == record.TransferId);
+            return cards.FirstOrDefault(card => TransferId.TryGetValue(card, out var value) && value == record.TransferId);
 
         if (record.DeckIndex >= 0 && record.DeckIndex < cards.Count)
         {
@@ -574,6 +677,11 @@ internal sealed class IrrefusableCardLifecycle : HookedSingletonModel
         return IrrefusableCardHelper.HandleCardDiscarded(choiceContext, card);
     }
 
+    public override Task BeforeCombatStart()
+    {
+        return IrrefusableCardHelper.HandleBeforeCombatStart(CurrentRunState as RunState);
+    }
+
     public override Task AfterCombatEnd(CombatRoom room)
     {
         return IrrefusableCardHelper.HandleCombatEnd(room, CurrentRunState as RunState);
@@ -584,6 +692,8 @@ internal sealed class IrrefusableRunData
 {
     public int NextTransferSequence { get; set; }
     public List<IrrefusablePendingTransfer> PendingTransfers { get; set; } = [];
+    public List<IrrefusablePendingTransferBatch> PendingTransferBatches { get; set; } = [];
+    public List<IrrefusablePendingStarlightGrant> PendingStarlightGrants { get; set; } = [];
     public List<IrrefusableCardRecord> Cards { get; set; } = [];
 }
 
@@ -594,16 +704,30 @@ internal sealed class IrrefusablePendingTransfer
     public ulong TargetPlayerNetId { get; set; }
     public int Sequence { get; set; }
     public SerializableCard? CardSnapshot { get; set; }
-    public bool ActionRequested { get; set; }
 }
 
-public sealed class IrrefusableTransferActionPayload
+internal sealed class IrrefusablePendingTransferBatch
 {
-    public string TransferId { get; set; } = string.Empty;
+    public string BatchId { get; set; } = string.Empty;
     public ulong SourcePlayerNetId { get; set; }
     public ulong TargetPlayerNetId { get; set; }
-    public int Sequence { get; set; }
-    public SerializableCard? CardSnapshot { get; set; }
+    public List<IrrefusablePendingTransfer> Transfers { get; set; } = [];
+    public List<string> AppliedTransferIds { get; set; } = [];
+}
+
+internal sealed class IrrefusablePendingStarlightGrant
+{
+    public string BatchId { get; set; } = string.Empty;
+    public ulong SourcePlayerNetId { get; set; }
+    public int Amount { get; set; }
+}
+
+internal sealed class IrrefusableTransferActionPayload
+{
+    public string BatchId { get; set; } = string.Empty;
+    public ulong SourcePlayerNetId { get; set; }
+    public ulong TargetPlayerNetId { get; set; }
+    public List<IrrefusablePendingTransfer> Transfers { get; set; } = [];
 }
 
 internal sealed class IrrefusableCardRecord

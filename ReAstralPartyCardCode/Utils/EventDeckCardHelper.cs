@@ -278,7 +278,8 @@ internal static class EventDeckCardHelper
         if (showPreview && LocalContext.IsMe(owner))
             CardCmd.PreviewCardPileAdd(result, previewTime);
 
-        SaveManager.Instance?.MarkCardAsSeen(addedCard.CanonicalInstance ?? addedCard);
+        if (LocalContext.IsMe(owner))
+            SaveManager.Instance?.MarkCardAsSeen(addedCard.CanonicalInstance ?? addedCard);
         MainFile.Logger.Info(
             $"[EventDeckCardHelper] Added verified run-deck card | owner={owner.NetId} | card={addedCard.Id.Entry}#{addedCard.GetHashCode()} | inRunState={owner.RunState.ContainsCard(addedCard)} | deck={deckBefore}->{owner.Deck.Cards.Count}.");
         return addedCard;
