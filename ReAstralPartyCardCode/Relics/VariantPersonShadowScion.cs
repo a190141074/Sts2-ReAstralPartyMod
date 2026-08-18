@@ -23,6 +23,7 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
 
     [SavedProperty] public int AstralParty_VariantPersonShadowScionCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_VariantPersonShadowScionPendingCard { get; set; }
+    [SavedProperty] public int AstralParty_VariantPersonShadowScionPendingTransferredStarLight { get; set; }
 
     protected override string RelicId => "variant_person_shadow_scion";
     protected override int CounterValue
@@ -58,6 +59,16 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
         if (Owner?.Creature == null)
             return;
 
+        var pendingTransferredStarLight = AstralParty_VariantPersonShadowScionPendingTransferredStarLight;
+        if (pendingTransferredStarLight > 0)
+        {
+            AstralParty_VariantPersonShadowScionPendingTransferredStarLight = 0;
+            Flash();
+            await PowerCmd.Apply<StarLightPower>(Owner.Creature, pendingTransferredStarLight, Owner.Creature, null, false);
+            MainFile.Logger.Info(
+                $"[VariantPersonShadowScion] granted deferred transferred Starlight | owner={Owner.NetId} | amount={pendingTransferredStarLight}.");
+        }
+
         var starlight = Owner.GetRelic<TokenEternalStarlight>()?.GetStacks() ?? 0;
         var bonus = starlight / EternalStarlightThreshold;
         if (bonus <= 0)
@@ -66,6 +77,16 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
         Flash();
         await PowerCmd.Apply<StrengthPower>(Owner.Creature, bonus, Owner.Creature, null);
         await PowerCmd.Apply<DexterityPower>(Owner.Creature, bonus, Owner.Creature, null);
+    }
+
+    internal void AccumulatePendingTransferredStarlight(int amount)
+    {
+        if (amount <= 0)
+            return;
+
+        AstralParty_VariantPersonShadowScionPendingTransferredStarLight += amount;
+        MainFile.Logger.Info(
+            $"[VariantPersonShadowScion] queued transferred Starlight | owner={Owner?.NetId.ToString() ?? "<null>"} | amount={amount} | pending={AstralParty_VariantPersonShadowScionPendingTransferredStarLight}.");
     }
 
     internal async Task HandleObservedCardGain(Player recipient, AbstractModel? source)
