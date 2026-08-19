@@ -94,7 +94,8 @@ public static class DeterministicMultiplayerChoiceHelper
         IReadOnlyList<RelicModel> options,
         string title,
         string prompt,
-        string context)
+        string context,
+        bool adaptiveLayout = false)
     {
         ArgumentNullException.ThrowIfNull(player);
         ArgumentNullException.ThrowIfNull(options);
@@ -102,17 +103,17 @@ public static class DeterministicMultiplayerChoiceHelper
         var runManager = RunManager.Instance;
         var gameType = runManager.NetService.Type;
         if (gameType is NetGameType.Singleplayer or NetGameType.None)
-            return await ShowLocalDirectRelicSelection(player, options, title, prompt);
+            return await ShowLocalDirectRelicSelection(player, options, title, prompt, adaptiveLayout);
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
-            return await ShowLocalDirectRelicSelection(player, options, title, prompt);
+            return await ShowLocalDirectRelicSelection(player, options, title, prompt, adaptiveLayout);
 
         var sessionKey = BuildSessionKey(AstralChoiceKind.RelicSelection, player, context);
         var choiceId = synchronizer.ReserveChoiceId(player);
         if (IsLocalPlayer(runManager, player))
         {
-            var selectedRelic = await ShowLocalDirectRelicSelection(player, options, title, prompt);
+            var selectedRelic = await ShowLocalDirectRelicSelection(player, options, title, prompt, adaptiveLayout);
             var selectedIndex = selectedRelic == null ? -1 : IndexOfRelic(options, selectedRelic);
             synchronizer.SyncLocalChoice(
                 player,
@@ -666,7 +667,8 @@ public static class DeterministicMultiplayerChoiceHelper
         Player player,
         IReadOnlyList<RelicModel> options,
         string title,
-        string prompt)
+        string prompt,
+        bool adaptiveLayout)
     {
         var overlayStack = await WaitForOverlayStackAsync();
         if (overlayStack == null)
@@ -676,7 +678,8 @@ public static class DeterministicMultiplayerChoiceHelper
             foreach (var relic in options)
                 SaveManager.Instance?.MarkRelicAsSeen(relic);
 
-        var screen = RefreshableTokenRelicSelectionScreen.CreateDirect(player, options, title, prompt);
+        var screen = RefreshableTokenRelicSelectionScreen.CreateDirect(
+            player, options, title, prompt, adaptiveLayout);
         overlayStack.Push(screen);
         var result = await screen.WaitForResult();
         screen.Close();

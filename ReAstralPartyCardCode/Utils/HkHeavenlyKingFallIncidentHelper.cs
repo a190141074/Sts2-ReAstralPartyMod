@@ -26,7 +26,8 @@ internal static class HkHeavenlyKingFallIncidentHelper
         new(static () => ModelDb.Relic<PersonSocialFearNun>()),
         new(static () => ModelDb.Relic<PersonSupermanMegas>()),
         new(static () => ModelDb.Relic<PersonMidnightFlash>()),
-        new(static () => ModelDb.Relic<PersonUnclePederman>())
+        new(static () => ModelDb.Relic<PersonUnclePederman>()),
+        new(static () => ModelDb.Relic<PersonVampire>())
     ];
 
     public static void Register()
@@ -72,7 +73,8 @@ internal static class HkHeavenlyKingFallIncidentHelper
             options,
             new LocString("cards", "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.selection_header").GetRawText(),
             new LocString("cards", "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.select_prompt").GetRawText(),
-            "hk_heavenly_king_fall_incident");
+            "hk_heavenly_king_fall_incident",
+            adaptiveLayout: true);
         if (selected == null)
             return;
 

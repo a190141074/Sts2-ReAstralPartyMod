@@ -5,8 +5,8 @@ using Mathf = Godot.Mathf;
 using GodotTime = Godot.Time;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
+using MegaCrit.Sts2.Core.Models;
 using ReAstralPartyMod.ReAstralPartyCardCode.Ancient;
-using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 using ReAstralPartyMod.ReAstralPartyCardCode.Events;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
@@ -57,10 +57,11 @@ public class MainFile
         SavedPropertyCacheBootstrap.ScheduleVerification(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
         var contentRegistry = RitsuLibFramework.GetContentRegistry(ModId);
-        contentRegistry.RegisterCardHandOutline<AstralPartyCardModel>(
-            ModCardHandOutlineRules<AstralPartyCardModel>.Dynamic(
+        contentRegistry.RegisterCardHandOutline<CardModel>(
+            ModCardHandOutlineRules<CardModel>.Dynamic(
                 static card => card.Keywords.Contains(AstralKeywords.AstralTemporary),
-                static _ => ResolveTemporaryCardOutlineColor()));
+                static _ => ResolveTemporaryCardOutlineColor(),
+                visibleWhenUnplayable: true));
         contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<PersonSkillCardPool>(
             "person_skill_pool",
             "res://ReAstralPartyMod/images/ui/person_skill_pool.png");

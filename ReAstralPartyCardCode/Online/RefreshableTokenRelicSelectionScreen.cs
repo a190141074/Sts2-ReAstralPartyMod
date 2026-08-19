@@ -47,10 +47,12 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private readonly string _probabilityText;
     private readonly string _bottomPrompt;
     private readonly bool _showRerollControls;
-    private readonly float _optionScale;
+    private readonly bool _adaptiveDirectLayout;
+    private float _optionScale;
     private int _remainingRerolls;
 
     private VBoxContainer _rootContainer = null!;
+    private HBoxContainer _selectionRow = null!;
     private GridContainer _holderContainer = null!;
     private Label _titleLabel = null!;
     private Label _infoLabel = null!;
@@ -60,6 +62,9 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private bool _closed;
     private bool _choiceLocked;
     private bool _holdersBuilt;
+    private bool _adaptiveLayoutLogged;
+    private Viewport? _subscribedViewport;
+    private Action? _viewportSizeChangedHandler;
 
     public NetScreenType ScreenType => NetScreenType.None;
     public bool UseSharedBackstop => true;
@@ -75,7 +80,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc,
         bool showRerollControls,
         string bottomPrompt,
-        float optionScale)
+        float optionScale,
+        bool adaptiveDirectLayout)
     {
         _owner = owner;
         _runState = (RunState)owner.RunState;
@@ -87,7 +93,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _rerollFunc = rerollFunc;
         _showRerollControls = showRerollControls;
         _bottomPrompt = bottomPrompt;
-        _optionScale = optionScale;
+        _adaptiveDirectLayout = adaptiveDirectLayout;
+        _optionScale = adaptiveDirectLayout ? 1f : optionScale;
 
         Name = nameof(RefreshableTokenRelicSelectionScreen);
         SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
@@ -108,14 +115,15 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> rerollFunc)
     {
         return new RefreshableTokenRelicSelectionScreen(owner, options, rerollCount, title, subtitlePrefix,
-            probabilityText, rerollFunc, true, title, 1f);
+            probabilityText, rerollFunc, true, title, 1f, false);
     }
 
     public static RefreshableTokenRelicSelectionScreen CreateDirect(
         Player owner,
         IReadOnlyList<RelicModel> options,
         string title,
-        string prompt)
+        string prompt,
+        bool adaptiveLayout = false)
     {
         return new RefreshableTokenRelicSelectionScreen(
             owner,
@@ -127,7 +135,8 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             static (currentOptions, _, _) => currentOptions,
             false,
             prompt,
-            1.5f);
+            adaptiveLayout ? 1f : 1.5f,
+            adaptiveLayout);
     }
 
     public Task<RefreshableTokenRelicSelectionResult> WaitForResult()
@@ -152,11 +161,18 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     public void AfterOverlayOpened()
     {
         Visible = true;
+        if (_adaptiveDirectLayout)
+        {
+            UpdateAdaptiveLayout();
+            SubscribeToViewportResize();
+        }
+
         BuildRelicHoldersIfNeeded();
     }
 
     public void AfterOverlayClosed()
     {
+        UnsubscribeFromViewportResize();
         EnsureCompletedOnForcedClose();
         _closed = true;
         _overlayClosedSource.TrySetResult();
@@ -242,7 +258,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         _rootContainer.OffsetBottom = -104f;
         AddChild(_rootContainer);
 
-        var selectionRow = new HBoxContainer
+        _selectionRow = new HBoxContainer
         {
             Name = "SelectionRow",
             MouseFilter = MouseFilterEnum.Ignore,
@@ -250,7 +266,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             SizeFlagsVertical = SizeFlags.ShrinkCenter,
             Alignment = BoxContainer.AlignmentMode.Center
         };
-        selectionRow.AddThemeConstantOverride("separation", (int)(16f * _optionScale));
+        _selectionRow.AddThemeConstantOverride("separation", (int)(16f * _optionScale));
 
         _holderContainer = new GridContainer
         {
@@ -267,7 +283,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
             MouseFilter = MouseFilterEnum.Ignore,
             CustomMinimumSize = new Vector2(0f, 10f)
         });
-        _rootContainer.AddChild(selectionRow);
+        _rootContainer.AddChild(_selectionRow);
         _rootContainer.AddChild(new Control
         {
             SizeFlagsVertical = SizeFlags.ExpandFill,
@@ -277,14 +293,14 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
 
         if (_showRerollControls)
         {
-            selectionRow.AddChild(new Control
+            _selectionRow.AddChild(new Control
             {
                 Name = "LeftBalanceSpacer",
                 CustomMinimumSize = new Vector2(40f, 0f),
                 MouseFilter = MouseFilterEnum.Ignore
             });
         }
-        selectionRow.AddChild(_holderContainer);
+        _selectionRow.AddChild(_holderContainer);
 
         _rerollButton = new Button
         {
@@ -330,7 +346,7 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         rerollColumn.AddChild(new Control
             { SizeFlagsVertical = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore });
         if (_showRerollControls)
-            selectionRow.AddChild(rerollColumn);
+            _selectionRow.AddChild(rerollColumn);
 
         var bottomPromptPanel = new PanelContainer
         {
@@ -492,8 +508,69 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
 
         _holderContainer.Columns = _showRerollControls
             ? ResolveOptionColumns(_options.Count)
-            : Math.Min(4, Math.Max(1, _options.Count));
+            : ResolveDirectOptionColumns(_options.Count);
         ConfigureHolderFocusNeighbors();
+    }
+
+    private void SubscribeToViewportResize()
+    {
+        var viewport = GetViewport();
+        if (viewport == null)
+            return;
+
+        _subscribedViewport = viewport;
+        _viewportSizeChangedHandler = UpdateAdaptiveLayout;
+        viewport.SizeChanged += _viewportSizeChangedHandler;
+    }
+
+    private void UnsubscribeFromViewportResize()
+    {
+        if (_subscribedViewport != null &&
+            IsInstanceValid(_subscribedViewport) &&
+            _viewportSizeChangedHandler != null)
+            _subscribedViewport.SizeChanged -= _viewportSizeChangedHandler;
+
+        _subscribedViewport = null;
+        _viewportSizeChangedHandler = null;
+    }
+
+    private void UpdateAdaptiveLayout()
+    {
+        if (!_adaptiveDirectLayout || _holderContainer == null)
+            return;
+
+        var viewportSize = GetViewport()?.GetVisibleRect().Size ?? Size;
+        var columns = ResolveDirectOptionColumns(_options.Count);
+        var rows = Math.Max(1, (int)Math.Ceiling(_options.Count / (double)columns));
+        const float horizontalMargin = 48f;
+        const float verticalMargin = 180f;
+        var baseWidth = columns * OptionWidth + Math.Max(0, columns - 1) * 20f;
+        var baseHeight = rows * OptionHeight + Math.Max(0, rows - 1) * 18f;
+        var availableWidth = Math.Max(1f, viewportSize.X - horizontalMargin * 2f);
+        var availableHeight = Math.Max(1f, viewportSize.Y - verticalMargin);
+        var resolvedScale = Math.Clamp(
+            Math.Min(1.5f, Math.Min(availableWidth / baseWidth, availableHeight / baseHeight)),
+            0.55f,
+            1.5f);
+
+        var scaleChanged = Math.Abs(resolvedScale - _optionScale) >= 0.01f;
+        if (!scaleChanged && _adaptiveLayoutLogged)
+            return;
+
+        if (scaleChanged)
+        {
+            _optionScale = resolvedScale;
+            _selectionRow.AddThemeConstantOverride("separation", (int)(16f * _optionScale));
+            _holderContainer.AddThemeConstantOverride("h_separation", (int)(20f * _optionScale));
+            _holderContainer.AddThemeConstantOverride("v_separation", (int)(18f * _optionScale));
+        }
+
+        MainFile.Logger.Info(
+            $"[HkFallIncident] adaptive relic layout | options={_options.Count} viewport={viewportSize} columns={columns} rows={rows} scale={_optionScale:0.###}");
+        _adaptiveLayoutLogged = true;
+
+        if (scaleChanged && _holdersBuilt)
+            BuildRelicHolders();
     }
 
     private void ClearRelicHolders()
@@ -804,6 +881,11 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         if (optionCount <= 6)
             return 3;
         return 4;
+    }
+
+    private static int ResolveDirectOptionColumns(int optionCount)
+    {
+        return Math.Min(4, Math.Max(1, optionCount));
     }
 }
 
