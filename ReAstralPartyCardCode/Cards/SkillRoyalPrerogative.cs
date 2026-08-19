@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
@@ -43,8 +44,10 @@ public class SkillRoyalPrerogative : AstralPartyCardModel
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         RecordTelemetryOnPlay();
-        if (Owner == null)
+        if (Owner?.Creature == null)
             return;
+
+        await PowerCmd.Apply<RoyalPrerogativePower>(Owner.Creature, 1m, Owner.Creature, this, false);
 
         var drawnCards = (await CardGainAttribution.RunWithSource(this,
             () => CardPileCmd.Draw(choiceContext, CardsToDraw, Owner))).ToList();

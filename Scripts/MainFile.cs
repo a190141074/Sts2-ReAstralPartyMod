@@ -8,6 +8,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Events;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
@@ -37,6 +38,7 @@ public class MainFile
         FinalArenaSeriesHelper.Register();
         IrrefusableCardHelper.Register();
         FallenHeavenlyKingDeckHelper.Register();
+        RoyalPrerogativePower.RegisterRightClickBinding();
 
         // Current content still references minted CardKeyword values while models materialize,
         // so keywords must be registered before assembly auto-discovery runs.
