@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
+using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
@@ -52,6 +53,7 @@ public class PersonOasisQueen : LegacyCooldownPersonRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillRoyalPrerogative>(),
+        HoverTipFactory.FromPower<RoyalPrerogativePower>(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralTemporaryId)
     ];
 

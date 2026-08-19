@@ -51,15 +51,15 @@ public sealed class SkillPowerfulPityPlus : AstralPartyCardModel
             owner,
             selectedCards,
             "skill_powerful_pity_plus");
-        var queuedTransfers = IrrefusableCardHelper.QueueTransfers(owner, target!, selectedCards);
+        var transferredCount = IrrefusableCardHelper.QueueTransfers(owner, target!, selectedCards);
 
-        var eternalStarlightGranted = queuedTransfers == MaxSelectedCards ? 2 : 1;
+        var eternalStarlightGranted = transferredCount == MaxSelectedCards ? 2 : 1;
         await TokenEternalStarlight.GrantStacks(owner, eternalStarlightGranted);
-        if (queuedTransfers == MaxSelectedCards)
+        if (transferredCount == MaxSelectedCards)
             await PlayerCmd.GainEnergy(1m, target!);
 
         MainFile.Logger.Info(
-            $"[SkillPowerfulPityPlus] transfer queued | owner={owner.NetId} | target={target!.NetId} | selected={selectedCards.Count} | queued={queuedTransfers} | eternal_starlight={eternalStarlightGranted}");
+            $"[SkillPowerfulPityPlus] transfer queued | owner={owner.NetId} | target={target!.NetId} | selected={selectedCards.Count} | transfers={transferredCount} | eternal_starlight={eternalStarlightGranted}");
     }
 
     private static async Task<IReadOnlyList<CardModel>> SelectDeckCards(Player owner)

@@ -97,7 +97,8 @@ internal static class FallenHeavenlyKingDeckHelper
         if (!await AddMissingCopies<HkMajestyOfTheHeavenlyKing>(owner, 3, existingCards.Count(static card => card is HkMajestyOfTheHeavenlyKing))
             || !await AddMissingCopies<HkExclusiveChannel>(owner, 3, existingCards.Count(static card => card is HkExclusiveChannel))
             || !await AddMissingCopies<HkHeavenlyKingsPresence>(owner, 3, existingCards.Count(static card => card is HkHeavenlyKingsPresence))
-            || !await AddMissingCopies<HkFallOfTheHeavenlyKing>(owner, 1, existingCards.Count(static card => card is HkFallOfTheHeavenlyKing)))
+            || !await AddMissingCopies<HkFallOfTheHeavenlyKing>(owner, 1, existingCards.Count(static card => card is HkFallOfTheHeavenlyKing))
+            || !await AddMissingCopies<HkHeavenlyKingFallIncident>(owner, 1, existingCards.Count(static card => card is HkHeavenlyKingFallIncident)))
         {
             MainFile.Logger.Warn(
                 $"[FallenHeavenlyKing] heavenly deck replacement retained | owner={owner.NetId} | cards={DescribeDeck(EventDeckCardHelper.GetRunDeckCards(owner))}.");
@@ -105,11 +106,12 @@ internal static class FallenHeavenlyKingDeckHelper
         }
 
         var completedCards = EventDeckCardHelper.GetRunDeckCards(owner);
-        if (completedCards.Count != 10
+        if (completedCards.Count != 11
             || completedCards.Count(static card => card is HkMajestyOfTheHeavenlyKing) != 3
             || completedCards.Count(static card => card is HkExclusiveChannel) != 3
             || completedCards.Count(static card => card is HkHeavenlyKingsPresence) != 3
             || completedCards.Count(static card => card is HkFallOfTheHeavenlyKing) != 1
+            || completedCards.Count(static card => card is HkHeavenlyKingFallIncident) != 1
             || completedCards.Any(card => !IsHeavenlyKingDeckCard(card)))
         {
             MainFile.Logger.Error(
@@ -342,12 +344,13 @@ internal static class FallenHeavenlyKingDeckHelper
         return card is HkMajestyOfTheHeavenlyKing
             or HkExclusiveChannel
             or HkHeavenlyKingsPresence
-            or HkFallOfTheHeavenlyKing;
+            or HkFallOfTheHeavenlyKing
+            or HkHeavenlyKingFallIncident;
     }
 
     private static string DescribeDeck(IReadOnlyCollection<CardModel> cards)
     {
-        return $"total={cards.Count},majesty={cards.Count(static card => card is HkMajestyOfTheHeavenlyKing)},exclusive_channel={cards.Count(static card => card is HkExclusiveChannel)},presence={cards.Count(static card => card is HkHeavenlyKingsPresence)},fall={cards.Count(static card => card is HkFallOfTheHeavenlyKing)}";
+        return $"total={cards.Count},majesty={cards.Count(static card => card is HkMajestyOfTheHeavenlyKing)},exclusive_channel={cards.Count(static card => card is HkExclusiveChannel)},presence={cards.Count(static card => card is HkHeavenlyKingsPresence)},fall={cards.Count(static card => card is HkFallOfTheHeavenlyKing)},incident={cards.Count(static card => card is HkHeavenlyKingFallIncident)}";
     }
 }
 

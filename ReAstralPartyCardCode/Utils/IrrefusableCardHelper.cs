@@ -107,8 +107,7 @@ internal static class IrrefusableCardHelper
             var transferId = $"{source.NetId}:{target.NetId}:{++data.NextTransferSequence}";
             var snapshot = card.ToSerializable();
             var sourceDeckIndex = originalDeckIndex
-                                  - CountEarlierPendingDeckRemovals(data, source.NetId, originalDeckIndex)
-                                  - transfers.Count(transfer => transfer.OriginalSourceDeckIndex < originalDeckIndex);
+                                  - CountEarlierPendingDeckRemovals(data, source.NetId, originalDeckIndex);
             transfers.Add(new IrrefusablePendingTransfer
             {
                 TransferId = transferId,
@@ -283,17 +282,32 @@ internal static class IrrefusableCardHelper
         MainFile.Logger.Info(
             $"[Irrefusable] managed transfer batch executing | batch={payload.BatchId} | source={source.NetId} | target={target.NetId} | count={payload.Transfers.Count} | source_deck={source.Deck?.Cards.Count ?? -1} | target_deck={target.Deck?.Cards.Count ?? -1}.");
 
-        foreach (var transfer in payload.Transfers.OrderBy(transfer => transfer.Sequence).ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal))
+        var orderedTransfers = payload.Transfers
+            .Select(transfer => new
+            {
+                Transfer = transfer,
+                Original = batch.Transfers.FirstOrDefault(item => item.TransferId == transfer.TransferId)?.OriginalSourceDeckIndex ?? int.MaxValue
+            })
+            .OrderBy(item => item.Original)
+            .ThenBy(item => item.Transfer.Sequence)
+            .ThenBy(item => item.Transfer.TransferId, StringComparer.Ordinal)
+            .Select(item => item.Transfer)
+            .ToList();
+
+        foreach (var transfer in orderedTransfers)
         {
             if (batch.AppliedTransferIds.Contains(transfer.TransferId))
                 continue;
 
-            var sourceCard = FindDeckCardByIndex(source, transfer.SourceDeckIndex);
+            var sourceDeckIndex = transfer.SourceDeckIndex
+                                  - batch.Transfers.Count(item =>
+                                      item.OriginalSourceDeckIndex < transfer.OriginalSourceDeckIndex);
+            var sourceCard = FindDeckCardByIndex(source, sourceDeckIndex);
             var targetCard = FindTargetDeckCardByTransferId(target, transfer.TransferId);
             if (sourceCard != null && !MatchesTransferSnapshot(sourceCard, transfer.CardSnapshot!))
             {
                 MainFile.Logger.Warn(
-                    $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | transfer={transfer.TransferId} | reason=source_snapshot_mismatch | deck_index={transfer.SourceDeckIndex} | card={sourceCard.Id.Entry}.");
+                    $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | transfer={transfer.TransferId} | reason=source_snapshot_mismatch | deck_index={sourceDeckIndex} | card={sourceCard.Id.Entry}.");
                 _runData.Set(runState, data);
                 return;
             }
@@ -301,7 +315,7 @@ internal static class IrrefusableCardHelper
             if (targetCard == null && sourceCard == null)
             {
                 MainFile.Logger.Warn(
-                    $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | transfer={transfer.TransferId} | reason=source_missing | deck_index={transfer.SourceDeckIndex}.");
+                    $"[Irrefusable] managed transfer batch retained | batch={payload.BatchId} | transfer={transfer.TransferId} | reason=source_missing | deck_index={sourceDeckIndex}.");
                 _runData.Set(runState, data);
                 return;
             }
@@ -422,6 +436,7 @@ internal static class IrrefusableCardHelper
             WriteTransferString(writer, transfer.TransferId, "transfer id");
             writer.WriteInt(transfer.Sequence);
             writer.WriteInt(transfer.SourceDeckIndex);
+            writer.WriteInt(transfer.OriginalSourceDeckIndex);
             writer.Write(transfer.CardSnapshot);
             EnsureTransferPayloadWithinLimit(writer);
         }
@@ -453,6 +468,7 @@ internal static class IrrefusableCardHelper
                 TransferId = ReadTransferString(reader, "transfer id"),
                 Sequence = reader.ReadInt(),
                 SourceDeckIndex = reader.ReadInt(),
+                OriginalSourceDeckIndex = reader.ReadInt(),
                 CardSnapshot = reader.Read<SerializableCard>()
             });
         }
@@ -519,11 +535,11 @@ internal static class IrrefusableCardHelper
         return payloadTransfers
             .OrderBy(transfer => transfer.Sequence)
             .ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal)
-            .Select(transfer => (transfer.TransferId, transfer.Sequence, transfer.SourceDeckIndex))
+            .Select(transfer => (transfer.TransferId, transfer.Sequence, transfer.SourceDeckIndex, transfer.OriginalSourceDeckIndex))
             .SequenceEqual(batchTransfers
                 .OrderBy(transfer => transfer.Sequence)
                 .ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal)
-                .Select(transfer => (transfer.TransferId, transfer.Sequence, transfer.SourceDeckIndex)));
+                .Select(transfer => (transfer.TransferId, transfer.Sequence, transfer.SourceDeckIndex, transfer.OriginalSourceDeckIndex)));
     }
 
     private static CardModel? FindDeckCardByIndex(Player owner, int deckIndex)

@@ -245,5 +245,9 @@
   "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KINGS_PRESENCE.title": "天王の随伴",
   "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVLY_KINGS_PRESENCE.description": "全員は[gold]永遠の星光[/gold]に等しいブロックを得る。",
   "RE_ASTRAL_PARTY_MOD_CARD_HK_FALL_OF_THE_HEAVENLY_KING.title": "天王落",
-  "RE_ASTRAL_PARTY_MOD_CARD_HK_FALL_OF_THE_HEAVENLY_KING.description": "すべての敵の最大HPを[blue]1[/blue]にし、[blue]50[/blue]ブロックを与える。"
+  "RE_ASTRAL_PARTY_MOD_CARD_HK_FALL_OF_THE_HEAVENLY_KING.description": "すべての敵の最大HPを[blue]1[/blue]にし、[blue]50[/blue]ブロックを与える。",
+  "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.title": "天王落事変",
+  "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.description": "現在存在しない人格を1つ選ぶ。戦闘終了後、選んだ人格を得る。",
+  "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.selection_header": "人格を選択",
+  "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.select_prompt": "人格を1つ選ぶ"
 }

@@ -105,6 +105,10 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
         if (Owner?.Creature?.CombatState == null)
             return;
 
+        if (Owner.GetRelic<PersonalityDerivativeFallenHeavenlyKing>()
+                ?.AstralParty_FallenHeavenlyKingDeckReplaced == true)
+            return;
+
         Flash();
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillPowerfulPityPlus>(), Owner);
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);

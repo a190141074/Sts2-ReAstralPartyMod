@@ -1,8 +1,12 @@
 using System.Reflection;
 using System.Security.Cryptography;
+using Color = Godot.Color;
+using Mathf = Godot.Mathf;
+using GodotTime = Godot.Time;
 using MegaCrit.Sts2.Core.Logging;
 using MegaCrit.Sts2.Core.Modding;
 using ReAstralPartyMod.ReAstralPartyCardCode.Ancient;
+using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 using ReAstralPartyMod.ReAstralPartyCardCode.Distortion;
 using ReAstralPartyMod.ReAstralPartyCardCode.Events;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
@@ -15,6 +19,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using ReAstralPartyMod.ReAstralPartyCardCode.Server;
 using STS2RitsuLib;
 using STS2RitsuLib.Interop;
+using STS2RitsuLib.Scaffolding.Cards.HandOutline;
 
 namespace ReAstralPartyMod;
 
@@ -23,6 +28,8 @@ public class MainFile
 {
     public const string ModId = "ReAstralPartyMod";
     public static readonly Logger Logger = RitsuLibFramework.CreateLogger(ModId);
+    private static readonly Color TemporaryCardOutlineLow = new(68f / 255f, 55f / 255f, 79f / 255f, 1f);
+    private static readonly Color TemporaryCardOutlineHigh = new(250f / 255f, 212f / 255f, 77f / 255f, 1f);
     private static bool _initialized;
 
     public static void Init()
@@ -38,6 +45,7 @@ public class MainFile
         FinalArenaSeriesHelper.Register();
         IrrefusableCardHelper.Register();
         FallenHeavenlyKingDeckHelper.Register();
+        HkHeavenlyKingFallIncidentHelper.Register();
         RoyalPrerogativePower.RegisterRightClickBinding();
 
         // Current content still references minted CardKeyword values while models materialize,
@@ -49,6 +57,10 @@ public class MainFile
         SavedPropertyCacheBootstrap.ScheduleVerification(assembly);
         ModTypeDiscoveryHub.RegisterModAssembly(ModId, assembly);
         var contentRegistry = RitsuLibFramework.GetContentRegistry(ModId);
+        contentRegistry.RegisterCardHandOutline<AstralPartyCardModel>(
+            ModCardHandOutlineRules<AstralPartyCardModel>.Dynamic(
+                static card => card.Keywords.Contains(AstralKeywords.AstralTemporary),
+                static _ => ResolveTemporaryCardOutlineColor()));
         contentRegistry.RegisterCardLibraryCompendiumSharedPoolFilter<PersonSkillCardPool>(
             "person_skill_pool",
             "res://ReAstralPartyMod/images/ui/person_skill_pool.png");
@@ -69,6 +81,12 @@ public class MainFile
         _initialized = true;
         Logger.Info($"{ModId} initialized | build={buildMarker}");
         LogLoadedArtifacts(buildMarker);
+    }
+
+    private static Color ResolveTemporaryCardOutlineColor()
+    {
+        var progress = (Mathf.Sin(GodotTime.GetTicksMsec() * MathF.Tau / 2000f) + 1f) * 0.5f;
+        return TemporaryCardOutlineLow.Lerp(TemporaryCardOutlineHigh, progress);
     }
 
     private static void LogLoadedArtifacts(string buildMarker)

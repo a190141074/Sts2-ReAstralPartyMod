@@ -523,26 +523,6 @@ internal static class GameplayDynamicPatchCatalog
     private static void RegisterUiPatches(DynamicPatchBuilder builder)
     {
         builder.AddMethod(
-            typeof(NHandCardHolder),
-            nameof(NHandCardHolder.UpdateCard),
-            Type.EmptyTypes,
-            postfix: DynamicPatchBuilder.FromMethod(
-                typeof(TemporaryCardHighlightPatch),
-                nameof(TemporaryCardHighlightPatch.UpdateCardPostfix)),
-            isCritical: false,
-            description: "UI patch: highlight temporary cards when hand cards refresh",
-            patchId: "temporary_card_highlight_update");
-        builder.AddMethod(
-            typeof(NHandCardHolder),
-            nameof(NHandCardHolder.Flash),
-            Type.EmptyTypes,
-            postfix: DynamicPatchBuilder.FromMethod(
-                typeof(TemporaryCardHighlightPatch),
-                nameof(TemporaryCardHighlightPatch.FlashPostfix)),
-            isCritical: false,
-            description: "UI patch: re-apply temporary card highlight after flash",
-            patchId: "temporary_card_highlight_flash");
-        builder.AddMethod(
             typeof(NMapScreen),
             "RecalculateTravelability",
             Type.EmptyTypes,
