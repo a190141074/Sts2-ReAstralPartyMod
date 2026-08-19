@@ -56,7 +56,7 @@ public sealed class VariantPersonNinja : CooldownPersonRelicBase,
         await base.AfterObtained();
         AstralParty_VariantPersonNinjaSkillsPlayedThisTurn = 0;
         AstralParty_VariantPersonNinjaGlobalSkillSequence =
-            Math.Clamp(AstralParty_VariantPersonNinjaGlobalSkillSequence, 0, int.MaxValue);
+            Math.Max(0, AstralParty_VariantPersonNinjaGlobalSkillSequence);
         _lastCopyableSkillCard = null;
 
         await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeNinjaRealGarrote>(Owner);
@@ -96,14 +96,16 @@ public sealed class VariantPersonNinja : CooldownPersonRelicBase,
             ? _lastCopyableSkillCard
             : cardPlay.Card;
 
-        var globalSequence = AdvanceGlobalSkillSequence();
+        AdvanceGlobalSkillSequence();
         NotifyDisplayChanged();
 
         var derivative = Owner.GetRelic<PersonalityDerivativeNinjaRealGarrote>();
-        if (globalSequence == 0)
+        var isGlobalThirdSkill = IsGlobalThirdSkill();
+        if (isGlobalThirdSkill)
             derivative?.HandleThirdGlobalSkill();
+        derivative?.NotifySkillSequenceChanged();
 
-        if (globalSequence != 0 || _lastCopyableSkillCard == null)
+        if (!isGlobalThirdSkill || _lastCopyableSkillCard == null)
             return;
 
         Flash();
@@ -121,7 +123,8 @@ public sealed class VariantPersonNinja : CooldownPersonRelicBase,
 
     internal int GetGlobalSkillSequenceStage()
     {
-        return AstralParty_VariantPersonNinjaGlobalSkillSequence % 3 + 1;
+        var globalSkillCount = AstralParty_VariantPersonNinjaGlobalSkillSequence;
+        return globalSkillCount <= 0 ? 0 : (globalSkillCount - 1) % 3 + 1;
     }
 
     internal bool ShouldBlockSkillPlay(CardModel card)
@@ -149,14 +152,14 @@ public sealed class VariantPersonNinja : CooldownPersonRelicBase,
 
     internal bool IsGlobalThirdSkill()
     {
-        return AstralParty_VariantPersonNinjaGlobalSkillSequence % 3 == 0;
+        return AstralParty_VariantPersonNinjaGlobalSkillSequence > 0
+               && AstralParty_VariantPersonNinjaGlobalSkillSequence % 3 == 0;
     }
 
-    private int AdvanceGlobalSkillSequence()
+    private void AdvanceGlobalSkillSequence()
     {
-        AstralParty_VariantPersonNinjaGlobalSkillSequence =
-            (AstralParty_VariantPersonNinjaGlobalSkillSequence + 1) % 3;
-        return AstralParty_VariantPersonNinjaGlobalSkillSequence;
+        if (AstralParty_VariantPersonNinjaGlobalSkillSequence < int.MaxValue)
+            AstralParty_VariantPersonNinjaGlobalSkillSequence++;
     }
 
     private void ResetTurnSkillCounter()

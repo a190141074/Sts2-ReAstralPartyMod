@@ -5,7 +5,6 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Relics;
-using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
@@ -31,11 +30,6 @@ public sealed class PersonalityDerivativeNinjaRealGarrote : AstralPartyRelicMode
     public override bool ShowCounter => true;
 
     public override int DisplayAmount => Math.Max(0, AstralParty_PersonalityDerivativeNinjaRealGarroteSkillDamage);
-
-    protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-    [
-        .. HoverTipFactory.FromRelic<VariantPersonNinja>()
-    ];
 
     public override async Task AfterObtained()
     {
@@ -71,13 +65,17 @@ public sealed class PersonalityDerivativeNinjaRealGarrote : AstralPartyRelicMode
         AstralParty_PersonalityDerivativeNinjaRealGarroteSkillDamage =
             Math.Max(0, AstralParty_PersonalityDerivativeNinjaRealGarroteSkillDamage) + 1;
         InvokeDisplayAmountChanged();
-        RelicExtraIconAmountLabelsInvalidated?.Invoke();
         Flash();
+    }
+
+    internal void NotifySkillSequenceChanged()
+    {
+        RelicExtraIconAmountLabelsInvalidated?.Invoke();
     }
 
     public IReadOnlyList<ExtraIconAmountLabelSlot> GetRelicExtraIconAmountLabelSlots()
     {
-        var stage = Owner?.GetRelic<VariantPersonNinja>()?.GetGlobalSkillSequenceStage() ?? 1;
+        var stage = Owner?.GetRelic<VariantPersonNinja>()?.GetGlobalSkillSequenceStage() ?? 0;
         return
         [
             ExtraIconAmountLabelSlot.At(ExtraIconAmountLabelCorner.TopRight, stage.ToString())
