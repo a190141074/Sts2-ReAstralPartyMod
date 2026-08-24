@@ -44,6 +44,7 @@ public class MainFile
         TokenSeriesAvailabilityHelper.Register();
         FinalArenaSeriesHelper.Register();
         IrrefusableCardHelper.Register();
+        TerraprismaHelper.Register();
         FallenHeavenlyKingDeckHelper.Register();
         HkHeavenlyKingFallIncidentHelper.Register();
         RoyalPrerogativePower.RegisterRightClickBinding();

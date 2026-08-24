@@ -339,5 +339,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ABYSSAL_EROSION_MARK_POWER.description": "[blue]3[/blue]層ごとに、魔淵触手から受けるダメージ+[blue]1[/blue]。",
   "RE_ASTRAL_PARTY_MOD_POWER_ROYAL_PREROGATIVE_POWER.title": "女王特权",
   "RE_ASTRAL_PARTY_MOD_POWER_ROYAL_PREROGATIVE_POWER.description": "このターン、[gold]一時的[/gold]カードを右クリックすると、自分の山札の一番上に置く。",
-  "RE_ASTRAL_PARTY_MOD_POWER_ROYAL_PREROGATIVE_POWER.smartDescription": "このターン、[gold]一時的[/gold]カードを右クリックすると、自分の山札の一番上に置く。"
+  "RE_ASTRAL_PARTY_MOD_POWER_ROYAL_PREROGATIVE_POWER.smartDescription": "このターン、[gold]一時的[/gold]カードを右クリックすると、自分の山札の一番上に置く。",
+  "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.title": "装填",
+  "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.description": "次の攻撃牌を装填する。",
+  "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.smartDescription": "次の攻撃牌を装填する。"
 }

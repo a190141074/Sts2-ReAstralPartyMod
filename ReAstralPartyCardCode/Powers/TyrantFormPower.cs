@@ -86,7 +86,7 @@ public class TyrantFormPower : AstralPartyPowerModel
     {
         return Owner?.Player?.PlayerCombatState?.AllCards
             .OfType<SovereignBlade>()
-            .Where(card => card.Owner == Owner.Player)
+            .Where(card => card.Owner == Owner.Player && !TerraprismaHelper.IsTerraprismaBlade(card))
             .ToList();
     }
 

@@ -174,12 +174,12 @@ internal static class AstralTelemetry
                         "settings_ui",
                         "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry.description",
                         "Allow anonymous usage statistics for personas, tokens, and skill cards.")),
-                TelemetryRequest.RunHistory(
+                TelemetryRequest.RunHistoryFiltered(
                     ModSettingsText.LocString(
                         "settings_ui",
                         "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_telemetry_run_history.description",
                         "Allow anonymized vanilla run history to be uploaded for verification and diagnostics."),
-                    captureFilter: ShouldCaptureRunHistory)
+                    context => context.SourceData is RunEndedEvent evt && ShouldCaptureRunHistory(evt))
             ]
         });
 

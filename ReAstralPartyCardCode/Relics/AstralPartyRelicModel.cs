@@ -3,6 +3,7 @@ using Godot;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using STS2RitsuLib.Scaffolding.Content;
@@ -70,12 +71,26 @@ public abstract partial class AstralPartyRelicModel : ModRelicTemplate
         return Task.CompletedTask;
     }
 
+    public virtual Task AfterAutoPostPlayPhase(
+        PlayerChoiceContext choiceContext,
+        Player player)
+    {
+        return Task.CompletedTask;
+    }
+
     public sealed override Task AfterSideTurnEnd(
         PlayerChoiceContext choiceContext,
         CombatSide side,
         IEnumerable<Creature> participants)
     {
         return AfterTurnEnd(choiceContext, side);
+    }
+
+    public sealed override Task AfterAutoPostPlayPhaseEntered(
+        PlayerChoiceContext choiceContext,
+        Player player)
+    {
+        return AfterAutoPostPlayPhase(choiceContext, player);
     }
 
     public virtual Task AfterPowerAmountChanged(

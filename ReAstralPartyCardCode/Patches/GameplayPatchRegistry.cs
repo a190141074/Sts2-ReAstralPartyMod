@@ -11,6 +11,7 @@ using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Events;
 using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Models.Cards;
 using MegaCrit.Sts2.Core.Models.Events;
 using MegaCrit.Sts2.Core.Multiplayer;
 using MegaCrit.Sts2.Core.Multiplayer.Game;
@@ -218,6 +219,14 @@ internal static class GameplayStaticPatchCatalog
                 typeof(AbyssalTentacleDamageMultiplicativePatch),
                 false,
                 "Gameplay patch: isolate Abyssal Tentacle damage from multiplicative modifiers"),
+            new ModPatchInfo(
+                "terraprisma_direct_load_patch",
+                typeof(CardModel),
+                nameof(CardModel.OnPlayWrapper),
+                typeof(TerraprismaDirectLoadPatch),
+                false,
+                "Gameplay patch: load the first manual attack directly instead of executing it",
+                [typeof(PlayerChoiceContext), typeof(Creature), typeof(bool), typeof(ResourceInfo), typeof(bool)]),
             new ModPatchInfo(
                 "attack_potion_warforge_compat_patch",
                 typeof(MegaCrit.Sts2.Core.Models.Potions.AttackPotion),
