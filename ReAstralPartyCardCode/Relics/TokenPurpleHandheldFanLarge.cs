@@ -14,9 +14,9 @@ using MegaCrit.Sts2.Core.Models.RelicPools;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(SharedRelicPool))]
-public class TokenGoldHandheldFanLarge : AstralPartyRelicModel
+public class TokenPurpleHandheldFanLarge : AstralPartyRelicModel
 {
-    public override RelicRarity Rarity => RelicRarity.Rare;
+    public override RelicRarity Rarity => RelicRarity.Uncommon;
 
     public override bool ShouldReceiveCombatHooks => true;
 

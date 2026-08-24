@@ -205,7 +205,7 @@
 | 【探天微星】 | Token Gold Exploration Satellite | `TokenGoldExplorationSatellite` |
 | 【额外电池】 | Token Gold Extra Battery | `TokenGoldExtraBattery` |
 | 【手电筒·爆闪】 | Token Gold Flashlight Flashburst | `TokenGoldFlashlightFlashburst` |
-| 【手持风扇·大】 | Token Gold Handheld Fan Large | `TokenGoldHandheldFanLarge` |
+| 【手持风扇·大】 | Token Purple Handheld Fan Large | `TokenPurpleHandheldFanLarge` |
 | 【初始点】 | Token Gold Initial Point | `TokenGoldInitialPoint` |
 | 【魔法箭袋】 | Token Gold Magic Quiver | `TokenGoldMagicQuiver` |
 | 【医疗箱·完备治疗】 | Token Gold Medical Kit Complete Treatment | `TokenGoldMedicalKitCompleteTreatment` |

@@ -1217,9 +1217,9 @@
       "desc": "Every [blue]3[/blue] Attack cards you play that cost at least [blue]1[/blue], gain [blue]1[/blue] [gold]StarLight[/gold].\nFor every [blue]10[/blue] stacks of [gold]Eternal Starlight[/gold], your Attack cards deal [blue]1[/blue] extra damage.\nThis relic also grants the [gold]Flashlight Set[/gold] effect."
     },
     {
-      "class": "TokenGoldHandheldFanLarge",
+      "class": "TokenPurpleHandheldFanLarge",
       "title": "Handheld Fan: Large",
-      "rarity": "Rare",
+      "rarity": "Uncommon",
       "desc": "After you play a Persona Skill card, draw [blue]1[/blue] card and apply [blue]1[/blue] stack of [gold]Mark[/gold] to a random enemy."
     },
     {

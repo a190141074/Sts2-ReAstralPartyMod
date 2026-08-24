@@ -506,8 +506,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_flashlight_flashburst.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_flashlight_flashburst.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_flying_star.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\token_gold_handheld_fan_large.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\token_gold_handheld_fan_large.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_purple_handheld_fan_large.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_purple_handheld_fan_large.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_magic_quiver.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_magic_quiver.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_medical_kit_complete_treatment.png"/>
