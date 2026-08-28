@@ -70,6 +70,10 @@ public static class GeneratedCardObserver
                     var variantRelic = player.GetRelic<VariantPersonShadowScion>();
                     if (variantRelic != null)
                         await variantRelic.HandleObservedCardGain(recipient, source);
+
+                    var lakeMarshKing = player.GetRelic<PersonalityDerivativeLakeMarshKing>();
+                    if (lakeMarshKing != null)
+                        await lakeMarshKing.HandleObservedCardGain(recipient, source);
                 }
             }
             finally

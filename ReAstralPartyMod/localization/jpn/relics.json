@@ -707,5 +707,11 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_FALLEN_HEAVENLY_KING.flavor": "天王落。",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_TERRAPRISMA.title": "【異格：テラプリズマ】",
   "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_TERRAPRISMA.description": "· 各ターンに最初に使う攻撃カードを[gold]テラプリズマ[/gold]として装填する。\n· 自分の攻撃カードは半分のダメージしか与えない。\n· ターン終了時、すべての[gold]テラプリズマ[/gold]を自動で使い、常にプレイヤーに最も近い敵を攻撃する。\n· [gold]テラプリズマ[/gold]は装填したカードの基本表示ダメージだけを与える。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_TERRAPRISMA.flavor": ""
+  "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_TERRAPRISMA.flavor": "",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_XIAO_LEI_DOPPELGANGER.title": "【人格：シャオ・レイβ】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_XIAO_LEI_DOPPELGANGER.description": "[blue]3[/blue]ターンごとに、【連鎖反応】を[blue]1[/blue]枚手札に加える。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_XIAO_LEI_DOPPELGANGER.flavor": "もう一人のシャオ・レイ。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LAKE_MARSH_KING.title": "【人格派生：湖沼の王】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LAKE_MARSH_KING.description": "他のプレイヤーにカードを得させるたび、【覚醒】を[blue]1[/blue]層得る。\n【覚醒】が[blue]8[/blue]層に達すると真のドラゴンの姿になり、手札と今後得る【噛みつき】を【ドラゴンの咆哮】に変える。\n真のドラゴンの姿で【連鎖反応】が解決した時、手札が[blue]4[/blue]枚未満のプレイヤー1人ごとに、ランダムな敵に[blue]6[/blue]ダメージを与える。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LAKE_MARSH_KING.flavor": "沼の底で、真竜が目覚める。"
 }

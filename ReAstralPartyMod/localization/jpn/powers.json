@@ -342,5 +342,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ROYAL_PREROGATIVE_POWER.smartDescription": "このターン、[gold]一時的[/gold]カードを右クリックすると、自分の山札の一番上に置く。",
   "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.title": "装填",
   "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.description": "次の攻撃牌を装填する。",
-  "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.smartDescription": "次の攻撃牌を装填する。"
+  "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.smartDescription": "次の攻撃牌を装填する。",
+  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.title": "真のドラゴンの姿",
+  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.description": "筋力+[blue]4[/blue]。ダメージを受けるたび、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。次のターン開始時、この能力がこのターンに与えた【幻影・逆鱗】を取り除く。",
+  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.smartDescription": "筋力+[blue]4[/blue]。ダメージを受けると、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。"
 }

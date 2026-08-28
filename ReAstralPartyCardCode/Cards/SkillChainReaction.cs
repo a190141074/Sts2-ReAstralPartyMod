@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -51,10 +52,18 @@ public class SkillChainReaction : AstralPartyCardModel
             var drawnCards =
                 await PersonMultiplayerEffectHelper.DrawCardsForPlayer(choiceContext, cardsToDraw, player, this);
             await XiaoLeiAwakeningHelper.TryGrantAwakeningForGrantedCard(Owner, player, drawnCards.Count());
+
+            var lakeMarshKing = Owner.GetRelic<PersonalityDerivativeLakeMarshKing>();
+            if (lakeMarshKing != null)
+                await lakeMarshKing.HandleObservedCardGain(player, this, drawnCards.Count());
         }
 
-        var bite = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillBite>(), Owner);
+        var lake = Owner.GetRelic<PersonalityDerivativeLakeMarshKing>();
+        var bite = lake?.CreateBiteOrRoar()
+                   ?? Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillBite>(), Owner);
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(bite, true, CardPilePosition.Top, this);
+        if (lake != null)
+            await lake.ResolveChainReactionDragonDamage(choiceContext);
     }
 }
 

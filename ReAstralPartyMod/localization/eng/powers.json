@@ -363,5 +363,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_ROYAL_PREROGATIVE_POWER.smartDescription": "This turn, right-click a [gold]Temporary[/gold] card to place it on top of your draw pile.",
   "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.title": "Load",
   "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.description": "Your next Attack card is loaded.",
-  "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.smartDescription": "Your next Attack card is loaded."
+  "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.smartDescription": "Your next Attack card is loaded.",
+  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.title": "True Dragon Form",
+  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.description": "Gain [blue]4[/blue] Strength. Whenever you take damage, gain [blue]1[/blue] [gold]Phantom Scales[/gold] this turn. At the start of next turn, remove the [gold]Phantom Scales[/gold] granted by this power this turn.",
+  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.smartDescription": "Gain [blue]4[/blue] Strength. Taking damage grants [blue]1[/blue] [gold]Phantom Scales[/gold] this turn."
 }

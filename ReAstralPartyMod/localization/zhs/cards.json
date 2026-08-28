@@ -97,7 +97,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_ORBITAL_RAILGUN.title": "轨道炮",
   "RE_ASTRAL_PARTY_MOD_CARD_BASE_ABILITY_ORBITAL_RAILGUN.description": "造成{Damage:diff()}点[gold]无视格挡[/gold]伤害。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CHAIN_REACTION.title": "连锁反应",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CHAIN_REACTION.description": "除你外的所有玩家抽[blue]1[/blue]张牌；若其手牌少于[blue]4[/blue]张，改为抽[blue]2[/blue]张。\n将[blue]1[/blue]张[gold]撕咬[/gold]加入手牌。",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CHAIN_REACTION.description": "其他玩家各抽[blue]1[/blue]张牌；\n将[blue]1[/blue]张[gold]撕咬[/gold]加入手牌。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_BITE.title": "撕咬",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_BITE.description": "获得[blue]1[/blue]层[gold]觉醒[/gold]。根据当前[gold]觉醒[/gold]层数，获得至多[blue]4[/blue]点临时[red]力量[/red]。",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_DRAGONS_ROAR.title": "龙之咆哮",
