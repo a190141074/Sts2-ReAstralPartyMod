@@ -223,7 +223,7 @@
       "type": "Attack",
       "rarity": "Rare",
       "target": "AnyEnemy",
-      "desc": "Apply 1 [vulnerable]Vulnerable[/vulnerable] and 1 [weak]Weak[/weak]. Gain 3 temporary [red]Strength[/red], and until the enemy turn starts, ignore damage from enemy sources."
+      "desc": "Apply 1 [vulnerable]Vulnerable[/vulnerable] and 1 [weak]Weak[/weak]. Gain 3 temporary [red]Strength[/red]."
     },
     {
       "class": "SkillFamousBlade",

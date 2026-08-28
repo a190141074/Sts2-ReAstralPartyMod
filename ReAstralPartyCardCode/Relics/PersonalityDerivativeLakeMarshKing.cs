@@ -78,7 +78,7 @@ public sealed class PersonalityDerivativeLakeMarshKing : AstralPartyRelicModel
             var target = Owner.RunState.Rng.CombatTargets.NextItem(enemies);
             if (target == null)
                 continue;
-            await DamageCmd.Attack(6m).Unpowered().Targeting(target).Execute(choiceContext);
+            await DamageCmd.Attack(3m).Unpowered().Targeting(target).Execute(choiceContext);
         }
     }
 
