@@ -395,7 +395,6 @@
 | 闪避 | Dodge Stance Power | `DodgeStancePower` |
 | 节点 | Dorothy Node Power | `DorothyNodePower` |
 | 觉醒 | Dragon Awakening Power | `DragonAwakeningPower` |
-| 龙吼护体 | Dragon Roar Ward Power | `DragonRoarWardPower` |
 | 优雅之羽 | Elegant Feather Power | `ElegantFeatherPower` |
 | 密宗强化 | Esoteric Empower Power | `EsotericEmpowerPower` |
 | 破绽 | Exposed Flaw Power | `ExposedFlawPower` |

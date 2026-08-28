@@ -26,7 +26,11 @@ public sealed class PersonXiaoLeiDoppelganger : CooldownPersonRelicBase
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-    [ HoverTipFactory.FromCard<SkillChainReaction>(), HoverTipFactory.FromPower<DragonAwakeningPower>(), HoverTipFactory.FromPower<TrueDragonFormRealPower>() ];
+    [
+        HoverTipFactory.FromCard<SkillChainReaction>(),
+        .. HoverTipFactory.FromRelic<PersonalityDerivativeLakeMarshKing>(),
+        HoverTipFactory.FromPower<TrueDragonFormRealPower>()
+    ];
 
     public override async Task AfterObtained()
     {

@@ -511,13 +511,6 @@
       "desc": "At the end of combat, [relic]Dragon Gate[/relic] reduces its Thunder counter by this amount."
     },
     {
-      "class": "DragonRoarWardPower",
-      "title": "Dragon Roar Ward",
-      "type": "Buff",
-      "stack": "None",
-      "desc": "Until the enemy turn starts, ignore damage from enemy sources."
-    },
-    {
       "class": "ElegantFeatherPower",
       "title": "Elegant Feather",
       "type": "Buff",

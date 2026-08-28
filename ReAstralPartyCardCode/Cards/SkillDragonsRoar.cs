@@ -37,11 +37,6 @@ public class SkillDragonsRoar : AstralPartyCardModel
             HoverTipFactory.FromPower<StrengthPower>()
         ];
 
-        protected override string ResolveIconPath()
-        {
-            return GenerateIconPath<DragonRoarWardPower>();
-        }
-
         public override async Task AfterApplied(MegaCrit.Sts2.Core.Entities.Creatures.Creature? applier,
             CardModel? cardSource)
         {
@@ -76,8 +71,7 @@ public class SkillDragonsRoar : AstralPartyCardModel
     [
         HoverTipFactory.FromPower<VulnerablePower>(),
         HoverTipFactory.FromPower<WeakPower>(),
-        HoverTipFactory.FromPower<StrengthPower>(),
-        HoverTipFactory.FromPower<DragonRoarWardPower>()
+        HoverTipFactory.FromPower<StrengthPower>()
     ];
 
     public SkillDragonsRoar() : base(0, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy)
@@ -103,7 +97,6 @@ public class SkillDragonsRoar : AstralPartyCardModel
             Owner.Creature,
             this,
             false);
-        await PowerCmd.Apply<DragonRoarWardPower>(Owner.Creature, 1m, Owner.Creature, this, false);
     }
 }
 

@@ -71,9 +71,6 @@
   "RE_ASTRAL_PARTY_MOD_POWER_REALM_OF_DEATH_POWER.title": "輪回絶境",
   "RE_ASTRAL_PARTY_MOD_POWER_REALM_OF_DEATH_POWER.description": "同じく【輪回絶境】を持つ対象としか互いにダメージを与え合えない。持続2ターン。",
   "RE_ASTRAL_PARTY_MOD_POWER_REALM_OF_DEATH_POWER.smartDescription": "同じく【輪回絶境】を持つ対象としか互いにダメージを与え合えない。持続2ターン。",
-  "RE_ASTRAL_PARTY_MOD_POWER_DRAGON_ROAR_WARD_POWER.title": "龙吼护体",
-  "RE_ASTRAL_PARTY_MOD_POWER_DRAGON_ROAR_WARD_POWER.description": "敵 回合 が開始するまで、敵ソースのダメージを無視します。",
-  "RE_ASTRAL_PARTY_MOD_POWER_DRAGON_ROAR_WARD_POWER.smartDescription": "敵 回合 が開始するまで、敵ソースのダメージを無視します。",
   "RE_ASTRAL_PARTY_MOD_POWER_CONCEALING_POWER.title": "隐匿",
   "RE_ASTRAL_PARTY_MOD_POWER_CONCEALING_POWER.description": "下回合 が始まるまで、敵によるダメージを無視してください。\n初めて敵に 获得 [power]突袭[/power] にダメージを与えたとき、その [power]标记[/power] に等しいパワーを除去します。",
   "RE_ASTRAL_PARTY_MOD_POWER_CONCEALING_POWER.smartDescription": "下回合 が始まるまで、敵からのダメージを無視してください。初めて敵にダメージを与えるとき、获得 [power]突袭[/power] がその [power]标记[/power] に等しく、このパワーを除去します。",
@@ -344,6 +341,6 @@
   "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.description": "次の攻撃牌を装填する。",
   "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.smartDescription": "次の攻撃牌を装填する。",
   "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.title": "真のドラゴンの姿",
-  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.description": "筋力+[blue]4[/blue]。ダメージを受けるたび、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。次のターン開始時、この能力がこのターンに与えた【幻影・逆鱗】を取り除く。",
-  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.smartDescription": "筋力+[blue]4[/blue]。ダメージを受けると、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。"
+  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.description": "筋力+[blue]4[/blue]。\nダメージを受けるたび、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。",
+  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.smartDescription": "筋力+[blue]4[/blue]。\nダメージを受けるたび、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。"
 }

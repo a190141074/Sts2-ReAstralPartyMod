@@ -26,7 +26,12 @@ public sealed class PersonalityDerivativeLakeMarshKing : AstralPartyRelicModel
     public override int DisplayAmount => AstralParty_PersonalityDerivativeLakeMarshKingAwakening;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-    [ HoverTipFactory.FromCard<SkillChainReaction>(), HoverTipFactory.FromCard<SkillBite>(), HoverTipFactory.FromCard<SkillDragonsRoar>(), HoverTipFactory.FromPower<DragonAwakeningPower>(), HoverTipFactory.FromPower<TrueDragonFormRealPower>() ];
+    [
+        HoverTipFactory.FromCard<SkillChainReaction>(),
+        HoverTipFactory.FromCard<SkillBite>(),
+        HoverTipFactory.FromCard<SkillDragonsRoar>(),
+        HoverTipFactory.FromPower<TrueDragonFormRealPower>()
+    ];
 
     public override Task BeforeCombatStart()
     {
