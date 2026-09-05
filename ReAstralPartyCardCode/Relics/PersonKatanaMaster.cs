@@ -26,6 +26,7 @@ public sealed class PersonKatanaMaster : CooldownPersonRelicBase
     [SavedProperty] public bool AstralParty_PersonKatanaMasterPendingCombatStartCard { get; set; }
     [SavedProperty] public bool AstralParty_PersonKatanaMasterFirstAttackTriggered { get; set; }
     [SavedProperty] public bool AstralParty_PersonKatanaMasterTookDamageThisTurn { get; set; }
+    [SavedProperty] public bool AstralParty_PersonKatanaMasterTurnStarted { get; set; }
 
     protected override int CounterValue
     {
@@ -60,6 +61,7 @@ public sealed class PersonKatanaMaster : CooldownPersonRelicBase
     {
         AstralParty_PersonKatanaMasterFirstAttackTriggered = false;
         AstralParty_PersonKatanaMasterTookDamageThisTurn = false;
+        AstralParty_PersonKatanaMasterTurnStarted = false;
         await EnsureHandCostPower();
     }
 
@@ -68,9 +70,12 @@ public sealed class PersonKatanaMaster : CooldownPersonRelicBase
         if (Owner?.Creature == null || player != Owner)
             return;
 
-        if (!AstralParty_PersonKatanaMasterTookDamageThisTurn)
+        // The first own turn has no preceding in-combat interval to evaluate;
+        // the no-damage Sword Gust reward starts from the next own turn.
+        if (AstralParty_PersonKatanaMasterTurnStarted && !AstralParty_PersonKatanaMasterTookDamageThisTurn)
             await GainSwordGust(1m);
 
+        AstralParty_PersonKatanaMasterTurnStarted = true;
         AstralParty_PersonKatanaMasterFirstAttackTriggered = false;
         AstralParty_PersonKatanaMasterTookDamageThisTurn = false;
     }

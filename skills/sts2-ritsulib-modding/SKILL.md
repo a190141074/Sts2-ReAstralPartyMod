@@ -1,266 +1,55 @@
 ---
 name: sts2-ritsulib-modding
-description: Build or modify Slay the Spire 2 mods that use RitsuLib as a required dependency. Use when Codex needs a Chinese-first workflow for RitsuLib project setup, `ModInitializer` entrypoints, `RegisterCard` or `RegisterRelic` auto-registration, `ModCardTemplate` or `ModRelicTemplate` content authoring, BaseLib-to-RitsuLib migration, or debugging why a RitsuLib-based mod is not loading or registering content.
+description: 用于开发或排错依赖 RitsuLib 的《杀戮尖塔2》模组，覆盖 RitsuLib 注册、模板、生命周期 Hook、联机状态、BaseLib 迁移和运行时加载问题；不用于无关的 STS2 或通用 C# 任务。
 ---
 
-# STS2 RitsuLib Modding
+# STS2 RitsuLib 模组开发
 
-## Overview
+这是 RitsuLib 通用层。若仓库有 overlay（例如 `sts2-reastralparty-modding`），先加载本文件，
+再加载仓库层。overlay 负责仓库专属路径和行为；本 skill 负责 RitsuLib 约定和证据要求。
 
-把这个 skill 当成“RitsuLib 前置 STS2 Mod 开发工作流”。它不替代 BaseLib skill；当仓库已经依赖 `STS2-RitsuLib`，或任务明确要求 `RegisterCard`、`ModTypeDiscoveryHub.RegisterModAssembly`、`ModCardTemplate`、`ModRelicTemplate`、`RitsuLibFramework` 时，优先使用这个 skill。
+## 工作循环
 
-这个 skill 只负责 RitsuLib 共性工作流，不承载单一仓库的日志路径、命名链约束或 feature-family 经验。若当前仓库还有自己的 agent 文档或 repo overlay skill，先读这个通用层，再继续读仓库层。
+1. 先分类：初始化/加载、内容制作、Hook/时机、迁移、联机、兼容性或运行时排错。
+2. 每次代码、排错、迁移、联机、本地化或导出任务都先读 [references/experience-ledger.md](references/experience-ledger.md)。
+   然后只读当前问题需要的一份专题参考，不要默认加载全部参考。
+3. 先在当前仓库找能正常工作的同类实现，对照它的注册链、基类、Hook、本地化和输出路径，再写新代码。
+4. 符号、重载、生命周期目标、参数名或版本有任何不确定时，检查当前运行时的
+   `STS2-RitsuLib.xml` 和 `sts2.xml`，必要时再用反射或反编译。禁止凭记忆或旧分支解决 API 不确定性。
+5. 使用现有 RitsuLib、模板和 helper 能表达需求时，采用最小改动。只有公开/窄入口无法表达需求时，才使用 Harmony 或宽范围 patch。
+6. 分层验证：源代码/静态检查、构建/导出、运行时日志、玩家可见行为。分别报告实际通过的层级；编译成功不等于运行时正确。
 
-## Updated Reference Roots
+## 不变量
 
-- `D:\MOD\杀戮尖塔2mod制作\RitsuLib-doc\RitsuLib`
-  - 新版教程主入口，优先看这里的 `01 - 添加基础内容`、`02 - 玩法基底`、`03 - 模组工具`。
-- `D:\MOD\杀戮尖塔2mod制作\RitsuLib-code`
-  - 当前 RitsuLib 代码与 lifecycle patch 权威。
-- `D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1`
-  - 当前本机运行时 RitsuLib 实际程序集目录。
-  - Workshop 根目录的 `STS2-RitsuLib.dll` 是 loader；日常编译、API 查询和签名核对优先用这里的 `STS2-RitsuLib.dll` / `STS2-RitsuLib.xml`。
-- `D:\Steam\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64`
-  - 当前本机运行时游戏程序集目录。
-  - 其中 `sts2.xml` 是游戏本体程序集 XML 文档索引；新版已为不少原生类型和方法补了注释，排查原生 Hook、参数名和 public API 时优先一起看。
-- `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode`
-  - 游戏内测试、作弊、脚本执行与 mod 调试工具箱。
-- `D:\MOD\杀戮尖塔2mod制作\Slay-the-Spire-2-gdsdecomp`
-  - 当前反编译源码主入口，优先查该目录下 `src\Core` 的具体系统源码。
+- 注册链是功能的一部分：先检查 manifest、依赖版本、`ModInitializer`、`EnsureGodotScriptsRegistered`、
+  `ModTypeDiscoveryHub.RegisterModAssembly` 和必要的 Harmony 初始化，再改下游玩法。
+- 联机和局内状态只保留一份权威的持久化/同步状态。使用官方命令链和稳定排序；调用可能修改集合的命令前先快照集合。
+- 当前运行时证据优先于旧资料。若 API 漂移只影响一条功能链，将兼容逻辑限制在该功能内，不要扩成全局抽象。
+- 需要跨存档、联机或显示稳定的概率/百分比状态，优先使用稳定的整型刻度，不要默认持久化 `float` 或 `decimal`。
+- 玩家文案和实现备注分开。保留用户给出的文字、占位符、标签和模型归属；不要重复自动生成的关键词或 hover 文本。
+- 不要把一次 bug、一个例子或一个用户特例写成通用规则；例外写在对应模型或专题参考旁边。
+- 经验账本记录的是反复失败后的高价值约束，匹配任务时必须执行；若用户明确需求或当前运行时证据与账本冲突，先按用户/当前证据取证，再把冲突作为局部例外记录，不要悄悄覆盖账本。
+- 未被需求授权时，不要修改启动链、设置链或无关功能链。
 
-默认按照这条优先级取证并落地方案：
+## 专题入口
 
-1. `RitsuLib-doc`
-2. 运行时 `STS2-RitsuLib.xml`
-3. `RitsuLib-code`
-4. 当前工作仓库
-5. `STS2-DevMode`
-6. `STS2_WineFox-main`
-7. 游戏反编译代码
+- 初始化、内容类型、排错和构建顺序：[references/workflows.md](references/workflows.md)
+- Hook/生命周期选择：[references/timing-map.md](references/timing-map.md)
+- 运行时和源码权威路径：[references/source-map.md](references/source-map.md)
+- BaseLib 到 RitsuLib 迁移：[references/migration-map.md](references/migration-map.md)
+- 项目组织案例：[references/project-patterns.md](references/project-patterns.md)
+- 原版内容查询（仅用于查卡牌、遗物、怪物和事件）：[references/spire-codex.md](references/spire-codex.md)
+- 反复失败经验及验收闸门：[references/experience-ledger.md](references/experience-ledger.md)
 
-## Quick Start
+需要跨 RitsuLib 文档、源码、WineFox、反编译代码和当前仓库查符号时，使用
+`scripts/find-ritsulib-symbol.ps1`，不要每次手写一套长搜索命令。
 
-1. 先判断任务类型：项目初始化、卡牌、遗物、能力、药水、事件、角色、时间线/附魔、迁移、排错。
-2. 打开 [references/workflows.md](references/workflows.md)，选对应工作流。
-3. 如果问题是“回合开始该挂哪一种 / 哪个 hook 更窄更安全 / 是模型 override 还是 lifecycle event”，先读 [references/timing-map.md](references/timing-map.md)。
-4. 打开 [references/source-map.md](references/source-map.md)，确认本机可用的权威路径。
-5. 如果任务涉及 BaseLib 写法迁移，先看 [references/migration-map.md](references/migration-map.md)。
-6. 如果任务需要项目组织参考或目录落点，先看 [references/project-patterns.md](references/project-patterns.md)。
-7. 如果当前仓库还有自己的 agent 文档或 overlay skill，继续加载仓库层。
-8. 需要找真实符号、特性、注册器、示例时，运行 `scripts/find-ritsulib-symbol.ps1`，不要手写长搜索命令。
+仓库副本与 `C:\Users\LuoYe\.codex\skills` 安装副本必须保持一致。修改后运行
+`skills/sync-codex-skills.ps1`；提交前运行 `skills/sync-codex-skills.ps1 -Check`。
 
-## Working Rules
+除经验账本外，只读取能回答当前问题的最小专题。参考文件是索引和决策依据，不是整套 RitsuLib 手册的复制品。
 
-- 优先使用 RitsuLib 已公开的注册/模板/内容包能力，不要先上 Harmony。
-- 只有在 RitsuLib 没覆盖目标行为，或者任务显式要求改原生流程时，才看 Harmony 或反编译代码。
-- 先确认“入口是否注册正确”，再写内容代码。很多“卡牌没出现”“遗物没加载”本质上是初始化或依赖问题。
-- 先做最小可运行切片：入口、依赖、1 个内容类型、本地化、图标或场景路径，然后再扩展复杂联动。
-- 当概念已明确，但 public 接口名、override 面、参数名、返回值语义还不确定时，先查运行时 `STS2-RitsuLib.xml`，再决定是否下钻 `RitsuLib-code`。
-- 不要把“看到更高版本 compat 目录”误判成“当前游戏就在跑那个版本”：
-  - 先看最新 `release_info.json`、带时间戳日志、以及实际加载的 `STS2-RitsuLib.dll` / `lib\<game-version>\STS2-RitsuLib.dll` 路径
-  - 再决定当前 runtime 是 `0.107.1` 还是别的分支
-- 大厅 / 角色选择 / lobby snapshot 相关代码不要继续直接依赖 `StartRunLobby.LocalPlayer`：
-  - 优先用 `lobby.NetService.NetId` 作为本地 netId
-  - 用 `lobby.Players` 推导 host/player 列表
-  - 把“本地玩家 / 房主 / 客户端”判断收口到 helper，不要每个功能链各写一份旧 API
-- 如果 multiplayer 类型名或签名漂移，例如 `LobbyPlayer`、`StartRunLobbyPlayer`、`StartRunLobby.LocalPlayer` 这类面突然失效：
-  - 同时检查当前仓库代码和 `RitsuLib-code`
-  - 不要只修业务模组，遗漏底层 lobby staging / run data sync
-- 对 `SavedAttachedState`、反射枚举字段、type discovery 这类启动链：
-  - 默认容忍 `FieldType` / `PropertyType` 的类型加载失败
-  - 日志要写清具体 owner type、field/property 名和失败类型
-  - 不要让一个过时 multiplayer 类型引用把整条 discovery 链直接炸掉
-- 当前游戏 API `0.105+` 分支默认把 manifest 当成新版口径处理：`min_game_version` 必填；依赖优先写对象形态并补 `min_version`，不要继续沿用旧字符串依赖数组。
-- 对 Harmony / patcher 直连原生方法时，不要只按旧代码记忆写 patch 形参；参数名也要对照运行时 `sts2.xml` 或反编译确认，例如 `choiceContext` 不能随手写成 `context`。
-- 遇到 hook/时机选择问题，不要凭感觉选最宽的入口；先看 `timing-map.md`，再决定是模型 override、RitsuLib lifecycle event，还是更窄的仓库 base/helper。
-- `STS2_WineFox-main` 是高价值 RitsuLib 实战案例，但不要无脑照抄。先抽取结构模式，再贴合当前仓库实现。
-- 如果仓库已经有自己的 working example、agent 文档、技能 overlay 或命名/资源约定，优先在仓库内找同类参照，不要强推通用模板。
-- 如果可以，尽量不要使用 `ModifierModel`：
-  - 不要把 run-scoped 全局效果默认做成开局就进入 `RunState.Modifiers` 的 hidden/global modifier
-  - 优先考虑 `RunSavedData`、run snapshot、窄 lifecycle hook，或直接 patch 真实生成入口
-  - 遇到 Neow、角色选择、ready page、Ancient 重建这类 startup window 时，优先保护真实生成入口，不要继续赌 lifecycle 安装时序
-- 需要跨存档、联机或显示稳定性的概率/倍率/百分比状态，优先存成稳定整型刻度（如 basis points），不要默认直接持久化 `float` / `decimal`。
-- 游戏 API 漂移若只影响单条功能链，优先做 feature-local compat helper；不要一上来把兼容逻辑扩成全局 patch 或全仓抽象。
-- 对依赖本地化、UI 节点树或延后初始化对象的 patch，优先考虑 required patcher + deferred patcher 分层；延迟 patch 要和明确初始化条件绑定。
-- 多阶段复杂玩法链若有来源、目标、交付方式、bonus/fallback 等多维状态，优先增加一个窄 `...ExecutionContext` / `...ResolveContext` 收口，而不是直接扩成大框架。
-- 构建 warning 不是纯样式噪音；若它暴露空引用、不安全重载、可空边界失真，默认按潜在 runtime 薄弱点处理。
-- 区分“代码没编过”和“编过了，但 manifest/后处理步骤炸了”：
-  - 如果主 DLL 已成功产出，只是 manifest generation 或导出后处理失败，不要先误判成 API 改动没对上
-  - 需要验证 compat DLL 时，可以临时跳过 manifest generation，再单独核对实际运行时加载路径里的 DLL 是否已经更新
-- 对选择、生成、抽取类 API，默认接受“空结果/数量不符即安全返回”的保守语义，不要强行继续结算。
+## 完成标准
 
-## 官方 `zhs` 本地化风格参考
-
-- 这个参考来自 `D:\MOD\杀戮尖塔2mod制作\Slay-the-Spire-2-gdsdecomp\localization\zhs` 的官方中文样本，只用于后续新写或重写文案时取风格，不代表必须逐字模仿。
-- 如果用户明确说“先不使用”“只总结”“不要回刷现有文本”，则只更新规则，不修改任何现有本地化内容文件。
-- 效果文案优先短句直述，先说玩家结果，少解释内部实现过程。
-- 多效果默认按阅读和结算顺序分句；常见写法是每条效果独立成句，必要时用 `。\n` 分行，而不是堆成一整段长句。
-- 数值、牌堆、区域与高频动作优先复用官方常见表达，例如：
-  - `获得X点格挡`
-  - `造成X点伤害`
-  - `抽牌堆 / 弃牌堆 / 消耗牌堆 / 手牌 / 牌组`
-  - `给予X层...`
-- 标签只做语义高亮，不滥加装饰；优先沿用官方高频结构如 `[gold]`、`[blue]`、`[green]`、`[red]`，不要为了“更炫”随意改标签种类。
-- 变量、动态图标、条件模板必须保持原结构稳定，不要为了润色破坏 `{}` 占位符、条件分支块或图标 helper。
-- 标题默认简短、纯中文、可直接给玩家识别；除非系统设定本身要求，否则不混入英文、内部 id、实现前缀或解释性后缀。
-- 设置项、悬浮提示、图鉴说明优先用中性说明口吻：短、直接、面向玩家结果，不写开发实现口吻。
-- 术语优先复用官方中文口径；同一概念不要并存多个近义翻法。
-- 事件叙事和选项说明也应遵守“玩家先读懂结果”的原则：
-  - 选项描述优先先写代价和收益
-  - 叙事段落可以有风格，但不要影响效果辨识
-- 只有当更短写法会改变规则理解时，才补最小必要限定；默认不把简单效果扩写成教学文案。
-
-## Task Routing
-
-### 项目初始化与依赖
-
-处理这些请求时优先看：
-
-- `RitsuLib-doc\README.md`
-- `RitsuLib-code\Docs\zh\GettingStarted.md`
-- 当前项目的 `*.csproj`
-- 当前项目的 manifest / mod json
-- 当前项目的入口文件
-
-重点检查：
-
-- `STS2-RitsuLib` DLL 或 NuGet 引用是否存在
-- 运行时 `STS2-RitsuLib.dll` 与 `STS2-RitsuLib.xml` 是否存在且版本匹配
-- 运行时 `sts2.dll` 与 `sts2.xml` 是否存在，且和当前参考的 API 分支一致
-- mod manifest 是否声明 `min_game_version`
-- mod manifest `dependencies` 是否包含 `STS2-RitsuLib`，以及当前分支是否应改为对象写法并补 `min_version`
-- 入口是否包含 `RitsuLibFramework.EnsureGodotScriptsRegistered(...)`
-- 入口是否包含 `ModTypeDiscoveryHub.RegisterModAssembly(modId, assembly)`
-
-### 添加卡牌
-
-优先看：
-
-- `RitsuLib-doc\01 - 添加卡牌\README.md`
-- `RitsuLib-code\Interop\AutoRegistration\RegistrationAttributes.cs`
-- `RitsuLib-code\Scaffolding\Content\ModCardTemplate.cs`
-- `STS2_WineFox-main\Cards\`
-
-默认流程：
-
-1. 先确认卡池类型和基类。
-2. 用 `[RegisterCard(typeof(...Pool))]` 而不是 BaseLib 的 `[Pool(...)]`。
-3. 如果接口名、virtual 面、构造参数或 helper 返回值不清楚，先查 `STS2-RitsuLib.xml`。
-4. 用 `ModCardTemplate` 或项目自定义卡牌基类，而不是 `CustomCardModel`。
-5. 补齐图片、本地化、必要的 starter 或 token 约定。
-
-### 添加遗物
-
-优先看：
-
-- `RitsuLib-doc\03 - 添加新遗物\README.md`
-- `RitsuLib-code` 中 `RegisterRelic` 和 `ModRelicTemplate`
-- 当前仓库遗物目录
-- WineFox 的遗物目录与基类模式
-
-默认检查点：
-
-- 是否使用 `[RegisterRelic(typeof(...Pool))]`
-- 是否继承 `ModRelicTemplate` 或项目自定义遗物模板
-- 如果 override 面或 helper 入口不清楚，先查 `STS2-RitsuLib.xml`
-- 是否补齐 `relics.json` 和图标路径
-- 是否需要 starter relic 或角色绑定
-
-### 添加能力、药水、事件、角色、时间线、附魔
-
-直接按章节走：
-
-- 能力: `05 - 添加新能力`
-- 药水: `06 - 添加新药水`
-- 时间线: `09 - 添加时间线`
-- 事件: `12 - 添加新事件`
-- 附魔: `13 - 添加新附魔`
-- 角色: `14 - 添加新人物`
-
-先看 RitsuLib 文档章节；如果 public 接口面不清楚，先补查 `STS2-RitsuLib.xml`；再看 RitsuLib code 里的对应模板或注册属性，最后对照 WineFox 或当前仓库已有实现。
-
-做附魔时默认额外确认一件事，不要省略：
-
-- 先明确 `CanEnchant(CardModel card)` 的目标牌型与边界。
-- 默认优先实现 `CanEnchantCardType(CardType)`，先把合法牌型在类型层收死。
-- 默认不要只写 `base.CanEnchant(card)` 就结束。
-- 推荐写法是双层判断：
-  - `CanEnchantCardType(CardType)` 负责限制 `Attack`、`Skill` 或其它明确牌型集合
-  - `CanEnchant(CardModel card)` 再补关键词、已有状态、额外限制
-- 只要场景是“从牌组里选择可附魔卡牌”，优先使用 `CardSelectCmd.FromDeckForEnchantment(...)` 这类专用入口，而不是 generic deck picker 再手写一层附魔 filter。
-- 至少要确认它是否应限制为：
-  - `CardType.Attack`
-  - `CardType.Skill`
-  - `Attack or Skill`
-  - 或其它明确牌型集合
-- 不要只靠事件、遗物、休息房等调用点的 filter 去兜底错误牌型；牌型约束应优先落在附魔模型自身。
-- 如果用户没指定，默认主动确认或从同类成品中找出稳定口径；否则很容易把本不该吃附魔的牌型也放进候选，后续再补兼容会更贵。
-
-### BaseLib -> RitsuLib 迁移
-
-遇到这些请求时，先打开 [references/migration-map.md](references/migration-map.md)：
-
-- “把这个 BaseLib 卡牌/遗物改成 RitsuLib”
-- “`[Pool]` 在 RitsuLib 里对应什么”
-- “为什么 ID 格式变了”
-- “角色池、starter card、starter relic 怎么换”
-- “事件、先古之民、升级替换在 RitsuLib 怎么写”
-
-迁移时默认先替换这几类内容：
-
-1. 注册特性
-2. 内容基类
-3. ID 约定
-4. 关键词与动态变量
-5. 角色/卡池/起始内容
-6. 事件与先古之民
-7. 升阶与替换映射
-
-### 排错与定位
-
-当用户说“没注册成功”“mod 没加载”“卡不出现”“Godot 脚本没绑定”“DLL 路径不对”时：
-
-1. 先检查入口：`[ModInitializer]`、`EnsureGodotScriptsRegistered`、`RegisterModAssembly`
-2. 再检查 manifest：`min_game_version`、`dependencies` 写法、依赖最低版本
-3. 再检查运行时 `STS2-RitsuLib.dll` / `STS2-RitsuLib.xml` 与 `sts2.dll` / `sts2.xml` 是否都在、是否和本地引用链一致
-   - 需要时再额外核对实际加载的是 Workshop loader 根目录 DLL，还是 `lib\<game-version>\STS2-RitsuLib.dll` 变体
-4. 再检查 `csproj`：RitsuLib、`sts2.dll`、`0Harmony.dll` 引用路径
-5. 再检查本地化、图片、场景路径
-6. 如果是 patch apply 失败，先对照运行时 XML / 反编译确认 target 签名与 patch 形参名，再怀疑逻辑本身
-7. 如果核心问题是“该挂哪一种时机”，回到 `timing-map.md`
-8. 最后才看更宽的 Harmony 重写或别的分支行为
-
-如果本机 `RitsuLib-code` 构建只在 manifest generation 这类后处理步骤失败，而你这轮只是要验证 compat DLL 或 runtime 签名：
-
-1. 先让主 DLL 编出来，必要时临时加 `-p:RitsuLibSkipManifestGeneration=true`
-2. 再确认输出的目标分支是不是当前 runtime 对应的 `lib\0.107.1\STS2-RitsuLib.dll` 之类实际加载路径
-3. 最后再用最新日志核对游戏是否真的加载了这份 DLL，而不是旧副本
-
-如果任务已经进入“需要高频实机复现或快速验证”的阶段，再补看：
-
-- `D:\MOD\杀戮尖塔2mod制作\STS2-DevMode`
-  - 优先查它的 README、docs、manual、scripts。
-  - 用来找游戏内直接生成卡牌/遗物、执行脚本、开调试开关、快速推进房间或战斗的做法。
-  - 这是验证与调试参考，不替代 RitsuLib 的注册/API 权威地位。
-
-如果怀疑符号或注册器名称写错，立刻运行：
-
-```powershell
-& "<skill>/scripts/find-ritsulib-symbol.ps1" -Pattern "RegisterCard"
-& "<skill>/scripts/find-ritsulib-symbol.ps1" -Pattern "ModRelicTemplate"
-& "<skill>/scripts/find-ritsulib-symbol.ps1" -Pattern "ModTypeDiscoveryHub.RegisterModAssembly"
-```
-
-## Resources
-
-### references/
-
-- [references/source-map.md](references/source-map.md): 本机所有关键路径与权威用途
-- [references/workflows.md](references/workflows.md): 各任务类型的“先看什么、再看什么”
-- [references/timing-map.md](references/timing-map.md): 游戏本体 hook 与 RitsuLib lifecycle 事件的时机选择索引
-- [references/migration-map.md](references/migration-map.md): BaseLib 到 RitsuLib 对照表
-- [references/project-patterns.md](references/project-patterns.md): WineFox 与常见 RitsuLib 项目组织模式
-
-### scripts/
-
-- `scripts/find-ritsulib-symbol.ps1`: 跨 `RitsuLib-doc`、`RitsuLib-code`、WineFox、反编译代码和当前仓库搜索符号与案例
+运行 `git diff --check` 和与改动匹配的最小验证；代码改动再运行正常项目构建。导出任务必须确认游戏目录中的 DLL/PCK 时间戳或哈希已变化。
+涉及行为的结论必须有运行时或实机证据；没有时要明确写出仍需执行的最小场景。

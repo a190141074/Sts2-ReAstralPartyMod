@@ -1,0 +1,81 @@
+# RitsuLib 经验账本（强制阅读）
+
+这些条目来自已经发生过的反复错误。它们不是泛化建议：匹配任务时必须逐条核对，
+并且不能用一次新案例覆盖旧条目。若新代码与账本冲突，先停下来取证，再更新实现或
+明确记录一个局部例外。
+
+## 启动、注册与版本
+
+- “内容不出现”先查启动和注册链，再查业务逻辑：manifest、`min_game_version`、依赖
+  对象写法与 `min_version`、`[ModInitializer]`、`EnsureGodotScriptsRegistered`、
+  `ModTypeDiscoveryHub.RegisterModAssembly`、Harmony 初始化、实际加载 DLL/PCK。
+- 看到 compat 目录名不能证明游戏正在运行该版本。用最新 `release_info.json`、带时间戳
+  日志和实际加载路径确认 runtime；不要把游戏版本目录称成 RitsuLib 版本。
+- `sts2.dll`、`sts2.xml`、`STS2-RitsuLib.dll`、`STS2-RitsuLib.xml` 必须成套核对。签名、
+  参数名、重载、继承关系不确定时停止猜测，查 XML、反射或反编译。
+- 如果主 DLL 已产出而 manifest generation/导出后处理失败，分开报告两件事；不要把后处理
+  错误误判为 API 代码未编过。Compat 构建要隔离 intermediate/output，避免递归导出。
+
+## Hook、生命周期与模型边界
+
+- 先判定目标是玩家自己的回合还是整个 side turn、单对象还是横切观察、模型 override 还是
+  lifecycle event，再选最窄入口。不要凭感觉选择最宽的 Harmony patch。
+- 对原生 patch，参数名也属于契约；例如 `choiceContext` 不能凭旧代码写成 `context`。
+- 依赖本地化、UI 节点或延迟初始化的链要区分 required patch 与 deferred patch，并绑定真实
+  初始化条件。
+- 能用现有 base/helper 就不要重写框架；复杂多阶段流程用窄的 `...ExecutionContext`/
+  `...ResolveContext` 收口，不要为了一个功能造全局大抽象。
+
+## 联机、持久化与随机
+
+- 大厅/角色选择不要继续依赖旧的 `StartRunLobby.LocalPlayer` 面；优先用
+  `lobby.NetService.NetId` 和 `lobby.Players`，把本地玩家/房主/客户端判断收口到 helper。
+- `SavedAttachedState`、反射枚举字段、type discovery 遇到过时 multiplayer 类型时要容忍
+  类型加载失败并记录 owner、成员名和失败类型，不能让一条旧引用炸掉整条 discovery 链。
+- 联机状态使用一份权威的持久化/同步状态；按玩家同步资格与最终值，不能只同步全局完成布尔值。
+  命令链要稳定排序，调用会改变集合的命令前先快照集合。
+- 语义为“每次触发重新随机”时，hash 必须包含跨触发单调推进且各端一致的事件序号；不能只
+  使用每回合重置的计数。失败尝试也要推进 sequence。
+- 跨存档、联机或显示稳定的概率/倍率/百分比优先用稳定整型刻度，不默认持久化 `float`/
+  `decimal`。
+
+## 内容、附魔与本地化
+
+- 先找仓库内完整 working example，对齐初始化链、注册链、真实 patch 目标、运行日志和资源，
+  不能只因目录或命名相似就照抄。
+- 卡牌/遗物/能力/事件要一起审计注册、canonical id、资源路径、三语 key、生成/变换路径、
+  hover 图和共享观察者；删除旧机制要全仓搜索代码、文案、文档、资源和生成描述。
+- 附魔模型自身必须用 `CanEnchantCardType` 收死牌型，再用 `CanEnchant` 补关键词和已有状态；
+  不要只在调用点 filter，也不要只写 `base.CanEnchant(card)`。
+- 玩家给出的原句是硬边界。不要擅自改数字、时机、范围、句序、标签、占位符或换行；实现
+  备注、内部 id、兼容来源不能进入玩家文案。
+- 标准关键词（如 Exhaust、Ethereal、Retain）由 UI 自动显示，除非用户明确要求，不要在描述
+  中重复。数字不要手动着色；命名效果统一沿用既有标签。
+- `smartDescription` 有变量时先确认当前 UI 是否显式注值；canonical 模型无 Owner/CombatState
+  也必须能安全生成标题、描述、hover 和注册信息。
+- 新增内容先做最小可运行切片：入口、依赖、一个内容类型、本地化和资源路径；确认注册与加载后再扩展复杂联动。
+- 新写或重写中文时以当前仓库和本地游戏资源的既有术语为准；短句直述玩家结果，保留变量、动态图标和条件模板结构，不为了润色改坏占位符。
+- 标题、设置项、悬浮提示和图鉴说明面向玩家写，短而直接；事件叙事可以有风格，但选项必须先让代价和收益可辨识。
+
+## 反复失败模式
+
+- 不要把一个人格的时序特例写成所有人格的通用规则；先看最近 working relic 和基类。
+- “编译通过”只证明语法/类型成立，不证明 hook 被安装、状态被同步、DLL/PCK 被游戏加载或
+  玩家看到了正确行为。每次结论要标明 source/static、build/export、runtime log、in-game
+  哪一层有证据。
+- 只改 initiating call site 不足以证明旧机制消失；必须搜索所有入口、观察者、资源和生成文本。
+- 可选外部模组不要在初始化时假定对方 DLL 已加载；将类型判断推迟到运行时，并优先 patch
+  我方稳定控制的原版/RitsuLib 入口。
+- 不要把修改前置发布包当作业务模组修复；前置 hash/variant 错误先归类为前置发布问题。
+- 发放遗物后不要强转 `RelicCmd.Obtain` 返回对象证明成功；从玩家实际持有实例重新读取，
+  只有后续效果和计数变化可验证时才结算“已发放”。
+- `STS2_WineFox-main` 只能作为结构案例，必须抽取模式后贴合当前仓库；不要因为目录、命名或旧版本相似就整段照抄。
+- 需要高频实机复现时，再读取 `STS2-DevMode` 的 README/docs/manual/scripts；它只用于验证和调试，不能取代运行时 XML、源码和日志证据。
+
+## Verification gate
+
+完成前必须回答：
+
+1. 这次需求命中了哪些账本条目？逐条如何核对？
+2. 哪个同类实现或当前 runtime 证据支持了选择？
+3. 哪些层级已验证，哪些仍需最小实机场景？
