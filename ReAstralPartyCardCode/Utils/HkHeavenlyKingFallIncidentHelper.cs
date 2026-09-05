@@ -22,6 +22,7 @@ internal static class HkHeavenlyKingFallIncidentHelper
     [
         new(static () => ModelDb.Relic<PersonWeirdEgg>(), static () => ModelDb.Relic<VariantPersonWeirdEgg>()),
         new(static () => ModelDb.Relic<PersonKatanaMaster>()),
+        new(static () => ModelDb.Relic<PersonSherryTachibana>()),
         new(static () => ModelDb.Relic<PersonNinja>()),
         new(static () => ModelDb.Relic<PersonSocialFearNun>()),
         new(static () => ModelDb.Relic<PersonSupermanMegas>()),

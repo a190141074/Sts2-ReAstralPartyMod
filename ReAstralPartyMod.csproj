@@ -153,6 +153,7 @@
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_sakura_setsudan.png"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_mighty_throw.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_token_legendary_sword_gawu_cut.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade_doppelganger.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade_doppelganger_beta.png"/>
@@ -224,6 +225,7 @@
 		<Content Include="ReAstralPartyMod\images\potion\vial_good_event_potion.png"/>
 		<Content Include="ReAstralPartyMod\images\potion\vial_neutral_event_potion.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\ambush_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\detective_on_the_case_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\ambush_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\bloodthirst_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\bloodthirst_power.png.import"/>
@@ -341,6 +343,7 @@
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_gust.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\person_katana_master.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\person_sherry_tachibana.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\person_katana_master_doppelganger.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_intent_doppelganger.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_xiao_lei_dragon_gate.png"/>
