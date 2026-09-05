@@ -76,7 +76,7 @@
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_MIGHTY_THROW.title": "Mighty Throw",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_MIGHTY_THROW.description": "Choose a target. Copy all base-game and Star Engine debuffs on it to the two nearest enemies, then deal {Damage:diff()} damage.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_LEGENDARY_SWORD_GAWU_CUT.title": "Legendary Sword: Gawu Cut",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_LEGENDARY_SWORD_GAWU_CUT.description": "Deal 8-33 random damage.\n[gold]Exhaust[/gold].",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TOKEN_LEGENDARY_SWORD_GAWU_CUT.description": "Deal 8-33 random damage.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.title": "Healing Slime",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.description": "Gain {HalfLifeHealPower:diff()} [gold]Half Life Heal[/gold].",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME.smartDescription": "Gain {HalfLifeHealPower:diff()} [gold]Half Life Heal[/gold].",
