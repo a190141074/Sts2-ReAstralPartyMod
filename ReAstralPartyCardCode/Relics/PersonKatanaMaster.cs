@@ -20,16 +20,28 @@ using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(EventRelicPool), StableEntryStem = "person_katana_master")]
-public sealed class PersonKatanaMaster : PersonRelicBase
+public sealed class PersonKatanaMaster : CooldownPersonRelicBase
 {
-    [SavedProperty] public int AstralParty_PersonKatanaMasterTurnCount { get; set; }
+    [SavedProperty] public int AstralParty_PersonKatanaMasterCounter { get; set; } = 1;
+    [SavedProperty] public bool AstralParty_PersonKatanaMasterPendingCombatStartCard { get; set; }
     [SavedProperty] public bool AstralParty_PersonKatanaMasterFirstAttackTriggered { get; set; }
     [SavedProperty] public bool AstralParty_PersonKatanaMasterTookDamageThisTurn { get; set; }
-    [SavedProperty] public bool AstralParty_PersonKatanaMasterTurnStarted { get; set; }
+
+    protected override int CounterValue
+    {
+        get => AstralParty_PersonKatanaMasterCounter;
+        set => AstralParty_PersonKatanaMasterCounter = value;
+    }
+
+    protected override bool PendingCombatStartCard
+    {
+        get => AstralParty_PersonKatanaMasterPendingCombatStartCard;
+        set => AstralParty_PersonKatanaMasterPendingCombatStartCard = value;
+    }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
     public override bool ShouldReceiveCombatHooks => true;
-
+    protected override int BaseMaxCounter => 3;
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillSakuraSetsudan>(),
@@ -46,10 +58,8 @@ public sealed class PersonKatanaMaster : PersonRelicBase
 
     public override async Task BeforeCombatStart()
     {
-        AstralParty_PersonKatanaMasterTurnCount = 0;
         AstralParty_PersonKatanaMasterFirstAttackTriggered = false;
         AstralParty_PersonKatanaMasterTookDamageThisTurn = false;
-        AstralParty_PersonKatanaMasterTurnStarted = false;
         await EnsureHandCostPower();
     }
 
@@ -58,16 +68,11 @@ public sealed class PersonKatanaMaster : PersonRelicBase
         if (Owner?.Creature == null || player != Owner)
             return;
 
-        if (AstralParty_PersonKatanaMasterTurnStarted && !AstralParty_PersonKatanaMasterTookDamageThisTurn)
+        if (!AstralParty_PersonKatanaMasterTookDamageThisTurn)
             await GainSwordGust(1m);
 
-        AstralParty_PersonKatanaMasterTurnStarted = true;
-        AstralParty_PersonKatanaMasterTurnCount++;
         AstralParty_PersonKatanaMasterFirstAttackTriggered = false;
         AstralParty_PersonKatanaMasterTookDamageThisTurn = false;
-
-        if ((AstralParty_PersonKatanaMasterTurnCount - 1) % 3 == 0)
-            await AddSakuraToHand();
     }
 
     public override async Task BeforeAttack(AttackCommand command)
@@ -112,4 +117,6 @@ public sealed class PersonKatanaMaster : PersonRelicBase
         var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillSakuraSetsudan>(), Owner);
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
+
+    protected override Task GrantCooldownCard() => AddSakuraToHand();
 }

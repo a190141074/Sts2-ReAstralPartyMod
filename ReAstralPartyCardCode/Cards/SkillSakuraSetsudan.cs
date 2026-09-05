@@ -15,6 +15,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(PersonSkillCardPool), StableEntryStem = "skill_sakura_setsudan")]
 public sealed class SkillSakuraSetsudan : AstralPartyCardModel
 {
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
+
     public SkillSakuraSetsudan() : base(0, CardType.Attack, CardRarity.Ancient, TargetType.AnyEnemy, false)
     {
     }
