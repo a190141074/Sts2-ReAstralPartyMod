@@ -15,8 +15,8 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-[RegisterRelic(typeof(EventRelicPool))]
-public class PersonalityDerivativeSwordIntent : AstralPartyRelicModel
+[RegisterRelic(typeof(EventRelicPool), StableEntryStem = "personality_derivative_sword_intent_doppelganger")]
+public class PersonalityDerivativeSwordIntentDoppelganger : AstralPartyRelicModel
 {
     [SavedProperty] public int AstralParty_PersonalityDerivativeSwordIntentCounter { get; set; }
 
@@ -30,7 +30,7 @@ public class PersonalityDerivativeSwordIntent : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<SkillFamousBlade>(),
+        HoverTipFactory.FromCard<SkillFamousBladeDoppelganger>(),
         HoverTipFactory.FromPower<SwordAuraPower>()
     ];
 

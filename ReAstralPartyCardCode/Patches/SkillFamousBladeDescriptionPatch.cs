@@ -12,7 +12,7 @@ public static class SkillFamousBladeDescriptionPatch
     [HarmonyPostfix]
     public static void Postfix(CardModel __instance, ref LocString __result)
     {
-        if (__instance is not SkillFamousBlade famousBlade)
+        if (__instance is not SkillFamousBladeDoppelganger famousBlade)
             return;
 
         var key = famousBlade.GetDisplayDescriptionKey();

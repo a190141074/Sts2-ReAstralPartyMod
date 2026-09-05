@@ -42,13 +42,13 @@ public class SamuraiPrawnHandCostCapPower : AstralPartyPowerModel
         return new Data();
     }
 
-    public override LocString Title => ModelDb.Relic<PersonSamuraiPrawn>().Title;
+    public override LocString Title => ModelDb.Relic<PersonKatanaMasterDoppelganger>().Title;
 
-    public override LocString Description => ModelDb.Relic<PersonSamuraiPrawn>().DynamicDescription;
+    public override LocString Description => ModelDb.Relic<PersonKatanaMasterDoppelganger>().DynamicDescription;
 
     protected override IEnumerable<string> GetCandidateIconPaths()
     {
-        yield return ModelDb.Relic<PersonSamuraiPrawn>().PackedIconPath;
+        yield return ModelDb.Relic<PersonKatanaMasterDoppelganger>().PackedIconPath;
 
         foreach (var path in base.GetCandidateIconPaths())
             yield return path;

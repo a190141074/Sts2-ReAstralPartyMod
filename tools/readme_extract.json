@@ -226,7 +226,7 @@
       "desc": "Apply 1 [vulnerable]Vulnerable[/vulnerable] and 1 [weak]Weak[/weak]. Gain 3 temporary [red]Strength[/red]."
     },
     {
-      "class": "SkillFamousBlade",
+      "class": "SkillSakuraSetsudan",
       "title": "Famous Blade",
       "cost": "0",
       "type": "Attack",
@@ -748,7 +748,7 @@
       "desc": "Every [blue]2[/blue] rooms, gain Gold equal to this relic's counter. [card]Transfer[/card] increases that counter by [blue]1[/blue]. This counter has no cap."
     },
     {
-      "class": "PersonalityDerivativeSwordIntent",
+      "class": "PersonalityDerivativeSwordGust",
       "title": "[Persona Derivative: Sword Intent]",
       "rarity": "Ancient",
       "desc": "Starts at [blue]0[/blue] and does not grow on its own. Every [blue]2[/blue] total [power]Sword Aura[/power] consumed by [card]Famous Blade[/card] increases this relic's counter by [blue]1[/blue]. Each time you play [card]Famous Blade[/card], deal bonus damage to the target equal to this relic's counter."
@@ -850,7 +850,7 @@
       "desc": "When entering a shop, gain gold equal to [blue]10[/blue] times the number of shops you have entered this run. While any player has this relic, every player's shop cards, potions, relics, and card removal service each have a [blue]3[/blue]% chance to cost only [blue]30[/blue]% of their normal price. This chance increases by [blue]3[/blue]% each time you pass through a shop. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn. At the start of every [blue]3[/blue]rd turn, trigger this relic's combat effect."
     },
     {
-      "class": "PersonSamuraiPrawn",
+      "class": "PersonKatanaMaster",
       "title": "[Persona: Samurai Prawn]",
       "rarity": "Ancient",
       "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Famous Blade[/card] to your hand. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn. The first time each turn you attack an enemy, gain [blue]1[/blue] stack of [power]Sword Aura[/power]. The first [blue]2[/blue] stacks each make your attacks deal [blue]1[/blue] extra damage. The [blue]3[/blue]rd stack makes your attacks deal [blue]2[/blue] extra damage. Maximum [blue]3[/blue] stacks."

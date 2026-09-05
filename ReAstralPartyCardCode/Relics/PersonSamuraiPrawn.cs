@@ -17,35 +17,35 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
-[RegisterRelic(typeof(EventRelicPool))]
-public class PersonSamuraiPrawn : LegacyCooldownPersonRelicBase
+[RegisterRelic(typeof(EventRelicPool), StableEntryStem = "person_katana_master_doppelganger")]
+public class PersonKatanaMasterDoppelganger : LegacyCooldownPersonRelicBase
 {
     [SavedProperty]
-    public int AstralParty_PersonSamuraiPrawnCounter
+    public int AstralParty_PersonKatanaMasterDoppelgangerCounter
     {
         get => GetCanonicalCounter();
         set => SetCanonicalCounter(value);
     }
 
     [SavedProperty]
-    public bool AstralParty_PersonSamuraiPrawnPendingCombatStartCard
+    public bool AstralParty_PersonKatanaMasterDoppelgangerPendingCombatStartCard
     {
         get => GetCanonicalPendingCombatStartCard();
         set => SetCanonicalPendingCombatStartCard(value);
     }
 
-    [SavedProperty] public bool AstralParty_PersonSamuraiPrawnFirstAttackTriggered { get; set; }
+    [SavedProperty] public bool AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered { get; set; }
 
     // Keep the removed legacy save field name so older runs can deserialize after Famous Blade growth
     // moved entirely onto PersonalityDerivativeSwordIntent.
-    public int AstralParty_PersonSamuraiPrawnFamousBladeConsumedAura
+    public int AstralParty_PersonKatanaMasterDoppelgangerFamousBladeConsumedAura
     {
         get => default;
         set { }
     }
 
     // Preserve the earliest Samurai Prawn save field so older runs can migrate into the new cooldown model.
-    public bool AstralParty_PersonSamuraiPrawnOpenedThisCombat
+    public bool AstralParty_PersonKatanaMasterDoppelgangerOpenedThisCombat
     {
         get => default;
         set => SetLegacyPendingAliasIfMissing(!value);
@@ -62,21 +62,21 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonRelicBase
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromCard<SkillFamousBlade>(),
+        HoverTipFactory.FromCard<SkillFamousBladeDoppelganger>(),
         HoverTipFactory.FromPower<SwordAuraPower>()
     ];
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
+        AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered = false;
 
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntent>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntentDoppelganger>(Owner);
     }
 
     public override async Task BeforeCombatStart()
     {
-        AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
+        AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered = false;
         await EnsureHandCostCapPower();
     }
 
@@ -87,7 +87,7 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonRelicBase
     {
         await EnsureSwordIntentRelic();
         await EnsureHandCostCapPower();
-        AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
+        AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered = false;
     }
 
     public override async Task BeforeAttack(AttackCommand command)
@@ -95,13 +95,13 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonRelicBase
         if (Owner?.Creature == null)
             return;
 
-        if (AstralParty_PersonSamuraiPrawnFirstAttackTriggered)
+        if (AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered)
             return;
 
         if (command.Attacker != Owner.Creature || command.TargetSide == Owner.Creature.Side)
             return;
 
-        AstralParty_PersonSamuraiPrawnFirstAttackTriggered = true;
+        AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered = true;
 
         if (Owner.Creature.GetPowerAmount<SwordAuraPower>() >= 3)
             return;
@@ -124,7 +124,7 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonRelicBase
 
     protected override Task BeforeAdvanceCounterAfterCombatEnd(CombatRoom room)
     {
-        AstralParty_PersonSamuraiPrawnFirstAttackTriggered = false;
+        AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered = false;
         return Task.CompletedTask;
     }
 
@@ -134,16 +134,16 @@ public class PersonSamuraiPrawn : LegacyCooldownPersonRelicBase
             return;
 
         Flash();
-        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBlade>(), Owner);
+        var card = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillFamousBladeDoppelganger>(), Owner);
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true);
     }
 
     private async Task EnsureSwordIntentRelic()
     {
-        if (Owner == null || Owner.GetRelic<PersonalityDerivativeSwordIntent>() != null)
+        if (Owner == null || Owner.GetRelic<PersonalityDerivativeSwordIntentDoppelganger>() != null)
             return;
 
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntent>(Owner);
+        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntentDoppelganger>(Owner);
     }
 
     private async Task EnsureHandCostCapPower()

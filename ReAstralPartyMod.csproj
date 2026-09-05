@@ -152,6 +152,10 @@
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_emotional_overdose.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade.png.import"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_sakura_setsudan.png"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_token_legendary_sword_gawu_cut.png"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade_doppelganger.png"/>
+		<Content Include="ReAstralPartyMod\images\card_portraits\skill_famous_blade_doppelganger_beta.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_guidance.png"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_guidance.png.import"/>
 		<Content Include="ReAstralPartyMod\images\card_portraits\skill_fate_firewood_stick.png"/>
@@ -335,8 +339,10 @@
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_panda_meng.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_proprietress_wealthism.png.import"/>
-		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_intent.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_intent.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_gust.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\person_katana_master.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\person_katana_master_doppelganger.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_sword_intent_doppelganger.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_xiao_lei_dragon_gate.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_derivative_xiao_lei_dragon_gate.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\personality_land_center.png"/>
@@ -378,8 +384,6 @@
 		<Content Include="ReAstralPartyMod\images\relic\person_poisoned_apple.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\person_proprietress.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\person_proprietress.png.import"/>
-		<Content Include="ReAstralPartyMod\images\relic\person_samurai_prawn.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\person_samurai_prawn.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\person_shadow_scion.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\person_shadow_scion.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\person_slime_lulu.png"/>

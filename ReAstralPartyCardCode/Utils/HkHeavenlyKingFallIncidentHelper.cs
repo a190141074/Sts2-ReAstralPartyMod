@@ -21,7 +21,7 @@ internal static class HkHeavenlyKingFallIncidentHelper
     private static readonly FallIncidentCandidate[] Candidates =
     [
         new(static () => ModelDb.Relic<PersonWeirdEgg>(), static () => ModelDb.Relic<VariantPersonWeirdEgg>()),
-        new(static () => ModelDb.Relic<PersonSamuraiPrawn>()),
+        new(static () => ModelDb.Relic<PersonKatanaMaster>()),
         new(static () => ModelDb.Relic<PersonNinja>()),
         new(static () => ModelDb.Relic<PersonSocialFearNun>()),
         new(static () => ModelDb.Relic<PersonSupermanMegas>()),

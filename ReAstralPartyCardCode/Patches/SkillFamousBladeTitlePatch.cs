@@ -12,7 +12,7 @@ public static class SkillFamousBladeTitlePatch
     [HarmonyPostfix]
     public static void Postfix(CardModel __instance, ref string __result)
     {
-        if (__instance is not SkillFamousBlade famousBlade)
+        if (__instance is not SkillFamousBladeDoppelganger famousBlade)
             return;
 
         var language = LocManager.Instance?.Language ?? "eng";

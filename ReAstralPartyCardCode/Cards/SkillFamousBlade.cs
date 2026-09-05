@@ -13,17 +13,17 @@ using MegaCrit.Sts2.Core.ValueProps;
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 
-[RegisterCard(typeof(PersonSkillCardPool))]
-public class SkillFamousBlade : AstralPartyCardModel
+[RegisterCard(typeof(PersonSkillCardPool), StableEntryStem = "skill_famous_blade_doppelganger")]
+public class SkillFamousBladeDoppelganger : AstralPartyCardModel
 {
     private const int BaseDamage = 2;
     private const int MaxAuraToConsume = 2;
     private const int GawuCutterBonusDamageMin = 1;
     private const int GawuCutterBonusDamageMaxExclusive = 21;
-    private const string BaseDescriptionKey = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.description";
+    private const string BaseDescriptionKey = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE_DOPPELGANGER.description";
 
     private const string GawuCutterDescriptionKey =
-        "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE.description_gawu_cutter";
+        "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE_DOPPELGANGER.description_gawu_cutter";
 
     private const string GawuCutterBonusDamageSalt = "gawu_cutter_bonus_damage";
 
@@ -39,7 +39,7 @@ public class SkillFamousBlade : AstralPartyCardModel
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
-    protected override string DefaultPortraitPath => "res://ReAstralPartyMod/images/card_portraits/skill_famous_blade.png";
+    protected override string DefaultPortraitPath => "res://ReAstralPartyMod/images/card_portraits/skill_famous_blade_doppelganger.png";
 
     protected override string ResolveActivePortraitPath()
     {
@@ -51,7 +51,7 @@ public class SkillFamousBlade : AstralPartyCardModel
         return null;
     }
 
-    public SkillFamousBlade() : base(
+    public SkillFamousBladeDoppelganger() : base(
         0,
         CardType.Attack,
         CardRarity.Ancient,
@@ -93,7 +93,7 @@ public class SkillFamousBlade : AstralPartyCardModel
                 this,
                 false);
 
-        var swordIntent = Owner.GetRelic<PersonalityDerivativeSwordIntent>();
+        var swordIntent = Owner.GetRelic<PersonalityDerivativeSwordIntentDoppelganger>();
         if (swordIntent != null)
             await swordIntent.OnFamousBladePlayed(choiceContext, originalTarget, auraToConsume, this);
 
@@ -169,7 +169,7 @@ public class SkillFamousBlade : AstralPartyCardModel
         if (ReferenceEquals(CanonicalInstance, this))
             return 0;
 
-        return Owner?.GetRelic<PersonalityDerivativeSwordIntent>()
+        return Owner?.GetRelic<PersonalityDerivativeSwordIntentDoppelganger>()
             ?.AstralParty_PersonalityDerivativeSwordIntentCounter ?? 0;
     }
 
@@ -255,4 +255,3 @@ public class SkillFamousBlade : AstralPartyCardModel
         GawuCutter
     }
 }
-
