@@ -17,7 +17,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 public class SkillFamousBladeDoppelganger : AstralPartyCardModel
 {
     private const int BaseDamage = 2;
-    private const int MaxAuraToConsume = 2;
+    private const int MaxSwordGustToConsume = 2;
     private const int GawuCutterBonusDamageMin = 1;
     private const int GawuCutterBonusDamageMaxExclusive = 21;
     private const string BaseDescriptionKey = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE_DOPPELGANGER.description";
@@ -76,17 +76,17 @@ public class SkillFamousBladeDoppelganger : AstralPartyCardModel
         var attackCmd = CommonActions.CardAttack(this, cardPlay, 1);
         await attackCmd.Execute(choiceContext);
 
-        var auraToConsume = Math.Min(MaxAuraToConsume, Owner.Creature.GetPowerAmount<SwordAuraPower>());
-        if (auraToConsume > 0)
+        var swordGustToConsume = Math.Min(MaxSwordGustToConsume, Owner.Creature.GetPowerAmount<SwordGustPower>());
+        if (swordGustToConsume > 0)
         {
-            var auraPower = Owner.Creature.GetPower<SwordAuraPower>();
-            if (auraPower != null)
-                await PowerCmd.ModifyAmount(auraPower, -auraToConsume, Owner.Creature, this, false);
+            var swordGustPower = Owner.Creature.GetPower<SwordGustPower>();
+            if (swordGustPower != null)
+                await PowerCmd.ModifyAmount(swordGustPower, -swordGustToConsume, Owner.Creature, this, false);
         }
 
-        if (Owner.Creature.GetPowerAmount<SwordAuraPower>() < 3)
+        if (Owner.Creature.GetPowerAmount<SwordGustPower>() < 3)
             await PowerCmd.Apply(
-                ModelDb.Power<SwordAuraPower>().ToMutable(),
+                ModelDb.Power<SwordGustPower>().ToMutable(),
                 Owner.Creature,
                 1,
                 Owner.Creature,
@@ -95,7 +95,7 @@ public class SkillFamousBladeDoppelganger : AstralPartyCardModel
 
         var swordIntent = Owner.GetRelic<PersonalityDerivativeSwordIntentDoppelganger>();
         if (swordIntent != null)
-            await swordIntent.OnFamousBladePlayed(choiceContext, originalTarget, auraToConsume, this);
+            await swordIntent.OnFamousBladePlayed(choiceContext, originalTarget, swordGustToConsume, this);
 
         if (!IsGawuCutterTier())
             return;

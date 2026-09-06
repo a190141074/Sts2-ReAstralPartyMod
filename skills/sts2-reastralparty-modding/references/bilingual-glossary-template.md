@@ -448,7 +448,7 @@
 | 星光 | Star Light Power | `StarLightPower` |
 | 奥法天河 | Sunset Glow Arcane River Debuff Power | `SunsetGlowArcaneRiverDebuffPower` |
 | 调查发现 | Survey Finds Power | `SurveyFindsPower` |
-| 剑气 | Sword Aura Power | `SwordAuraPower` |
+| 剑气 | Sword Gust Power | `SwordGustPower` |
 | 雷息 | Thunders Breath Power | `ThundersBreathPower` |
 | 强化·三叉戟 | Trident Empower Power | `TridentEmpowerPower` |
 | 真龙形态 | True Dragon Form Power | `TrueDragonFormPower` |

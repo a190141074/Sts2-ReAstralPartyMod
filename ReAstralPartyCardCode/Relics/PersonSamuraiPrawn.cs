@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Commands.Builders;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
@@ -14,6 +15,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
+using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -36,9 +38,9 @@ public class PersonKatanaMasterDoppelganger : LegacyCooldownPersonRelicBase
 
     [SavedProperty] public bool AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered { get; set; }
 
-    // Keep the removed legacy save field name so older runs can deserialize after Famous Blade growth
+    // Keep the removed legacy save field so older runs can deserialize after Famous Blade growth
     // moved entirely onto PersonalityDerivativeSwordIntent.
-    public int AstralParty_PersonKatanaMasterDoppelgangerFamousBladeConsumedAura
+    public int AstralParty_PersonKatanaMasterDoppelgangerFamousBladeConsumedSwordGust
     {
         get => default;
         set { }
@@ -63,7 +65,7 @@ public class PersonKatanaMasterDoppelganger : LegacyCooldownPersonRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillFamousBladeDoppelganger>(),
-        HoverTipFactory.FromPower<SwordAuraPower>()
+        HoverTipFactory.FromPower<SwordGustPower>()
     ];
 
     public override async Task AfterObtained()
@@ -90,7 +92,8 @@ public class PersonKatanaMasterDoppelganger : LegacyCooldownPersonRelicBase
         AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered = false;
     }
 
-    public override async Task BeforeAttack(AttackCommand command)
+    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature? dealer, DamageResult result,
+        ValueProp props, Creature target, CardModel? cardSource)
     {
         if (Owner?.Creature == null)
             return;
@@ -98,17 +101,19 @@ public class PersonKatanaMasterDoppelganger : LegacyCooldownPersonRelicBase
         if (AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered)
             return;
 
-        if (command.Attacker != Owner.Creature || command.TargetSide == Owner.Creature.Side)
+        if (dealer != Owner.Creature || target.Side == Owner.Creature.Side || result.TotalDamage <= 0m)
+            return;
+        if (cardSource?.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return;
 
         AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered = true;
 
-        if (Owner.Creature.GetPowerAmount<SwordAuraPower>() >= 3)
+        if (Owner.Creature.GetPowerAmount<SwordGustPower>() >= 3)
             return;
 
         Flash();
         await PowerCmd.Apply(
-            ModelDb.Power<SwordAuraPower>().ToMutable(),
+            ModelDb.Power<SwordGustPower>().ToMutable(),
             Owner.Creature,
             1,
             Owner.Creature,

@@ -80,11 +80,14 @@ public sealed class PersonKatanaMaster : CooldownPersonRelicBase
         AstralParty_PersonKatanaMasterTookDamageThisTurn = false;
     }
 
-    public override async Task BeforeAttack(AttackCommand command)
+    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature? dealer, DamageResult result,
+        ValueProp props, Creature target, CardModel? cardSource)
     {
         if (Owner?.Creature == null || AstralParty_PersonKatanaMasterFirstAttackTriggered)
             return;
-        if (command.Attacker != Owner.Creature || command.TargetSide == Owner.Creature.Side)
+        if (dealer != Owner.Creature || target.Side == Owner.Creature.Side || result.TotalDamage <= 0m)
+            return;
+        if (cardSource?.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return;
 
         AstralParty_PersonKatanaMasterFirstAttackTriggered = true;

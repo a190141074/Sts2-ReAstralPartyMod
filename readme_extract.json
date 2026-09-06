@@ -13,7 +13,7 @@
       "class": "CollectorsCardIAmDragon",
       "title": "I Am a Dragon!",
       "cost": "1",
-      "type": "Attack",
+      "type": "Skill",
       "rarity": "Rare",
       "target": "AllEnemies",
       "desc": "Deal {Damage:diff()} damage to all enemies and temporarily reduce their [red]Strength[/red] by {StrengthLoss:diff()}.\nAfter being played, when you take damage, automatically play this card from your [gold]Exhaust Pile[/gold]. Then return it to your [gold]Exhaust Pile[/gold].\nIf you have lost HP this turn, deal {BonusDamage:diff()} extra damage."
@@ -193,7 +193,7 @@
       "class": "SkillBite",
       "title": "Bite",
       "cost": "0",
-      "type": "Attack",
+      "type": "Skill",
       "rarity": "Rare",
       "target": "Self",
       "desc": "Gain 1 stack of [power]Dragon Awakening[/power]. Then gain temporary [red]Strength[/red] equal to your current [power]Dragon Awakening[/power], up to 4."
@@ -220,19 +220,19 @@
       "class": "SkillDragonsRoar",
       "title": "Dragon's Roar",
       "cost": "0",
-      "type": "Attack",
+      "type": "Skill",
       "rarity": "Rare",
       "target": "AnyEnemy",
       "desc": "Apply 1 [vulnerable]Vulnerable[/vulnerable] and 1 [weak]Weak[/weak]. Gain 3 temporary [red]Strength[/red]."
     },
     {
       "class": "SkillSakuraSetsudan",
-      "title": "Famous Blade",
+      "title": "Sakura Setsudan",
       "cost": "0",
-      "type": "Attack",
-      "rarity": "Rare",
+      "type": "Skill",
+      "rarity": "Ancient",
       "target": "AnyEnemy",
-      "desc": "Deal {Damage:diff()} damage. After playing this, consume up to 2 [power]Sword Aura[/power]. Then gain 1 [power]Sword Aura[/power]."
+      "desc": "Gain 1 [power]Sword Gust[/power], then deal 2 damage."
     },
     {
       "class": "SkillFateGuidance",
@@ -283,7 +283,7 @@
       "class": "SkillMudTruckCrash",
       "title": "Mud Truck Crash",
       "cost": "0",
-      "type": "Attack",
+      "type": "Skill",
       "rarity": "Rare",
       "target": "AnyEnemy",
       "desc": "Deal {Damage:diff()} damage.\nDeal equal damage to all other enemies and apply [power]Fracture[/power]."
@@ -679,11 +679,11 @@
       "desc": "At the end of this combat, gain Gold equal to this power's amount."
     },
     {
-      "class": "SwordAuraPower",
-      "title": "Sword Aura",
+      "class": "SwordGustPower",
+      "title": "Sword Gust",
       "type": "Buff",
       "stack": "Counter",
-      "desc": "The first 2 stacks each make your attacks deal 1 extra damage. The 3rd stack makes your attacks deal 2 extra damage. Maximum 3 stacks."
+      "desc": "Each stack makes your Attack cards deal 1 additional damage. At 3 stacks, they deal 2 additional damage on top of this (5 total)."
     },
     {
       "class": "TokenRelicBridgePower",
@@ -751,7 +751,7 @@
       "class": "PersonalityDerivativeSwordGust",
       "title": "[Persona Derivative: Sword Intent]",
       "rarity": "Ancient",
-      "desc": "Starts at [blue]0[/blue] and does not grow on its own. Every [blue]2[/blue] total [power]Sword Aura[/power] consumed by [card]Famous Blade[/card] increases this relic's counter by [blue]1[/blue]. Each time you play [card]Famous Blade[/card], deal bonus damage to the target equal to this relic's counter."
+      "desc": "Starts at [blue]0[/blue] and does not grow on its own. Every [blue]2[/blue] total [power]Sword Gust[/power] consumed by [card]Famous Blade[/card] increases this relic's counter by [blue]1[/blue]. Each time you play [card]Famous Blade[/card], deal bonus damage to the target equal to this relic's counter."
     },
     {
       "class": "PersonalityDerivativeXiaoLeiDragonGate",
@@ -835,7 +835,7 @@
       "class": "PersonKatanaMaster",
       "title": "[Persona: Samurai Prawn]",
       "rarity": "Ancient",
-      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Famous Blade[/card] to your hand. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn. The first time each turn you attack an enemy, gain [blue]1[/blue] stack of [power]Sword Aura[/power]. The first [blue]2[/blue] stacks each make your attacks deal [blue]1[/blue] extra damage. The [blue]3[/blue]rd stack makes your attacks deal [blue]2[/blue] extra damage. Maximum [blue]3[/blue] stacks."
+      "desc": "At the start of every [blue]3[/blue]rd turn, add [blue]1[/blue] [card]Sakura Setsudan[/card] to your hand. Combat end also reduces this relic's cooldown by [blue]1[/blue] turn. The first time each turn an Attack card deals damage to an enemy, gain [blue]1[/blue] stack of [power]Sword Gust[/power], up to [blue]3[/blue] stacks. Each stack makes your Attack cards deal [blue]1[/blue] additional damage, and at [blue]3[/blue] stacks they deal [blue]2[/blue] additional damage on top of this ([blue]5[/blue] total)."
     },
     {
       "class": "PersonShadowScion",

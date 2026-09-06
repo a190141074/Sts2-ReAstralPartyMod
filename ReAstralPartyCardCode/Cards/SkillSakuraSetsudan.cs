@@ -6,6 +6,7 @@ using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
+using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using STS2RitsuLib.Content;
@@ -17,7 +18,7 @@ public sealed class SkillSakuraSetsudan : AstralPartyCardModel
 {
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
-    public SkillSakuraSetsudan() : base(0, CardType.Attack, CardRarity.Ancient, TargetType.AnyEnemy, false)
+    public SkillSakuraSetsudan() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.AnyEnemy, false)
     {
     }
 
@@ -32,16 +33,17 @@ public sealed class SkillSakuraSetsudan : AstralPartyCardModel
         if (Owner?.Creature == null || cardPlay.Target == null)
             return;
 
-        await CommonActions.CardAttack(this, cardPlay, 1).Execute(choiceContext);
-        if (Owner.GetRelic<PersonKatanaMaster>() == null)
-            return;
-
-        var swordGustRelic = Owner.GetRelic<PersonalityDerivativeSwordGust>();
-        if (swordGustRelic != null)
-            await swordGustRelic.ResolveSakuraPlayed();
-
         var amount = Owner.Creature.GetPowerAmount<SwordGustPower>();
         if (amount < 3m)
-            await PowerCmd.Apply(ModelDb.Power<SwordGustPower>().ToMutable(), Owner.Creature, 1m, Owner.Creature, this, false);
+            await PowerCmd.Apply<SwordGustPower>(Owner.Creature, 1m, Owner.Creature, this, false);
+
+        if (Owner.GetRelic<PersonKatanaMaster>() != null)
+        {
+            var swordGustRelic = Owner.GetRelic<PersonalityDerivativeSwordGust>();
+            if (swordGustRelic != null)
+                await swordGustRelic.ResolveSakuraPlayed();
+        }
+
+        await CreatureCmd.Damage(choiceContext, cardPlay.Target, 2m, ValueProp.Unpowered, Owner.Creature, this);
     }
 }

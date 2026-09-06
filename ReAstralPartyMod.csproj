@@ -309,8 +309,8 @@
 		<Content Include="ReAstralPartyMod\images\powers\star_fragment_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\star_light_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\star_light_power.png.import"/>
-		<Content Include="ReAstralPartyMod\images\powers\sword_aura_power.png"/>
-		<Content Include="ReAstralPartyMod\images\powers\sword_aura_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\sword_gust_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\sword_gust_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\trident_empower_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\trident_empower_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\tyrant_form_power.png"/>

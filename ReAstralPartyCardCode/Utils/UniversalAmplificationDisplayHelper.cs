@@ -23,7 +23,7 @@ internal static class UniversalAmplificationDisplayHelper
         total += creature.GetPowerAmount<BaiZeBlessingPower>() > 0m
             ? creature.GetPowerAmount<HalfLifeHealPower>()
             : 0m;
-        total += GetSwordAuraAttackBonus(creature);
+        total += GetSwordGustAttackBonus(creature);
         total += MosesCombatHelper.GetEquivalentAttackBonus(player);
         total += creature.GetPowerAmount<TrueDragonFormPower>() > 0m ? 4m : 0m;
 
@@ -99,16 +99,16 @@ internal static class UniversalAmplificationDisplayHelper
             await PowerCmd.SetAmount<TPower>(creature, amount, applier, sourceCard);
     }
 
-    private static decimal GetSwordAuraAttackBonus(Creature creature)
+    private static decimal GetSwordGustAttackBonus(Creature creature)
     {
-        var amount = creature.GetPowerAmount<SwordAuraPower>();
+        var amount = creature.GetPowerAmount<SwordGustPower>();
         if (amount >= 3m)
-            return 4m;
+            return 5m;
         if (amount >= 2m)
             return 2m;
         if (amount >= 1m)
             return 1m;
-
         return 0m;
     }
+
 }

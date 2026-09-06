@@ -58,7 +58,7 @@ public sealed class PersonSherryTachibana : PersonRelicBase
     {
         if (Owner?.Creature is not { } ownerCreature || AstralParty_PersonSherryTachibanaFirstAttackTriggered)
             return;
-        if (dealer != ownerCreature || target.Side == ownerCreature.Side || result.UnblockedDamage <= 0m)
+        if (dealer != ownerCreature || target.Side == ownerCreature.Side || result.TotalDamage <= 0m)
             return;
         if (cardSource == null || cardSource.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return;

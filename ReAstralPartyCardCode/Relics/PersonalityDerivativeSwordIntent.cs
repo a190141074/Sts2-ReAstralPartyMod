@@ -20,7 +20,7 @@ public class PersonalityDerivativeSwordIntentDoppelganger : AstralPartyRelicMode
 {
     [SavedProperty] public int AstralParty_PersonalityDerivativeSwordIntentCounter { get; set; }
 
-    [SavedProperty] public int AstralParty_PersonalityDerivativeSwordIntentAuraProgress { get; set; }
+    [SavedProperty] public int AstralParty_PersonalityDerivativeSwordIntentSwordGustProgress { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
@@ -31,31 +31,31 @@ public class PersonalityDerivativeSwordIntentDoppelganger : AstralPartyRelicMode
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillFamousBladeDoppelganger>(),
-        HoverTipFactory.FromPower<SwordAuraPower>()
+        HoverTipFactory.FromPower<SwordGustPower>()
     ];
 
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
         AstralParty_PersonalityDerivativeSwordIntentCounter = 0;
-        AstralParty_PersonalityDerivativeSwordIntentAuraProgress = 0;
+        AstralParty_PersonalityDerivativeSwordIntentSwordGustProgress = 0;
         InvokeDisplayAmountChanged();
     }
 
     public async Task OnFamousBladePlayed(
         PlayerChoiceContext choiceContext,
         Creature? target,
-        int consumedAura,
+        int consumedSwordGust,
         CardModel sourceCard)
     {
         if (Owner?.Creature == null)
             return;
 
-        if (consumedAura > 0)
+        if (consumedSwordGust > 0)
         {
-            AstralParty_PersonalityDerivativeSwordIntentAuraProgress += consumedAura;
-            var convertedDamage = AstralParty_PersonalityDerivativeSwordIntentAuraProgress / 2;
-            AstralParty_PersonalityDerivativeSwordIntentAuraProgress %= 2;
+            AstralParty_PersonalityDerivativeSwordIntentSwordGustProgress += consumedSwordGust;
+            var convertedDamage = AstralParty_PersonalityDerivativeSwordIntentSwordGustProgress / 2;
+            AstralParty_PersonalityDerivativeSwordIntentSwordGustProgress %= 2;
 
             if (convertedDamage > 0)
             {
