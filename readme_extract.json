@@ -892,6 +892,12 @@
       "desc": "Gain [blue]14[/blue] stacks of [gold]Eternal Starlight[/gold]. If you do not have [gold]Eternal Starlight[/gold], obtain it first, then add the stacks."
     },
     {
+      "class": "TokenBlueBookmark",
+      "title": "Bookmark",
+      "rarity": "Common",
+      "desc": "Whenever you play a non-Colorless Skill, deal [blue]1[/blue] damage to the nearest enemy."
+    },
+    {
       "class": "TokenBlueBoxingGloveGeneral",
       "title": "Boxing Glove: Basic",
       "rarity": "Common",
@@ -937,7 +943,7 @@
       "class": "TokenBlueElegantFeather",
       "title": "Elegant Feather",
       "rarity": "Common",
-      "desc": "Whenever damage you take is fully blocked, gain [blue]1[/blue] stack of [gold]Elegant Feather[/gold], up to [blue]3[/blue]."
+      "desc": "Whenever damage you take is fully blocked, gain [blue]1[/blue] stack of [gold]Elegant Feather[/gold], up to [blue]4[/blue]."
     },
     {
       "class": "TokenBlueFlashlightGeneral",
@@ -968,12 +974,6 @@
       "title": "Medical Kit: Emergency Treatment",
       "rarity": "Common",
       "desc": "At the start of each turn, gain [blue]1[/blue] stack of [gold]Half Life Heal[/gold]."
-    },
-    {
-      "class": "TokenBlueMembersReferenceStandard",
-      "title": "Member Referral Letter",
-      "rarity": "Common",
-      "desc": "At the start of your [blue]3[/blue]rd, [blue]6[/blue]th, [blue]9[/blue]th, and later turns, draw [blue]1[/blue] extra card."
     },
     {
       "class": "TokenBlueMotorcycleHelmetGeneral",
@@ -1204,12 +1204,6 @@
       "desc": "At the start of each turn, gain [blue]3[/blue] stacks of [gold]Half Life Heal[/gold]."
     },
     {
-      "class": "TokenGoldMembersReferenceUltimate",
-      "title": "Ultimate Black Gold Referral Letter",
-      "rarity": "Rare",
-      "desc": "At the start of your [blue]3[/blue]rd, [blue]6[/blue]th, [blue]9[/blue]th, and later turns, draw [blue]2[/blue] extra cards and gain {energyPrefix:energyIcons(2)}."
-    },
-    {
       "class": "TokenGoldMotorcycleHelmetPremium",
       "title": "Gold Motorcycle Helmet",
       "rarity": "Rare",
@@ -1295,9 +1289,9 @@
     },
     {
       "class": "TokenPurpleMembersReferencePremium",
-      "title": "Premium Member Referral Letter",
+      "title": "Member Referral Letter",
       "rarity": "Uncommon",
-      "desc": "At the start of your [blue]3[/blue]rd, [blue]6[/blue]th, [blue]9[/blue]th, and later turns, draw [blue]2[/blue] extra cards."
+      "desc": "At the start of every [blue]3[/blue]rd turn, draw [blue]1[/blue] extra card.\nAll items are [blue]25[/blue]% off."
     },
     {
       "class": "TokenPurpleMotorcycleHelmetIntermediate",
@@ -1307,9 +1301,21 @@
     },
     {
       "class": "TokenPurpleSandwichBiscuitIntermediate",
-      "title": "Purple Sandwich Biscuit",
+      "title": "Tasty Sandwich Biscuit",
       "rarity": "Rare",
-      "desc": "Gain [blue]15[/blue] Max HP. At the start of each turn, if your current HP is below [blue]50[/blue]% of your Max HP, gain [blue]1[/blue] [gold]Counter[/gold]."
+      "desc": "Gain [blue]15[/blue] Max HP. At combat start, gain [blue]1[/blue] [red]Strength[/red] for every [blue]10[/blue] additional Max HP you have."
+    },
+    {
+      "class": "TokenPurpleSandwichBiscuitMouse",
+      "title": "Mouse-Flavored Sandwich Biscuit",
+      "rarity": "Rare",
+      "desc": "Gain [blue]25[/blue] Max HP. At the start of each turn, if your current HP is below [blue]50[/blue]% of your Max HP, gain [blue]1[/blue] [gold]Counter[/gold]."
+    },
+    {
+      "class": "TokenPurpleSharpeningStone",
+      "title": "Sharpening Stone",
+      "rarity": "Rare",
+      "desc": "Below [blue]65[/blue]% HP, gain [blue]2[/blue] temporary [red]Strength[/red]. Below [blue]30[/blue]% HP, gain [blue]4[/blue] temporary [red]Strength[/red] instead and gain [blue]1[/blue] stack of [gold]Phantom Reverse Scales[/gold]."
     },
     {
       "class": "TokenPurpleSmartWatch",

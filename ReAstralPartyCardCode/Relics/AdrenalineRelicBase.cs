@@ -20,6 +20,8 @@ public abstract class AdrenalineRelicBase : AstralPartyRelicModel
 
     public override bool ShouldReceiveCombatHooks => true;
 
+    public bool IsEffectActive => Owner?.Creature?.CombatState != null && GetDesiredStrengthBonus() > 0m;
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<StrengthPower>()

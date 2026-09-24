@@ -1,15 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Context;
-using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
-using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.HoverTips;
+using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Models.RelicPools;
-using MegaCrit.Sts2.Core.Saves.Runs;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
@@ -17,7 +16,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class TokenPurpleSandwichBiscuitIntermediate : AstralPartyRelicModel
 {
     private const decimal MaxHpBonus = 15m;
-    private const decimal CounterAmount = 1m;
+    private const decimal MaxHpPerStrength = 10m;
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -25,7 +24,7 @@ public class TokenPurpleSandwichBiscuitIntermediate : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<CounterPower>()
+        HoverTipFactory.FromPower<StrengthPower>()
     ];
 
     public override async Task AfterObtained()
@@ -41,23 +40,17 @@ public class TokenPurpleSandwichBiscuitIntermediate : AstralPartyRelicModel
         await PandaMaxHpHelper.GainMaxHpFromRelic(Owner.Creature, MaxHpBonus, false);
     }
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
+    public override Task BeforeCombatStart()
     {
-        if (player != Owner || Owner?.Creature?.CombatState == null)
-            return;
-        if (!ShouldGrantCounter())
-            return;
+        if (Owner?.Creature == null)
+            return Task.CompletedTask;
+
+        var extraMaxHp = Math.Max(0m, Owner.Creature.MaxHp - BaseMaxHpHelper.GetBaseMaxHp(Owner));
+        var strength = Math.Floor(extraMaxHp / MaxHpPerStrength);
+        if (strength <= 0m)
+            return Task.CompletedTask;
 
         Flash();
-        await PowerCmd.Apply<CounterPower>(Owner.Creature, CounterAmount, Owner.Creature, null, false);
-    }
-
-    private bool ShouldGrantCounter()
-    {
-        var creature = Owner?.Creature;
-        if (creature == null || creature.MaxHp <= 0)
-            return false;
-
-        return creature.HasPower<BloodthirstPower>() || LowHpStateHelper.IsBelowHalfHp(creature);
+        return PowerCmd.Apply<StrengthPower>(Owner.Creature, strength, Owner.Creature, null, true);
     }
 }

@@ -49,6 +49,8 @@
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_MIXED.description": "Attack: +[blue]1[/blue] temporary Strength\nDefensive Skill: +[blue]1[/blue] temporary Dexterity\nSkill (no Block): Heal [blue]1[/blue] HP\nPower: Gain [blue]1[/blue] Energy\nStatus: Draw [blue]1[/blue] card\nCurse: Heal [blue]1[/blue] HP and gain [blue]1[/blue] Block",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.title": "End",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_END.description": "At turn end, if this is in your hand, play it automatically.",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_FLYING_STAR.title": "Flying Star",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_FLYING_STAR.description": "Every [blue]3[/blue] triggers, gain [blue]1[/blue] [gold]Eternal Starlight[/gold].",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.title": "Irrefusable",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_IRREFUSABLE.description": "When it leaves your hand, [gold]Exhaust[/gold] it and gain [blue]3[/blue] [gold]Starlight[/gold]. Remove it from your deck after [blue]3[/blue] combats; [gold]Curse[/gold] cards require [blue]2[/blue] additional combats.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_FALLEN_HEAVENLY_KING.title": "Fall of the Heavenly King",

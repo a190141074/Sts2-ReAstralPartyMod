@@ -15,7 +15,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenBlueElegantFeather : AstralPartyRelicModel
 {
-    private const decimal MaxStacks = 3m;
+    private const decimal MaxStacks = 4m;
 
     public override RelicRarity Rarity => RelicRarity.Common;
 

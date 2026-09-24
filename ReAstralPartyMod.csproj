@@ -430,6 +430,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_bank_card_general.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_battle_book_basic.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_battle_book_basic.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_blue_bookmark.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_blue_bookmark.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_boxing_glove_general.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_boxing_glove_general.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_die10.png"/>
@@ -456,8 +458,6 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_mark_spray_can.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_medical_kit_emergency_treatment.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_medical_kit_emergency_treatment.png.import"/>
-		<Content Include="ReAstralPartyMod\images\relic\token_blue_members_reference_standard.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\token_blue_members_reference_standard.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_motorcycle_helmet_general.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_motorcycle_helmet_general.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_blue_piggy_bank.png"/>
@@ -544,8 +544,6 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_magic_quiver.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_medical_kit_complete_treatment.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_medical_kit_complete_treatment.png.import"/>
-		<Content Include="ReAstralPartyMod\images\relic\token_gold_members_reference_ultimate.png"/>
-		<Content Include="ReAstralPartyMod\images\relic\token_gold_members_reference_ultimate.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_motorcycle_helmet_premium.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_motorcycle_helmet_premium.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_gold_ninja_shuriken.png"/>
@@ -581,6 +579,8 @@
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_motorcycle_helmet_intermediate.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_sandwich_biscuit_intermediate.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_sandwich_biscuit_intermediate.png.import"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_purple_sharpening_stone.png"/>
+		<Content Include="ReAstralPartyMod\images\relic\token_purple_sharpening_stone.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_smart_watch.png"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_smart_watch.png.import"/>
 		<Content Include="ReAstralPartyMod\images\relic\token_purple_speed_roller_intermediate.png"/>

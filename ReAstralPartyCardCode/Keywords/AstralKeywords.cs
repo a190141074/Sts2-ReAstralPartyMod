@@ -36,6 +36,7 @@ public static class AstralKeywords
         AstralInvestigationProgressStem,
         AstralFusionClueStem,
         AstralEndStem,
+        AstralFlyingStarStem,
         IrrefusableStem,
         FallenHeavenlyKingStem
     ];
@@ -69,6 +70,7 @@ public static class AstralKeywords
     public const string AstralInvestigationProgressStem = "ASTRAL_INVESTIGATION_PROGRESS";
     public const string AstralFusionClueStem = "ASTRAL_FUSION_CLUE";
     public const string AstralEndStem = "ASTRAL_END";
+    public const string AstralFlyingStarStem = "ASTRAL_FLYING_STAR";
     public const string IrrefusableStem = "IRREFUSABLE";
     public const string FallenHeavenlyKingStem = "FALLEN_HEAVENLY_KING";
 
@@ -99,6 +101,7 @@ public static class AstralKeywords
     public static string AstralInvestigationProgressId => GetId(AstralInvestigationProgressStem);
     public static string AstralFusionClueId => GetId(AstralFusionClueStem);
     public static string AstralEndId => GetId(AstralEndStem);
+    public static string AstralFlyingStarId => GetId(AstralFlyingStarStem);
     public static string IrrefusableId => GetId(IrrefusableStem);
     public static string FallenHeavenlyKingId => GetId(FallenHeavenlyKingStem);
 
@@ -129,6 +132,7 @@ public static class AstralKeywords
     public static CardKeyword AstralInvestigationProgress => GetKeyword(AstralInvestigationProgressStem);
     public static CardKeyword AstralFusionClue => GetKeyword(AstralFusionClueStem);
     public static CardKeyword AstralEnd => GetKeyword(AstralEndStem);
+    public static CardKeyword AstralFlyingStar => GetKeyword(AstralFlyingStarStem);
     public static CardKeyword Irrefusable => GetKeyword(IrrefusableStem);
     public static CardKeyword FallenHeavenlyKing => GetKeyword(FallenHeavenlyKingStem);
 

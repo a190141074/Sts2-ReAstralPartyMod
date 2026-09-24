@@ -267,6 +267,14 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatches(
         [
             new ModPatchInfo(
+                "efficient_adrenaline_thorns_patch",
+                typeof(MegaCrit.Sts2.Core.Models.Powers.ThornsPower),
+                nameof(MegaCrit.Sts2.Core.Models.Powers.ThornsPower.BeforeDamageReceived),
+                typeof(EfficientAdrenalineThornsPatch),
+                false,
+                "Gameplay patch: prevent active Efficient Adrenaline from triggering Thorns",
+                [typeof(PlayerChoiceContext), typeof(Creature), typeof(decimal), typeof(MegaCrit.Sts2.Core.ValueProps.ValueProp), typeof(Creature), typeof(CardModel)]),
+            new ModPatchInfo(
                 "card_model_paranoid_should_receive_hooks_patch",
                 typeof(CardModel),
                 nameof(CardModel.ShouldReceiveCombatHooks),

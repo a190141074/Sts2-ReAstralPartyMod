@@ -10,6 +10,7 @@ using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Rooms;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -20,18 +21,32 @@ public sealed class TokenGoldFlyingStar : AstralPartyRelicModel
 {
     private const decimal EndTurnDamage = 6m;
     private const int StarLightAmount = 1;
+    private const int EnemiesPerEternalStarlight = 3;
 
     [SavedProperty] public bool AstralParty_TokenGoldFlyingStarPlayedAttackCardThisTurn { get; set; }
+    [SavedProperty] public int AstralParty_TokenGoldFlyingStarEnemyHitProgress { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
     public override bool ShouldReceiveCombatHooks => true;
 
+    public override bool ShowCounter => true;
+
+    public override int DisplayAmount => AstralParty_TokenGoldFlyingStarEnemyHitProgress;
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         TokenEternalStarlight.BuildReferenceHoverTip(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<StarLightPower>(),
+        AstralKeywords.CreateHoverTip(AstralKeywords.AstralFlyingStarId)
     ];
+
+    public override async Task AfterObtained()
+    {
+        await base.AfterObtained();
+        AstralParty_TokenGoldFlyingStarEnemyHitProgress = 0;
+        InvokeDisplayAmountChanged();
+    }
 
     public override Task BeforeCombatStart()
     {
@@ -78,9 +93,24 @@ public sealed class TokenGoldFlyingStar : AstralPartyRelicModel
                     ValueProp.Unblockable | ValueProp.Unpowered,
                     Owner.Creature,
                     null);
+
+            await RecordEnemyHit();
         }
 
         await PowerCmd.Apply(ModelDb.Power<StarLightPower>().ToMutable(), Owner.Creature, StarLightAmount, Owner.Creature, null, false);
+    }
+
+    private async Task RecordEnemyHit()
+    {
+        AstralParty_TokenGoldFlyingStarEnemyHitProgress++;
+        var triggerCount = AstralParty_TokenGoldFlyingStarEnemyHitProgress / EnemiesPerEternalStarlight;
+        AstralParty_TokenGoldFlyingStarEnemyHitProgress %= EnemiesPerEternalStarlight;
+        InvokeDisplayAmountChanged();
+
+        if (triggerCount <= 0 || Owner == null)
+            return;
+
+        await TokenEternalStarlight.GrantStacks(Owner, triggerCount);
     }
 
     private decimal GetBossExtraDamage()

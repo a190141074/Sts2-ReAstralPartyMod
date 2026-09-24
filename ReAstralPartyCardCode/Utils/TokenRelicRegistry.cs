@@ -14,6 +14,7 @@ public static class TokenRelicRegistry
     [
         typeof(TokenBlueAtm),
         typeof(TokenBlueBankCardGeneral),
+        typeof(TokenBlueBookmark),
         typeof(TokenBlueBoxingGloveGeneral),
         typeof(TokenBlueDie10),
         typeof(TokenBlueDie12),
@@ -27,7 +28,6 @@ public static class TokenRelicRegistry
         typeof(TokenBlueHandheldFanSmall),
         typeof(TokenBlueMarkSprayCan),
         typeof(TokenBlueMedicalKitEmergencyTreatment),
-        typeof(TokenBlueMembersReferenceStandard),
         typeof(TokenBlueMotorcycleHelmetGeneral),
         typeof(TokenBluePiggyBank),
         typeof(TokenBlueSandwichBiscuitGeneral),
@@ -74,7 +74,6 @@ public static class TokenRelicRegistry
         typeof(TokenGoldArcaneCodex),
         typeof(TokenGoldMagicQuiver),
         typeof(TokenGoldMedicalKitCompleteTreatment),
-        typeof(TokenGoldMembersReferenceUltimate),
         typeof(TokenGoldMotorcycleHelmetPremium),
         typeof(TokenGoldNinjaShuriken),
         typeof(TokenGoldSandwichBiscuitPremium),
@@ -94,6 +93,8 @@ public static class TokenRelicRegistry
         typeof(TokenPurpleMembersReferencePremium),
         typeof(TokenPurpleMotorcycleHelmetIntermediate),
         typeof(TokenPurpleSandwichBiscuitIntermediate),
+        typeof(TokenPurpleSandwichBiscuitMouse),
+        typeof(TokenPurpleSharpeningStone),
         typeof(TokenPurpleSmartWatch),
         typeof(TokenPurpleSpeedRollerIntermediate),
         typeof(TokenPurpleTastyCandy)

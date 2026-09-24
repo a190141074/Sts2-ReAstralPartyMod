@@ -156,6 +156,7 @@
 | 【全息球】 | Tetra Holo Sphere | `TetraHoloSphere` |
 | 【ATM】 | Token Blue Atm | `TokenBlueAtm` |
 | 【银行卡·余额少】 | Token Blue Bank Card General | `TokenBlueBankCardGeneral` |
+| 【书签】 | Token Blue Bookmark | `TokenBlueBookmark` |
 | 【拳击手套·初级】 | Token Blue Boxing Glove General | `TokenBlueBoxingGloveGeneral` |
 | 【十面·骰子】 | Token Blue Die10 | `TokenBlueDie10` |
 | 【十二面·骰子】 | Token Blue Die12 | `TokenBlueDie12` |
@@ -169,7 +170,6 @@
 | 【手持风扇·小】 | Token Blue Handheld Fan Small | `TokenBlueHandheldFanSmall` |
 | 【标记喷罐】 | Token Blue Mark Spray Can | `TokenBlueMarkSprayCan` |
 | 【医疗箱·紧急治疗】 | Token Blue Medical Kit Emergency Treatment | `TokenBlueMedicalKitEmergencyTreatment` |
-| 【会员推荐信】 | Token Blue Members Reference Standard | `TokenBlueMembersReferenceStandard` |
 | 【摩托头盔·一般】 | Token Blue Motorcycle Helmet General | `TokenBlueMotorcycleHelmetGeneral` |
 | 【小猪存钱罐】 | Token Blue PiggyBank | `TokenBluePiggyBank` |
 | 【夹心饼干·一般】 | Token Blue Sandwich Biscuit General | `TokenBlueSandwichBiscuitGeneral` |
@@ -209,7 +209,6 @@
 | 【初始点】 | Token Gold Initial Point | `TokenGoldInitialPoint` |
 | 【魔法箭袋】 | Token Gold Magic Quiver | `TokenGoldMagicQuiver` |
 | 【医疗箱·完备治疗】 | Token Gold Medical Kit Complete Treatment | `TokenGoldMedicalKitCompleteTreatment` |
-| 【至尊黑金会员推荐信】 | Token Gold Members Reference Ultimate | `TokenGoldMembersReferenceUltimate` |
 | 【摩托头盔·高级】 | Token Gold Motorcycle Helmet Premium | `TokenGoldMotorcycleHelmetPremium` |
 | 【忍术飞镖】 | Token Gold Ninja Shuriken | `TokenGoldNinjaShuriken` |
 | 【夹心饼干·可口】 | Token Gold Sandwich Biscuit Premium | `TokenGoldSandwichBiscuitPremium` |
@@ -224,9 +223,11 @@
 | 【拳击手套·中级】 | Token Purple Boxing Glove Intermediate | `TokenPurpleBoxingGloveIntermediate` |
 | 【手电筒·强光】 | Token Purple Flashlight Stronglight | `TokenPurpleFlashlightStronglight` |
 | 【友情徽章】 | Token Purple Friendship Badge | `TokenPurpleFriendshipBadge` |
-| 【超级会员推荐信】 | Token Purple Members Reference Premium | `TokenPurpleMembersReferencePremium` |
+| 【会员推荐信】 | Token Purple Members Reference Premium | `TokenPurpleMembersReferencePremium` |
 | 【摩托头盔·中级】 | Token Purple Motorcycle Helmet Intermediate | `TokenPurpleMotorcycleHelmetIntermediate` |
 | 【夹心饼干·美味】 | Token Purple Sandwich Biscuit Intermediate | `TokenPurpleSandwichBiscuitIntermediate` |
+| 【夹心饼干·鼠味】 | Token Purple Sandwich Biscuit Mouse | `TokenPurpleSandwichBiscuitMouse` |
+| 【磨刀石】 | Token Purple Sharpening Stone | `TokenPurpleSharpeningStone` |
 | 【智能手表】 | Token Purple Smart Watch | `TokenPurpleSmartWatch` |
 | 【速度滑轮·中级】 | Token Purple Speed Roller Intermediate | `TokenPurpleSpeedRollerIntermediate` |
 | 【可口糖果】 | Token Purple Tasty Candy | `TokenPurpleTastyCandy` |

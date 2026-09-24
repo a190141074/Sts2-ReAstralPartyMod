@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Commands.Builders;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Entities.Merchant;
 using MegaCrit.Sts2.Core.Entities.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Powers;
@@ -266,6 +267,11 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         return Forward(relic => relic.ModifyMaxEnergy(player, amount), amount);
     }
 
+    public override decimal ModifyMerchantPrice(Player player, MerchantEntry entry, decimal originalPrice)
+    {
+        return Forward(relic => relic.ModifyMerchantPrice(player, entry, originalPrice), originalPrice);
+    }
+
     public override bool TryModifyPowerAmountReceived(
         PowerModel canonicalPower,
         Creature target,
@@ -283,16 +289,15 @@ public class TokenRelicBridgePower : AstralPartyPowerModel
         return relic.TryModifyPowerAmountReceived(canonicalPower, target, amount, applier, out modifiedAmount);
     }
 
-    public override Task AfterRemoved(Creature oldOwner)
+    public override async Task AfterRemoved(Creature oldOwner)
     {
         if (_bridgedRelic != null)
         {
+            await _bridgedRelic.AfterRemoved();
             _bridgedRelic.Flashed -= HandleRelicFlashed;
             _bridgedRelic.DisplayAmountChanged -= HandleRelicDisplayAmountChanged;
             _bridgedRelic = null;
         }
-
-        return Task.CompletedTask;
     }
 
     private Task ForwardAsync(Func<RelicModel, Task> callback)

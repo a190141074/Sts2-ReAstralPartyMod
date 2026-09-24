@@ -38,10 +38,10 @@
 |------|------|
 | 卡牌 | 44 |
 | Power | 45 |
-| 遗物 | 105 |
+| 遗物 | 106 |
 | 人格遗物 | 24 |
 | 人格衍生遗物 | 6 |
-| 筹码与特殊遗物 | 75 |
+| 筹码与特殊遗物 | 76 |
 | 本地化文件 | `cards / powers / relics / potions / modifiers / enchantments / card_keywords / relic_collection / rest_site_ui` |
 
 ## 主要玩法系统
@@ -231,6 +231,7 @@
 |------|------|------|------|
 | `TokenBlueAtm` | 【ATM】 | `普通` | 当你使其他玩家获得星光时，目标额外获得1点星光，你获得1点星光。 |
 | `TokenBlueBankCardGeneral` | 【银行卡·余额少】 | `普通` | 获得14层永恒星光。 |
+| `TokenBlueBookmark` | 【书签】 | `普通` | 打出非无色技能牌时，对最近的敌人造成1点伤害。 |
 | `TokenBlueBoxingGloveGeneral` | 【拳击手套·初级】 | `普通` | 每回合开始获得1层活力。<br>拥有【套装·拳击手套】效果。 |
 | `TokenBlueDie10` | 【十面·骰子】 | `未标注` | 如果你正好在第10回合结束战斗，则在下场战斗开始时获得10点星光和7点格挡。<br><br>每触发3次后，获得你没有的骰子系列遗物。若骰子系列已集齐，则此效果不再触发。 |
 | `TokenBlueDie12` | 【十二面·骰子】 | `未标注` | 如果你正好在第12回合结束战斗，则在下场战斗开始时获得12点星光并恢复9点生命。<br><br>每触发3次后，获得你没有的骰子系列遗物。若骰子系列已集齐，则此效果不再触发。 |
@@ -238,13 +239,12 @@
 | `TokenBlueDie4` | 【四面·骰子】 | `未标注` | 如果你正好在第4回合结束战斗，则在下场战斗开始时获得4点星光和{energyPrefix:energyIcons(2)}。<br><br>每触发3次后，获得你没有的骰子系列遗物。若骰子系列已集齐，则此效果不再触发。 |
 | `TokenBlueDie6` | 【六面·骰子】 | `未标注` | 如果你正好在第6回合结束战斗，则在下场战斗开始时获得6点星光并额外抽3张牌。<br><br>每触发3次后，获得你没有的骰子系列遗物。若骰子系列已集齐，则此效果不再触发。 |
 | `TokenBlueDie8` | 【八面·骰子】 | `未标注` | 如果你正好在第8回合结束战斗，则在下场战斗开始时获得8点星光，并对所有敌人造成5点伤害。<br><br>每触发3次后，获得你没有的骰子系列遗物。若骰子系列已集齐，则此效果不再触发。 |
-| `TokenBlueElegantFeather` | 【优雅之羽】 | `普通` | 每当你受到的伤害被格挡时，获得1层优雅之羽，最多3层。 |
+| `TokenBlueElegantFeather` | 【优雅之羽】 | `普通` | 每当你受到的伤害被完全格挡时，获得1层优雅之羽，最多4层。 |
 | `TokenBlueFlashlightGeneral` | 【手电筒·一般】 | `普通` | 击杀敌方时，恢复4点生命。<br>拥有【套装·手电筒】效果。 |
 | `TokenBlueGiantAnchor` | 【大铁锚】 | `普通` | 受到未被格挡的伤害时，获得1层大铁锚。<br>拥有【系列·梦想号】效果。 |
 | `TokenBlueHandheldFanSmall` | 【手持风扇·小】 | `普通` | 使用人格技能牌后，对随机怪物施加1层标记。 |
 | `TokenBlueMarkSprayCan` | 【标记喷罐】 | `普通` | 使用技能牌对敌方造成伤害后，对目标施加1层标记。 |
 | `TokenBlueMedicalKitEmergencyTreatment` | 【医疗箱·紧急治疗】 | `普通` | 每回合开始时，获得1层治愈。 |
-| `TokenBlueMembersReferenceStandard` | 【会员推荐信】 | `普通` | 在你的第3的倍数回合开始时，额外抽1张牌。 |
 | `TokenBlueMotorcycleHelmetGeneral` | 【摩托头盔·一般】 | `普通` | 战斗开始时，获得1层幻影·逆鳞。<br>每回合开始时，获得1点格挡。 |
 | `TokenBluePiggyBank` | 【小猪存钱罐】 | `普通` | 你每消耗{energyPrefix:energyIcons(6)}，获得3点星光。 |
 | `TokenBlueSandwichBiscuitGeneral` | 【夹心饼干·一般】 | `普通` | 获得8点最大生命。 |
@@ -263,9 +263,11 @@
 | `TokenPurpleBoxingGloveIntermediate` | 【拳击手套·中级】 | `非普通` | 战斗开始时，获得1点力量；每回合开始获得1层活力。<br>拥有【套装·拳击手套】效果。 |
 | `TokenPurpleFlashlightStronglight` | 【手电筒·强光】 | `非普通` | 累计打出3张不低于1费的攻击牌，获得1点星光。<br>拥有【套装·手电筒】效果。 |
 | `TokenPurpleFriendshipBadge` | 【友情徽章】 | `非普通` | 当你使队友获得星光或治愈时，你与该目标各获得1层治愈。 |
-| `TokenPurpleMembersReferencePremium` | 【超级会员推荐信】 | `非普通` | 在你的第3的倍数回合开始时，额外抽2张牌。 |
+| `TokenPurpleMembersReferencePremium` | 【会员推荐信】 | `罕见` | 在你的第3的倍数回合开始时，额外抽1张牌。<br>所有商品打折25% |
 | `TokenPurpleMotorcycleHelmetIntermediate` | 【摩托头盔·中级】 | `非普通` | 战斗开始时，获得2层幻影·逆鳞。<br>每回合开始时，获得1点格挡。 |
-| `TokenPurpleSandwichBiscuitIntermediate` | 【夹心饼干·美味】 | `稀有` | 获得15点最大生命。回合开始时，若你当前生命低于最大生命的50%，获得1层反击。 |
+| `TokenPurpleSandwichBiscuitIntermediate` | 【夹心饼干·美味】 | `稀有` | 获得15点最大生命。战斗开始时，每拥有10点额外最大生命，获得1点力量。 |
+| `TokenPurpleSandwichBiscuitMouse` | 【夹心饼干·鼠味】 | `稀有` | 获得25点最大生命。回合开始时，若你当前生命低于最大生命的50%，获得1层反击。 |
+| `TokenPurpleSharpeningStone` | 【磨刀石】 | `稀有` | 生命值低于65%时，获得2点临时力量；<br>生命值低于30%时，改为获得4点临时力量和1层幻影·逆鳞。 |
 | `TokenPurpleSmartWatch` | 【智能手表】 | `非普通` | 回合结束时，如果你的手牌少于5张，下回合额外抽1张牌。 |
 | `TokenPurpleSpeedRollerIntermediate` | 【速度滑轮·中级】 | `非普通` | 战斗开始时，获得1点敏捷。每攀爬9层，获得1次仅对下一层选择生效的。 |
 | `TokenPurpleTastyCandy` | 【可口糖果】 | `非普通` | 打出不低于1费的手牌时，获得1层治愈。<br>若你当前生命已满，则消耗4层治愈并获得{energyPrefix:energyIcons(1)}。 |
@@ -289,7 +291,6 @@
 | `TokenGoldInitialPoint` | 【初始点】 | `稀有` | 在休息处，你可以花费金币升星<br>花费60/90/120金币，从3个筹码遗物中选择1个，恢复15%最大生命值；<br>完成3次后，该选项仅恢复15%最大生命值。<br>重复获取会改为三层永恒星光。 |
 | `TokenGoldMagicQuiver` | 【魔法箭袋】 | `稀有` | 每回合1次，对拥有标记的怪物使用技能牌造成伤害时：施加1层标记，并复制该技能牌返回手牌。 |
 | `TokenGoldMedicalKitCompleteTreatment` | 【医疗箱·完备治疗】 | `稀有` | 每回合开始时，获得3层治愈。 |
-| `TokenGoldMembersReferenceUltimate` | 【至尊黑金会员推荐信】 | `稀有` | 在你的第3的倍数回合开始时，额外抽2张牌，并获得{energyPrefix:energyIcons(2)}。 |
 | `TokenGoldMotorcycleHelmetPremium` | 【摩托头盔·高级】 | `稀有` | 战斗开始时，获得2层幻影·逆鳞和1点敏捷；<br>每回合开始时，获得2点格挡。 |
 | `TokenGoldNinjaShuriken` | 【忍术飞镖】 | `稀有` | 战斗开始时，能量上限+{energyPrefix:energyIcons(1)}。<br>对敌方目标使用技能牌造成伤害时，使其额外受到等同于标记层数的伤害。 |
 | `TokenGoldSandwichBiscuitPremium` | 【夹心饼干·可口】 | `非普通` | 获得11点最大生命。 |
