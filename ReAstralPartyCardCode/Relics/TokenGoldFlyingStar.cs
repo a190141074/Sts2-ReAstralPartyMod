@@ -21,7 +21,7 @@ public sealed class TokenGoldFlyingStar : AstralPartyRelicModel
     private const decimal EndTurnDamage = 6m;
     private const int StarLightAmount = 1;
 
-    [SavedProperty] public bool AstralParty_TokenGoldFlyingStarDealtEnemyUnblockedDamageByCardThisTurn { get; set; }
+    [SavedProperty] public bool AstralParty_TokenGoldFlyingStarPlayedAttackCardThisTurn { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -35,23 +35,17 @@ public sealed class TokenGoldFlyingStar : AstralPartyRelicModel
 
     public override Task BeforeCombatStart()
     {
-        AstralParty_TokenGoldFlyingStarDealtEnemyUnblockedDamageByCardThisTurn = false;
+        AstralParty_TokenGoldFlyingStarPlayedAttackCardThisTurn = false;
         return Task.CompletedTask;
     }
 
-    public override async Task AfterDamageGiven(
-        PlayerChoiceContext choiceContext,
-        Creature? dealer,
-        DamageResult result,
-        ValueProp props,
-        Creature target,
-        CardModel? cardSource)
+    public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (!IsTrackedCardDamage(target, result.UnblockedDamage, cardSource))
-            return;
+        if (cardPlay.Card.Owner != Owner || cardPlay.Card.Type != CardType.Attack)
+            return Task.CompletedTask;
 
-        AstralParty_TokenGoldFlyingStarDealtEnemyUnblockedDamageByCardThisTurn = true;
-        await Task.CompletedTask;
+        AstralParty_TokenGoldFlyingStarPlayedAttackCardThisTurn = true;
+        return Task.CompletedTask;
     }
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
@@ -59,8 +53,8 @@ public sealed class TokenGoldFlyingStar : AstralPartyRelicModel
         if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
             return;
 
-        var shouldResolve = !AstralParty_TokenGoldFlyingStarDealtEnemyUnblockedDamageByCardThisTurn;
-        AstralParty_TokenGoldFlyingStarDealtEnemyUnblockedDamageByCardThisTurn = false;
+        var shouldResolve = !AstralParty_TokenGoldFlyingStarPlayedAttackCardThisTurn;
+        AstralParty_TokenGoldFlyingStarPlayedAttackCardThisTurn = false;
         if (!shouldResolve)
             return;
 
@@ -93,21 +87,6 @@ public sealed class TokenGoldFlyingStar : AstralPartyRelicModel
     {
         return Math.Max(0, Owner?.GetRelic<TokenEternalStarlight>()?.GetStacks() ?? 0) / 3m;
     }
-
-    private bool IsTrackedCardDamage(Creature target, decimal unblockedDamage, CardModel? cardSource)
-    {
-        if (Owner?.Creature == null)
-            return false;
-        if (target.Side == Owner.Creature.Side)
-            return false;
-        if (unblockedDamage <= 0m)
-            return false;
-        if (cardSource == null || cardSource.Owner != Owner)
-            return false;
-
-        return true;
-    }
-
     private bool IsBossEnemy(Creature creature)
     {
         var combatState = creature.CombatState as CombatState;

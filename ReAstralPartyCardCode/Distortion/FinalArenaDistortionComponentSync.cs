@@ -44,7 +44,7 @@ internal static class FinalArenaDistortionComponentSync
         if (!FinalArenaSeriesHelper.TryGetRunDataSnapshot(runState, out var components, out var runData))
             return;
 
-        netService.SendMessage(new FinalArenaDistortionComponentMessage(components, runData));
+        netService.SendMessage(new FinalArenaDistortionComponentMessage(runState, components, runData));
     }
 
     private static void HandleMessage(FinalArenaDistortionComponentMessage message, ulong senderId)
@@ -97,7 +97,7 @@ internal static class FinalArenaDistortionComponentSync
             await FinalArenaSeriesHelper.ReconcileSyncedHumanAiDuelAsync(
                 runState,
                 grantedPlayerNetIds,
-                message.GetHumanAiDuelRecordedMindStacks());
+                message.GetHumanAiDuelCurrentMindStacks());
             await FinalArenaSeriesHelper.ReconcileSyncedChaosFloodAsync(
                 runState,
                 message.GetChaosFloodAppliedPlayerNetIds(),
@@ -113,16 +113,18 @@ internal static class FinalArenaDistortionComponentSync
 
 internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSerializable
 {
-    private const int SchemaVersion = 4;
+    private const int SchemaVersion = 5;
 
     private List<FinalArenaDistortionComponent> _components;
     private List<ulong> _humanAiDuelGrantedPlayerNetIds;
     private Dictionary<ulong, int> _humanAiDuelRecordedMindStacks;
+    private Dictionary<ulong, int> _humanAiDuelCurrentMindStacks;
     private List<ulong> _chaosFloodAppliedPlayerNetIds;
     private Dictionary<ulong, int> _chaosFloodTargetMaxPotionCounts;
     private Dictionary<ulong, int> _chaosFloodTargetPersonChestCounts;
 
     public FinalArenaDistortionComponentMessage(
+        RunState runState,
         IReadOnlyList<FinalArenaDistortionComponent> components,
         FinalArenaSeriesRunData runData)
     {
@@ -130,6 +132,14 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         HumanAiDuelApplied = runData.HumanAiDuelApplied;
         _humanAiDuelGrantedPlayerNetIds = [.. runData.HumanAiDuelGrantedPlayerNetIds];
         _humanAiDuelRecordedMindStacks = new(runData.HumanAiDuelRecordedMindStacks);
+        _humanAiDuelCurrentMindStacks = [];
+        var grantedPlayerNetIds = _humanAiDuelGrantedPlayerNetIds.ToHashSet();
+        foreach (var player in runState.Players)
+        {
+            if (grantedPlayerNetIds.Contains(player.NetId))
+                _humanAiDuelCurrentMindStacks[player.NetId] =
+                    Math.Max(0, StunGunMindSyncHelper.GetRecordedMindStacks(player));
+        }
         _chaosFloodAppliedPlayerNetIds = [.. runData.ChaosFloodAppliedPlayerNetIds];
         _chaosFloodTargetMaxPotionCounts = new(runData.ChaosFloodTargetMaxPotionCounts);
         _chaosFloodTargetPersonChestCounts = new(runData.ChaosFloodTargetPersonChestCounts);
@@ -173,6 +183,11 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         return _humanAiDuelRecordedMindStacks ?? new Dictionary<ulong, int>();
     }
 
+    public IReadOnlyDictionary<ulong, int> GetHumanAiDuelCurrentMindStacks()
+    {
+        return _humanAiDuelCurrentMindStacks ?? new Dictionary<ulong, int>();
+    }
+
     public IReadOnlyList<ulong> GetChaosFloodAppliedPlayerNetIds()
     {
         return _chaosFloodAppliedPlayerNetIds ?? [];
@@ -204,12 +219,18 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         {
             writer.WriteULong(entry.Key);
             writer.WriteInt(entry.Value);
+        }
+        writer.WriteInt((_humanAiDuelCurrentMindStacks ?? []).Count);
+        foreach (var entry in (_humanAiDuelCurrentMindStacks ?? new Dictionary<ulong, int>()).OrderBy(entry => entry.Key))
+        {
+            writer.WriteULong(entry.Key);
+            writer.WriteInt(entry.Value);
+        }
         writer.WriteInt((_chaosFloodAppliedPlayerNetIds ?? []).Count);
         foreach (var playerNetId in (_chaosFloodAppliedPlayerNetIds ?? []).OrderBy(static netId => netId))
             writer.WriteULong(playerNetId);
         WritePlayerTargets(writer, _chaosFloodTargetMaxPotionCounts);
         WritePlayerTargets(writer, _chaosFloodTargetPersonChestCounts);
-        }
         writer.WriteBool(RobberyGoldGranted);
         writer.WriteBool(ThreeThousandAstrolabeGoldGranted);
         writer.WriteBool(RobberyNextCombatPending);
@@ -245,6 +266,10 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         _humanAiDuelRecordedMindStacks = new Dictionary<ulong, int>(Math.Max(0, recordedMindCount));
         for (var i = 0; i < recordedMindCount; i++)
             _humanAiDuelRecordedMindStacks[reader.ReadULong()] = reader.ReadInt();
+        var currentMindCount = reader.ReadInt();
+        _humanAiDuelCurrentMindStacks = new Dictionary<ulong, int>(Math.Max(0, currentMindCount));
+        for (var i = 0; i < currentMindCount; i++)
+            _humanAiDuelCurrentMindStacks[reader.ReadULong()] = reader.ReadInt();
         var chaosFloodAppliedCount = reader.ReadInt();
         _chaosFloodAppliedPlayerNetIds = new List<ulong>(Math.Max(0, chaosFloodAppliedCount));
         for (var i = 0; i < chaosFloodAppliedCount; i++)

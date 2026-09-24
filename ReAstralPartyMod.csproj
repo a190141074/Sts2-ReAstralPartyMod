@@ -16,6 +16,11 @@
 		<GodotExportPreset>Windows Desktop</GodotExportPreset>
 		<ModOutputDir>$(Sts2Dir)\mods\$(MSBuildProjectName)\</ModOutputDir>
 		<PckOutputPath>$(ModOutputDir)$(MSBuildProjectName).pck</PckOutputPath>
+		<!-- RitsuLib 0.6.2 moved game-version variants from lib to compat. Keep the
+		     former path first so older Workshop installations remain buildable. -->
+		<RitsuLibDir Condition="'$(RitsuLibDir)' == '' and Exists('D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1\STS2-RitsuLib.dll')">D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1</RitsuLibDir>
+		<RitsuLibDir Condition="'$(RitsuLibDir)' == '' and Exists('D:\Steam\steamapps\workshop\content\2868840\3747602295\compat\0.107.1\STS2-RitsuLib.dll')">D:\Steam\steamapps\workshop\content\2868840\3747602295\compat\0.107.1</RitsuLibDir>
+		<RitsuLibSharedDir Condition="'$(RitsuLibSharedDir)' == ''">D:\Steam\steamapps\workshop\content\2868840\3747602295\shared</RitsuLibSharedDir>
 		<GodotEditorPath Condition="'$(GodotEditorPath)' == '' and Exists('D:\MOD\杀戮尖塔2mod制作\megadot-4.5.1-m.8-windows-x86_64-llvm-editor-csharp\MegaDot_v4.5.1-stable_mono_win64.exe')">D:\MOD\杀戮尖塔2mod制作\megadot-4.5.1-m.8-windows-x86_64-llvm-editor-csharp\MegaDot_v4.5.1-stable_mono_win64.exe</GodotEditorPath>
 	</PropertyGroup>
 
@@ -41,7 +46,23 @@
 
 		<!-- 本地引用，当前运行时 RitsuLib 来自 Workshop 变体目录 -->
 		<Reference Include="STS2-RitsuLib">
-			<HintPath>D:\Steam\steamapps\workshop\content\2868840\3747602295\lib\0.107.1\STS2-RitsuLib.dll</HintPath>
+			<HintPath>$(RitsuLibDir)\STS2-RitsuLib.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+		<Reference Include="STS2-RitsuLib.Runtime" Condition="Exists('$(RitsuLibDir)\STS2-RitsuLib.Runtime.dll')">
+			<HintPath>$(RitsuLibDir)\STS2-RitsuLib.Runtime.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+		<Reference Include="STS2-RitsuLib.Shared" Condition="Exists('$(RitsuLibDir)\STS2-RitsuLib.Runtime.dll') and Exists('$(RitsuLibSharedDir)\STS2-RitsuLib.Shared.dll')">
+			<HintPath>$(RitsuLibSharedDir)\STS2-RitsuLib.Shared.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+		<Reference Include="STS2-RitsuLib.Settings" Condition="Exists('$(RitsuLibDir)\STS2-RitsuLib.Runtime.dll') and Exists('$(RitsuLibSharedDir)\STS2-RitsuLib.Settings.dll')">
+			<HintPath>$(RitsuLibSharedDir)\STS2-RitsuLib.Settings.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+		<Reference Include="STS2-RitsuLib.Ui" Condition="Exists('$(RitsuLibDir)\STS2-RitsuLib.Runtime.dll') and Exists('$(RitsuLibSharedDir)\STS2-RitsuLib.Ui.dll')">
+			<HintPath>$(RitsuLibSharedDir)\STS2-RitsuLib.Ui.dll</HintPath>
 			<Private>true</Private>
 		</Reference>
 

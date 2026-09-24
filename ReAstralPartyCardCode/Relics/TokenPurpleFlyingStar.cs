@@ -20,7 +20,7 @@ public sealed class TokenPurpleFlyingStar : AstralPartyRelicModel
     private const decimal EndTurnDamage = 3m;
     private const int StarLightAmount = 1;
 
-    [SavedProperty] public bool AstralParty_TokenPurpleFlyingStarDealtEnemyDamageByCardThisTurn { get; set; }
+    [SavedProperty] public bool AstralParty_TokenPurpleFlyingStarPlayedAttackCardThisTurn { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Uncommon;
 
@@ -33,23 +33,17 @@ public sealed class TokenPurpleFlyingStar : AstralPartyRelicModel
 
     public override Task BeforeCombatStart()
     {
-        AstralParty_TokenPurpleFlyingStarDealtEnemyDamageByCardThisTurn = false;
+        AstralParty_TokenPurpleFlyingStarPlayedAttackCardThisTurn = false;
         return Task.CompletedTask;
     }
 
-    public override async Task AfterDamageGiven(
-        PlayerChoiceContext choiceContext,
-        Creature? dealer,
-        DamageResult result,
-        ValueProp props,
-        Creature target,
-        CardModel? cardSource)
+    public override Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
-        if (!IsTrackedCardDamage(target, result.TotalDamage, cardSource))
-            return;
+        if (cardPlay.Card.Owner != Owner || cardPlay.Card.Type != CardType.Attack)
+            return Task.CompletedTask;
 
-        AstralParty_TokenPurpleFlyingStarDealtEnemyDamageByCardThisTurn = true;
-        await Task.CompletedTask;
+        AstralParty_TokenPurpleFlyingStarPlayedAttackCardThisTurn = true;
+        return Task.CompletedTask;
     }
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
@@ -57,8 +51,8 @@ public sealed class TokenPurpleFlyingStar : AstralPartyRelicModel
         if (Owner?.Creature?.CombatState == null || side != Owner.Creature.Side)
             return;
 
-        var shouldResolve = !AstralParty_TokenPurpleFlyingStarDealtEnemyDamageByCardThisTurn;
-        AstralParty_TokenPurpleFlyingStarDealtEnemyDamageByCardThisTurn = false;
+        var shouldResolve = !AstralParty_TokenPurpleFlyingStarPlayedAttackCardThisTurn;
+        AstralParty_TokenPurpleFlyingStarPlayedAttackCardThisTurn = false;
         if (!shouldResolve)
             return;
 
@@ -74,19 +68,5 @@ public sealed class TokenPurpleFlyingStar : AstralPartyRelicModel
                 null);
 
         await PowerCmd.Apply(ModelDb.Power<StarLightPower>().ToMutable(), Owner.Creature, StarLightAmount, Owner.Creature, null, false);
-    }
-
-    private bool IsTrackedCardDamage(Creature target, decimal totalDamage, CardModel? cardSource)
-    {
-        if (Owner?.Creature == null)
-            return false;
-        if (target.Side == Owner.Creature.Side)
-            return false;
-        if (totalDamage <= 0m)
-            return false;
-        if (cardSource == null || cardSource.Owner != Owner)
-            return false;
-
-        return true;
     }
 }

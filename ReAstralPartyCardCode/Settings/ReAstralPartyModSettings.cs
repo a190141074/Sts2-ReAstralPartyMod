@@ -819,6 +819,7 @@ public static partial class ReAstralPartyModSettingsManager
             return;
 
         bool sanitizedNonBannableRelics = false;
+        bool normalizedCurrentModeSettings = false;
         using (RitsuLibFramework.BeginModDataRegistration(MainFile.ModId))
         {
             var store = RitsuLibFramework.GetDataStore(MainFile.ModId);
@@ -841,13 +842,17 @@ public static partial class ReAstralPartyModSettingsManager
 
             var settings = store.Get<ReAstralPartyModSettings>(SettingsKey);
             sanitizedNonBannableRelics = SanitizeNonBannableRelicIds(settings);
-            var normalizedCurrentModeSettings = NormalizeCurrentModeScopedSettings(settings);
+            normalizedCurrentModeSettings = NormalizeCurrentModeScopedSettings(settings);
             ApplyRuntimeSettings(settings, "register");
             if (sanitizedNonBannableRelics || normalizedCurrentModeSettings)
                 store.Save(SettingsKey);
         }
 
+        MainFile.Logger.Info(
+            $"{MainFile.ModId} settings data registration complete | saved={sanitizedNonBannableRelics || normalizedCurrentModeSettings}.");
+        MainFile.Logger.Info($"{MainFile.ModId} registering settings pages.");
         RegisterSettingsPage();
+        MainFile.Logger.Info($"{MainFile.ModId} settings pages registered.");
         _registered = true;
         MainFile.Logger.Info($"{MainFile.ModId} mod settings registered.");
     }

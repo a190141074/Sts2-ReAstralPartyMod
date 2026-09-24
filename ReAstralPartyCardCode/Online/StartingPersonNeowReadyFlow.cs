@@ -34,7 +34,7 @@ internal static class StartingPersonNeowReadyFlow
     private const string ReadyOptionIconPath = "res://ReAstralPartyMod/images/ui/person_choose.png";
 
     private static readonly object SyncLock = new();
-    private static readonly Dictionary<Neow, ReadyPageState> ReadyPages = [];
+    private static readonly Dictionary<AncientEventModel, ReadyPageState> ReadyPages = [];
     private static readonly Dictionary<string, Task<bool>> SelectionTasksByRun = [];
     private static readonly Dictionary<string, List<string>> LaunchPayloadsByRun = [];
     private static readonly HashSet<string> LaunchingRunKeys = [];
@@ -70,6 +70,7 @@ internal static class StartingPersonNeowReadyFlow
         IReadOnlyList<EventOption> OriginalOptions,
         LocString OriginalDescription,
         StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind CachedPageKind,
+        bool IsNeow,
         bool Restored = false);
 
     private sealed record TemporaryNeowModifierFilterState(
@@ -90,31 +91,31 @@ internal static class StartingPersonNeowReadyFlow
     {
         if (RunManager.Instance?.NetService?.Type != NetGameType.Client)
             return false;
-        if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is not Neow neow)
+        if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is not AncientEventModel ancient)
             return false;
 
         ReadyPageState? state;
         lock (SyncLock)
         {
-            if (!ReadyPages.TryGetValue(neow, out state))
+            if (!ReadyPages.TryGetValue(ancient, out state))
                 return false;
         }
 
-        var localOptionCount = neow.CurrentOptions?.Count ?? 0;
+        var localOptionCount = ancient.CurrentOptions?.Count ?? 0;
         if (optionIndex < localOptionCount)
             return false;
 
         // EventSynchronizer validates the remote option index immediately against CurrentOptions.
         // If the client is still on the 1-button ready page, restore the real Neow page first.
-        RestoreOriginalOptionsOrFinish(neow, "remote_choice_pre_restore");
+        RestoreOriginalOptionsOrFinish(ancient, "remote_choice_pre_restore");
         MainFile.Logger.Warn(
             $"[StartingPersonNeowReadyFlow] Restored cached Neow option page before remote choice processing | runKey={state.RunKey} sender={senderId} optionIndex={optionIndex} localCount={localOptionCount} cachedCount={state.OriginalOptions.Count}.");
         return true;
     }
 
-    internal static void TryReplaceInitialState(Neow neow)
+    internal static void TryReplaceInitialState(AncientEventModel ancient)
     {
-        if (!ShouldInjectReadyPage(neow, out var runState, out var reason))
+        if (!ShouldInjectReadyPage(ancient, out var runState, out var reason))
         {
             MainFile.Logger.Info($"[StartingPersonNeowReadyFlow] Skipped Neow ready page: {reason}.");
             return;
@@ -122,23 +123,24 @@ internal static class StartingPersonNeowReadyFlow
 
         lock (SyncLock)
         {
-            if (ReadyPages.ContainsKey(neow))
+            if (ReadyPages.ContainsKey(ancient))
                 return;
 
             var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
-            var cachedPageKind = StartingPersonaExternalNeowCompatHelper.ResolveCachedPageKind(neow);
-            var originalOptions = cachedPageKind == StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
-                ? (neow.CurrentOptions?.ToList() ?? [])
-                : NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
-                    neow,
-                    neow.CurrentOptions,
-                    "ready_page_cache");
-            ReadyPages[neow] = new ReadyPageState(
+            var isNeow = ancient is Neow;
+            var cachedPageKind = isNeow
+                ? StartingPersonaExternalNeowCompatHelper.ResolveCachedPageKind((Neow)ancient)
+                : StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.NormalNeowPage;
+            var originalOptions = isNeow && cachedPageKind != StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
+                ? NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(ancient, ancient.CurrentOptions, "ready_page_cache")
+                : (ancient.CurrentOptions?.ToList() ?? []);
+            ReadyPages[ancient] = new ReadyPageState(
                 runKey,
                 runState,
                 originalOptions,
-                neow.Description ?? neow.InitialDescription,
-                cachedPageKind);
+                ancient.Description ?? ancient.InitialDescription,
+                cachedPageKind,
+                isNeow);
             ReadyPageInjectedRunKeys.Add(runKey);
             MainFile.Logger.Info(
                 $"[StartingPersonNeowReadyFlow] Cached Neow page before ready-page injection | runKey={runKey} pageKind={StartingPersonaExternalNeowCompatHelper.DescribePageKind(cachedPageKind)} compatSource={StartingPersonaExternalNeowCompatHelper.DescribeDetectedSource()} optionCount={originalOptions.Count}.");
@@ -146,13 +148,13 @@ internal static class StartingPersonNeowReadyFlow
 
         var readyOptions = new[]
         {
-            CreateReadyOption(neow, runState)
+            CreateReadyOption(ancient, runState)
         };
 
         if (SetEventStateMethod == null)
             throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page injection.");
 
-        SetEventStateMethod.Invoke(neow, [CreateReadyPageDescription(), readyOptions]);
+        SetEventStateMethod.Invoke(ancient, [CreateReadyPageDescription(), readyOptions]);
         MainFile.Logger.Info(
             $"[StartingPersonNeowReadyFlow] Ready page injected | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)}.");
     }
@@ -167,9 +169,9 @@ internal static class StartingPersonNeowReadyFlow
         return string.Equals(textKey, ReadyOptionTextKey, StringComparison.OrdinalIgnoreCase);
     }
 
-    private static bool ShouldInjectReadyPage(Neow neow, out RunState runState, out string reason)
+    private static bool ShouldInjectReadyPage(AncientEventModel ancient, out RunState runState, out string reason)
     {
-        if (!TryResolveRunState(neow, out var resolvedRunState))
+        if (!TryResolveRunState(ancient, out var resolvedRunState))
         {
             reason = "Neow owner or run state was unavailable";
             runState = null!;
@@ -177,17 +179,32 @@ internal static class StartingPersonNeowReadyFlow
         }
 
         runState = resolvedRunState;
+        if (ancient is not Neow && (runState.CurrentActIndex != 0 || runState.ActFloor > 0))
+        {
+            reason = "non-Neow Ancient is not the Act 1 first floor";
+            return false;
+        }
+
+        lock (SyncLock)
+        {
+            if (ReadyPages.Keys.Any(existing => existing.Owner == ancient.Owner && existing is not Neow))
+            {
+                reason = "an Act 1 fallback Ancient is already selected";
+                return false;
+            }
+        }
+
         return StartingPersonRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out reason);
     }
 
-    private static EventOption CreateReadyOption(Neow neow, RunState runState)
+    private static EventOption CreateReadyOption(AncientEventModel ancient, RunState runState)
     {
         var netService = RunManager.Instance?.NetService;
         if (netService == null || netService.Type is NetGameType.None or NetGameType.Singleplayer)
         {
             MainFile.Logger.Info(
                 $"[StartingPersonNeowReadyFlow] Host can start persona selection | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)} role=Singleplayer.");
-            return new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
+            return new EventOption(ancient, () => OnReadyChosenAsync(ancient, runState), ReadyOptionTextKey)
                 .ThatWontSaveToChoiceHistory();
         }
 
@@ -196,17 +213,17 @@ internal static class StartingPersonNeowReadyFlow
         {
             MainFile.Logger.Info(
                 $"[StartingPersonNeowReadyFlow] Host can start persona selection | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)} role=Host.");
-            return new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
+            return new EventOption(ancient, () => OnReadyChosenAsync(ancient, runState), ReadyOptionTextKey)
                 .ThatWontSaveToChoiceHistory();
         }
 
         MainFile.Logger.Info(
             $"[StartingPersonNeowReadyFlow] Non-host ready page shown with host-gated interaction | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)} role={role}.");
-        return new EventOption(neow, () => OnReadyChosenAsync(neow, runState), ReadyOptionTextKey)
+        return new EventOption(ancient, () => OnReadyChosenAsync(ancient, runState), ReadyOptionTextKey)
             .ThatWontSaveToChoiceHistory();
     }
 
-    private static async Task OnReadyChosenAsync(Neow neow, RunState runState)
+    private static async Task OnReadyChosenAsync(AncientEventModel ancient, RunState runState)
     {
         try
         {
@@ -240,22 +257,22 @@ internal static class StartingPersonNeowReadyFlow
         {
             MainFile.Logger.Warn(
                 $"[StartingPersonNeowReadyFlow] Ready page selection flow failed: {ex}");
-            RestoreOriginalOptionsOrFinish(neow, "ready_selection_failed");
+            RestoreOriginalOptionsOrFinish(ancient, "ready_selection_failed");
         }
     }
 
     internal static bool TryInterceptReadyOptionRelease(NEventOptionButton optionButton)
     {
-        if (optionButton.Event is not Neow neow)
+        if (optionButton.Event is not AncientEventModel ancient)
             return false;
         if (!IsReadyOptionTextKey(optionButton.Option?.TextKey))
             return false;
-        if (!TryResolveRunState(neow, out var runState))
+        if (!TryResolveRunState(ancient, out var runState))
             return false;
 
         MainFile.Logger.Info(
             $"[StartingPersonNeowReadyFlow] Intercepted ready option release outside default event flow | runKey={StartingPersonRelicSelectionPatch.GetRunKey(runState)}.");
-        TaskHelper.RunSafely(OnReadyChosenAsync(neow, runState));
+        TaskHelper.RunSafely(OnReadyChosenAsync(ancient, runState));
         return true;
     }
 
@@ -266,9 +283,9 @@ internal static class StartingPersonNeowReadyFlow
 
         if (!IsReadyOptionTextKey(option.TextKey))
             return false;
-        if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is not Neow neow)
+        if (RunManager.Instance?.EventSynchronizer?.GetLocalEvent() is not AncientEventModel ancient)
             return false;
-        if (!TryResolveRunState(neow, out var runState))
+        if (!TryResolveRunState(ancient, out var runState))
             return false;
 
         var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
@@ -465,9 +482,9 @@ internal static class StartingPersonNeowReadyFlow
         return cachedPayload;
     }
 
-    private static bool TryResolveRunState(Neow neow, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out RunState? runState)
+    private static bool TryResolveRunState(AncientEventModel ancient, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out RunState? runState)
     {
-        if (neow.Owner?.RunState is RunState ownerRunState)
+        if (ancient.Owner?.RunState is RunState ownerRunState)
         {
             runState = ownerRunState;
             return true;
@@ -504,7 +521,7 @@ internal static class StartingPersonNeowReadyFlow
 
     private static void RestoreOriginalOptionsForRun(string runKey, string reason)
     {
-        List<Neow> neowsToRestore;
+        List<AncientEventModel> neowsToRestore;
         lock (SyncLock)
         {
             neowsToRestore = ReadyPages
@@ -513,13 +530,13 @@ internal static class StartingPersonNeowReadyFlow
                 .ToList();
         }
 
-        foreach (var neow in neowsToRestore)
-            RestoreOriginalOptionsOrFinish(neow, reason);
+        foreach (var ancient in neowsToRestore)
+            RestoreOriginalOptionsOrFinish(ancient, reason);
     }
 
     private static bool RestoreOrRebuildInitialOptionsForRun(string runKey, string reason)
     {
-        List<Neow> neowsToRebuild;
+        List<AncientEventModel> neowsToRebuild;
         lock (SyncLock)
         {
             neowsToRebuild = ReadyPages
@@ -529,28 +546,27 @@ internal static class StartingPersonNeowReadyFlow
         }
 
         var usedExternalRestore = false;
-        foreach (var neow in neowsToRebuild)
-            usedExternalRestore |= RebuildInitialOptionsOrFallback(neow, reason);
+        foreach (var ancient in neowsToRebuild)
+            usedExternalRestore |= RebuildInitialOptionsOrFallback(ancient, reason);
 
         return usedExternalRestore;
     }
 
-    private static void RestoreOriginalOptionsOrFinish(Neow neow, string reason)
+    private static void RestoreOriginalOptionsOrFinish(AncientEventModel ancient, string reason)
     {
         ReadyPageState? state;
         lock (SyncLock)
         {
-            if (!ReadyPages.Remove(neow, out state))
+            if (!ReadyPages.Remove(ancient, out state))
                 return;
         }
 
-        var restoredOptions = NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
-            neow,
-            state.OriginalOptions,
-            "ready_page_restore");
+        var restoredOptions = state.IsNeow
+            ? NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(ancient, state.OriginalOptions, "ready_page_restore")
+            : state.OriginalOptions;
         if (restoredOptions.Count == 0)
         {
-            neow.StartPreFinished();
+            ancient.StartPreFinished();
             MainFile.Logger.Info(
                 $"[StartingPersonNeowReadyFlow] Ready page restored by finishing Neow immediately because the original option page was empty | runKey={state.RunKey} reason={reason}.");
             return;
@@ -559,17 +575,17 @@ internal static class StartingPersonNeowReadyFlow
         if (SetEventStateMethod == null)
             throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
 
-        SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
+        SetEventStateMethod.Invoke(ancient, [state.OriginalDescription, restoredOptions]);
         MainFile.Logger.Info(
             $"[StartingPersonNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
     }
 
-    private static bool RebuildInitialOptionsOrFallback(Neow neow, string reason)
+    private static bool RebuildInitialOptionsOrFallback(AncientEventModel ancient, string reason)
     {
         ReadyPageState? state;
         lock (SyncLock)
         {
-            if (!ReadyPages.Remove(neow, out state))
+            if (!ReadyPages.Remove(ancient, out state))
                 return false;
         }
 
@@ -577,18 +593,24 @@ internal static class StartingPersonNeowReadyFlow
         {
             MainFile.Logger.Info(
                 $"[StartingPersonNeowReadyFlow] External Seven Curses Neow compat hit | runKey={state.RunKey} reason={reason} compatSource={StartingPersonaExternalNeowCompatHelper.DescribeDetectedSource()} restoreStrategy=restore_cached_external_page.");
-            RestoreCachedStateOrFinish(neow, state, $"{reason}:restore_cached_external_page");
+            RestoreCachedStateOrFinish(ancient, state, $"{reason}:restore_cached_external_page");
             return true;
         }
 
         if (SetInitialEventStateMethod == null)
         {
-            RestoreCachedStateOrFinish(neow, state, $"{reason}:missing_set_initial_event_state");
+            RestoreCachedStateOrFinish(ancient, state, $"{reason}:missing_set_initial_event_state");
             return false;
         }
 
         try
         {
+            if (ancient is not Neow neow)
+            {
+                RestoreCachedStateOrFinish(ancient, state, $"{reason}:external_ancient_cached_restore");
+                return true;
+            }
+
             var modifierFilterState = ApplyTemporaryNeowModifierFilter(neow, state.RunKey, reason);
             try
             {
@@ -604,7 +626,7 @@ internal static class StartingPersonNeowReadyFlow
             {
                 MainFile.Logger.Warn(
                     $"[StartingPersonNeowReadyFlow] Rebuilt Neow initial option page produced fewer options than the cached page; falling back to cached options | runKey={state.RunKey} reason={reason} rebuilt={rebuiltOptionCount} cached={cachedOptionCount}.");
-                RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached_after_short_rebuild");
+                RestoreCachedStateOrFinish(ancient, state, $"{reason}:fallback_cached_after_short_rebuild");
                 return false;
             }
 
@@ -615,7 +637,7 @@ internal static class StartingPersonNeowReadyFlow
         {
             MainFile.Logger.Warn(
                 $"[StartingPersonNeowReadyFlow] Failed to rebuild Neow initial option page; falling back to cached options | runKey={state.RunKey} reason={reason}: {ex}");
-            RestoreCachedStateOrFinish(neow, state, $"{reason}:fallback_cached");
+            RestoreCachedStateOrFinish(ancient, state, $"{reason}:fallback_cached");
         }
 
         return false;
@@ -663,17 +685,14 @@ internal static class StartingPersonNeowReadyFlow
             $"[StartingPersonNeowReadyFlow] Neow rebuild modifier filter restored | runKey={runKey} reason={reason} restored={state.OriginalModifiers.Count} filtered={state.FilteredCount}.");
     }
 
-    private static void RestoreCachedStateOrFinish(Neow neow, ReadyPageState state, string reason)
+    private static void RestoreCachedStateOrFinish(AncientEventModel ancient, ReadyPageState state, string reason)
     {
-        var restoredOptions = state.CachedPageKind == StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
+        var restoredOptions = !state.IsNeow || state.CachedPageKind == StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
             ? state.OriginalOptions
-            : NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(
-                neow,
-                state.OriginalOptions,
-                "ready_page_restore");
+            : NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(ancient, state.OriginalOptions, "ready_page_restore");
         if (restoredOptions.Count == 0)
         {
-            neow.StartPreFinished();
+            ancient.StartPreFinished();
             MainFile.Logger.Info(
                 $"[StartingPersonNeowReadyFlow] Ready page restored by finishing Neow immediately because the cached option page was empty | runKey={state.RunKey} reason={reason}.");
             return;
@@ -682,7 +701,7 @@ internal static class StartingPersonNeowReadyFlow
         if (SetEventStateMethod == null)
             throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
 
-        SetEventStateMethod.Invoke(neow, [state.OriginalDescription, restoredOptions]);
+        SetEventStateMethod.Invoke(ancient, [state.OriginalDescription, restoredOptions]);
         MainFile.Logger.Info(
             $"[StartingPersonNeowReadyFlow] Restored cached Neow option page | runKey={state.RunKey} reason={reason} pageKind={StartingPersonaExternalNeowCompatHelper.DescribePageKind(state.CachedPageKind)} optionCount={restoredOptions.Count}.");
     }
@@ -858,10 +877,7 @@ internal sealed class StartingPersonaNeowReadyInitialStatePatch
     [HarmonyPostfix]
     public static void Postfix(AncientEventModel __instance)
     {
-        if (__instance is not Neow neow)
-            return;
-
-        StartingPersonNeowReadyFlow.TryReplaceInitialState(neow);
+        StartingPersonNeowReadyFlow.TryReplaceInitialState(__instance);
     }
 }
 

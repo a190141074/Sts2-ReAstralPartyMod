@@ -50,7 +50,11 @@ public static class TokenSeriesAvailabilityHelper
         [TokenSeries.FinalArena] = "ASTRAL_FINAL_ARENA_SERIES"
     };
 
-    private static readonly Dictionary<TokenSeries, IReadOnlyList<ModelId>> RelicIdsBySeries = new()
+    // Run-data registration happens during the mod initializer, before the game invokes the
+    // one-shot model discovery pipeline. Keep ModelDb access out of this type's static
+    // initialization; these maps are only needed once a run or its UI queries token relics.
+    private static readonly Lazy<IReadOnlyDictionary<TokenSeries, IReadOnlyList<ModelId>>> RelicIdsBySeriesCache =
+        new(() => new Dictionary<TokenSeries, IReadOnlyList<ModelId>>
     {
         [TokenSeries.Dreamship] =
         [
@@ -97,13 +101,21 @@ public static class TokenSeriesAvailabilityHelper
             ModelDb.GetId<TokenExclusiveStunGun>(),
             ModelDb.GetId<TokenExclusiveTimePocketWatch>()
         ]
-    };
+        });
 
-    private static readonly Dictionary<ModelId, TokenSeries> RelicSeriesByRelicId = RelicIdsBySeries
-        .SelectMany(pair => pair.Value.Select(id => new KeyValuePair<ModelId, TokenSeries>(id, pair.Key)))
-        .ToDictionary(pair => pair.Key, pair => pair.Value);
+    private static IReadOnlyDictionary<TokenSeries, IReadOnlyList<ModelId>> RelicIdsBySeries =>
+        RelicIdsBySeriesCache.Value;
 
-    private static readonly Dictionary<ModelId, string> FallbackRelicTitles = new()
+    private static readonly Lazy<IReadOnlyDictionary<ModelId, TokenSeries>> RelicSeriesByRelicIdCache =
+        new(() => RelicIdsBySeries
+            .SelectMany(pair => pair.Value.Select(id => new KeyValuePair<ModelId, TokenSeries>(id, pair.Key)))
+            .ToDictionary(pair => pair.Key, pair => pair.Value));
+
+    private static IReadOnlyDictionary<ModelId, TokenSeries> RelicSeriesByRelicId =>
+        RelicSeriesByRelicIdCache.Value;
+
+    private static readonly Lazy<IReadOnlyDictionary<ModelId, string>> FallbackRelicTitlesCache =
+        new(() => new Dictionary<ModelId, string>
     {
         [ModelDb.GetId<TokenBlueGiantAnchor>()] = "【大铁锚】",
         [ModelDb.GetId<TokenExclusiveDreamshipModel>()] = "【梦想号模型】",
@@ -129,7 +141,9 @@ public static class TokenSeriesAvailabilityHelper
         [ModelDb.GetId<TokenExclusiveOriginalConsciousness>()] = "【原初意识】",
         [ModelDb.GetId<TokenExclusiveStunGun>()] = "【电击枪】",
         [ModelDb.GetId<TokenExclusiveTimePocketWatch>()] = "【时间怀表】"
-    };
+        });
+
+    private static IReadOnlyDictionary<ModelId, string> FallbackRelicTitles => FallbackRelicTitlesCache.Value;
 
     private static readonly Dictionary<string, TokenSeries> SeriesAliases =
         new(StringComparer.OrdinalIgnoreCase)
