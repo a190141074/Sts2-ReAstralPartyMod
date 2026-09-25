@@ -345,5 +345,8 @@
   "RE_ASTRAL_PARTY_MOD_POWER_LOAD_TERRAPRISMA_POWER.smartDescription": "次の攻撃牌を装填する。",
   "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.title": "真のドラゴンの姿",
   "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.description": "筋力+[blue]4[/blue]。\nダメージを受けるたび、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。",
-  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.smartDescription": "筋力+[blue]4[/blue]。\nダメージを受けるたび、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。"
+  "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.smartDescription": "筋力+[blue]4[/blue]。\nダメージを受けるたび、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。",
+  "RE_ASTRAL_PARTY_MOD_POWER_WINDFALL_HITS_POWER.title": "意外の財",
+  "RE_ASTRAL_PARTY_MOD_POWER_WINDFALL_HITS_POWER.description": "戦闘終了時、層数と同じゴールドを得る。",
+  "RE_ASTRAL_PARTY_MOD_POWER_WINDFALL_HITS_POWER.smartDescription": "戦闘終了時、層数と同じゴールドを得る。"
 }

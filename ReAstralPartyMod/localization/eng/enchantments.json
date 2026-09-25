@@ -13,5 +13,7 @@
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText_attack": "[red]-1[/red] damage. After played, gain [blue]4[/blue] Block.",
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText_skill": "[red]-1[/red] Block. After played, deal [blue]4[/blue] damage to a random enemy.",
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_MINI_LULU_ENCHANTMENT.title": "Mini Lulu",
-  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_MINI_LULU_ENCHANTMENT.description": "After this card is played, heal [blue]1[/blue]. If the player who played it has [gold][Person: Slime Lulu][/gold] or [gold][Person: Slime Lulu Beta][/gold], they may spend [blue]1[/blue] [gold]Half Life Heal[/gold] to heal [blue]1[/blue] more."
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_MINI_LULU_ENCHANTMENT.description": "After this card is played, heal [blue]1[/blue]. If the player who played it has [gold][Person: Slime Lulu][/gold] or [gold][Person: Slime Lulu Beta][/gold], they may spend [blue]1[/blue] [gold]Half Life Heal[/gold] to heal [blue]1[/blue] more.",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_WINDFALL_HITS_ENCHANTMENT.title": "Windfall Hits",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_WINDFALL_HITS_ENCHANTMENT.description": "The first time this card is played each combat, gain a random amount of [gold]Starlight[/gold]: [blue]1[/blue], [blue]2[/blue], [blue]3[/blue], [blue]5[/blue], or [blue]10[/blue]."
 }

@@ -13,5 +13,7 @@
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText_attack": "ダメージ[red]-1[/red]。使用後、[blue]4[/blue]ブロックを得る。",
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText_skill": "ブロック[red]-1[/red]。使用後、ランダムな敵1体に[blue]4[/blue]ダメージを与える。",
   "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_MINI_LULU_ENCHANTMENT.title": "迷你史莱姆",
-  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_MINI_LULU_ENCHANTMENT.description": "このカードをプレイした後、[blue]1[/blue]回復する。プレイしたプレイヤーが[gold]【性格：スライム】[/gold]または[gold]【性格：スライムβ】[/gold]を持つなら、[blue]1[/blue]層の[gold]治愈[/gold]を消費して、さらに[blue]1[/blue]回復できる。"
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_MINI_LULU_ENCHANTMENT.description": "このカードをプレイした後、[blue]1[/blue]回復する。プレイしたプレイヤーが[gold]【性格：スライム】[/gold]または[gold]【性格：スライムβ】[/gold]を持つなら、[blue]1[/blue]層の[gold]治愈[/gold]を消費して、さらに[blue]1[/blue]回復できる。",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_WINDFALL_HITS_ENCHANTMENT.title": "意外の財",
+  "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_WINDFALL_HITS_ENCHANTMENT.description": "戦闘ごとに初めてこのカードをプレイした時、[blue]1[/blue]、[blue]2[/blue]、[blue]3[/blue]、[blue]5[/blue]、[blue]10[/blue]のいずれかの[gold]星光[/gold]を得る。"
 }
