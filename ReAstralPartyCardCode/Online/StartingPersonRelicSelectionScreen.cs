@@ -63,6 +63,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
     private readonly Dictionary<ulong, int> _selectionSequencesByPlayer = new();
     private readonly Dictionary<ulong, int> _pendingLocalSelectionIndexes = new();
 
+    private ScrollContainer _holderScroll = null!;
     private Control _holderContainer = null!;
     private Label _titleLabel = null!;
     private Label _subtitleLabel = null!;
@@ -241,15 +242,25 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         };
         titlePanel.AddChild(_subtitleLabel);
 
+        _holderScroll = new ScrollContainer
+        {
+            Name = "HolderScroll",
+            MouseFilter = MouseFilterEnum.Pass,
+            HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled,
+            VerticalScrollMode = ScrollContainer.ScrollMode.Auto
+        };
+        _holderScroll.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+        _holderScroll.OffsetTop = 140f;
+        _holderScroll.OffsetBottom = -170f;
+        AddChild(_holderScroll);
+
         _holderContainer = new Control
         {
             Name = "HolderContainer",
-            MouseFilter = MouseFilterEnum.Pass
+            MouseFilter = MouseFilterEnum.Pass,
         };
-        _holderContainer.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-        _holderContainer.OffsetTop = 140f;
-        _holderContainer.OffsetBottom = -170f;
-        AddChild(_holderContainer);
+        _holderContainer.SetAnchorsAndOffsetsPreset(LayoutPreset.TopLeft);
+        _holderScroll.AddChild(_holderContainer);
 
         _fightBackstop = new ColorRect
         {
@@ -300,6 +311,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
             _holderContainer.AddChild(holder);
             holder.Connect(NClickableControl.SignalName.Released,
                 Callable.From<NTreasureRoomRelicHolder>(_ => OnHolderSelected(holder)));
+            holder.FocusEntered += () => _holderScroll.EnsureControlVisible(holder);
             _holdersByIndex[index] = holder;
         }
 
@@ -1122,23 +1134,44 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
     private void ConfigureHolderFocusNeighbors()
     {
         var holders = _holdersByIndex.Values.OrderBy(holder => holder.Index).ToList();
+        var columns = Math.Min(8, Math.Max(1, _relicOptions.Count));
+        var rows = (int)Math.Ceiling(_relicOptions.Count / (double)columns);
         for (var i = 0; i < holders.Count; i++)
         {
+            var row = i / columns;
+            var column = i % columns;
+            var rowCount = row == rows - 1 ? _relicOptions.Count - row * columns : columns;
+            var leftColumn = (column - 1 + rowCount) % rowCount;
+            var rightColumn = (column + 1) % rowCount;
+            var topRow = Math.Max(0, row - 1);
+            var bottomRow = Math.Min(rows - 1, row + 1);
+            var topRowCount = topRow == rows - 1 ? _relicOptions.Count - topRow * columns : columns;
+            var bottomRowCount = bottomRow == rows - 1 ? _relicOptions.Count - bottomRow * columns : columns;
+            var topIndex = topRow * columns + Math.Min(column, topRowCount - 1);
+            var bottomIndex = bottomRow * columns + Math.Min(column, bottomRowCount - 1);
             holders[i].SetFocusMode(FocusModeEnum.All);
-            holders[i].FocusNeighborTop = holders[i].GetPath();
-            holders[i].FocusNeighborBottom = holders[i].GetPath();
-            holders[i].FocusNeighborLeft = holders[(i - 1 + holders.Count) % holders.Count].GetPath();
-            holders[i].FocusNeighborRight = holders[(i + 1) % holders.Count].GetPath();
+            holders[i].FocusNeighborTop = holders[topIndex].GetPath();
+            holders[i].FocusNeighborBottom = holders[bottomIndex].GetPath();
+            holders[i].FocusNeighborLeft = holders[row * columns + leftColumn].GetPath();
+            holders[i].FocusNeighborRight = holders[row * columns + rightColumn].GetPath();
         }
     }
 
-    private static void ApplyHolderLayout(IReadOnlyList<NTreasureRoomRelicHolder> holders, int optionCount)
+    private void ApplyHolderLayout(IReadOnlyList<NTreasureRoomRelicHolder> holders, int optionCount)
     {
         const float horizontalSpacing = 176f;
         const float verticalSpacing = 190f;
+        const float topPadding = 24f;
+        const float bottomPadding = 24f;
 
         var columns = Math.Min(8, Math.Max(1, optionCount));
         var rows = (int)Math.Ceiling(optionCount / (double)columns);
+        var requiredWidth = (columns - 1) * horizontalSpacing + HolderWidth + 80f;
+        var contentWidth = Math.Max(1200f, Math.Max(requiredWidth, _holderScroll.Size.X));
+        var contentHeight = Math.Max(_holderScroll.Size.Y,
+            topPadding + HolderHeight + Math.Max(0, rows - 1) * verticalSpacing + bottomPadding);
+        _holderContainer.CustomMinimumSize = new Vector2(contentWidth, contentHeight);
+        _holderContainer.Size = new Vector2(contentWidth, contentHeight);
 
         for (var index = 0; index < holders.Count; index++)
         {
@@ -1146,13 +1179,14 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
             var row = index / columns;
             var column = index % columns;
             var rowCount = row == rows - 1 ? optionCount - row * columns : columns;
-            var x = (column - (rowCount - 1) * 0.5f) * horizontalSpacing - HolderWidth * 0.5f;
-            var y = (row - (rows - 1) * 0.5f) * verticalSpacing - HolderHeight * 0.5f - 30f;
+            var rowWidth = (rowCount - 1) * horizontalSpacing + HolderWidth;
+            var x = (contentWidth - rowWidth) * 0.5f + column * horizontalSpacing;
+            var y = topPadding + row * verticalSpacing;
 
-            holder.AnchorLeft = 0.5f;
-            holder.AnchorRight = 0.5f;
-            holder.AnchorTop = 0.5f;
-            holder.AnchorBottom = 0.5f;
+            holder.AnchorLeft = 0f;
+            holder.AnchorRight = 0f;
+            holder.AnchorTop = 0f;
+            holder.AnchorBottom = 0f;
             holder.OffsetLeft = x;
             holder.OffsetTop = y;
             holder.OffsetRight = x + HolderWidth;

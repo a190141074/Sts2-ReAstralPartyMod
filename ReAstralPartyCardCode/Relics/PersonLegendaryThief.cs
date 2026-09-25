@@ -27,7 +27,7 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_PersonLegendaryThiefCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonLegendaryThiefPendingCombatStartCard { get; set; }
-    [SavedProperty] public decimal AstralParty_PersonLegendaryThiefAppliedDexterity { get; set; }
+    [SavedProperty] public int AstralParty_PersonLegendaryThiefAppliedDexterity { get; set; }
 
     protected override int CounterValue { get => AstralParty_PersonLegendaryThiefCounter; set => AstralParty_PersonLegendaryThiefCounter = value; }
     protected override bool PendingCombatStartCard { get => AstralParty_PersonLegendaryThiefPendingCombatStartCard; set => AstralParty_PersonLegendaryThiefPendingCombatStartCard = value; }
@@ -39,7 +39,7 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
 
     public override async Task BeforeCombatStart()
     {
-        AstralParty_PersonLegendaryThiefAppliedDexterity = 0m;
+        AstralParty_PersonLegendaryThiefAppliedDexterity = 0;
         await SyncDexterity();
     }
 
@@ -105,9 +105,9 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
         if (creature == null)
             return;
 
-        var desired = Math.Floor(Math.Max(0m, creature.GetPowerAmount<StarLightPower>()) / 7m);
+        var desired = (int)Math.Floor(Math.Max(0m, creature.GetPowerAmount<StarLightPower>()) / 7m);
         var delta = desired - AstralParty_PersonLegendaryThiefAppliedDexterity;
-        if (delta == 0m)
+        if (delta == 0)
             return;
         AstralParty_PersonLegendaryThiefAppliedDexterity = desired;
         await PowerCmd.Apply<DexterityPower>(creature, delta, creature, null, true);

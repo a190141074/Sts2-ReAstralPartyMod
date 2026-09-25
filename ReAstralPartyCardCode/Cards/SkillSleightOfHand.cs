@@ -24,7 +24,7 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
         HoverTipFactory.FromPower<WindfallHitsPower>()
     ];
 
-    public SkillSleightOfHand() : base(0, CardType.Skill, CardRarity.Rare, CandyPotionTargetingHelper.AnyOtherLivingPlayer)
+    public SkillSleightOfHand() : base(0, CardType.Skill, CardRarity.Rare, CandyPotionTargetingHelper.AnyOtherLivingPlayerOrEnemy)
     {
     }
 
@@ -37,7 +37,7 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
         RecordTelemetryOnPlay();
         var owner = Owner;
         var target = cardPlay.Target;
-        if (owner?.Creature == null || target == null || !CandyPotionTargetingHelper.IsOtherLivingPlayer(target, owner.Creature))
+        if (owner?.Creature == null || target == null || !CandyPotionTargetingHelper.IsOtherLivingPlayerOrEnemy(target, owner))
             return;
 
         var targetStarLight = target.GetPower<StarLightPower>();

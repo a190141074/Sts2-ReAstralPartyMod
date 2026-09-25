@@ -268,6 +268,6 @@
   "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.select_prompt": "选择一项人格",
   "RE_ASTRAL_PARTY_MOD_CARD_TERRAPRISMA.title": "泰拉棱镜",
   "RE_ASTRAL_PARTY_MOD_CARD_TERRAPRISMA.description": "造成{Damage:diff()}点伤害。",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SLEIGHT_OF_HAND.title": "弹囊妙手",
-  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SLEIGHT_OF_HAND.description": "偷取目标[blue]4[/blue]星光，若目标为队友，为其随机手牌附魔：[gold]天降之财[/gold]"
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SLEIGHT_OF_HAND.title": "探囊妙手",
+  "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SLEIGHT_OF_HAND.description": "偷取目标[blue]4[/blue]星光；\n若目标为队友，为其随机手牌附魔：[gold]天降之财[/gold]。"
 }

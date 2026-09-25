@@ -2,7 +2,6 @@ using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Entities.Cards;
-using MegaCrit.Sts2.Core.Context;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using STS2RitsuLib.Combat.CardTargeting;
 
@@ -10,10 +9,10 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class CandyPotionTargetingHelper
 {
-    public static readonly TargetType AnyOtherLivingPlayer = CustomTargetType.RegisterSingleTargetType(
+    public static readonly TargetType AnyOtherLivingPlayerOrEnemy = CustomTargetType.RegisterSingleTargetType(
         MainFile.ModId,
-        "any_other_living_player",
-        static creature => IsOtherLivingPlayer(creature, null));
+        "any_other_living_player_or_enemy",
+        static (creature, owner) => IsOtherLivingPlayerOrEnemy(creature, owner));
 
     public static readonly TargetType AnyModifiedPlayer = CustomTargetType.RegisterSingleTargetType(
         MainFile.ModId,
@@ -26,11 +25,13 @@ public static class CandyPotionTargetingHelper
                && creature.GetPowerAmount<ModificationPower>() > 0m;
     }
 
-    public static bool IsOtherLivingPlayer(Creature? creature, Creature? owner)
+    public static bool IsOtherLivingPlayerOrEnemy(Creature? creature, Player? owner)
     {
-        return creature is { IsAlive: true, IsPet: false, Player: not null }
-               && !ReferenceEquals(creature, owner)
-               && !LocalContext.IsMe(creature.Player);
+        if (creature is not { IsAlive: true, IsPet: false })
+            return false;
+
+        // Enemies have no Player; player targets must be a different player.
+        return creature.Player == null || creature.Player != owner;
     }
 
     public static bool AnyModifiedPlayersInCombat(Player? owner)
