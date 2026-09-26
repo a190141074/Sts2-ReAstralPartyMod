@@ -155,5 +155,12 @@ public abstract class CooldownPersonRelicBase : PersonRelicBase
         RefreshCooldownDisplay();
     }
 
+    internal void ReduceCooldownProgressForExternalEffect(int amount)
+    {
+        if (amount <= 0 || PendingCombatStartCard) return;
+        CounterValue = Math.Max(1, CounterValue - amount);
+        RefreshCooldownDisplay();
+    }
+
     protected abstract Task GrantCooldownCard();
 }

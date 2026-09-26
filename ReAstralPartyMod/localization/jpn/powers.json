@@ -348,5 +348,7 @@
   "RE_ASTRAL_PARTY_MOD_POWER_TRUE_DRAGON_FORM_REAL_POWER.smartDescription": "筋力+[blue]4[/blue]。\nダメージを受けるたび、このターン【幻影・逆鱗】を[blue]1[/blue]層得る。",
   "RE_ASTRAL_PARTY_MOD_POWER_WINDFALL_HITS_POWER.title": "意外の財",
   "RE_ASTRAL_PARTY_MOD_POWER_WINDFALL_HITS_POWER.description": "戦闘終了時、層数と同じゴールドを得る。",
-  "RE_ASTRAL_PARTY_MOD_POWER_WINDFALL_HITS_POWER.smartDescription": "戦闘終了時、層数と同じゴールドを得る。"
+  "RE_ASTRAL_PARTY_MOD_POWER_WINDFALL_HITS_POWER.smartDescription": "戦闘終了時、層数と同じゴールドを得る。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ENERGY_POWER.title": "チャージ",
+  "RE_ASTRAL_PARTY_MOD_POWER_ENERGY_POWER.description": "湧き上がるエネルギー、最大[blue]10[/blue]層。"
 }

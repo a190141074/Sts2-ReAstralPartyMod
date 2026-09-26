@@ -728,5 +728,21 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_LAKE_MARSH_KING.flavor": "沼の底で、真竜が目覚める。",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_LEGENDARY_THIEF.title": "【人格：大盗】",
   "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_LEGENDARY_THIEF.description": "· [blue]3[/blue]ターンごとの開始時、[blue]1[/blue]枚の[gold]探囊妙手[/gold]を手札に加える。\n· [gold]攻撃カード[/gold]のダメージ-[blue]1[/blue]。さらに[blue]1[/blue]点の[gold]意外の財[/gold]を盗む。\n· 他の方法では[gold]敏捷[/gold]を得られない。自身の[gold]意外の財[/gold][blue]7[/blue]点ごとに、[gold]敏捷[/gold]を[blue]1[/blue]得る。\n· 死亡時、[blue]60[/blue]+現在の[gold]ゴールド[/gold]を全プレイヤーに均等に分配する。",
-  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_LEGENDARY_THIEF.flavor": "富は誰のものでもない。"
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_LEGENDARY_THIEF.flavor": "富は誰のものでもない。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_BLUE_ENERGY_RECYCLER.title": "【エネルギー回収】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_BLUE_ENERGY_RECYCLER.description": "· エネルギーを5消費するたび、[gold]チャージ[/gold]を2層得る。\n· 自分のターン開始時、[gold]チャージ[/gold]が5より多ければ、{energyPrefix:energyIcons(1)}を得る。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_BLUE_ELECTRIC_BLADE.title": "【電流の剣】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_BLUE_ELECTRIC_BLADE.description": "· コスト1以上の攻撃カードをプレイした後、[gold]チャージ[/gold]を1層得る。\n· [gold]チャージ[/gold]が7より多ければ、一時的な筋力を2得る。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_PURPLE_AIR_BAG.title": "【安全エアバッグ】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_PURPLE_AIR_BAG.description": "· ブロックされなかったダメージを受けた後、{energyPrefix:energyIcons(1)}を得る。\n· 致命的なダメージを受けるとき、[gold]チャージ[/gold]を6層消費し、そのダメージを0にする。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_PURPLE_SHOCK_GLOVES.title": "【電撃グローブ】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_PURPLE_SHOCK_GLOVES.description": "· スキルカードをプレイするたび、[gold]チャージ[/gold]を2層得る。\n· ターン終了時、[gold]チャージ[/gold]を4層消費し、最も近い2体の敵に6ダメージを与える。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_BLUE_WARP_ENGINE.title": "【ワープエンジン】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_BLUE_WARP_ENGINE.description": "ショップまたは休憩所を離れると、次の戦闘開始時に[gold]チャージ[/gold]を2層、敏捷を2得る。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_PURPLE_ELECTRIC_CORE.title": "【電流コア】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_PURPLE_ELECTRIC_CORE.description": "· 人格スキルカードを得るたび、[gold]チャージ[/gold]を1層得る。\n· 人格スキルカードを使用した後、{energyPrefix:energyIcons(1)}を得て、[gold]チャージ[/gold]を5層消費し、人格クールダウンを1減らす。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_PERPETUAL_MOTION_MACHINE.title": "【永久機関】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_PERPETUAL_MOTION_MACHINE.description": "· 戦闘開始時、敏捷を1得る。ボス戦では倍になる。\n· 自分のターン開始時、[gold]チャージ[/gold]が6未満なら6にする。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ELECTROMAGNETIC_GUN.title": "【電磁砲】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ELECTROMAGNETIC_GUN.description": "· 戦闘開始時、筋力を1得る。ボス戦開始時は倍になる。\n· 攻撃カードをプレイした後、[gold]チャージ[/gold]を4層消費し、命中した最初の対象とその最も近い2体の敵に、攻撃カードの基礎ダメージ50%+筋力層数の追加ダメージを与える。"
 }

@@ -35,4 +35,12 @@ public static class PersonRelicHelper
                     break;
             }
     }
+
+    public static void ReduceCooldownRelics(Player owner, int amount)
+    {
+        if (amount <= 0) return;
+        foreach (var relic in owner.Relics)
+            if (relic is CooldownPersonRelicBase cooldown)
+                cooldown.ReduceCooldownProgressForExternalEffect(amount);
+    }
 }

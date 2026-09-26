@@ -118,7 +118,7 @@ public abstract class RandomTokenPackRelicBase : AstralPartyRelicModel
         bool excludeOwned,
         IReadOnlySet<ModelId> selectedIds)
     {
-        return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(owner.RunState, rarity)
+        return TokenRelicRegistry.GetAvailableNonDiceTokenRelicsByRarity(owner.RunState, rarity, true)
             .Where(relic => !TokenRelicRegistry.IsSeriesTokenRelic(relic))
             .Where(relic => !selectedIds.Contains(TokenRewardSelectionHelper.GetCanonicalId(relic)))
             .Where(relic =>

@@ -23,6 +23,8 @@ public static class TokenRelicRegistry
         typeof(TokenBlueDie6),
         typeof(TokenBlueDie8),
         typeof(TokenBlueElegantFeather),
+        typeof(TokenBlueEnergyRecycler),
+        typeof(TokenBlueElectricBlade),
         typeof(TokenBlueFlashlightGeneral),
         typeof(TokenBlueGiantAnchor),
         typeof(TokenBlueHandheldFanSmall),
@@ -33,6 +35,7 @@ public static class TokenRelicRegistry
         typeof(TokenBlueSandwichBiscuitGeneral),
         typeof(TokenBlueSpeedRollerGeneral),
         typeof(TokenBlueTargetBoard),
+        typeof(TokenBlueWarpEngine),
         typeof(TokenEternalStarlight),
         typeof(TokenExclusiveAncientWand),
         typeof(TokenExclusiveAdaptiveCore),
@@ -76,6 +79,8 @@ public static class TokenRelicRegistry
         typeof(TokenGoldMedicalKitCompleteTreatment),
         typeof(TokenGoldMotorcycleHelmetPremium),
         typeof(TokenGoldNinjaShuriken),
+        typeof(TokenGoldPerpetualMotionMachine),
+        typeof(TokenGoldElectromagneticGun),
         typeof(TokenGoldSandwichBiscuitPremium),
         typeof(TokenGoldSpeedRollerPremium),
         typeof(TokenGoldStarCoinHammer),
@@ -90,6 +95,9 @@ public static class TokenRelicRegistry
         typeof(TokenPurpleFlyingStar),
         typeof(TokenPurpleFriendshipBadge),
         typeof(TokenPurpleHandheldFanLarge),
+        typeof(TokenPurpleAirBag),
+        typeof(TokenPurpleShockGloves),
+        typeof(TokenPurpleElectricCore),
         typeof(TokenPurpleMembersReferencePremium),
         typeof(TokenPurpleMotorcycleHelmetIntermediate),
         typeof(TokenPurpleSandwichBiscuitIntermediate),
@@ -135,12 +143,14 @@ public static class TokenRelicRegistry
     public static IReadOnlyList<RelicModel> GetAvailableTokenRelicsByRarity(
         IRunState? runState,
         RelicRarity rarity,
-        bool excludeDice = false)
+        bool excludeDice = false,
+        bool includeChargeTokens = false)
     {
         return GetCanonicalTokenRelics()
             .Where(relic => relic.Rarity == rarity)
             .Where(IsTokenRelicPoolCandidate)
             .Where(relic => !excludeDice || !DiceSeriesHelper.IsDiceSeriesRelic(relic))
+            .Where(relic => includeChargeTokens || !ChargeTokenRegistry.IsChargeToken(relic))
             .Where(relic => TokenSeriesAvailabilityHelper.IsRelicAvailableForRun(runState, relic))
             .Where(relic => !BannedRelicRegistry.IsBanned(
                 ReAstralPartyModSettingsManager.GetBannedRelicIds(runState),
@@ -163,9 +173,9 @@ public static class TokenRelicRegistry
     }
 
     public static IReadOnlyList<RelicModel> GetAvailableNonDiceTokenRelicsByRarity(IRunState? runState,
-        RelicRarity rarity)
+        RelicRarity rarity, bool includeChargeTokens = false)
     {
-        return GetAvailableTokenRelicsByRarity(runState, rarity, true);
+        return GetAvailableTokenRelicsByRarity(runState, rarity, true, includeChargeTokens);
     }
 
     public static bool IsTokenRelic(RelicModel relic)
