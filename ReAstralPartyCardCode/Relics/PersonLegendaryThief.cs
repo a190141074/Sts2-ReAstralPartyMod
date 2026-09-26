@@ -31,7 +31,7 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
 
     protected override int CounterValue { get => AstralParty_PersonLegendaryThiefCounter; set => AstralParty_PersonLegendaryThiefCounter = value; }
     protected override bool PendingCombatStartCard { get => AstralParty_PersonLegendaryThiefPendingCombatStartCard; set => AstralParty_PersonLegendaryThiefPendingCombatStartCard = value; }
-    protected override int BaseMaxCounter => 3;
+    protected override int BaseMaxCounter => 4;
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
@@ -45,7 +45,7 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
 
     public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
     {
-        if (Owner?.Creature == null || power.Owner != Owner.Creature || power is not StarLightPower)
+        if (Owner?.Creature == null || power.Owner != Owner.Creature || power is not WindfallHitsPower)
             return;
         await SyncDexterity();
     }
@@ -105,7 +105,7 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
         if (creature == null)
             return;
 
-        var desired = (int)Math.Floor(Math.Max(0m, creature.GetPowerAmount<StarLightPower>()) / 7m);
+        var desired = (int)Math.Floor(Math.Max(0m, creature.GetPowerAmount<WindfallHitsPower>()) / 7m);
         var delta = desired - AstralParty_PersonLegendaryThiefAppliedDexterity;
         if (delta == 0)
             return;

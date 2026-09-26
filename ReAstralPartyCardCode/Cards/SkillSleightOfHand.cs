@@ -9,6 +9,7 @@ using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using ReAstralPartyMod.ReAstralPartyCardCode.Enchantments;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Combat.CardTargeting;
@@ -18,6 +19,11 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(PersonSkillCardPool))]
 public sealed class SkillSleightOfHand : PersonSkillCardModel
 {
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        [AstralKeywords.AstralUnique];
+
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<StarLightPower>(),

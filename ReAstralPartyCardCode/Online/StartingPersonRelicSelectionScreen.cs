@@ -252,6 +252,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         _holderScroll.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
         _holderScroll.OffsetTop = 140f;
         _holderScroll.OffsetBottom = -170f;
+        ConfigureHolderScrollBar(_holderScroll.GetVScrollBar());
         AddChild(_holderScroll);
 
         _holderContainer = new Control
@@ -289,6 +290,29 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         _fightLabel.OffsetRight = 320f;
         _fightLabel.OffsetBottom = 220f;
         _fightBackstop.AddChild(_fightLabel);
+    }
+
+    private static void ConfigureHolderScrollBar(VScrollBar scrollBar)
+    {
+        scrollBar.CustomMinimumSize = new Vector2(18f, 0f);
+        scrollBar.AddThemeConstantOverride("minimum_grab_thickness", 18);
+        scrollBar.AddThemeStyleboxOverride("scroll", CreateScrollBarStyle(new Color(0.08f, 0.08f, 0.1f, 0.42f)));
+        scrollBar.AddThemeStyleboxOverride("grabber", CreateScrollBarStyle(new Color(0.78f, 0.72f, 0.58f, 0.9f), 8));
+        scrollBar.AddThemeStyleboxOverride("grabber_highlight", CreateScrollBarStyle(new Color(0.92f, 0.86f, 0.68f, 0.98f), 8));
+        scrollBar.AddThemeStyleboxOverride("grabber_pressed", CreateScrollBarStyle(new Color(1f, 0.91f, 0.58f, 1f), 8));
+    }
+
+    private static StyleBoxFlat CreateScrollBarStyle(Color color, int cornerRadius = 0)
+    {
+        var style = new StyleBoxFlat
+        {
+            BgColor = color,
+            CornerRadiusTopLeft = cornerRadius,
+            CornerRadiusTopRight = cornerRadius,
+            CornerRadiusBottomLeft = cornerRadius,
+            CornerRadiusBottomRight = cornerRadius
+        };
+        return style;
     }
 
     private async Task BuildRelicHoldersIfNeededAsync()
