@@ -22,7 +22,7 @@ public class TokenBlueMarkSprayCan : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>()
+        HoverTipFactory.FromPower<EffectsMarkPower>()
     ];
 
     public override async Task AfterDamageGiven(
@@ -37,7 +37,7 @@ public class TokenBlueMarkSprayCan : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<MarkLockPower>(target, 1m, Owner?.Creature, cardSource, false);
+        await PowerCmd.Apply<EffectsMarkPower>(target, 1m, Owner?.Creature, cardSource, false);
     }
 
     private bool IsTrackedSkillDamage(Creature? target, decimal amount, Creature? dealer, CardModel? cardSource)

@@ -18,7 +18,7 @@ public class InvestigationTargetPower : AstralPartyPowerModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>(),
+        HoverTipFactory.FromPower<EffectsMarkPower>(),
         HoverTipFactory.FromPower<ConcealingPower>()
     ];
 

@@ -22,7 +22,7 @@ public class EventGiftFromSky : AstralPartyCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
@@ -47,7 +47,7 @@ public class EventGiftFromSky : AstralPartyCardModel
         {
             await CardGainAttribution.RunWithSource(this,
                 () => CardPileCmd.Draw(choiceContext, (int)DynamicVars["Cards"].BaseValue, player));
-            await PowerCmd.Apply(ModelDb.Power<StarLightPower>().ToMutable(), player.Creature,
+            await PowerCmd.Apply(ModelDb.Power<EffectsStarlightPower>().ToMutable(), player.Creature,
                 DynamicVars["StarLight"].BaseValue, Owner.Creature, this, false);
         }
     }

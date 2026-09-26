@@ -19,7 +19,7 @@ public class TokenGoldBigStewBowl : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<HalfLifeHealPower>()
+        HoverTipFactory.FromPower<EffectsHealPower>()
     ];
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
@@ -33,7 +33,7 @@ public class TokenGoldBigStewBowl : AstralPartyRelicModel
             if (player.Creature == null || !player.Creature.IsAlive)
                 continue;
 
-            await PowerCmd.Apply<HalfLifeHealPower>(player.Creature, 1m, Owner.Creature, null, false);
+            await PowerCmd.Apply<EffectsHealPower>(player.Creature, 1m, Owner.Creature, null, false);
             await CreatureCmd.Heal(player.Creature, 1m, true);
         }
     }

@@ -21,7 +21,7 @@ internal static class UniversalAmplificationDisplayHelper
 
         total += creature.GetPowerAmount<ChannelEnergyAttackBoostPower>();
         total += creature.GetPowerAmount<BaiZeBlessingPower>() > 0m
-            ? creature.GetPowerAmount<HalfLifeHealPower>()
+            ? creature.GetPowerAmount<EffectsHealPower>()
             : 0m;
         total += GetSwordGustAttackBonus(creature);
         total += MosesCombatHelper.GetEquivalentAttackBonus(player);
@@ -30,7 +30,7 @@ internal static class UniversalAmplificationDisplayHelper
         if (player.GetRelic<TokenPurpleBasicScope>() != null)
             total += 2m;
         if (player.GetRelic<TokenGoldArtKnifeSharp>() != null && ArtKnifeActivationHelper.IsActivationSatisfied(creature))
-            total += creature.GetPowerAmount<HalfLifeHealPower>();
+            total += creature.GetPowerAmount<EffectsHealPower>();
 
         return Math.Max(0m, total);
     }

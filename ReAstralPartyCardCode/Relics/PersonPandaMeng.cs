@@ -48,7 +48,7 @@ public class PersonPandaMeng : CooldownPersonRelicBase
     [
         HoverTipFactory.FromCard<SkillBigEater>(),
         HoverTipFactory.FromPower<RegenPower>(),
-        HoverTipFactory.FromPower<HalfLifeHealPower>(),
+        HoverTipFactory.FromPower<EffectsHealPower>(),
         .. HoverTipFactory.FromRelic<PersonalityDerivativePandaMeng>()
     ];
 
@@ -98,8 +98,8 @@ public class PersonPandaMeng : CooldownPersonRelicBase
                     AstralParty_PersonPandaMengObservedRegenerationAmount,
                     value => AstralParty_PersonPandaMengObservedRegenerationAmount = value);
                 break;
-            case HalfLifeHealPower:
-                await HandleSharedSupportPowerGain<HalfLifeHealPower>(
+            case EffectsHealPower:
+                await HandleSharedSupportPowerGain<EffectsHealPower>(
                     GetObservedPowerAmount(power.Amount),
                     AstralParty_PersonPandaMengObservedHalfLifeHealAmount,
                     value => AstralParty_PersonPandaMengObservedHalfLifeHealAmount = value);
@@ -172,7 +172,7 @@ public class PersonPandaMeng : CooldownPersonRelicBase
         AstralParty_PersonPandaMengObservedRegenerationAmount =
             GetObservedPowerAmount(Owner?.Creature?.GetPowerAmount<RegenPower>() ?? 0m);
         AstralParty_PersonPandaMengObservedHalfLifeHealAmount =
-            GetObservedPowerAmount(Owner?.Creature?.GetPowerAmount<HalfLifeHealPower>() ?? 0m);
+            GetObservedPowerAmount(Owner?.Creature?.GetPowerAmount<EffectsHealPower>() ?? 0m);
     }
 
     private static int GetObservedPowerAmount(decimal amount)

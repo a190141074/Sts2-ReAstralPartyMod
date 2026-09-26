@@ -22,7 +22,7 @@ public abstract class ArtKnifeRelicBase : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<HalfLifeHealPower>(),
+        HoverTipFactory.FromPower<EffectsHealPower>(),
         HoverTipFactory.FromPower<StrengthPower>()
     ];
 
@@ -64,7 +64,7 @@ public abstract class ArtKnifeRelicBase : AstralPartyRelicModel
         if (!WarforgeEnchantmentHelper.MatchesCardType(cardSource, DamageCardType))
             return 0m;
 
-        return Owner.Creature.GetPowerAmount<HalfLifeHealPower>() / HealDamageDivisor;
+        return Owner.Creature.GetPowerAmount<EffectsHealPower>() / HealDamageDivisor;
     }
 
     private bool IsAtFullHp()

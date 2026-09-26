@@ -9,7 +9,7 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
-public class MarkLockPower : AstralPartyPowerModel
+public class EffectsMarkPower : AstralPartyPowerModel
 {
     public override PowerType Type => PowerType.Debuff;
 

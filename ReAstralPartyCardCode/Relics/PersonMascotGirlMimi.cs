@@ -53,7 +53,7 @@ public class PersonMascotGirlMimi : CooldownPersonRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillProductRestocking>(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task AfterObtained()

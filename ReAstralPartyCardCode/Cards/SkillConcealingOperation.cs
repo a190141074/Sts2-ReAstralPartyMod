@@ -41,8 +41,8 @@ public class SkillConcealingOperation : AstralPartyCardModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<InvestigationTargetPower>(),
-        HoverTipFactory.FromPower<MarkLockPower>(),
-        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromPower<EffectsMarkPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralInvestigationProgressId)
     ];
 
@@ -66,11 +66,11 @@ public class SkillConcealingOperation : AstralPartyCardModel
             return;
 
         await ConcealingInvestigationHelper.ApplyInvestigationTarget(target, owner, this);
-        await PowerCmd.Apply<MarkLockPower>(target, MarkAmount, ownerCreature, this, false);
+        await PowerCmd.Apply<EffectsMarkPower>(target, MarkAmount, ownerCreature, this, false);
 
-        var targetMarks = target.GetPowerAmount<MarkLockPower>();
+        var targetMarks = target.GetPowerAmount<EffectsMarkPower>();
         if (targetMarks > 0m)
-            await PowerCmd.Apply<StarLightPower>(ownerCreature, targetMarks * 2m, ownerCreature, this, false);
+            await PowerCmd.Apply<EffectsStarlightPower>(ownerCreature, targetMarks * 2m, ownerCreature, this, false);
 
         await ConcealingInvestigationHelper.TryTriggerTruthUnveiledOnSpecialTarget(choiceContext, owner, owner, this);
     }
@@ -92,4 +92,3 @@ public class SkillConcealingOperation : AstralPartyCardModel
         };
     }
 }
-

@@ -42,7 +42,7 @@ public class VariantPersonWeirdEgg : LegacyCooldownPersonRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillAnomalyMaker>(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task AfterObtained()
@@ -82,7 +82,7 @@ public class VariantPersonWeirdEgg : LegacyCooldownPersonRelicBase
             return;
 
         Flash();
-        await PowerCmd.Apply<StarLightPower>(
+        await PowerCmd.Apply<EffectsStarlightPower>(
             Owner.Creature,
             StarLightPerTriggeredEventCard,
             Owner.Creature,

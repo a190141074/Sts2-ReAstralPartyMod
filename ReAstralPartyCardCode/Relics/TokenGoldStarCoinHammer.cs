@@ -49,7 +49,7 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
     [
         TokenEternalStarlight.BuildReferenceHoverTip(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralEternalStarlightSetId),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task AfterObtained()
@@ -243,6 +243,6 @@ public class TokenGoldStarCoinHammer : AstralPartyRelicModel
 
         var pendingAmount = AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill;
         AstralParty_RelicGoldStarCoinHammerPendingStarLightOnKill = 0;
-        await PowerCmd.Apply<StarLightPower>(Owner.Creature, pendingAmount, Owner.Creature, source, false);
+        await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, pendingAmount, Owner.Creature, source, false);
     }
 }

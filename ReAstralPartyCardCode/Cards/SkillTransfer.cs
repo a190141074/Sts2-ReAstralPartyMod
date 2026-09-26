@@ -33,7 +33,7 @@ public class SkillTransfer : AstralPartyCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public SkillTransfer() : base(
@@ -61,7 +61,7 @@ public class SkillTransfer : AstralPartyCardModel
         Owner.GetRelic<TokenGoldStarCoinHammer>()?.RefreshDisplayedBonusDamage();
         Owner.GetRelic<PersonalityDerivativeProprietressWealthism>()?.RecordTransferSpend(TransferGoldCost);
         await PowerCmd.Apply(
-            ModelDb.Power<StarLightPower>().ToMutable(),
+            ModelDb.Power<EffectsStarlightPower>().ToMutable(),
             resolvedTarget,
             TransferStarLightAmount,
             ownerCreature,

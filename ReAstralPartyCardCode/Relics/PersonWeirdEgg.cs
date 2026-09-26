@@ -58,7 +58,7 @@ public class PersonWeirdEgg : LegacyCooldownPersonRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillTroubleMaker>(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task AfterObtained()
@@ -98,7 +98,7 @@ public class PersonWeirdEgg : LegacyCooldownPersonRelicBase
             return;
 
         Flash();
-        await PowerCmd.Apply<StarLightPower>(
+        await PowerCmd.Apply<EffectsStarlightPower>(
             Owner.Creature,
             StarLightPerTriggeredEventCard,
             Owner.Creature,

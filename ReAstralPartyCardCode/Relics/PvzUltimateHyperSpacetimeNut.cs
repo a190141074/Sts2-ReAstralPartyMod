@@ -149,9 +149,9 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
 
             for (var i = 0; i < rewardCount; i++)
             {
-                await PowerCmd.Apply<HalfLifeHealPower>(ownerCreature, ImmunityHealAmount, ownerCreature, null, false);
+                await PowerCmd.Apply<EffectsHealPower>(ownerCreature, ImmunityHealAmount, ownerCreature, null, false);
                 await PowerCmd.Apply(
-                    ModelDb.Power<StarLightPower>().ToMutable(),
+                    ModelDb.Power<EffectsStarlightPower>().ToMutable(),
                     ownerCreature,
                     ImmunityStarLightAmount,
                     ownerCreature,

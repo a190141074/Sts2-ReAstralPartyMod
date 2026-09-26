@@ -23,7 +23,7 @@ public class TokenPurpleBasicScope : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>()
+        HoverTipFactory.FromPower<EffectsMarkPower>()
     ];
 
     public override decimal ModifyDamageAdditive(
@@ -52,7 +52,7 @@ public class TokenPurpleBasicScope : AstralPartyRelicModel
         if (result.TotalDamage <= 0m)
             return;
 
-        await PowerCmd.Apply<MarkLockPower>(target, 1m, Owner?.Creature, cardSource, false);
+        await PowerCmd.Apply<EffectsMarkPower>(target, 1m, Owner?.Creature, cardSource, false);
     }
 
     private bool IsTrackedAttack(Creature? target, decimal amount, Creature? dealer, CardModel? cardSource)

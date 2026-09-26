@@ -23,7 +23,7 @@ public class TokenGoldNinjaShuriken : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>(),
+        HoverTipFactory.FromPower<EffectsMarkPower>(),
         HoverTipFactory.FromPower<SkillPointPower>()
     ];
 
@@ -45,7 +45,7 @@ public class TokenGoldNinjaShuriken : AstralPartyRelicModel
         if (!IsTrackedSkillDamage(target, amount, dealer, cardSource))
             return 0m;
 
-        var marks = target?.GetPowerAmount<MarkLockPower>() ?? 0m;
+        var marks = target?.GetPowerAmount<EffectsMarkPower>() ?? 0m;
         return StableNumericStateHelper.FloorDivisionToNonNegativeInt(marks, 2m);
     }
 

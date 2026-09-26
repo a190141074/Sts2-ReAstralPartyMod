@@ -27,7 +27,7 @@ public class TokenGoldVitamin : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<HalfLifeHealPower>()
+        HoverTipFactory.FromPower<EffectsHealPower>()
     ];
 
     public override async Task AfterObtained()
@@ -67,6 +67,6 @@ public class TokenGoldVitamin : AstralPartyRelicModel
 
         AstralParty_TokenGoldVitaminTriggerCountThisTurn++;
         Flash();
-        await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, 1m, Owner.Creature, card, false);
+        await PowerCmd.Apply<EffectsHealPower>(Owner.Creature, 1m, Owner.Creature, card, false);
     }
 }

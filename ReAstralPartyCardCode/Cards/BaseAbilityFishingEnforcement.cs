@@ -20,7 +20,7 @@ public class BaseAbilityFishingEnforcement : BaseAbilityCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Exhaust];
@@ -40,7 +40,7 @@ public class BaseAbilityFishingEnforcement : BaseAbilityCardModel
 
         if (PandaPersonaHelper.HasAttackIntent(cardPlay.Target!))
         {
-            await PowerCmd.Apply<StarLightPower>(Owner.Creature, 5m, Owner.Creature, this, false);
+            await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, 5m, Owner.Creature, this, false);
             return;
         }
 

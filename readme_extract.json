@@ -259,7 +259,7 @@
       "type": "Skill",
       "rarity": "Rare",
       "target": "AnyAlly",
-      "desc": "Gain {HalfLifeHealPower:diff()} [power]Half Life Heal[/power]."
+      "desc": "Gain {EffectsHealPower:diff()} [power]Half Life Heal[/power]."
     },
     {
       "class": "SkillIronVirgin",
@@ -553,7 +553,7 @@
       "desc": "Each stack gives you [blue]1[/blue] temporary [red]Strength[/red]. Lose [blue]1[/blue] stack at the end of your turn."
     },
     {
-      "class": "HalfLifeHealPower",
+      "class": "EffectsHealPower",
       "title": "Half Life Heal",
       "type": "Buff",
       "stack": "Counter",
@@ -602,7 +602,7 @@
       "desc": "Each stack grants [blue]1[/blue] [red]Strength[/red] and [blue]1[/blue] [green]Dexterity[/green]."
     },
     {
-      "class": "MarkLockPower",
+      "class": "EffectsMarkPower",
       "title": "Mark",
       "type": "Debuff",
       "stack": "Counter",
@@ -672,7 +672,7 @@
       "desc": "Whenever you play an Attack or Skill that actually spends at least [blue]1[/blue] Energy and it deals damage, spend [blue]1[/blue] [gold]Stagnant Protocol[/gold] to apply [gold]Stagnation[/gold] to the target equal to that card's cost."
     },
     {
-      "class": "StarLightPower",
+      "class": "EffectsStarlightPower",
       "title": "StarLight",
       "type": "Buff",
       "stack": "Counter",

@@ -23,10 +23,10 @@ public class EventAnomalyDemonLordProtection : AstralPartyCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>(),
+        HoverTipFactory.FromPower<EffectsMarkPower>(),
         HoverTipFactory.FromPower<VulnerablePower>(),
         HoverTipFactory.FromPower<WeakPower>(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public EventAnomalyDemonLordProtection() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AllEnemies)
@@ -44,12 +44,12 @@ public class EventAnomalyDemonLordProtection : AstralPartyCardModel
 
         foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(CombatState, Owner.Creature))
         {
-            await PowerCmd.Apply<MarkLockPower>(enemy, MarkAmount, Owner.Creature, this, false);
+            await PowerCmd.Apply<EffectsMarkPower>(enemy, MarkAmount, Owner.Creature, this, false);
             await PowerCmd.Apply<VulnerablePower>(enemy, VulnerableAmount, Owner.Creature, this, false);
             await PowerCmd.Apply<WeakPower>(enemy, WeakAmount, Owner.Creature, this, false);
         }
 
         foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
-            await PowerCmd.Apply<StarLightPower>(player.Creature, StarLightAmount, Owner.Creature, this, false);
+            await PowerCmd.Apply<EffectsStarlightPower>(player.Creature, StarLightAmount, Owner.Creature, this, false);
     }
 }

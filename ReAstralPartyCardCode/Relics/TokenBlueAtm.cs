@@ -23,7 +23,7 @@ public class TokenBlueAtm : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override bool TryModifyPowerAmountReceived(
@@ -39,7 +39,7 @@ public class TokenBlueAtm : AstralPartyRelicModel
             return false;
         if (Owner?.Creature == null)
             return false;
-        if (canonicalPower is not StarLightPower)
+        if (canonicalPower is not EffectsStarlightPower)
             return false;
         if (applier != Owner.Creature)
             return false;
@@ -72,7 +72,7 @@ public class TokenBlueAtm : AstralPartyRelicModel
         }
         if (power.Owner == Owner.Creature)
             return;
-        if (power is not StarLightPower)
+        if (power is not EffectsStarlightPower)
             return;
         if (applier != Owner.Creature)
             return;
@@ -88,7 +88,7 @@ public class TokenBlueAtm : AstralPartyRelicModel
         try
         {
             await PowerCmd.Apply(
-                ModelDb.Power<StarLightPower>().ToMutable(),
+                ModelDb.Power<EffectsStarlightPower>().ToMutable(),
                 Owner.Creature,
                 pendingSelfStarLight,
                 Owner.Creature,

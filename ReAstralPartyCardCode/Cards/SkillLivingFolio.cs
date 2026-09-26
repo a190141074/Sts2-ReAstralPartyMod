@@ -43,7 +43,7 @@ public class SkillLivingFolio : AstralPartyCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>(),
+        HoverTipFactory.FromPower<EffectsMarkPower>(),
         HoverTipFactory.FromPower<SurveyFindsPower>()
     ];
 
@@ -96,7 +96,7 @@ public class SkillLivingFolio : AstralPartyCardModel
         if (owner.GetRelic<PersonDeityLin>() is not { } personDeityLin)
             return;
 
-        var targetMarksBeforePlay = target.GetPowerAmount<MarkLockPower>();
+        var targetMarksBeforePlay = target.GetPowerAmount<EffectsMarkPower>();
         personDeityLin.RecordLivingFolioConsumption(1);
 
         await CreatureCmd.Damage(
@@ -107,7 +107,7 @@ public class SkillLivingFolio : AstralPartyCardModel
             ownerCreature,
             this);
 
-        await PowerCmd.Apply<MarkLockPower>(target, 1m, ownerCreature, this, false);
+        await PowerCmd.Apply<EffectsMarkPower>(target, 1m, ownerCreature, this, false);
 
         if (targetMarksBeforePlay >= 3m && personDeityLin.TryRefundLivingFolioEnergy())
             await PlayerCmd.GainEnergy(1m, owner);

@@ -38,7 +38,7 @@ internal static class MiniLuluEnchantmentHelper
         if (!HasEligibleSlimePersona(owner))
             return;
 
-        var halfLifeHeal = ownerCreature.GetPower<HalfLifeHealPower>();
+        var halfLifeHeal = ownerCreature.GetPower<EffectsHealPower>();
         if (halfLifeHeal == null || halfLifeHeal.Amount < ExtraHealCost)
             return;
 

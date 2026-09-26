@@ -44,7 +44,7 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
     [
         HoverTipFactory.FromCard<SkillPowerfulPityPlus>(),
         .. HoverTipFactory.FromRelic<PersonalityDerivativeFallenHeavenlyKing>(),
-        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
         TokenEternalStarlight.BuildReferenceHoverTip()
     ];
 
@@ -64,7 +64,7 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
         {
             AstralParty_VariantPersonShadowScionPendingTransferredStarLight = 0;
             Flash();
-            await PowerCmd.Apply<StarLightPower>(Owner.Creature, pendingTransferredStarLight, Owner.Creature, null, false);
+            await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, pendingTransferredStarLight, Owner.Creature, null, false);
             MainFile.Logger.Info(
                 $"[VariantPersonShadowScion] granted deferred transferred Starlight | owner={Owner.NetId} | amount={pendingTransferredStarLight}.");
         }
@@ -95,7 +95,7 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
             return;
 
         Flash();
-        await PowerCmd.Apply<StarLightPower>(Owner.Creature, 1m, Owner.Creature, source as CardModel, false);
+        await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, 1m, Owner.Creature, source as CardModel, false);
         MainFile.Logger.Info(
             $"[VariantPersonShadowScion] card gain observed; granted Starlight | owner={Owner.NetId} | recipient={recipient.NetId} | source={source?.GetType().Name ?? "<null>"}");
     }

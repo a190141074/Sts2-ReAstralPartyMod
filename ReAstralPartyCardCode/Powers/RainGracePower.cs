@@ -51,7 +51,7 @@ public class RainGracePower : AstralPartyPowerModel
             return;
 
         Flash();
-        await PowerCmd.Apply<HalfLifeHealPower>(Owner, 1m, Owner, cardPlay.Card, false);
+        await PowerCmd.Apply<EffectsHealPower>(Owner, 1m, Owner, cardPlay.Card, false);
     }
 
     public override async Task BeforeFlushLate(PlayerChoiceContext choiceContext, Player player)

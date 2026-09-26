@@ -24,8 +24,8 @@ public class TokenGoldBufferShield : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<HalfLifeHealPower>(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsHealPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task AfterDamageReceived(
@@ -45,9 +45,9 @@ public class TokenGoldBufferShield : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<HalfLifeHealPower>(ownerCreature, HealAmount, ownerCreature, null, false);
+        await PowerCmd.Apply<EffectsHealPower>(ownerCreature, HealAmount, ownerCreature, null, false);
         await PowerCmd.Apply(
-            ModelDb.Power<StarLightPower>().ToMutable(),
+            ModelDb.Power<EffectsStarlightPower>().ToMutable(),
             ownerCreature,
             StarLightAmount,
             ownerCreature,

@@ -24,8 +24,8 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>(),
-        HoverTipFactory.FromPower<HalfLifeHealPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
+        HoverTipFactory.FromPower<EffectsHealPower>()
     ];
 
     public override bool TryModifyPowerAmountReceived(
@@ -42,7 +42,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
 
         Flash();
 
-        if (canonicalPower is HalfLifeHealPower)
+        if (canonicalPower is EffectsHealPower)
         {
             modifiedAmount += 1m;
             _pendingOwnerHeals++;
@@ -53,7 +53,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
             _pendingOwnerHeals++;
         }
 
-        return canonicalPower is HalfLifeHealPower;
+        return canonicalPower is EffectsHealPower;
     }
 
     private bool ShouldTrigger(PowerModel canonicalPower, Creature target, decimal amount, Creature? applier)
@@ -69,7 +69,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
         if (amount <= 0m)
             return false;
 
-        return canonicalPower is HalfLifeHealPower or StarLightPower;
+        return canonicalPower is EffectsHealPower or EffectsStarlightPower;
     }
 
     public override async Task AfterPowerAmountChanged(
@@ -91,7 +91,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
             return;
         if (amount <= 0m)
             return;
-        if (power is not HalfLifeHealPower and not StarLightPower)
+        if (power is not EffectsHealPower and not EffectsStarlightPower)
             return;
 
         await DerivedHealResolutionHelper.RunBatchedAsync(() =>
@@ -99,7 +99,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
             _isResolvingPendingHeals = true;
             try
             {
-                if (power is StarLightPower && _pendingTargetHeals > 0 && power.Owner.IsAlive)
+                if (power is EffectsStarlightPower && _pendingTargetHeals > 0 && power.Owner.IsAlive)
                 {
                     DerivedHealResolutionHelper.EnqueueHalfLifeHeal(
                         power.Owner,

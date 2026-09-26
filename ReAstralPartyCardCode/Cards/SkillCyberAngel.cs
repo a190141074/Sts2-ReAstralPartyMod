@@ -31,7 +31,7 @@ public class SkillCyberAngel : AstralPartyCardModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<FanPower>(),
-        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
         HoverTipFactory.FromPower<RegenPower>()
     ];
 
@@ -51,7 +51,7 @@ public class SkillCyberAngel : AstralPartyCardModel
 
         var starLightToGain = Math.Min(BaseStarLightGain + fanStacksBeforeApply, MaxStarLightGain);
         await PowerCmd.Apply(
-            ModelDb.Power<StarLightPower>().ToMutable(),
+            ModelDb.Power<EffectsStarlightPower>().ToMutable(),
             Owner.Creature,
             starLightToGain,
             Owner.Creature,
@@ -76,7 +76,7 @@ public class SkillCyberAngel : AstralPartyCardModel
             foreach (var player in Owner.Creature.CombatState.Players
                          .Where(player => player != Owner)
                          .OrderBy(player => player.NetId))
-                await PowerCmd.Apply<StarLightPower>(player.Creature, ExtraTeamStarLightGain, Owner.Creature, this,
+                await PowerCmd.Apply<EffectsStarlightPower>(player.Creature, ExtraTeamStarLightGain, Owner.Creature, this,
                     false);
         }
 

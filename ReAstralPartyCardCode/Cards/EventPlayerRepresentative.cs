@@ -68,10 +68,10 @@ public class EventPlayerRepresentative : AstralPartyCardModel
             return;
         }
 
-        await PowerCmd.Apply(ModelDb.Power<StarLightPower>().ToMutable(), Owner.Creature,
+        await PowerCmd.Apply(ModelDb.Power<EffectsStarlightPower>().ToMutable(), Owner.Creature,
             DynamicVars["SelfStarLight"].BaseValue, Owner.Creature, this, false);
         foreach (var teammate in teammates)
-            await PowerCmd.Apply(ModelDb.Power<StarLightPower>().ToMutable(), teammate.Creature,
+            await PowerCmd.Apply(ModelDb.Power<EffectsStarlightPower>().ToMutable(), teammate.Creature,
                 DynamicVars["TeamStarLight"].BaseValue, Owner.Creature, this, false);
     }
 }

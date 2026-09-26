@@ -39,7 +39,7 @@ public class TokenGoldFlashlightFlashburst : AstralPartyRelicModel
         HoverTipFactory.FromPower<ExposurePower>(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralFlashlightSetId),
         TokenEternalStarlight.BuildReferenceHoverTip(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task AfterObtained()
@@ -95,7 +95,7 @@ public class TokenGoldFlashlightFlashburst : AstralPartyRelicModel
 
         Flash();
         await PowerCmd.Apply(
-            ModelDb.Power<StarLightPower>().ToMutable(),
+            ModelDb.Power<EffectsStarlightPower>().ToMutable(),
             Owner.Creature,
             triggerCount,
             Owner.Creature,

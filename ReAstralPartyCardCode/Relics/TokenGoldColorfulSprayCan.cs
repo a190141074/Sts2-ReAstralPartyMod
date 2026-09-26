@@ -29,7 +29,7 @@ public class TokenGoldColorfulSprayCan : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>()
+        HoverTipFactory.FromPower<EffectsMarkPower>()
     ];
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -43,7 +43,7 @@ public class TokenGoldColorfulSprayCan : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<MarkLockPower>(enemy, 1m, Owner.Creature, null, false);
+        await PowerCmd.Apply<EffectsMarkPower>(enemy, 1m, Owner.Creature, null, false);
     }
 
     public override async Task BeforeCardPlayed(CardPlay cardPlay)
@@ -60,7 +60,7 @@ public class TokenGoldColorfulSprayCan : AstralPartyRelicModel
         if (target.Side == ownerCreature.Side)
             return;
 
-        var mark = target.GetPower<MarkLockPower>();
+        var mark = target.GetPower<EffectsMarkPower>();
         if (mark == null || mark.Amount <= 0m)
             return;
 

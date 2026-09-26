@@ -20,7 +20,7 @@ public class EventAnomalyRichCat : AstralPartyCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<HalfLifeHealPower>(),
+        HoverTipFactory.FromPower<EffectsHealPower>(),
         HoverTipFactory.FromPower<AnomalyFreeNextAttackPower>()
     ];
 
@@ -39,7 +39,7 @@ public class EventAnomalyRichCat : AstralPartyCardModel
 
         foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
         {
-            await PowerCmd.Apply<HalfLifeHealPower>(player.Creature, HalfLifeHealAmount, Owner?.Creature, this, false);
+            await PowerCmd.Apply<EffectsHealPower>(player.Creature, HalfLifeHealAmount, Owner?.Creature, this, false);
             var freeAttack = ModelDb.Power<AnomalyFreeNextAttackPower>().ToMutable();
             await PowerCmd.Apply(freeAttack, player.Creature, 1m, Owner?.Creature, this, false);
         }

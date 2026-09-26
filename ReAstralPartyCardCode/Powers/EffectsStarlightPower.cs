@@ -6,7 +6,7 @@ using MegaCrit.Sts2.Core.Rewards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
-public class StarLightPower : AstralPartyPowerModel
+public class EffectsStarlightPower : AstralPartyPowerModel
 {
     public override PowerType Type => PowerType.Buff;
 

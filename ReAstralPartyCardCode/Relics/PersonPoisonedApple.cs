@@ -49,7 +49,7 @@ public class PersonPoisonedApple : CooldownPersonRelicBase
     [
         HoverTipFactory.FromCard<SkillConcealingOperation>(),
         HoverTipFactory.FromPower<InvestigationTargetPower>(),
-        HoverTipFactory.FromPower<MarkLockPower>(),
+        HoverTipFactory.FromPower<EffectsMarkPower>(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralInvestigationProgressId)
     ];
 
@@ -108,7 +108,7 @@ public class PersonPoisonedApple : CooldownPersonRelicBase
         if (!WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return false;
 
-        return target.GetPowerAmount<MarkLockPower>() > 0m;
+        return target.GetPowerAmount<EffectsMarkPower>() > 0m;
     }
 
     protected override async Task GrantCooldownCard()

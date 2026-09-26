@@ -26,7 +26,7 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
         HoverTipFactory.FromPower<WindfallHitsPower>()
     ];
 
@@ -46,7 +46,7 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
         if (owner?.Creature == null || target == null || !CandyPotionTargetingHelper.IsOtherLivingPlayerOrEnemy(target, owner))
             return;
 
-        var targetStarLight = target.GetPower<StarLightPower>();
+        var targetStarLight = target.GetPower<EffectsStarlightPower>();
         if (targetStarLight != null && targetStarLight.Amount > 0m)
             await PowerCmd.ModifyAmount(targetStarLight, -Math.Min(4m, targetStarLight.Amount), owner.Creature, this, true);
 

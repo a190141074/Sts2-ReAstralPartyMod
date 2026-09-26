@@ -115,7 +115,7 @@
 | `SkillFamousBladeDoppelganger` | 名刀（太刀使β） | `0` | `攻击` | `稀有` | `任意敌人` | 造成{Damage:diff()}点伤害；消耗剑气并增强剑意。 |
 | `SkillFateGuidance` | 命运指引 | `0` | `技能` | `稀有` | `自己` | 你拥有的人格遗物冷却-1，并获得{energyPrefix:energyIcons(1)}。 |
 | `SkillFateWeakMprint` | 虚弱印记 | `0` | `技能` | `稀有` | `任意敌人` | 使目标获得虚弱印记。 |
-| `SkillHealingSlime` | 治愈黏液 | `0` | `技能` | `稀有` | `任意友方` | 获得{HalfLifeHealPower:diff()}层治愈。 |
+| `SkillHealingSlime` | 治愈黏液 | `0` | `技能` | `稀有` | `任意友方` | 获得{EffectsHealPower:diff()}层治愈。 |
 | `SkillIronVirgin` | 铁处女 | `1` | `技能` | `稀有` | `自己` | 获得1层铁处女，直到下一回合开始前免疫伤害。<br>如果当前回合还未触发边界强化，则额外获得3点临时力量。 |
 | `SkillMixedCocktails` | 调制饮料 | `0` | `技能` | `稀有` | `任意玩家` | 选择一名玩家<br>弃置至多3张手牌，按调制为目标提供效果，然后抽取等于弃置数量的卡牌。 |
 | `SkillMudTruckCrash` | 泥头车，创死死！ | `0` | `攻击` | `稀有` | `任意敌人` | 造成{Damage:diff()}点伤害。<br>对所有其他敌人造成等量的伤害，并施加骨折。 |
@@ -156,14 +156,14 @@
 | `FateWeakImprintPower` | 虚弱印记 | `减益` | `不叠层` | 受到的任意伤害+1。不可叠加，重复施加会刷新为2回合。<br>若带有此印记时被击倒，击杀者获得1张命运指引。<br>持续2回合。 |
 | `FracturePower` | 骨折 | `减益` | `计数` | 施加易伤1层和缩小1层。<br>持续1回合。 |
 | `GiantAnchorPower` | 大铁锚 | `增益` | `计数` | 每层使你获得1点临时力量。你的回合结束时减少1层。 |
-| `HalfLifeHealPower` | 治愈 | `增益` | `计数` | 回合开始时，回复等同于层数的生命，下回合层数减半。 |
+| `EffectsHealPower` | 治愈 | `增益` | `计数` | 回合开始时，回复等同于层数的生命，下回合层数减半。 |
 | `HuntersFeastPower` | 掠食 | `增益` | `计数` | 本场战斗结束时，永久提升等同于层数的暗影额度上限。<br>进入精英房，提供1层掠食；<br>进入Boss房时，提供3层掠食。 |
 | `IAmDragonTemporaryStrengthLossPower` | 龙威压制 | `减益` | `计数` | 本回合内，力量-{Amount}。回合结束时恢复。 |
 | `InvestigationTargetPower` | 调查目标 | `减益` | `不叠层` | 不可叠加，不可重复。<br>带有此能力的单位被击杀后，击杀者会立即触发1张隐匿调查事件牌，【人格：邦尼】持有者获得5点星光。 |
 | `IronVirginWardPower` | 铁处女 | `增益` | `不叠层` | 直到你的下一回合开始前，免疫所有伤害。 |
 | `LingHunLianJiePower` | 灵魂链接 | `增益` | `计数` | 灵魂链接。 |
 | `LittleCarpDollPower` | 强化·小鲤鱼玩偶 | `增益` | `计数` | 每层使你获得1点力量和1点敏捷。 |
-| `MarkLockPower` | 标记 | `减益` | `计数` | 可叠加，但无论有多少层，受到的任意伤害只会额外+1。每回合减少1层。 |
+| `EffectsMarkPower` | 标记 | `减益` | `计数` | 可叠加，但无论有多少层，受到的任意伤害只会额外+1。每回合减少1层。 |
 | `MixedCocktailsPower` | 调制效果 | `增益` | `不叠层` | 本次调制饮料提供的效果：<br>临时力量：{TemporaryStrength}<br>临时敏捷：{TemporaryDexterity}<br>额外敏捷：{Dexterity}<br>回复：{Heal}<br>能量：{Energy:energyIcons()}<br>抽牌：{Draw}<br>格挡：{Block} |
 | `ModificationPower` | 改造 | `增益` | `计数` | 你的回合结束时，减少1层。 |
 | `MouseShieldPower` | 鼠鼠护盾 | `增益` | `不叠层` | 鼠鼠护盾会帮你减少999点未被格挡的伤害。 |
@@ -173,7 +173,7 @@
 | `ReversedScalesPower` | 幻影·逆鳞 | `增益` | `计数` | 每层使你受到敌方伤害时获得2点伤害减免。每次获得1层时，获得2点临时力量。回合结束时移除。 |
 | `ShadowsLimitPower` | 暗影额度 | `增益` | `计数` | 显示本回合还能通过攻击牌施加几次双生之影。 |
 | `StagnantCosmosPower` | 静滞协议 | `增益` | `计数` | 每当你打出一张实际消耗不低于{energyPrefix:energyIcons(1)}的攻击牌或技能牌并造成伤害时，消耗1层静滞协议，使目标获得等同于该牌费用+1的静滞。 |
-| `StarLightPower` | 星光 | `增益` | `计数` | 本场战斗结束后，获得等同于星光层数的金币。 |
+| `EffectsStarlightPower` | 星光 | `增益` | `计数` | 本场战斗结束后，获得等同于星光层数的金币。 |
 | `SwordGustPower` | 剑气 | `增益` | `计数` | 每层使攻击牌伤害+1，3层时额外+2； |
 | `TridentEmpowerPower` | 强化·三叉戟 | `增益` | `不叠层` | 不可叠加。获得1点力量和1点敏捷。 |
 | `TrueDragonFormPower` | 真龙形态 | `增益` | `不叠层` | 战斗开始时，已经升级且没有附魔的攻击牌获得华彩，并升级你的全部卡牌。<br>你的攻击牌伤害+4，获得2点力量、1点敏捷，并永久获得2点最大生命。不可叠加。 |

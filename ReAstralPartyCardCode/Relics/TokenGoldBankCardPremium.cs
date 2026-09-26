@@ -26,7 +26,7 @@ public class TokenGoldBankCardPremium : AstralPartyRelicModel
     [
         TokenEternalStarlight.BuildReferenceHoverTip(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralEternalStarlightSetId),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task AfterObtained()
@@ -49,7 +49,7 @@ public class TokenGoldBankCardPremium : AstralPartyRelicModel
         Flash();
         foreach (var player in Owner.Creature.CombatState.Players)
             await PowerCmd.Apply(
-                ModelDb.Power<StarLightPower>().ToMutable(),
+                ModelDb.Power<EffectsStarlightPower>().ToMutable(),
                 player.Creature,
                 StarLightPerPlayer,
                 Owner.Creature,

@@ -21,7 +21,7 @@ public class EventAnomalyTransferRequest : AstralPartyCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public EventAnomalyTransferRequest() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AllAllies)
@@ -51,6 +51,6 @@ public class EventAnomalyTransferRequest : AstralPartyCardModel
 
         var starLightAmount = otherPlayers.Count * StarLightPerOtherPlayer;
         if (starLightAmount > 0)
-            await PowerCmd.Apply<StarLightPower>(Owner.Creature, starLightAmount, Owner.Creature, this, false);
+            await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, starLightAmount, Owner.Creature, this, false);
     }
 }

@@ -31,7 +31,7 @@ public class BaiZeBlessingPower : AstralPartyPowerModel
         if (target == null || target.Side == Owner.Side)
             return 0m;
 
-        return Owner.GetPowerAmount<HalfLifeHealPower>();
+        return Owner.GetPowerAmount<EffectsHealPower>();
     }
 
     public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)

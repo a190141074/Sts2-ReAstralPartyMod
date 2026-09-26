@@ -19,7 +19,7 @@ public class ConcealingPower : AstralPartyPowerModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>(),
+        HoverTipFactory.FromPower<EffectsMarkPower>(),
         HoverTipFactory.FromPower<AmbushPower>()
     ];
 
@@ -58,7 +58,7 @@ public class ConcealingPower : AstralPartyPowerModel
         if (result.TotalDamage <= 0m)
             return;
 
-        var ambushAmount = target.GetPowerAmount<MarkLockPower>();
+        var ambushAmount = target.GetPowerAmount<EffectsMarkPower>();
         Flash();
         if (ambushAmount > 0m)
             await PowerCmd.Apply<AmbushPower>(Owner, ambushAmount, Owner, cardSource, false);

@@ -20,7 +20,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public abstract class ChargeTokenRelicBase : AstralPartyRelicModel
 {
     public override bool ShouldReceiveCombatHooks => true;
-    protected override IEnumerable<IHoverTip> ExtraHoverTips => [HoverTipFactory.FromPower<EnergyPower>()];
+    protected override IEnumerable<IHoverTip> ExtraHoverTips => [HoverTipFactory.FromPower<EffectsEnergyPower>()];
     protected Task Add(int amount, CardModel? source = null) =>
         Owner?.Creature == null ? Task.CompletedTask : EnergyChargeHelper.Add(Owner.Creature, amount, Owner.Creature, source);
     protected Task Spend(int amount, CardModel? source = null) =>
@@ -61,7 +61,7 @@ public sealed class TokenBlueElectricBlade : ChargeTokenRelicBase
         await SyncStrength(play.Card);
     }
     public override Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? source) =>
-        power is EnergyPower ? SyncStrength(source) : Task.CompletedTask;
+        power is EffectsEnergyPower ? SyncStrength(source) : Task.CompletedTask;
     private async Task SyncStrength(CardModel? source)
     {
         if (Owner?.Creature == null) return;

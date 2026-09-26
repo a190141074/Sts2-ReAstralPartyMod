@@ -46,7 +46,7 @@ public class VariantPersonLingYulin : CooldownPersonRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillSummonRain>(),
-        HoverTipFactory.FromPower<HalfLifeHealPower>(),
+        HoverTipFactory.FromPower<EffectsHealPower>(),
         HoverTipFactory.FromPower<WaterWrapPower>(),
         HoverTipFactory.FromPower<RainGracePower>()
     ];
@@ -70,7 +70,7 @@ public class VariantPersonLingYulin : CooldownPersonRelicBase
             return;
         if (!Hook.ShouldFlush(Owner.Creature.CombatState, player))
             return;
-        if (Owner.Creature.GetPowerAmount<HalfLifeHealPower>() <= WaterWrapTriggerThreshold)
+        if (Owner.Creature.GetPowerAmount<EffectsHealPower>() <= WaterWrapTriggerThreshold)
             return;
 
         Flash();

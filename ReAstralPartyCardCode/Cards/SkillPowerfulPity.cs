@@ -33,7 +33,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
         TokenEternalStarlight.BuildReferenceHoverTip()
     ];
 
@@ -80,7 +80,7 @@ public class SkillPowerfulPity : AstralPartyCardModel
             await XiaoLeiAwakeningHelper.TryGrantAwakeningForGrantedCard(owner, targetPlayer, selectedCards.Count);
 
             await PowerCmd.Apply(
-                ModelDb.Power<StarLightPower>().ToMutable(),
+                ModelDb.Power<EffectsStarlightPower>().ToMutable(),
                 ownerCreature,
                 selectedCards.Count,
                 ownerCreature,

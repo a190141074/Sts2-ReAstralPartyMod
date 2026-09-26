@@ -39,7 +39,7 @@ public class SkillMixedCocktails : AstralPartyCardModel
     [
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralMixedId),
         HoverTipFactory.FromPower<MixedCocktailsPower>(),
-        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
         HoverTipFactory.FromPower<DexterityPower>()
     ];
 
@@ -93,7 +93,7 @@ public class SkillMixedCocktails : AstralPartyCardModel
         if (distinctTypeCount == MaxDiscardCount)
         {
             await PowerCmd.Apply(
-                ModelDb.Power<StarLightPower>().ToMutable(),
+                ModelDb.Power<EffectsStarlightPower>().ToMutable(),
                 ownerCreature,
                 RelicDistinctTypesStarLight,
                 ownerCreature,

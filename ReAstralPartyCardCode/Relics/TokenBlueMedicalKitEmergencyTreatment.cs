@@ -19,7 +19,7 @@ public class TokenBlueMedicalKitEmergencyTreatment : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<HalfLifeHealPower>()
+        HoverTipFactory.FromPower<EffectsHealPower>()
     ];
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -28,6 +28,6 @@ public class TokenBlueMedicalKitEmergencyTreatment : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, 1m, Owner.Creature, null, false);
+        await PowerCmd.Apply<EffectsHealPower>(Owner.Creature, 1m, Owner.Creature, null, false);
     }
 }

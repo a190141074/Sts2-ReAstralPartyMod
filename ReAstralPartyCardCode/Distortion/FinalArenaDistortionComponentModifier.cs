@@ -124,7 +124,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         if (FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.WideAreaMark))
             await ApplyToAllCreatures(
                 combatState,
-                creature => PowerCmd.Apply<MarkLockPower>(creature, WideAreaMarkStacks, creature, null, false));
+                creature => PowerCmd.Apply<EffectsMarkPower>(creature, WideAreaMarkStacks, creature, null, false));
 
         if (FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.Robbery) &&
             FinalArenaSeriesHelper.ConsumeRobberyNextCombatStun(runState))

@@ -16,7 +16,7 @@ public class BaseAbilityHamburger : BaseAbilityCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<HalfLifeHealPower>(),
+        HoverTipFactory.FromPower<EffectsHealPower>(),
         HoverTipFactory.FromPower<CounterPower>()
     ];
 
@@ -33,6 +33,6 @@ public class BaseAbilityHamburger : BaseAbilityCardModel
         if (Owner?.Creature == null)
             return;
 
-        await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, 4m, Owner.Creature, this, false);
+        await PowerCmd.Apply<EffectsHealPower>(Owner.Creature, 4m, Owner.Creature, this, false);
     }
 }

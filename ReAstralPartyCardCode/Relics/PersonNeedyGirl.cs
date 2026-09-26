@@ -42,7 +42,7 @@ public class PersonNeedyGirl : CooldownPersonRelicBase
     [
         HoverTipFactory.FromCard<SkillEmotionalOverdose>(),
         HoverTipFactory.FromPower<LovePower>(),
-        HoverTipFactory.FromPower<HalfLifeHealPower>()
+        HoverTipFactory.FromPower<EffectsHealPower>()
     ];
 
     public override async Task AfterObtained()

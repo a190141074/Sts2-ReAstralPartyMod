@@ -260,6 +260,8 @@
 		<Content Include="ReAstralPartyMod\images\powers\concealing_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\conserve_energy_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\conserve_energy_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\effects_energy_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\effects_energy_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\cosmos_freezes_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\cosmos_freezes_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\counter_power.png"/>
@@ -286,8 +288,8 @@
 		<Content Include="ReAstralPartyMod\images\powers\gathering_strength_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\giant_anchor_power.png.import"/>
-		<Content Include="ReAstralPartyMod\images\powers\half_life_heal_power.png"/>
-		<Content Include="ReAstralPartyMod\images\powers\half_life_heal_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\effects_heal_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\effects_heal_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\hunters_feast_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\hunters_feast_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\investigation_target_power.png"/>
@@ -302,8 +304,8 @@
 		<Content Include="ReAstralPartyMod\images\powers\ling_hun_lian_jie_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\little_carp_doll_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\little_carp_doll_power.png.import"/>
-		<Content Include="ReAstralPartyMod\images\powers\mark_lock_power.png"/>
-		<Content Include="ReAstralPartyMod\images\powers\mark_lock_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\effects_mark_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\effects_mark_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\mixed_cocktails_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\mixed_cocktails_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\mind_power.png"/>
@@ -328,8 +330,8 @@
 		<Content Include="ReAstralPartyMod\images\powers\stagnant_cosmos_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\star_fragment_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\star_fragment_power.png.import"/>
-		<Content Include="ReAstralPartyMod\images\powers\star_light_power.png"/>
-		<Content Include="ReAstralPartyMod\images\powers\star_light_power.png.import"/>
+		<Content Include="ReAstralPartyMod\images\powers\effects_starlight_power.png"/>
+		<Content Include="ReAstralPartyMod\images\powers\effects_starlight_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\sword_gust_power.png"/>
 		<Content Include="ReAstralPartyMod\images\powers\sword_gust_power.png.import"/>
 		<Content Include="ReAstralPartyMod\images\powers\trident_empower_power.png"/>

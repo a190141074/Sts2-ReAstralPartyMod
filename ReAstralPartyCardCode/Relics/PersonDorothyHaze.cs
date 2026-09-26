@@ -52,7 +52,7 @@ public class PersonDorothyHaze : CooldownPersonRelicBase
         HoverTipFactory.FromCard<SkillTrueMe>(),
         HoverTipFactory.FromPower<WarmPower>(),
         HoverTipFactory.FromPower<DorothyNodePower>(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task BeforeCombatStart()
@@ -96,7 +96,7 @@ public class PersonDorothyHaze : CooldownPersonRelicBase
         if (player != Owner && player.Gold >= StolenGoldAmount)
             await PersonMultiplayerEffectHelper.LoseGoldDeterministic(StolenGoldAmount, player, GoldLossType.Spent);
 
-        await PowerCmd.Apply<StarLightPower>(Owner.Creature, StolenStarLightAmount, Owner.Creature, null, false);
+        await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, StolenStarLightAmount, Owner.Creature, null, false);
     }
 
     protected override async Task GrantCooldownCard()

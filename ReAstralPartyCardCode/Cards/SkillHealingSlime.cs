@@ -15,7 +15,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 public class SkillHealingSlime : AstralPartyCardModel
 {
     protected override IEnumerable<DynamicVar> CanonicalVars =>
-        new List<DynamicVar> { new PowerVar<HalfLifeHealPower>(3m) };
+        new List<DynamicVar> { new PowerVar<EffectsHealPower>(3m) };
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [ReAstralPartyMod.ReAstralPartyCardCode.Keywords.AstralKeywords.AstralUnique];
@@ -23,7 +23,7 @@ public class SkillHealingSlime : AstralPartyCardModel
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-        new List<IHoverTip> { HoverTipFactory.FromPower<HalfLifeHealPower>() };
+        new List<IHoverTip> { HoverTipFactory.FromPower<EffectsHealPower>() };
 
     public SkillHealingSlime() : base(
         0,
@@ -36,7 +36,7 @@ public class SkillHealingSlime : AstralPartyCardModel
 
     protected override void OnUpgrade()
     {
-        DynamicVars["HalfLifeHealPower"].UpgradeValueBy(1m);
+        DynamicVars["EffectsHealPower"].UpgradeValueBy(1m);
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -46,9 +46,9 @@ public class SkillHealingSlime : AstralPartyCardModel
         if (target == null || Owner?.Creature == null)
             return;
 
-        await PowerCmd.Apply<HalfLifeHealPower>(
+        await PowerCmd.Apply<EffectsHealPower>(
             target,
-            DynamicVars["HalfLifeHealPower"].BaseValue,
+            DynamicVars["EffectsHealPower"].BaseValue,
             Owner.Creature,
             this,
             false

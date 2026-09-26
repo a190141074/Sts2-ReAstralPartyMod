@@ -53,7 +53,7 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralDiceSetId)
     ];
 
@@ -147,7 +147,7 @@ public abstract class TokenBlueDieRelicBase : AstralPartyRelicModel
 
         if (starLightAmount > 0)
             await PowerCmd.Apply(
-                ModelDb.Power<StarLightPower>().ToMutable(),
+                ModelDb.Power<EffectsStarlightPower>().ToMutable(),
                 Owner.Creature,
                 starLightAmount,
                 Owner.Creature,

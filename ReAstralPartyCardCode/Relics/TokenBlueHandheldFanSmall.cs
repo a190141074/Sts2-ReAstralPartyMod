@@ -22,7 +22,7 @@ public class TokenBlueHandheldFanSmall : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>()
+        HoverTipFactory.FromPower<EffectsMarkPower>()
     ];
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -41,7 +41,7 @@ public class TokenBlueHandheldFanSmall : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<MarkLockPower>(target, 1m, Owner.Creature, cardPlay.Card, false);
+        await PowerCmd.Apply<EffectsMarkPower>(target, 1m, Owner.Creature, cardPlay.Card, false);
     }
 
 }

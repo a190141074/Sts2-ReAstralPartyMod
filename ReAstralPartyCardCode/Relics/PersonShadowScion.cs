@@ -48,7 +48,7 @@ public class PersonShadowScion : CooldownPersonRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillPowerfulPity>(),
-        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
         HoverTipFactory.FromPower<StrengthPower>(),
         HoverTipFactory.FromPower<DexterityPower>(),
         TokenEternalStarlight.BuildReferenceHoverTip()
@@ -100,7 +100,7 @@ public class PersonShadowScion : CooldownPersonRelicBase
 
         Flash();
         await PowerCmd.Apply(
-            ModelDb.Power<StarLightPower>().ToMutable(),
+            ModelDb.Power<EffectsStarlightPower>().ToMutable(),
             Owner.Creature,
             1m,
             Owner.Creature,
@@ -109,7 +109,7 @@ public class PersonShadowScion : CooldownPersonRelicBase
         );
 
         await PowerCmd.Apply(
-            ModelDb.Power<StarLightPower>().ToMutable(),
+            ModelDb.Power<EffectsStarlightPower>().ToMutable(),
             recipient.Creature,
             1m,
             Owner.Creature,
@@ -123,7 +123,7 @@ public class PersonShadowScion : CooldownPersonRelicBase
     {
         if (Owner?.Creature == null || power.Owner != Owner.Creature)
             return;
-        if (power is not StarLightPower)
+        if (power is not EffectsStarlightPower)
             return;
         if (amount <= 0m)
             return;

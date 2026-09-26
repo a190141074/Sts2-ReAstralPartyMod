@@ -31,7 +31,7 @@ public class SkillHealingSlimeDoppelganger : AstralPartyCardModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<HalfLifeHealPower>()
+        HoverTipFactory.FromPower<EffectsHealPower>()
     ];
 
     public SkillHealingSlimeDoppelganger() : base(
@@ -55,7 +55,7 @@ public class SkillHealingSlimeDoppelganger : AstralPartyCardModel
         if (ownerCreature == null || target == null || targetPlayer == null)
             return;
 
-        await PowerCmd.Apply<HalfLifeHealPower>(
+        await PowerCmd.Apply<EffectsHealPower>(
             target,
             HealAmount,
             ownerCreature,

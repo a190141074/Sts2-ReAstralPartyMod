@@ -144,7 +144,7 @@ internal static class DerivedHealResolutionHelper
                         if (target == null || !target.IsAlive || pending.Amount <= 0m)
                             continue;
 
-                        await PowerCmd.Apply<HalfLifeHealPower>(target, pending.Amount, pending.Applier, pending.Source,
+                        await PowerCmd.Apply<EffectsHealPower>(target, pending.Amount, pending.Applier, pending.Source,
                             false);
                     }
 

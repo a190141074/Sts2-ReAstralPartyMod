@@ -412,7 +412,7 @@
 | 骨折 | Fracture Power | `FracturePower` |
 | 养精蓄锐 | Gathering Strength Power | `GatheringStrengthPower` |
 | 大铁锚 | Giant Anchor Power | `GiantAnchorPower` |
-| 治愈 | Half Life Heal Power | `HalfLifeHealPower` |
+| 治愈 | Effects Heal Power | `EffectsHealPower` |
 | 掠食 | Hunters Feast Power | `HuntersFeastPower` |
 | 龙威压制 | I Am Dragon Temporary Strength Loss Power | `IAmDragonTemporaryStrengthLossPower` |
 | 岿然不动 | Immovable Dexterity Power | `ImmovableDexterityPower` |
@@ -425,7 +425,7 @@
 | 灵魂链接 | Ling Hun Lian Jie Power | `LingHunLianJiePower` |
 | 强化·小鲤鱼玩偶 | Little Carp Doll Power | `LittleCarpDollPower` |
 | 爱 | Love Power | `LovePower` |
-| 标记 | Mark Lock Power | `MarkLockPower` |
+| 标记 | Effects Mark Power | `EffectsMarkPower` |
 | 调制效果 | Mixed Cocktails Power | `MixedCocktailsPower` |
 | 改造 | Modification Power | `ModificationPower` |
 | 钞能力 | Money Power | `MoneyPower` |
@@ -446,7 +446,7 @@
 | 落日 | Setting Sun Power | `SettingSunPower` |
 | 暗影额度 | Shadows Limit Power | `ShadowsLimitPower` |
 | 静滞协议 | Stagnant Cosmos Power | `StagnantCosmosPower` |
-| 星光 | Star Light Power | `StarLightPower` |
+| 星光 | Effects Starlight Power | `EffectsStarlightPower` |
 | 奥法天河 | Sunset Glow Arcane River Debuff Power | `SunsetGlowArcaneRiverDebuffPower` |
 | 调查发现 | Survey Finds Power | `SurveyFindsPower` |
 | 剑气 | Sword Gust Power | `SwordGustPower` |

@@ -22,7 +22,7 @@ public class EventAnomalyItsOver : AstralPartyCardModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<WeakPower>(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public EventAnomalyItsOver() : base(0, CardType.Skill, CardRarity.Rare, TargetType.AllAllies)
@@ -42,6 +42,6 @@ public class EventAnomalyItsOver : AstralPartyCardModel
             await PowerCmd.Apply<WeakPower>(creature, WeakAmount, Owner?.Creature, this, false);
 
         foreach (var player in EventCombatTargetHelper.GetAlivePlayers(CombatState))
-            await PowerCmd.Apply<StarLightPower>(player.Creature, StarLightAmount, Owner?.Creature, this, false);
+            await PowerCmd.Apply<EffectsStarlightPower>(player.Creature, StarLightAmount, Owner?.Creature, this, false);
     }
 }

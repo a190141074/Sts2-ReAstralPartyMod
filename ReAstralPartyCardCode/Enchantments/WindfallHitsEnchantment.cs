@@ -38,7 +38,7 @@ public sealed class WindfallHitsEnchantment : ModEnchantmentTemplate
             cardPlay.PlayIndex,
             cardPlay.Card.CanonicalInstance?.Id ?? cardPlay.Card.Id);
         var amount = new[] { 1m, 2m, 3m, 5m, 10m }[Math.Clamp(roll, 0, 4)];
-        await PowerCmd.Apply<StarLightPower>(
+        await PowerCmd.Apply<EffectsStarlightPower>(
             owner.Creature,
             amount,
             owner.Creature,

@@ -25,7 +25,7 @@ public class TokenGoldEagleEyeScope : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>()
+        HoverTipFactory.FromPower<EffectsMarkPower>()
     ];
 
     public override async Task AfterDamageGiven(
@@ -41,7 +41,7 @@ public class TokenGoldEagleEyeScope : AstralPartyRelicModel
         if (result.TotalDamage <= 0m)
             return;
 
-        await PowerCmd.Apply<MarkLockPower>(target, 1m, Owner?.Creature, cardSource, false);
+        await PowerCmd.Apply<EffectsMarkPower>(target, 1m, Owner?.Creature, cardSource, false);
 
         _pursuitTargetsByCard.TryAdd(cardSource!, target);
     }
@@ -53,7 +53,7 @@ public class TokenGoldEagleEyeScope : AstralPartyRelicModel
         if (Owner?.Creature == null || !target.IsAlive)
             return;
 
-        var markedStacks = target.GetPowerAmount<MarkLockPower>();
+        var markedStacks = target.GetPowerAmount<EffectsMarkPower>();
         var pursuitDamage = StableNumericStateHelper.FloorDivisionToNonNegativeInt(markedStacks, 2m) * 2m;
         if (pursuitDamage <= 0m)
             return;

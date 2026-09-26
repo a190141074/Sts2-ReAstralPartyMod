@@ -46,7 +46,7 @@ public class PersonJillSteinle : CooldownPersonRelicBase
         HoverTipFactory.FromCard<SkillMixedCocktails>(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralMixedId),
         HoverTipFactory.FromPower<MixedCocktailsPower>(),
-        HoverTipFactory.FromPower<StarLightPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
         HoverTipFactory.FromPower<DexterityPower>()
     ];
 

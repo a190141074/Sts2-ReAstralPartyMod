@@ -35,7 +35,7 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-    [HoverTipFactory.FromCard<SkillSleightOfHand>(), HoverTipFactory.FromPower<WindfallHitsPower>(), HoverTipFactory.FromPower<StarLightPower>(), HoverTipFactory.FromPower<DexterityPower>()];
+    [HoverTipFactory.FromCard<SkillSleightOfHand>(), HoverTipFactory.FromPower<WindfallHitsPower>(), HoverTipFactory.FromPower<EffectsStarlightPower>(), HoverTipFactory.FromPower<DexterityPower>()];
 
     public override async Task BeforeCombatStart()
     {

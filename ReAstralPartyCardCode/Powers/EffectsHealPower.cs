@@ -13,7 +13,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 /// <summary>
 /// Heals at the start of the owner's next turn, then halves its amount.
 /// </summary>
-public class HalfLifeHealPower : AstralPartyPowerModel
+public class EffectsHealPower : AstralPartyPowerModel
 {
     public override PowerType Type => PowerType.Buff;
 
@@ -67,14 +67,14 @@ public class HalfLifeHealPower : AstralPartyPowerModel
     private string GetDescriptionLocKey()
     {
         return ShouldUseLingYulinDecay()
-            ? "RE_ASTRAL_PARTY_MOD_POWER_HALF_LIFE_HEAL_POWER.description_ling_yu_lin"
-            : "RE_ASTRAL_PARTY_MOD_POWER_HALF_LIFE_HEAL_POWER.description";
+            ? "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_HEAL_POWER.description_ling_yu_lin"
+            : "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_HEAL_POWER.description";
     }
 
     private string GetSmartDescriptionLocKey()
     {
         return ShouldUseLingYulinDecay()
-            ? "RE_ASTRAL_PARTY_MOD_POWER_HALF_LIFE_HEAL_POWER.smartDescription_ling_yu_lin"
-            : "RE_ASTRAL_PARTY_MOD_POWER_HALF_LIFE_HEAL_POWER.smartDescription";
+            ? "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_HEAL_POWER.smartDescription_ling_yu_lin"
+            : "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_HEAL_POWER.smartDescription";
     }
 }

@@ -59,7 +59,7 @@ public class SkillProductRestocking : AstralPartyCardModel
 
         if (discardedCardCount > 0)
             await PowerCmd.Apply(
-                ModelDb.Power<StarLightPower>().ToMutable(),
+                ModelDb.Power<EffectsStarlightPower>().ToMutable(),
                 Owner.Creature,
                 discardedCardCount,
                 Owner.Creature,

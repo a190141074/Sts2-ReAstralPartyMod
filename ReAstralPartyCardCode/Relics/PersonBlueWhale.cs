@@ -71,7 +71,7 @@ public class PersonBlueWhale : CooldownPersonRelicBase
         HoverTipFactory.FromCard<SkillFateWeakMprint>(),
         HoverTipFactory.FromPower<FateWeakImprintPower>(),
         HoverTipFactory.FromPower<BlueWhaleNodePower>(),
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task AfterObtained()
@@ -183,7 +183,7 @@ public class PersonBlueWhale : CooldownPersonRelicBase
             return;
 
         Flash();
-        await PowerCmd.Apply<StarLightPower>(Owner.Creature, NodeRewardStarLight, Owner.Creature, null, false);
+        await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, NodeRewardStarLight, Owner.Creature, null, false);
     }
 
     internal void AddPendingFateGuidanceForRecipient(Player recipient, int amount)

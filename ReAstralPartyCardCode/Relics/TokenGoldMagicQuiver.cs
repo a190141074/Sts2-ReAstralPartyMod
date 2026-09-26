@@ -32,7 +32,7 @@ public class TokenGoldMagicQuiver : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<MarkLockPower>()
+        HoverTipFactory.FromPower<EffectsMarkPower>()
     ];
 
     public override async Task AfterObtained()
@@ -104,7 +104,7 @@ public class TokenGoldMagicQuiver : AstralPartyRelicModel
             return;
         if (!IsTrackedSkillDamage(target, result.UnblockedDamage, dealer, cardSource))
             return;
-        if (target.GetPowerAmount<MarkLockPower>() <= 0m)
+        if (target.GetPowerAmount<EffectsMarkPower>() <= 0m)
             return;
 
         var owner = Owner;
@@ -115,7 +115,7 @@ public class TokenGoldMagicQuiver : AstralPartyRelicModel
         _shouldCopyTrackedSkillCard = true;
         Flash();
 
-        await PowerCmd.Apply<MarkLockPower>(target, 1m, owner.Creature, cardSource, false);
+        await PowerCmd.Apply<EffectsMarkPower>(target, 1m, owner.Creature, cardSource, false);
     }
 
     public override async Task AfterCardPlayed(PlayerChoiceContext context, CardPlay cardPlay)

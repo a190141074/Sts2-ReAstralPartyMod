@@ -23,7 +23,7 @@ public class SkillEmotionalOverdose : AstralPartyCardModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<LovePower>(),
-        HoverTipFactory.FromPower<HalfLifeHealPower>(),
+        HoverTipFactory.FromPower<EffectsHealPower>(),
         HoverTipFactory.FromPower<AstralTemporaryDexterityPower>()
     ];
 
@@ -44,7 +44,7 @@ public class SkillEmotionalOverdose : AstralPartyCardModel
 
         if (loveStacks > 0)
         {
-            await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, loveStacks, Owner.Creature, this, false);
+            await PowerCmd.Apply<EffectsHealPower>(Owner.Creature, loveStacks, Owner.Creature, this, false);
             await AstralTemporaryDexterityPower.Apply(Owner.Creature, loveStacks, this, Owner.Creature, this, true);
         }
 

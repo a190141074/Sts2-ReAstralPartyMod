@@ -23,7 +23,7 @@ public class TokenExclusiveStormTalisman : AstralPartyRelicModel
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<DoomPower>(),
-        HoverTipFactory.FromPower<HalfLifeHealPower>(),
+        HoverTipFactory.FromPower<EffectsHealPower>(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralDragonPalaceSeriesId)
     ];
 
@@ -44,6 +44,6 @@ public class TokenExclusiveStormTalisman : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, 1m, Owner.Creature, card, false);
+        await PowerCmd.Apply<EffectsHealPower>(Owner.Creature, 1m, Owner.Creature, card, false);
     }
 }

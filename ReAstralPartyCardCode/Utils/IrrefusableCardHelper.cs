@@ -605,7 +605,7 @@ internal static class IrrefusableCardHelper
         if (card.Pile?.Type != PileType.Exhaust)
             await CardCmd.Exhaust(choiceContext, card, false, false);
 
-        await PowerCmd.Apply<StarLightPower>(owner.Creature, 3m, owner.Creature, card, false);
+        await PowerCmd.Apply<EffectsStarlightPower>(owner.Creature, 3m, owner.Creature, card, false);
         MainFile.Logger.Info(
             $"[Irrefusable] {trigger} resolved | owner={owner.NetId} | card={card.Id.Entry} | starlight=3.");
     }

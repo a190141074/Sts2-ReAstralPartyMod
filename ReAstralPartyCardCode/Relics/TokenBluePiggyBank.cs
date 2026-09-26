@@ -29,7 +29,7 @@ public class TokenBluePiggyBank : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<StarLightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>()
     ];
 
     public override async Task AfterObtained()
@@ -59,7 +59,7 @@ public class TokenBluePiggyBank : AstralPartyRelicModel
 
         Flash();
         await PowerCmd.Apply(
-            ModelDb.Power<StarLightPower>().ToMutable(),
+            ModelDb.Power<EffectsStarlightPower>().ToMutable(),
             Owner.Creature,
             triggerCount * StarLightPerTrigger,
             Owner.Creature,

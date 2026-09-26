@@ -23,7 +23,7 @@ public class TokenPurpleTastyCandy : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<HalfLifeHealPower>()
+        HoverTipFactory.FromPower<EffectsHealPower>()
     ];
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
@@ -36,13 +36,13 @@ public class TokenPurpleTastyCandy : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<HalfLifeHealPower>(Owner.Creature, HealToGainPerCard, Owner.Creature, cardPlay.Card,
+        await PowerCmd.Apply<EffectsHealPower>(Owner.Creature, HealToGainPerCard, Owner.Creature, cardPlay.Card,
             false);
 
         if (Owner.Creature.CurrentHp < Owner.Creature.MaxHp)
             return;
 
-        var healPower = Owner.Creature.GetPower<HalfLifeHealPower>();
+        var healPower = Owner.Creature.GetPower<EffectsHealPower>();
         if (healPower == null || healPower.Amount < HealCostForEnergy)
             return;
 

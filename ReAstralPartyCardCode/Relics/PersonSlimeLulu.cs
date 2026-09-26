@@ -66,7 +66,7 @@ public class PersonSlimeLulu : CooldownPersonRelicBase
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillHealingSlime>(),
-        HoverTipFactory.FromPower<HalfLifeHealPower>(),
+        HoverTipFactory.FromPower<EffectsHealPower>(),
         HoverTipFactory.FromPower<AdherentMucusPower>()
     ];
 
@@ -111,7 +111,7 @@ public class PersonSlimeLulu : CooldownPersonRelicBase
 
         Flash();
 
-        await PowerCmd.Apply<HalfLifeHealPower>(
+        await PowerCmd.Apply<EffectsHealPower>(
             ownerCreature,
             1m,
             ownerCreature,

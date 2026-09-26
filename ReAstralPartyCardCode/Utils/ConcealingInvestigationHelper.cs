@@ -59,7 +59,7 @@ public static class ConcealingInvestigationHelper
         if (poisonedApple != null)
         {
             if (controllerPlayer.Creature != null && controllerPlayer.Creature.IsAlive)
-                await PowerCmd.Apply<StarLightPower>(
+                await PowerCmd.Apply<EffectsStarlightPower>(
                     controllerPlayer.Creature,
                     BonnieTriggerStarLightAmount,
                     controllerPlayer.Creature,
@@ -148,7 +148,7 @@ public static class ConcealingInvestigationHelper
         if (target == null || triggerPlayer.Creature == null)
             return;
 
-        await PowerCmd.Apply<MarkLockPower>(target, amount, triggerPlayer.Creature, source, false);
+        await PowerCmd.Apply<EffectsMarkPower>(target, amount, triggerPlayer.Creature, source, false);
     }
 
     public static async Task ApplyMarkToAllLivingEnemies(Player triggerPlayer, decimal amount, CardModel? source)
@@ -157,7 +157,7 @@ public static class ConcealingInvestigationHelper
             return;
 
         foreach (var creature in GetAllLivingEnemies(triggerPlayer))
-            await PowerCmd.Apply<MarkLockPower>(creature, amount, triggerPlayer.Creature, source, false);
+            await PowerCmd.Apply<EffectsMarkPower>(creature, amount, triggerPlayer.Creature, source, false);
     }
 
     public static async Task GrantAttackCardOrEnergyToTriggerAndBonnie(Player triggerPlayer, CardModel? source)
