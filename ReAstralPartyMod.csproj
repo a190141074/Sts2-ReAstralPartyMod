@@ -232,6 +232,7 @@
 		<Content Include="ReAstralPartyMod\images\enchantments\astral_cooldown_enchantment.png.import"/>
 		<Content Include="ReAstralPartyMod\images\events\astral_relic_store.png"/>
 		<Content Include="ReAstralPartyMod\images\events\astral_relic_store.png.import"/>
+		<Content Include="ReAstralPartyMod\images\events\astral_token_breakthrough.png"/>
 		<Content Include="ReAstralPartyMod\images\events\vial_episode_store.png"/>
 		<Content Include="ReAstralPartyMod\images\potion\candy_big_brain_gummy.png"/>
 		<Content Include="ReAstralPartyMod\images\potion\candy_big_brain_gummy.png.import"/>

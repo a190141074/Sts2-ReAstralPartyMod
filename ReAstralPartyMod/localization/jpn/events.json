@@ -32,5 +32,20 @@
   "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.ANOMALY_FINISH.description": "あなたは最も安いバイアルを手に取ります。中では今にも弾けそうな静電気のパチパチ音がします。",
   "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.NEUTRAL_FINISH.description": "これは、疑わしいほど平凡であると十分にバランスが取れているように感じます。",
   "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.GOOD_FINISH.description": "ガラスからは温かい光が漏れます。少なくとも、これはすぐに危険なものには見えません。",
-  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.DEUS_EX_MACHINA_FINISH.description": "最も高価な小瓶は、まるで誰かが奇跡をすべて瓶の中に詰め込んだかのように、見た目よりも重いです。"
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.DEUS_EX_MACHINA_FINISH.description": "最も高価な小瓶は、まるで誰かが奇跡をすべて瓶の中に詰め込んだかのように、見た目よりも重いです。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.title": "トークン突破",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.description": "レリックをより高いレアリティへ突破させられる場所を見つけた。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.options.BREAKTHROUGH.title": "突破する",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.options.BREAKTHROUGH.description": "可能な突破を確認する。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.options.GOLD.title": "ゴールド110枚を受け取る",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.options.GOLD.description": "[gold]110[/gold]ゴールドを得てイベントを終了する。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.BREAKTHROUGH.description": "突破を選ぶか、立ち去る。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.option.title": "{Source} → {Target}",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.option.description": "[gold]{Cost}[/gold]ゴールドを消費する。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.BREAKTHROUGH.options.LEAVE.title": "立ち去る",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.BREAKTHROUGH.options.LEAVE.description": "イベントを終了する。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.COMPLETE.description": "このイベントで可能な突破をすべて行った。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INVALID.description": "候補が無効になったか、ゴールドが不足しているため、突破は行われなかった。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.GOLD_FINISH.description": "ゴールド110枚を受け取った。",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.LEAVE.description": "突破の場を立ち去った。"
 }

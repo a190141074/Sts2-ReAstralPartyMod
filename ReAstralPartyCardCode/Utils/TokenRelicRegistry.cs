@@ -14,6 +14,7 @@ public static class TokenRelicRegistry
     [
         typeof(TokenBlueAtm),
         typeof(TokenBlueBankCardGeneral),
+        typeof(TokenBlueBattleBookBasic),
         typeof(TokenBlueBookmark),
         typeof(TokenBlueBoxingGloveGeneral),
         typeof(TokenBlueDie10),
@@ -64,6 +65,7 @@ public static class TokenRelicRegistry
         typeof(TokenGoldArtKnifeEnchanted),
         typeof(TokenGoldArtKnifeSharp),
         typeof(TokenGoldBankCardPremium),
+        typeof(TokenGoldBattleBookMid),
         typeof(TokenGoldBigStewBowl),
         typeof(TokenGoldBoxingGlovePremium),
         typeof(TokenGoldColorfulSprayCan),

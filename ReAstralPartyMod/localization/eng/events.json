@@ -32,5 +32,20 @@
   "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.ANOMALY_FINISH.description": "You pick up the cheapest vial. Static crackles inside like it might burst open at any moment.",
   "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.NEUTRAL_FINISH.description": "This one feels balanced enough to be suspiciously ordinary.",
   "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.GOOD_FINISH.description": "A warm glow leaks from the glass. At least this one does not look immediately dangerous.",
-  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.DEUS_EX_MACHINA_FINISH.description": "The most expensive vial is heavier than it looks, as if someone compressed a whole miracle into the bottle."
+  "RE_ASTRAL_PARTY_MOD_EVENT_VIAL_EPISODE_STORE.pages.DEUS_EX_MACHINA_FINISH.description": "The most expensive vial is heavier than it looks, as if someone compressed a whole miracle into the bottle.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.title": "Token Breakthrough",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.description": "You find a place where relics can break through to a higher quality.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.options.BREAKTHROUGH.title": "Break Through",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.options.BREAKTHROUGH.description": "View available breakthroughs.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.options.GOLD.title": "Take 110 Gold",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INITIAL.options.GOLD.description": "Gain [gold]110[/gold] Gold and end the event.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.BREAKTHROUGH.description": "Choose a breakthrough or leave.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.option.title": "{Source} → {Target}",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.option.description": "Spend [gold]{Cost}[/gold] Gold.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.BREAKTHROUGH.options.LEAVE.title": "Leave",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.BREAKTHROUGH.options.LEAVE.description": "End the event.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.COMPLETE.description": "You have used all breakthroughs available in this event.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.INVALID.description": "The offer is no longer valid or you lack the Gold. No breakthrough was made.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.GOLD_FINISH.description": "You take the 110 Gold.",
+  "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.pages.LEAVE.description": "You leave the breakthrough site."
 }
