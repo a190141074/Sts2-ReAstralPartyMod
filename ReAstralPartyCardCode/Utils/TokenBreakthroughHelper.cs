@@ -7,7 +7,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
-public readonly record struct TokenBreakthroughCandidate(RelicModel Source, RelicModel Target, int QualityFactor);
+public readonly record struct TokenBreakthroughCandidate(RelicModel Source, RelicModel Target, decimal QualityFactor);
 
 public static class TokenBreakthroughHelper
 {
@@ -54,7 +54,7 @@ public static class TokenBreakthroughHelper
                 .OrderBy(r => Stable(owner, completedCount, slot, r.Id.Entry)).ThenBy(r => r.Id.Entry, StringComparer.Ordinal)
                 .FirstOrDefault();
             if (source != null && target != null)
-                return [new(source, target, 1)];
+                return [new(source, target, 0.5m)];
             return [];
         }
 
@@ -103,21 +103,21 @@ public static class TokenBreakthroughHelper
             .ThenBy(relic => relic.Id.Entry, StringComparer.Ordinal).ToList();
 
         return sources.SelectMany(source => targets.Select(target =>
-                new TokenBreakthroughCandidate(source, Canonical(target), 1)))
+                new TokenBreakthroughCandidate(source, Canonical(target), 0.5m)))
             .OrderBy(candidate => Stable(owner, completedCount, slot, candidate.Source.Id.Entry, candidate.Target.Id.Entry))
             .ThenBy(candidate => candidate.Source.Id.Entry, StringComparer.Ordinal)
             .ThenBy(candidate => candidate.Target.Id.Entry, StringComparer.Ordinal).ToList();
     }
 
     public static int Cost(TokenBreakthroughCandidate candidate, int completedCount) =>
-        (int)(100m * (1m + 0.1m * completedCount) * candidate.QualityFactor);
+        (int)Math.Round(100m * (1m + 0.1m * completedCount) * candidate.QualityFactor, MidpointRounding.AwayFromZero);
 
-    private static int QualityFactor(RelicModel source) => !TokenRelicRegistry.IsTokenRelic(source) ? 1 : source.Rarity switch
+    private static decimal QualityFactor(RelicModel source) => !TokenRelicRegistry.IsTokenRelic(source) ? 0.5m : source.Rarity switch
     {
-        RelicRarity.Common => 2,
-        RelicRarity.Uncommon => 4,
-        RelicRarity.Rare => 5,
-        _ => 5
+        RelicRarity.Common => 1m,
+        RelicRarity.Uncommon => 2m,
+        RelicRarity.Rare => 4m,
+        _ => 4m
     };
 
     private static RelicModel Canonical(RelicModel relic) => relic.CanonicalInstance ?? relic;

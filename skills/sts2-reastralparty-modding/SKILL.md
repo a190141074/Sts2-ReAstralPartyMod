@@ -48,5 +48,7 @@ description: 用于 B:\Documents\re-astral-party-mod 的仓库专属开发，覆
 
 ## 构建与导出
 
+每次执行构建前，先将仓库根目录 `ReAstralPartyMod.json` 的补丁版本号递增 `1`；不追踪构建过程内部是否额外导致版本变化，只保证本次构建操作主动递增一次。构建验证时同时检查 manifest 版本和游戏目录中的 DLL/PCK 是否更新。
+
 代码改动使用 `dotnet build ReAstralPartyMod.csproj`。导出任务必须确认游戏目录 DLL/PCK 已变化；行为排错先看最新相关日志中的第一个硬错误。
 PCK 文本扫描只能作为诊断，不能证明运行时行为。
