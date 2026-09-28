@@ -16,6 +16,8 @@ description: 用于 B:\Documents\re-astral-party-mod 的仓库专属开发，覆
 4. 选择最窄的现有 base/helper/Hook；时机问题读 [timing-map.md](references/timing-map.md)，功能路线读 [workflows.md](references/workflows.md)。
 5. 修改后搜索旧 ID/文本在代码、本地化、文档、资源和生成描述中的所有残留，验证 JSON/UTF-8 与 `git diff --check`。
 
+人格选择相关代码每次修改都必须同步更新通用层的 [经验账本](../sts2-ritsulib-modding/references/experience-ledger.md)（错题本），从本次起执行，不追溯旧提交。每处改动分别写明修改位置、原错误或风险、日志或同类实现依据、修正方式和下次修改前自检项；完成前逐项对照代码 diff，不能用一句笼统结论代替。
+
 ## 玩家可见描述
 
 - 品质映射固定为：蓝色 = `common` = 普通；紫色 = `uncommon` = 罕见；金色 = `rare` = 稀有。注册品质、本地化品质名称和玩家描述必须按此对应，不能混用“罕见/稀有”。

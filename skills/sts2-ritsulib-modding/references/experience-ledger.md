@@ -59,6 +59,12 @@
 
 ## 反复失败模式
 
+### ReAstralParty 人格选择：2026-09-28 Neow 收尾同步
+
+- 修改位置：`ReAstralPartyCardCode/Online/StartingPersonNeowReadyFlow.cs` 的 `RunSelectionTaskAsync`。原错误/风险：人格选择完成后调用 `SetInitialEventState(false)` 重建每名玩家的 Neow 选项，可能使不同端额外推进随机流。依据：`godot (7).log` 首次分歧在退出 `EVENT.NEOW`，主机与客户端 `Niche` 计数为 6/0；同文件的 `RestoreOriginalOptionsOrFinish` 已有缓存恢复链。修正：完成后统一恢复准备页注入前缓存的选项和描述，不重新生成。下次修改前自检：逐端追踪准备页缓存、结束恢复和 Neow 退出时的 RNG 计数；未经联机实测，不把计数差异直接写成已证实的根因。
+- 修改位置：同文件的 `RestoreOriginalOptionsOrFinish`。原错误/风险：复用缓存恢复链时，外部 Seven Curses Neow 页可能被补入本模组额外选项。依据：原重建分支对 `ExternalSevenCursesPage` 明确使用缓存原页；普通 Neow 页才调用 `EnsureSelectedCustomOptionPresent`。修正：缓存恢复时保留同一判别，普通 Neow 补回已选自定义选项，外部页和其他 Ancient 原样恢复。下次修改前自检：逐项对照普通 Neow、外部 Seven Curses 页和替代 Ancient 的缓存与恢复结果。
+- 修改位置：同文件的重建辅助链。原错误/风险：切换为缓存恢复后，`RebuildInitialOptionsOrFallback`、临时修改 `RunState.Modifiers` 的反射链和重复的缓存恢复函数成为孤儿代码，保留会让后续维护误走旧路径。依据：仓库调用搜索显示这些方法仅服务于被替换的完成后重建入口。修正：删除失去调用方的辅助代码，保留原有 UI 刷新和远程选择前恢复入口。下次修改前自检：搜索所有 `SetInitialEventState(false)`、`RunState.Modifiers` 反射写入及恢复函数调用点，确认没有从人格选择收尾重新引入选项生成。
+
 - 不要把一个人格的时序特例写成所有人格的通用规则；先看最近 working relic 和基类。
 - “编译通过”只证明语法/类型成立，不证明 hook 被安装、状态被同步、DLL/PCK 被游戏加载或
   玩家看到了正确行为。每次结论要标明 source/static、build/export、runtime log、in-game

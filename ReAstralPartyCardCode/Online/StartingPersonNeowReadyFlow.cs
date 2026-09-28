@@ -43,13 +43,6 @@ internal static class StartingPersonNeowReadyFlow
         typeof(EventModel),
         "SetEventState",
         [typeof(LocString), typeof(IEnumerable<EventOption>)]);
-    private static readonly MethodInfo? SetInitialEventStateMethod = AccessTools.Method(
-        typeof(AncientEventModel),
-        "SetInitialEventState",
-        [typeof(bool)]);
-    private static readonly FieldInfo? RunStateModifiersBackingField = AccessTools.Field(
-        typeof(RunState),
-        "<Modifiers>k__BackingField");
     private static readonly MethodInfo? EventRoomSetupLayoutMethod =
         AccessTools.Method(typeof(NEventRoom), "SetupLayout");
     private static readonly MethodInfo? EventRoomRefreshEventStateMethod =
@@ -72,10 +65,6 @@ internal static class StartingPersonNeowReadyFlow
         StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind CachedPageKind,
         bool IsNeow,
         bool Restored = false);
-
-    private sealed record TemporaryNeowModifierFilterState(
-        IReadOnlyList<ModifierModel> OriginalModifiers,
-        int FilteredCount);
 
     internal static bool IsInternalNeowRefreshActive => InternalNeowRefreshDepth.Value > 0;
 
@@ -418,9 +407,9 @@ internal static class StartingPersonNeowReadyFlow
                 overrideRelicOptions.Count > 0 ? overrideRelicOptions : null);
             if (opened)
             {
-                var usedExternalRestore = RestoreOrRebuildInitialOptionsForRun(runKey, "post_selection_rebuild");
+                RestoreOriginalOptionsForRun(runKey, "post_selection_restore");
                 MainFile.Logger.Info(
-                    $"[StartingPersonNeowReadyFlow] Closed persona overlay and restored Neow page | runKey={runKey} source={sourceTag} restoreStrategy={(usedExternalRestore ? "restore_cached_external_page" : "default_rebuild_or_cached_fallback")}.");
+                    $"[StartingPersonNeowReadyFlow] Closed persona overlay and restored cached Ancient option pages | runKey={runKey} source={sourceTag} restoreStrategy=cached_options.");
             }
             else
             {
@@ -534,24 +523,6 @@ internal static class StartingPersonNeowReadyFlow
             RestoreOriginalOptionsOrFinish(ancient, reason);
     }
 
-    private static bool RestoreOrRebuildInitialOptionsForRun(string runKey, string reason)
-    {
-        List<AncientEventModel> neowsToRebuild;
-        lock (SyncLock)
-        {
-            neowsToRebuild = ReadyPages
-                .Where(pair => pair.Value.RunKey == runKey)
-                .Select(static pair => pair.Key)
-                .ToList();
-        }
-
-        var usedExternalRestore = false;
-        foreach (var ancient in neowsToRebuild)
-            usedExternalRestore |= RebuildInitialOptionsOrFallback(ancient, reason);
-
-        return usedExternalRestore;
-    }
-
     private static void RestoreOriginalOptionsOrFinish(AncientEventModel ancient, string reason)
     {
         ReadyPageState? state;
@@ -562,6 +533,7 @@ internal static class StartingPersonNeowReadyFlow
         }
 
         var restoredOptions = state.IsNeow
+            && state.CachedPageKind != StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
             ? NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(ancient, state.OriginalOptions, "ready_page_restore")
             : state.OriginalOptions;
         if (restoredOptions.Count == 0)
@@ -578,132 +550,6 @@ internal static class StartingPersonNeowReadyFlow
         SetEventStateMethod.Invoke(ancient, [state.OriginalDescription, restoredOptions]);
         MainFile.Logger.Info(
             $"[StartingPersonNeowReadyFlow] Restored Neow original option page | runKey={state.RunKey} reason={reason} optionCount={restoredOptions.Count}.");
-    }
-
-    private static bool RebuildInitialOptionsOrFallback(AncientEventModel ancient, string reason)
-    {
-        ReadyPageState? state;
-        lock (SyncLock)
-        {
-            if (!ReadyPages.Remove(ancient, out state))
-                return false;
-        }
-
-        if (state.CachedPageKind == StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage)
-        {
-            MainFile.Logger.Info(
-                $"[StartingPersonNeowReadyFlow] External Seven Curses Neow compat hit | runKey={state.RunKey} reason={reason} compatSource={StartingPersonaExternalNeowCompatHelper.DescribeDetectedSource()} restoreStrategy=restore_cached_external_page.");
-            RestoreCachedStateOrFinish(ancient, state, $"{reason}:restore_cached_external_page");
-            return true;
-        }
-
-        if (SetInitialEventStateMethod == null)
-        {
-            RestoreCachedStateOrFinish(ancient, state, $"{reason}:missing_set_initial_event_state");
-            return false;
-        }
-
-        try
-        {
-            if (ancient is not Neow neow)
-            {
-                RestoreCachedStateOrFinish(ancient, state, $"{reason}:external_ancient_cached_restore");
-                return true;
-            }
-
-            var modifierFilterState = ApplyTemporaryNeowModifierFilter(neow, state.RunKey, reason);
-            try
-            {
-                SetInitialEventStateMethod.Invoke(neow, [false]);
-            }
-            finally
-            {
-                RestoreTemporaryNeowModifierFilter(neow, modifierFilterState, state.RunKey, reason);
-            }
-            var rebuiltOptionCount = neow.CurrentOptions?.Count ?? 0;
-            var cachedOptionCount = state.OriginalOptions.Count;
-            if (rebuiltOptionCount < cachedOptionCount)
-            {
-                MainFile.Logger.Warn(
-                    $"[StartingPersonNeowReadyFlow] Rebuilt Neow initial option page produced fewer options than the cached page; falling back to cached options | runKey={state.RunKey} reason={reason} rebuilt={rebuiltOptionCount} cached={cachedOptionCount}.");
-                RestoreCachedStateOrFinish(ancient, state, $"{reason}:fallback_cached_after_short_rebuild");
-                return false;
-            }
-
-            MainFile.Logger.Info(
-                $"[StartingPersonNeowReadyFlow] Rebuilt Neow initial option page from source event state | runKey={state.RunKey} reason={reason} optionCount={rebuiltOptionCount}.");
-        }
-        catch (Exception ex)
-        {
-            MainFile.Logger.Warn(
-                $"[StartingPersonNeowReadyFlow] Failed to rebuild Neow initial option page; falling back to cached options | runKey={state.RunKey} reason={reason}: {ex}");
-            RestoreCachedStateOrFinish(ancient, state, $"{reason}:fallback_cached");
-        }
-
-        return false;
-    }
-
-    private static TemporaryNeowModifierFilterState? ApplyTemporaryNeowModifierFilter(Neow neow, string runKey, string reason)
-    {
-        if (RunStateModifiersBackingField == null)
-            throw new InvalidOperationException("Failed to resolve RunState.Modifiers backing field for Neow rebuild filtering.");
-        if (neow.Owner?.RunState is not RunState runState)
-            return null;
-
-        var originalModifiers = runState.Modifiers;
-        var filteredModifiers = originalModifiers
-            .Where(modifier => modifier.GenerateNeowOption(neow) != null)
-            .ToList();
-        if (filteredModifiers.Count == originalModifiers.Count)
-        {
-            MainFile.Logger.Info(
-                $"[StartingPersonNeowReadyFlow] Neow rebuild modifier filter skipped | runKey={runKey} reason={reason} before={originalModifiers.Count}.");
-            return null;
-        }
-
-        RunStateModifiersBackingField.SetValue(runState, filteredModifiers);
-        MainFile.Logger.Info(
-            $"[StartingPersonNeowReadyFlow] Neow rebuild modifier filter applied | runKey={runKey} reason={reason} before={originalModifiers.Count} after={filteredModifiers.Count}.");
-        return new TemporaryNeowModifierFilterState(originalModifiers, filteredModifiers.Count);
-    }
-
-    private static void RestoreTemporaryNeowModifierFilter(
-        Neow neow,
-        TemporaryNeowModifierFilterState? state,
-        string runKey,
-        string reason)
-    {
-        if (state == null)
-            return;
-        if (RunStateModifiersBackingField == null)
-            throw new InvalidOperationException("Failed to resolve RunState.Modifiers backing field for Neow rebuild filtering.");
-        if (neow.Owner?.RunState is not RunState runState)
-            return;
-
-        RunStateModifiersBackingField.SetValue(runState, state.OriginalModifiers);
-        MainFile.Logger.Info(
-            $"[StartingPersonNeowReadyFlow] Neow rebuild modifier filter restored | runKey={runKey} reason={reason} restored={state.OriginalModifiers.Count} filtered={state.FilteredCount}.");
-    }
-
-    private static void RestoreCachedStateOrFinish(AncientEventModel ancient, ReadyPageState state, string reason)
-    {
-        var restoredOptions = !state.IsNeow || state.CachedPageKind == StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
-            ? state.OriginalOptions
-            : NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(ancient, state.OriginalOptions, "ready_page_restore");
-        if (restoredOptions.Count == 0)
-        {
-            ancient.StartPreFinished();
-            MainFile.Logger.Info(
-                $"[StartingPersonNeowReadyFlow] Ready page restored by finishing Neow immediately because the cached option page was empty | runKey={state.RunKey} reason={reason}.");
-            return;
-        }
-
-        if (SetEventStateMethod == null)
-            throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
-
-        SetEventStateMethod.Invoke(ancient, [state.OriginalDescription, restoredOptions]);
-        MainFile.Logger.Info(
-            $"[StartingPersonNeowReadyFlow] Restored cached Neow option page | runKey={state.RunKey} reason={reason} pageKind={StartingPersonaExternalNeowCompatHelper.DescribePageKind(state.CachedPageKind)} optionCount={restoredOptions.Count}.");
     }
 
     private static async Task RefreshRestoredNeowUiAsync(RunState runState, string runKey, string stage)
