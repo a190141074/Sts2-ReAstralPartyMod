@@ -14,6 +14,8 @@ using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
+using STS2RitsuLib.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
@@ -52,7 +54,8 @@ public class PersonDorothyHaze : CooldownPersonRelicBase
         HoverTipFactory.FromCard<SkillTrueMe>(),
         HoverTipFactory.FromPower<WarmPower>(),
         HoverTipFactory.FromPower<DorothyNodePower>(),
-        HoverTipFactory.FromPower<EffectsStarlightPower>()
+        HoverTipFactory.FromPower<EffectsStarlightPower>(),
+        ..new[] { AstralKeywords.AstralPassingThroughId }.ToHoverTips()
     ];
 
     public override async Task BeforeCombatStart()
@@ -68,20 +71,7 @@ public class PersonDorothyHaze : CooldownPersonRelicBase
         if (Owner?.Creature?.CombatState == null)
             return;
 
-        var orderedPlayers = Owner.Creature.CombatState.Players
-            .Where(entry => entry.Creature != null)
-            .OrderBy(entry => entry.NetId)
-            .ToList();
-        if (orderedPlayers.Count == 0)
-            return;
-
-        var playerIndex = orderedPlayers.FindIndex(entry => entry.NetId == player.NetId);
-        if (playerIndex < 0)
-            return;
-
-        var playerDigit = playerIndex % 10;
-        var nodeDigit = GetCurrentNodeDigit();
-        if (playerDigit != nodeDigit)
+        if (!AstralPassingThroughHelper.IsPassingThrough(Owner, player, GetCurrentNodeDigit()))
             return;
 
         var targetCreature = player.Creature;

@@ -1,4 +1,6 @@
 {
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_PASSING_THROUGH.title":"经过",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_PASSING_THROUGH.description":"你的节点数与按NetId排序后的玩家序号的个位数相等时，视为经过。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.title": "事件牌",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.description": "来自星引擎MOD[gold]事件[/gold]系统的特殊卡牌。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.title": "步数",

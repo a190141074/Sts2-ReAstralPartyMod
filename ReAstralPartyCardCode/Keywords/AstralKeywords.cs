@@ -38,7 +38,8 @@ public static class AstralKeywords
         AstralEndStem,
         AstralFlyingStarStem,
         IrrefusableStem,
-        FallenHeavenlyKingStem
+        FallenHeavenlyKingStem,
+        AstralPassingThroughStem
     ];
 
     private static bool _registered;
@@ -73,6 +74,7 @@ public static class AstralKeywords
     public const string AstralFlyingStarStem = "ASTRAL_FLYING_STAR";
     public const string IrrefusableStem = "IRREFUSABLE";
     public const string FallenHeavenlyKingStem = "FALLEN_HEAVENLY_KING";
+    public const string AstralPassingThroughStem = "ASTRAL_PASSING_THROUGH";
 
     public static string AstralEventId => GetId(AstralEventStem);
     public static string AstralStepsId => GetId(AstralStepsStem);
@@ -104,6 +106,7 @@ public static class AstralKeywords
     public static string AstralFlyingStarId => GetId(AstralFlyingStarStem);
     public static string IrrefusableId => GetId(IrrefusableStem);
     public static string FallenHeavenlyKingId => GetId(FallenHeavenlyKingStem);
+    public static string AstralPassingThroughId => GetId(AstralPassingThroughStem);
 
     public static CardKeyword AstralEvent => GetKeyword(AstralEventStem);
     public static CardKeyword AstralSteps => GetKeyword(AstralStepsStem);
@@ -135,6 +138,7 @@ public static class AstralKeywords
     public static CardKeyword AstralFlyingStar => GetKeyword(AstralFlyingStarStem);
     public static CardKeyword Irrefusable => GetKeyword(IrrefusableStem);
     public static CardKeyword FallenHeavenlyKing => GetKeyword(FallenHeavenlyKingStem);
+    public static CardKeyword AstralPassingThrough => GetKeyword(AstralPassingThroughStem);
 
     public static void RegisterAll()
     {

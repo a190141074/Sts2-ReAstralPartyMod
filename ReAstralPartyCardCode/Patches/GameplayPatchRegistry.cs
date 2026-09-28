@@ -283,6 +283,22 @@ internal static class GameplayStaticPatchCatalog
                 "Gameplay patch: force all cards with the paranoid essence enchantment to receive combat hooks",
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
+                "astral_levitation_debuff_suppression_patch",
+                typeof(AbstractModel),
+                nameof(AbstractModel.ShouldReceiveCombatHooks),
+                typeof(AstralLevitationDebuffSuppressionPatch),
+                false,
+                "Gameplay patch: temporarily suppress combat hooks from debuffs while Astral Levitation is active",
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
+                "personality_derivative_doll_description_patch",
+                typeof(MegaCrit.Sts2.Core.Models.RelicModel),
+                "DynamicDescription",
+                typeof(PersonalityDerivativeDollDescriptionPatch),
+                false,
+                "Gameplay patch: switch Doll Making relic description after permanent completion",
+                harmonyMethodType: MethodType.Getter),
+            new ModPatchInfo(
                 "card_model_paranoid_is_playable_patch",
                 typeof(CardModel),
                 "IsPlayable",

@@ -1,4 +1,6 @@
 {
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_PASSING_THROUGH.title":"通過",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_PASSING_THROUGH.description":"NetId順のプレイヤー番号の1桁がノードと等しいとき、通過とみなす。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.title": "イベントカード",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.description": "Star Engine MOD[gold]Event[/gold] システムからの特別なカード。",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.title": "歩数",

@@ -270,4 +270,6 @@
   "RE_ASTRAL_PARTY_MOD_CARD_TERRAPRISMA.description": "Deals {Damage:diff()} damage.",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SLEIGHT_OF_HAND.title": "Sleight of Hand",
   "RE_ASTRAL_PARTY_MOD_CARD_SKILL_SLEIGHT_OF_HAND.description": "Steal [blue]4[/blue] [gold]Starlight[/gold] from the target.\nIf the target is an ally, enchant a random card in their hand with [gold]Windfall Hits[/gold]."
+  ,"RE_ASTRAL_PARTY_MOD_CARD_SKILL_MAGIC_LEVITATION.title":"Magic Levitation"
+  ,"RE_ASTRAL_PARTY_MOD_CARD_SKILL_MAGIC_LEVITATION.description":"Gain [gold]Levitation[/gold] for one turn."
 }
