@@ -13,6 +13,7 @@ using MegaCrit.Sts2.Core.Localization;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Rooms;
+using MegaCrit.Sts2.Core.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Tags;
@@ -132,8 +133,9 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             await ApplyRobberyCombatStart(combatState);
         }
 
+        var hasTreasureTarget = aliveEnemies.Any(enemy => !IsBossEnemy(enemy));
         if (FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.MysteriousTreasure) &&
-            FinalArenaSeriesHelper.ShouldApplyMysteriousTreasureThisCombat(runState))
+            FinalArenaSeriesHelper.ShouldApplyMysteriousTreasureThisCombat(runState, hasTreasureTarget))
         {
             var treasureTarget = GetDeterministicRandomNonBossEnemy(aliveEnemies, "mysterious_treasure", runState.TotalFloor);
             if (treasureTarget != null)
@@ -532,8 +534,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         if (intervals <= 0)
             return Task.CompletedTask;
 
-        FinalArenaSeriesHelper.SetArbitrageFloorBaseline(runState, baseline + intervals * ArbitrageFloorInterval);
-        return GrantArbitrageGold(intervals);
+        return GrantArbitrageGold(runState, baseline + intervals * ArbitrageFloorInterval, intervals);
     }
 
     private CombatState? GetCombatState()
@@ -846,20 +847,22 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             await CreatureCmdCompat.Damage(choiceContext, creature!, ThundercloudDamage, ValueProp.Move, null, null);
     }
 
-    private async Task GrantArbitrageGold(int intervals)
+    private async Task GrantArbitrageGold(RunState runState, int paidThroughFloor, int intervals)
     {
         foreach (var player in GetStablePlayers())
         {
+            if (FinalArenaSeriesHelper.HasArbitragePaidPlayerThroughFloor(runState, player.NetId, paidThroughFloor))
+                continue;
             var currentGold = player.Gold;
-            if (currentGold <= 0m)
-                continue;
-
-            var goldToGain = Math.Floor(currentGold * ArbitragePercent * intervals);
-            if (goldToGain <= 0m)
-                continue;
-
-            await PlayerCmd.GainGold(goldToGain, player);
+            if (currentGold > 0m)
+            {
+                var goldToGain = Math.Floor(currentGold * ArbitragePercent * intervals);
+                if (goldToGain > 0m)
+                    await PlayerCmd.GainGold(goldToGain, player);
+            }
+            FinalArenaSeriesHelper.MarkArbitragePaidPlayerThroughFloor(runState, player.NetId, paidThroughFloor);
         }
+        FinalArenaSeriesHelper.SetArbitrageFloorBaseline(runState, paidThroughFloor);
     }
 
     private async Task DiscardRandomHandCard(PlayerChoiceContext choiceContext, Player player, CardModel cardSource)

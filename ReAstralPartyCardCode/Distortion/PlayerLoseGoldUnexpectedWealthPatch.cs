@@ -39,6 +39,7 @@ public sealed class PlayerLoseGoldUnexpectedWealthPatch : IPatchMethod
         if (!FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.UnexpectedWealth))
             return;
 
+        var sequence = FinalArenaSeriesHelper.AdvanceUnexpectedWealthTriggerSequence(runState, player.NetId);
         var roll = DeterministicMultiplayerChoiceHelper.RollDeterministically(
             0,
             100,
@@ -48,7 +49,8 @@ public sealed class PlayerLoseGoldUnexpectedWealthPatch : IPatchMethod
             player.NetId,
             runState.TotalFloor,
             player.Gold,
-            amount);
+            amount,
+            sequence);
         if (roll >= 30)
             return;
 

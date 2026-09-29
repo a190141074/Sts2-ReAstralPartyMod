@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Godot;
 using MegaCrit.Sts2.Core.Commands;
@@ -81,6 +82,21 @@ public static class FinalArenaSeriesHelper
 
     private static RunSavedData<FinalArenaSeriesRunData> _runData = null!;
     private static bool _registered;
+    private static readonly ConditionalWeakTable<RunState, SemaphoreSlim> HumanAiDuelSyncGates = new();
+
+    internal static async Task WithHumanAiDuelSyncGate(RunState runState, Func<Task> action)
+    {
+        var gate = HumanAiDuelSyncGates.GetValue(runState, static _ => new SemaphoreSlim(1, 1));
+        await gate.WaitAsync();
+        try
+        {
+            await action();
+        }
+        finally
+        {
+            gate.Release();
+        }
+    }
 
     public static void Register()
     {
@@ -124,10 +140,13 @@ public static class FinalArenaSeriesHelper
             _runData.Set(runState, runData);
         }
 
-        await ApplyOneTimeComponents(runState, runData, components);
+        await WithHumanAiDuelSyncGate(runState, async () =>
+        {
+            await ApplyOneTimeComponents(runState, runData, components);
 
-        if (broadcastIfHost)
-            FinalArenaDistortionComponentSync.BroadcastState(runState);
+            if (broadcastIfHost)
+                FinalArenaDistortionComponentSync.BroadcastState(runState);
+        });
     }
 
     public static bool EnsureInitializedForUi(
@@ -166,6 +185,8 @@ public static class FinalArenaSeriesHelper
             ChaosFloodAppliedPlayerNetIds = [],
             ChaosFloodTargetMaxPotionCounts = [],
             ChaosFloodTargetPersonChestCounts = [],
+            RobberyGoldGrantedPlayerNetIds = [],
+            ThreeThousandAstrolabeGoldGrantedPlayerNetIds = [],
             RobberyGoldGranted = false,
             ThreeThousandAstrolabeGoldGranted = false,
             RobberyNextCombatStunPending = false,
@@ -173,6 +194,8 @@ public static class FinalArenaSeriesHelper
             MysteriousTreasureNextCombatPending = false,
             MysteriousTreasureCombatCounter = 0,
             ArbitrageLastFloor = -1,
+            ArbitrageLastPaidFloorByPlayer = [],
+            UnexpectedWealthTriggerSequences = [],
             GlobalPlayerTurnCounter = 0
         };
         _runData.Set(runState, runData);
@@ -269,12 +292,16 @@ public static class FinalArenaSeriesHelper
         IReadOnlyDictionary<ulong, int> chaosFloodTargetMaxPotionCounts,
         IReadOnlyDictionary<ulong, int> chaosFloodTargetPersonChestCounts,
         bool robberyGoldGranted,
+        IReadOnlyList<ulong> robberyGoldGrantedPlayerNetIds,
         bool threeThousandAstrolabeGoldGranted,
+        IReadOnlyList<ulong> threeThousandAstrolabeGoldGrantedPlayerNetIds,
         bool robberyNextCombatPending,
         bool mysteriousTreasureInitialized,
         bool mysteriousTreasureNextCombatPending,
         int mysteriousTreasureCombatCounter,
         int arbitrageLastFloor,
+        IReadOnlyDictionary<ulong, int> arbitrageLastPaidFloorByPlayer,
+        IReadOnlyDictionary<ulong, int> unexpectedWealthTriggerSequences,
         int globalPlayerTurnCounter)
     {
         var runData = GetOrCreateRunData(runState);
@@ -295,14 +322,54 @@ public static class FinalArenaSeriesHelper
         runData.ChaosFloodTargetPersonChestCounts = chaosFloodTargetPersonChestCounts
             .ToDictionary(entry => entry.Key, entry => Math.Max(0, entry.Value));
         runData.RobberyGoldGranted = robberyGoldGranted;
+        runData.RobberyGoldGrantedPlayerNetIds = robberyGoldGrantedPlayerNetIds
+            .Concat(runData.RobberyGoldGrantedPlayerNetIds).Distinct().OrderBy(static id => id).ToList();
         runData.ThreeThousandAstrolabeGoldGranted = threeThousandAstrolabeGoldGranted;
+        runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds = threeThousandAstrolabeGoldGrantedPlayerNetIds
+            .Concat(runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds).Distinct().OrderBy(static id => id).ToList();
         runData.RobberyNextCombatStunPending = robberyNextCombatPending;
         runData.MysteriousTreasureInitialized = mysteriousTreasureInitialized;
         runData.MysteriousTreasureNextCombatPending = mysteriousTreasureNextCombatPending;
         runData.MysteriousTreasureCombatCounter = mysteriousTreasureCombatCounter;
         runData.ArbitrageLastFloor = arbitrageLastFloor;
+        foreach (var entry in arbitrageLastPaidFloorByPlayer)
+            runData.ArbitrageLastPaidFloorByPlayer[entry.Key] = Math.Max(
+                runData.ArbitrageLastPaidFloorByPlayer.GetValueOrDefault(entry.Key), entry.Value);
+        foreach (var entry in unexpectedWealthTriggerSequences)
+            runData.UnexpectedWealthTriggerSequences[entry.Key] = Math.Max(
+                runData.UnexpectedWealthTriggerSequences.GetValueOrDefault(entry.Key), entry.Value);
         runData.GlobalPlayerTurnCounter = globalPlayerTurnCounter;
         _runData.Set(runState, runData);
+    }
+
+    internal static async Task ReconcileSyncedGoldGrantsAsync(
+        RunState runState,
+        IReadOnlyList<ulong> robberyGrantedPlayerNetIds,
+        IReadOnlyList<ulong> astrolabeGrantedPlayerNetIds)
+    {
+        var runData = GetOrCreateRunData(runState);
+        if (runData.RobberyGoldGranted && runData.RobberyGoldGrantedPlayerNetIds.Count == 0)
+            runData.RobberyGoldGrantedPlayerNetIds = runState.Players.Select(static player => player.NetId).ToList();
+        if (runData.ThreeThousandAstrolabeGoldGranted && runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Count == 0)
+            runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds = runState.Players.Select(static player => player.NetId).ToList();
+
+        foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+        {
+            if (robberyGrantedPlayerNetIds.Contains(player.NetId) &&
+                !runData.RobberyGoldGrantedPlayerNetIds.Contains(player.NetId))
+            {
+                await PlayerCmd.GainGold(60m, player);
+                runData.RobberyGoldGrantedPlayerNetIds.Add(player.NetId);
+                _runData.Set(runState, runData);
+            }
+            if (astrolabeGrantedPlayerNetIds.Contains(player.NetId) &&
+                !runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Contains(player.NetId))
+            {
+                await PlayerCmd.GainGold(3000m, player);
+                runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Add(player.NetId);
+                _runData.Set(runState, runData);
+            }
+        }
     }
 
     public static void EnsureCombatModifierInstalled(RunState? runState)
@@ -332,7 +399,7 @@ public static class FinalArenaSeriesHelper
         return true;
     }
 
-    public static bool ShouldApplyMysteriousTreasureThisCombat(RunState runState)
+    public static bool ShouldApplyMysteriousTreasureThisCombat(RunState runState, bool hasEligibleTarget)
     {
         if (!HasComponent(runState, FinalArenaDistortionComponent.MysteriousTreasure))
             return false;
@@ -340,18 +407,43 @@ public static class FinalArenaSeriesHelper
         var runData = GetOrCreateRunData(runState);
         if (runData.MysteriousTreasureNextCombatPending)
         {
+            if (!hasEligibleTarget)
+                return false;
             runData.MysteriousTreasureNextCombatPending = false;
-            runData.MysteriousTreasureCombatCounter = 1;
+            runData.MysteriousTreasureCombatCounter = 0;
             _runData.Set(runState, runData);
             return true;
         }
 
-        runData.MysteriousTreasureCombatCounter++;
+        runData.MysteriousTreasureCombatCounter = Math.Min(5, runData.MysteriousTreasureCombatCounter + 1);
         var shouldApply = runData.MysteriousTreasureCombatCounter >= 5;
-        if (shouldApply)
+        if (shouldApply && hasEligibleTarget)
             runData.MysteriousTreasureCombatCounter = 0;
         _runData.Set(runState, runData);
-        return shouldApply;
+        return shouldApply && hasEligibleTarget;
+    }
+
+    public static int AdvanceUnexpectedWealthTriggerSequence(RunState runState, ulong playerNetId)
+    {
+        var runData = GetOrCreateRunData(runState);
+        runData.UnexpectedWealthTriggerSequences.TryGetValue(playerNetId, out var sequence);
+        sequence = checked(sequence + 1);
+        runData.UnexpectedWealthTriggerSequences[playerNetId] = sequence;
+        _runData.Set(runState, runData);
+        return sequence;
+    }
+
+    public static bool HasArbitragePaidPlayerThroughFloor(RunState runState, ulong playerNetId, int floor)
+    {
+        var runData = GetOrCreateRunData(runState);
+        return runData.ArbitrageLastPaidFloorByPlayer.TryGetValue(playerNetId, out var paidFloor) && paidFloor >= floor;
+    }
+
+    public static void MarkArbitragePaidPlayerThroughFloor(RunState runState, ulong playerNetId, int floor)
+    {
+        var runData = GetOrCreateRunData(runState);
+        runData.ArbitrageLastPaidFloorByPlayer[playerNetId] = floor;
+        _runData.Set(runState, runData);
     }
 
     public static int GetAndUpdateArbitrageFloorBaseline(RunState runState)
@@ -405,16 +497,21 @@ public static class FinalArenaSeriesHelper
         FinalArenaSeriesRunData runData,
         IReadOnlyList<FinalArenaDistortionComponent> components)
     {
-        if (components.Contains(FinalArenaDistortionComponent.HumanAiDuel) &&
-            LobbyGameplayNetRoleHelper.GetCurrentRole() != LobbyGameplayNetRole.Client)
+        if (components.Contains(FinalArenaDistortionComponent.HumanAiDuel))
         {
-            MigrateLegacyHumanAiDuelState(runState, runData);
+            var isClient = LobbyGameplayNetRoleHelper.GetCurrentRole() == LobbyGameplayNetRole.Client;
+            if (!isClient)
+                MigrateLegacyHumanAiDuelState(runState, runData);
 
             foreach (var player in runState.Players.OrderBy(static player => player.NetId))
             {
                 if (runData.HumanAiDuelGrantedPlayerNetIds.Contains(player.NetId) &&
-                    runData.HumanAiDuelRecordedMindStacks.ContainsKey(player.NetId))
+                    runData.HumanAiDuelRecordedMindStacks.TryGetValue(player.NetId, out var savedMind))
+                {
+                    if (player.GetRelic<TokenExclusiveStunGun>() == null)
+                        await SetHumanAiDuelMindTarget(player, savedMind);
                     continue;
+                }
 
                 var recordedMind = await GrantHumanAiDuelStunGun(player);
                 if (!recordedMind.HasValue)
@@ -433,22 +530,39 @@ public static class FinalArenaSeriesHelper
                 runData.HumanAiDuelRecordedMindStacks.ContainsKey(player.NetId));
         }
 
-        if (components.Contains(FinalArenaDistortionComponent.Robbery) && !runData.RobberyGoldGranted)
+        if (components.Contains(FinalArenaDistortionComponent.Robbery))
         {
+            var wasGoldGranted = runData.RobberyGoldGranted;
+            if (runData.RobberyGoldGranted && runData.RobberyGoldGrantedPlayerNetIds.Count == 0)
+                runData.RobberyGoldGrantedPlayerNetIds = runState.Players.Select(static player => player.NetId).ToList();
             foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+            {
+                if (runData.RobberyGoldGrantedPlayerNetIds.Contains(player.NetId))
+                    continue;
                 await PlayerCmd.GainGold(60m, player);
+                runData.RobberyGoldGrantedPlayerNetIds.Add(player.NetId);
+                _runData.Set(runState, runData);
+            }
 
-            runData.RobberyGoldGranted = true;
-            runData.RobberyNextCombatStunPending = true;
+            runData.RobberyGoldGranted = runState.Players.All(player => runData.RobberyGoldGrantedPlayerNetIds.Contains(player.NetId));
+            if (runData.RobberyGoldGranted && !wasGoldGranted)
+                runData.RobberyNextCombatStunPending = true;
         }
 
-        if (components.Contains(FinalArenaDistortionComponent.ThreeThousandAstrolabe) &&
-            !runData.ThreeThousandAstrolabeGoldGranted)
+        if (components.Contains(FinalArenaDistortionComponent.ThreeThousandAstrolabe))
         {
+            if (runData.ThreeThousandAstrolabeGoldGranted && runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Count == 0)
+                runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds = runState.Players.Select(static player => player.NetId).ToList();
             foreach (var player in runState.Players.OrderBy(static player => player.NetId))
+            {
+                if (runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Contains(player.NetId))
+                    continue;
                 await PlayerCmd.GainGold(3000m, player);
+                runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Add(player.NetId);
+                _runData.Set(runState, runData);
+            }
 
-            runData.ThreeThousandAstrolabeGoldGranted = true;
+            runData.ThreeThousandAstrolabeGoldGranted = runState.Players.All(player => runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Contains(player.NetId));
         }
 
         if (components.Contains(FinalArenaDistortionComponent.MysteriousTreasure) &&
@@ -861,11 +975,15 @@ public sealed class FinalArenaSeriesRunData
     public Dictionary<ulong, int> ChaosFloodTargetMaxPotionCounts { get; set; } = [];
     public Dictionary<ulong, int> ChaosFloodTargetPersonChestCounts { get; set; } = [];
     public bool RobberyGoldGranted { get; set; }
+    public List<ulong> RobberyGoldGrantedPlayerNetIds { get; set; } = [];
     public bool ThreeThousandAstrolabeGoldGranted { get; set; }
+    public List<ulong> ThreeThousandAstrolabeGoldGrantedPlayerNetIds { get; set; } = [];
     public bool RobberyNextCombatStunPending { get; set; }
     public bool MysteriousTreasureInitialized { get; set; }
     public bool MysteriousTreasureNextCombatPending { get; set; }
     public int MysteriousTreasureCombatCounter { get; set; }
     public int ArbitrageLastFloor { get; set; } = -1;
+    public Dictionary<ulong, int> ArbitrageLastPaidFloorByPlayer { get; set; } = [];
+    public Dictionary<ulong, int> UnexpectedWealthTriggerSequences { get; set; } = [];
     public int GlobalPlayerTurnCounter { get; set; }
 }
