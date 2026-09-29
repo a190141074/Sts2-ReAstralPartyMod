@@ -44,13 +44,13 @@ public sealed class PersonalityDerivativeDollMaking : AstralPartyRelicModel
         if (Owner?.Creature?.CombatState == null || player == Owner) return;
         if (!AstralPassingThroughHelper.IsPassingThrough(Owner, player, (int)Owner.Creature.GetPowerAmount<HannaNodePower>())) return;
         AstralParty_PersonalityDerivativeDollMakingStacks = Math.Min(7, AstralParty_PersonalityDerivativeDollMakingStacks + 1);
-        await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, 1m, Owner.Creature, null, false);
+        await PowerCmd.Apply<EffectsStarlightPower>(choiceContext, Owner.Creature, 1m, Owner.Creature, null, false);
         if (Owner.Creature.GetPower<AstralLevitationPower>() != null)
-            await PowerCmd.Apply<EffectsStarlightPower>(player.Creature, 3m, Owner.Creature, null, false);
+            await PowerCmd.Apply<EffectsStarlightPower>(choiceContext, player.Creature, 3m, Owner.Creature, null, false);
         if (AstralParty_PersonalityDerivativeDollMakingStacks >= 7)
             AstralParty_PersonalityDerivativeDollMakingComplete = true;
         if (AstralParty_PersonalityDerivativeDollMakingComplete)
-            await AstralTemporaryDexterityPower.Apply(player.Creature, 2m, this, Owner.Creature, null, false);
+            await AstralTemporaryDexterityPower.Apply(choiceContext, player.Creature, 2m, this, Owner.Creature, null, false);
         Flash();
         InvokeDisplayAmountChanged();
     }

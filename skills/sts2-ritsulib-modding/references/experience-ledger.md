@@ -28,6 +28,7 @@
 
 ## 联机、持久化与随机
 
+- **联机状态不能沿用单机命令入口**：修改任何多人局状态前，检查 Hook 是否提供 `PlayerChoiceContext`、实现是否丢弃 context，以及 `PowerCmdCompat` 等兼容层是否用 `ThrowingPlayerChoiceContext` 代替了真实联机上下文。无上下文 Hook（例如 `AfterEnergySpent(CardModel, int)`）触发的命令必须证明由谁执行、如何复制到其他端；不得假定卡牌播放同步就会同步 Hook 副作用。日志堆栈不是 API 契约，当前 `sts2.dll`/XML 和项目编译引用才是。
 - 大厅/角色选择不要继续依赖旧的 `StartRunLobby.LocalPlayer` 面；优先用
   `lobby.NetService.NetId` 和 `lobby.Players`，把本地玩家/房主/客户端判断收口到 helper。
 - `SavedAttachedState`、反射枚举字段、type discovery 遇到过时 multiplayer 类型时要容忍

@@ -1,5 +1,6 @@
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Cards;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Models;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
@@ -15,6 +16,14 @@ public static class EnergyChargeHelper
     public static Task Add(Creature creature, int amount, Creature? applier = null, CardModel? source = null) =>
         EffectsEnergyPower.Add(creature, amount, applier, source);
 
+    public static Task Add(PlayerChoiceContext context, Creature creature, int amount,
+        Creature? applier = null, CardModel? source = null) =>
+        EffectsEnergyPower.Add(context, creature, amount, applier, source);
+
     public static Task Spend(Creature creature, int amount, Creature? applier = null, CardModel? source = null) =>
         EffectsEnergyPower.Spend(creature, amount, applier, source);
+
+    public static Task Spend(PlayerChoiceContext context, Creature creature, int amount,
+        Creature? applier = null, CardModel? source = null) =>
+        EffectsEnergyPower.Spend(context, creature, amount, applier, source);
 }

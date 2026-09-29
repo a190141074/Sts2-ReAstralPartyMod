@@ -39,8 +39,34 @@ public sealed class EffectsEnergyPower : AstralPartyPowerModel
         return PowerCmd.Apply<EffectsEnergyPower>(target, amount, applier ?? target, source, false);
     }
 
+    public static Task Add(
+        PlayerChoiceContext choiceContext,
+        Creature target,
+        decimal amount,
+        Creature? applier = null,
+        CardModel? source = null)
+    {
+        if (amount == 0m)
+            return Task.CompletedTask;
+        return PowerCmd.Apply<EffectsEnergyPower>(
+            choiceContext,
+            target,
+            amount,
+            applier ?? target,
+            source,
+            false);
+    }
+
     public static Task Spend(Creature target, decimal amount, Creature? applier = null, CardModel? source = null)
     {
         return Add(target, -Math.Max(0m, amount), applier, source);
     }
+
+    public static Task Spend(
+        PlayerChoiceContext choiceContext,
+        Creature target,
+        decimal amount,
+        Creature? applier = null,
+        CardModel? source = null) =>
+        Add(choiceContext, target, -Math.Max(0m, amount), applier, source);
 }

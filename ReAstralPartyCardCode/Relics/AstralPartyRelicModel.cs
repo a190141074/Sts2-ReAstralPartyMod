@@ -102,7 +102,7 @@ public abstract partial class AstralPartyRelicModel : ModRelicTemplate
         return Task.CompletedTask;
     }
 
-    public sealed override Task AfterPowerAmountChanged(
+    protected virtual Task AfterPowerAmountChangedWithContext(
         PlayerChoiceContext choiceContext,
         PowerModel power,
         decimal amount,
@@ -110,6 +110,16 @@ public abstract partial class AstralPartyRelicModel : ModRelicTemplate
         CardModel? cardSource)
     {
         return AfterPowerAmountChanged(power, amount, applier, cardSource);
+    }
+
+    public sealed override Task AfterPowerAmountChanged(
+        PlayerChoiceContext choiceContext,
+        PowerModel power,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource)
+    {
+        return AfterPowerAmountChangedWithContext(choiceContext, power, amount, applier, cardSource);
     }
 
     [GeneratedRegex(@"([a-z])([A-Z])", RegexOptions.Compiled)]

@@ -17,6 +17,6 @@ public sealed class HannaNodePower : AstralPartyPowerModel
         if (Owner?.Player != player) return;
         var next = NodePowerRollHelper.RollNodeValue(player, this, nameof(HannaNodePower), 1, 10);
         if (Amount != next)
-            await PowerCmd.SetAmount<HannaNodePower>(Owner, next, Owner, null);
+            await PowerCmd.SetAmount<HannaNodePower>(choiceContext, Owner, next, Owner, null);
     }
 }

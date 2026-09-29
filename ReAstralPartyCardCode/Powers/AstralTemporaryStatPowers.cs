@@ -121,6 +121,7 @@ public sealed class AstralTemporaryStrengthPower : AstralTemporaryAppliedPowerBa
 
         return PowerCmd.Apply(power, owner, amount, applier, cardSource, silent);
     }
+
 }
 
 public sealed class AstralTemporaryDexterityPower : AstralTemporaryAppliedPowerBase
@@ -151,6 +152,16 @@ public sealed class AstralTemporaryDexterityPower : AstralTemporaryAppliedPowerB
             silent);
     }
 
+    public static Task Apply(PlayerChoiceContext context, Creature owner, decimal amount,
+        AbstractModel originModel, Creature? applier, CardModel? cardSource, bool silent = false)
+    {
+        if (amount < 0m)
+            return AstralTemporaryDexterityLossPower.Apply(owner, -amount, originModel, applier, cardSource, silent);
+        var power = (AstralTemporaryDexterityPower)ModelDb.Power<AstralTemporaryDexterityPower>().ToMutable();
+        return ApplyInternal(context, power.Configure(originModel, ModelDb.Power<DexterityPower>()), owner,
+            amount, applier, cardSource, silent);
+    }
+
     private static Task ApplyInternal(AstralTemporaryAppliedPowerBase power, Creature owner, decimal amount,
         Creature? applier, CardModel? cardSource, bool silent)
     {
@@ -158,6 +169,14 @@ public sealed class AstralTemporaryDexterityPower : AstralTemporaryAppliedPowerB
             return Task.CompletedTask;
 
         return PowerCmd.Apply(power, owner, amount, applier, cardSource, silent);
+    }
+
+    private static Task ApplyInternal(PlayerChoiceContext context, AstralTemporaryAppliedPowerBase power,
+        Creature owner, decimal amount, Creature? applier, CardModel? cardSource, bool silent)
+    {
+        if (amount <= 0m)
+            return Task.CompletedTask;
+        return MegaCrit.Sts2.Core.Commands.PowerCmd.Apply(context, power, owner, amount, applier, cardSource, silent);
     }
 }
 

@@ -33,6 +33,24 @@ public static class PowerCmdCompat
             silent);
     }
 
+    public static Task<TPower?> Apply<TPower>(
+        PlayerChoiceContext choiceContext,
+        Creature target,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource,
+        bool silent = false)
+        where TPower : PowerModel
+    {
+        return MegaCrit.Sts2.Core.Commands.PowerCmd.Apply<TPower>(
+            choiceContext,
+            target,
+            amount,
+            applier,
+            cardSource,
+            silent);
+    }
+
     public static Task Apply(
         PowerModel power,
         Creature target,
@@ -77,6 +95,26 @@ public static class PowerCmdCompat
                 applier,
                 cardSource,
                 true);
+    }
+
+    public static Task SetAmount<TPower>(
+        PlayerChoiceContext choiceContext,
+        Creature target,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource)
+        where TPower : PowerModel
+    {
+        var existing = target.GetPower<TPower>();
+        if (amount <= 0m)
+            return existing == null ? Task.CompletedTask : MegaCrit.Sts2.Core.Commands.PowerCmd.Remove(existing);
+        if (existing == null)
+            return Apply<TPower>(choiceContext, target, amount, applier, cardSource, false);
+        var delta = amount - existing.Amount;
+        return delta == 0m
+            ? Task.CompletedTask
+            : MegaCrit.Sts2.Core.Commands.PowerCmd.ModifyAmount(
+                choiceContext, existing, delta, applier, cardSource, true);
     }
 
     public static Task<int> ModifyAmount(

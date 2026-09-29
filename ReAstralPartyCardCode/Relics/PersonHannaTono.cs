@@ -1,10 +1,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MegaCrit.Sts2.Core.Commands;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Entities.Multiplayer;
+using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
@@ -43,7 +46,12 @@ public sealed class PersonHannaTono : CooldownPersonRelicBase
     public override async Task BeforeCombatStart()
     {
         if (Owner?.Creature != null)
-            await PowerCmd.SetAmount<HannaNodePower>(Owner.Creature, 10m, Owner.Creature, null);
+        {
+            PlayerChoiceContext context = Owner.Creature.CombatState != null && LocalContext.NetId.HasValue
+                ? new HookPlayerChoiceContext(this, LocalContext.NetId.Value, Owner.Creature.CombatState, GameActionType.Combat)
+                : new ThrowingPlayerChoiceContext();
+            await PowerCmd.SetAmount<HannaNodePower>(context, Owner.Creature, 10m, Owner.Creature, null);
+        }
     }
 
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
@@ -51,7 +59,7 @@ public sealed class PersonHannaTono : CooldownPersonRelicBase
         if (Owner?.Creature == null || player != Owner) return;
         var node = (int)Owner.Creature.GetPowerAmount<HannaNodePower>();
         if (node < 6) return;
-        await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, 1m, Owner.Creature, null, false);
+        await PowerCmd.Apply<EffectsStarlightPower>(choiceContext, Owner.Creature, 1m, Owner.Creature, null, false);
         if (Owner.GetRelic<PersonalityDerivativeDollMaking>()?.IsComplete == true)
             await TokenEternalStarlight.GrantStacks(Owner, 1);
     }
