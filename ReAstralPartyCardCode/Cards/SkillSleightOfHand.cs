@@ -48,9 +48,10 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
 
         var targetStarLight = target.GetPower<EffectsStarlightPower>();
         if (targetStarLight != null && targetStarLight.Amount > 0m)
-            await PowerCmd.ModifyAmount(targetStarLight, -Math.Min(4m, targetStarLight.Amount), owner.Creature, this, true);
+            await PowerCmdCompat.ModifyAmount(choiceContext, targetStarLight,
+                -Math.Min(4m, targetStarLight.Amount), owner.Creature, this, true);
 
-        await PowerCmd.Apply<WindfallHitsPower>(owner.Creature, 4m, owner.Creature, this, false);
+        await PowerCmd.Apply<WindfallHitsPower>(choiceContext, owner.Creature, 4m, owner.Creature, this, false);
 
         if (target.Player == null)
             return;

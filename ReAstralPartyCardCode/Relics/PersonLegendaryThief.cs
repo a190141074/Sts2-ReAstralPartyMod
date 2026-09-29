@@ -2,12 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Combat;
+using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Gold;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Entities.Relics;
 using MegaCrit.Sts2.Core.GameActions.Multiplayer;
+using MegaCrit.Sts2.Core.Entities.Multiplayer;
+using MegaCrit.Sts2.Core.GameActions;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Cards;
@@ -40,21 +43,26 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
     public override async Task BeforeCombatStart()
     {
         AstralParty_PersonLegendaryThiefAppliedDexterity = 0;
-        await SyncDexterity();
+        await SyncDexterity(CreateHookContext());
     }
 
-    public override async Task AfterPowerAmountChanged(PowerModel power, decimal amount, Creature? applier, CardModel? cardSource)
+    protected override async Task AfterPowerAmountChangedWithContext(
+        PlayerChoiceContext choiceContext,
+        PowerModel power,
+        decimal amount,
+        Creature? applier,
+        CardModel? cardSource)
     {
         if (Owner?.Creature == null || power.Owner != Owner.Creature || power is not WindfallHitsPower)
             return;
-        await SyncDexterity();
+        await SyncDexterity(choiceContext);
     }
 
     public override async Task AfterCardPlayed(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (Owner?.Creature == null || cardPlay.Card.Owner != Owner || cardPlay.Card.Type != CardType.Attack)
             return;
-        await PowerCmd.Apply<WindfallHitsPower>(Owner.Creature, 1m, Owner.Creature, cardPlay.Card, false);
+        await PowerCmd.Apply<WindfallHitsPower>(choiceContext, Owner.Creature, 1m, Owner.Creature, cardPlay.Card, false);
     }
 
     public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
@@ -99,7 +107,15 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
-    private async Task SyncDexterity()
+    private PlayerChoiceContext CreateHookContext()
+    {
+        if (Owner?.Creature?.CombatState != null && LocalContext.NetId.HasValue)
+            return new HookPlayerChoiceContext(this, LocalContext.NetId.Value, Owner.Creature.CombatState,
+                GameActionType.Combat);
+        return new ThrowingPlayerChoiceContext();
+    }
+
+    private async Task SyncDexterity(PlayerChoiceContext choiceContext)
     {
         var creature = Owner?.Creature;
         if (creature == null)
@@ -110,6 +126,6 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
         if (delta == 0)
             return;
         AstralParty_PersonLegendaryThiefAppliedDexterity = desired;
-        await PowerCmd.Apply<DexterityPower>(creature, delta, creature, null, true);
+        await PowerCmd.Apply<DexterityPower>(choiceContext, creature, delta, creature, null, true);
     }
 }

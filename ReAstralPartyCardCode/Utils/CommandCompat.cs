@@ -133,6 +133,23 @@ public static class PowerCmdCompat
             silent);
     }
 
+    public static Task<int> ModifyAmount(
+        PlayerChoiceContext choiceContext,
+        PowerModel power,
+        decimal offset,
+        Creature? applier,
+        CardModel? cardSource,
+        bool silent = false)
+    {
+        return MegaCrit.Sts2.Core.Commands.PowerCmd.ModifyAmount(
+            choiceContext,
+            power,
+            offset,
+            applier,
+            cardSource,
+            silent);
+    }
+
     public static Task Decrement(PowerModel power)
     {
         return MegaCrit.Sts2.Core.Commands.PowerCmd.Decrement(power);
