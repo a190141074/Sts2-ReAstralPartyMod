@@ -5,6 +5,10 @@ description: 用于开发或排错依赖 RitsuLib 的《杀戮尖塔2》模组�
 
 # STS2 RitsuLib 模组开发
 
+## Mod 边界（硬规则）
+
+使用本 skill 的项目是以 RitsuLib 为前置、运行在《杀戮尖塔 2》中的游戏 Mod。RitsuLib 提供注册、生命周期和联机扩展入口；游戏本体的房间、战斗状态、节点和构造函数仍归游戏本体所有。分析或实现时必须明确区分 Mod 自己的注册/Harmony/生命周期处理器与本体对象的执行过程，不能把本体的 `CombatRoom` 构造、房间切换或其他引擎生命周期描述成 Mod 的“房间创建功能”。优先使用当前版本已确认的 RitsuLib API，只有在完整调用链证明确有必要时才触碰本体 Hook。
+
 这是 RitsuLib 通用层。若仓库有 overlay（例如 `sts2-reastralparty-modding`），先加载本文件，
 再加载仓库层。overlay 负责仓库专属路径和行为；本 skill 负责 RitsuLib 约定和证据要求。
 

@@ -5,6 +5,10 @@ description: 用于 B:\Documents\re-astral-party-mod 的仓库专属开发，覆
 
 # ReAstralParty 仓库层
 
+## 项目边界（硬规则）
+
+`re-astral-party-mod` 是一个运行在《杀戮尖塔 2》中的游戏 Mod，`STS2-RitsuLib` 是其前置库。仓库代码只能通过游戏公开运行时、RitsuLib 注册链、生命周期事件和已验证的兼容补丁扩展游戏；游戏内部的 `CombatRoom`、战斗状态对象、房间切换和其他引擎对象属于游戏本体，不是本 Mod 自己提供的“创建功能”。描述、排错和实现时必须区分“本 Mod 的 Hook/事件处理器”和“游戏本体正在执行的生命周期”。不得把本体构造函数、日志阶段或 RitsuLib 转发事件改写成 Mod 拥有对应游戏系统。
+
 先加载 `sts2-ritsulib-modding`，再加载本仓库层。每次代码、排错、迁移、联机、本地化或导出任务都必须先读通用层的
 `references/experience-ledger.md`，再按需读取本仓库专题。`doc/AGENT.zh.md` 和 `doc/AGENT.md` 是仓库政策，不能代替实际代码和日志取证。
 

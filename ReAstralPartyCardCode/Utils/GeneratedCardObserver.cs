@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
+using ReAstralPartyMod.ReAstralPartyCardCode.Online;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Cards;
@@ -34,6 +35,7 @@ public static class GeneratedCardObserver
         CardPilePosition position = CardPilePosition.Top, AbstractModel? source = null)
     {
         EnsureCleanupHooksRegistered();
+        CombatEntryDiagnostics.Mark("generated_card_observer", card.Owner);
         await CardGainAttribution.RunWithSource(source, async () =>
         {
             await CardPileCmd.AddGeneratedCardToCombat(card, PileType.Hand, card.Owner, position);
@@ -61,7 +63,10 @@ public static class GeneratedCardObserver
 
             try
             {
-                foreach (var player in recipient.Creature.CombatState.Players)
+                var players = recipient.Creature.CombatState.Players
+                    .OrderBy(player => player.NetId)
+                    .ToList();
+                foreach (var player in players)
                 {
                     var relic = player.GetRelic<PersonShadowScion>();
                     if (relic != null)

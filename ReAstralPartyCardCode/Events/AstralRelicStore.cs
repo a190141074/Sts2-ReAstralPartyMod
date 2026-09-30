@@ -13,6 +13,8 @@ using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Interop.AutoRegistration;
+using STS2RitsuLib;
+using STS2RitsuLib.RunData;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Events;
 
@@ -27,7 +29,25 @@ public sealed class AstralRelicStore : AstralPartyEventModel
     private const decimal PurplePackCost = 120m;
     private const decimal GoldPackCost = 180m;
     private const decimal InitialPointCost = 1m;
-    private static readonly HashSet<string> ConsumedActs = [];
+    private const string RunDataKey = "astral_relic_store";
+    private static RunSavedData<AstralRelicStoreRunData> _runData = null!;
+    private static bool _registered;
+
+    public static void Register()
+    {
+        if (_registered)
+            return;
+
+        using (RitsuLibFramework.BeginModDataRegistration(MainFile.ModId))
+        {
+            _runData = RitsuLibFramework.GetRunSavedDataStore(MainFile.ModId).Register(
+                RunDataKey,
+                static () => new AstralRelicStoreRunData(),
+                new RunSavedDataOptions { WritePolicy = RunSavedDataWritePolicy.WhenNonDefault });
+        }
+
+        _registered = true;
+    }
 
     public override bool IsAllowed(IRunState runState)
     {
@@ -177,7 +197,8 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         if (runState == null)
             return false;
 
-        return ConsumedActs.Contains(GetCurrentActConsumptionKey(runState));
+        Register();
+        return Get(runState).ConsumedActKeys.Contains(GetCurrentActConsumptionKey(runState));
     }
 
     internal static void MarkConsumedForCurrentAct(IRunState? runState)
@@ -185,7 +206,14 @@ public sealed class AstralRelicStore : AstralPartyEventModel
         if (runState == null)
             return;
 
-        ConsumedActs.Add(GetCurrentActConsumptionKey(runState));
+        Register();
+        var data = Get(runState);
+        var key = GetCurrentActConsumptionKey(runState);
+        if (!data.ConsumedActKeys.Contains(key))
+        {
+            data.ConsumedActKeys.Add(key);
+            _runData.Set((RunState)runState, data);
+        }
     }
 
     private void MarkConsumedForCurrentAct()
@@ -197,4 +225,18 @@ public sealed class AstralRelicStore : AstralPartyEventModel
     {
         return $"{runState.Rng.StringSeed}|act:{runState.CurrentActIndex}";
     }
+
+    private static AstralRelicStoreRunData Get(IRunState runState)
+    {
+        Register();
+        var data = _runData.TryGet((RunState)runState, out var saved) && saved != null
+            ? saved
+            : new AstralRelicStoreRunData();
+        return data;
+    }
+}
+
+public sealed class AstralRelicStoreRunData
+{
+    public List<string> ConsumedActKeys { get; set; } = [];
 }

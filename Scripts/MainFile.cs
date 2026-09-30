@@ -47,6 +47,7 @@ public class MainFile
         TerraprismaHelper.Register();
         FallenHeavenlyKingDeckHelper.Register();
         HkHeavenlyKingFallIncidentHelper.Register();
+        AstralRelicStore.Register();
         RoyalPrerogativePower.RegisterRightClickBinding();
 
         // Current content still references minted CardKeyword values while models materialize,
@@ -70,6 +71,7 @@ public class MainFile
             "astral_event_card_pool",
             "res://ReAstralPartyMod/images/ui/astral_event_card_pool.png");
         NeowOptionInjectionHelper.Register();
+        CombatEntryDiagnostics.Register();
         GameplayPatchRegistry.RegisterAndApply();
         AstralTelemetry.Initialize();
         AstralChoiceProtocol.LogStartupDiagnostics();

@@ -48,7 +48,7 @@ public static class DeterministicMultiplayerChoiceHelper
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
-            return await ShowLocalRelicSelection(player, options);
+            throw MultiplayerChoiceUnavailable(player, context);
 
         var sessionKey = BuildSessionKey(AstralChoiceKind.RelicSelection, player, context);
         var choiceId = synchronizer.ReserveChoiceId(player);
@@ -107,7 +107,7 @@ public static class DeterministicMultiplayerChoiceHelper
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
-            return await ShowLocalDirectRelicSelection(player, options, title, prompt, adaptiveLayout);
+            throw MultiplayerChoiceUnavailable(player, context);
 
         var sessionKey = BuildSessionKey(AstralChoiceKind.RelicSelection, player, context);
         var choiceId = synchronizer.ReserveChoiceId(player);
@@ -172,7 +172,7 @@ public static class DeterministicMultiplayerChoiceHelper
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
-            return await ShowLocalGroupedRelicSelection(player, options, groups, title, subtitle, groupTitle, groupSubtitle, relicTitle, relicSubtitle, skipText, allowSkip);
+            throw MultiplayerChoiceUnavailable(player, context);
 
         var sessionKey = BuildSessionKey(AstralChoiceKind.RelicSelection, player, context);
         var choiceId = synchronizer.ReserveChoiceId(player);
@@ -234,7 +234,7 @@ public static class DeterministicMultiplayerChoiceHelper
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
-            return await ShowLocalCanonicalCardSelection(player, options, canSkip);
+            throw MultiplayerChoiceUnavailable(player, context);
 
         var sessionKey = BuildSessionKey(AstralChoiceKind.CanonicalCardSelection, player, context);
         var choiceId = synchronizer.ReserveChoiceId(player);
@@ -331,7 +331,7 @@ public static class DeterministicMultiplayerChoiceHelper
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
-            return await ShowLocalCanonicalCardGridSelection(choiceContext, player, options, prefs);
+            throw MultiplayerChoiceUnavailable(player, context);
 
         var sessionKey = BuildSessionKey(AstralChoiceKind.CanonicalCardSelection, player, context);
         var choiceId = synchronizer.ReserveChoiceId(player);
@@ -438,13 +438,7 @@ public static class DeterministicMultiplayerChoiceHelper
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
-        {
-            var localResult = await ShowLocalRefreshableRelicSelection(player, options, rerollCount, title,
-                subtitlePrefix, probabilityText, rerollFunc);
-            AstralTelemetry.RecordTokenChoice(player, context, localResult.FinalOptions, localResult.SelectedRelic,
-                localResult.RerollHistory.Count);
-            return localResult;
-        }
+            throw MultiplayerChoiceUnavailable(player, context);
 
         var sessionKey = BuildSessionKey(AstralChoiceKind.RefreshableRelicSelection, player, context);
         var choiceId = synchronizer.ReserveChoiceId(player);
@@ -547,6 +541,13 @@ public static class DeterministicMultiplayerChoiceHelper
         }
 
         return runManager.PlayerChoiceSynchronizer;
+    }
+
+    private static InvalidOperationException MultiplayerChoiceUnavailable(Player player, string context)
+    {
+        var message = $"多人选择同步器不可用，已中止选择：context={context} player={player.NetId}";
+        Log.Error($"[{MainFile.ModId}] {message}");
+        return new InvalidOperationException(message);
     }
 
     internal static async Task<RemoteIndexedChoiceEnvelope?> WaitForRemoteIndexedEnvelope(

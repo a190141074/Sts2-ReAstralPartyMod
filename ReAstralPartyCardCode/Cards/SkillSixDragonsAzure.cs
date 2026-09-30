@@ -52,7 +52,7 @@ public sealed class SkillSixDragonsAzure : AstralPartyCardModel
         }
         else
         {
-            await ResolveEvenDrawPileBenefit();
+            await ResolveEvenDrawPileBenefit(choiceContext);
         }
 
         if (ManaAmplificationHelper.GetCurrent(Owner) >= 18 && Owner.Creature.CombatState != null)
@@ -62,7 +62,7 @@ public sealed class SkillSixDragonsAzure : AstralPartyCardModel
         }
     }
 
-    private async Task ResolveEvenDrawPileBenefit()
+    private async Task ResolveEvenDrawPileBenefit(PlayerChoiceContext choiceContext)
     {
         if (Owner?.Creature == null)
             return;
@@ -99,7 +99,7 @@ public sealed class SkillSixDragonsAzure : AstralPartyCardModel
         }
 
         if (summonPoints > 0)
-            await OstyCmd.Summon(new ThrowingPlayerChoiceContext(), Owner, summonPoints, this);
+            await OstyCmd.Summon(choiceContext, Owner, summonPoints, this);
         if (vigorPoints > 0)
             await PowerCmd.Apply<VigorPower>(Owner.Creature, vigorPoints, Owner.Creature, this, false);
         if (temporaryDexterityPoints > 0)
