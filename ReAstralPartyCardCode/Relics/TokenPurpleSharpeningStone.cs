@@ -15,8 +15,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public sealed class TokenPurpleSharpeningStone : AstralPartyRelicModel
 {
-    [SavedProperty] public decimal AstralParty_TokenPurpleSharpeningStoneAppliedStrength { get; set; }
-    [SavedProperty] public decimal AstralParty_TokenPurpleSharpeningStoneAppliedScales { get; set; }
+    [SavedProperty] public int AstralParty_TokenPurpleSharpeningStoneAppliedStrength { get; set; }
+    [SavedProperty] public int AstralParty_TokenPurpleSharpeningStoneAppliedScales { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -30,8 +30,8 @@ public sealed class TokenPurpleSharpeningStone : AstralPartyRelicModel
 
     public override async Task BeforeCombatStart()
     {
-        AstralParty_TokenPurpleSharpeningStoneAppliedStrength = 0m;
-        AstralParty_TokenPurpleSharpeningStoneAppliedScales = 0m;
+        AstralParty_TokenPurpleSharpeningStoneAppliedStrength = 0;
+        AstralParty_TokenPurpleSharpeningStoneAppliedScales = 0;
         await SyncHealthMode();
     }
 
@@ -60,7 +60,7 @@ public sealed class TokenPurpleSharpeningStone : AstralPartyRelicModel
 
     private async Task CleanupAppliedState(Creature oldOwner)
     {
-        if (AstralParty_TokenPurpleSharpeningStoneAppliedStrength != 0m)
+        if (AstralParty_TokenPurpleSharpeningStoneAppliedStrength != 0)
             await PowerCmd.Apply<StrengthPower>(
                 oldOwner,
                 -AstralParty_TokenPurpleSharpeningStoneAppliedStrength,
@@ -68,7 +68,7 @@ public sealed class TokenPurpleSharpeningStone : AstralPartyRelicModel
                 null,
                 true);
 
-        if (AstralParty_TokenPurpleSharpeningStoneAppliedScales != 0m)
+        if (AstralParty_TokenPurpleSharpeningStoneAppliedScales != 0)
             await PowerCmd.Apply<ReversedScalesHolographicPower>(
                 oldOwner,
                 -AstralParty_TokenPurpleSharpeningStoneAppliedScales,
@@ -87,31 +87,31 @@ public sealed class TokenPurpleSharpeningStone : AstralPartyRelicModel
 
         var belowThirtyPercent = creature.CurrentHp * 100m < creature.MaxHp * 30m;
         var desiredStrength = belowThirtyPercent
-            ? 4m
+            ? 4
             : creature.CurrentHp * 100m < creature.MaxHp * 65m
-                ? 2m
-                : 0m;
-        var desiredScales = belowThirtyPercent ? 1m : 0m;
+                ? 2
+                : 0;
+        var desiredScales = belowThirtyPercent ? 1 : 0;
         var strengthDelta = desiredStrength - AstralParty_TokenPurpleSharpeningStoneAppliedStrength;
         var scalesDelta = desiredScales - AstralParty_TokenPurpleSharpeningStoneAppliedScales;
 
-        if (strengthDelta == 0m && scalesDelta == 0m)
+        if (strengthDelta == 0 && scalesDelta == 0)
             return;
 
         Flash();
         AstralParty_TokenPurpleSharpeningStoneAppliedStrength = desiredStrength;
         AstralParty_TokenPurpleSharpeningStoneAppliedScales = desiredScales;
 
-        if (strengthDelta != 0m)
+        if (strengthDelta != 0)
             await PowerCmd.Apply<StrengthPower>(creature, strengthDelta, creature, null, true);
 
-        if (scalesDelta != 0m)
+        if (scalesDelta != 0)
             await PowerCmd.Apply<ReversedScalesHolographicPower>(creature, scalesDelta, creature, null, true);
     }
 
     private void ResetAppliedState()
     {
-        AstralParty_TokenPurpleSharpeningStoneAppliedStrength = 0m;
-        AstralParty_TokenPurpleSharpeningStoneAppliedScales = 0m;
+        AstralParty_TokenPurpleSharpeningStoneAppliedStrength = 0;
+        AstralParty_TokenPurpleSharpeningStoneAppliedScales = 0;
     }
 }

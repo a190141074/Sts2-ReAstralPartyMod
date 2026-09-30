@@ -66,6 +66,7 @@
 - 依据：`logs/BugReport-2026_10_01_02_03_12/logs/godot.log` 在添加电流剑后明确报 `Property AstralParty_ElectricBladeStrengthBonus ... is not a valid type for [SavedProperty] (type System.Decimal)`，堆栈进入 `NetFullCombatState.FromRun` 和 checksum；`Scripts/SavedPropertyGovernance.cs` 已将 `decimal` 判为不支持类型，且启动时已输出该字段的 `unsupported_type` 警告。不能以编译通过或力量命令接受 `decimal` 反推存档合法。
 - 修正：该字段只记录电流剑已经施加的整数力量差额，改为 `[SavedProperty] int`；施加力量时再由命令参数类型进行转换。保留原 `PlayerChoiceContext`。此修正已构建导出，但双人联机的攻击牌收尾、充能与力量最终值仍需实机确认。
 - 下次修改前自检：新增或改动任何 `[SavedProperty]` 时，逐项对照同类模型字段、当前游戏支持的序列化类型及 `SavedPropertyGovernance` 告警；明确区分业务计算/命令参数类型和持久化字段类型。若已有 `unsupported_type` 告警，先修该告警再进行联机复测，不得把后续卡牌悬空归因于未证实的播放 Hook。仓库中其余 `[SavedProperty] decimal` 须按各自完整调用链单独核查，不凭本次一条日志宣称其行为已验证。
+- 同次复查发现 `TokenPurpleSharpeningStone` 的两个 `[SavedProperty] decimal` 也属于同一错误类别：它们保存的力量/反转鳞片状态是离散整数，已改为 `int`；命令调用仍使用 `decimal` 参数。后续不得只修日志中第一个字段后停止全量搜索。
 
 ### ReAstralParty 人格选择：2026-09-28 Neow 收尾同步
 
