@@ -237,7 +237,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             ApplyEnergyDisorderForCurrentHand(player, globalTurnCounter);
 
         if (globalTurnCounter > 0 && globalTurnCounter % RefereeTriggerInterval == 0)
-            await TriggerRefereeAttention(player, globalTurnCounter);
+            await TriggerRefereeAttention(choiceContext, player, globalTurnCounter);
     }
 
     public override async Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool fromHandDraw)
@@ -725,7 +725,10 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         return Math.Max(0, runData.GlobalPlayerTurnCounter) + 1;
     }
 
-    private async Task TriggerRefereeAttention(Player player, int globalTurnCounter)
+    private async Task TriggerRefereeAttention(
+        PlayerChoiceContext choiceContext,
+        Player player,
+        int globalTurnCounter)
     {
         if (RunState == null)
             return;
@@ -734,7 +737,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         {
             var randomPlayer = GetDeterministicRandomPlayer("referee_attention_1", player, globalTurnCounter);
             if (randomPlayer?.Creature != null)
-                await AstralTemporaryDexterityPower.Apply(randomPlayer.Creature, -RefereeStatLoss, this, null, null, true);
+                await AstralTemporaryDexterityPower.Apply(choiceContext, randomPlayer.Creature, -RefereeStatLoss, this, null, null, true);
         }
 
         if (FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.RefereeAttentionTwo))
@@ -743,7 +746,8 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             var refereePenaltyStat = RollRefereeAttentionTwoPenaltyStat(player, globalTurnCounter);
             var randomPlayer = GetDeterministicRandomPlayer("referee_attention_2_player", player, globalTurnCounter);
             if (randomPlayer?.Creature != null)
-                await ApplyDeterministicTemporaryStatPenalty(
+                    await ApplyDeterministicTemporaryStatPenalty(
+                    choiceContext,
                     randomPlayer.Creature,
                     refereePenaltyStat);
 
@@ -751,7 +755,8 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
                 ? null
                 : GetDeterministicRandomNonBossEnemy(GetAliveEnemies(combatState), "referee_attention_2_enemy", globalTurnCounter);
             if (enemy != null)
-                await ApplyDeterministicTemporaryStatPenalty(
+                    await ApplyDeterministicTemporaryStatPenalty(
+                    choiceContext,
                     enemy,
                     refereePenaltyStat);
         }
@@ -771,13 +776,14 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
     }
 
     private async Task ApplyDeterministicTemporaryStatPenalty(
+        PlayerChoiceContext choiceContext,
         Creature target,
         RefereePenaltyStat penaltyStat)
     {
         if (penaltyStat == RefereePenaltyStat.Dexterity)
-            await AstralTemporaryDexterityPower.Apply(target, -RefereeStatLoss, this, null, null, true);
+            await AstralTemporaryDexterityPower.Apply(choiceContext, target, -RefereeStatLoss, this, null, null, true);
         else
-            await AstralTemporaryStrengthPower.Apply(target, -RefereeStatLoss, this, null, null, true);
+            await AstralTemporaryStrengthPower.Apply(choiceContext, target, -RefereeStatLoss, this, null, null, true);
     }
 
     private async Task ResolvePreciseSelection(PlayerChoiceContext choiceContext, Player player, int globalTurnCounter)

@@ -6,11 +6,65 @@ using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Hooks;
 using MegaCrit.Sts2.Core.Models.Powers;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
+
+public sealed class UniversalAmplificationDisplayApplyPowerWithContextPatch : IPatchMethod
+{
+    public static string PatchId => "universal_amplification_display_apply_power_with_context_patch";
+    public static string Description => "Refresh amplification displays after context-aware power applications";
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets() =>
+    [
+        new(typeof(PowerCmd), nameof(PowerCmd.Apply),
+            [typeof(PlayerChoiceContext), typeof(PowerModel), typeof(Creature), typeof(decimal), typeof(Creature), typeof(CardModel), typeof(bool)])
+    ];
+
+    public static void Postfix(PlayerChoiceContext choiceContext, Creature target, ref Task __result)
+    {
+        var player = target.Player;
+        if (player != null)
+            __result = ContinueAfterOriginal(__result, player, choiceContext);
+    }
+
+    private static async Task ContinueAfterOriginal(Task originalTask, Player player, PlayerChoiceContext choiceContext)
+    {
+        await originalTask;
+        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player, choiceContext: choiceContext);
+    }
+}
+
+public sealed class UniversalAmplificationDisplayModifyAmountWithContextPatch : IPatchMethod
+{
+    public static string PatchId => "universal_amplification_display_modify_amount_with_context_patch";
+    public static string Description => "Refresh amplification displays after context-aware power amount changes";
+    public static bool IsCritical => false;
+
+    public static ModPatchTarget[] GetTargets() =>
+    [
+        new(typeof(PowerCmd), nameof(PowerCmd.ModifyAmount),
+            [typeof(PlayerChoiceContext), typeof(PowerModel), typeof(decimal), typeof(Creature), typeof(CardModel), typeof(bool)])
+    ];
+
+    public static void Postfix(PlayerChoiceContext choiceContext, PowerModel power, ref Task<int> __result)
+    {
+        var player = power.Owner?.Player;
+        if (player != null)
+            __result = ContinueAfterOriginal(__result, player, choiceContext);
+    }
+
+    private static async Task<int> ContinueAfterOriginal(Task<int> originalTask, Player player, PlayerChoiceContext choiceContext)
+    {
+        var result = await originalTask;
+        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player, choiceContext: choiceContext);
+        return result;
+    }
+}
 
 public sealed class UniversalAmplificationDisplayApplyPowerPatch : IPatchMethod
 {
@@ -38,10 +92,13 @@ public sealed class UniversalAmplificationDisplayApplyPowerPatch : IPatchMethod
         __result = ContinueAfterOriginal(__result, player);
     }
 
-    private static async Task ContinueAfterOriginal(Task originalTask, Player player)
+    private static async Task ContinueAfterOriginal(
+        Task originalTask,
+        Player player,
+        PlayerChoiceContext? choiceContext = null)
     {
         await originalTask;
-        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player);
+        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player, choiceContext: choiceContext);
     }
 }
 
@@ -71,10 +128,13 @@ public sealed class UniversalAmplificationDisplaySetPowerAmountPatch : IPatchMet
         __result = ContinueAfterOriginal(__result, player);
     }
 
-    private static async Task<int> ContinueAfterOriginal(Task<int> originalTask, Player player)
+    private static async Task<int> ContinueAfterOriginal(
+        Task<int> originalTask,
+        Player player,
+        PlayerChoiceContext? choiceContext = null)
     {
         var result = await originalTask;
-        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player);
+        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player, choiceContext: choiceContext);
         return result;
     }
 }

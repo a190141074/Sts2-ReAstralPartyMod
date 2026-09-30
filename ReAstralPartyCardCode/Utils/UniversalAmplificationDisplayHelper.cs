@@ -1,6 +1,7 @@
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.GameActions.Multiplayer;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Powers;
@@ -11,6 +12,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 internal static class UniversalAmplificationDisplayHelper
 {
+    private static readonly AsyncLocal<int> RefreshDepth = new();
     public static decimal GetStableAttackAmplification(Player? player)
     {
         if (player?.Creature == null)
@@ -52,32 +54,51 @@ internal static class UniversalAmplificationDisplayHelper
         return Math.Max(0m, total);
     }
 
-    public static async Task RefreshAmplificationDisplayPowers(Player? player, AbstractModel? source = null)
+    public static async Task RefreshAmplificationDisplayPowers(
+        Player? player,
+        AbstractModel? source = null,
+        PlayerChoiceContext? choiceContext = null)
     {
         if (player?.Creature == null)
             return;
 
-        var creature = player.Creature;
-        var sourceCreature = creature;
-        var sourceCard = source as CardModel;
+        // Display powers are themselves PowerCmd targets. Do not let their own
+        // Apply/ModifyAmount callbacks start another refresh before this one ends.
+        if (RefreshDepth.Value > 0)
+            return;
 
-        await RefreshSinglePower<AttackAmplificationDisplayPower>(
-            creature,
-            GetStableAttackAmplification(player),
-            sourceCreature,
-            sourceCard);
-        await RefreshSinglePower<SkillAmplificationDisplayPower>(
-            creature,
-            GetStableSkillAmplification(player),
-            sourceCreature,
-            sourceCard);
+        RefreshDepth.Value++;
+        try
+        {
+            var creature = player.Creature;
+            var sourceCreature = creature;
+            var sourceCard = source as CardModel;
+
+            await RefreshSinglePower<AttackAmplificationDisplayPower>(
+                creature,
+                GetStableAttackAmplification(player),
+                sourceCreature,
+                sourceCard,
+                choiceContext);
+            await RefreshSinglePower<SkillAmplificationDisplayPower>(
+                creature,
+                GetStableSkillAmplification(player),
+                sourceCreature,
+                sourceCard,
+                choiceContext);
+        }
+        finally
+        {
+            RefreshDepth.Value--;
+        }
     }
 
     private static async Task RefreshSinglePower<TPower>(
         Creature creature,
         decimal amount,
         Creature applier,
-        CardModel? sourceCard)
+        CardModel? sourceCard,
+        PlayerChoiceContext? choiceContext)
         where TPower : PowerModel
     {
         var existingPower = creature.GetPower<TPower>();
@@ -91,12 +112,20 @@ internal static class UniversalAmplificationDisplayHelper
 
         if (existingPower == null)
         {
-            await PowerCmd.Apply<TPower>(creature, amount, applier, sourceCard, true);
+            if (choiceContext == null)
+                await PowerCmd.Apply<TPower>(creature, amount, applier, sourceCard, true);
+            else
+                await PowerCmd.Apply<TPower>(choiceContext, creature, amount, applier, sourceCard, true);
             return;
         }
 
         if (existingPower.Amount != amount)
-            await PowerCmd.SetAmount<TPower>(creature, amount, applier, sourceCard);
+        {
+            if (choiceContext == null)
+                await PowerCmd.SetAmount<TPower>(creature, amount, applier, sourceCard);
+            else
+                await PowerCmd.SetAmount<TPower>(choiceContext, creature, amount, applier, sourceCard);
+        }
     }
 
     private static decimal GetSwordGustAttackBonus(Creature creature)
