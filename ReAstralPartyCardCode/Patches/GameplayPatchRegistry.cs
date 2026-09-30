@@ -289,6 +289,7 @@ internal static class GameplayStaticPatchCatalog
                 typeof(AstralLevitationDebuffSuppressionPatch),
                 false,
                 "Gameplay patch: temporarily suppress combat hooks from debuffs while Astral Levitation is active",
+                ignoreIfTargetMissing: true,
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
                 "personality_derivative_doll_description_patch",

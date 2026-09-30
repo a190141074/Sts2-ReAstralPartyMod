@@ -38,6 +38,7 @@ internal static class TerraprismaDirectLoadPatch
             __instance,
             choiceContext,
             target,
+            isAutoPlay,
             resources,
             skipCardPileVisuals);
         return false;
@@ -48,24 +49,27 @@ internal static class TerraprismaDirectLoadPatch
         CardModel card,
         PlayerChoiceContext choiceContext,
         Creature? target,
+        bool isAutoPlay,
         ResourceInfo resources,
         bool skipCardPileVisuals)
     {
+        var contextPushed = false;
         choiceContext.PushModel(card);
+        contextPushed = true;
         var mounted = false;
+        var owner = card.Owner;
         try
         {
             await CombatManager.Instance.WaitForUnpause();
             if (card.CombatState == null || card.Owner?.Creature?.IsDead == true)
             {
-                await PlayOriginalAsync(card, choiceContext, target, false, resources, skipCardPileVisuals);
+                await PlayOriginalAsync(card, choiceContext, target, isAutoPlay, resources, skipCardPileVisuals);
                 return;
             }
 
-            var owner = card.Owner;
             if (owner == null)
             {
-                await PlayOriginalAsync(card, choiceContext, target, false, resources, skipCardPileVisuals);
+                await PlayOriginalAsync(card, choiceContext, target, isAutoPlay, resources, skipCardPileVisuals);
                 return;
             }
 
@@ -74,7 +78,7 @@ internal static class TerraprismaDirectLoadPatch
             mounted = await power.DirectLoadAsync(choiceContext, card);
             if (!mounted)
             {
-                await PlayOriginalAsync(card, choiceContext, target, false, resources, skipCardPileVisuals);
+                await PlayOriginalAsync(card, choiceContext, target, isAutoPlay, resources, skipCardPileVisuals);
                 return;
             }
             await card.MoveToResultPileWithoutPlaying(choiceContext);
@@ -87,12 +91,36 @@ internal static class TerraprismaDirectLoadPatch
             if (!mounted)
             {
                 power.CancelDirectLoad(card);
-                await PlayOriginalAsync(card, choiceContext, target, false, resources, skipCardPileVisuals);
+                await PlayOriginalAsync(card, choiceContext, target, isAutoPlay, resources, skipCardPileVisuals);
+                return;
+            }
+
+            // A successful mount replaces the original card's effect, but the
+            // original card still has to leave the play pile before the action
+            // can finish. Retry the official result-pile path after a partial
+            // failure so the card cannot remain in the play area.
+            try
+            {
+                await card.MoveToResultPileWithoutPlaying(choiceContext);
+                if (owner != null)
+                    await CombatManager.Instance.CheckForEmptyHand(choiceContext, owner);
+            }
+            catch (Exception recoveryEx)
+            {
+                MainFile.Logger.Error(
+                    $"[Terraprisma] mounted card recovery failed | card={card.Id.Entry} | " +
+                    $"pile={card.Pile?.Type.ToString() ?? "None"} | error={recoveryEx}");
+                // Do not let the action appear successful after the official
+                // result-pile transition failed. The caller must observe the
+                // fault and close the action instead of leaving a card in an
+                // indeterminate play-pile state.
+                throw;
             }
         }
         finally
         {
-            choiceContext.PopModel(card);
+            if (contextPushed)
+                choiceContext.PopModel(card);
         }
     }
 

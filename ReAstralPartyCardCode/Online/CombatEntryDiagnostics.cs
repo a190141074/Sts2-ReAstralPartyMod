@@ -1,5 +1,6 @@
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Runs;
 using STS2RitsuLib;
 
@@ -8,6 +9,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 internal static class CombatEntryDiagnostics
 {
     private static bool _registered;
+    private static int _combatSequence;
 
     public static void Register()
     {
@@ -25,6 +27,7 @@ internal static class CombatEntryDiagnostics
 
     private static void OnCombatStarting(CombatStartingEvent lifecycleEvent)
     {
+        Interlocked.Increment(ref _combatSequence);
         Mark("combat_starting", lifecycleEvent.RunState);
     }
 

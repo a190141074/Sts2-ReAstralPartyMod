@@ -60,6 +60,13 @@
 
 ## 反复失败模式
 
+### ReAstralParty 电流剑：2026-10-01 非法 SavedProperty 类型
+
+- 修改位置：`ReAstralPartyCardCode/Relics/ChargeTokenRelics.cs` 的 `TokenBlueElectricBlade.AstralParty_ElectricBladeStrengthBonus`。原错误：把 `PowerCmd.Apply<StrengthPower>` 接收的 `decimal` 数值类型照搬为 `[SavedProperty] decimal`，没有先检查持久化类型契约，也没有对照同文件 `TokenBlueEnergyRecycler` 的 `[SavedProperty] int`。这不是电流剑机制要求，而是混淆了命令参数与存档字段。
+- 依据：`logs/BugReport-2026_10_01_02_03_12/logs/godot.log` 在添加电流剑后明确报 `Property AstralParty_ElectricBladeStrengthBonus ... is not a valid type for [SavedProperty] (type System.Decimal)`，堆栈进入 `NetFullCombatState.FromRun` 和 checksum；`Scripts/SavedPropertyGovernance.cs` 已将 `decimal` 判为不支持类型，且启动时已输出该字段的 `unsupported_type` 警告。不能以编译通过或力量命令接受 `decimal` 反推存档合法。
+- 修正：该字段只记录电流剑已经施加的整数力量差额，改为 `[SavedProperty] int`；施加力量时再由命令参数类型进行转换。保留原 `PlayerChoiceContext`。此修正已构建导出，但双人联机的攻击牌收尾、充能与力量最终值仍需实机确认。
+- 下次修改前自检：新增或改动任何 `[SavedProperty]` 时，逐项对照同类模型字段、当前游戏支持的序列化类型及 `SavedPropertyGovernance` 告警；明确区分业务计算/命令参数类型和持久化字段类型。若已有 `unsupported_type` 告警，先修该告警再进行联机复测，不得把后续卡牌悬空归因于未证实的播放 Hook。仓库中其余 `[SavedProperty] decimal` 须按各自完整调用链单独核查，不凭本次一条日志宣称其行为已验证。
+
 ### ReAstralParty 人格选择：2026-09-28 Neow 收尾同步
 
 - 修改位置：`ReAstralPartyCardCode/Online/StartingPersonNeowReadyFlow.cs` 的 `RunSelectionTaskAsync`。原错误/风险：人格选择完成后调用 `SetInitialEventState(false)` 重建每名玩家的 Neow 选项，可能使不同端额外推进随机流。依据：`godot (7).log` 首次分歧在退出 `EVENT.NEOW`，主机与客户端 `Niche` 计数为 6/0；同文件的 `RestoreOriginalOptionsOrFinish` 已有缓存恢复链。修正：完成后统一恢复准备页注入前缓存的选项和描述，不重新生成。下次修改前自检：逐端追踪准备页缓存、结束恢复和 Neow 退出时的 RNG 计数；未经联机实测，不把计数差异直接写成已证实的根因。

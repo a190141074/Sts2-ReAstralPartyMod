@@ -66,7 +66,8 @@ public sealed class TokenBlueEnergyRecycler : ChargeTokenRelicBase
 [RegisterRelic(typeof(SharedRelicPool))]
 public sealed class TokenBlueElectricBlade : ChargeTokenRelicBase
 {
-    [SavedProperty] public decimal AstralParty_ElectricBladeStrengthBonus { get; set; }
+    // Run saves only support the primitive integer form for this binary strength bonus.
+    [SavedProperty] public int AstralParty_ElectricBladeStrengthBonus { get; set; }
     public override RelicRarity Rarity => RelicRarity.Common;
     public override async Task AfterCardPlayed(PlayerChoiceContext context, CardPlay play)
     {
@@ -86,7 +87,7 @@ public sealed class TokenBlueElectricBlade : ChargeTokenRelicBase
     private async Task SyncStrength(PlayerChoiceContext context, CardModel? source)
     {
         if (Owner?.Creature == null) return;
-        var desired = EnergyChargeHelper.Get(Owner.Creature) > 7 ? 2m : 0m;
+        var desired = EnergyChargeHelper.Get(Owner.Creature) > 7 ? 2 : 0;
         var delta = desired - AstralParty_ElectricBladeStrengthBonus;
         if (delta == 0m) return;
         AstralParty_ElectricBladeStrengthBonus = desired;

@@ -22,6 +22,10 @@ public class TokenPurpleSandwichBiscuitIntermediate : AstralPartyRelicModel
 
     public override bool ShouldReceiveCombatHooks => true;
 
+    public override bool ShowCounter => true;
+
+    public override int DisplayAmount => GetExtraMaxHpLayers();
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<StrengthPower>()
@@ -35,9 +39,13 @@ public class TokenPurpleSandwichBiscuitIntermediate : AstralPartyRelicModel
 
         Flash();
         if (TokenRelicBridgeInitializationContext.ShouldSkipOneTimeObtainRewards)
+        {
+            InvokeDisplayAmountChanged();
             return;
+        }
 
         await PandaMaxHpHelper.GainMaxHpFromRelic(Owner.Creature, MaxHpBonus, false);
+        InvokeDisplayAmountChanged();
     }
 
     public override Task BeforeCombatStart()
@@ -45,12 +53,21 @@ public class TokenPurpleSandwichBiscuitIntermediate : AstralPartyRelicModel
         if (Owner?.Creature == null)
             return Task.CompletedTask;
 
-        var extraMaxHp = Math.Max(0m, Owner.Creature.MaxHp - BaseMaxHpHelper.GetBaseMaxHp(Owner));
-        var strength = Math.Floor(extraMaxHp / MaxHpPerStrength);
+        var strength = GetExtraMaxHpLayers();
+        InvokeDisplayAmountChanged();
         if (strength <= 0m)
             return Task.CompletedTask;
 
         Flash();
         return PowerCmd.Apply<StrengthPower>(Owner.Creature, strength, Owner.Creature, null, true);
+    }
+
+    private int GetExtraMaxHpLayers()
+    {
+        if (Owner?.Creature == null)
+            return 0;
+
+        var extraMaxHp = Math.Max(0m, Owner.Creature.MaxHp - BaseMaxHpHelper.GetBaseMaxHp(Owner));
+        return StableNumericStateHelper.FloorDivisionToNonNegativeInt(extraMaxHp, MaxHpPerStrength);
     }
 }
