@@ -7,6 +7,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Entities.Players;
 using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Saves;
+using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
@@ -282,6 +283,7 @@ internal static class EventDeckCardHelper
             SaveManager.Instance?.MarkCardAsSeen(addedCard.CanonicalInstance ?? addedCard);
         MainFile.Logger.Info(
             $"[EventDeckCardHelper] Added verified run-deck card | owner={owner.NetId} | card={addedCard.Id.Entry}#{addedCard.GetHashCode()} | inRunState={owner.RunState.ContainsCard(addedCard)} | deck={deckBefore}->{owner.Deck.Cards.Count}.");
+        owner.GetRelic<TokenGoldVitamin>()?.HandleRunDeckCardAdded();
         return addedCard;
     }
 }

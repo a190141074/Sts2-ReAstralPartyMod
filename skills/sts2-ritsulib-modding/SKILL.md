@@ -18,6 +18,7 @@ description: 用于开发或排错依赖 RitsuLib 的《杀戮尖塔2》模组�
 2. 每次代码、排错、迁移、联机、本地化或导出任务都先读 [references/experience-ledger.md](references/experience-ledger.md)。
    然后只读当前问题需要的一份专题参考，不要默认加载全部参考。
 3. 先在当前仓库找能正常工作的同类实现，对照它的注册链、基类、Hook、本地化和输出路径，再写新代码。
+   涉及额外角标或图标第二计数时，必须先读 [workflows.md 的额外角标流程](references/workflows.md#额外角标--图标第二计数) 指向的 RitsuLib doc 教程，再核对当前运行时接口；原生只有一个计数槽、仓库没有例子，都不能作为跳过前置功能而自写 UI patch 的依据。
 4. 符号、重载、生命周期目标、参数名或版本有任何不确定时，检查当前运行时的
    `STS2-RitsuLib.xml` 和 `sts2.xml`，必要时再用反射或反编译。禁止凭记忆或旧分支解决 API 不确定性。
 5. 使用现有 RitsuLib、模板和 helper 能表达需求时，采用最小改动。只有公开/窄入口无法表达需求时，才使用 Harmony 或宽范围 patch。

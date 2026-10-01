@@ -82,6 +82,17 @@
 6. 再补注册属性、图标路径、本地化。
 7. 如果需要 starter relic，再看角色绑定或 starter 标记。
 
+## 额外角标 / 图标第二计数
+
+先读 `D:\MOD\杀戮尖塔2mod制作\RitsuLib-doc\RitsuLib\02 - 玩法基底\07 - 额外角标\README.md`。教程路径失效时，用 `scripts/find-ritsulib-symbol.ps1 -Pattern '角标'` 重新定位，不能直接退回自写 UI patch。
+
+- 核对当前 `csproj` 实际引用的 DLL/XML；分包版本的接口可能在 `STS2-RitsuLib.Runtime.dll` / `.xml`，不要只搜索 loader 或转发程序集。
+- 遗物额外角标使用 `STS2RitsuLib.Combat.Ui.ExtraCornerAmountLabels.IRelicExtraIconAmountLabelSpecsProvider`，在 `GetRelicExtraIconAmountLabelSpecs()` 返回 `ExtraIconAmountLabelSpec.Plain(ExtraIconAmountLabelCorner.TopRight, text)`。能力、意图按教程使用各自的 provider，不把遗物接口照搬到其他模型。
+- `DisplayAmount` 保留原计数职责；额外角标实时计算派生值，不新增一份存档或联机状态。canonical 模型无 Owner 时也必须安全返回。
+- 默认随 `DisplayAmountChanged` 刷新；若派生值来自另一模型，该模型变化时通知持有者对应遗物刷新。确实不走该事件时，才实现 `IRelicExtraIconAmountLabelsChangeSource` 并触发 `RelicExtraIconAmountLabelsInvalidated`。
+- 复用 RitsuLib 的定位、字体、鼠标穿透和生命周期清理。只有当前运行时 provider 确实无法表达需求并有取证依据时，才考虑局部 UI patch；替换旧实现后删除其注册项、节点代码及失去用途的资源。
+- 修改前自检：已读对应 doc 章节、已核对实际 Runtime 接口、已搜索仓库同类代码、已说明刷新来源与生命周期；不能因“原生只有一个槽”或“仓库没有例子”跳过前置能力。
+
 ## 添加能力
 
 先看：

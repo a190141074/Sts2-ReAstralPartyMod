@@ -25,11 +25,22 @@ public static class EfficientAdrenalineThornsPatch
         ref Task __result)
     {
         var player = dealer?.Player ?? dealer?.PetOwner;
-        if (player == null || !HasActiveEfficientAdrenaline(player))
+        if (player == null || (!HasActiveEfficientAdrenaline(player)
+                               && !(cardSource?.Type == CardType.Attack && HasCrossedTwinCarp(player))))
             return true;
 
         __result = Task.CompletedTask;
         return false;
+    }
+
+    private static bool HasCrossedTwinCarp(Player player)
+    {
+        return player.Relics.OfType<TokenExclusiveCrossedTwinCarp>().Any()
+               || player.Creature?.GetPowerInstances<TokenRelicBridgePower>()
+                   .Where(power => power.BridgedTokenRelicId == ModelDb.GetId<TokenExclusiveCrossedTwinCarp>())
+                   .Select(power => power.GetBridgedRelic())
+                   .OfType<TokenExclusiveCrossedTwinCarp>()
+                   .Any() == true;
     }
 
     private static bool HasActiveEfficientAdrenaline(Player player)

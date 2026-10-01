@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
-using ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 using MegaCrit.Sts2.Core.Commands;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Entities.Players;
@@ -18,8 +17,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 [RegisterRelic(typeof(SharedRelicPool))]
 public class TokenExclusiveCrossedTwinCarp : AstralPartyRelicModel
 {
-    private bool _pendingGrant;
-    private bool _isGrantingPower;
+    private const decimal TargetVigor = 6m;
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -27,7 +25,6 @@ public class TokenExclusiveCrossedTwinCarp : AstralPartyRelicModel
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
-        HoverTipFactory.FromPower<CrossedTwinCarpPower>(),
         HoverTipFactory.FromPower<VigorPower>(),
         AstralKeywords.CreateHoverTip(AstralKeywords.AstralDragonPalaceSeriesId)
     ];
@@ -36,72 +33,10 @@ public class TokenExclusiveCrossedTwinCarp : AstralPartyRelicModel
     {
         if (player != Owner || Owner?.Creature == null)
             return;
-        if (Owner.Creature.HasPower<CrossedTwinCarpPower>())
+        var vigor = Owner.Creature.GetPowerAmount<VigorPower>();
+        if (vigor >= TargetVigor)
             return;
-
-        await GrantCrossedTwinCarpPower();
-    }
-
-    public override bool TryModifyPowerAmountReceived(
-        PowerModel canonicalPower,
-        Creature target,
-        decimal amount,
-        Creature? applier,
-        out decimal modifiedAmount)
-    {
-        modifiedAmount = amount;
-
-        if (_isGrantingPower)
-            return false;
-        if (Owner?.Creature == null || target != Owner.Creature)
-            return false;
-        if (canonicalPower is not VigorPower || amount <= 0m)
-            return false;
-        if (Owner.Creature.HasPower<CrossedTwinCarpPower>())
-            return false;
-
-        _pendingGrant = true;
-        return false;
-    }
-
-    public override async Task AfterPowerAmountChanged(
-        PowerModel power,
-        decimal amount,
-        Creature? applier,
-        CardModel? cardSource)
-    {
-        if (!_pendingGrant)
-            return;
-        if (_isGrantingPower)
-            return;
-        if (Owner?.Creature == null || Owner.Creature.HasPower<CrossedTwinCarpPower>())
-        {
-            _pendingGrant = false;
-            return;
-        }
-        if (power.Owner != Owner.Creature)
-            return;
-        if (power is not VigorPower || amount <= 0m)
-            return;
-
-        _pendingGrant = false;
-        await GrantCrossedTwinCarpPower();
-    }
-
-    private async Task GrantCrossedTwinCarpPower()
-    {
-        if (Owner?.Creature == null)
-            return;
-
-        _isGrantingPower = true;
-        try
-        {
-            Flash();
-            await PowerCmd.Apply<CrossedTwinCarpPower>(Owner.Creature, 1m, Owner.Creature, null, false);
-        }
-        finally
-        {
-            _isGrantingPower = false;
-        }
+        Flash();
+        await PowerCmd.Apply<VigorPower>(Owner.Creature, TargetVigor - vigor, Owner.Creature, null, false);
     }
 }

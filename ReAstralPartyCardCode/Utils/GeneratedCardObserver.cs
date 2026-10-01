@@ -66,6 +66,10 @@ public static class GeneratedCardObserver
                 var players = recipient.Creature.CombatState.Players
                     .OrderBy(player => player.NetId)
                     .ToList();
+                var vitamin = recipient.GetRelic<TokenGoldVitamin>();
+                if (vitamin != null)
+                    await vitamin.HandleGeneratedCard(card);
+
                 foreach (var player in players)
                 {
                     var relic = player.GetRelic<PersonShadowScion>();

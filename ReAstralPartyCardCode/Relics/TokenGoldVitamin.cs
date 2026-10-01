@@ -20,6 +20,8 @@ public class TokenGoldVitamin : AstralPartyRelicModel
     private const int MaxTriggersPerTurn = 9;
 
     [SavedProperty] public int AstralParty_TokenGoldVitaminTriggerCountThisTurn { get; set; }
+    [SavedProperty] public int AstralParty_TokenGoldVitaminGeneratedCount { get; set; }
+    [SavedProperty] public int AstralParty_TokenGoldVitaminPendingCombatHeals { get; set; }
 
     public override RelicRarity Rarity => RelicRarity.Rare;
 
@@ -34,17 +36,14 @@ public class TokenGoldVitamin : AstralPartyRelicModel
     {
         await base.AfterObtained();
         AstralParty_TokenGoldVitaminTriggerCountThisTurn = 0;
-    }
-
-    public override Task BeforeCombatStart()
-    {
-        AstralParty_TokenGoldVitaminTriggerCountThisTurn = 0;
-        return Task.CompletedTask;
+        AstralParty_TokenGoldVitaminGeneratedCount = 0;
+        AstralParty_TokenGoldVitaminPendingCombatHeals = 0;
     }
 
     public override Task AfterCombatEnd(CombatRoom room)
     {
         AstralParty_TokenGoldVitaminTriggerCountThisTurn = 0;
+        AstralParty_TokenGoldVitaminGeneratedCount = 0;
         return Task.CompletedTask;
     }
 
@@ -56,7 +55,20 @@ public class TokenGoldVitamin : AstralPartyRelicModel
         return Task.CompletedTask;
     }
 
-    public override async Task AfterCardDrawn(PlayerChoiceContext choiceContext, CardModel card, bool fromHandDraw)
+    public override async Task BeforeCombatStart()
+    {
+        AstralParty_TokenGoldVitaminTriggerCountThisTurn = 0;
+        AstralParty_TokenGoldVitaminGeneratedCount = 0;
+        if (Owner?.Creature == null || AstralParty_TokenGoldVitaminPendingCombatHeals <= 0)
+            return;
+
+        var amount = AstralParty_TokenGoldVitaminPendingCombatHeals;
+        AstralParty_TokenGoldVitaminPendingCombatHeals = 0;
+        Flash();
+        await PowerCmd.Apply<EffectsHealPower>(Owner.Creature, amount, Owner.Creature, null, false);
+    }
+
+    public async Task HandleGeneratedCard(CardModel card)
     {
         if (Owner?.Creature?.CombatState == null)
             return;
@@ -65,8 +77,18 @@ public class TokenGoldVitamin : AstralPartyRelicModel
         if (AstralParty_TokenGoldVitaminTriggerCountThisTurn >= MaxTriggersPerTurn)
             return;
 
+        AstralParty_TokenGoldVitaminGeneratedCount++;
+        if (AstralParty_TokenGoldVitaminGeneratedCount < 3)
+            return;
+
+        AstralParty_TokenGoldVitaminGeneratedCount = 0;
         AstralParty_TokenGoldVitaminTriggerCountThisTurn++;
         Flash();
         await PowerCmd.Apply<EffectsHealPower>(Owner.Creature, 1m, Owner.Creature, card, false);
+    }
+
+    public void HandleRunDeckCardAdded()
+    {
+        AstralParty_TokenGoldVitaminPendingCombatHeals++;
     }
 }

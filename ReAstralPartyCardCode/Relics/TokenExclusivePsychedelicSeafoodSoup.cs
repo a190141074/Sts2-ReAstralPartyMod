@@ -28,6 +28,10 @@ public class TokenExclusivePsychedelicSeafoodSoup : AstralPartyRelicModel
     {
         if (player != Owner || Owner?.Creature == null)
             return;
+        if (Owner.GetRelic<TokenExclusiveCrossedTwinCarp>() != null)
+            return;
+        if (Owner.Creature.GetPowerAmount<VigorPower>() >= 6m)
+            return;
 
         var vigorRoll = DeterministicMultiplayerChoiceHelper.RollDeterministically(
             0,

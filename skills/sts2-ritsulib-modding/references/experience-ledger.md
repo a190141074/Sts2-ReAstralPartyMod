@@ -60,6 +60,15 @@
 
 ## 反复失败模式
 
+### ReAstralParty 手电筒：2026-10-01 漏查 RitsuLib 额外角标教程
+
+- 修改位置：`TokenPurpleFlashlightStronglight`、`TokenGoldFlashlightFlashburst` 及已删除的 `FlashlightDamageBadgePatch`。原错误：只核对原生 `NRelicInventoryHolder` 的单计数槽与仓库例子，没有按已有 source-map 先读 RitsuLib doc，便复制原生数字节点并新增 Harmony patch；违反了现有前置功能优先的规则。
+- 依据：`RitsuLib-doc\RitsuLib\02 - 玩法基底\07 - 额外角标\README.md` 已有遗物角标示例；当前项目引用的 `STS2-RitsuLib.Runtime.dll` / `.xml` 确认存在 `IRelicExtraIconAmountLabelSpecsProvider`、`ExtraIconAmountLabelSpec.Plain` 和 `TopRight`，RitsuLib 自行处理刷新与退出清理。仅搜索较小的 `STS2-RitsuLib.xml` 不能证明功能缺失。
+- 修正：两件手电筒直接实现 provider，右上角实时显示当前增伤；删除原 UI patch、注册项和 `.uid`。永恒星光增加时通过两件遗物的 `DisplayAmountChanged` 通知刷新，canonical/无 Owner 查询返回零，不另存派生值。
+- 机制核对：最终用户确认紫手电每 4 张、金手电每 3 张不低于 1 费的攻击牌触发；主计数分别循环 0–3、0–2。显示样式一致不能推导触发阈值一致，按每件最终确认的文案核对代码、三语与生成说明；增伤继续按当前永恒星光 / 14、/ 10 向下取整。
+- 下次修改前自检：先读角标教程，再核对当前实际引用的 Runtime 接口和仓库同类实现；确认主计数与派生角标各自语义、canonical 安全、跨模型刷新来源和生命周期。不因原生限制或仓库无例子而跳过 RitsuLib 现成功能。
+- 验证边界：provider 与动态增伤的针对性程序集检查、计数修正检查及 0.6.34 构建导出已通过；角标实机布局、真实星光应用和双人 checksum 尚未验证，不能把这些检查写成联机实测通过。
+
 ### ReAstralParty 电流剑：2026-10-01 非法 SavedProperty 类型
 
 - 修改位置：`ReAstralPartyCardCode/Relics/ChargeTokenRelics.cs` 的 `TokenBlueElectricBlade.AstralParty_ElectricBladeStrengthBonus`。原错误：把 `PowerCmd.Apply<StrengthPower>` 接收的 `decimal` 数值类型照搬为 `[SavedProperty] decimal`，没有先检查持久化类型契约，也没有对照同文件 `TokenBlueEnergyRecycler` 的 `[SavedProperty] int`。这不是电流剑机制要求，而是混淆了命令参数与存档字段。
