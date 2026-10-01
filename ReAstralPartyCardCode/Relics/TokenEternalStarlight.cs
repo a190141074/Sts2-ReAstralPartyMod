@@ -127,6 +127,8 @@ public class TokenEternalStarlight : AstralPartyRelicModel
         Flash();
         InvokeDisplayAmountChanged();
         Owner?.GetRelic<TokenGoldStarCoinHammer>()?.RefreshDisplayedBonusDamage();
+        Owner?.GetRelic<TokenPurpleFlashlightStronglight>()?.RefreshDisplayedBonusDamage();
+        Owner?.GetRelic<TokenGoldFlashlightFlashburst>()?.RefreshDisplayedBonusDamage();
     }
 
     private static bool TryGetCurrentSetBonus(int stacks, out int goldReward, out bool grantMembership)

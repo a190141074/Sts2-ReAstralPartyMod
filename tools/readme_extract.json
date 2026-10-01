@@ -1207,7 +1207,7 @@
       "class": "TokenGoldFlashlightFlashburst",
       "title": "Flashlight: Flashburst",
       "rarity": "Rare",
-      "desc": "Every [blue]3[/blue] Attack cards you play that cost at least [blue]1[/blue], gain [blue]1[/blue] [gold]StarLight[/gold].\nFor every [blue]10[/blue] stacks of [gold]Eternal Starlight[/gold], your Attack cards deal [blue]1[/blue] extra damage.\nThis relic also grants the [gold]Flashlight Set[/gold] effect."
+      "desc": "· Every [blue]3[/blue] Attack cards you play that cost at least [blue]1[/blue], gain [blue]1[/blue] [gold]StarLight[/gold].\n· For every [blue]10[/blue] stacks of [gold]Eternal Starlight[/gold], your Attack cards deal [blue]1[/blue] extra damage.\n· This relic also grants the [gold]Flashlight Set[/gold] effect."
     },
     {
       "class": "TokenPurpleHandheldFanLarge",
@@ -1309,7 +1309,7 @@
       "class": "TokenPurpleFlashlightStronglight",
       "title": "Flashlight: Strong Beam",
       "rarity": "Uncommon",
-      "desc": "Every [blue]3[/blue] Attack cards you play that cost at least [blue]1[/blue], gain [blue]1[/blue] [gold]StarLight[/gold].\nThis relic also grants the [gold]Flashlight Set[/gold] effect."
+      "desc": "· Every [blue]4[/blue] Attack cards you play that cost at least [blue]1[/blue], gain [blue]1[/blue] [gold]StarLight[/gold].\n· For every [blue]14[/blue] stacks of [gold]Eternal Starlight[/gold], your Attack cards deal [blue]1[/blue] extra damage.\n· This relic also grants the [gold]Flashlight Set[/gold] effect."
     },
     {
       "class": "TokenPurpleFriendshipBadge",

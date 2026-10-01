@@ -14,11 +14,12 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.RelicPools;
 using MegaCrit.Sts2.Core.Saves.Runs;
 using MegaCrit.Sts2.Core.ValueProps;
+using STS2RitsuLib.Combat.Ui.ExtraCornerAmountLabels;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 [RegisterRelic(typeof(SharedRelicPool))]
-public class TokenPurpleFlashlightStronglight : AstralPartyRelicModel
+public class TokenPurpleFlashlightStronglight : AstralPartyRelicModel, IRelicExtraIconAmountLabelSpecsProvider
 {
     private const int MinTrackedAttackCost = 1;
     private const int CardsPerTrigger = 4;
@@ -33,6 +34,14 @@ public class TokenPurpleFlashlightStronglight : AstralPartyRelicModel
     public override bool ShowCounter => true;
 
     public override int DisplayAmount => AstralParty_TokenPurpleFlashlightStronglightHitProgress;
+
+    public IReadOnlyList<ExtraIconAmountLabelSpec> GetRelicExtraIconAmountLabelSpecs()
+    {
+        return
+        [
+            ExtraIconAmountLabelSpec.Plain(ExtraIconAmountLabelCorner.TopRight, $"+{GetAttackDamageBonus()}")
+        ];
+    }
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
@@ -93,8 +102,8 @@ public class TokenPurpleFlashlightStronglight : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply(
-            ModelDb.Power<EffectsStarlightPower>().ToMutable(),
+        await PowerCmd.Apply<EffectsStarlightPower>(
+            choiceContext,
             Owner.Creature,
             triggerCount,
             Owner.Creature,
@@ -111,19 +120,25 @@ public class TokenPurpleFlashlightStronglight : AstralPartyRelicModel
     {
         if (Owner?.Creature == null || dealer != Owner.Creature)
             return 0m;
-        if (target == null || target.Side == Owner.Creature.Side)
+        if (target != null && target.Side == Owner.Creature.Side)
             return 0m;
-        if (amount <= 0m)
-            return 0m;
-        if (cardSource?.Type != CardType.Attack)
+        if (cardSource?.Owner != Owner || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return 0m;
 
         return GetAttackDamageBonus();
     }
 
-    private int GetAttackDamageBonus()
+    public int GetAttackDamageBonus()
     {
+        if (!IsMutable)
+            return 0;
+
         var eternalStarlight = Owner?.GetRelic<TokenEternalStarlight>()?.GetStacks() ?? 0;
         return eternalStarlight / EternalStarlightPerDamageBonus;
+    }
+
+    internal void RefreshDisplayedBonusDamage()
+    {
+        InvokeDisplayAmountChanged();
     }
 }

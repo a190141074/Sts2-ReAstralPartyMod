@@ -261,7 +261,7 @@
 | `TokenPurpleBasicScope` | 【普通瞄具】 | `非普通` | 你的攻击牌伤害+2，并在造成伤害后施加1层标记。 |
 | `TokenPurpleBigBackpack` | 【大背包】 | `非普通` | 战斗开始时，能量上限+{energyPrefix:energyIcons(1)}。 |
 | `TokenPurpleBoxingGloveIntermediate` | 【拳击手套·中级】 | `非普通` | 战斗开始时，获得1点力量；每回合开始获得1层活力。<br>拥有【套装·拳击手套】效果。 |
-| `TokenPurpleFlashlightStronglight` | 【手电筒·强光】 | `非普通` | 累计打出3张不低于1费的攻击牌，获得1点星光。<br>拥有【套装·手电筒】效果。 |
+| `TokenPurpleFlashlightStronglight` | 【手电筒·强光】 | `非普通` | · 累计打出4张不低于1费的攻击牌，获得1点星光。<br>· 每有14层永恒星光，你的攻击牌伤害+1。<br>· 拥有【套装·手电筒】效果。 |
 | `TokenPurpleFriendshipBadge` | 【友情徽章】 | `非普通` | 当你使队友获得星光或治愈时，你与该目标各获得1层治愈。 |
 | `TokenPurpleMembersReferencePremium` | 【会员推荐信】 | `罕见` | 在你的第3的倍数回合开始时，额外抽1张牌。<br>所有商品打折25% |
 | `TokenPurpleMotorcycleHelmetIntermediate` | 【摩托头盔·中级】 | `非普通` | 战斗开始时，获得2层幻影·逆鳞。<br>每回合开始时，获得1点格挡。 |
@@ -286,7 +286,7 @@
 | `TokenGoldEagleEyeScope` | 【鹰眼瞄具】 | `稀有` | 你的攻击牌造成伤害时，先为目标施加1层标记，本次伤害额外增加目标标记层数×2。 |
 | `TokenGoldExplorationSatellite` | 【探天微星】 | `稀有` | 所有星引擎系列效果牌，额外追加1次基础伤害(3点)的轨道轰炸。<br>回合结束时，如果你的手牌少于6张，下回合获得1张轨道炮。 |
 | `TokenGoldExtraBattery` | 【额外电池】 | `稀有` | 冷却类人格遗物的冷却上限-1。<br>【人格：绿油油】的步数转换需求降低1/4。 |
-| `TokenGoldFlashlightFlashburst` | 【手电筒·爆闪】 | `稀有` | 累计打出3张不低于1费的攻击牌，获得1点星光。<br>每有10层永恒星光，你的攻击牌伤害+1。<br>拥有【套装·手电筒】效果。 |
+| `TokenGoldFlashlightFlashburst` | 【手电筒·爆闪】 | `稀有` | · 累计打出3张不低于1费的攻击牌，获得1点星光。<br>· 每有10层永恒星光，你的攻击牌伤害+1。<br>· 拥有【套装·手电筒】效果。 |
 | `TokenPurpleHandheldFanLarge` | 【手持风扇·大】 | `罕见` | 使用人格技能牌后，抽1张牌，并对随机怪物施加1层标记。 |
 | `TokenGoldInitialPoint` | 【初始点】 | `稀有` | 在休息处，你可以花费金币升星<br>花费60/90/120金币，从3个筹码遗物中选择1个，恢复15%最大生命值；<br>完成3次后，该选项仅恢复15%最大生命值。<br>重复获取会改为三层永恒星光。 |
 | `TokenGoldMagicQuiver` | 【魔法箭袋】 | `稀有` | 每回合1次，对拥有标记的怪物使用技能牌造成伤害时：施加1层标记，并复制该技能牌返回手牌。 |
