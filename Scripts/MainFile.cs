@@ -48,6 +48,7 @@ public class MainFile
         FallenHeavenlyKingDeckHelper.Register();
         HkHeavenlyKingFallIncidentHelper.Register();
         AstralRelicStore.Register();
+        AstralSamuraiPrawn.Register();
         RoyalPrerogativePower.RegisterRightClickBinding();
 
         // Current content still references minted CardKeyword values while models materialize,
