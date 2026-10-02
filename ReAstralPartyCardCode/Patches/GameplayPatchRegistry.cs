@@ -117,6 +117,25 @@ internal static class GameplayStaticPatchCatalog
     {
         RegisterUiPatches(patcher);
         RegisterGameplayPatches(patcher);
+        patcher.RegisterPatches(
+        [
+            new ModPatchInfo(
+                "samurai_prawn_music_run_cleanup",
+                typeof(RunManager),
+                nameof(RunManager.CleanUp),
+                typeof(ReAstralPartyMod.ReAstralPartyCardCode.Events.AstralSamuraiPrawnMusicRunCleanupPatch),
+                false,
+                "Stop event music before run cleanup",
+                [typeof(bool)]),
+            new ModPatchInfo(
+                "samurai_prawn_music_local_disconnect",
+                typeof(RunManager),
+                nameof(RunManager.LocalPlayerDisconnected),
+                typeof(ReAstralPartyMod.ReAstralPartyCardCode.Events.AstralSamuraiPrawnMusicLocalDisconnectPatch),
+                false,
+                "Stop event music on local disconnect",
+                [typeof(NetErrorInfo)])
+        ]);
     }
 
     private static void RegisterUiPatches(ModPatcher patcher)
