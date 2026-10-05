@@ -2,6 +2,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Events;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using STS2RitsuLib.Interop.AutoRegistration;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Modifiers;
@@ -14,6 +15,14 @@ public sealed class AstralRelicStoreFirstEventModifier : ModifierModel
     public override EventModel ModifyNextEvent(EventModel currentEvent)
     {
         var runState = RunState;
+        var role = LobbyGameplayNetRoleHelper.GetCurrentRole();
+        if (role is not (LobbyGameplayNetRole.Host or LobbyGameplayNetRole.Singleplayer))
+        {
+            MainFile.Logger.Info(
+                $"AstralRelicStore modify-next-event skipped | reason=non_authoritative_role | role={role} | hostNetId={LobbyGameplayNetRoleHelper.GetHostNetId()} | event={currentEvent.Id.Entry}");
+            return currentEvent;
+        }
+
         var storeEvent = ModelDb.Event<AstralRelicStore>();
         var storeId = storeEvent.Id;
 

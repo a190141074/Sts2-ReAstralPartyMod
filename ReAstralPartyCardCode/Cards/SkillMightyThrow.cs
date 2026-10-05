@@ -12,6 +12,7 @@ using MegaCrit.Sts2.Core.Localization.DynamicVars;
 using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.CardPools;
 using MegaCrit.Sts2.Core.ValueProps;
+using ReAstralPartyMod.ReAstralPartyCardCode.Keywords;
 using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 using STS2RitsuLib.Content;
 
@@ -23,6 +24,10 @@ public sealed class SkillMightyThrow : AstralPartyCardModel
     public SkillMightyThrow() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.AnyEnemy, false)
     {
     }
+
+    public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralKeywords.AstralUnique];
+
+    protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
     protected override IEnumerable<DynamicVar> CanonicalVars => [new DamageVar(2m, ValueProp.Move)];
 

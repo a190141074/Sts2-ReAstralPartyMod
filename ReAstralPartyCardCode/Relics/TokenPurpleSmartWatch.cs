@@ -33,6 +33,12 @@ public class TokenPurpleSmartWatch : AstralPartyRelicModel
             return;
 
         Flash();
-        await PowerCmd.Apply<DrawCardsNextTurnPower>(Owner.Creature, 1m, Owner.Creature, null);
+        await PowerCmd.Apply<DrawCardsNextTurnPower>(
+            choiceContext,
+            Owner.Creature,
+            1m,
+            Owner.Creature,
+            null,
+            false);
     }
 }

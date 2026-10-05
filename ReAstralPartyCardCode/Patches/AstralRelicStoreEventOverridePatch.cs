@@ -2,6 +2,7 @@ using MegaCrit.Sts2.Core.Models;
 using MegaCrit.Sts2.Core.Models.Acts;
 using MegaCrit.Sts2.Core.Runs;
 using ReAstralPartyMod.ReAstralPartyCardCode.Events;
+using ReAstralPartyMod.ReAstralPartyCardCode.Settings;
 using STS2RitsuLib.Patching.Models;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
@@ -22,8 +23,18 @@ public sealed class AstralRelicStoreEventOverridePatch : IPatchMethod
 
     public static void Postfix(ActModel __instance, RunState runState, ref EventModel __result)
     {
+        var role = LobbyGameplayNetRoleHelper.GetCurrentRole();
+        var hostNetId = LobbyGameplayNetRoleHelper.GetHostNetId();
+        if (role is not (LobbyGameplayNetRole.Host or LobbyGameplayNetRole.Singleplayer))
+        {
+            MainFile.Logger.Info(
+                $"AstralRelicStore override skipped | reason=non_authoritative_role | role={role} | hostNetId={hostNetId} | event={__result.Id.Entry}");
+            return;
+        }
+
         var storeEvent = ModelDb.Event<AstralRelicStore>();
         var storeId = storeEvent.Id;
+        var originalEventId = __result.Id.Entry;
         var storeVisited = runState.VisitedEventIds.Contains(storeId);
         var storeConsumedThisAct = AstralRelicStore.HasBeenConsumedThisAct(runState);
 
@@ -34,21 +45,21 @@ public sealed class AstralRelicStoreEventOverridePatch : IPatchMethod
         {
             AstralRelicStore.MarkConsumedForCurrentAct(runState);
             MainFile.Logger.Info(
-                $"AstralRelicStore consume-marked-post-pull | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeVisited={storeVisited}");
+                $"AstralRelicStore consume-marked-post-pull | role={role} | hostNetId={hostNetId} | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeVisited={storeVisited}");
             return;
         }
 
         if (!ShouldForceStoreEvent(__instance, runState, __result))
         {
             MainFile.Logger.Info(
-                $"AstralRelicStore skipped | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeVisited={storeVisited} | storeConsumedThisAct={storeConsumedThisAct}");
+                $"AstralRelicStore skipped | role={role} | hostNetId={hostNetId} | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeVisited={storeVisited} | storeConsumedThisAct={storeConsumedThisAct}");
             return;
         }
 
         AstralRelicStore.MarkConsumedForCurrentAct(runState);
         __result = storeEvent;
         MainFile.Logger.Info(
-            $"AstralRelicStore override applied | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeConsumedThisAct=true | pendingUntilFirstActualEventPull=false");
+            $"AstralRelicStore override applied | role={role} | hostNetId={hostNetId} | originalEvent={originalEventId} | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | event={__result.Id.Entry} | visitedEvents={runState.VisitedEventIds.Count} | storeConsumedThisAct=true | pendingUntilFirstActualEventPull=false");
     }
 
     private static bool ShouldForceStoreEvent(ActModel act, RunState? runState, EventModel? currentEvent)
