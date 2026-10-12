@@ -58,6 +58,7 @@ public sealed class AstralRelicStoreFirstEventModifier : ModifierModel
             $"AstralRelicStore modify-next-event applied | act={runState.Act.Id.Entry} | actIndex={runState.CurrentActIndex} | original={currentEvent.Id.Entry} | replacement={storeId.Entry}");
         return storeEvent;
     }
+
     private static bool IsSecondAct(RunState runState)
     {
         return runState.CurrentActIndex == 1

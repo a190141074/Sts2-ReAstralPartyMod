@@ -34,8 +34,8 @@ public sealed partial class AstralContentModeMainMenuButtonPatch : IPatchMethod
     {
         return
         [
-            new(typeof(NMainMenu), nameof(NMainMenu._Ready)),
-            new(typeof(NMainMenu), "OnSubmenuStackChanged"),
+            new ModPatchTarget(typeof(NMainMenu), nameof(NMainMenu._Ready)),
+            new ModPatchTarget(typeof(NMainMenu), "OnSubmenuStackChanged")
         ];
     }
 
@@ -129,7 +129,7 @@ public sealed partial class AstralContentModeMainMenuButtonPatch : IPatchMethod
         button.OffsetRight = ButtonSize;
         button.OffsetBottom = ButtonSize;
 
-VersionLabelPlacement:
+        VersionLabelPlacement:
         if (group.GetNodeOrNull<Label>(VersionLabelNodeName) is not { } label)
             return;
 

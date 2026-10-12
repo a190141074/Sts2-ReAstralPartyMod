@@ -157,7 +157,8 @@ public static class VigilCounterCombatHelper
             var tableNodeStillPresent = NCard.FindOnTable(cardToPlay) != null;
             var leftHandDuringResolution = !selectedFromHand || handCountAfterResolution < handCountBeforeTrigger;
             var autoPlaySuccessfullyLeftPlayablePile = leftHandDuringResolution
-                                                       && pileTypeAfterResolution is not (PileType.Hand or PileType.Play);
+                                                       && pileTypeAfterResolution is not (PileType.Hand or PileType.Play
+                                                           );
             CurrentState.Value.DidLeaveHandDuringResolution = leftHandDuringResolution;
             CurrentState.Value.ResolvedPileType = pileTypeAfterResolution;
             CurrentState.Value.AutoPlayedCardSuccessfully = autoPlaySuccessfullyLeftPlayablePile;

@@ -11,12 +11,19 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 public sealed class ProphecySoulDevourRunDeckRemovalPatch : IPatchMethod
 {
     public static string PatchId => "prophecy_soul_devour_run_deck_removal_patch";
-    public static string Description => "Grant Prophecy Soul Devour mineral recovery gold after formal run-deck removal succeeds";
+
+    public static string Description =>
+        "Grant Prophecy Soul Devour mineral recovery gold after formal run-deck removal succeeds";
+
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(EventDeckCardHelper), nameof(EventDeckCardHelper.RemoveCardFromRunDeck), [typeof(Player), typeof(CardModel), typeof(bool)])];
+        return
+        [
+            new ModPatchTarget(typeof(EventDeckCardHelper), nameof(EventDeckCardHelper.RemoveCardFromRunDeck),
+                [typeof(Player), typeof(CardModel), typeof(bool)])
+        ];
     }
 
     public static async Task<bool> Postfix(Task<bool> __result, Player owner)

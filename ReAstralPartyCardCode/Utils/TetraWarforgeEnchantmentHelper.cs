@@ -13,10 +13,13 @@ internal static class TetraWarforgeEnchantmentHelper
 {
     private const decimal PenaltyAmount = -1m;
     private const decimal BonusAmount = 4m;
+
     private const string AttackExtraCardTextKey =
         "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText_attack";
+
     private const string SkillExtraCardTextKey =
         "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText_skill";
+
     private const string CanonicalExtraCardTextKey =
         "RE_ASTRAL_PARTY_MOD_ENCHANTMENT_TETRA_WARFORGE_ENCHANTMENT.extraCardText";
 

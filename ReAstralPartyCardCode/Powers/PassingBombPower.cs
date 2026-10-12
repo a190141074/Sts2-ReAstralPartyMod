@@ -33,7 +33,10 @@ public class PassingBombPower : AstralPartyPowerModel
         {
             var damage = 9m + (decimal)Math.Pow(2d, (double)Amount);
             using (DebuffDamageContextHelper.Enter())
+            {
                 await CreatureCmd.Damage(choiceContext, Owner, damage, ValueProp.Unpowered, Applier, null);
+            }
+
             return;
         }
 
@@ -57,6 +60,7 @@ public class PassingBombPower : AstralPartyPowerModel
         var amountToTransfer = Amount;
 
         await PowerCmd.Remove(this);
-        await PowerCmd.Apply(ModelDb.Power<PassingBombPower>().ToMutable(), target, amountToTransfer, Applier, null, false);
+        await PowerCmd.Apply(ModelDb.Power<PassingBombPower>().ToMutable(), target, amountToTransfer, Applier, null,
+            false);
     }
 }

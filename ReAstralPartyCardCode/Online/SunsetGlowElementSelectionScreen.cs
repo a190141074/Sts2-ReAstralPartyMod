@@ -12,8 +12,10 @@ internal sealed partial class SunsetGlowElementSelectionScreen : Control, IOverl
 {
     private readonly TaskCompletionSource<SunsetGlowElementSelectionResult?> _completionSource =
         new(TaskCreationOptions.RunContinuationsAsynchronously);
+
     private readonly TaskCompletionSource _overlayClosedSource =
         new(TaskCreationOptions.RunContinuationsAsynchronously);
+
     private readonly IReadOnlyList<SunsetGlowElementSelectionOption> _options;
     private readonly string _title;
     private readonly string _subtitle;
@@ -282,8 +284,10 @@ internal sealed partial class SunsetGlowElementSelectionScreen : Control, IOverl
         descriptionPanel.AddChild(description);
 
         button.Pressed += () => Complete(option, index);
-        button.MouseEntered += () => SetHoverState(button, frame, iconFrame, descriptionPanel, true, option.BorderColor);
-        button.MouseExited += () => SetHoverState(button, frame, iconFrame, descriptionPanel, false, option.BorderColor);
+        button.MouseEntered +=
+            () => SetHoverState(button, frame, iconFrame, descriptionPanel, true, option.BorderColor);
+        button.MouseExited += () =>
+            SetHoverState(button, frame, iconFrame, descriptionPanel, false, option.BorderColor);
         return button;
     }
 

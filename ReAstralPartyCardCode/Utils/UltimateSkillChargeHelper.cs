@@ -52,8 +52,8 @@ public static class UltimateSkillChargeHelper
         var seenCards = new HashSet<UltimateSkillCardModel>();
 
         foreach (var pile in player.Piles)
-            foreach (var card in pile.Cards)
-                if (card is UltimateSkillCardModel ultimateCard && seenCards.Add(ultimateCard))
-                    yield return ultimateCard;
+        foreach (var card in pile.Cards)
+            if (card is UltimateSkillCardModel ultimateCard && seenCards.Add(ultimateCard))
+                yield return ultimateCard;
     }
 }

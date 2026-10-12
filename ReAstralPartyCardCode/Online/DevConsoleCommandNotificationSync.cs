@@ -65,7 +65,8 @@ internal static class DevConsoleCommandNotificationSync
         ShowNotification(player.NetId, player.Character.Id.Entry, normalizedCommand);
 
         var netService = _registeredNetService ?? RunManager.Instance?.NetService;
-        if (netService == null || netService.Type is NetGameType.None or NetGameType.Singleplayer || !netService.IsConnected)
+        if (netService == null || netService.Type is NetGameType.None or NetGameType.Singleplayer ||
+            !netService.IsConnected)
             return;
 
         if (!LocalContext.IsMe(player))

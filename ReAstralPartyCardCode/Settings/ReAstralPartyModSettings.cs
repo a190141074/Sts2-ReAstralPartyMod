@@ -322,7 +322,8 @@ public static partial class ReAstralPartyModSettingsManager
     public static bool EnableStartingInitialPoint =>
         ReadRuntime(settings => settings.EnableStartingInitialPoint);
 
-    public static bool EnableStartingAstralRelicStore => ReadRuntime(settings => settings.EnableStartingAstralRelicStore);
+    public static bool EnableStartingAstralRelicStore =>
+        ReadRuntime(settings => settings.EnableStartingAstralRelicStore);
 
     public static bool EnableStartingPersonSelection => ReadRuntime(settings => settings.EnableStartingPersonSelection);
 
@@ -624,6 +625,7 @@ public static partial class ReAstralPartyModSettingsManager
 
         return EnableStartingAstralRelicStore;
     }
+
     public static bool GetEnableStartingPersonaSelection(IRunState? runState)
     {
         if (TryGetRunSnapshot(runState, out var snapshot))
@@ -818,8 +820,8 @@ public static partial class ReAstralPartyModSettingsManager
         if (_registered)
             return;
 
-        bool sanitizedNonBannableRelics = false;
-        bool normalizedCurrentModeSettings = false;
+        var sanitizedNonBannableRelics = false;
+        var normalizedCurrentModeSettings = false;
         using (RitsuLibFramework.BeginModDataRegistration(MainFile.ModId))
         {
             var store = RitsuLibFramework.GetDataStore(MainFile.ModId);
@@ -857,7 +859,8 @@ public static partial class ReAstralPartyModSettingsManager
         MainFile.Logger.Info($"{MainFile.ModId} mod settings registered.");
     }
 
-    internal static bool TryGetStoredRunSettingsSnapshot(IRunState? runState, out ReAstralPartyRunSettingsSnapshot snapshot)
+    internal static bool TryGetStoredRunSettingsSnapshot(IRunState? runState,
+        out ReAstralPartyRunSettingsSnapshot snapshot)
     {
         snapshot = null!;
         if (runState is not RunState concreteRunState)
@@ -965,7 +968,8 @@ public static partial class ReAstralPartyModSettingsManager
             },
             (settings, value) =>
             {
-                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableStartingAstralRelicStore = value);
+                UpdateCurrentModeScopedGameplaySettings(settings,
+                    scoped => scoped.EnableStartingAstralRelicStore = value);
                 ApplyRuntimeSettings(settings, "enable_starting_astral_relic_store");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.label",
@@ -982,7 +986,8 @@ public static partial class ReAstralPartyModSettingsManager
             },
             (settings, value) =>
             {
-                UpdateCurrentModeScopedGameplaySettings(settings, scoped => scoped.EnableStartingPersonaSelection = value);
+                UpdateCurrentModeScopedGameplaySettings(settings,
+                    scoped => scoped.EnableStartingPersonaSelection = value);
                 ApplyRuntimeSettings(settings, "enable_starting_persona_selection");
                 ShowBoolSettingToast(
                     "RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label",
@@ -1057,25 +1062,27 @@ public static partial class ReAstralPartyModSettingsManager
                     value);
             });
 
-        var neowExtraOptionSelectionMode = ModSettingsBindings.Global<ReAstralPartyModSettings, NeowExtraOptionSelectionMode>(
-            MainFile.ModId,
-            SettingsKey,
-            settings =>
-            {
-                EnsureContentModeSettingsInitialized(settings);
-                var scoped = GetScopedSettingsForCurrentMode(settings);
-                return NormalizeNeowExtraOptionSelectionMode(
-                    scoped.NeowExtraOptionSelectionMode);
-            },
-            (settings, value) =>
-            {
-                var scoped = GetScopedSettingsForCurrentMode(settings);
-                var normalizedValue = NormalizeNeowExtraOptionSelectionMode(
-                    value);
-                UpdateCurrentModeScopedGameplaySettings(settings, activeScoped => activeScoped.NeowExtraOptionSelectionMode = normalizedValue);
-                ApplyRuntimeSettings(settings, "neow_extra_option_selection_mode");
-                ShowNeowExtraOptionSelectionModeToast(normalizedValue);
-            });
+        var neowExtraOptionSelectionMode =
+            ModSettingsBindings.Global<ReAstralPartyModSettings, NeowExtraOptionSelectionMode>(
+                MainFile.ModId,
+                SettingsKey,
+                settings =>
+                {
+                    EnsureContentModeSettingsInitialized(settings);
+                    var scoped = GetScopedSettingsForCurrentMode(settings);
+                    return NormalizeNeowExtraOptionSelectionMode(
+                        scoped.NeowExtraOptionSelectionMode);
+                },
+                (settings, value) =>
+                {
+                    var scoped = GetScopedSettingsForCurrentMode(settings);
+                    var normalizedValue = NormalizeNeowExtraOptionSelectionMode(
+                        value);
+                    UpdateCurrentModeScopedGameplaySettings(settings,
+                        activeScoped => activeScoped.NeowExtraOptionSelectionMode = normalizedValue);
+                    ApplyRuntimeSettings(settings, "neow_extra_option_selection_mode");
+                    ShowNeowExtraOptionSelectionModeToast(normalizedValue);
+                });
 
         var enableExtremeMode = ModSettingsBindings.Global<ReAstralPartyModSettings, bool>(
             MainFile.ModId,
@@ -1357,19 +1364,22 @@ public static partial class ReAstralPartyModSettingsManager
                     "These toggles apply globally across all profiles unless stated otherwise."))
                 .AddToggle(
                     "enable_starting_initial_point",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label", "Enable Starting Initial Point"),
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.label",
+                        "Enable Starting Initial Point"),
                     enableStartingInitialPoint,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_initial_point.description",
                         "At run start, every player automatically obtains Initial Point and loses 1 Gold."))
                 .AddToggle(
                     "enable_starting_astral_relic_store",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.label", "Enable Astral Relic Store"),
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.label",
+                        "Enable Astral Relic Store"),
                     enableStartingAstralRelicStore,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_astral_relic_store.description",
                         "Control whether the first actual event pull in Act 2 is replaced with Astral Relic Store."))
                 .AddToggle(
                     "enable_starting_persona_selection",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label", "Enable Starting Persona Selection"),
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.label",
+                        "Enable Starting Persona Selection"),
                     enableStartingPersonaSelection,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_starting_persona_selection.description",
                         "If disabled, the run skips the starting persona selection entirely and no player starts with a persona relic."))
@@ -1484,37 +1494,37 @@ public static partial class ReAstralPartyModSettingsManager
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.VariantPersonas,
-                        roomSurface: false) == AstralModeAvailability.Editable)
+                        false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_mech_tide_mode", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.MechTideMode,
-                        roomSurface: false) == AstralModeAvailability.Editable)
+                        false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_all_variant_personas", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.AllVariantPersonas,
-                        roomSurface: false) == AstralModeAvailability.Editable)
+                        false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_jewelry_relics", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.JewelryRelics,
-                        roomSurface: false) == AstralModeAvailability.Editable)
+                        false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_neow_extra_option", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.NeowExtraOption,
-                        roomSurface: false) == AstralModeAvailability.Editable)
+                        false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("neow_extra_option_selection_mode", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.NeowExtraOptionSelectionMode,
-                        roomSurface: false) == AstralModeAvailability.Editable)
+                        false) == AstralModeAvailability.Editable)
                 .WithEntryEnabledWhen("enable_collectors_cards", () =>
                     AstralContentModeRegistry.GetAvailability(
                         GetCurrentContentMode(),
                         AstralGameplaySettingKey.CollectorsCards,
-                        roomSurface: false) == AstralModeAvailability.Editable))
+                        false) == AstralModeAvailability.Editable))
             .AddSection("ban", section => section
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.ban.title", "BAN"))
                 .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.ban.description",
@@ -1586,7 +1596,8 @@ public static partial class ReAstralPartyModSettingsManager
                     "Control general Astral toast notifications."))
                 .AddToggle(
                     "enable_startup_notifications",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_startup_notifications.label", "Enable Startup Notifications"),
+                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_startup_notifications.label",
+                        "Enable Startup Notifications"),
                     enableStartupNotifications,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_startup_notifications.description",
                         "Show startup and mod-loaded notifications."))
@@ -1644,142 +1655,142 @@ public static partial class ReAstralPartyModSettingsManager
                     enableNeowDiagnosticsNotifications,
                     T("RE_ASTRAL_PARTY_MOD_SETTINGS.enable_neow_diagnostics_notifications.description",
                         "Show targeted numbered diagnostics for the post-persona NEOW, Ancient layout, and event-room divergence window."))
-        ));
+            ));
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
-            .AsChildOf(MainFile.ModId)
-            .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_title", "BAN Personas"))
-            .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
-                "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
-            .AddSection("banned_relics_navigation", section => section
-                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_title", "Relic Ban List"))
-                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
-                    "Move content between available and banned lists."))
-                .AddSubpage(
-                    "banned_personas_subpage",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_persona", "Personas"),
-                    $"{MainFile.ModId}.banned_personas",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
-                        "Manage content removed from relevant offer pools. Changes apply to new runs only."))
-                .AddSubpage(
-                    "banned_variant_personas_subpage",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_variant_persona", "Variants"),
-                    $"{MainFile.ModId}.banned_variant_personas",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
-                        "Manage content removed from relevant offer pools. Changes apply to new runs only."))
-                .AddSubpage(
-                    "banned_derivatives_subpage",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_derivative", "Derivatives"),
-                    $"{MainFile.ModId}.banned_derivatives",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
-                        "Manage content removed from relevant offer pools. Changes apply to new runs only."))
-                .AddSubpage(
-                    "banned_tokens_subpage",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_token", "Tokens"),
-                    $"{MainFile.ModId}.banned_tokens",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
-                        "Manage content removed from relevant offer pools. Changes apply to new runs only."))
-                .AddSubpage(
-                    "banned_other_relics_subpage",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_other", "Other Relics"),
-                    $"{MainFile.ModId}.banned_other_relics",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
-                        "Manage content removed from relevant offer pools. Changes apply to new runs only."))),
+                .AsChildOf(MainFile.ModId)
+                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_title", "BAN Personas"))
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
+                    "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
+                .AddSection("banned_relics_navigation", section => section
+                    .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_title", "Relic Ban List"))
+                    .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
+                        "Move content between available and banned lists."))
+                    .AddSubpage(
+                        "banned_personas_subpage",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_persona", "Personas"),
+                        $"{MainFile.ModId}.banned_personas",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
+                            "Manage content removed from relevant offer pools. Changes apply to new runs only."))
+                    .AddSubpage(
+                        "banned_variant_personas_subpage",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_variant_persona", "Variants"),
+                        $"{MainFile.ModId}.banned_variant_personas",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
+                            "Manage content removed from relevant offer pools. Changes apply to new runs only."))
+                    .AddSubpage(
+                        "banned_derivatives_subpage",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_derivative", "Derivatives"),
+                        $"{MainFile.ModId}.banned_derivatives",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
+                            "Manage content removed from relevant offer pools. Changes apply to new runs only."))
+                    .AddSubpage(
+                        "banned_tokens_subpage",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_token", "Tokens"),
+                        $"{MainFile.ModId}.banned_tokens",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
+                            "Manage content removed from relevant offer pools. Changes apply to new runs only."))
+                    .AddSubpage(
+                        "banned_other_relics_subpage",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_other", "Other Relics"),
+                        $"{MainFile.ModId}.banned_other_relics",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.button", "Manage"),
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.description",
+                            "Manage content removed from relevant offer pools. Changes apply to new runs only."))),
             $"{MainFile.ModId}.banned_relics");
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
-            .AsChildOf($"{MainFile.ModId}.banned_relics")
-            .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_persona", "Personas"))
-            .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
-                "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
-            .AddSection("banned_personas_manager", section => section
+                .AsChildOf($"{MainFile.ModId}.banned_relics")
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_persona", "Personas"))
-                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
-                    "Move content between available and banned lists."))
-                .AddCustom(
-                    "banned_personas_manager_control",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_persona", "Personas"),
-                    host => BuildBannedRelicManagerControl(host, BannedRelicCategory.Persona))),
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
+                    "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
+                .AddSection("banned_personas_manager", section => section
+                    .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_persona", "Personas"))
+                    .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
+                        "Move content between available and banned lists."))
+                    .AddCustom(
+                        "banned_personas_manager_control",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_persona", "Personas"),
+                        host => BuildBannedRelicManagerControl(host, BannedRelicCategory.Persona))),
             $"{MainFile.ModId}.banned_personas");
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
-            .AsChildOf($"{MainFile.ModId}.banned_relics")
-            .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_variant_persona", "Variants"))
-            .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
-                "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
-            .AddSection("banned_variant_personas_manager", section => section
+                .AsChildOf($"{MainFile.ModId}.banned_relics")
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_variant_persona", "Variants"))
-                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
-                    "Move content between available and banned lists."))
-                .AddCustom(
-                    "banned_variant_personas_manager_control",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_variant_persona", "Variants"),
-                    host => BuildBannedRelicManagerControl(host, BannedRelicCategory.VariantPersona))),
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
+                    "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
+                .AddSection("banned_variant_personas_manager", section => section
+                    .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_variant_persona", "Variants"))
+                    .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
+                        "Move content between available and banned lists."))
+                    .AddCustom(
+                        "banned_variant_personas_manager_control",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_variant_persona", "Variants"),
+                        host => BuildBannedRelicManagerControl(host, BannedRelicCategory.VariantPersona))),
             $"{MainFile.ModId}.banned_variant_personas");
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
-            .AsChildOf($"{MainFile.ModId}.banned_relics")
-            .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_derivative", "Derivatives"))
-            .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
-                "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
-            .AddSection("banned_derivatives_manager", section => section
+                .AsChildOf($"{MainFile.ModId}.banned_relics")
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_derivative", "Derivatives"))
-                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
-                    "Move content between available and banned lists."))
-                .AddCustom(
-                    "banned_derivatives_manager_control",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_derivative", "Derivatives"),
-                    host => BuildBannedRelicManagerControl(host, BannedRelicCategory.PersonalityDerivative))),
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
+                    "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
+                .AddSection("banned_derivatives_manager", section => section
+                    .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_derivative", "Derivatives"))
+                    .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
+                        "Move content between available and banned lists."))
+                    .AddCustom(
+                        "banned_derivatives_manager_control",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_derivative", "Derivatives"),
+                        host => BuildBannedRelicManagerControl(host, BannedRelicCategory.PersonalityDerivative))),
             $"{MainFile.ModId}.banned_derivatives");
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
-            .AsChildOf($"{MainFile.ModId}.banned_relics")
-            .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_token", "Tokens"))
-            .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
-                "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
-            .AddSection("banned_tokens_manager", section => section
+                .AsChildOf($"{MainFile.ModId}.banned_relics")
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_token", "Tokens"))
-                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
-                    "Move content between available and banned lists."))
-                .AddCustom(
-                    "banned_tokens_manager_control",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_token", "Tokens"),
-                    host => BuildBannedRelicManagerControl(host, BannedRelicCategory.Token))),
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
+                    "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
+                .AddSection("banned_tokens_manager", section => section
+                    .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_token", "Tokens"))
+                    .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
+                        "Move content between available and banned lists."))
+                    .AddCustom(
+                        "banned_tokens_manager_control",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_token", "Tokens"),
+                        host => BuildBannedRelicManagerControl(host, BannedRelicCategory.Token))),
             $"{MainFile.ModId}.banned_tokens");
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
-            .AsChildOf($"{MainFile.ModId}.banned_relics")
-            .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_other", "Other Relics"))
-            .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
-                "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
-            .AddSection("banned_other_relics_manager", section => section
+                .AsChildOf($"{MainFile.ModId}.banned_relics")
                 .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_other", "Other Relics"))
-                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
-                    "Move content between available and banned lists."))
-                .AddCustom(
-                    "banned_other_relics_manager_control",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_other", "Other Relics"),
-                    host => BuildBannedRelicManagerControl(host, BannedRelicCategory.Other))),
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.page_description",
+                    "Manage, by category, which content is excluded from related selection pools. Changes apply to new runs only."))
+                .AddSection("banned_other_relics_manager", section => section
+                    .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_other", "Other Relics"))
+                    .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.section_description",
+                        "Move content between available and banned lists."))
+                    .AddCustom(
+                        "banned_other_relics_manager_control",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.category_other", "Other Relics"),
+                        host => BuildBannedRelicManagerControl(host, BannedRelicCategory.Other))),
             $"{MainFile.ModId}.banned_other_relics");
 
         RitsuLibFramework.RegisterModSettings(MainFile.ModId, page => page
-            .AsChildOf(MainFile.ModId)
-            .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.page_title", "Compat Modules"))
-            .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.page_description",
-                "Review the crossover mods Astral currently supports and whether each one is loaded."))
-            .AddSection("compat_modules_manager", section => section
-                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_title", "Linked Mods"))
-                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_description",
-                    "This page lists the linked mods that Astral can currently integrate with."))
-                .AddCustom(
-                    "compat_modules_manager_control",
-                    T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_title", "Linked Mods"),
-                    BuildCompatModulesControl)),
+                .AsChildOf(MainFile.ModId)
+                .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.page_title", "Compat Modules"))
+                .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.page_description",
+                    "Review the crossover mods Astral currently supports and whether each one is loaded."))
+                .AddSection("compat_modules_manager", section => section
+                    .WithTitle(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_title", "Linked Mods"))
+                    .WithDescription(T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_description",
+                        "This page lists the linked mods that Astral can currently integrate with."))
+                    .AddCustom(
+                        "compat_modules_manager_control",
+                        T("RE_ASTRAL_PARTY_MOD_SETTINGS.compat.section_title", "Linked Mods"),
+                        BuildCompatModulesControl)),
             $"{MainFile.ModId}.compat_modules");
     }
 
@@ -1939,11 +1950,14 @@ public static partial class ReAstralPartyModSettingsManager
         var key = mode switch
         {
             StartingPersonMode.Standard => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard",
-            StartingPersonMode.StandardDuplicate => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate",
-            StartingPersonMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign",
+            StartingPersonMode.StandardDuplicate =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate",
+            StartingPersonMode.RandomAssign =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign",
             StartingPersonMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone",
             StartingPersonMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone",
-            StartingPersonMode.DestinedClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone",
+            StartingPersonMode.DestinedClone =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone",
             _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard"
         };
         return new LocString("settings_ui", key).GetRawText();
@@ -1953,12 +1967,17 @@ public static partial class ReAstralPartyModSettingsManager
     {
         var key = mode switch
         {
-            StartingPersonMode.Standard => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description",
-            StartingPersonMode.StandardDuplicate => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate.description",
-            StartingPersonMode.RandomAssign => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign.description",
+            StartingPersonMode.Standard =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description",
+            StartingPersonMode.StandardDuplicate =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard_duplicate.description",
+            StartingPersonMode.RandomAssign =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_assign.description",
             StartingPersonMode.Clone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_clone.description",
-            StartingPersonMode.RandomClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone.description",
-            StartingPersonMode.DestinedClone => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone.description",
+            StartingPersonMode.RandomClone =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_random_clone.description",
+            StartingPersonMode.DestinedClone =>
+                "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_destined_clone.description",
             _ => "RE_ASTRAL_PARTY_MOD_SETTINGS.starting_persona_mode.option_standard.description"
         };
         return new LocString("settings_ui", key).GetRawText();
@@ -1997,7 +2016,7 @@ public static partial class ReAstralPartyModSettingsManager
 
     internal static string GetNeowExtraOptionSelectionModeDescription(NeowExtraOptionSelectionMode mode)
     {
-        var key = GetNeowExtraOptionSelectionModeLocKey(mode, includeDescriptionSuffix: true)
+        var key = GetNeowExtraOptionSelectionModeLocKey(mode, true)
                   ?? "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random.description";
         return TryGetSettingsUiText(key, GetNeowExtraOptionSelectionModeDescriptionFallback(mode));
     }
@@ -2023,11 +2042,9 @@ public static partial class ReAstralPartyModSettingsManager
         bool includeDescriptionSuffix = false)
     {
         if (mode == NeowExtraOptionSelectionMode.DefaultRandom)
-        {
             return includeDescriptionSuffix
                 ? "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random.description"
                 : "RE_ASTRAL_PARTY_MOD_SETTINGS.neow_extra_option_selection_mode.option_default_random";
-        }
 
         var stableKey = TryGetForcedNeowExtraOptionStableKey(mode);
         if (string.IsNullOrWhiteSpace(stableKey))
@@ -2368,7 +2385,8 @@ public static partial class ReAstralPartyModSettingsManager
         settings.EnableJewelryRelics = modpack.EnableJewelryRelics;
         settings.EnableNeowExtraOption = modpack.EnableNeowExtraOption;
         settings.EnableCollectorsCards = modpack.EnableCollectorsCards;
-        settings.NeowExtraOptionSelectionMode = NormalizeNeowExtraOptionSelectionMode(modpack.NeowExtraOptionSelectionMode);
+        settings.NeowExtraOptionSelectionMode =
+            NormalizeNeowExtraOptionSelectionMode(modpack.NeowExtraOptionSelectionMode);
         settings.EnableAllPersons = modpack.EnableAllPersons;
         settings.EnableVariantPersons = modpack.EnableVariantPersons;
         settings.EnableAllVariantPersons = modpack.EnableAllVariantPersons;
@@ -2387,14 +2405,18 @@ public static partial class ReAstralPartyModSettingsManager
         var defaults = BuildVanillaModeDefaults();
         var changed = false;
 
-        changed |= SetIfDifferent(vanilla.EnableJewelryRelics, defaults.EnableJewelryRelics, value => vanilla.EnableJewelryRelics = value);
-        changed |= SetIfDifferent(vanilla.EnableNeowExtraOption, defaults.EnableNeowExtraOption, value => vanilla.EnableNeowExtraOption = value);
-        changed |= SetIfDifferent(vanilla.EnableCollectorsCards, defaults.EnableCollectorsCards, value => vanilla.EnableCollectorsCards = value);
+        changed |= SetIfDifferent(vanilla.EnableJewelryRelics, defaults.EnableJewelryRelics,
+            value => vanilla.EnableJewelryRelics = value);
+        changed |= SetIfDifferent(vanilla.EnableNeowExtraOption, defaults.EnableNeowExtraOption,
+            value => vanilla.EnableNeowExtraOption = value);
+        changed |= SetIfDifferent(vanilla.EnableCollectorsCards, defaults.EnableCollectorsCards,
+            value => vanilla.EnableCollectorsCards = value);
         changed |= SetIfDifferent(
             vanilla.NeowExtraOptionSelectionMode,
             defaults.NeowExtraOptionSelectionMode,
             value => vanilla.NeowExtraOptionSelectionMode = value);
-        changed |= SetIfDifferent(vanilla.EnableMechTideMode, defaults.EnableMechTideMode, value => vanilla.EnableMechTideMode = value);
+        changed |= SetIfDifferent(vanilla.EnableMechTideMode, defaults.EnableMechTideMode,
+            value => vanilla.EnableMechTideMode = value);
 
         return changed;
     }
@@ -2506,8 +2528,8 @@ public static partial class ReAstralPartyModSettingsManager
         {
             EnsureContentModeSettingsInitialized(settings);
             var scoped = GetScopedSettingsForCurrentMode(settings);
-        return new LocalRuntimeSettings
-        {
+            return new LocalRuntimeSettings
+            {
                 BannedRelicIds = DeserializeModelIdSet(ResolveBannedRelicIds(settings)),
                 CurrentContentMode = AstralContentModeRegistry.NormalizeMode(settings.CurrentContentMode),
                 EnableExtremeMode = scoped.EnableExtremeMode,
@@ -2694,10 +2716,8 @@ public static partial class ReAstralPartyModSettingsManager
         {
             var error = OS.ShellOpen(releasePageUrl);
             if (error != Error.Ok)
-            {
                 MainFile.Logger.Warn(
                     $"[{MainFile.ModId}] Failed to open compat link '{releasePageUrl}': {error}");
-            }
         }
 
         private static Label CreateCompatTextCell(string text, bool header, bool loaded = false)
@@ -2710,16 +2730,14 @@ public static partial class ReAstralPartyModSettingsManager
                 SizeFlagsHorizontal = SizeFlags.ExpandFill
             };
             if (header)
-            {
                 label.AddThemeColorOverride("font_color", new Color(0.96f, 0.84f, 0.48f));
-            }
-            else if (text == new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.status_loaded").GetRawText()
-                     || text == new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.status_not_loaded").GetRawText())
-            {
+            else if (text == new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.status_loaded")
+                         .GetRawText()
+                     || text == new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.compat.status_not_loaded")
+                         .GetRawText())
                 label.AddThemeColorOverride("font_color", loaded
                     ? new Color(0.42f, 0.9f, 0.56f)
                     : new Color(0.95f, 0.38f, 0.38f));
-            }
             return label;
         }
 
@@ -2829,7 +2847,7 @@ public static partial class ReAstralPartyModSettingsManager
             {
                 SizeFlagsHorizontal = SizeFlags.ExpandFill,
                 MouseFilter = MouseFilterEnum.Ignore,
-                Alignment = BoxContainer.AlignmentMode.End
+                Alignment = AlignmentMode.End
             };
             footer.AddThemeConstantOverride("separation", 10);
             AddChild(footer);
@@ -2998,17 +3016,14 @@ public static partial class ReAstralPartyModSettingsManager
         private void NotifyChanged()
         {
             if (EnableSettingsNotifications)
-            {
                 AstralNotificationService.ShowInfo(
                     AstralNotificationModule.Settings,
                     new LocString("settings_ui",
                         "RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.toast_body").GetRawText(),
                     new LocString("settings_ui",
                         "RE_ASTRAL_PARTY_MOD_SETTINGS.banned_personas.label").GetRawText());
-            }
 
             _host.RequestRefresh();
         }
     }
-
 }

@@ -97,7 +97,8 @@ public sealed class TokenExclusiveTimePocketWatch : AstralPartyRelicModel
         Flash();
         await PowerCmd.Apply<RingingPower>(Owner.Creature, 1m, Owner.Creature, null, false);
 
-        foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature))
+        foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState,
+                     Owner.Creature))
             await CreatureCmd.Stun(enemy);
     }
 

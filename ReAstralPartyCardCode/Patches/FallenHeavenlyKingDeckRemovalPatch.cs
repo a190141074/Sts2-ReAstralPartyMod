@@ -16,7 +16,11 @@ public sealed class FallenHeavenlyKingDeckRemovalPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(CardPileCmd), nameof(CardPileCmd.RemoveFromDeck), [typeof(IReadOnlyList<CardModel>), typeof(bool)])];
+        return
+        [
+            new ModPatchTarget(typeof(CardPileCmd), nameof(CardPileCmd.RemoveFromDeck),
+                [typeof(IReadOnlyList<CardModel>), typeof(bool)])
+        ];
     }
 
     public static void Postfix(IReadOnlyList<CardModel> cards, ref Task __result)

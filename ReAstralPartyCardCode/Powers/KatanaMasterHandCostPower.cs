@@ -23,7 +23,12 @@ public sealed class KatanaMasterHandCostPower : AstralPartyPowerModel
     public override PowerStackType StackType => PowerStackType.None;
     public override int DisplayAmount => 0;
     protected override bool IsVisibleInternal => false;
-    protected override object InitInternalData() => new Data();
+
+    protected override object InitInternalData()
+    {
+        return new Data();
+    }
+
     public override LocString Title => ModelDb.Relic<PersonKatanaMaster>().Title;
     public override LocString Description => ModelDb.Relic<PersonKatanaMaster>().DynamicDescription;
 
@@ -39,7 +44,8 @@ public sealed class KatanaMasterHandCostPower : AstralPartyPowerModel
         modifiedCost = originalCost;
         if (Owner?.Player == null || card.Owner != Owner.Player || card.Pile?.Type != PileType.Hand)
             return false;
-        if (card.Type != CardType.Attack || card.EnergyCost.CostsX || !GetInternalData<Data>().TrackedCards.Contains(card))
+        if (card.Type != CardType.Attack || card.EnergyCost.CostsX ||
+            !GetInternalData<Data>().TrackedCards.Contains(card))
             return false;
 
         modifiedCost = Math.Max(0m, originalCost - 1m);
@@ -60,6 +66,7 @@ public sealed class KatanaMasterHandCostPower : AstralPartyPowerModel
                 data.TrackedCards.Add(card);
                 card.InvokeEnergyCostChanged();
             }
+
             return;
         }
 
@@ -72,7 +79,8 @@ public sealed class KatanaMasterHandCostPower : AstralPartyPowerModel
         }
     }
 
-    public override async Task AfterCardPlayed(MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext choiceContext,
+    public override async Task AfterCardPlayed(
+        MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext choiceContext,
         CardPlay cardPlay)
     {
         if (Owner?.Player == null || cardPlay.Card.Owner != Owner.Player)

@@ -11,7 +11,6 @@ using MegaCrit.Sts2.Core.Saves.Runs;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillFateGuidance : AstralPartyCardModel
 {
@@ -53,4 +52,3 @@ public class SkillFateGuidance : AstralPartyCardModel
         await PlayerCmd.GainEnergy(1m, Owner);
     }
 }
-

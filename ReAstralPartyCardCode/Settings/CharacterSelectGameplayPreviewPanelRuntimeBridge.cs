@@ -11,4 +11,3 @@ internal static class CharacterSelectGameplayPreviewPanelRuntimeBridge
         RefreshRequested?.Invoke();
     }
 }
-

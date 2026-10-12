@@ -10,6 +10,7 @@ public sealed class FinalArenaDistortionCombatRoomPatch : IPatchMethod
 {
     public static string PatchId => "final_arena_distortion_combat_room_patch";
     public static bool IsCritical => false;
+
     public static string Description =>
         "Install Final Arena's hidden combat modifier only when a combat room is about to create its combat state";
 
@@ -17,7 +18,7 @@ public sealed class FinalArenaDistortionCombatRoomPatch : IPatchMethod
     {
         return
         [
-            new(
+            new ModPatchTarget(
                 typeof(CombatRoom),
                 ".ctor",
                 [typeof(EncounterModel), typeof(IRunState)],

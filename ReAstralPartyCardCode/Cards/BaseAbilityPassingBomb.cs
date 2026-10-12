@@ -33,6 +33,7 @@ public class BaseAbilityPassingBomb : BaseAbilityCardModel
         if (cardPlay.Target == null)
             return;
 
-        await PowerCmd.Apply(ModelDb.Power<PassingBombPower>().ToMutable(), cardPlay.Target, 1m, Owner?.Creature, this, false);
+        await PowerCmd.Apply(ModelDb.Power<PassingBombPower>().ToMutable(), cardPlay.Target, 1m, Owner?.Creature, this,
+            false);
     }
 }

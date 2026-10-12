@@ -84,7 +84,8 @@ public class PvzRareBigMouthedNut : AstralPartyRelicModel
         AstralParty_PvzRareBigMouthedNutLastTriggeredRound = PvzNutRelicHelper.MarkTriggeredThisRound(currentRound);
         InvokeDisplayAmountChanged();
         Flash();
-        await CreatureCmd.Damage(choiceContext, dealer, dealer.CurrentHp + dealer.Block + 999m, ValueProp.Move, ownerCreature, null);
+        await CreatureCmd.Damage(choiceContext, dealer, dealer.CurrentHp + dealer.Block + 999m, ValueProp.Move,
+            ownerCreature, null);
         await CreatureCmd.Heal(ownerCreature, HealAmount, true);
         MainFile.Logger.Info(
             $"[PvzRareBigMouthedNut] Triggered execution | owner={Owner?.NetId} | target={dealer?.GetType().Name} | round={currentRound}");

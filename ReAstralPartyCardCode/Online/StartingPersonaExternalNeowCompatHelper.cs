@@ -71,10 +71,8 @@ internal static class StartingPersonaExternalNeowCompatHelper
                 continue;
 
             foreach (var marker in SevenCursesOptionMarkers)
-            {
                 if (textKey.Contains(marker, StringComparison.OrdinalIgnoreCase))
                     return true;
-            }
         }
 
         return false;

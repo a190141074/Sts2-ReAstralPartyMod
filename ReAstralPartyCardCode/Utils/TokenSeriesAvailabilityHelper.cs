@@ -55,52 +55,52 @@ public static class TokenSeriesAvailabilityHelper
     // initialization; these maps are only needed once a run or its UI queries token relics.
     private static readonly Lazy<IReadOnlyDictionary<TokenSeries, IReadOnlyList<ModelId>>> RelicIdsBySeriesCache =
         new(() => new Dictionary<TokenSeries, IReadOnlyList<ModelId>>
-    {
-        [TokenSeries.Dreamship] =
-        [
-            ModelDb.GetId<TokenBlueGiantAnchor>(),
-            ModelDb.GetId<TokenExclusiveDreamshipModel>(),
-            ModelDb.GetId<TokenExclusiveTrident>()
-        ],
-        [TokenSeries.SpiritFestival] =
-        [
-            ModelDb.GetId<TokenExclusiveCursedSword>(),
-            ModelDb.GetId<TokenExclusivePiercingGun>(),
-            ModelDb.GetId<TokenExclusiveVengeanceHalberd>()
-        ],
-        [TokenSeries.WaterTown] =
-        [
-            ModelDb.GetId<TokenExclusiveBronzeGong>()
-        ],
-        [TokenSeries.MagicAcademy] =
-        [
-            ModelDb.GetId<TokenExclusiveAncientWand>(),
-            ModelDb.GetId<TokenExclusiveBoutiqueSwordShield>(),
-            ModelDb.GetId<TokenExclusiveZuoTeaCake>()
-        ],
-        [TokenSeries.DragonPalace] =
-        [
-            ModelDb.GetId<TokenExclusiveCrossedTwinCarp>(),
-            ModelDb.GetId<TokenExclusiveInfiniteSnake>(),
-            ModelDb.GetId<TokenExclusiveLittleCarpDoll>(),
-            ModelDb.GetId<TokenExclusiveLittleSnakeDoll>(),
-            ModelDb.GetId<TokenExclusivePsychedelicSeafoodSoup>(),
-            ModelDb.GetId<TokenExclusiveStormTalisman>()
-        ],
-        [TokenSeries.GhostAlley] =
-        [
-            ModelDb.GetId<TokenExclusiveCandyMembershipCard>(),
-            ModelDb.GetId<TokenExclusiveTimer>()
-        ],
-        [TokenSeries.FinalArena] =
-        [
-            ModelDb.GetId<TokenExclusiveAdaptiveCore>(),
-            ModelDb.GetId<TokenExclusiveEntertainmentTerminal>(),
-            ModelDb.GetId<TokenExclusiveFitnessTracker>(),
-            ModelDb.GetId<TokenExclusiveOriginalConsciousness>(),
-            ModelDb.GetId<TokenExclusiveStunGun>(),
-            ModelDb.GetId<TokenExclusiveTimePocketWatch>()
-        ]
+        {
+            [TokenSeries.Dreamship] =
+            [
+                ModelDb.GetId<TokenBlueGiantAnchor>(),
+                ModelDb.GetId<TokenExclusiveDreamshipModel>(),
+                ModelDb.GetId<TokenExclusiveTrident>()
+            ],
+            [TokenSeries.SpiritFestival] =
+            [
+                ModelDb.GetId<TokenExclusiveCursedSword>(),
+                ModelDb.GetId<TokenExclusivePiercingGun>(),
+                ModelDb.GetId<TokenExclusiveVengeanceHalberd>()
+            ],
+            [TokenSeries.WaterTown] =
+            [
+                ModelDb.GetId<TokenExclusiveBronzeGong>()
+            ],
+            [TokenSeries.MagicAcademy] =
+            [
+                ModelDb.GetId<TokenExclusiveAncientWand>(),
+                ModelDb.GetId<TokenExclusiveBoutiqueSwordShield>(),
+                ModelDb.GetId<TokenExclusiveZuoTeaCake>()
+            ],
+            [TokenSeries.DragonPalace] =
+            [
+                ModelDb.GetId<TokenExclusiveCrossedTwinCarp>(),
+                ModelDb.GetId<TokenExclusiveInfiniteSnake>(),
+                ModelDb.GetId<TokenExclusiveLittleCarpDoll>(),
+                ModelDb.GetId<TokenExclusiveLittleSnakeDoll>(),
+                ModelDb.GetId<TokenExclusivePsychedelicSeafoodSoup>(),
+                ModelDb.GetId<TokenExclusiveStormTalisman>()
+            ],
+            [TokenSeries.GhostAlley] =
+            [
+                ModelDb.GetId<TokenExclusiveCandyMembershipCard>(),
+                ModelDb.GetId<TokenExclusiveTimer>()
+            ],
+            [TokenSeries.FinalArena] =
+            [
+                ModelDb.GetId<TokenExclusiveAdaptiveCore>(),
+                ModelDb.GetId<TokenExclusiveEntertainmentTerminal>(),
+                ModelDb.GetId<TokenExclusiveFitnessTracker>(),
+                ModelDb.GetId<TokenExclusiveOriginalConsciousness>(),
+                ModelDb.GetId<TokenExclusiveStunGun>(),
+                ModelDb.GetId<TokenExclusiveTimePocketWatch>()
+            ]
         });
 
     private static IReadOnlyDictionary<TokenSeries, IReadOnlyList<ModelId>> RelicIdsBySeries =>
@@ -116,31 +116,31 @@ public static class TokenSeriesAvailabilityHelper
 
     private static readonly Lazy<IReadOnlyDictionary<ModelId, string>> FallbackRelicTitlesCache =
         new(() => new Dictionary<ModelId, string>
-    {
-        [ModelDb.GetId<TokenBlueGiantAnchor>()] = "【大铁锚】",
-        [ModelDb.GetId<TokenExclusiveDreamshipModel>()] = "【梦想号模型】",
-        [ModelDb.GetId<TokenExclusiveTrident>()] = "【三叉戟】",
-        [ModelDb.GetId<TokenExclusiveCursedSword>()] = "【诅咒之剑】",
-        [ModelDb.GetId<TokenExclusivePiercingGun>()] = "【贯穿之铳】",
-        [ModelDb.GetId<TokenExclusiveVengeanceHalberd>()] = "【复仇之戟】",
-        [ModelDb.GetId<TokenExclusiveBronzeGong>()] = "【大铜锣】",
-        [ModelDb.GetId<TokenExclusiveAncientWand>()] = "【古老法杖】",
-        [ModelDb.GetId<TokenExclusiveBoutiqueSwordShield>()] = "【精品剑盾】",
-        [ModelDb.GetId<TokenExclusiveZuoTeaCake>()] = "【佐茶蛋糕】",
-        [ModelDb.GetId<TokenExclusiveCrossedTwinCarp>()] = "【交错双鲤】",
-        [ModelDb.GetId<TokenExclusiveInfiniteSnake>()] = "【无限之蛇】",
-        [ModelDb.GetId<TokenExclusiveLittleCarpDoll>()] = "【小鲤鱼玩偶】",
-        [ModelDb.GetId<TokenExclusiveLittleSnakeDoll>()] = "【小蛇玩偶】",
-        [ModelDb.GetId<TokenExclusivePsychedelicSeafoodSoup>()] = "【迷幻海鲜汤】",
-        [ModelDb.GetId<TokenExclusiveStormTalisman>()] = "【惊涛御守】",
-        [ModelDb.GetId<TokenExclusiveCandyMembershipCard>()] = "【糖果会员卡】",
-        [ModelDb.GetId<TokenExclusiveTimer>()] = "【计时器】",
-        [ModelDb.GetId<TokenExclusiveFitnessTracker>()] = "【运动手环】",
-        [ModelDb.GetId<TokenExclusiveAdaptiveCore>()] = "【适应核心】",
-        [ModelDb.GetId<TokenExclusiveEntertainmentTerminal>()] = "【娱乐终端】",
-        [ModelDb.GetId<TokenExclusiveOriginalConsciousness>()] = "【原初意识】",
-        [ModelDb.GetId<TokenExclusiveStunGun>()] = "【电击枪】",
-        [ModelDb.GetId<TokenExclusiveTimePocketWatch>()] = "【时间怀表】"
+        {
+            [ModelDb.GetId<TokenBlueGiantAnchor>()] = "【大铁锚】",
+            [ModelDb.GetId<TokenExclusiveDreamshipModel>()] = "【梦想号模型】",
+            [ModelDb.GetId<TokenExclusiveTrident>()] = "【三叉戟】",
+            [ModelDb.GetId<TokenExclusiveCursedSword>()] = "【诅咒之剑】",
+            [ModelDb.GetId<TokenExclusivePiercingGun>()] = "【贯穿之铳】",
+            [ModelDb.GetId<TokenExclusiveVengeanceHalberd>()] = "【复仇之戟】",
+            [ModelDb.GetId<TokenExclusiveBronzeGong>()] = "【大铜锣】",
+            [ModelDb.GetId<TokenExclusiveAncientWand>()] = "【古老法杖】",
+            [ModelDb.GetId<TokenExclusiveBoutiqueSwordShield>()] = "【精品剑盾】",
+            [ModelDb.GetId<TokenExclusiveZuoTeaCake>()] = "【佐茶蛋糕】",
+            [ModelDb.GetId<TokenExclusiveCrossedTwinCarp>()] = "【交错双鲤】",
+            [ModelDb.GetId<TokenExclusiveInfiniteSnake>()] = "【无限之蛇】",
+            [ModelDb.GetId<TokenExclusiveLittleCarpDoll>()] = "【小鲤鱼玩偶】",
+            [ModelDb.GetId<TokenExclusiveLittleSnakeDoll>()] = "【小蛇玩偶】",
+            [ModelDb.GetId<TokenExclusivePsychedelicSeafoodSoup>()] = "【迷幻海鲜汤】",
+            [ModelDb.GetId<TokenExclusiveStormTalisman>()] = "【惊涛御守】",
+            [ModelDb.GetId<TokenExclusiveCandyMembershipCard>()] = "【糖果会员卡】",
+            [ModelDb.GetId<TokenExclusiveTimer>()] = "【计时器】",
+            [ModelDb.GetId<TokenExclusiveFitnessTracker>()] = "【运动手环】",
+            [ModelDb.GetId<TokenExclusiveAdaptiveCore>()] = "【适应核心】",
+            [ModelDb.GetId<TokenExclusiveEntertainmentTerminal>()] = "【娱乐终端】",
+            [ModelDb.GetId<TokenExclusiveOriginalConsciousness>()] = "【原初意识】",
+            [ModelDb.GetId<TokenExclusiveStunGun>()] = "【电击枪】",
+            [ModelDb.GetId<TokenExclusiveTimePocketWatch>()] = "【时间怀表】"
         });
 
     private static IReadOnlyDictionary<ModelId, string> FallbackRelicTitles => FallbackRelicTitlesCache.Value;
@@ -333,10 +333,8 @@ public static class TokenSeriesAvailabilityHelper
 
         var openSeries = new List<TokenSeries>();
         foreach (var serializedSeries in runData.OpenSeries)
-        {
             if (TryParseSeries(serializedSeries, out var series))
                 openSeries.Add(series);
-        }
 
         state = NormalizeSeries(openSeries);
         return true;

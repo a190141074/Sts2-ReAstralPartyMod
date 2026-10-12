@@ -11,7 +11,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillEmotionalOverdose : AstralPartyCardModel
 {
@@ -53,4 +52,3 @@ public class SkillEmotionalOverdose : AstralPartyCardModel
             await PowerCmd.Remove(lovePower);
     }
 }
-

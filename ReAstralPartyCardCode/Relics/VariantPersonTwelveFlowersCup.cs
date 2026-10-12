@@ -39,7 +39,9 @@ public class VariantPersonTwelveFlowersCup : CooldownPersonRelicBase
     [SavedProperty] public int AstralParty_VariantPersonTwelveFlowersCupJingRuiGainCount { get; set; }
     [SavedProperty] public int AstralParty_VariantPersonTwelveFlowersCupJingRuiBombRewardCount { get; set; }
     [SavedProperty] public int AstralParty_VariantPersonTwelveFlowersCupPassiveBombTriggersThisTurn { get; set; }
-    [SavedProperty] public int AstralParty_VariantPersonTwelveFlowersCupLastFallenFlowerEnergyRound { get; set; } =
+
+    [SavedProperty]
+    public int AstralParty_VariantPersonTwelveFlowersCupLastFallenFlowerEnergyRound { get; set; } =
         UninitializedRound;
 
     protected override int CounterValue
@@ -258,9 +260,6 @@ public class VariantPersonTwelveFlowersCup : CooldownPersonRelicBase
             card => WarforgeEnchantmentHelper.CountsAsAttack(card) && !card.ShouldRetainThisTurn,
             this);
 
-        foreach (var card in selectedCards)
-        {
-            card.GiveSingleTurnRetain();
-        }
+        foreach (var card in selectedCards) card.GiveSingleTurnRetain();
     }
 }

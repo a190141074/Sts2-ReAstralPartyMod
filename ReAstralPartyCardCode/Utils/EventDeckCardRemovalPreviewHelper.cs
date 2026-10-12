@@ -67,6 +67,7 @@ internal sealed partial class EventDeckCardRemovalPreviewVfx : Control
     private const float PreviewHeight = 700f;
     private const float CardScale = 1.04f;
     private const float AnimationDurationScale = 1.15f;
+
     private static readonly Vector2[] ShardDirections =
     [
         new(-0.95f, -0.65f),
@@ -191,7 +192,8 @@ internal sealed partial class EventDeckCardRemovalPreviewVfx : Control
             await WaitSecondsAsync(0.12f);
 
             var compress = CreateTween().SetParallel();
-            compress.TweenProperty(_cardNode, "scale", new Vector2(CardScale * 1.08f, CardScale * 0.84f), ScaleDuration(0.1f))
+            compress.TweenProperty(_cardNode, "scale", new Vector2(CardScale * 1.08f, CardScale * 0.84f),
+                    ScaleDuration(0.1f))
                 .SetEase(Tween.EaseType.In)
                 .SetTrans(Tween.TransitionType.Back);
             compress.TweenProperty(_cardNode, "rotation_degrees", -4f, ScaleDuration(0.08f))
@@ -203,7 +205,8 @@ internal sealed partial class EventDeckCardRemovalPreviewVfx : Control
             PlayShatterBurst();
 
             var shatter = CreateTween().SetParallel();
-            shatter.TweenProperty(_cardNode, "scale", new Vector2(CardScale * 1.26f, CardScale * 0.42f), ScaleDuration(0.12f))
+            shatter.TweenProperty(_cardNode, "scale", new Vector2(CardScale * 1.26f, CardScale * 0.42f),
+                    ScaleDuration(0.12f))
                 .SetEase(Tween.EaseType.Out)
                 .SetTrans(Tween.TransitionType.Back);
             shatter.TweenProperty(_cardNode, "rotation_degrees", 8f, ScaleDuration(0.12f))
@@ -236,7 +239,7 @@ internal sealed partial class EventDeckCardRemovalPreviewVfx : Control
     {
         var center = GetCenteredCardPosition() + new Vector2(PreviewWidth * 0.5f, PreviewHeight * 0.48f);
         for (var i = 0; i < _shards.Length; i++)
-            _shards[i].Position = center - (_shards[i].Size * 0.5f);
+            _shards[i].Position = center - _shards[i].Size * 0.5f;
     }
 
     private void PlayShatterBurst()
@@ -246,7 +249,7 @@ internal sealed partial class EventDeckCardRemovalPreviewVfx : Control
         {
             var shard = _shards[i];
             var direction = ShardDirections[i];
-            var target = origin + (direction * 235f) - (shard.Size * 0.5f);
+            var target = origin + direction * 235f - shard.Size * 0.5f;
             shard.Color = i % 2 == 0
                 ? new Color(1f, 0.84f, 0.42f, 0.92f)
                 : new Color(0.93f, 0.28f, 0.28f, 0.88f);
@@ -256,7 +259,8 @@ internal sealed partial class EventDeckCardRemovalPreviewVfx : Control
             tween.TweenProperty(shard, "position", target, ScaleDuration(0.24f))
                 .SetEase(Tween.EaseType.Out)
                 .SetTrans(Tween.TransitionType.Cubic);
-            tween.TweenProperty(shard, "rotation_degrees", shard.RotationDegrees + (direction.X * 42f), ScaleDuration(0.24f))
+            tween.TweenProperty(shard, "rotation_degrees", shard.RotationDegrees + direction.X * 42f,
+                    ScaleDuration(0.24f))
                 .SetEase(Tween.EaseType.Out)
                 .SetTrans(Tween.TransitionType.Quad);
             tween.TweenProperty(shard, "scale", new Vector2(0.95f, 1.18f), ScaleDuration(0.18f))

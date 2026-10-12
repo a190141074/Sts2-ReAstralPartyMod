@@ -18,7 +18,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillInvokeSpirits : AstralPartyCardModel
 {
@@ -113,4 +112,3 @@ public class SkillInvokeSpirits : AstralPartyCardModel
         return Math.Ceiling(value * ratio);
     }
 }
-

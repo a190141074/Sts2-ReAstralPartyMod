@@ -21,6 +21,7 @@ internal static class AstralDivinePersonaHelper
 {
     private const int SaraChargeThreshold = 7;
     private const decimal DivinePowerAmount = 1m;
+
     public static IReadOnlyList<Player> GetStablePlayers(Player owner)
     {
         return PersonMultiplayerEffectHelper.GetStableCombatPlayers(owner);
@@ -28,14 +29,16 @@ internal static class AstralDivinePersonaHelper
 
     public static async Task<PersonalityDerivativeDivineThrone?> EnsureDivineThrone(Player? owner)
     {
-        return await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeDivineThrone>(owner)
-               as PersonalityDerivativeDivineThrone;
+        return await PersonMultiplayerEffectHelper
+                .ObtainDerivativeRelicIfMissing<PersonalityDerivativeDivineThrone>(owner)
+            as PersonalityDerivativeDivineThrone;
     }
 
     public static async Task<PersonalityDerivativeBookOfHeaven?> EnsureBookOfHeaven(Player? owner)
     {
-        return await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeBookOfHeaven>(owner)
-               as PersonalityDerivativeBookOfHeaven;
+        return await PersonMultiplayerEffectHelper
+                .ObtainDerivativeRelicIfMissing<PersonalityDerivativeBookOfHeaven>(owner)
+            as PersonalityDerivativeBookOfHeaven;
     }
 
     public static async Task GrantDivineSonToAllPlayers(Player owner, AbstractModel? source)
@@ -45,7 +48,8 @@ internal static class AstralDivinePersonaHelper
             if (player.Creature == null)
                 continue;
 
-            await PowerCmd.Apply<DivineSonPower>(player.Creature, DivinePowerAmount, owner.Creature, source as CardModel, false);
+            await PowerCmd.Apply<DivineSonPower>(player.Creature, DivinePowerAmount, owner.Creature,
+                source as CardModel, false);
         }
     }
 
@@ -56,7 +60,8 @@ internal static class AstralDivinePersonaHelper
             if (player.Creature == null)
                 continue;
 
-            await PowerCmd.Apply<DivineThronePower>(player.Creature, DivinePowerAmount, owner.Creature, source as CardModel,
+            await PowerCmd.Apply<DivineThronePower>(player.Creature, DivinePowerAmount, owner.Creature,
+                source as CardModel,
                 false);
         }
     }

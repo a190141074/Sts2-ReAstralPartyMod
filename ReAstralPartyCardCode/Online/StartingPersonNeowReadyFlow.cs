@@ -27,10 +27,13 @@ internal static class StartingPersonNeowReadyFlow
 {
     private const string ReadyPageDescriptionKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.description";
+
     private const string ReadyOptionTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY.options.READY";
+
     private const string WaitingOptionTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.STARTING_PERSONA_READY_WAITING.options.WAITING";
+
     private const string ReadyOptionIconPath = "res://ReAstralPartyMod/images/ui/person_choose.png";
 
     private static readonly object SyncLock = new();
@@ -39,22 +42,30 @@ internal static class StartingPersonNeowReadyFlow
     private static readonly Dictionary<string, List<string>> LaunchPayloadsByRun = [];
     private static readonly HashSet<string> LaunchingRunKeys = [];
     private static readonly HashSet<string> ReadyPageInjectedRunKeys = [];
+
     private static readonly MethodInfo? SetEventStateMethod = AccessTools.Method(
         typeof(EventModel),
         "SetEventState",
         [typeof(LocString), typeof(IEnumerable<EventOption>)]);
+
     private static readonly MethodInfo? EventRoomSetupLayoutMethod =
         AccessTools.Method(typeof(NEventRoom), "SetupLayout");
+
     private static readonly MethodInfo? EventRoomRefreshEventStateMethod =
         AccessTools.Method(typeof(NEventRoom), "RefreshEventState", [typeof(EventModel)]);
+
     private static readonly MethodInfo? AncientLayoutInitializeVisualsMethod =
         AccessTools.Method(typeof(NAncientEventLayout), "InitializeVisuals");
+
     private static readonly MethodInfo? AncientLayoutUpdateBannerVisibilityMethod =
         AccessTools.Method(typeof(NAncientEventLayout), "UpdateBannerVisibility");
+
     private static readonly MethodInfo? AncientLayoutUpdateFakeNextButtonMethod =
         AccessTools.Method(typeof(NAncientEventLayout), "UpdateFakeNextButton");
+
     private static readonly MethodInfo? ControlUpdateMinimumSizeMethod =
         AccessTools.Method(typeof(Control), "UpdateMinimumSize");
+
     private static readonly AsyncLocal<int> InternalNeowRefreshDepth = new();
 
     private sealed record ReadyPageState(
@@ -120,9 +131,11 @@ internal static class StartingPersonNeowReadyFlow
             var cachedPageKind = isNeow
                 ? StartingPersonaExternalNeowCompatHelper.ResolveCachedPageKind((Neow)ancient)
                 : StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.NormalNeowPage;
-            var originalOptions = isNeow && cachedPageKind != StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
-                ? NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(ancient, ancient.CurrentOptions, "ready_page_cache")
-                : (ancient.CurrentOptions?.ToList() ?? []);
+            var originalOptions = isNeow && cachedPageKind !=
+                StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
+                    ? NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(ancient, ancient.CurrentOptions,
+                        "ready_page_cache")
+                    : ancient.CurrentOptions?.ToList() ?? [];
             ReadyPages[ancient] = new ReadyPageState(
                 runKey,
                 runState,
@@ -141,7 +154,8 @@ internal static class StartingPersonNeowReadyFlow
         };
 
         if (SetEventStateMethod == null)
-            throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page injection.");
+            throw new InvalidOperationException(
+                "Failed to resolve EventModel.SetEventState for Neow ready-page injection.");
 
         SetEventStateMethod.Invoke(ancient, [CreateReadyPageDescription(), readyOptions]);
         MainFile.Logger.Info(
@@ -304,7 +318,8 @@ internal static class StartingPersonNeowReadyFlow
         if (label is not null)
         {
             var waitingTitle = new LocString("ancients", $"{WaitingOptionTextKey}.title").GetFormattedText();
-            var waitingDescription = new LocString("ancients", $"{WaitingOptionTextKey}.description").GetFormattedText();
+            var waitingDescription =
+                new LocString("ancients", $"{WaitingOptionTextKey}.description").GetFormattedText();
             label.Set("text", $"[red][b]{waitingTitle}[/b][/red]\n{waitingDescription}");
         }
 
@@ -323,7 +338,8 @@ internal static class StartingPersonNeowReadyFlow
         var texture = GD.Load<Texture2D>(ReadyOptionIconPath);
         if (texture == null)
         {
-            MainFile.Logger.Warn($"[StartingPersonNeowReadyFlow] Failed to load ready option icon at {ReadyOptionIconPath}.");
+            MainFile.Logger.Warn(
+                $"[StartingPersonNeowReadyFlow] Failed to load ready option icon at {ReadyOptionIconPath}.");
             return;
         }
 
@@ -389,17 +405,15 @@ internal static class StartingPersonNeowReadyFlow
         try
         {
             var overrideRelicOptions =
-                StartingPersonRelicSelectionPatch.ResolveRelicOptionsFromSerializedIds(serializedRelicOptionIds, sourceTag);
-            if (serializedRelicOptionIds != null && serializedRelicOptionIds.Count > 0 && overrideRelicOptions.Count == 0)
-            {
+                StartingPersonRelicSelectionPatch.ResolveRelicOptionsFromSerializedIds(serializedRelicOptionIds,
+                    sourceTag);
+            if (serializedRelicOptionIds != null && serializedRelicOptionIds.Count > 0 &&
+                overrideRelicOptions.Count == 0)
                 MainFile.Logger.Warn(
                     $"[StartingPersonNeowReadyFlow] Host persona option payload resolved to 0 options; falling back to local generation | runKey={runKey} source={sourceTag} payloadCount={serializedRelicOptionIds.Count}.");
-            }
             else if (serializedRelicOptionIds != null)
-            {
                 MainFile.Logger.Info(
                     $"[StartingPersonNeowReadyFlow] Starting persona payload resolved | runKey={runKey} source={sourceTag} payloadCount={serializedRelicOptionIds.Count} resolvedCount={overrideRelicOptions.Count}.");
-            }
 
             var opened = await StartingPersonRelicSelectionPatch.OpenSelectionOverlayAsync(
                 runState,
@@ -471,7 +485,8 @@ internal static class StartingPersonNeowReadyFlow
         return cachedPayload;
     }
 
-    private static bool TryResolveRunState(AncientEventModel ancient, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out RunState? runState)
+    private static bool TryResolveRunState(AncientEventModel ancient,
+        [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out RunState? runState)
     {
         if (ancient.Owner?.RunState is RunState ownerRunState)
         {
@@ -483,7 +498,8 @@ internal static class StartingPersonNeowReadyFlow
         return runState is not null;
     }
 
-    private static bool TryResolveReadyRunState(string runKey, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out RunState? runState)
+    private static bool TryResolveReadyRunState(string runKey,
+        [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out RunState? runState)
     {
         lock (SyncLock)
         {
@@ -533,8 +549,10 @@ internal static class StartingPersonNeowReadyFlow
         }
 
         var restoredOptions = state.IsNeow
-            && state.CachedPageKind != StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind.ExternalSevenCursesPage
-            ? NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(ancient, state.OriginalOptions, "ready_page_restore")
+                              && state.CachedPageKind != StartingPersonaExternalNeowCompatHelper.CachedNeowPageKind
+                                  .ExternalSevenCursesPage
+            ? NeowOptionInjectionHelper.EnsureSelectedCustomOptionPresent(ancient, state.OriginalOptions,
+                "ready_page_restore")
             : state.OriginalOptions;
         if (restoredOptions.Count == 0)
         {
@@ -545,7 +563,8 @@ internal static class StartingPersonNeowReadyFlow
         }
 
         if (SetEventStateMethod == null)
-            throw new InvalidOperationException("Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
+            throw new InvalidOperationException(
+                "Failed to resolve EventModel.SetEventState for Neow ready-page restoration.");
 
         SetEventStateMethod.Invoke(ancient, [state.OriginalDescription, restoredOptions]);
         MainFile.Logger.Info(
@@ -565,7 +584,6 @@ internal static class StartingPersonNeowReadyFlow
 
         var eventModel = TryResolveCurrentEventModel(runState);
         if (eventRoom != null && eventModel != null)
-        {
             try
             {
                 if (EventRoomSetupLayoutMethod?.Invoke(eventRoom, null) is Task setupTask)
@@ -579,7 +597,6 @@ internal static class StartingPersonNeowReadyFlow
                 MainFile.Logger.Warn(
                     $"[StartingPersonNeowReadyFlow] Failed to rebuild Neow event room UI | runKey={runKey} stage={stage}: {ex}");
             }
-        }
 
         layoutNode = FindCurrentAncientLayout(eventRoom);
         if (layoutNode != null)
@@ -590,7 +607,8 @@ internal static class StartingPersonNeowReadyFlow
         AstralNeowDiagnosticHelper.ReportReadyRestoreUiSnapshot(runState, layoutNode, $"{stage}:after_refresh");
     }
 
-    private static async Task RefreshRestoredNeowUiAfterOverlayClosedAsync(RunState runState, string runKey, string stage)
+    private static async Task RefreshRestoredNeowUiAfterOverlayClosedAsync(RunState runState, string runKey,
+        string stage)
     {
         MainFile.Logger.Info(
             $"[StartingPersonNeowReadyFlow] Neow restore frame barrier begin | runKey={runKey} stage={stage}.");
@@ -643,10 +661,8 @@ internal static class StartingPersonNeowReadyFlow
     {
         RefreshNodeLayout(layoutNode);
         foreach (var nodePath in new[] { "%ContentContainer", "%Content", "%DialogueContainer", "%OptionsContainer" })
-        {
             if (layoutNode.GetNodeOrNull<Node>(nodePath) is { } child)
                 RefreshNodeLayout(child);
-        }
 
         if (layoutNode is NAncientEventLayout ancientLayout)
         {
@@ -661,11 +677,10 @@ internal static class StartingPersonNeowReadyFlow
                 return;
 
             RefreshNodeLayout(layoutNode);
-            foreach (var nodePath in new[] { "%ContentContainer", "%Content", "%DialogueContainer", "%OptionsContainer" })
-            {
+            foreach (var nodePath in new[]
+                         { "%ContentContainer", "%Content", "%DialogueContainer", "%OptionsContainer" })
                 if (layoutNode.GetNodeOrNull<Node>(nodePath) is { } child)
                     RefreshNodeLayout(child);
-            }
         }).CallDeferred();
     }
 

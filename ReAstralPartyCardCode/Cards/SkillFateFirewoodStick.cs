@@ -70,7 +70,9 @@ public sealed class SkillFateFirewoodStick : AstralPartyCardModel
         if (selectedBranch == null)
             return;
 
-        var createdBranch = ownerCreature.CombatState.CreateCard(selectedBranch.CanonicalInstance ?? selectedBranch, owner);
-        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(createdBranch, true, CardPilePosition.Top, this);
+        var createdBranch =
+            ownerCreature.CombatState.CreateCard(selectedBranch.CanonicalInstance ?? selectedBranch, owner);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(createdBranch, true, CardPilePosition.Top,
+            this);
     }
 }

@@ -160,7 +160,8 @@ public sealed class AstralDlcConsoleCmd : AbstractConsoleCmd
             AstralDlcOverrideSync.BroadcastOverride(state.OpenSeries);
 
         _ = FinalizeSuccessfulOverrideAsync(runState, state.OpenSeries);
-        return new CmdResult(true, $"{message} {TokenSeriesAvailabilityHelper.BuildSeriesListSummary(state.OpenSeries)}");
+        return new CmdResult(true,
+            $"{message} {TokenSeriesAvailabilityHelper.BuildSeriesListSummary(state.OpenSeries)}");
     }
 
     private static async Task FinalizeSuccessfulOverrideAsync(
@@ -197,7 +198,8 @@ public sealed class AstralDlcConsoleCmd : AbstractConsoleCmd
 
     private static string BuildUsage()
     {
-        return "Usage: astraldlc add <series> | astraldlc remove <index> | astraldlc replace <index> <series> | astraldlc <series>";
+        return
+            "Usage: astraldlc add <series> | astraldlc remove <index> | astraldlc replace <index> <series> | astraldlc <series>";
     }
 
     private static string GetPartialArg(string[] args, int index)

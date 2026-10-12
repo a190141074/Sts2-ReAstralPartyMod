@@ -78,7 +78,9 @@ public sealed class TokenExclusiveEntertainmentTerminal : AstralPartyRelicModel,
 
         AstralParty_TokenExclusiveEntertainmentTerminalUsedThisCombat = true;
         Flash();
-        await AstralTemporaryStrengthPower.Apply(Owner.Creature, TemporaryStrengthAmount, this, Owner.Creature, null, true);
-        await AstralTemporaryDexterityPower.Apply(Owner.Creature, TemporaryDexterityAmount, this, Owner.Creature, null, true);
+        await AstralTemporaryStrengthPower.Apply(Owner.Creature, TemporaryStrengthAmount, this, Owner.Creature, null,
+            true);
+        await AstralTemporaryDexterityPower.Apply(Owner.Creature, TemporaryDexterityAmount, this, Owner.Creature, null,
+            true);
     }
 }

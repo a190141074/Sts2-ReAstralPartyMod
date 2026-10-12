@@ -21,6 +21,7 @@ public sealed class TerraprismaCard : AstralPartyCardModel
 {
     private const string SovereignBladePortraitPath =
         "res://images/packed/card_portraits/token/sovereign_blade.png";
+
     private const string SovereignBladeBetaPortraitPath =
         "res://images/packed/card_portraits/token/beta/sovereign_blade.png";
 

@@ -41,7 +41,6 @@ public sealed class SkillSixDragonsAzure : AstralPartyCardModel
 
         var drawPileCount = PileType.Draw.GetPile(Owner).Cards.Count;
         if (drawPileCount % 2 != 0)
-        {
             foreach (var player in PersonMultiplayerEffectHelper.GetStableCombatPlayers(Owner))
             {
                 if (player.Creature == null || !player.Creature.IsAlive)
@@ -49,16 +48,14 @@ public sealed class SkillSixDragonsAzure : AstralPartyCardModel
 
                 await PowerCmd.Apply<BufferPower>(player.Creature, 1m, Owner.Creature, this, false);
             }
-        }
         else
-        {
             await ResolveEvenDrawPileBenefit(choiceContext);
-        }
 
         if (ManaAmplificationHelper.GetCurrent(Owner) >= 18 && Owner.Creature.CombatState != null)
         {
             var transcend = Owner.Creature.CombatState.CreateCard(ModelDb.Card<SkillTokenTranscendDimensions>(), Owner);
-            await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(transcend, true, CardPilePosition.Top, this);
+            await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(transcend, true, CardPilePosition.Top,
+                this);
         }
     }
 
@@ -103,6 +100,7 @@ public sealed class SkillSixDragonsAzure : AstralPartyCardModel
         if (vigorPoints > 0)
             await PowerCmd.Apply<VigorPower>(Owner.Creature, vigorPoints, Owner.Creature, this, false);
         if (temporaryDexterityPoints > 0)
-            await AstralTemporaryDexterityPower.Apply(Owner.Creature, temporaryDexterityPoints, this, Owner.Creature, this, false);
+            await AstralTemporaryDexterityPower.Apply(Owner.Creature, temporaryDexterityPoints, this, Owner.Creature,
+                this, false);
     }
 }

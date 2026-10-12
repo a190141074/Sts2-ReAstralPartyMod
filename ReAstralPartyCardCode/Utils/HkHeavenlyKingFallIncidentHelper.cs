@@ -72,10 +72,12 @@ internal static class HkHeavenlyKingFallIncidentHelper
         var selected = await DeterministicMultiplayerChoiceHelper.SelectOverlayRelicForPlayer(
             owner,
             options,
-            new LocString("cards", "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.selection_header").GetRawText(),
-            new LocString("cards", "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.select_prompt").GetRawText(),
+            new LocString("cards", "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.selection_header")
+                .GetRawText(),
+            new LocString("cards", "RE_ASTRAL_PARTY_MOD_CARD_HK_HEAVENLY_KING_FALL_INCIDENT.select_prompt")
+                .GetRawText(),
             "hk_heavenly_king_fall_incident",
-            adaptiveLayout: true);
+            true);
         if (selected == null)
             return;
 

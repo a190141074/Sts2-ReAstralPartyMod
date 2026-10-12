@@ -123,7 +123,7 @@ internal static class GameplayStaticPatchCatalog
                 "samurai_prawn_music_run_cleanup",
                 typeof(RunManager),
                 nameof(RunManager.CleanUp),
-                typeof(ReAstralPartyMod.ReAstralPartyCardCode.Events.AstralSamuraiPrawnMusicRunCleanupPatch),
+                typeof(Events.AstralSamuraiPrawnMusicRunCleanupPatch),
                 false,
                 "Stop event music before run cleanup",
                 [typeof(bool)]),
@@ -131,7 +131,7 @@ internal static class GameplayStaticPatchCatalog
                 "samurai_prawn_music_local_disconnect",
                 typeof(RunManager),
                 nameof(RunManager.LocalPlayerDisconnected),
-                typeof(ReAstralPartyMod.ReAstralPartyCardCode.Events.AstralSamuraiPrawnMusicLocalDisconnectPatch),
+                typeof(Events.AstralSamuraiPrawnMusicLocalDisconnectPatch),
                 false,
                 "Stop event music on local disconnect",
                 [typeof(NetErrorInfo)])
@@ -253,7 +253,7 @@ internal static class GameplayStaticPatchCatalog
                 typeof(AttackPotionWarforgeCompatPatch),
                 false,
                 "Gameplay patch: let Attack Potion include Warforge-enhanced Skill cards",
-                [typeof(MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext), typeof(MegaCrit.Sts2.Core.Entities.Creatures.Creature)]),
+                [typeof(PlayerChoiceContext), typeof(Creature)]),
             new ModPatchInfo(
                 "skill_potion_warforge_compat_patch",
                 typeof(MegaCrit.Sts2.Core.Models.Potions.SkillPotion),
@@ -261,7 +261,7 @@ internal static class GameplayStaticPatchCatalog
                 typeof(SkillPotionWarforgeCompatPatch),
                 false,
                 "Gameplay patch: let Skill Potion include Warforge-enhanced Attack cards",
-                [typeof(MegaCrit.Sts2.Core.GameActions.Multiplayer.PlayerChoiceContext), typeof(MegaCrit.Sts2.Core.Entities.Creatures.Creature)]),
+                [typeof(PlayerChoiceContext), typeof(Creature)]),
             new ModPatchInfo(
                 "free_attack_power_warforge_before_played_compat_patch",
                 typeof(MegaCrit.Sts2.Core.Models.Powers.FreeAttackPower),
@@ -277,7 +277,7 @@ internal static class GameplayStaticPatchCatalog
                 typeof(FreeSkillPowerWarforgeBeforePlayedCompatPatch),
                 false,
                 "Gameplay patch: let Free Skill Power consume on Warforge-enhanced Attack cards",
-                [typeof(CardPlay)]),
+                [typeof(CardPlay)])
         ]);
     }
 
@@ -292,7 +292,10 @@ internal static class GameplayStaticPatchCatalog
                 typeof(EfficientAdrenalineThornsPatch),
                 false,
                 "Gameplay patch: prevent active Efficient Adrenaline from triggering Thorns",
-                [typeof(PlayerChoiceContext), typeof(Creature), typeof(decimal), typeof(MegaCrit.Sts2.Core.ValueProps.ValueProp), typeof(Creature), typeof(CardModel)]),
+                [
+                    typeof(PlayerChoiceContext), typeof(Creature), typeof(decimal),
+                    typeof(MegaCrit.Sts2.Core.ValueProps.ValueProp), typeof(Creature), typeof(CardModel)
+                ]),
             new ModPatchInfo(
                 "card_model_paranoid_should_receive_hooks_patch",
                 typeof(CardModel),
@@ -312,7 +315,7 @@ internal static class GameplayStaticPatchCatalog
                 harmonyMethodType: MethodType.Getter),
             new ModPatchInfo(
                 "personality_derivative_doll_description_patch",
-                typeof(MegaCrit.Sts2.Core.Models.RelicModel),
+                typeof(RelicModel),
                 "DynamicDescription",
                 typeof(PersonalityDerivativeDollDescriptionPatch),
                 false,
@@ -357,7 +360,7 @@ internal static class GameplayStaticPatchCatalog
                 typeof(CardModelParanoidAfterCurrentHpChangedPatch),
                 false,
                 "Gameplay patch: auto-play all cards with the paranoid essence enchantment when their owner loses HP",
-                [typeof(MegaCrit.Sts2.Core.Entities.Creatures.Creature), typeof(decimal)]),
+                [typeof(Creature), typeof(decimal)]),
             new ModPatchInfo(
                 "card_model_essence_enchantment_should_receive_hooks_patch",
                 typeof(CardModel),
@@ -470,7 +473,10 @@ internal static class GameplayStaticPatchCatalog
                 typeof(RunHistoryModifierVisibilityFilterPatch),
                 false,
                 "Gameplay patch: keep hidden runtime modifiers out of run-history modifier displays",
-                [typeof(SerializableRun), typeof(bool), typeof(bool), typeof(MegaCrit.Sts2.Core.Platform.PlatformType)]),
+                [
+                    typeof(SerializableRun), typeof(bool), typeof(bool),
+                    typeof(MegaCrit.Sts2.Core.Platform.PlatformType)
+                ]),
             new ModPatchInfo(
                 "custom_run_modifiers_list_visibility_filter_patch",
                 typeof(MegaCrit.Sts2.Core.Nodes.Screens.MainMenu.NCustomRunModifiersList),
@@ -515,7 +521,6 @@ internal static class GameplayStaticPatchCatalog
         patcher.RegisterPatch<MerchantNaturalRelicCreateInventoryPatch>();
         patcher.RegisterPatch<MerchantNaturalRelicInitializeInventoryPatch>();
     }
-
 }
 
 internal static class GameplayDeferredPatchCatalog
@@ -550,12 +555,12 @@ internal static class GameplayDeferredPatchCatalog
                 "Gameplay patch: make the starting-persona ready option locally non-interactable for clients"),
             new ModPatchInfo(
                 "starting_persona_neow_ready_event_room_guard_patch",
-                typeof(MegaCrit.Sts2.Core.Nodes.Rooms.NEventRoom),
+                typeof(NEventRoom),
                 "OptionButtonClicked",
                 typeof(StartingPersonaNeowReadyEventRoomGuardPatch),
                 false,
                 "Gameplay patch: swallow any ready-option clicks that leak into the default Neow event room handler",
-                [typeof(EventOption), typeof(int)]),
+                [typeof(EventOption), typeof(int)])
         ]);
         patcher.RegisterPatch<AstralTelemetryDeleteCurrentRunPatch>();
         patcher.RegisterPatch<ReAstralPartyRunSettingsLoadPatch>();

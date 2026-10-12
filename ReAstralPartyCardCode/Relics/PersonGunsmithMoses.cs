@@ -50,12 +50,14 @@ public class PersonGunsmithMoses : CooldownPersonRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeMysteriousDodgingMan>(Owner);
+        await PersonMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeMysteriousDodgingMan>(Owner);
     }
 
     public override async Task BeforeCombatStart()
     {
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeMysteriousDodgingMan>(Owner);
+        await PersonMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeMysteriousDodgingMan>(Owner);
         await MosesCombatHelper.EnsureNodeCarrier(Owner);
     }
 

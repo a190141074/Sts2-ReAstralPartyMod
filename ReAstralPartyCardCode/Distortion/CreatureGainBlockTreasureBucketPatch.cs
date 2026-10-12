@@ -15,7 +15,7 @@ public sealed class CreatureGainBlockTreasureBucketPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(CreatureCmd), nameof(CreatureCmd.GainBlock))];
+        return [new ModPatchTarget(typeof(CreatureCmd), nameof(CreatureCmd.GainBlock))];
     }
 
     public static bool Prefix(Creature creature, ref decimal amount)

@@ -38,7 +38,10 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
     }
 
     [SavedProperty] public bool AstralParty_PersonalityDerivativeSolidStateTimePlayedThisCombat { get; set; }
-    [SavedProperty] public string AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId { get; set; } = string.Empty;
+
+    [SavedProperty]
+    public string AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId { get; set; } = string.Empty;
+
     [SavedProperty] public int AstralParty_PersonalityDerivativeSolidStateTimeTouchSequence { get; set; }
     [SavedProperty] public int AstralParty_PersonalityDerivativeSolidStateTimeWeightedRecordEventsConsumed { get; set; }
 
@@ -46,7 +49,8 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
 
     public override bool ShouldReceiveCombatHooks => true;
 
-    public override bool ShowCounter => Owner?.GetRelic<PersonMascotGirlMimiDoppelganger>() != null && GetPrimaryRecord() != null;
+    public override bool ShowCounter =>
+        Owner?.GetRelic<PersonMascotGirlMimiDoppelganger>() != null && GetPrimaryRecord() != null;
 
     public override int DisplayAmount => GetPrimaryRecord()?.Progress ?? 0;
 
@@ -79,12 +83,14 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
     {
         if (Owner == null || cardPlay.Card.Owner != Owner)
             return;
-        if (!SolidStateTimeHelper.TryGetTrackedDeckPowerCard(Owner, cardPlay.Card, out var deckCard) || deckCard == null)
+        if (!SolidStateTimeHelper.TryGetTrackedDeckPowerCard(Owner, cardPlay.Card, out var deckCard) ||
+            deckCard == null)
             return;
 
         var record = GetOrCreateRecord(deckCard);
         record.LastTouchedSequence = ++AstralParty_PersonalityDerivativeSolidStateTimeTouchSequence;
-        AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId = SolidStateTimeHelper.GetRecordStateKey(record);
+        AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId =
+            SolidStateTimeHelper.GetRecordStateKey(record);
 
         var gain = SolidStateTimeHelper.GetWeightedProgressGain(
             AstralParty_PersonalityDerivativeSolidStateTimeWeightedRecordEventsConsumed);
@@ -129,16 +135,21 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
                 if (playbackCard == null)
                     continue;
 
-                var target = SolidStateTimeHelper.ResolvePlaybackTarget(Owner, combatState, playbackCard, recordIndex, playIndex);
+                var target =
+                    SolidStateTimeHelper.ResolvePlaybackTarget(Owner, combatState, playbackCard, recordIndex,
+                        playIndex);
                 if (playbackCard.TargetType == TargetType.AnyEnemy && target == null)
                 {
-                    MainFile.Logger.Warn($"[SolidStateTime] Skipped playback for '{playbackCard.Id.Entry}' because no valid enemy target was found.");
+                    MainFile.Logger.Warn(
+                        $"[SolidStateTime] Skipped playback for '{playbackCard.Id.Entry}' because no valid enemy target was found.");
                     continue;
                 }
 
-                if (playbackCard.TargetType is not (TargetType.Self or TargetType.AnyAlly or TargetType.AnyPlayer or TargetType.AnyEnemy))
+                if (playbackCard.TargetType is not (TargetType.Self or TargetType.AnyAlly or TargetType.AnyPlayer
+                    or TargetType.AnyEnemy))
                 {
-                    MainFile.Logger.Warn($"[SolidStateTime] Skipped playback for unsupported target type '{playbackCard.TargetType}' on '{playbackCard.Id.Entry}'.");
+                    MainFile.Logger.Warn(
+                        $"[SolidStateTime] Skipped playback for unsupported target type '{playbackCard.TargetType}' on '{playbackCard.Id.Entry}'.");
                     continue;
                 }
 
@@ -154,7 +165,7 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
         foreach (var record in _records
                      .OrderByDescending(static record => record.Completions)
                      .ThenByDescending(static record => record.LastTouchedSequence)
-            .ThenBy(static record => record.ModelId, StringComparer.Ordinal))
+                     .ThenBy(static record => record.ModelId, StringComparer.Ordinal))
         {
             var previewCard = SolidStateTimeHelper.CreatePreviewCard(record);
             if (previewCard == null)
@@ -200,7 +211,8 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
             GD.Load<Texture2D>(PackedIconPath))
         {
             IsInstanced = true,
-            Id = $"{Id.Entry}:{SolidStateTimeHelper.GetRecordStateKey(record)}:{record.Completions}:{record.Progress}:{record.NextThreshold}"
+            Id =
+                $"{Id.Entry}:{SolidStateTimeHelper.GetRecordStateKey(record)}:{record.Completions}:{record.Progress}:{record.NextThreshold}"
         };
     }
 
@@ -217,7 +229,8 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
                 return primary;
 
             primary = _records.FirstOrDefault(record =>
-                string.Equals(record.ModelId, AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId, StringComparison.Ordinal));
+                string.Equals(record.ModelId, AstralParty_PersonalityDerivativeSolidStateTimePrimaryRecordModelId,
+                    StringComparison.Ordinal));
             if (primary != null)
                 return primary;
         }
@@ -239,7 +252,9 @@ public sealed class PersonalityDerivativeSolidStateTime : AstralPartyRelicModel
             ModelId = SolidStateTimeHelper.GetRecordModelId(deckCard),
             UpgradeLevel = deckCard.CurrentUpgradeLevel,
             MadScienceCardType = deckCard is MadScience madScience ? (int)madScience.TinkerTimeType : null,
-            MadScienceRider = deckCard is MadScience madScienceWithRider ? (int)madScienceWithRider.TinkerTimeRider : null,
+            MadScienceRider = deckCard is MadScience madScienceWithRider
+                ? (int)madScienceWithRider.TinkerTimeRider
+                : null,
             NextThreshold = SolidStateTimeHelper.GetThresholdForCompletionIndex(0),
             LastTouchedSequence = ++AstralParty_PersonalityDerivativeSolidStateTimeTouchSequence
         };

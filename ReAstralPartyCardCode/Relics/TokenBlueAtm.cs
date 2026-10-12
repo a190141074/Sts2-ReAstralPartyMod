@@ -70,6 +70,7 @@ public class TokenBlueAtm : AstralPartyRelicModel
             ResetPendingState();
             return;
         }
+
         if (power.Owner == Owner.Creature)
             return;
         if (power is not EffectsStarlightPower)

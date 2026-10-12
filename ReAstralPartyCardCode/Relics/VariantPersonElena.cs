@@ -49,38 +49,55 @@ public sealed class VariantPersonElena : PersonRelicBase
 
     private static readonly LocString ElementSelectionTitle =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.selection_title");
+
     private static readonly LocString ElementSelectionSubtitle =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.selection_subtitle");
+
     private static readonly LocString BaseTsunamiName =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_tsunami_base_name");
+
     private static readonly LocString BaseTsunamiDescription =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_tsunami_base_description");
+
     private static readonly LocString BaseSettingSunName =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_setting_sun_base_name");
+
     private static readonly LocString BaseSettingSunDescription =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_setting_sun_base_description");
+
     private static readonly LocString BaseThundersBreathName =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_thunders_breath_base_name");
+
     private static readonly LocString BaseThundersBreathDescription =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_thunders_breath_base_description");
+
     private static readonly LocString StageTwoTsunamiName =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_tsunami_stage2_name");
+
     private static readonly LocString StageTwoTsunamiDescription =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_tsunami_stage2_description");
+
     private static readonly LocString StageTwoSettingSunName =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_setting_sun_stage2_name");
+
     private static readonly LocString StageTwoSettingSunDescription =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_setting_sun_stage2_description");
+
     private static readonly LocString StageTwoThundersBreathName =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_thunders_breath_stage2_name");
+
     private static readonly LocString StageTwoThundersBreathDescription =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_thunders_breath_stage2_description");
+
     private static readonly LocString StageThreeName =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_stage3_name");
+
     private static readonly LocString StageThreeTsunamiDescription =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_tsunami_stage3_description");
+
     private static readonly LocString StageThreeSettingSunDescription =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_setting_sun_stage3_description");
+
     private static readonly LocString StageThreeThundersBreathDescription =
         new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_VARIANT_PERSON_ELENA.element_thunders_breath_stage3_description");
 
@@ -182,7 +199,8 @@ public sealed class VariantPersonElena : PersonRelicBase
             return Task.CompletedTask;
         if (target.GetPowerAmount<ConductingPower>() <= 0m)
             return Task.CompletedTask;
-        if (Owner.Creature.GetPowerAmount<ThundersBreathPower>() <= 0m && !AstralParty_VariantPersonElenaPendingThunderFieldGuarantee)
+        if (Owner.Creature.GetPowerAmount<ThundersBreathPower>() <= 0m &&
+            !AstralParty_VariantPersonElenaPendingThunderFieldGuarantee)
             return Task.CompletedTask;
 
         _pendingThunderCard = cardPlay.Card;
@@ -247,9 +265,11 @@ public sealed class VariantPersonElena : PersonRelicBase
                && card.Owner == Owner;
     }
 
-    public async Task ResolveSunsetGlowPlayed(PlayerChoiceContext choiceContext, CardModel sourceCard, CardPlay cardPlay)
+    public async Task ResolveSunsetGlowPlayed(PlayerChoiceContext choiceContext, CardModel sourceCard,
+        CardPlay cardPlay)
     {
-        if (Owner?.Creature?.CombatState == null || AstralParty_VariantPersonElenaSunsetGlowPlaysThisTurn >= GetSunsetGlowPlayLimitThisTurn())
+        if (Owner?.Creature?.CombatState == null ||
+            AstralParty_VariantPersonElenaSunsetGlowPlaysThisTurn >= GetSunsetGlowPlayLimitThisTurn())
             return;
 
         AstralParty_VariantPersonElenaSunsetGlowPlaysThisTurn++;
@@ -259,7 +279,8 @@ public sealed class VariantPersonElena : PersonRelicBase
             await GrantEnergyToAllPlayers();
 
         var sharedBlockBase = Math.Max(0m, Owner.Creature.Block);
-        var sharedBlock = StableNumericStateHelper.FloorToNonNegativeInt(sharedBlockBase * GetSharedBlockPercentForCurrentAct());
+        var sharedBlock =
+            StableNumericStateHelper.FloorToNonNegativeInt(sharedBlockBase * GetSharedBlockPercentForCurrentAct());
 
         var branchId = await SelectElementBranch();
         if (string.IsNullOrWhiteSpace(branchId))
@@ -327,14 +348,17 @@ public sealed class VariantPersonElena : PersonRelicBase
                     await PowerCmd.Apply<TsunamiPower>(player.Creature, 1m, Owner.Creature, sourceCard, false);
                 break;
             case SunsetGlowElementSelectionHelper.SettingSunBranch:
-                foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature))
+                foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState,
+                             Owner.Creature))
                 {
                     await PowerCmd.Apply<SettingSunPower>(enemy, 1m, Owner.Creature, sourceCard, false);
                     await PowerCmd.Apply<BlazingSolarBurnPower>(enemy, 1m, Owner.Creature, sourceCard, false);
                 }
+
                 break;
             case SunsetGlowElementSelectionHelper.ThundersBreathBranch:
-                foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature))
+                foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState,
+                             Owner.Creature))
                     await PowerCmd.Apply<ConductingPower>(enemy, 1m, Owner.Creature, sourceCard, false);
                 foreach (var player in EventCombatTargetHelper.GetAlivePlayers(Owner.Creature.CombatState))
                     await PowerCmd.Apply<ThundersBreathPower>(player.Creature, 1m, Owner.Creature, sourceCard, false);
@@ -351,26 +375,36 @@ public sealed class VariantPersonElena : PersonRelicBase
         {
             case SunsetGlowElementSelectionHelper.TsunamiBranch:
                 await DamageAllEnemies(choiceContext, ArcaneRiverHitDamage, sourceCard);
-                foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature))
+                foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState,
+                             Owner.Creature))
                     await PowerCmd.Apply<WeakPower>(enemy, ArcaneRiverWeakAmount, Owner.Creature, sourceCard, false);
-                var blockAmount = StableNumericStateHelper.FloorToNonNegativeInt(Math.Max(0m, Owner.Creature.CurrentHp) * ArcaneRiverCurrentHpBlockPercent);
+                var blockAmount =
+                    StableNumericStateHelper.FloorToNonNegativeInt(Math.Max(0m, Owner.Creature.CurrentHp) *
+                                                                   ArcaneRiverCurrentHpBlockPercent);
                 if (blockAmount > 0)
                     await GrantBlockToAllPlayers(blockAmount);
                 break;
             case SunsetGlowElementSelectionHelper.SettingSunBranch:
                 await DamageAllEnemies(choiceContext, ExplosiveFlameHitDamage, sourceCard);
-                foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature).ToList())
+                foreach (var enemy in EventCombatTargetHelper
+                             .GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature).ToList())
                 {
-                    await PowerCmd.Apply<BlazingSolarBurnPower>(enemy, ExplosiveFlameBurnAmount, Owner.Creature, sourceCard, false);
-                    var extraDamage = StableNumericStateHelper.FloorToNonNegativeInt(enemy.GetPowerAmount<BlazingSolarBurnPower>() * ExplosiveFlameBonusBurnPercent);
+                    await PowerCmd.Apply<BlazingSolarBurnPower>(enemy, ExplosiveFlameBurnAmount, Owner.Creature,
+                        sourceCard, false);
+                    var extraDamage = StableNumericStateHelper.FloorToNonNegativeInt(
+                        enemy.GetPowerAmount<BlazingSolarBurnPower>() * ExplosiveFlameBonusBurnPercent);
                     if (extraDamage > 0 && enemy.IsAlive)
-                        await CreatureCmd.Damage(choiceContext, enemy, extraDamage, ValueProp.Unpowered, Owner.Creature, sourceCard);
+                        await CreatureCmd.Damage(choiceContext, enemy, extraDamage, ValueProp.Unpowered, Owner.Creature,
+                            sourceCard);
                 }
+
                 break;
             case SunsetGlowElementSelectionHelper.ThundersBreathBranch:
                 await DamageAllEnemies(choiceContext, ThunderFieldHitDamage, sourceCard);
-                foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature))
-                    await PowerCmd.Apply<ConductingPower>(enemy, ThunderFieldConductingAmount, Owner.Creature, sourceCard, false);
+                foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState,
+                             Owner.Creature))
+                    await PowerCmd.Apply<ConductingPower>(enemy, ThunderFieldConductingAmount, Owner.Creature,
+                        sourceCard, false);
                 AstralParty_VariantPersonElenaPendingThunderFieldGuarantee = true;
                 break;
         }
@@ -386,9 +420,11 @@ public sealed class VariantPersonElena : PersonRelicBase
         if (damage > 0)
             await DamageAllEnemies(choiceContext, damage, sourceCard);
 
-        foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature))
+        foreach (var enemy in EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState,
+                     Owner.Creature))
         {
-            await AstralTemporaryStrengthLossPower.Apply(enemy, ArcaneGalaxyStrengthLossAmount, this, Owner.Creature, sourceCard, false);
+            await AstralTemporaryStrengthLossPower.Apply(enemy, ArcaneGalaxyStrengthLossAmount, this, Owner.Creature,
+                sourceCard, false);
             await PowerCmd.Apply<SunsetGlowArcaneRiverDebuffPower>(
                 enemy,
                 ArcaneGalaxyDamageTakenDuration,
@@ -466,7 +502,8 @@ public sealed class VariantPersonElena : PersonRelicBase
 
         if (enemies.Count == 1)
         {
-            await CreatureCmd.Damage(choiceContext, enemies[0], totalDamage, ValueProp.Move, Owner.Creature, sourceCard);
+            await CreatureCmd.Damage(choiceContext, enemies[0], totalDamage, ValueProp.Move, Owner.Creature,
+                sourceCard);
             return;
         }
 
@@ -499,7 +536,8 @@ public sealed class VariantPersonElena : PersonRelicBase
             if (assigned <= 0 || !enemies[index].IsAlive)
                 continue;
 
-            await CreatureCmd.Damage(choiceContext, enemies[index], assigned, ValueProp.Move, Owner.Creature, sourceCard);
+            await CreatureCmd.Damage(choiceContext, enemies[index], assigned, ValueProp.Move, Owner.Creature,
+                sourceCard);
         }
     }
 
@@ -622,7 +660,8 @@ public sealed class VariantPersonElena : PersonRelicBase
         return branchId switch
         {
             SunsetGlowElementSelectionHelper.TsunamiBranch => AstralParty_VariantPersonElenaCycleTsunamiSelections,
-            SunsetGlowElementSelectionHelper.SettingSunBranch => AstralParty_VariantPersonElenaCycleSettingSunSelections,
+            SunsetGlowElementSelectionHelper.SettingSunBranch =>
+                AstralParty_VariantPersonElenaCycleSettingSunSelections,
             _ => AstralParty_VariantPersonElenaCycleThundersBreathSelections
         };
     }

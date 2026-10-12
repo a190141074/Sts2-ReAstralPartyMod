@@ -48,15 +48,14 @@ public class JewelrySolarCrown : AstralPartyRelicModel
             return;
 
         if (SinkouSetHelper.HasVariantSinkou(Owner))
-        {
             foreach (var teammate in Owner.Creature.CombatState.Players)
             {
-                if (teammate == Owner || teammate.Creature == null || teammate.Creature.HasPower<WhereDivineLightShinesPower>())
+                if (teammate == Owner || teammate.Creature == null ||
+                    teammate.Creature.HasPower<WhereDivineLightShinesPower>())
                     continue;
 
                 await PowerCmd.Apply<WhereDivineLightShinesPower>(teammate.Creature, 1m, Owner.Creature, null, false);
             }
-        }
 
         if (SinkouSetHelper.HasFullListeningToSolarRoarSet(Owner))
         {

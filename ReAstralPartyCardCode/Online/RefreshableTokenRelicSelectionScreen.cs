@@ -32,8 +32,12 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
     private const string RareRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_gold.png";
     private const string OptionBackgroundPath = "res://ReAstralPartyMod/images/ui/relic_background.png";
 
-    private readonly TaskCompletionSource<RefreshableTokenRelicSelectionResult> _completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private readonly TaskCompletionSource _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource<RefreshableTokenRelicSelectionResult> _completionSource =
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    private readonly TaskCompletionSource
+        _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
     private readonly RunState _runState;
     private readonly Player _owner;
     private readonly Func<IReadOnlyList<RelicModel>, int, IReadOnlySet<ModelId>, IReadOnlyList<RelicModel>> _rerollFunc;
@@ -292,14 +296,12 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
         });
 
         if (_showRerollControls)
-        {
             _selectionRow.AddChild(new Control
             {
                 Name = "LeftBalanceSpacer",
                 CustomMinimumSize = new Vector2(40f, 0f),
                 MouseFilter = MouseFilterEnum.Ignore
             });
-        }
         _selectionRow.AddChild(_holderContainer);
 
         _rerollButton = new Button
@@ -674,7 +676,6 @@ public sealed partial class RefreshableTokenRelicSelectionScreen : Control, IOve
                     : holders[i].GetPath();
             holders[i].FocusNeighborLeft = holders[leftIndex].GetPath();
             holders[i].FocusNeighborRight = holders[rightIndex].GetPath();
-
         }
 
         if (_showRerollControls)

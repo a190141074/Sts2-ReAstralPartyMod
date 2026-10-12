@@ -76,7 +76,8 @@ public sealed class TokenExclusiveAdaptiveCore : AstralPartyRelicModel
         if (strengthDelta != 0m)
         {
             _appliedStrengthAmount = desiredStrength;
-            await PowerCmd.Apply<StrengthPower>(Owner.Creature, strengthDelta, applier ?? Owner.Creature, cardSource, true);
+            await PowerCmd.Apply<StrengthPower>(Owner.Creature, strengthDelta, applier ?? Owner.Creature, cardSource,
+                true);
         }
 
         if (reversedScalesDelta != 0m)

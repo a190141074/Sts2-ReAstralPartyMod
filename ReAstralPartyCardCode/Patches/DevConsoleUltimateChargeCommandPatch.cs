@@ -11,7 +11,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 public sealed class DevConsoleUltimateChargeCommandPatch : IPatchMethod
 {
     private static readonly FieldInfo? NDevConsoleField =
-        typeof(NDevConsole).GetField("_devConsole", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        typeof(NDevConsole).GetField("_devConsole",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
     private static readonly FieldInfo? CommandsField =
         typeof(DevConsole).GetField("_commands", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -25,7 +26,7 @@ public sealed class DevConsoleUltimateChargeCommandPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(NDevConsole), "_Ready")];
+        return [new ModPatchTarget(typeof(NDevConsole), "_Ready")];
     }
 
     public static void Postfix(NDevConsole __instance)
@@ -47,7 +48,6 @@ public sealed class DevConsoleUltimateChargeCommandPatch : IPatchMethod
             RegisterCommand(commands, RapUltChargeHandConsoleCmd.CommandName, new RapUltChargeHandConsoleCmd());
             RegisterCommand(commands, AstralDlcConsoleCmd.CommandName, new AstralDlcConsoleCmd());
             RegisterCommand(commands, AstralMutatorConsoleCmd.CommandName, new AstralMutatorConsoleCmd());
-
         }
         catch (Exception ex)
         {

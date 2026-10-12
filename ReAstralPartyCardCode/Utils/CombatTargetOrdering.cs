@@ -30,7 +30,7 @@ public static class CombatTargetOrdering
             return [];
 
         return sameSide
-            .Select((creature, index) => new { Creature = creature, Distance = System.Math.Abs(index - anchorIndex) })
+            .Select((creature, index) => new { Creature = creature, Distance = Math.Abs(index - anchorIndex) })
             .Where(entry => entry.Creature != anchor && entry.Creature.IsAlive)
             .OrderBy(entry => entry.Distance)
             .ThenBy(entry => entry.Creature.CombatId ?? uint.MaxValue)

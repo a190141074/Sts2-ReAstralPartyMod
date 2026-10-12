@@ -59,7 +59,8 @@ public sealed class VariantPersonNinja : CooldownPersonRelicBase,
             Math.Max(0, AstralParty_VariantPersonNinjaGlobalSkillSequence);
         _lastCopyableSkillCard = null;
 
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeNinjaRealGarrote>(Owner);
+        await PersonMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeNinjaRealGarrote>(Owner);
     }
 
     public override Task BeforeCombatStart()

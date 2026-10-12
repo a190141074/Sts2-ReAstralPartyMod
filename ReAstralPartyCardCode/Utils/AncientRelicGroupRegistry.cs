@@ -18,7 +18,6 @@ internal static class AncientRelicGroupRegistry
             "NEOW",
             "neows_talisman",
             20,
-            relicIds:
             [
                 "neows_talisman",
                 "neows_bones",
@@ -30,7 +29,6 @@ internal static class AncientRelicGroupRegistry
             "WONGO",
             "wongos_mystery_ticket",
             30,
-            relicIds:
             [
                 "wongos_mystery_ticket",
                 "wongo_customer_appreciation_badge"
@@ -39,7 +37,6 @@ internal static class AncientRelicGroupRegistry
             "VAKUU",
             "vakuu_card_selector",
             40,
-            relicIds:
             [
                 "vakuu_card_selector",
                 "history_course",
@@ -50,7 +47,6 @@ internal static class AncientRelicGroupRegistry
             "LOST",
             "lost_wisp",
             50,
-            relicIds:
             [
                 "lost_wisp",
                 "lost_coffer",
@@ -61,7 +57,6 @@ internal static class AncientRelicGroupRegistry
             "ROYAL",
             "royal_stamp",
             60,
-            relicIds:
             [
                 "royal_stamp",
                 "royal_poison",
@@ -72,7 +67,6 @@ internal static class AncientRelicGroupRegistry
             "MARTIAL",
             "sword_of_jade",
             70,
-            relicIds:
             [
                 "sword_of_jade",
                 "sword_of_stone",
@@ -86,7 +80,6 @@ internal static class AncientRelicGroupRegistry
             "BEAST",
             "byrdpip",
             80,
-            relicIds:
             [
                 "byrdpip",
                 "ghost_seed",
@@ -99,7 +92,6 @@ internal static class AncientRelicGroupRegistry
             "MYSTIC",
             "arcane_scroll",
             90,
-            relicIds:
             [
                 "arcane_scroll",
                 "massive_scroll",
@@ -113,7 +105,6 @@ internal static class AncientRelicGroupRegistry
             "OTHER",
             "toolbox",
             9999,
-            relicIds:
             [
                 "toolbox"
             ])
@@ -164,10 +155,12 @@ internal static class AncientRelicGroupRegistry
         return Definitions.First(static definition => definition.GroupKey == "OTHER");
     }
 
-    private static RelicModel ResolveRepresentative(AncientRelicGroupDefinition definition, IReadOnlyList<RelicModel> relics)
+    private static RelicModel ResolveRepresentative(AncientRelicGroupDefinition definition,
+        IReadOnlyList<RelicModel> relics)
     {
         var representative = relics.FirstOrDefault(relic =>
-            string.Equals((relic.CanonicalInstance?.Id ?? relic.Id).Entry, definition.RepresentativeRelicId, StringComparison.Ordinal));
+            string.Equals((relic.CanonicalInstance?.Id ?? relic.Id).Entry, definition.RepresentativeRelicId,
+                StringComparison.Ordinal));
         return representative ?? relics[0];
     }
 

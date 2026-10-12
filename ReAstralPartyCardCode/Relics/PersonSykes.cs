@@ -127,10 +127,7 @@ public sealed class PersonSykes : CooldownPersonRelicBase
     public override async Task AfterCombatEnd(CombatRoom room)
     {
         ResetAbyssalErosionTracking();
-        if (Owner?.Creature != null)
-        {
-            await AbyssalTentacleCombatHelper.CleanupAsync(Owner);
-        }
+        if (Owner?.Creature != null) await AbyssalTentacleCombatHelper.CleanupAsync(Owner);
 
         await base.AfterCombatEnd(room);
     }

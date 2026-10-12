@@ -11,7 +11,7 @@ public sealed class AstralTelemetryDeleteCurrentRunPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(SaveManager), nameof(SaveManager.DeleteCurrentRun))];
+        return [new ModPatchTarget(typeof(SaveManager), nameof(SaveManager.DeleteCurrentRun))];
     }
 
     public static void Postfix()

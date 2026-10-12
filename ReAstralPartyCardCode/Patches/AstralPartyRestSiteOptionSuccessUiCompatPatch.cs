@@ -19,7 +19,7 @@ public sealed class AstralPartyRestSiteOptionSuccessUiCompatPatch : IPatchMethod
     {
         return
         [
-            new(
+            new ModPatchTarget(
                 typeof(NRestSiteRoom),
                 "OnAfterPlayerSelectedRestSiteOption",
                 [typeof(RestSiteOption), typeof(bool), typeof(ulong)])

@@ -18,10 +18,10 @@ internal static class CombatEntryDiagnostics
 
         RitsuLibFramework.SubscribeLifecycle<CombatStartingEvent>(
             OnCombatStarting,
-            replayCurrentState: false);
+            false);
         RitsuLibFramework.SubscribeLifecycle<CombatEndedEvent>(
             OnCombatEnded,
-            replayCurrentState: false);
+            false);
         _registered = true;
     }
 

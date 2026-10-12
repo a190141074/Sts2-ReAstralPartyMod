@@ -52,11 +52,20 @@ internal static class SavedPropertyGovernance
         ("Bonus", ["Bonus"]),
         ("Active", ["Active"]),
         ("NetBinding", ["NetIdRaw", "NetId"]),
-        ("UsageCount", ["UseCount", "Uses", "TriggerCount", "CardsPlayed", "Refunds", "GrowthCount", "RemainingTriggers"]),
+        ("UsageCount",
+            ["UseCount", "Uses", "TriggerCount", "CardsPlayed", "Refunds", "GrowthCount", "RemainingTriggers"]),
         ("ResourceAmount", ["Amount", "Damage", "Strength", "Dexterity", "Energy", "Block", "Heal"]),
-        ("RunProgression", ["Floor", "ActIndex", "Round", "Steps", "Charges", "Charge", "Quota", "Marked", "Coords", "Consecutive", "Visited", "PendingExtraTurn", "ThisRun", "AscensionCount", "RemainingRerolls"]),
+        ("RunProgression",
+        [
+            "Floor", "ActIndex", "Round", "Steps", "Charges", "Charge", "Quota", "Marked", "Coords", "Consecutive",
+            "Visited", "PendingExtraTurn", "ThisRun", "AscensionCount", "RemainingRerolls"
+        ]),
         ("EconomyTracking", ["Spent", "Earned", "Accumulated", "Applied", "RewardCount"]),
-        ("StateFlag", ["IgnoreBlock", "Mode", "Initialization", "PaysOn", "FirstAttack", "Pending", "FusionProcessed", "Json", "RelicId"])
+        ("StateFlag",
+        [
+            "IgnoreBlock", "Mode", "Initialization", "PaysOn", "FirstAttack", "Pending", "FusionProcessed", "Json",
+            "RelicId"
+        ])
     ];
 
     public static void LogGovernanceSummary(Assembly assembly)
@@ -99,7 +108,9 @@ internal static class SavedPropertyGovernance
                     categoryCounts[matchedCategory] = categoryCount + 1;
                 }
                 else
+                {
                     uncategorizedWarnings.Add($"{modelType.FullName}.{property.Name}");
+                }
 
                 fingerprintParts.Add($"{modelType.FullName}.{property.Name}:{matchedCategory ?? "uncategorized"}");
 
@@ -159,10 +170,8 @@ internal static class SavedPropertyGovernance
     private static string? ResolveCategory(string propertyName)
     {
         foreach (var (category, markers) in CategoryRules)
-        {
             if (markers.Any(marker => propertyName.Contains(marker, StringComparison.Ordinal)))
                 return category;
-        }
 
         return null;
     }

@@ -22,7 +22,7 @@ public sealed class RealmOfDeathDurationTickPatch : IPatchMethod
     {
         return
         [
-            new(typeof(Hook), nameof(Hook.AfterTurnEnd),
+            new ModPatchTarget(typeof(Hook), nameof(Hook.AfterTurnEnd),
                 [typeof(ICombatState), typeof(CombatSide), typeof(IEnumerable<Creature>)])
         ];
     }

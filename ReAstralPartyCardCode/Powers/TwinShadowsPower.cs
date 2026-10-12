@@ -30,6 +30,7 @@ public class TwinShadowsPower : AstralPartyPowerModel
 
         Flash();
         using (DebuffDamageContextHelper.Enter())
+        {
             await CreatureCmd.Damage(
                 new ThrowingPlayerChoiceContext(),
                 Owner,
@@ -38,6 +39,7 @@ public class TwinShadowsPower : AstralPartyPowerModel
                 Applier,
                 null
             );
+        }
 
         if (Owner.IsAlive)
             await PowerCmd.TickDownDuration(this);

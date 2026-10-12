@@ -18,6 +18,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 public sealed class SkillPowerfulPityPlus : AstralPartyCardModel
 {
     private const int MaxSelectedCards = 4;
+
     private static readonly LocString SelectionPrompt =
         new("cards", "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY_PLUS.select_prompt");
 

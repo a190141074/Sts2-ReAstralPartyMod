@@ -11,7 +11,6 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillProductRestocking : AstralPartyCardModel
 {
@@ -70,4 +69,3 @@ public class SkillProductRestocking : AstralPartyCardModel
         await mascotGirlMimi.HandleProductRestockingDraw(choiceContext, this, cardsToDraw);
     }
 }
-

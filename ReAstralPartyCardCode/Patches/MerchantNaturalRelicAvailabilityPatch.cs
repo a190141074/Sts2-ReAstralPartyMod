@@ -40,10 +40,8 @@ internal static class MerchantNaturalRelicAvailabilityHelper
         }
 
         if (replacedCount > 0)
-        {
             MainFile.Logger.Info(
                 $"[{MainFile.ModId}] Replaced {replacedCount} disallowed natural merchant relic entries | player={player.NetId} floor={player.RunState.TotalFloor}.");
-        }
     }
 
     public static bool IsFakeMerchantInventory(NMerchantInventory merchantInventory)
@@ -104,13 +102,18 @@ public sealed class MerchantNaturalRelicCreateInventoryPatch : IPatchMethod
 {
     public static string PatchId => "merchant_natural_relic_create_inventory";
 
-    public static string Description => "Replace disallowed natural merchant relic entries after the normal merchant inventory is created";
+    public static string Description =>
+        "Replace disallowed natural merchant relic entries after the normal merchant inventory is created";
 
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(MerchantInventory), nameof(MerchantInventory.CreateForNormalMerchant), [typeof(Player)])];
+        return
+        [
+            new ModPatchTarget(typeof(MerchantInventory), nameof(MerchantInventory.CreateForNormalMerchant),
+                [typeof(Player)])
+        ];
     }
 
     public static void Postfix(Player player, MerchantInventory __result)
@@ -123,13 +126,18 @@ public sealed class MerchantNaturalRelicInitializeInventoryPatch : IPatchMethod
 {
     public static string PatchId => "merchant_natural_relic_initialize_inventory";
 
-    public static string Description => "Replace disallowed natural merchant relic entries before the merchant UI initializes";
+    public static string Description =>
+        "Replace disallowed natural merchant relic entries before the merchant UI initializes";
 
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(NMerchantInventory), nameof(NMerchantInventory.Initialize), [typeof(MerchantInventory), typeof(MerchantDialogueSet)])];
+        return
+        [
+            new ModPatchTarget(typeof(NMerchantInventory), nameof(NMerchantInventory.Initialize),
+                [typeof(MerchantInventory), typeof(MerchantDialogueSet)])
+        ];
     }
 
     public static void Prefix(NMerchantInventory __instance, MerchantInventory inventory)

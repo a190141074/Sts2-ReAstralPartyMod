@@ -16,7 +16,7 @@ public sealed class ReAstralPartyRunSettingsLoadPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(NGame), "LoadRun", [typeof(RunState), typeof(SerializableRoom)])];
+        return [new ModPatchTarget(typeof(NGame), "LoadRun", [typeof(RunState), typeof(SerializableRoom)])];
     }
 
     public static void Postfix(RunState runState, ref Task __result)

@@ -47,8 +47,9 @@ public abstract partial class AstralPartyRelicModel : ModRelicTemplate
         ICombatState combatState)
     {
         return BeforeSideTurnStart(choiceContext, side, combatState as CombatState
-            ?? Owner?.Creature?.CombatState as CombatState
-            ?? throw new InvalidOperationException("Expected CombatState for legacy relic hook bridge."));
+                                                        ?? Owner?.Creature?.CombatState as CombatState
+                                                        ?? throw new InvalidOperationException(
+                                                            "Expected CombatState for legacy relic hook bridge."));
     }
 
     public virtual Task AfterSideTurnStart(CombatSide side, CombatState combatState)
@@ -62,8 +63,9 @@ public abstract partial class AstralPartyRelicModel : ModRelicTemplate
         ICombatState combatState)
     {
         return AfterSideTurnStart(side, combatState as CombatState
-            ?? Owner?.Creature?.CombatState as CombatState
-            ?? throw new InvalidOperationException("Expected CombatState for legacy relic hook bridge."));
+                                        ?? Owner?.Creature?.CombatState as CombatState
+                                        ?? throw new InvalidOperationException(
+                                            "Expected CombatState for legacy relic hook bridge."));
     }
 
     public virtual Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)

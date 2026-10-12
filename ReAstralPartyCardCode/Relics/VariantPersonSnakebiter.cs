@@ -41,7 +41,8 @@ public class VariantPersonSnakebiter : PersonRelicBase
         if (options.Source != CardCreationSource.Encounter)
             return false;
 
-        var createdCard = player.RunState?.CreateCard(ModelDb.Card<Snakebite>(), player) ?? ModelDb.Card<Snakebite>().ToMutable();
+        var createdCard = player.RunState?.CreateCard(ModelDb.Card<Snakebite>(), player) ??
+                          ModelDb.Card<Snakebite>().ToMutable();
         createdCard.Owner ??= player;
         rewardCards.Add(new CardCreationResult(createdCard));
         return true;

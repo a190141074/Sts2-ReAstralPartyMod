@@ -19,7 +19,10 @@ public sealed class AstralTokenBreakthrough : AstralPartyEventModel
     [SavedProperty] public int AstralParty_TokenBreakthroughCount { get; set; }
     protected override string EventId => "astral_token_breakthrough";
 
-    public override bool IsAllowed(IRunState runState) => runState.CurrentActIndex == 2 && runState.Players.All(p => p.Gold >= MinimumGold);
+    public override bool IsAllowed(IRunState runState)
+    {
+        return runState.CurrentActIndex == 2 && runState.Players.All(p => p.Gold >= MinimumGold);
+    }
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions()
     {
@@ -60,7 +63,8 @@ public sealed class AstralTokenBreakthrough : AstralPartyEventModel
         return options;
     }
 
-    private static List<TokenBreakthroughCandidate> CreateCandidates(MegaCrit.Sts2.Core.Entities.Players.Player owner, int count)
+    private static List<TokenBreakthroughCandidate> CreateCandidates(MegaCrit.Sts2.Core.Entities.Players.Player owner,
+        int count)
     {
         var tokenCandidates = Enumerable.Range(1, 2)
             .SelectMany(slot => TokenBreakthroughHelper.CreateCandidates(owner, count, slot))
@@ -73,12 +77,13 @@ public sealed class AstralTokenBreakthrough : AstralPartyEventModel
             foreach (var candidate in normalCandidates)
             {
                 if (normalOptions.Any(existing => existing.Source.Id == candidate.Source.Id
-                    || existing.Target.Id == candidate.Target.Id))
+                                                  || existing.Target.Id == candidate.Target.Id))
                     continue;
                 normalOptions.Add(candidate);
                 if (normalOptions.Count == 3)
                     return normalOptions;
             }
+
             return normalOptions;
         }
 
@@ -86,12 +91,13 @@ public sealed class AstralTokenBreakthrough : AstralPartyEventModel
         foreach (var candidate in tokenCandidates)
         {
             if (candidates.Any(existing => existing.Source.Id == candidate.Source.Id
-                || existing.Target.Id == candidate.Target.Id))
+                                           || existing.Target.Id == candidate.Target.Id))
                 continue;
             candidates.Add(candidate);
             if (candidates.Count == 3)
                 break;
         }
+
         return candidates;
     }
 
@@ -101,7 +107,8 @@ public sealed class AstralTokenBreakthrough : AstralPartyEventModel
         var sourceName = candidate.Source.Title.GetFormattedText();
         var targetName = candidate.Target.Title.GetFormattedText();
         var title = new LocString("events", "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.option.title");
-        var description = new LocString("events", "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.option.description");
+        var description = new LocString("events",
+            "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_TOKEN_BREAKTHROUGH.option.description");
         title.Add("Source", sourceName);
         title.Add("Target", targetName);
         description.Add("Source", sourceName);
@@ -110,7 +117,8 @@ public sealed class AstralTokenBreakthrough : AstralPartyEventModel
         var sourceId = candidate.Source.CanonicalInstance?.Id ?? candidate.Source.Id;
         var ownedSource = Owner?.Relics.FirstOrDefault(relic =>
             (relic.CanonicalInstance?.Id ?? relic.Id) == sourceId) ?? candidate.Source;
-        return new EventOption(this, Owner != null && Owner.Gold >= cost ? () => Resolve(candidate) : null, title, description,
+        return new EventOption(this, Owner != null && Owner.Gold >= cost ? () => Resolve(candidate) : null, title,
+            description,
             ModOptionKey("BREAKTHROUGH", $"SLOT_{slot}"), ownedSource.HoverTips.Concat(candidate.Target.HoverTips));
     }
 
@@ -125,22 +133,37 @@ public sealed class AstralTokenBreakthrough : AstralPartyEventModel
         var source = owner.Relics.FirstOrDefault(r => (r.CanonicalInstance?.Id ?? r.Id) == sourceId);
         var target = candidate.Target.CanonicalInstance ?? candidate.Target;
         var cost = TokenBreakthroughHelper.Cost(candidate, count);
-        if (count >= MaxBreakthroughs || source == null || owner.Gold < cost || owner.Relics.Any(r => (r.CanonicalInstance ?? r).Id == targetId))
+        if (count >= MaxBreakthroughs || source == null || owner.Gold < cost ||
+            owner.Relics.Any(r => (r.CanonicalInstance ?? r).Id == targetId))
         {
             SetEventState(PageDescription("INVALID"), CreateBreakthroughOptions());
             return;
         }
+
         await PersonMultiplayerEffectHelper.LoseGoldDeterministic(cost, owner, GoldLossType.Spent);
         await RelicCmd.Remove(source);
         await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, target);
         SetCount(owner, count + 1);
         if (count + 1 >= MaxBreakthroughs)
-            SetEventState(PageDescription("COMPLETE"), [new EventOption(this, Finish, ModOptionKey("BREAKTHROUGH", "LEAVE"))]);
+            SetEventState(PageDescription("COMPLETE"),
+                [new EventOption(this, Finish, ModOptionKey("BREAKTHROUGH", "LEAVE"))]);
         else
             SetEventState(PageDescription("BREAKTHROUGH"), CreateBreakthroughOptions());
     }
 
-    private Task Finish() { SetEventFinished(PageDescription("LEAVE")); return Task.CompletedTask; }
-    private int GetCount(MegaCrit.Sts2.Core.Entities.Players.Player owner) => AstralParty_TokenBreakthroughCount;
-    private void SetCount(MegaCrit.Sts2.Core.Entities.Players.Player owner, int count) => AstralParty_TokenBreakthroughCount = count;
+    private Task Finish()
+    {
+        SetEventFinished(PageDescription("LEAVE"));
+        return Task.CompletedTask;
+    }
+
+    private int GetCount(MegaCrit.Sts2.Core.Entities.Players.Player owner)
+    {
+        return AstralParty_TokenBreakthroughCount;
+    }
+
+    private void SetCount(MegaCrit.Sts2.Core.Entities.Players.Player owner, int count)
+    {
+        AstralParty_TokenBreakthroughCount = count;
+    }
 }

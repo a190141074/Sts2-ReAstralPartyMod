@@ -85,6 +85,7 @@ public class TokenPurpleFriendshipBadge : AstralPartyRelicModel
             ResetPendingState();
             return;
         }
+
         if (applier != Owner.Creature)
             return;
         if (power.Owner == Owner.Creature)

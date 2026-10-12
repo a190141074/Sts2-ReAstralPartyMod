@@ -48,7 +48,8 @@ internal static class SunsetGlowElementSelectionHelper
             return (await ShowLocalSelectionAsync(owner, title, subtitle, options))?.BranchId;
 
         var choiceId = synchronizer.ReserveChoiceId(owner);
-        var sessionKey = $"{AstralChoiceKind.SunsetGlowElementSelection}|{context}|{owner.NetId}|{ChoiceContextVersion}";
+        var sessionKey =
+            $"{AstralChoiceKind.SunsetGlowElementSelection}|{context}|{owner.NetId}|{ChoiceContextVersion}";
         if (owner.NetId == runManager.NetService.NetId)
         {
             var localResult = await ShowLocalSelectionAsync(owner, title, subtitle, options);
@@ -93,9 +94,12 @@ internal static class SunsetGlowElementSelectionHelper
     {
         return
         [
-            new SunsetGlowElementSelectionOption(TsunamiBranch, tsunamiTitle, tsunamiDescription, TsunamiIconPath, TsunamiColor),
-            new SunsetGlowElementSelectionOption(SettingSunBranch, settingSunTitle, settingSunDescription, SettingSunIconPath, SettingSunColor),
-            new SunsetGlowElementSelectionOption(ThundersBreathBranch, thundersBreathTitle, thundersBreathDescription, ThundersBreathIconPath, ThundersBreathColor)
+            new SunsetGlowElementSelectionOption(TsunamiBranch, tsunamiTitle, tsunamiDescription, TsunamiIconPath,
+                TsunamiColor),
+            new SunsetGlowElementSelectionOption(SettingSunBranch, settingSunTitle, settingSunDescription,
+                SettingSunIconPath, SettingSunColor),
+            new SunsetGlowElementSelectionOption(ThundersBreathBranch, thundersBreathTitle, thundersBreathDescription,
+                ThundersBreathIconPath, ThundersBreathColor)
         ];
     }
 
@@ -150,11 +154,9 @@ internal static class SunsetGlowElementSelectionHelper
     private static async Task WaitForOverlaySettleFramesAsync(int frames)
     {
         for (var index = 0; index < frames; index++)
-        {
             if (NGame.Instance?.IsInsideTree() == true)
                 await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
             else
                 await Task.Yield();
-        }
     }
 }

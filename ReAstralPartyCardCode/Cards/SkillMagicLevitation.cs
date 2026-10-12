@@ -12,7 +12,11 @@ public sealed class SkillMagicLevitation : PersonSkillCardModel
 {
     public override IEnumerable<CardKeyword> CanonicalKeywords => [AstralKeywords.AstralUnique];
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
-    public SkillMagicLevitation() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self) { }
+
+    public SkillMagicLevitation() : base(0, CardType.Skill, CardRarity.Ancient, TargetType.Self)
+    {
+    }
+
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)
     {
         if (Owner?.Creature != null)

@@ -19,7 +19,6 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillMixedCocktails : AstralPartyCardModel
 {
@@ -170,4 +169,3 @@ public class SkillMixedCocktails : AstralPartyCardModel
         return selectedCards.ToList();
     }
 }
-

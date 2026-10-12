@@ -33,9 +33,10 @@ public static class TokenBreakthroughHelper
         (typeof(TokenPurpleAdrenalineGeneral), typeof(TokenGoldAdrenalineEfficient)),
         (typeof(TokenBlueMedicalKitEmergencyTreatment), typeof(TokenGoldMedicalKitCompleteTreatment))
     ];
+
     private static readonly HashSet<Type> TerminalGoldTokenTypes = Promotions
         .Where(mapping => mapping.Target.Name.StartsWith("TokenGold", StringComparison.Ordinal)
-            && Promotions.All(next => next.Source != mapping.Target))
+                          && Promotions.All(next => next.Source != mapping.Target))
         .Select(mapping => mapping.Target)
         .ToHashSet();
 
@@ -47,14 +48,16 @@ public static class TokenBreakthroughHelper
         if (slot == 0)
         {
             var source = owned.Where(r => r.Rarity == RelicRarity.Common && !TokenRelicRegistry.IsTokenRelic(r))
-                .OrderBy(r => Stable(owner, completedCount, slot, "source", r.Id.Entry)).ThenBy(r => r.Id.Entry, StringComparer.Ordinal).FirstOrDefault();
+                .OrderBy(r => Stable(owner, completedCount, slot, "source", r.Id.Entry))
+                .ThenBy(r => r.Id.Entry, StringComparer.Ordinal).FirstOrDefault();
             var target = TokenRelicRegistry.GetAvailableTokenRelicsByRarity(owner.RunState, RelicRarity.Common, true)
                 .Where(r => !ownedIds.Contains(Canonical(r).Id) && !ChargeTokenRegistry.IsChargeToken(r)
-                    && IsExplicitProgressionRelic(r))
-                .OrderBy(r => Stable(owner, completedCount, slot, r.Id.Entry)).ThenBy(r => r.Id.Entry, StringComparer.Ordinal)
+                                                                && IsExplicitProgressionRelic(r))
+                .OrderBy(r => Stable(owner, completedCount, slot, r.Id.Entry))
+                .ThenBy(r => r.Id.Entry, StringComparer.Ordinal)
                 .FirstOrDefault();
             if (source != null && target != null)
-                return [new(source, target, 0.5m)];
+                return [new TokenBreakthroughCandidate(source, target, 0.5m)];
             return [];
         }
 
@@ -68,13 +71,15 @@ public static class TokenBreakthroughHelper
                 continue;
             var target = ModelDb.GetById<RelicModel>(ModelDb.GetId(targetType));
             if (ownedIds.Contains(Canonical(target).Id) || ChargeTokenRegistry.IsChargeToken(target)
-                || !TokenRelicRegistry.IsRelicAvailableForRun(owner.RunState, target))
+                                                        || !TokenRelicRegistry.IsRelicAvailableForRun(owner.RunState,
+                                                            target))
                 continue;
-            choices.Add(new(source, Canonical(target), QualityFactor(source)));
+            choices.Add(new TokenBreakthroughCandidate(source, Canonical(target), QualityFactor(source)));
         }
 
         var selected = choices.OrderBy(c => Stable(owner, completedCount, slot, c.Source.Id.Entry, c.Target.Id.Entry))
-            .ThenBy(c => c.Source.Id.Entry, StringComparer.Ordinal).ThenBy(c => c.Target.Id.Entry, StringComparer.Ordinal).ToList();
+            .ThenBy(c => c.Source.Id.Entry, StringComparer.Ordinal)
+            .ThenBy(c => c.Target.Id.Entry, StringComparer.Ordinal).ToList();
         var availableAncients = ProphecySoulDevourHelper.CreateSafeBaseGameAncientRelics(owner)
             .Where(r => !ownedIds.Contains(Canonical(r).Id))
             .Where(r => !PersonMultiplayerEffectHelper.IsRelicBannedForOwner(owner, r))
@@ -83,13 +88,15 @@ public static class TokenBreakthroughHelper
             .Where(r => !ChargeTokenRegistry.IsChargeToken(r))
             .OrderBy(r => r.Id.Entry, StringComparer.Ordinal).ToList();
         if (availableAncients.Count > 0 && goldSources.Count > 0
-            && Stable(owner, completedCount, slot, "ancient-roll") % 10 == 0)
-            selected.Add(new(goldSources[0], availableAncients[Stable(owner, completedCount, slot, "ancient-target") % availableAncients.Count], 5));
+                                        && Stable(owner, completedCount, slot, "ancient-roll") % 10 == 0)
+            selected.Add(new TokenBreakthroughCandidate(goldSources[0],
+                availableAncients[Stable(owner, completedCount, slot, "ancient-target") % availableAncients.Count], 5));
 
         return selected;
     }
 
-    public static IReadOnlyList<TokenBreakthroughCandidate> CreateNormalRelicCandidates(Player owner, int completedCount, int slot)
+    public static IReadOnlyList<TokenBreakthroughCandidate> CreateNormalRelicCandidates(Player owner,
+        int completedCount, int slot)
     {
         var ownedIds = owner.Relics.Select(Canonical).Select(relic => relic.Id).ToHashSet();
         var sources = owner.Relics.Select(Canonical)
@@ -98,36 +105,56 @@ public static class TokenBreakthroughHelper
             .ThenBy(relic => relic.Id.Entry, StringComparer.Ordinal).ToList();
         var targets = TokenRelicRegistry.GetAvailableTokenRelicsByRarity(owner.RunState, RelicRarity.Common, true)
             .Where(relic => !ownedIds.Contains(Canonical(relic).Id) && !ChargeTokenRegistry.IsChargeToken(relic)
-                && IsExplicitProgressionRelic(relic))
+                                                                    && IsExplicitProgressionRelic(relic))
             .OrderBy(relic => Stable(owner, completedCount, slot, "normal-target", relic.Id.Entry))
             .ThenBy(relic => relic.Id.Entry, StringComparer.Ordinal).ToList();
 
         return sources.SelectMany(source => targets.Select(target =>
                 new TokenBreakthroughCandidate(source, Canonical(target), 0.5m)))
-            .OrderBy(candidate => Stable(owner, completedCount, slot, candidate.Source.Id.Entry, candidate.Target.Id.Entry))
+            .OrderBy(candidate =>
+                Stable(owner, completedCount, slot, candidate.Source.Id.Entry, candidate.Target.Id.Entry))
             .ThenBy(candidate => candidate.Source.Id.Entry, StringComparer.Ordinal)
             .ThenBy(candidate => candidate.Target.Id.Entry, StringComparer.Ordinal).ToList();
     }
 
-    public static int Cost(TokenBreakthroughCandidate candidate, int completedCount) =>
-        (int)Math.Round(100m * (1m + 0.1m * completedCount) * candidate.QualityFactor, MidpointRounding.AwayFromZero);
-
-    private static decimal QualityFactor(RelicModel source) => !TokenRelicRegistry.IsTokenRelic(source) ? 0.5m : source.Rarity switch
+    public static int Cost(TokenBreakthroughCandidate candidate, int completedCount)
     {
-        RelicRarity.Common => 1m,
-        RelicRarity.Uncommon => 2m,
-        RelicRarity.Rare => 4m,
-        _ => 4m
-    };
+        return (int)Math.Round(100m * (1m + 0.1m * completedCount) * candidate.QualityFactor,
+            MidpointRounding.AwayFromZero);
+    }
 
-    private static RelicModel Canonical(RelicModel relic) => relic.CanonicalInstance ?? relic;
+    private static decimal QualityFactor(RelicModel source)
+    {
+        return !TokenRelicRegistry.IsTokenRelic(source)
+            ? 0.5m
+            : source.Rarity switch
+            {
+                RelicRarity.Common => 1m,
+                RelicRarity.Uncommon => 2m,
+                RelicRarity.Rare => 4m,
+                _ => 4m
+            };
+    }
 
-    private static bool IsExplicitProgressionRelic(RelicModel relic) => Promotions.Any(mapping =>
-        mapping.Source.IsInstanceOfType(relic) || mapping.Target.IsInstanceOfType(relic));
+    private static RelicModel Canonical(RelicModel relic)
+    {
+        return relic.CanonicalInstance ?? relic;
+    }
 
-    private static int Stable(Player owner, int count, int slot, params string?[] values) =>
-        DeterministicMultiplayerChoiceHelper.RollDeterministically(0, int.MaxValue,
-            new object?[] { MainFile.ModId, nameof(TokenBreakthroughHelper), owner.RunState?.Rng.StringSeed,
-                owner.RunState?.CurrentActIndex, owner.RunState?.TotalFloor, owner.NetId, count, slot }
+    private static bool IsExplicitProgressionRelic(RelicModel relic)
+    {
+        return Promotions.Any(mapping =>
+            mapping.Source.IsInstanceOfType(relic) || mapping.Target.IsInstanceOfType(relic));
+    }
+
+    private static int Stable(Player owner, int count, int slot, params string?[] values)
+    {
+        return DeterministicMultiplayerChoiceHelper.RollDeterministically(0, int.MaxValue,
+            new object?[]
+                {
+                    MainFile.ModId, nameof(TokenBreakthroughHelper), owner.RunState?.Rng.StringSeed,
+                    owner.RunState?.CurrentActIndex, owner.RunState?.TotalFloor, owner.NetId, count, slot
+                }
                 .Concat(values).ToArray());
+    }
 }

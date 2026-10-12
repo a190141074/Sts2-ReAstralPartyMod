@@ -15,7 +15,10 @@ public sealed class AstralMutatorConsoleCmd : AbstractConsoleCmd
 
     public override string CmdName => CommandName;
     public override string Args => "";
-    public override string Description => "[ReAstralPartyMod] Reroll Final Arena distortion components for the current run";
+
+    public override string Description =>
+        "[ReAstralPartyMod] Reroll Final Arena distortion components for the current run";
+
     public override bool IsNetworked => false;
     public override bool DebugOnly => false;
 

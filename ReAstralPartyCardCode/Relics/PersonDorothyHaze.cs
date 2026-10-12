@@ -124,7 +124,7 @@ public class PersonDorothyHaze : CooldownPersonRelicBase
         if (Owner?.Creature == null || amount <= 0)
             return;
 
-        var newAmount = System.Math.Min(GetWarmAmount() + amount, MaxWarmStacks);
+        var newAmount = Math.Min(GetWarmAmount() + amount, MaxWarmStacks);
         await SetWarmAmount(newAmount, source);
     }
 
@@ -133,7 +133,7 @@ public class PersonDorothyHaze : CooldownPersonRelicBase
         if (Owner?.Creature == null)
             return;
 
-        var clampedAmount = System.Math.Clamp(amount, 0, MaxWarmStacks);
+        var clampedAmount = Math.Clamp(amount, 0, MaxWarmStacks);
         var existingPower = Owner.Creature.GetPower<WarmPower>();
         if (clampedAmount <= 0)
         {
@@ -149,14 +149,14 @@ public class PersonDorothyHaze : CooldownPersonRelicBase
     {
         return Owner?.Creature == null
             ? 0
-            : System.Math.Max((int)Owner.Creature.GetPowerAmount<WarmPower>(), 0);
+            : Math.Max((int)Owner.Creature.GetPowerAmount<WarmPower>(), 0);
     }
 
     private int GetCurrentNodeDigit()
     {
         var currentNode = Owner?.Creature == null
             ? 0
-            : System.Math.Max((int)Owner.Creature.GetPowerAmount<DorothyNodePower>(), 0);
+            : Math.Max((int)Owner.Creature.GetPowerAmount<DorothyNodePower>(), 0);
         return currentNode % 10;
     }
 }

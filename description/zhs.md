@@ -44,7 +44,7 @@
 
 反馈表格：[AsralPartyMod](https://docs.qq.com/sheet/DSWx0R0ZEVnFtRXVP?tab=4dfqzj)
 
-模组在遇到问题时，请先确认版本是否为正式版，没有实装beta版的适配。 
+模组在遇到问题时，请先确认版本是否为正式版，没有实装beta版的适配。
 
 bug反馈时请按"~"打开控制台输入"getlogs"，并将错误日志的压缩包发到群里。
 

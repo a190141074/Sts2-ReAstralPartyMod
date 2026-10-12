@@ -12,7 +12,6 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillComeHereYou : AstralPartyCardModel
 {
@@ -60,4 +59,3 @@ public class SkillComeHereYou : AstralPartyCardModel
         await PowerCmd.Apply<DexterityPower>(cardPlay.Target, DexterityLoss, Owner.Creature, this, false);
     }
 }
-

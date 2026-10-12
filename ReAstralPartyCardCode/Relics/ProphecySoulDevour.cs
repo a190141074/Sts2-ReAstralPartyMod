@@ -129,6 +129,7 @@ public class ProphecySoulDevour : AstralPartyRelicModel
 
     public override bool ShouldReceiveCombatHooks => true;
     public override bool ShowCounter => true;
+
     public override int DisplayAmount => AstralParty_ProphecySoulDevourPendingDiscoveryCounter > 0
         ? 0
         : Math.Max(0, AstralParty_ProphecySoulDevourDiscoveryBattleCounter);
@@ -202,7 +203,8 @@ public class ProphecySoulDevour : AstralPartyRelicModel
             modified |= RemoveSmithOptions(options);
             AstralParty_ProphecySoulDevourDisableNextSmithPending = false;
         }
-        else if (!AstralParty_ProphecySoulDevourAncientRuinsPermanent && AstralParty_ProphecySoulDevourPendingSmithBonusCounter > 0)
+        else if (!AstralParty_ProphecySoulDevourAncientRuinsPermanent &&
+                 AstralParty_ProphecySoulDevourPendingSmithBonusCounter > 0)
         {
             var smithOption = options.OfType<SmithRestSiteOption>().FirstOrDefault();
             if (smithOption != null)
@@ -265,7 +267,8 @@ public class ProphecySoulDevour : AstralPartyRelicModel
         if (!AstralParty_ProphecySoulDevourMatrixRecyclingPermanent)
             return false;
 
-        var skipIndex = alternatives.FindIndex(static option => string.Equals(option.OptionId, "Skip", StringComparison.Ordinal));
+        var skipIndex = alternatives.FindIndex(static option =>
+            string.Equals(option.OptionId, "Skip", StringComparison.Ordinal));
         if (skipIndex < 0)
             return false;
 
@@ -279,7 +282,7 @@ public class ProphecySoulDevour : AstralPartyRelicModel
                     : null;
                 foreach (var card in cardReward.Cards)
                 {
-                    historyEntry?.CardChoices.Add(new CardChoiceHistoryEntry(card, wasPicked: false));
+                    historyEntry?.CardChoices.Add(new CardChoiceHistoryEntry(card, false));
                     RunManager.Instance?.RewardSynchronizer?.SyncLocalSkippedCard(card);
                 }
             },

@@ -25,7 +25,8 @@ internal static class StokovPaelsWingCardRewardCompatHelper
 
         return alternatives.Any(static option => string.Equals(option.OptionId, "Skip", StringComparison.Ordinal))
                && alternatives.Any(static option => string.Equals(option.OptionId, "REROLL", StringComparison.Ordinal))
-               && alternatives.Any(static option => string.Equals(option.OptionId, "SACRIFICE", StringComparison.Ordinal));
+               && alternatives.Any(static option =>
+                   string.Equals(option.OptionId, "SACRIFICE", StringComparison.Ordinal));
     }
 
     public static bool TryDropSkipForStokovPaelsWing(

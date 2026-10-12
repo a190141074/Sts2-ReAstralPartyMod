@@ -80,9 +80,7 @@ public class VariantPersonYanxin : CooldownPersonRelicBase
 
         Flash();
         foreach (var teammate in AstralDivinePersonaHelper.GetStablePlayers(Owner))
-        {
             await PlayerCmd.GainEnergy(1m, teammate);
-        }
 
         await AstralDivinePersonaHelper.GrantDivineSonToAllPlayers(Owner, this);
     }

@@ -22,7 +22,8 @@ public class PersonalityDerivativeScionGrace : AstralPartyRelicModel
 
     [SavedProperty] public int AstralParty_PersonalityDerivativeScionGracePendingRoyalPrerogativeCombats { get; set; }
 
-    [SavedProperty] public int AstralParty_PersonalityDerivativeScionGracePendingRoyalPrerogativeActIndex { get; set; } = -1;
+    [SavedProperty]
+    public int AstralParty_PersonalityDerivativeScionGracePendingRoyalPrerogativeActIndex { get; set; } = -1;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

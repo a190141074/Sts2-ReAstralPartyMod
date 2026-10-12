@@ -21,7 +21,9 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 internal static class SolidStateTimeHelper
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
-    private static readonly MethodInfo CardOnPlayMethod = typeof(CardModel).GetMethod("OnPlay", BindingFlags.Instance | BindingFlags.NonPublic)
+
+    private static readonly MethodInfo CardOnPlayMethod =
+        typeof(CardModel).GetMethod("OnPlay", BindingFlags.Instance | BindingFlags.NonPublic)
         ?? throw new InvalidOperationException("CardModel.OnPlay was not found.");
 
     public static string SerializeRecords(IEnumerable<SolidStateTimeRecord> records)
@@ -192,7 +194,8 @@ internal static class SolidStateTimeHelper
         return preview;
     }
 
-    public static CardModel? CreateCombatPlaybackCard(Player owner, CombatState combatState, SolidStateTimeRecord record)
+    public static CardModel? CreateCombatPlaybackCard(Player owner, CombatState combatState,
+        SolidStateTimeRecord record)
     {
         var canonical = TryGetCanonicalCard(record.ModelId);
         if (canonical == null || !IsStoredAsPowerCard(canonical, record))
@@ -215,7 +218,8 @@ internal static class SolidStateTimeHelper
         return playbackCard.TargetType switch
         {
             TargetType.Self or TargetType.AnyAlly or TargetType.AnyPlayer => owner.Creature,
-            TargetType.AnyEnemy => ResolveDeterministicEnemyTarget(owner, combatState, playbackCard, recordIndex, playIndex),
+            TargetType.AnyEnemy => ResolveDeterministicEnemyTarget(owner, combatState, playbackCard, recordIndex,
+                playIndex),
             _ => null
         };
     }
@@ -227,7 +231,7 @@ internal static class SolidStateTimeHelper
 
         try
         {
-            await CardPileCmd.RemoveFromCombat(card, skipVisuals: true);
+            await CardPileCmd.RemoveFromCombat(card, true);
         }
         catch (Exception ex)
         {
@@ -235,7 +239,8 @@ internal static class SolidStateTimeHelper
         }
     }
 
-    public static async Task PlayStoredPowerDirectly(PlayerChoiceContext choiceContext, CardModel card, Creature? target)
+    public static async Task PlayStoredPowerDirectly(PlayerChoiceContext choiceContext, CardModel card,
+        Creature? target)
     {
         var addedToTemporaryPlayPile = false;
         if (card.Pile == null)
@@ -278,7 +283,7 @@ internal static class SolidStateTimeHelper
         {
             choiceContext.PopModel(card);
             if (addedToTemporaryPlayPile && card.Pile?.IsCombatPile == true)
-                await CardPileCmd.RemoveFromCombat(card, skipVisuals: true);
+                await CardPileCmd.RemoveFromCombat(card, true);
         }
     }
 
@@ -341,10 +346,11 @@ internal static class SolidStateTimeHelper
 
     private static MethodInfo GetOnPlayMethod(CardModel card)
     {
-        Type? type = card.GetType();
+        var type = card.GetType();
         while (type != null)
         {
-            var method = type.GetMethod("OnPlay", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
+            var method = type.GetMethod("OnPlay",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.DeclaredOnly);
             if (method != null)
                 return method;
 

@@ -108,6 +108,7 @@ public class SkillHealingSlimeDoppelganger : AstralPartyCardModel
             index = i;
             break;
         }
+
         return $"{index:D4}|{(card.CanonicalInstance?.Id ?? card.Id).Entry}|{card.CurrentUpgradeLevel}";
     }
 }

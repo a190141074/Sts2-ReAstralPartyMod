@@ -146,18 +146,16 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         _components = [.. components];
         HumanAiDuelApplied = runData.HumanAiDuelApplied;
         _humanAiDuelGrantedPlayerNetIds = [.. runData.HumanAiDuelGrantedPlayerNetIds];
-        _humanAiDuelRecordedMindStacks = new(runData.HumanAiDuelRecordedMindStacks);
+        _humanAiDuelRecordedMindStacks = new Dictionary<ulong, int>(runData.HumanAiDuelRecordedMindStacks);
         _humanAiDuelCurrentMindStacks = [];
         var grantedPlayerNetIds = _humanAiDuelGrantedPlayerNetIds.ToHashSet();
         foreach (var player in runState.Players)
-        {
             if (grantedPlayerNetIds.Contains(player.NetId))
                 _humanAiDuelCurrentMindStacks[player.NetId] =
                     Math.Max(0, StunGunMindSyncHelper.GetRecordedMindStacks(player));
-        }
         _chaosFloodAppliedPlayerNetIds = [.. runData.ChaosFloodAppliedPlayerNetIds];
-        _chaosFloodTargetMaxPotionCounts = new(runData.ChaosFloodTargetMaxPotionCounts);
-        _chaosFloodTargetPersonChestCounts = new(runData.ChaosFloodTargetPersonChestCounts);
+        _chaosFloodTargetMaxPotionCounts = new Dictionary<ulong, int>(runData.ChaosFloodTargetMaxPotionCounts);
+        _chaosFloodTargetPersonChestCounts = new Dictionary<ulong, int>(runData.ChaosFloodTargetPersonChestCounts);
         RobberyGoldGranted = runData.RobberyGoldGranted;
         _robberyGoldGrantedPlayerNetIds = [.. runData.RobberyGoldGrantedPlayerNetIds];
         ThreeThousandAstrolabeGoldGranted = runData.ThreeThousandAstrolabeGoldGranted;
@@ -167,8 +165,8 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         MysteriousTreasureNextCombatPending = runData.MysteriousTreasureNextCombatPending;
         MysteriousTreasureCombatCounter = runData.MysteriousTreasureCombatCounter;
         ArbitrageLastFloor = runData.ArbitrageLastFloor;
-        _arbitrageLastPaidFloorByPlayer = new(runData.ArbitrageLastPaidFloorByPlayer);
-        _unexpectedWealthTriggerSequences = new(runData.UnexpectedWealthTriggerSequences);
+        _arbitrageLastPaidFloorByPlayer = new Dictionary<ulong, int>(runData.ArbitrageLastPaidFloorByPlayer);
+        _unexpectedWealthTriggerSequences = new Dictionary<ulong, int>(runData.UnexpectedWealthTriggerSequences);
         GlobalPlayerTurnCounter = runData.GlobalPlayerTurnCounter;
     }
 
@@ -212,10 +210,25 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         return _chaosFloodAppliedPlayerNetIds ?? [];
     }
 
-    public IReadOnlyList<ulong> GetRobberyGoldGrantedPlayerNetIds() => _robberyGoldGrantedPlayerNetIds ?? [];
-    public IReadOnlyList<ulong> GetThreeThousandAstrolabeGoldGrantedPlayerNetIds() => _threeThousandAstrolabeGoldGrantedPlayerNetIds ?? [];
-    public IReadOnlyDictionary<ulong, int> GetArbitrageLastPaidFloorByPlayer() => _arbitrageLastPaidFloorByPlayer ?? new Dictionary<ulong, int>();
-    public IReadOnlyDictionary<ulong, int> GetUnexpectedWealthTriggerSequences() => _unexpectedWealthTriggerSequences ?? new Dictionary<ulong, int>();
+    public IReadOnlyList<ulong> GetRobberyGoldGrantedPlayerNetIds()
+    {
+        return _robberyGoldGrantedPlayerNetIds ?? [];
+    }
+
+    public IReadOnlyList<ulong> GetThreeThousandAstrolabeGoldGrantedPlayerNetIds()
+    {
+        return _threeThousandAstrolabeGoldGrantedPlayerNetIds ?? [];
+    }
+
+    public IReadOnlyDictionary<ulong, int> GetArbitrageLastPaidFloorByPlayer()
+    {
+        return _arbitrageLastPaidFloorByPlayer ?? new Dictionary<ulong, int>();
+    }
+
+    public IReadOnlyDictionary<ulong, int> GetUnexpectedWealthTriggerSequences()
+    {
+        return _unexpectedWealthTriggerSequences ?? new Dictionary<ulong, int>();
+    }
 
     public IReadOnlyDictionary<ulong, int> GetChaosFloodTargetMaxPotionCounts()
     {
@@ -239,17 +252,21 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         foreach (var playerNetId in _humanAiDuelGrantedPlayerNetIds ?? [])
             writer.WriteULong(playerNetId);
         writer.WriteInt((_humanAiDuelRecordedMindStacks ?? []).Count);
-        foreach (var entry in (_humanAiDuelRecordedMindStacks ?? new Dictionary<ulong, int>()).OrderBy(entry => entry.Key))
+        foreach (var entry in (_humanAiDuelRecordedMindStacks ?? new Dictionary<ulong, int>()).OrderBy(entry =>
+                     entry.Key))
         {
             writer.WriteULong(entry.Key);
             writer.WriteInt(entry.Value);
         }
+
         writer.WriteInt((_humanAiDuelCurrentMindStacks ?? []).Count);
-        foreach (var entry in (_humanAiDuelCurrentMindStacks ?? new Dictionary<ulong, int>()).OrderBy(entry => entry.Key))
+        foreach (var entry in (_humanAiDuelCurrentMindStacks ?? new Dictionary<ulong, int>()).OrderBy(
+                     entry => entry.Key))
         {
             writer.WriteULong(entry.Key);
             writer.WriteInt(entry.Value);
         }
+
         writer.WriteInt((_chaosFloodAppliedPlayerNetIds ?? []).Count);
         foreach (var playerNetId in (_chaosFloodAppliedPlayerNetIds ?? []).OrderBy(static netId => netId))
             writer.WriteULong(playerNetId);
@@ -260,7 +277,8 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         foreach (var id in (_robberyGoldGrantedPlayerNetIds ?? []).OrderBy(static id => id)) writer.WriteULong(id);
         writer.WriteBool(ThreeThousandAstrolabeGoldGranted);
         writer.WriteInt((_threeThousandAstrolabeGoldGrantedPlayerNetIds ?? []).Count);
-        foreach (var id in (_threeThousandAstrolabeGoldGrantedPlayerNetIds ?? []).OrderBy(static id => id)) writer.WriteULong(id);
+        foreach (var id in (_threeThousandAstrolabeGoldGrantedPlayerNetIds ?? []).OrderBy(static id => id))
+            writer.WriteULong(id);
         writer.WriteBool(RobberyNextCombatPending);
         writer.WriteBool(MysteriousTreasureInitialized);
         writer.WriteBool(MysteriousTreasureNextCombatPending);
@@ -275,7 +293,8 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
     {
         var schemaVersion = reader.ReadInt();
         if (schemaVersion != SchemaVersion)
-            throw new InvalidOperationException($"{MainFile.ModId} received unsupported Final Arena distortion schema {schemaVersion}.");
+            throw new InvalidOperationException(
+                $"{MainFile.ModId} received unsupported Final Arena distortion schema {schemaVersion}.");
 
         var count = reader.ReadInt();
         _components = new List<FinalArenaDistortionComponent>(Math.Max(0, count));
@@ -313,7 +332,8 @@ internal struct FinalArenaDistortionComponentMessage : INetMessage, IPacketSeria
         ThreeThousandAstrolabeGoldGranted = reader.ReadBool();
         var astrolabeGrantedCount = reader.ReadInt();
         _threeThousandAstrolabeGoldGrantedPlayerNetIds = new List<ulong>(Math.Max(0, astrolabeGrantedCount));
-        for (var i = 0; i < astrolabeGrantedCount; i++) _threeThousandAstrolabeGoldGrantedPlayerNetIds.Add(reader.ReadULong());
+        for (var i = 0; i < astrolabeGrantedCount; i++)
+            _threeThousandAstrolabeGoldGrantedPlayerNetIds.Add(reader.ReadULong());
         RobberyNextCombatPending = reader.ReadBool();
         MysteriousTreasureInitialized = reader.ReadBool();
         MysteriousTreasureNextCombatPending = reader.ReadBool();

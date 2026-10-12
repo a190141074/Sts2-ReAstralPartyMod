@@ -29,5 +29,5 @@ public sealed class AbyssalTentaclesPower : AstralPartyPowerModel
         return !IsTentacleEntity || target != Owner;
     }
 
-    private bool IsTentacleEntity => Owner?.Monster is ReAstralPartyMod.ReAstralPartyCardCode.Utils.AbyssalTentacleMonster;
+    private bool IsTentacleEntity => Owner?.Monster is AbyssalTentacleMonster;
 }

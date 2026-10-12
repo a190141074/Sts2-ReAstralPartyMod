@@ -40,7 +40,7 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(NGame), "StartRun", [typeof(RunState)])];
+        return [new ModPatchTarget(typeof(NGame), "StartRun", [typeof(RunState)])];
     }
 
     public static void Postfix(RunState runState, ref Task __result)
@@ -68,7 +68,8 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
         await ReAstralPartyRunSettingsSync.EnsureSyncedAsync(runState);
         LogInfo("P006", "Starting persona relic selection finished run settings sync.");
         await GrantStartingInitialPointIfEnabledAsync(runState);
-        LogInfo("P007", "Starting persona relic selection run bootstrap completed; Neow ready-page flow will handle the actual persona selection entry.");
+        LogInfo("P007",
+            "Starting persona relic selection run bootstrap completed; Neow ready-page flow will handle the actual persona selection entry.");
         await TryTriggerHonkaiFlameChasersFallbackAsync(runState);
     }
 
@@ -81,9 +82,7 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
         {
             LogInfo("P008", $"Starting persona relic selection skipped from {sourceTag}: {skipReason}.");
             if (skipReason.Contains("already own persona relics", StringComparison.Ordinal))
-            {
                 ShowWarning("P008", "启动门禁", "检测到至少一名玩家在开局阶段已经持有人格遗物，因此本轮人格选择被跳过。请反馈编号和日志。");
-            }
 
             return false;
         }
@@ -193,7 +192,7 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
         for (var attempt = 0; attempt < 120; attempt++)
         {
             var overlayStack = NOverlayStack.Instance;
-            if (overlayStack != null && Godot.GodotObject.IsInstanceValid(overlayStack))
+            if (overlayStack != null && GodotObject.IsInstanceValid(overlayStack))
                 return overlayStack;
 
             await WaitForNextProcessFrameAsync();
@@ -308,7 +307,8 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
                 StartingInitialPointGoldCost,
                 player,
                 GoldLossType.Spent);
-            await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(player, ModelDb.Relic<TokenGoldInitialPoint>());
+            await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(player,
+                ModelDb.Relic<TokenGoldInitialPoint>());
             LogInfo("P006C",
                 $"Granted Starting Initial Point to player {player.NetId} | gold_after={player.Gold}.");
         }
@@ -407,10 +407,8 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
             .ToList();
 
         if (options.Count < targetCount)
-        {
             LogInfo("P025",
                 $"Starting persona primary pool collapsed duplicate weighted rolls: uniqueOptions={options.Count} targetCount={targetCount} weightedCandidates={weightedCandidates.Count}.");
-        }
 
         if (options.Count >= targetCount)
             return ApplyStartingVariantPersonaPostProcessing(runState, options);
@@ -430,7 +428,8 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
         return ApplyStartingVariantPersonaPostProcessing(runState, options);
     }
 
-    private static IReadOnlyList<RelicModel> CreateAutomaticStartingPersonaRelicOptions(RunState runState, int playerCount)
+    private static IReadOnlyList<RelicModel> CreateAutomaticStartingPersonaRelicOptions(RunState runState,
+        int playerCount)
     {
         var pool = CreateAutomaticStartingPersonaPool(runState);
         if (pool.Count == 0)
@@ -493,22 +492,18 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
             .Where(relic => !ownedPersonaRelicIds.Contains(relic.CanonicalInstance?.Id ?? relic.Id))
             .ToList();
         if (pool.Count == 0)
-        {
             pool = PersonRelicRegistry.GetCanonicalPersonaRelicsFiltered(bannedPersonaRelicIds)
                 .ToList();
-        }
 
         if (!ReAstralPartyModSettingsManager.GetEnableVariantPersonas(runState))
-        {
             return DeterministicMultiplayerChoiceHelper.OrderDeterministically(
-                pool,
-                relic => relic.Id.Entry,
-                MainFile.ModId,
-                "starting_persona_automatic_pool",
-                runState.Rng.StringSeed,
-                runState.Players.Count)
+                    pool,
+                    relic => relic.Id.Entry,
+                    MainFile.ModId,
+                    "starting_persona_automatic_pool",
+                    runState.Rng.StringSeed,
+                    runState.Players.Count)
                 .ToList();
-        }
 
         if (ReAstralPartyModSettingsManager.GetEnableAllVariantPersonas(runState))
         {
@@ -528,12 +523,12 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
             .ToList();
 
         return DeterministicMultiplayerChoiceHelper.OrderDeterministically(
-            pool,
-            relic => relic.Id.Entry,
-            MainFile.ModId,
-            "starting_persona_automatic_pool",
-            runState.Rng.StringSeed,
-            runState.Players.Count)
+                pool,
+                relic => relic.Id.Entry,
+                MainFile.ModId,
+                "starting_persona_automatic_pool",
+                runState.Rng.StringSeed,
+                runState.Players.Count)
             .ToList();
     }
 
@@ -644,7 +639,8 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
             .ToList();
         if (allVariants.Count == 0)
         {
-            LogInfo("P017", "Starting persona variant chain skipped because no gameplay-available variants are registered.");
+            LogInfo("P017",
+                "Starting persona variant chain skipped because no gameplay-available variants are registered.");
             return options;
         }
 
@@ -695,7 +691,8 @@ public sealed class StartingPersonRelicSelectionPatch : IPatchMethod
 
     private static bool IsForcedCompatVariantRelic(RelicModel relic)
     {
-        return (relic.CanonicalInstance ?? relic) is VariantPersonWindchaserThePlaneswalker or VariantPersonManosabaLinHiro;
+        return (relic.CanonicalInstance ?? relic) is VariantPersonWindchaserThePlaneswalker
+            or VariantPersonManosabaLinHiro;
     }
 
     private static IReadOnlyList<RelicModel> ApplyStartingPersonMutualExclusion(

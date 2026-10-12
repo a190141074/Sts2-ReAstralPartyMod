@@ -198,14 +198,19 @@ public class PendingExtraTurnQueuePower : AstralPartyPowerModel
 
     private async Task SyncState()
     {
-        AstralParty_PendingExtraTurnQueueSaraPendingCount = Math.Max(AstralParty_PendingExtraTurnQueueSaraPendingCount, 0);
-        AstralParty_PendingExtraTurnQueueNightSkinPendingCount = Math.Max(AstralParty_PendingExtraTurnQueueNightSkinPendingCount, 0);
+        AstralParty_PendingExtraTurnQueueSaraPendingCount =
+            Math.Max(AstralParty_PendingExtraTurnQueueSaraPendingCount, 0);
+        AstralParty_PendingExtraTurnQueueNightSkinPendingCount =
+            Math.Max(AstralParty_PendingExtraTurnQueueNightSkinPendingCount, 0);
         AstralParty_PendingExtraTurnQueuePendingEnergyCount = Math.Max(
-            Math.Min(AstralParty_PendingExtraTurnQueuePendingEnergyCount, AstralParty_PendingExtraTurnQueueSaraPendingCount),
+            Math.Min(AstralParty_PendingExtraTurnQueuePendingEnergyCount,
+                AstralParty_PendingExtraTurnQueueSaraPendingCount),
             0);
-        AstralParty_PendingExtraTurnQueueReadyEnergyCount = Math.Max(AstralParty_PendingExtraTurnQueueReadyEnergyCount, 0);
+        AstralParty_PendingExtraTurnQueueReadyEnergyCount =
+            Math.Max(AstralParty_PendingExtraTurnQueueReadyEnergyCount, 0);
         AstralParty_PendingExtraTurnQueuePendingShatterStarThisCombatCount = Math.Max(
-            Math.Min(AstralParty_PendingExtraTurnQueuePendingShatterStarThisCombatCount, AstralParty_PendingExtraTurnQueueSaraPendingCount),
+            Math.Min(AstralParty_PendingExtraTurnQueuePendingShatterStarThisCombatCount,
+                AstralParty_PendingExtraTurnQueueSaraPendingCount),
             0);
 
         var ownerPlayer = Owner?.Player;
@@ -229,5 +234,4 @@ public class PendingExtraTurnQueuePower : AstralPartyPowerModel
 
         return 0m;
     }
-
 }

@@ -27,9 +27,11 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 internal static class TerraprismaHelper
 {
     internal static PileType MountedPileType { get; private set; }
+
     private static readonly MethodInfo? UpdateHoverTipMethod = typeof(NSovereignBladeVfx).GetMethod(
         "UpdateHoverTip",
         BindingFlags.Instance | BindingFlags.NonPublic);
+
     private static readonly HashSet<CardModel> AutoPlayingBlades = new(CardReferenceComparer.Instance);
     private static bool _registered;
 
@@ -110,7 +112,7 @@ internal static class TerraprismaHelper
                     $"[Terraprisma] mounted blade moving to play pile | owner={owner.NetId} | " +
                     $"card={blade.Id.Entry} | oldPile={blade.Pile?.Type.ToString() ?? "None"} | " +
                     $"target={target.CombatId?.ToString() ?? target.ModelId.ToString()}.");
-                await CardPileCmd.Add(blade, PileType.Play, CardPilePosition.Top, null, skipVisuals: true);
+                await CardPileCmd.Add(blade, PileType.Play, CardPilePosition.Top, null, true);
                 if (blade.Pile?.Type != PileType.Play)
                 {
                     MainFile.Logger.Error(
@@ -125,8 +127,8 @@ internal static class TerraprismaHelper
                     blade,
                     target,
                     AutoPlayType.Default,
-                    skipXCapture: true,
-                    skipCardPileVisuals: true);
+                    true,
+                    true);
 
                 await EnsureMountedPileAsync(blade, mountedPile);
                 MainFile.Logger.Info(
@@ -207,7 +209,10 @@ internal static class TerraprismaHelper
                && card.TryGetCapability<TerraprismaLoadedBladeCapability>(out _);
     }
 
-    public static bool IsTerraprismaBlade(CardModel? card) => IsMountedBlade(card);
+    public static bool IsTerraprismaBlade(CardModel? card)
+    {
+        return IsMountedBlade(card);
+    }
 
     public static bool TryGetLoadedDamage(CardModel card, out decimal damage)
     {
@@ -242,12 +247,10 @@ internal static class TerraprismaHelper
 
         ownerNode.AddChildSafely(vfxNode);
         for (var frame = 0; frame < 8 && GodotObject.IsInstanceValid(vfxNode) && !vfxNode.IsInsideTree(); frame++)
-        {
             if (NGame.Instance?.IsInsideTree() == true)
                 await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
             else
                 await Task.Yield();
-        }
         if (!GodotObject.IsInstanceValid(vfxNode) || !vfxNode.IsInsideTree())
         {
             MainFile.Logger.Error(
@@ -280,13 +283,11 @@ internal static class TerraprismaHelper
         if (blade.Pile == mountedPile)
             return;
 
-        await CardPileCmd.Add(blade, mountedPile, CardPilePosition.Bottom, null, skipVisuals: true);
+        await CardPileCmd.Add(blade, mountedPile, CardPilePosition.Bottom, null, true);
         if (blade.Pile != mountedPile)
-        {
             throw new InvalidOperationException(
                 $"Official mounted pile recovery did not complete for {blade.Id.Entry}; " +
                 $"pile={blade.Pile?.Type.ToString() ?? "None"}.");
-        }
     }
 
     public static Creature? FindNearestLivingEnemy(Player owner)
@@ -324,22 +325,32 @@ internal static class TerraprismaHelper
     private static bool TryEnterAutoPlay(CardModel card)
     {
         lock (AutoPlayingBlades)
+        {
             return AutoPlayingBlades.Add(card);
+        }
     }
 
     private static void ExitAutoPlay(CardModel card)
     {
         lock (AutoPlayingBlades)
+        {
             AutoPlayingBlades.Remove(card);
+        }
     }
 
     private sealed class CardReferenceComparer : IEqualityComparer<CardModel>
     {
         public static CardReferenceComparer Instance { get; } = new();
 
-        public bool Equals(CardModel? x, CardModel? y) => ReferenceEquals(x, y);
+        public bool Equals(CardModel? x, CardModel? y)
+        {
+            return ReferenceEquals(x, y);
+        }
 
-        public int GetHashCode(CardModel obj) => RuntimeHelpers.GetHashCode(obj);
+        public int GetHashCode(CardModel obj)
+        {
+            return RuntimeHelpers.GetHashCode(obj);
+        }
     }
 }
 

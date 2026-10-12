@@ -88,18 +88,16 @@ public static partial class NTopBarOpenTokenSeriesPatch
                 "SeriesIcon",
                 0f,
                 ResourceLoader.Load<Texture2D>("res://ReAstralPartyMod/images/astral_token.png"),
-                onMouseEntered: OnSeriesMouseEntered,
-                onMouseExited: OnMouseExited));
+                OnSeriesMouseEntered,
+                OnMouseExited));
 
             if (FinalArenaSeriesHelper.TryGetActiveComponents(_runState, out _))
-            {
                 AddChild(CreateIconNode(
                     "DistortionIcon",
                     56f,
                     ResourceLoader.Load<Texture2D>("res://ReAstralPartyMod/images/ui/distortion_component_logo.png"),
-                    onMouseEntered: OnDistortionMouseEntered,
-                    onMouseExited: OnMouseExited));
-            }
+                    OnDistortionMouseEntered,
+                    OnMouseExited));
         }
 
         private Control CreateIconNode(
@@ -172,9 +170,7 @@ public static partial class NTopBarOpenTokenSeriesPatch
                     Pressed: true,
                     DoubleClick: false
                 })
-            {
                 return;
-            }
 
             if (iconName == "DistortionIcon")
             {
@@ -182,7 +178,9 @@ public static partial class NTopBarOpenTokenSeriesPatch
                 FinalArenaDistortionComponentPopup.Open(_runState);
             }
             else
+            {
                 ShowHoverTips(TokenSeriesAvailabilityHelper.BuildHoverTips(_runState, _seriesIcon), 0f);
+            }
 
             AcceptEvent();
         }

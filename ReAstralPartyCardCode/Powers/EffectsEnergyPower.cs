@@ -19,7 +19,9 @@ public sealed class EffectsEnergyPower : AstralPartyPowerModel
     public override PowerStackType StackType => PowerStackType.Counter;
     public override int DisplayAmount => Math.Clamp((int)Amount, 0, (int)MaxStacks);
     public override LocString Title => new("powers", "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_ENERGY_POWER.title");
-    public override LocString Description => new("powers", "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_ENERGY_POWER.description");
+
+    public override LocString Description =>
+        new("powers", "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_ENERGY_POWER.description");
 
     public override bool TryModifyPowerAmountReceived(PowerModel canonicalPower, Creature target, decimal amount,
         Creature? applier, out decimal modifiedAmount)
@@ -67,6 +69,8 @@ public sealed class EffectsEnergyPower : AstralPartyPowerModel
         Creature target,
         decimal amount,
         Creature? applier = null,
-        CardModel? source = null) =>
-        Add(choiceContext, target, -Math.Max(0m, amount), applier, source);
+        CardModel? source = null)
+    {
+        return Add(choiceContext, target, -Math.Max(0m, amount), applier, source);
+    }
 }

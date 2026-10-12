@@ -117,7 +117,8 @@ public sealed class AstralTemporaryStrengthPower : AstralTemporaryAppliedPowerBa
         AbstractModel originModel, Creature? applier, CardModel? cardSource, bool silent = false)
     {
         if (amount < 0m)
-            return AstralTemporaryStrengthLossPower.Apply(context, owner, -amount, originModel, applier, cardSource, silent);
+            return AstralTemporaryStrengthLossPower.Apply(context, owner, -amount, originModel, applier, cardSource,
+                silent);
 
         var power = (AstralTemporaryStrengthPower)ModelDb.Power<AstralTemporaryStrengthPower>().ToMutable();
         return MegaCrit.Sts2.Core.Commands.PowerCmd.Apply(
@@ -138,7 +139,6 @@ public sealed class AstralTemporaryStrengthPower : AstralTemporaryAppliedPowerBa
 
         return PowerCmd.Apply(power, owner, amount, applier, cardSource, silent);
     }
-
 }
 
 public sealed class AstralTemporaryDexterityPower : AstralTemporaryAppliedPowerBase
@@ -173,7 +173,8 @@ public sealed class AstralTemporaryDexterityPower : AstralTemporaryAppliedPowerB
         AbstractModel originModel, Creature? applier, CardModel? cardSource, bool silent = false)
     {
         if (amount < 0m)
-            return AstralTemporaryDexterityLossPower.Apply(context, owner, -amount, originModel, applier, cardSource, silent);
+            return AstralTemporaryDexterityLossPower.Apply(context, owner, -amount, originModel, applier, cardSource,
+                silent);
         var power = (AstralTemporaryDexterityPower)ModelDb.Power<AstralTemporaryDexterityPower>().ToMutable();
         return ApplyInternal(context, power.Configure(originModel, ModelDb.Power<DexterityPower>()), owner,
             amount, applier, cardSource, silent);

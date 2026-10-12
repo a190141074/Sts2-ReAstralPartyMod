@@ -43,5 +43,4 @@ public class TokenBlueHandheldFanSmall : AstralPartyRelicModel
         Flash();
         await PowerCmd.Apply<EffectsMarkPower>(target, 1m, Owner.Creature, cardPlay.Card, false);
     }
-
 }

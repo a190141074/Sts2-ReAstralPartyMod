@@ -22,6 +22,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 internal static class StokovCardRewardRefreshHelper
 {
     private sealed class EligibleRewardMarker;
+
     private sealed class RerollState
     {
         public int Count;
@@ -31,10 +32,13 @@ internal static class StokovCardRewardRefreshHelper
 
     private static readonly ConditionalWeakTable<CardReward, EligibleRewardMarker> EligibleRewards = new();
     private static readonly ConditionalWeakTable<CardReward, RerollState> RerollStates = new();
+
     private static readonly PropertyInfo? OptionsProperty =
         AccessTools.Property(typeof(CardReward), "Options");
+
     private static readonly FieldInfo? CardsField =
         AccessTools.Field(typeof(CardReward), "_cards");
+
     private static readonly FieldInfo? HasBeenRerolledField =
         AccessTools.Field(typeof(CardReward), "_hasBeenRerolled");
 
@@ -160,7 +164,7 @@ internal static class StokovCardRewardRefreshHelper
 
         foreach (var card in cards)
         {
-            historyEntry?.CardChoices.Add(new CardChoiceHistoryEntry(card, wasPicked: false));
+            historyEntry?.CardChoices.Add(new CardChoiceHistoryEntry(card, false));
             RunManager.Instance?.RewardSynchronizer?.SyncLocalSkippedCard(card);
         }
     }

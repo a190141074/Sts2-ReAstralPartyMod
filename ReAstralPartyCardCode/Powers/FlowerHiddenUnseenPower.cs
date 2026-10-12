@@ -25,7 +25,7 @@ public class FlowerHiddenUnseenPower : AstralPartyPowerModel
 
     public override int DisplayAmount => (int)Math.Clamp(Amount, 0m, MaxStacks);
 
-    public override async Task AfterApplied(Creature? applier, MegaCrit.Sts2.Core.Models.CardModel? cardSource)
+    public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
     {
         AstralParty_FlowerHiddenUnseenRemainingDuration = DefaultDuration;
         await base.AfterApplied(applier, cardSource);

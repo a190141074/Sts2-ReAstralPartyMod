@@ -63,7 +63,8 @@ internal static class BaseAbilityHelper
         if (selectedCard == null)
             return null;
 
-        var createdCard = owner.Creature.CombatState.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, recipient);
+        var createdCard =
+            owner.Creature.CombatState.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, recipient);
         await PersonMultiplayerEffectHelper.MoveOwnedCombatCardToHandAndNotify(
             createdCard,
             CardPilePosition.Top,

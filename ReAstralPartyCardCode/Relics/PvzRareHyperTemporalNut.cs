@@ -101,13 +101,15 @@ public class PvzRareHyperTemporalNut : AstralPartyRelicModel
             AstralParty_PvzRareHyperTemporalNutFusionProcessed = true;
             return;
         }
+
         if (!PvzNutRelicHelper.CanFuseUltimateNut(Owner, out var fusionRelics))
             return;
 
         AstralParty_PvzRareHyperTemporalNutFusionProcessed = true;
         MainFile.Logger.Info($"[PvzRareHyperTemporalNut] Fusing into ultimate nut | owner={Owner.NetId}");
         await PvzNutRelicHelper.MeltRelicsAsync(fusionRelics);
-        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(Owner, ModelDb.Relic<PvzUltimateHyperSpacetimeNut>());
+        await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(Owner,
+            ModelDb.Relic<PvzUltimateHyperSpacetimeNut>());
     }
 
     private decimal ResolveRestoredHp(Creature creature)
@@ -119,7 +121,8 @@ public class PvzRareHyperTemporalNut : AstralPartyRelicModel
         if (_hpSnapshots.Count == 1)
             return ClampToPositive(_hpSnapshots[0], creature.MaxHp);
 
-        MainFile.Logger.Warn($"[PvzRareHyperTemporalNut] No snapshots available; falling back to 1 HP | owner={Owner?.NetId}");
+        MainFile.Logger.Warn(
+            $"[PvzRareHyperTemporalNut] No snapshots available; falling back to 1 HP | owner={Owner?.NetId}");
         return 1m;
     }
 

@@ -149,11 +149,11 @@ public static class AstralKeywords
         foreach (var stem in OwnedKeywordStems)
             registry.RegisterCardKeywordOwnedByLocNamespace(
                 stem,
-                iconPath: null,
-                cardDescriptionPlacement: stem is IrrefusableStem or FallenHeavenlyKingStem
+                null,
+                stem is IrrefusableStem or FallenHeavenlyKingStem
                     ? ModKeywordCardDescriptionPlacement.BeforeCardDescription
                     : ModKeywordCardDescriptionPlacement.None,
-                includeInCardHoverTip: true);
+                true);
 
         _registered = true;
     }

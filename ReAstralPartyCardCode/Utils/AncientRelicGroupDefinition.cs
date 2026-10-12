@@ -14,7 +14,9 @@ public sealed record AncientRelicGroupDefinition(
     IReadOnlyList<string> RelicIdPrefixes)
 {
     public LocString TitleLocString => new("relics", TitleLocKey);
-    public LocString? DescriptionLocString => DescriptionLocKey == null ? null : new("relics", DescriptionLocKey);
+
+    public LocString? DescriptionLocString =>
+        DescriptionLocKey == null ? null : new LocString("relics", DescriptionLocKey);
 
     public bool Matches(RelicModel relic)
     {

@@ -21,10 +21,11 @@ public sealed class AttackPotionWarforgeCompatPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(AttackPotion), "OnUse", [typeof(PlayerChoiceContext), typeof(Creature)])];
+        return [new ModPatchTarget(typeof(AttackPotion), "OnUse", [typeof(PlayerChoiceContext), typeof(Creature)])];
     }
 
-    public static bool Prefix(AttackPotion __instance, PlayerChoiceContext choiceContext, Creature? target, ref Task __result)
+    public static bool Prefix(AttackPotion __instance, PlayerChoiceContext choiceContext, Creature? target,
+        ref Task __result)
     {
         __result = UseAttackPotionAsync(__instance, choiceContext);
         return false;
@@ -44,12 +45,13 @@ public sealed class AttackPotionWarforgeCompatPatch : IPatchMethod
             choiceContext,
             cards,
             potion.Owner,
-            canSkip: true);
+            true);
         if (selected == null)
             return;
 
         selected.SetToFreeThisTurn();
-        await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(selected, PileType.Hand, potion.Owner, CardPilePosition.Top);
+        await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(selected, PileType.Hand, potion.Owner,
+            CardPilePosition.Top);
     }
 }
 
@@ -61,10 +63,11 @@ public sealed class SkillPotionWarforgeCompatPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(SkillPotion), "OnUse", [typeof(PlayerChoiceContext), typeof(Creature)])];
+        return [new ModPatchTarget(typeof(SkillPotion), "OnUse", [typeof(PlayerChoiceContext), typeof(Creature)])];
     }
 
-    public static bool Prefix(SkillPotion __instance, PlayerChoiceContext choiceContext, Creature? target, ref Task __result)
+    public static bool Prefix(SkillPotion __instance, PlayerChoiceContext choiceContext, Creature? target,
+        ref Task __result)
     {
         __result = UseSkillPotionAsync(__instance, choiceContext);
         return false;
@@ -84,26 +87,30 @@ public sealed class SkillPotionWarforgeCompatPatch : IPatchMethod
             choiceContext,
             cards,
             potion.Owner,
-            canSkip: true);
+            true);
         if (selected == null)
             return;
 
         selected.SetToFreeThisTurn();
-        await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(selected, PileType.Hand, potion.Owner, CardPilePosition.Top);
+        await MegaCrit.Sts2.Core.Commands.CardPileCmd.AddGeneratedCardToCombat(selected, PileType.Hand, potion.Owner,
+            CardPilePosition.Top);
     }
 }
 
 public sealed class FreeAttackPowerWarforgeBeforePlayedCompatPatch : IPatchMethod
 {
     public static string PatchId => "free_attack_power_warforge_before_played_compat_patch";
-    public static string Description => "Gameplay patch: let Free Attack Power consume on Warforge-enhanced Skill cards";
+
+    public static string Description =>
+        "Gameplay patch: let Free Attack Power consume on Warforge-enhanced Skill cards";
+
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
         return
         [
-            new(typeof(FreeAttackPower), nameof(FreeAttackPower.BeforeCardPlayed), [typeof(CardPlay)])
+            new ModPatchTarget(typeof(FreeAttackPower), nameof(FreeAttackPower.BeforeCardPlayed), [typeof(CardPlay)])
         ];
     }
 
@@ -131,14 +138,17 @@ public sealed class FreeAttackPowerWarforgeBeforePlayedCompatPatch : IPatchMetho
 public sealed class FreeSkillPowerWarforgeBeforePlayedCompatPatch : IPatchMethod
 {
     public static string PatchId => "free_skill_power_warforge_before_played_compat_patch";
-    public static string Description => "Gameplay patch: let Free Skill Power consume on Warforge-enhanced Attack cards";
+
+    public static string Description =>
+        "Gameplay patch: let Free Skill Power consume on Warforge-enhanced Attack cards";
+
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
         return
         [
-            new(typeof(FreeSkillPower), nameof(FreeSkillPower.BeforeCardPlayed), [typeof(CardPlay)])
+            new ModPatchTarget(typeof(FreeSkillPower), nameof(FreeSkillPower.BeforeCardPlayed), [typeof(CardPlay)])
         ];
     }
 

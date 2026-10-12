@@ -165,6 +165,7 @@ public static class AstralContentModeRegistry
 
     private static readonly Dictionary<AstralGameplaySettingKey, AstralGameplaySettingDefinition> ByKey =
         BuildByKey();
+
     private static readonly Dictionary<string, AstralGameplaySettingDefinition> ByEntryId =
         BuildByEntryId();
 
@@ -180,10 +181,8 @@ public static class AstralContentModeRegistry
     {
         var normalized = NormalizeMode(mode);
         foreach (var definition in ModeDefinitions)
-        {
             if (definition.Mode == normalized)
                 return definition;
-        }
 
         return ModeDefinitions[0];
     }
@@ -204,7 +203,7 @@ public static class AstralContentModeRegistry
         AstralContentMode mode,
         AstralGameplaySettingKey key)
     {
-        return GetAvailability(mode, key, roomSurface: false) == AstralModeAvailability.Editable;
+        return GetAvailability(mode, key, false) == AstralModeAvailability.Editable;
     }
 
     public static AstralModeAvailability GetAvailability(

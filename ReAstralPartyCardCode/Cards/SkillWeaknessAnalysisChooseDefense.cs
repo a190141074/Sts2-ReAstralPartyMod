@@ -18,7 +18,7 @@ public class SkillWeaknessAnalysisChooseDefense : AstralPartyCardModel
         CardType.Skill,
         CardRarity.Rare,
         TargetType.Self,
-        showInCardLibrary: false)
+        false)
     {
     }
 

@@ -169,7 +169,8 @@ public static class PersonMultiplayerEffectHelper
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
         if (IsRelicBannedForOwner(owner, canonicalRelic))
-            throw new InvalidOperationException($"Attempted to deterministically obtain banned relic '{canonicalRelic.Id}'.");
+            throw new InvalidOperationException(
+                $"Attempted to deterministically obtain banned relic '{canonicalRelic.Id}'.");
 
         ExclusiveRelicUnlockHelper.MarkRelicUnlockedForCurrentRunAndProfile(owner, canonicalRelic);
         if (canonicalRelic.Id == ModelDb.GetId<TokenGoldInitialPoint>() &&
@@ -202,7 +203,8 @@ public static class PersonMultiplayerEffectHelper
     {
         var canonicalRelic = relic.CanonicalInstance ?? relic;
         if (IsRelicBannedForOwner(owner, canonicalRelic))
-            throw new InvalidOperationException($"Attempted to grant banned multiplayer-safe relic reward '{canonicalRelic.Id}'.");
+            throw new InvalidOperationException(
+                $"Attempted to grant banned multiplayer-safe relic reward '{canonicalRelic.Id}'.");
 
         if (RewardContextPolicy.CanUseRewardSynchronizer(owner, "safe relic reward"))
             return ObtainRelicAsReward(owner, canonicalRelic);

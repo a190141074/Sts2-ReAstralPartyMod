@@ -11,7 +11,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 [RegisterCard(typeof(PersonSkillCardPool))]
 public sealed class HkMajestyOfTheHeavenlyKing : AstralPartyCardModel
 {
-    protected override string PortraitBasePath => "res://ReAstralPartyMod/images/card_portraits/hk_majesty_of_the_heavenly_king，rare";
+    protected override string PortraitBasePath =>
+        "res://ReAstralPartyMod/images/card_portraits/hk_majesty_of_the_heavenly_king，rare";
 
     public HkMajestyOfTheHeavenlyKing() : base(3, CardType.Attack, CardRarity.Rare, TargetType.AnyEnemy)
     {
@@ -27,7 +28,8 @@ public sealed class HkMajestyOfTheHeavenlyKing : AstralPartyCardModel
             return;
 
         var damage = Owner.GetRelic<TokenEternalStarlight>()?.GetStacks() ?? 0;
-        var results = await CreatureCmd.Damage(choiceContext, cardPlay.Target, damage, ValueProp.Move, Owner.Creature, this);
+        var results =
+            await CreatureCmd.Damage(choiceContext, cardPlay.Target, damage, ValueProp.Move, Owner.Creature, this);
         var unblockedDamage = results.Sum(static result => result.UnblockedDamage);
         if (unblockedDamage <= 0m || CombatState == null)
             return;

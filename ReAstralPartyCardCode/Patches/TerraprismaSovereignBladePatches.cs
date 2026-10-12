@@ -12,7 +12,7 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
- [HarmonyPatch(typeof(CardModel), nameof(CardModel.OnPlayWrapper))]
+[HarmonyPatch(typeof(CardModel), nameof(CardModel.OnPlayWrapper))]
 internal static class TerraprismaDirectLoadPatch
 {
     private static readonly AsyncLocal<int> FallbackDepth = new();
@@ -81,6 +81,7 @@ internal static class TerraprismaDirectLoadPatch
                 await PlayOriginalAsync(card, choiceContext, target, isAutoPlay, resources, skipCardPileVisuals);
                 return;
             }
+
             await card.MoveToResultPileWithoutPlaying(choiceContext);
             await CombatManager.Instance.CheckForEmptyHand(choiceContext, owner);
         }

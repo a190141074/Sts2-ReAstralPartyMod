@@ -25,7 +25,9 @@ public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
     [SavedProperty] public int AstralParty_PersonProprietressDoppelgangerCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonProprietressDoppelgangerPendingCombatStartCard { get; set; }
     [SavedProperty] public int AstralParty_PersonProprietressDoppelgangerSpentGoldForDamage { get; set; }
-    [SavedProperty] public int AstralParty_PersonProprietressDoppelgangerLastEternalStarlightActIndex { get; set; } = -1;
+
+    [SavedProperty]
+    public int AstralParty_PersonProprietressDoppelgangerLastEternalStarlightActIndex { get; set; } = -1;
 
     protected override int CounterValue
     {
@@ -128,6 +130,6 @@ public sealed class PersonProprietressDoppelganger : CooldownPersonRelicBase
         await TokenEternalStarlight.GrantStacks(
             owner,
             EternalStarlightPerAct,
-            bypassProprietressDoppelgangerPenalty: true);
+            true);
     }
 }

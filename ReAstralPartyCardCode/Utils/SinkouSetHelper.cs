@@ -116,10 +116,8 @@ internal static class SinkouSetHelper
             return;
 
         foreach (var memberName in ReplayMemberNames)
-        {
             if (TryModifyReplayProperty(card, memberName, amount))
                 return;
-        }
 
         MainFile.Logger.Warn($"[SinkouSetHelper] Failed to locate replay member on card {card.Id.Entry}.");
     }
@@ -136,7 +134,8 @@ internal static class SinkouSetHelper
         var runStateType = owner.RunState.GetType();
         foreach (var memberName in RunDeckMemberNames)
         {
-            var member = runStateType.GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            var member = runStateType
+                .GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .FirstOrDefault();
             if (member == null)
                 continue;
@@ -182,7 +181,8 @@ internal static class SinkouSetHelper
     {
         var title = new LocString("relics", "RE_ASTRAL_PARTY_MOD_RELIC_SINKOU_SET.current_set_title");
         var body = GetCurrentSetLineText(owner);
-        return new HoverTip(title, body, GD.Load<Texture2D>("res://ReAstralPartyMod/images/relic/jewelry_solar_crown.png"));
+        return new HoverTip(title, body,
+            GD.Load<Texture2D>("res://ReAstralPartyMod/images/relic/jewelry_solar_crown.png"));
     }
 
     public static LocString? GetCurrentSetLine(Player? owner)
@@ -199,7 +199,8 @@ internal static class SinkouSetHelper
 
     private static bool TryModifyReplayProperty(CardModel card, string memberName, int amount)
     {
-        var property = card.GetType().GetProperty(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var property = card.GetType()
+            .GetProperty(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         if (property != null && property.CanRead && property.CanWrite)
         {
             var currentValue = property.GetValue(card);
@@ -210,7 +211,8 @@ internal static class SinkouSetHelper
             }
         }
 
-        var field = card.GetType().GetField(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+        var field = card.GetType()
+            .GetField(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         if (field != null)
         {
             var currentValue = field.GetValue(card);

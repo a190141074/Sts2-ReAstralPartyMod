@@ -100,7 +100,7 @@ public class PvzRareDestructionNut : AstralPartyRelicModel
         InvokeDisplayAmountChanged();
         Flash();
         foreach (var enemy in CombatTargetSnapshotHelper.GetAliveNonAlliedCreatures(
-                     ownerCreature.CombatState as MegaCrit.Sts2.Core.Combat.CombatState
+                     ownerCreature.CombatState as CombatState
                      ?? throw new InvalidOperationException("Expected CombatState for destruction nut explosion."),
                      ownerCreature))
             await CreatureCmd.Damage(choiceContext, enemy, DeathDamageAmount, ValueProp.Unpowered, ownerCreature, null);

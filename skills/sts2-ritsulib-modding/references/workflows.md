@@ -38,8 +38,8 @@
 - 运行时 `D:\Steam\steamapps\common\Slay the Spire 2\data_sts2_windows_x86_64\sts2.xml` 是否存在
 - manifest 是否声明 `min_game_version`
 - manifest 是否按当前分支声明依赖：
-  - 旧分支可用 `dependencies: ["STS2-RitsuLib"]`
-  - 当前 `0.105+` / 新版口径优先用对象写法并补 `min_version`
+	- 旧分支可用 `dependencies: ["STS2-RitsuLib"]`
+	- 当前 `0.105+` / 新版口径优先用对象写法并补 `min_version`
 - 是否有 `[ModInitializer(...)]`
 - 是否调用 `RitsuLibFramework.EnsureGodotScriptsRegistered(...)`
 - 是否调用 `ModTypeDiscoveryHub.RegisterModAssembly(...)`
@@ -84,13 +84,19 @@
 
 ## 额外角标 / 图标第二计数
 
-先读 `D:\MOD\杀戮尖塔2mod制作\RitsuLib-doc\RitsuLib\02 - 玩法基底\07 - 额外角标\README.md`。教程路径失效时，用 `scripts/find-ritsulib-symbol.ps1 -Pattern '角标'` 重新定位，不能直接退回自写 UI patch。
+先读 `D:\MOD\杀戮尖塔2mod制作\RitsuLib-doc\RitsuLib\02 - 玩法基底\07 - 额外角标\README.md`。教程路径失效时，用
+`scripts/find-ritsulib-symbol.ps1 -Pattern '角标'` 重新定位，不能直接退回自写 UI patch。
 
-- 核对当前 `csproj` 实际引用的 DLL/XML；分包版本的接口可能在 `STS2-RitsuLib.Runtime.dll` / `.xml`，不要只搜索 loader 或转发程序集。
-- 遗物额外角标使用 `STS2RitsuLib.Combat.Ui.ExtraCornerAmountLabels.IRelicExtraIconAmountLabelSpecsProvider`，在 `GetRelicExtraIconAmountLabelSpecs()` 返回 `ExtraIconAmountLabelSpec.Plain(ExtraIconAmountLabelCorner.TopRight, text)`。能力、意图按教程使用各自的 provider，不把遗物接口照搬到其他模型。
+- 核对当前 `csproj` 实际引用的 DLL/XML；分包版本的接口可能在 `STS2-RitsuLib.Runtime.dll` / `.xml`，不要只搜索 loader
+  或转发程序集。
+- 遗物额外角标使用 `STS2RitsuLib.Combat.Ui.ExtraCornerAmountLabels.IRelicExtraIconAmountLabelSpecsProvider`，在
+  `GetRelicExtraIconAmountLabelSpecs()` 返回 `ExtraIconAmountLabelSpec.Plain(ExtraIconAmountLabelCorner.TopRight, text)`
+  。能力、意图按教程使用各自的 provider，不把遗物接口照搬到其他模型。
 - `DisplayAmount` 保留原计数职责；额外角标实时计算派生值，不新增一份存档或联机状态。canonical 模型无 Owner 时也必须安全返回。
-- 默认随 `DisplayAmountChanged` 刷新；若派生值来自另一模型，该模型变化时通知持有者对应遗物刷新。确实不走该事件时，才实现 `IRelicExtraIconAmountLabelsChangeSource` 并触发 `RelicExtraIconAmountLabelsInvalidated`。
-- 复用 RitsuLib 的定位、字体、鼠标穿透和生命周期清理。只有当前运行时 provider 确实无法表达需求并有取证依据时，才考虑局部 UI patch；替换旧实现后删除其注册项、节点代码及失去用途的资源。
+- 默认随 `DisplayAmountChanged` 刷新；若派生值来自另一模型，该模型变化时通知持有者对应遗物刷新。确实不走该事件时，才实现
+  `IRelicExtraIconAmountLabelsChangeSource` 并触发 `RelicExtraIconAmountLabelsInvalidated`。
+- 复用 RitsuLib 的定位、字体、鼠标穿透和生命周期清理。只有当前运行时 provider 确实无法表达需求并有取证依据时，才考虑局部 UI
+  patch；替换旧实现后删除其注册项、节点代码及失去用途的资源。
 - 修改前自检：已读对应 doc 章节、已核对实际 Runtime 接口、已搜索仓库同类代码、已说明刷新来源与生命周期；不能因“原生只有一个槽”或“仓库没有例子”跳过前置能力。
 
 ## 添加能力
@@ -183,7 +189,8 @@
 - 需要游戏内脚本/控制台辅助验证
 - 需要把“代码核对”补成“实机可重复测试”
 
-如果当前仓库有自己的 overlay skill，把 repo-specific 的本地化、日志路径、命名链、系统面排错，交给 overlay 继续收窄，不要继续往通用 workflow 里硬塞仓库例外。
+如果当前仓库有自己的 overlay skill，把 repo-specific 的本地化、日志路径、命名链、系统面排错，交给 overlay 继续收窄，不要继续往通用
+workflow 里硬塞仓库例外。
 
 ## 检索脚本使用方式
 

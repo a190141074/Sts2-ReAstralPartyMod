@@ -34,20 +34,18 @@ internal static class AbsoluteFormHelper
         var discoveredEntries = new HashSet<string>(StringComparer.Ordinal);
 
         foreach (var player in EventCombatTargetHelper.GetAlivePlayers(combatState))
+        foreach (var card in EventDeckCardHelper.GetRunDeckCards(player))
         {
-            foreach (var card in EventDeckCardHelper.GetRunDeckCards(player))
-            {
-                var entry = (card.CanonicalInstance ?? card)?.Id.Entry;
-                if (string.IsNullOrWhiteSpace(entry))
-                    continue;
+            var entry = (card.CanonicalInstance ?? card)?.Id.Entry;
+            if (string.IsNullOrWhiteSpace(entry))
+                continue;
 
-                if (!targetEntries.Contains(entry))
-                    continue;
+            if (!targetEntries.Contains(entry))
+                continue;
 
-                discoveredEntries.Add(entry);
-                if (discoveredEntries.Count == targetEntries.Count)
-                    return true;
-            }
+            discoveredEntries.Add(entry);
+            if (discoveredEntries.Count == targetEntries.Count)
+                return true;
         }
 
         return false;

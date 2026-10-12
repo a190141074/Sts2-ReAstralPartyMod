@@ -60,6 +60,6 @@ public class OriginalEnhancedTyrantForm : AstralPartyCardModel
             this,
             false);
 
-        PlayerCmd.EndTurn(Owner, canBackOut: false);
+        PlayerCmd.EndTurn(Owner, false);
     }
 }

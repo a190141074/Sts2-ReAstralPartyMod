@@ -120,7 +120,8 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         if (FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.Gale))
             await ApplyToAllCreatures(
                 combatState,
-                creature => PowerCmd.Apply<ReversedScalesHolographicPower>(creature, GaleReversedScales, creature, null, false));
+                creature => PowerCmd.Apply<ReversedScalesHolographicPower>(creature, GaleReversedScales, creature, null,
+                    false));
 
         if (FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.WideAreaMark))
             await ApplyToAllCreatures(
@@ -129,15 +130,14 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
 
         if (FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.Robbery) &&
             FinalArenaSeriesHelper.ConsumeRobberyNextCombatStun(runState))
-        {
             await ApplyRobberyCombatStart(combatState);
-        }
 
         var hasTreasureTarget = aliveEnemies.Any(enemy => !IsBossEnemy(enemy));
         if (FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.MysteriousTreasure) &&
             FinalArenaSeriesHelper.ShouldApplyMysteriousTreasureThisCombat(runState, hasTreasureTarget))
         {
-            var treasureTarget = GetDeterministicRandomNonBossEnemy(aliveEnemies, "mysterious_treasure", runState.TotalFloor);
+            var treasureTarget =
+                GetDeterministicRandomNonBossEnemy(aliveEnemies, "mysterious_treasure", runState.TotalFloor);
             if (treasureTarget != null)
                 await PowerCmd.Apply<TreasureBucketPower>(treasureTarget, 1m, treasureTarget, null, false);
         }
@@ -208,7 +208,8 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         return modified;
     }
 
-    public override async Task BeforeHandDraw(Player player, PlayerChoiceContext choiceContext, ICombatState combatState)
+    public override async Task BeforeHandDraw(Player player, PlayerChoiceContext choiceContext,
+        ICombatState combatState)
     {
         var data = GetData();
         if (!data.PendingPreciseSelectionTurnSeeds.TryGetValue(player.NetId, out var turnSeed))
@@ -350,30 +351,30 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
                 ValueProp.Unblockable | ValueProp.Unpowered,
                 player.Creature,
                 null);
-            await AstralTemporaryStrengthPower.Apply(player.Creature, RainstormTemporaryStrength, this, player.Creature, null, true);
+            await AstralTemporaryStrengthPower.Apply(player.Creature, RainstormTemporaryStrength, this, player.Creature,
+                null, true);
         }
 
         if (pending?.TriggerSeasickness == true &&
             RunState != null &&
             FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Seasickness))
         {
-            var poisonTarget = GetDeterministicRandomPlayerOrNull("seasickness", player, GetCurrentGlobalPlayerTurnCounter());
+            var poisonTarget =
+                GetDeterministicRandomPlayerOrNull("seasickness", player, GetCurrentGlobalPlayerTurnCounter());
             if (poisonTarget?.Creature != null)
-                await PowerCmd.Apply<PoisonPower>(poisonTarget.Creature, SeasicknessPoison, player.Creature, cardPlay.Card, false);
+                await PowerCmd.Apply<PoisonPower>(poisonTarget.Creature, SeasicknessPoison, player.Creature,
+                    cardPlay.Card, false);
         }
 
         if (pending?.TriggerGale == true &&
             RunState != null &&
             FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Gale))
-        {
             FinalArenaPersonaCooldownAdjustmentHelper.AdvanceCooldownRelicsFromDistortion(player, 1);
-        }
 
         if (pending?.TriggerOverloadPersonaSkill == true &&
             RunState != null &&
             FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Overload) &&
             PersonRelicHelper.IsPersonSkillCard(cardPlay.Card))
-        {
             await AstralTemporaryDexterityPower.Apply(
                 player.Creature,
                 -OverloadTemporaryDexterityLoss,
@@ -381,26 +382,21 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
                 player.Creature,
                 cardPlay.Card,
                 true);
-        }
 
         if (pending?.TriggerCopyLow == true &&
             RunState != null &&
             FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.CopyCard) &&
             WarforgeEnchantmentHelper.CountsAsSkill(cardPlay.Card))
-        {
             await PersonMultiplayerEffectHelper.CopyCardToHandOrRedirectLivingFolioAsync(
                 player,
                 cardPlay.Card,
                 this,
                 CardPilePosition.Top);
-        }
 
         if (pending?.TriggerCopyHigh == true &&
             RunState != null &&
             FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.CopyCard))
-        {
             await DiscardRandomHandCard(choiceContext, player, cardPlay.Card);
-        }
     }
 
     public override async Task AfterCardChangedPiles(CardModel card, PileType oldPileType, AbstractModel? source)
@@ -473,14 +469,14 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         if (combatState == null)
             return;
 
-        if (RunState != null && FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Thundercloud))
+        if (RunState != null &&
+            FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.Thundercloud))
             await ResolveThundercloud(choiceContext, combatState);
 
         if (side == CombatSide.Player)
-        {
-            foreach (var player in participants.Select(static creature => creature.Player).Where(static player => player != null))
+            foreach (var player in participants.Select(static creature => creature.Player)
+                         .Where(static player => player != null))
                 ClearEnergyDisorderEntriesForPlayer(player);
-        }
     }
 
     public async Task AfterAttackHit(AttackHitContext context)
@@ -539,7 +535,8 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
 
     private CombatState? GetCombatState()
     {
-        return RunState?.Players.FirstOrDefault(static player => player.Creature?.CombatState != null)?.Creature?.CombatState as CombatState;
+        return RunState?.Players.FirstOrDefault(static player => player.Creature?.CombatState != null)?.Creature
+            ?.CombatState as CombatState;
     }
 
     private IReadOnlyList<Player> GetStablePlayers()
@@ -737,7 +734,8 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         {
             var randomPlayer = GetDeterministicRandomPlayer("referee_attention_1", player, globalTurnCounter);
             if (randomPlayer?.Creature != null)
-                await AstralTemporaryDexterityPower.Apply(choiceContext, randomPlayer.Creature, -RefereeStatLoss, this, null, null, true);
+                await AstralTemporaryDexterityPower.Apply(choiceContext, randomPlayer.Creature, -RefereeStatLoss, this,
+                    null, null, true);
         }
 
         if (FinalArenaSeriesHelper.HasComponent(RunState, FinalArenaDistortionComponent.RefereeAttentionTwo))
@@ -746,16 +744,17 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
             var refereePenaltyStat = RollRefereeAttentionTwoPenaltyStat(player, globalTurnCounter);
             var randomPlayer = GetDeterministicRandomPlayer("referee_attention_2_player", player, globalTurnCounter);
             if (randomPlayer?.Creature != null)
-                    await ApplyDeterministicTemporaryStatPenalty(
+                await ApplyDeterministicTemporaryStatPenalty(
                     choiceContext,
                     randomPlayer.Creature,
                     refereePenaltyStat);
 
             var enemy = combatState == null
                 ? null
-                : GetDeterministicRandomNonBossEnemy(GetAliveEnemies(combatState), "referee_attention_2_enemy", globalTurnCounter);
+                : GetDeterministicRandomNonBossEnemy(GetAliveEnemies(combatState), "referee_attention_2_enemy",
+                    globalTurnCounter);
             if (enemy != null)
-                    await ApplyDeterministicTemporaryStatPenalty(
+                await ApplyDeterministicTemporaryStatPenalty(
                     choiceContext,
                     enemy,
                     refereePenaltyStat);
@@ -806,7 +805,8 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
         if (actualCard == null)
             return;
 
-        await PersonMultiplayerEffectHelper.MoveCombatCardToHandAndNotify(actualCard.Owner!, actualCard, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.MoveCombatCardToHandAndNotify(actualCard.Owner!, actualCard,
+            CardPilePosition.Top, this);
     }
 
     private List<CardModel> BuildPreciseSelectionCandidates(Player player)
@@ -866,8 +866,10 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
                 if (goldToGain > 0m)
                     await PlayerCmd.GainGold(goldToGain, player);
             }
+
             FinalArenaSeriesHelper.MarkArbitragePaidPlayerThroughFloor(runState, player.NetId, paidThroughFloor);
         }
+
         FinalArenaSeriesHelper.SetArbitrageFloorBaseline(runState, paidThroughFloor);
     }
 
@@ -1054,7 +1056,7 @@ public sealed class FinalArenaDistortionComponentModifier : ModifierModel, IAtta
     {
         var owner = card?.Owner;
         if (owner?.Creature?.CombatState == null ||
-            owner.RunState is not MegaCrit.Sts2.Core.Runs.RunState runState ||
+            owner.RunState is not RunState runState ||
             !FinalArenaSeriesHelper.HasComponent(runState, FinalArenaDistortionComponent.Overload))
             return false;
 

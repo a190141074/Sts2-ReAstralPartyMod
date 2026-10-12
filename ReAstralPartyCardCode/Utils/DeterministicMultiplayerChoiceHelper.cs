@@ -56,15 +56,15 @@ public static class DeterministicMultiplayerChoiceHelper
         {
             var selectedRelic = await ShowLocalRelicSelection(player, options);
             var selectedIndex = selectedRelic == null ? -1 : IndexOfRelic(options, selectedRelic);
-                synchronizer.SyncLocalChoice(
-                    player,
-                    choiceId,
-                    AstralChoiceProtocol.CreateIndexedEnvelope(
-                        AstralChoiceKind.RelicSelection,
-                        (RunState?)player.RunState,
-                        sessionKey,
-                        0,
-                        [selectedIndex]));
+            synchronizer.SyncLocalChoice(
+                player,
+                choiceId,
+                AstralChoiceProtocol.CreateIndexedEnvelope(
+                    AstralChoiceKind.RelicSelection,
+                    (RunState?)player.RunState,
+                    sessionKey,
+                    0,
+                    [selectedIndex]));
             AstralTelemetry.RecordTokenChoice(player, context, options, selectedRelic, 0);
             Log.Info(
                 $"[{MainFile.ModId}] Synced local relic choice: context={context} player={player.NetId} choiceId={choiceId} index={selectedIndex}");
@@ -168,7 +168,8 @@ public static class DeterministicMultiplayerChoiceHelper
         var runManager = RunManager.Instance;
         var gameType = runManager.NetService.Type;
         if (gameType is NetGameType.Singleplayer or NetGameType.None)
-            return await ShowLocalGroupedRelicSelection(player, options, groups, title, subtitle, groupTitle, groupSubtitle, relicTitle, relicSubtitle, skipText, allowSkip);
+            return await ShowLocalGroupedRelicSelection(player, options, groups, title, subtitle, groupTitle,
+                groupSubtitle, relicTitle, relicSubtitle, skipText, allowSkip);
 
         var synchronizer = await WaitForPlayerChoiceSynchronizerAsync(runManager);
         if (synchronizer == null)
@@ -178,7 +179,8 @@ public static class DeterministicMultiplayerChoiceHelper
         var choiceId = synchronizer.ReserveChoiceId(player);
         if (IsLocalPlayer(runManager, player))
         {
-            var selectedRelic = await ShowLocalGroupedRelicSelection(player, options, groups, title, subtitle, groupTitle, groupSubtitle, relicTitle, relicSubtitle, skipText, allowSkip);
+            var selectedRelic = await ShowLocalGroupedRelicSelection(player, options, groups, title, subtitle,
+                groupTitle, groupSubtitle, relicTitle, relicSubtitle, skipText, allowSkip);
             var selectedIndex = selectedRelic == null ? -1 : IndexOfRelic(options, selectedRelic);
             synchronizer.SyncLocalChoice(
                 player,
@@ -294,6 +296,7 @@ public static class DeterministicMultiplayerChoiceHelper
                         $"[{MainFile.ModId}] Closed Trouble Maker spectator selection: context={context} player={player.NetId} choiceId={choiceId}.");
                 }
             }
+
             var remotePayload = remoteChoice?.Payload ?? [];
 
             var remoteIndex = remotePayload.Count > 0 ? remotePayload[0] : -1;
@@ -777,12 +780,10 @@ public static class DeterministicMultiplayerChoiceHelper
     private static async Task WaitForOverlaySettleFramesAsync(int frames)
     {
         for (var i = 0; i < frames; i++)
-        {
             if (NGame.Instance?.IsInsideTree() == true)
                 await NGame.Instance.ToSignal(NGame.Instance.GetTree(), SceneTree.SignalName.ProcessFrame);
             else
                 await Task.Yield();
-        }
     }
 
     private static RefreshableTokenRelicSelectionResult CreateForcedRefreshableFallbackResult(

@@ -11,12 +11,12 @@ public static class AstralRelicStoreFirstEventModifierInstaller
 
     public static void EnsureInstalledForNewRun(RunState? runState)
     {
-        EnsureInstalled(runState, loadedRun: false);
+        EnsureInstalled(runState, false);
     }
 
     public static void EnsureInstalledForLoadedRun(RunState? runState)
     {
-        EnsureInstalled(runState, loadedRun: true);
+        EnsureInstalled(runState, true);
     }
 
     private static void EnsureInstalled(RunState? runState, bool loadedRun)

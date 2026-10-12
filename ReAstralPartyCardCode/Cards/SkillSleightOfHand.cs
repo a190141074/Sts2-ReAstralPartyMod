@@ -30,7 +30,8 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
         HoverTipFactory.FromPower<WindfallHitsPower>()
     ];
 
-    public SkillSleightOfHand() : base(0, CardType.Skill, CardRarity.Rare, CandyPotionTargetingHelper.AnyOtherLivingPlayerOrEnemy)
+    public SkillSleightOfHand() : base(0, CardType.Skill, CardRarity.Rare,
+        CandyPotionTargetingHelper.AnyOtherLivingPlayerOrEnemy)
     {
     }
 
@@ -43,7 +44,8 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
         RecordTelemetryOnPlay();
         var owner = Owner;
         var target = cardPlay.Target;
-        if (owner?.Creature == null || target == null || !CandyPotionTargetingHelper.IsOtherLivingPlayerOrEnemy(target, owner))
+        if (owner?.Creature == null || target == null ||
+            !CandyPotionTargetingHelper.IsOtherLivingPlayerOrEnemy(target, owner))
             return;
 
         var targetStarLight = target.GetPower<EffectsStarlightPower>();
@@ -63,7 +65,7 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
 
         var selected = DeterministicMultiplayerChoiceHelper.PickDeterministically(
             legalCards,
-            card => $"{GetHandIndex(hand, card):D4}|{(card.CanonicalInstance?.Id ?? card.Id)}|{card.CurrentUpgradeLevel}",
+            card => $"{GetHandIndex(hand, card):D4}|{card.CanonicalInstance?.Id ?? card.Id}|{card.CurrentUpgradeLevel}",
             CardId,
             target.Player.NetId,
             hand.Count,
@@ -72,7 +74,8 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
         if (selected == null)
             return;
         CardCmd.Enchant<WindfallHitsEnchantment>(selected, 1m);
-        MainFile.Logger.Info($"[LegendaryThief] SleightOfHand synced: skill={GetStableCardInstanceKey(cardPlay.Card)} target={target.Player.NetId} handCard={GetStableCardInstanceKey(selected)} play={GetCombatPlaySequence(cardPlay)}");
+        MainFile.Logger.Info(
+            $"[LegendaryThief] SleightOfHand synced: skill={GetStableCardInstanceKey(cardPlay.Card)} target={target.Player.NetId} handCard={GetStableCardInstanceKey(selected)} play={GetCombatPlaySequence(cardPlay)}");
     }
 
     private static int GetHandIndex(IReadOnlyList<CardModel> hand, CardModel card)
@@ -83,8 +86,13 @@ public sealed class SkillSleightOfHand : PersonSkillCardModel
         return -1;
     }
 
-    private static string GetStableCardInstanceKey(CardModel card) =>
-        $"{card.CanonicalInstance?.Id ?? card.Id}:{card.CurrentUpgradeLevel}";
+    private static string GetStableCardInstanceKey(CardModel card)
+    {
+        return $"{card.CanonicalInstance?.Id ?? card.Id}:{card.CurrentUpgradeLevel}";
+    }
 
-    private static int GetCombatPlaySequence(CardPlay cardPlay) => cardPlay.PlayIndex;
+    private static int GetCombatPlaySequence(CardPlay cardPlay)
+    {
+        return cardPlay.PlayIndex;
+    }
 }

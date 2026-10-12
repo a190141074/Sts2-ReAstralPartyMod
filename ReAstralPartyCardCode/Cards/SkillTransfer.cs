@@ -14,7 +14,6 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillTransfer : AstralPartyCardModel
 {
@@ -91,4 +90,3 @@ public class SkillTransfer : AstralPartyCardModel
                && HasAnyLivingPlayerTarget();
     }
 }
-

@@ -19,6 +19,7 @@ internal static class FallenHeavenlyKingDeckHelper
     private const string ReplacementRunDataKey = "fallen_heavenly_king_deck_replacement";
     private const string ReplacementActionKey = "fallen_heavenly_king_deck_replacement";
     private static readonly HashSet<ulong> ReplacementRequestsInFlight = [];
+
     private static readonly RitsuLibManagedNetActionDescriptor<FallenHeavenlyKingDeckReplacementActionPayload>
         ReplacementAction =
             new(
@@ -28,6 +29,7 @@ internal static class FallenHeavenlyKingDeckHelper
                 DeserializeReplacementAction,
                 ExecuteReplacementAction,
                 GameActionType.NonCombat);
+
     private static RunSavedData<FallenHeavenlyKingDeckReplacementRunData> _replacementRunData = null!;
     private static bool _registered;
 
@@ -45,8 +47,8 @@ internal static class FallenHeavenlyKingDeckHelper
         }
 
         RitsuLibManagedNetActions.Register(ReplacementAction);
-        RitsuLibFramework.SubscribeLifecycle<RoomEnteredEvent>(OnRoomEntered, replayCurrentState: false);
-        RitsuLibFramework.SubscribeLifecycle<RunLoadedEvent>(OnRunLoaded, replayCurrentState: false);
+        RitsuLibFramework.SubscribeLifecycle<RoomEnteredEvent>(OnRoomEntered, false);
+        RitsuLibFramework.SubscribeLifecycle<RunLoadedEvent>(OnRunLoaded, false);
         _registered = true;
     }
 
@@ -59,17 +61,13 @@ internal static class FallenHeavenlyKingDeckHelper
             .Select(card => (CardId: card.Id.Entry, Snapshot: card.ToSerializable()))
             .ToList();
         foreach (var source in originals)
-        {
             for (var copyIndex = 0; copyIndex < 2; copyIndex++)
-            {
                 try
                 {
                     var copy = runState.LoadCard(source.Snapshot, owner);
                     if (!await EventDeckCardHelper.AddCardToRunDeckAsync(owner, copy, true))
-                    {
                         throw new InvalidOperationException(
                             $"Could not add duplicated card '{source.CardId}' to player {owner.NetId}'s deck.");
-                    }
                 }
                 catch (Exception exception)
                 {
@@ -77,8 +75,6 @@ internal static class FallenHeavenlyKingDeckHelper
                         $"[FallenHeavenlyKing] deck duplication failed | owner={owner.NetId} | card={source.CardId} | copy={copyIndex + 1}: {exception}");
                     throw;
                 }
-            }
-        }
 
         MainFile.Logger.Info(
             $"[FallenHeavenlyKing] duplicated deck twice | owner={owner.NetId} | originals={originals.Count}");
@@ -94,11 +90,16 @@ internal static class FallenHeavenlyKingDeckHelper
             return false;
         }
 
-        if (!await AddMissingCopies<HkMajestyOfTheHeavenlyKing>(owner, 3, existingCards.Count(static card => card is HkMajestyOfTheHeavenlyKing))
-            || !await AddMissingCopies<HkExclusiveChannel>(owner, 3, existingCards.Count(static card => card is HkExclusiveChannel))
-            || !await AddMissingCopies<HkHeavenlyKingsPresence>(owner, 3, existingCards.Count(static card => card is HkHeavenlyKingsPresence))
-            || !await AddMissingCopies<HkFallOfTheHeavenlyKing>(owner, 1, existingCards.Count(static card => card is HkFallOfTheHeavenlyKing))
-            || !await AddMissingCopies<HkHeavenlyKingFallIncident>(owner, 1, existingCards.Count(static card => card is HkHeavenlyKingFallIncident)))
+        if (!await AddMissingCopies<HkMajestyOfTheHeavenlyKing>(owner, 3,
+                existingCards.Count(static card => card is HkMajestyOfTheHeavenlyKing))
+            || !await AddMissingCopies<HkExclusiveChannel>(owner, 3,
+                existingCards.Count(static card => card is HkExclusiveChannel))
+            || !await AddMissingCopies<HkHeavenlyKingsPresence>(owner, 3,
+                existingCards.Count(static card => card is HkHeavenlyKingsPresence))
+            || !await AddMissingCopies<HkFallOfTheHeavenlyKing>(owner, 1,
+                existingCards.Count(static card => card is HkFallOfTheHeavenlyKing))
+            || !await AddMissingCopies<HkHeavenlyKingFallIncident>(owner, 1,
+                existingCards.Count(static card => card is HkHeavenlyKingFallIncident)))
         {
             MainFile.Logger.Warn(
                 $"[FallenHeavenlyKing] heavenly deck replacement retained | owner={owner.NetId} | cards={DescribeDeck(EventDeckCardHelper.GetRunDeckCards(owner))}.");
@@ -284,7 +285,8 @@ internal static class FallenHeavenlyKingDeckHelper
         return [.. writer.Buffer.AsSpan(0, writer.BytePosition)];
     }
 
-    private static FallenHeavenlyKingDeckReplacementActionPayload DeserializeReplacementAction(ReadOnlySpan<byte> payload)
+    private static FallenHeavenlyKingDeckReplacementActionPayload DeserializeReplacementAction(
+        ReadOnlySpan<byte> payload)
     {
         var reader = new PacketReader();
         reader.Reset([.. payload]);
@@ -325,7 +327,7 @@ internal static class FallenHeavenlyKingDeckHelper
         {
             var card = ModelDb.Card<TCard>().ToMutable();
             card.FloorAddedToDeck = Math.Max(owner.RunState?.TotalFloor ?? 1, 1);
-            if (!await EventDeckCardHelper.AddCardToRunDeckAsync(owner, card, showPreview: true))
+            if (!await EventDeckCardHelper.AddCardToRunDeckAsync(owner, card, true))
             {
                 MainFile.Logger.Warn(
                     $"[FallenHeavenlyKing] heavenly deck add failed | owner={owner.NetId} | card={card.Id.Entry} | added={index}/{missingCount}.");
@@ -350,7 +352,8 @@ internal static class FallenHeavenlyKingDeckHelper
 
     private static string DescribeDeck(IReadOnlyCollection<CardModel> cards)
     {
-        return $"total={cards.Count},majesty={cards.Count(static card => card is HkMajestyOfTheHeavenlyKing)},exclusive_channel={cards.Count(static card => card is HkExclusiveChannel)},presence={cards.Count(static card => card is HkHeavenlyKingsPresence)},fall={cards.Count(static card => card is HkFallOfTheHeavenlyKing)},incident={cards.Count(static card => card is HkHeavenlyKingFallIncident)}";
+        return
+            $"total={cards.Count},majesty={cards.Count(static card => card is HkMajestyOfTheHeavenlyKing)},exclusive_channel={cards.Count(static card => card is HkExclusiveChannel)},presence={cards.Count(static card => card is HkHeavenlyKingsPresence)},fall={cards.Count(static card => card is HkFallOfTheHeavenlyKing)},incident={cards.Count(static card => card is HkHeavenlyKingFallIncident)}";
     }
 }
 

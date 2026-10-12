@@ -74,7 +74,8 @@ public sealed class TokenGoldFlyingStar : AstralPartyRelicModel
             return;
 
         Flash();
-        var enemies = EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature).ToList();
+        var enemies = EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature)
+            .ToList();
         var bossExtraDamage = GetBossExtraDamage();
         foreach (var enemy in enemies)
         {
@@ -97,7 +98,8 @@ public sealed class TokenGoldFlyingStar : AstralPartyRelicModel
             await RecordEnemyHit();
         }
 
-        await PowerCmd.Apply(ModelDb.Power<EffectsStarlightPower>().ToMutable(), Owner.Creature, StarLightAmount, Owner.Creature, null, false);
+        await PowerCmd.Apply(ModelDb.Power<EffectsStarlightPower>().ToMutable(), Owner.Creature, StarLightAmount,
+            Owner.Creature, null, false);
     }
 
     private async Task RecordEnemyHit()
@@ -117,6 +119,7 @@ public sealed class TokenGoldFlyingStar : AstralPartyRelicModel
     {
         return Math.Max(0, Owner?.GetRelic<TokenEternalStarlight>()?.GetStacks() ?? 0) / 3m;
     }
+
     private bool IsBossEnemy(Creature creature)
     {
         var combatState = creature.CombatState as CombatState;

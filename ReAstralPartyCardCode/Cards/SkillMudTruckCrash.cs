@@ -16,7 +16,6 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillMudTruckCrash : AstralPartyCardModel
 {
@@ -84,4 +83,3 @@ public class SkillMudTruckCrash : AstralPartyCardModel
             await PowerCmd.Apply<FracturePower>(splashTarget, FractureAmount, Owner.Creature, this, false);
     }
 }
-

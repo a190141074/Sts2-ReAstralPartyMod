@@ -47,7 +47,10 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
     private static readonly Dictionary<Type, FieldInfo?> VoteDelegateFields = new();
 
     private readonly TaskCompletionSource _completionSource = new();
-    private readonly TaskCompletionSource _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    private readonly TaskCompletionSource
+        _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
     private readonly TaskCompletionSource<int> _singlePlayerChoiceSource = new();
     private readonly TaskCompletionSource<CommittedSelectionSnapshot> _multiplayerCommitSource = new();
     private readonly RunState _runState;
@@ -200,7 +203,8 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
     {
         var backgroundTexture = GD.Load<Texture2D>(BackgroundTexturePath);
         if (backgroundTexture == null)
-            LogWarn("P132", $"Starting persona selection background texture failed to load: path={BackgroundTexturePath}.");
+            LogWarn("P132",
+                $"Starting persona selection background texture failed to load: path={BackgroundTexturePath}.");
 
         var background = new TextureRect
         {
@@ -258,7 +262,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         _holderContainer = new Control
         {
             Name = "HolderContainer",
-            MouseFilter = MouseFilterEnum.Pass,
+            MouseFilter = MouseFilterEnum.Pass
         };
         _holderContainer.SetAnchorsAndOffsetsPreset(LayoutPreset.TopLeft);
         _holderScroll.AddChild(_holderContainer);
@@ -298,7 +302,8 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         scrollBar.AddThemeConstantOverride("minimum_grab_thickness", 18);
         scrollBar.AddThemeStyleboxOverride("scroll", CreateScrollBarStyle(new Color(0.08f, 0.08f, 0.1f, 0.42f)));
         scrollBar.AddThemeStyleboxOverride("grabber", CreateScrollBarStyle(new Color(0.78f, 0.72f, 0.58f, 0.9f), 8));
-        scrollBar.AddThemeStyleboxOverride("grabber_highlight", CreateScrollBarStyle(new Color(0.92f, 0.86f, 0.68f, 0.98f), 8));
+        scrollBar.AddThemeStyleboxOverride("grabber_highlight",
+            CreateScrollBarStyle(new Color(0.92f, 0.86f, 0.68f, 0.98f), 8));
         scrollBar.AddThemeStyleboxOverride("grabber_pressed", CreateScrollBarStyle(new Color(1f, 0.91f, 0.58f, 1f), 8));
     }
 
@@ -346,7 +351,8 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
             var holder = entry.Value;
             if (!IsInstanceValid(holder))
             {
-                LogWarn("P130", $"Starting persona selection holder became invalid before initialization: index={entry.Key}.");
+                LogWarn("P130",
+                    $"Starting persona selection holder became invalid before initialization: index={entry.Key}.");
                 continue;
             }
 
@@ -361,7 +367,8 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
             RebindVoteContainer(holder);
         }
 
-        ApplyHolderLayout(_holdersByIndex.OrderBy(entry => entry.Key).Select(entry => entry.Value).ToList(), _relicOptions.Count);
+        ApplyHolderLayout(_holdersByIndex.OrderBy(entry => entry.Key).Select(entry => entry.Value).ToList(),
+            _relicOptions.Count);
         ConfigureHolderFocusNeighbors();
     }
 
@@ -1017,6 +1024,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
                 AstralRelicDiagnosticHelper.ShowObtainFailure(result.player, relic, "人格发放", 109, ex);
                 throw;
             }
+
             awardedResults.Add((result.player, relic));
         }
 
@@ -1330,7 +1338,8 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         }
         catch (Exception ex)
         {
-            MainFile.Logger.Error($"[P120] Starting persona selection remote observer failed for player {player.NetId}: {ex}");
+            MainFile.Logger.Error(
+                $"[P120] Starting persona selection remote observer failed for player {player.NetId}: {ex}");
             if (!_closed && !_selectionFinalized)
             {
                 AstralNotificationService.ShowDiagnosticWarning(
@@ -1473,12 +1482,10 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
     private CommittedSelectionSnapshot BuildTimeoutFallbackSnapshot()
     {
         if (_displayMode == StartingPersonDisplayMode.Automatic)
-        {
             return new CommittedSelectionSnapshot
             {
                 SelectedIndexes = BuildAutomaticCommittedSelectionIndexes()
             };
-        }
 
         if (IsDestinedCloneMode())
         {
@@ -1733,10 +1740,7 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         if (mode == StartingPersonMode.DestinedClone)
             return "当前为天命克隆模式：仅房主选择的人格会生效，锁定后统一发给所有玩家；其他玩家无法选择。";
 
-        if (mode == StartingPersonMode.StandardDuplicate)
-        {
-            return "当前为标准可重复模式：所有玩家共享同一批人格。全员完成前可以改选；多人选择同一人格时，都会直接获得。";
-        }
+        if (mode == StartingPersonMode.StandardDuplicate) return "当前为标准可重复模式：所有玩家共享同一批人格。全员完成前可以改选；多人选择同一人格时，都会直接获得。";
 
         return "当前为标准模式：所有玩家共享同一批人格。全员完成前可以改选；若多人选中同一人格，则按稳定猜拳规则决定归属。";
     }
@@ -1801,7 +1805,9 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
             if (!_closed)
             {
                 if (NOverlayStack.Instance != null && IsInsideTree())
+                {
                     NOverlayStack.Instance.Remove(this);
+                }
                 else
                 {
                     _closed = true;
@@ -2006,7 +2012,8 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
         if (_authorityPlayer == null)
             return false;
 
-        if (!_selectionStates.TryGetValue(_authorityPlayer.NetId, out var authorityState) || authorityState.SelectedRelic == null)
+        if (!_selectionStates.TryGetValue(_authorityPlayer.NetId, out var authorityState) ||
+            authorityState.SelectedRelic == null)
             return false;
 
         selectedIndex = IndexOfRelic(_relicOptions, authorityState.SelectedRelic);
@@ -2043,5 +2050,4 @@ public sealed partial class StartingPersonRelicSelectionScreen : Control, IOverl
     {
         MainFile.Logger.Warn($"[{code}] {message}");
     }
-
 }

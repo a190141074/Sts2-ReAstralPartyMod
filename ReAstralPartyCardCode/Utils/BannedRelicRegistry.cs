@@ -17,6 +17,7 @@ public enum BannedRelicCategory
 public static class BannedRelicRegistry
 {
     private static readonly IReadOnlyList<RelicModel> AllAstralRelics = BuildAllAstralRelics();
+
     private static readonly HashSet<ModelId> NonBannableRelicIds =
     [
         ModelDb.GetId<TokenGoldInitialPoint>()
@@ -118,7 +119,7 @@ public static class BannedRelicRegistry
     private static IReadOnlyList<RelicModel> FilterForCurrentMode(IEnumerable<RelicModel> relics)
     {
         return AstralRelicAvailabilityHelper.FilterVisibleRelics(
-            bannedRelicIds: null,
+            null,
             ReAstralPartyModSettingsManager.GetCurrentContentMode(),
             ReAstralPartyModSettingsManager.GetEnableJewelryRelics(null),
             relics);

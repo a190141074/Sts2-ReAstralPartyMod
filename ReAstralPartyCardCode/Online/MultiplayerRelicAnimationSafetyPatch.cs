@@ -14,6 +14,7 @@ public static class MultiplayerRelicAnimationSafetyPatch
     private static int _skipLogCount;
     private static int _personaToastCount;
     private static int _tokenToastCount;
+
     private static readonly FieldInfo? RelicField =
         AccessTools.Field(typeof(NRelicInventoryHolder), "_relic")
         ?? AccessTools.Field(typeof(NRelicInventoryHolder), "relic")

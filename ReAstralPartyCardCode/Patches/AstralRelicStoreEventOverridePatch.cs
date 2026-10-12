@@ -18,7 +18,7 @@ public sealed class AstralRelicStoreEventOverridePatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(ActModel), nameof(ActModel.PullNextEvent), [typeof(RunState)])];
+        return [new ModPatchTarget(typeof(ActModel), nameof(ActModel.PullNextEvent), [typeof(RunState)])];
     }
 
     public static void Postfix(ActModel __instance, RunState runState, ref EventModel __result)
@@ -67,7 +67,7 @@ public sealed class AstralRelicStoreEventOverridePatch : IPatchMethod
         if (runState == null || currentEvent == null)
             return false;
 
-        if (!Settings.ReAstralPartyModSettingsManager.GetEnableStartingAstralRelicStore(runState))
+        if (!ReAstralPartyModSettingsManager.GetEnableStartingAstralRelicStore(runState))
             return false;
 
         if (!IsSecondAct(runState, act))

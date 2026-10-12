@@ -45,7 +45,8 @@ public class BloodthirstPower : AstralPartyPowerModel
             return;
         if (target.Side == Owner.Side)
             return;
-        if (cardSource == null || cardSource.Owner != Owner.Player || !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
+        if (cardSource == null || cardSource.Owner != Owner.Player ||
+            !WarforgeEnchantmentHelper.CountsAsAttack(cardSource))
             return;
         if (result.UnblockedDamage <= 0m)
             return;

@@ -72,7 +72,6 @@ public class SkillTrueMe : AstralPartyCardModel
 
         var currentDexterity = (int)Owner.Creature.GetPowerAmount<DexterityPower>();
         if (currentDexterity > 0)
-        {
             await AstralTemporaryStrengthPower.Apply(
                 Owner.Creature,
                 currentDexterity,
@@ -80,7 +79,6 @@ public class SkillTrueMe : AstralPartyCardModel
                 Owner.Creature,
                 this,
                 true);
-        }
 
         var warmPower = Owner.Creature.GetPower<WarmPower>();
         if (warmPower != null)

@@ -51,6 +51,7 @@ public static class FinalArenaSeriesHelper
 {
     private const string DistortionComponentsKey = "final_arena_distortion_components";
     private const string HoverTipRoot = "RE_ASTRAL_PARTY_MOD_DISTORTION_COMPONENT";
+
     private static readonly FinalArenaDistortionComponent[] RequiredAttentionComponents =
     [
         FinalArenaDistortionComponent.RefereeAttentionOne,
@@ -116,7 +117,7 @@ public static class FinalArenaSeriesHelper
                     });
         }
 
-        RitsuLibFramework.SubscribeLifecycle<ActEnteredEvent>(OnActEntered, replayCurrentState: false);
+        RitsuLibFramework.SubscribeLifecycle<ActEnteredEvent>(OnActEntered, false);
 
         _registered = true;
     }
@@ -181,7 +182,7 @@ public static class FinalArenaSeriesHelper
             ComponentsJson = SerializeComponents(components),
             HumanAiDuelApplied = existingRunData.HumanAiDuelApplied,
             HumanAiDuelGrantedPlayerNetIds = [.. existingRunData.HumanAiDuelGrantedPlayerNetIds],
-            HumanAiDuelRecordedMindStacks = new(existingRunData.HumanAiDuelRecordedMindStacks),
+            HumanAiDuelRecordedMindStacks = new Dictionary<ulong, int>(existingRunData.HumanAiDuelRecordedMindStacks),
             ChaosFloodAppliedPlayerNetIds = [],
             ChaosFloodTargetMaxPotionCounts = [],
             ChaosFloodTargetPersonChestCounts = [],
@@ -350,8 +351,10 @@ public static class FinalArenaSeriesHelper
         var runData = GetOrCreateRunData(runState);
         if (runData.RobberyGoldGranted && runData.RobberyGoldGrantedPlayerNetIds.Count == 0)
             runData.RobberyGoldGrantedPlayerNetIds = runState.Players.Select(static player => player.NetId).ToList();
-        if (runData.ThreeThousandAstrolabeGoldGranted && runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Count == 0)
-            runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds = runState.Players.Select(static player => player.NetId).ToList();
+        if (runData.ThreeThousandAstrolabeGoldGranted &&
+            runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Count == 0)
+            runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds =
+                runState.Players.Select(static player => player.NetId).ToList();
 
         foreach (var player in runState.Players.OrderBy(static player => player.NetId))
         {
@@ -362,6 +365,7 @@ public static class FinalArenaSeriesHelper
                 runData.RobberyGoldGrantedPlayerNetIds.Add(player.NetId);
                 _runData.Set(runState, runData);
             }
+
             if (astrolabeGrantedPlayerNetIds.Contains(player.NetId) &&
                 !runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Contains(player.NetId))
             {
@@ -377,7 +381,7 @@ public static class FinalArenaSeriesHelper
         if (runState == null || !TryGetActiveComponents(runState, out _))
             return;
 
-        FinalArenaDistortionComponentModifierInstaller.EnsureInstalled(runState, loadedRun: true);
+        FinalArenaDistortionComponentModifierInstaller.EnsureInstalled(runState, true);
     }
 
     public static int AdvanceGlobalPlayerTurnCounter(RunState runState)
@@ -534,7 +538,8 @@ public static class FinalArenaSeriesHelper
         {
             var wasGoldGranted = runData.RobberyGoldGranted;
             if (runData.RobberyGoldGranted && runData.RobberyGoldGrantedPlayerNetIds.Count == 0)
-                runData.RobberyGoldGrantedPlayerNetIds = runState.Players.Select(static player => player.NetId).ToList();
+                runData.RobberyGoldGrantedPlayerNetIds =
+                    runState.Players.Select(static player => player.NetId).ToList();
             foreach (var player in runState.Players.OrderBy(static player => player.NetId))
             {
                 if (runData.RobberyGoldGrantedPlayerNetIds.Contains(player.NetId))
@@ -544,15 +549,18 @@ public static class FinalArenaSeriesHelper
                 _runData.Set(runState, runData);
             }
 
-            runData.RobberyGoldGranted = runState.Players.All(player => runData.RobberyGoldGrantedPlayerNetIds.Contains(player.NetId));
+            runData.RobberyGoldGranted =
+                runState.Players.All(player => runData.RobberyGoldGrantedPlayerNetIds.Contains(player.NetId));
             if (runData.RobberyGoldGranted && !wasGoldGranted)
                 runData.RobberyNextCombatStunPending = true;
         }
 
         if (components.Contains(FinalArenaDistortionComponent.ThreeThousandAstrolabe))
         {
-            if (runData.ThreeThousandAstrolabeGoldGranted && runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Count == 0)
-                runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds = runState.Players.Select(static player => player.NetId).ToList();
+            if (runData.ThreeThousandAstrolabeGoldGranted &&
+                runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Count == 0)
+                runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds =
+                    runState.Players.Select(static player => player.NetId).ToList();
             foreach (var player in runState.Players.OrderBy(static player => player.NetId))
             {
                 if (runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Contains(player.NetId))
@@ -562,7 +570,8 @@ public static class FinalArenaSeriesHelper
                 _runData.Set(runState, runData);
             }
 
-            runData.ThreeThousandAstrolabeGoldGranted = runState.Players.All(player => runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Contains(player.NetId));
+            runData.ThreeThousandAstrolabeGoldGranted = runState.Players.All(player =>
+                runData.ThreeThousandAstrolabeGoldGrantedPlayerNetIds.Contains(player.NetId));
         }
 
         if (components.Contains(FinalArenaDistortionComponent.MysteriousTreasure) &&
@@ -576,9 +585,7 @@ public static class FinalArenaSeriesHelper
         if (components.Contains(FinalArenaDistortionComponent.ChaosFlood) &&
             runState.CurrentActIndex == 1 &&
             LobbyGameplayNetRoleHelper.GetCurrentRole() != LobbyGameplayNetRole.Client)
-        {
             await ApplyChaosFloodForPlayersAsync(runState, runData);
-        }
 
         _runData.Set(runState, runData);
     }

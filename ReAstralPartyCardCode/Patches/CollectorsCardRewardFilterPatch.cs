@@ -36,7 +36,7 @@ public sealed class CollectorsCardRewardFilterPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(CardReward), nameof(CardReward.Populate), Type.EmptyTypes)];
+        return [new ModPatchTarget(typeof(CardReward), nameof(CardReward.Populate), Type.EmptyTypes)];
     }
 
     public static void Postfix(CardReward __instance)

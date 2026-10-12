@@ -13,7 +13,6 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillSolarBombardment : AstralPartyCardModel
 {
@@ -121,7 +120,8 @@ public class SkillSolarBombardment : AstralPartyCardModel
                 await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable,
                     owner.Creature, sourceCard);
             else
-                await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable, owner.Creature);
+                await CreatureCmd.Damage(choiceContext, target, damage, ValueProp.Move | ValueProp.Unblockable,
+                    owner.Creature);
         }
     }
 
@@ -143,4 +143,3 @@ public class SkillSolarBombardment : AstralPartyCardModel
         return card is BaseAbilityOrbitalRailgun;
     }
 }
-

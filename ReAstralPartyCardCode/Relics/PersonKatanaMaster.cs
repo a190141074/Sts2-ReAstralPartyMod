@@ -43,6 +43,7 @@ public sealed class PersonKatanaMaster : CooldownPersonRelicBase
     public override RelicRarity Rarity => RelicRarity.Ancient;
     public override bool ShouldReceiveCombatHooks => true;
     protected override int BaseMaxCounter => 3;
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillSakuraSetsudan>(),
@@ -80,7 +81,8 @@ public sealed class PersonKatanaMaster : CooldownPersonRelicBase
         AstralParty_PersonKatanaMasterTookDamageThisTurn = false;
     }
 
-    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature? dealer, DamageResult result,
+    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature? dealer,
+        DamageResult result,
         ValueProp props, Creature target, CardModel? cardSource)
     {
         if (Owner?.Creature == null || AstralParty_PersonKatanaMasterFirstAttackTriggered)
@@ -113,7 +115,8 @@ public sealed class PersonKatanaMaster : CooldownPersonRelicBase
     {
         if (Owner?.Creature == null || Owner.Creature.GetPowerAmount<SwordGustPower>() >= 3m)
             return;
-        await PowerCmd.Apply<SwordGustPower>(Owner.Creature, Math.Min(amount, 3m - Owner.Creature.GetPowerAmount<SwordGustPower>()),
+        await PowerCmd.Apply<SwordGustPower>(Owner.Creature,
+            Math.Min(amount, 3m - Owner.Creature.GetPowerAmount<SwordGustPower>()),
             Owner.Creature, null, false);
     }
 
@@ -126,5 +129,8 @@ public sealed class PersonKatanaMaster : CooldownPersonRelicBase
         await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(card, true, CardPilePosition.Top, this);
     }
 
-    protected override Task GrantCooldownCard() => AddSakuraToHand();
+    protected override Task GrantCooldownCard()
+    {
+        return AddSakuraToHand();
+    }
 }

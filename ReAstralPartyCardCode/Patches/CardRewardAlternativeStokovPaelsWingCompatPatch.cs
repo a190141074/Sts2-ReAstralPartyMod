@@ -11,13 +11,18 @@ public sealed class CardRewardAlternativeStokovPaelsWingCompatPatch : IPatchMeth
 {
     public static string PatchId => "card_reward_alternative_stokov_paels_wing_compat_patch";
 
-    public static string Description => "Drop Skip from card reward alternatives when Stokov reroll and Pael's Wing sacrifice would otherwise exceed the vanilla two-option limit";
+    public static string Description =>
+        "Drop Skip from card reward alternatives when Stokov reroll and Pael's Wing sacrifice would otherwise exceed the vanilla two-option limit";
 
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(CardRewardAlternative), nameof(CardRewardAlternative.Generate), [typeof(CardReward)])];
+        return
+        [
+            new ModPatchTarget(typeof(CardRewardAlternative), nameof(CardRewardAlternative.Generate),
+                [typeof(CardReward)])
+        ];
     }
 
     public static bool Prefix(CardReward cardReward, ref IReadOnlyList<CardRewardAlternative> __result)
@@ -26,14 +31,11 @@ public sealed class CardRewardAlternativeStokovPaelsWingCompatPatch : IPatchMeth
         // immediately before the original two-option limit check.
         var alternatives = new List<CardRewardAlternative>();
         if (cardReward.CanSkip)
-        {
             alternatives.Add(new CardRewardAlternative(
                 "Skip",
                 PostAlternateCardRewardAction.EndSelectionAndDoNotCompleteReward));
-        }
 
         if (cardReward.CanReroll)
-        {
             alternatives.Add(new CardRewardAlternative(
                 "REROLL",
                 () =>
@@ -42,7 +44,6 @@ public sealed class CardRewardAlternativeStokovPaelsWingCompatPatch : IPatchMeth
                     return Task.CompletedTask;
                 },
                 PostAlternateCardRewardAction.DoNothing));
-        }
 
         Hook.ModifyCardRewardAlternatives(cardReward.Player.RunState, cardReward.Player, cardReward, alternatives);
         StokovPaelsWingCardRewardCompatHelper.TryDropSkipForStokovPaelsWing(cardReward, alternatives);

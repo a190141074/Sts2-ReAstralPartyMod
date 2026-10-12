@@ -14,7 +14,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillCyberAngel : AstralPartyCardModel
 {
@@ -76,7 +75,8 @@ public class SkillCyberAngel : AstralPartyCardModel
             foreach (var player in Owner.Creature.CombatState.Players
                          .Where(player => player != Owner)
                          .OrderBy(player => player.NetId))
-                await PowerCmd.Apply<EffectsStarlightPower>(player.Creature, ExtraTeamStarLightGain, Owner.Creature, this,
+                await PowerCmd.Apply<EffectsStarlightPower>(player.Creature, ExtraTeamStarLightGain, Owner.Creature,
+                    this,
                     false);
         }
 
@@ -84,4 +84,3 @@ public class SkillCyberAngel : AstralPartyCardModel
             await PowerCmd.Apply<RegenPower>(Owner.Creature, RegenerationAmount, Owner.Creature, this, false);
     }
 }
-

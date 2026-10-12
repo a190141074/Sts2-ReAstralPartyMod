@@ -9,7 +9,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillBigEater : AstralPartyCardModel
 {
@@ -45,4 +44,3 @@ public class SkillBigEater : AstralPartyCardModel
             this);
     }
 }
-

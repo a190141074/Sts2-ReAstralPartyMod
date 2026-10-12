@@ -18,7 +18,7 @@ public sealed class MainMenuLoadedToastPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(NMainMenu), "_Ready")];
+        return [new ModPatchTarget(typeof(NMainMenu), "_Ready")];
     }
 
     public static void Postfix()

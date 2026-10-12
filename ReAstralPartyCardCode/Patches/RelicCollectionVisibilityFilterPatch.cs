@@ -26,10 +26,8 @@ internal static class RelicCollectionVisibilityFilterHelper
 
         var sourceCount = relics.Count();
         if (LoggedContexts.Add($"{mode}:{context}:{sourceCount}:{filtered.Count}"))
-        {
             MainFile.Logger.Info(
                 $"[RelicCollectionVisibilityFilter] mode={mode} context={context} source={sourceCount} filtered={filtered.Count}");
-        }
 
         return filtered;
     }
@@ -71,7 +69,11 @@ public sealed class RelicCollectionAddRelicsFilterPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(NRelicCollection), nameof(NRelicCollection.AddRelics), [typeof(IEnumerable<RelicModel>)])];
+        return
+        [
+            new ModPatchTarget(typeof(NRelicCollection), nameof(NRelicCollection.AddRelics),
+                [typeof(IEnumerable<RelicModel>)])
+        ];
     }
 
     public static void Prefix(ref IEnumerable<RelicModel> relics)
@@ -90,7 +92,11 @@ public sealed class RelicCollectionLoadRelicNodesFilterPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(NRelicCollectionCategory), "LoadRelicNodes", [typeof(IEnumerable<RelicModel>), typeof(HashSet<RelicModel>), typeof(HashSet<RelicModel>)])];
+        return
+        [
+            new ModPatchTarget(typeof(NRelicCollectionCategory), "LoadRelicNodes",
+                [typeof(IEnumerable<RelicModel>), typeof(HashSet<RelicModel>), typeof(HashSet<RelicModel>)])
+        ];
     }
 
     public static void Prefix(ref IEnumerable<RelicModel> relics)

@@ -42,7 +42,8 @@ public sealed class PersonalityDerivativeLakeMarshKing : AstralPartyRelicModel
 
     internal async Task HandleObservedCardGain(Player recipient, AbstractModel? source, int amount = 1)
     {
-        if (Owner?.Creature?.CombatState == null || recipient == Owner || !CardGainAttribution.IsCausedBy(Owner)) return;
+        if (Owner?.Creature?.CombatState == null || recipient == Owner ||
+            !CardGainAttribution.IsCausedBy(Owner)) return;
         var current = AstralParty_PersonalityDerivativeLakeMarshKingAwakening;
         if (current < 8)
         {
@@ -86,7 +87,7 @@ public sealed class PersonalityDerivativeLakeMarshKing : AstralPartyRelicModel
     {
         if (Owner?.Creature == null || Owner.Creature.GetPower<TrueDragonFormRealPower>() != null) return;
         await PowerCmd.Apply<TrueDragonFormRealPower>(Owner.Creature, 1m, Owner.Creature, null, false);
-        var hand = MegaCrit.Sts2.Core.Entities.Cards.PileType.Hand.GetPile(Owner).Cards.ToList();
+        var hand = PileType.Hand.GetPile(Owner).Cards.ToList();
         foreach (var card in hand)
         {
             if (card is not SkillBite) continue;

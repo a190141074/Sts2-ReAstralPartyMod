@@ -25,9 +25,7 @@ public sealed class LoadTerraprismaPower : AstralPartyPowerModel
             || Owner?.Player == null
             || card.Owner != Owner.Player
             || card.Type != CardType.Attack)
-        {
             return false;
-        }
 
         _neutralizedCard = card;
         _loadedBaseDamage = card.DynamicVars.TryGetValue("Damage", out var damage)
@@ -61,6 +59,7 @@ public sealed class LoadTerraprismaPower : AstralPartyPowerModel
         {
             MainFile.Logger.Warn($"[Terraprisma] load power cleanup deferred after successful mount | error={ex}");
         }
+
         return loaded;
     }
 
@@ -73,7 +72,7 @@ public sealed class LoadTerraprismaPower : AstralPartyPowerModel
         _loadedBaseDamage = 0m;
     }
 
-    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, MegaCrit.Sts2.Core.Combat.CombatSide side)
+    public override async Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)
     {
         if (Owner?.Player == null || side != Owner.Side)
             return;

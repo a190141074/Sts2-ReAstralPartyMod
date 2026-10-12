@@ -82,9 +82,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include=".gitignore" />
-		<Content Include="description\eng.md" />
-		<Content Include="description\zhs.md" />
+		<Content Include=".gitignore"/>
+		<Content Include="description\eng.md"/>
+		<Content Include="description\zhs.md"/>
 		<Content Include="README.md"/>
 		<Content Include="ReAstralPartyMod.json"/>
 		<Content Include="ReAstralPartyMod\images\astral_token.png"/>
@@ -625,7 +625,7 @@
 		<Content Include="ReAstralPartyMod\images\ui\persona_relic_pool_energy_text.png.import"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png"/>
 		<Content Include="ReAstralPartyMod\images\ui\rest_site\option_re_astral_party_mod_option_initial_point.png.import"/>
-		<Content Include="ReAstralPartyMod\localization\eng\ancients.json" />
+		<Content Include="ReAstralPartyMod\localization\eng\ancients.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\cards.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\card_keywords.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\enchantments.json"/>
@@ -640,7 +640,7 @@
 		<Content Include="ReAstralPartyMod\localization\eng\rest_site_ui.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\static_hover_tips.json"/>
 		<Content Include="ReAstralPartyMod\localization\eng\settings_ui.json"/>
-		<Content Include="ReAstralPartyMod\localization\jpn\ancients.json" />
+		<Content Include="ReAstralPartyMod\localization\jpn\ancients.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\cards.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\card_keywords.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\enchantments.json"/>
@@ -655,7 +655,7 @@
 		<Content Include="ReAstralPartyMod\localization\jpn\rest_site_ui.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\static_hover_tips.json"/>
 		<Content Include="ReAstralPartyMod\localization\jpn\settings_ui.json"/>
-		<Content Include="ReAstralPartyMod\localization\zhs\ancients.json" />
+		<Content Include="ReAstralPartyMod\localization\zhs\ancients.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\cards.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\card_keywords.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\enchantments.json"/>
@@ -670,19 +670,19 @@
 		<Content Include="ReAstralPartyMod\localization\zhs\static_hover_tips.json"/>
 		<Content Include="ReAstralPartyMod\localization\zhs\settings_ui.json"/>
 		<Content Include="Preview\FinalArenaDistortionComponentLayoutPreview.tscn"/>
-		<Content Include="skills\sts2-reastralparty-modding\agents\openai.yaml" />
-		<Content Include="skills\sts2-reastralparty-modding\references\bilingual-glossary-template.md" />
-		<Content Include="skills\sts2-reastralparty-modding\references\timing-map.md" />
-		<Content Include="skills\sts2-reastralparty-modding\references\workflows.md" />
-		<Content Include="skills\sts2-reastralparty-modding\SKILL.md" />
-		<Content Include="skills\sts2-ritsulib-modding\agents\openai.yaml" />
-		<Content Include="skills\sts2-ritsulib-modding\references\migration-map.md" />
-		<Content Include="skills\sts2-ritsulib-modding\references\project-patterns.md" />
-		<Content Include="skills\sts2-ritsulib-modding\references\source-map.md" />
-		<Content Include="skills\sts2-ritsulib-modding\references\timing-map.md" />
-		<Content Include="skills\sts2-ritsulib-modding\references\workflows.md" />
-		<Content Include="skills\sts2-ritsulib-modding\scripts\find-ritsulib-symbol.ps1" />
-		<Content Include="skills\sts2-ritsulib-modding\SKILL.md" />
+		<Content Include="skills\sts2-reastralparty-modding\agents\openai.yaml"/>
+		<Content Include="skills\sts2-reastralparty-modding\references\bilingual-glossary-template.md"/>
+		<Content Include="skills\sts2-reastralparty-modding\references\timing-map.md"/>
+		<Content Include="skills\sts2-reastralparty-modding\references\workflows.md"/>
+		<Content Include="skills\sts2-reastralparty-modding\SKILL.md"/>
+		<Content Include="skills\sts2-ritsulib-modding\agents\openai.yaml"/>
+		<Content Include="skills\sts2-ritsulib-modding\references\migration-map.md"/>
+		<Content Include="skills\sts2-ritsulib-modding\references\project-patterns.md"/>
+		<Content Include="skills\sts2-ritsulib-modding\references\source-map.md"/>
+		<Content Include="skills\sts2-ritsulib-modding\references\timing-map.md"/>
+		<Content Include="skills\sts2-ritsulib-modding\references\workflows.md"/>
+		<Content Include="skills\sts2-ritsulib-modding\scripts\find-ritsulib-symbol.ps1"/>
+		<Content Include="skills\sts2-ritsulib-modding\SKILL.md"/>
 	</ItemGroup>
 
 	<ItemGroup>

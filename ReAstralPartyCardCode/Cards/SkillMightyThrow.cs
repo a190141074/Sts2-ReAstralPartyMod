@@ -65,5 +65,4 @@ public sealed class SkillMightyThrow : AstralPartyCardModel
     {
         return power.IsMutable ? ModelDb.GetById<PowerModel>(power.Id) : power;
     }
-
 }

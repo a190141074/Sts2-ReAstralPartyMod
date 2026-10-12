@@ -12,8 +12,11 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 public abstract class UltimateSkillCardModel : PersonSkillCardModel
 {
     private const string ChargeVarName = "UltimateCharge";
+
     private static readonly System.Reflection.MethodInfo? InvokeDisplayAmountChangedMethod = typeof(CardModel)
-        .GetMethod("InvokeDisplayAmountChanged", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+        .GetMethod("InvokeDisplayAmountChanged",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public |
+            System.Reflection.BindingFlags.NonPublic);
 
     [SavedProperty] public int AstralParty_UltimateSkillCharge { get; set; }
 

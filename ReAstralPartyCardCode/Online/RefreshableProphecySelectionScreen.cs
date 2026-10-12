@@ -12,11 +12,18 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Online;
 
 internal sealed partial class RefreshableProphecySelectionScreen : Control, IOverlayScreen, IScreenContext
 {
+    private readonly TaskCompletionSource<RefreshableProphecySelectionResult> _completionSource =
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-    private readonly TaskCompletionSource<RefreshableProphecySelectionResult> _completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private readonly TaskCompletionSource _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource
+        _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
     private readonly Player _owner;
-    private readonly Func<IReadOnlyList<ProphecySoulDevourKind>, int, IReadOnlySet<ProphecySoulDevourKind>, IReadOnlyList<ProphecySoulDevourKind>> _rerollFunc;
+
+    private readonly
+        Func<IReadOnlyList<ProphecySoulDevourKind>, int, IReadOnlySet<ProphecySoulDevourKind>,
+            IReadOnlyList<ProphecySoulDevourKind>> _rerollFunc;
+
     private readonly List<int> _rerollHistory = [];
     private readonly HashSet<ProphecySoulDevourKind> _seenOptions = [];
     private IReadOnlyList<ProphecySoulDevourKind> _options;
@@ -43,7 +50,8 @@ internal sealed partial class RefreshableProphecySelectionScreen : Control, IOve
         string subtitle,
         int refreshCost,
         bool allowRefresh,
-        Func<IReadOnlyList<ProphecySoulDevourKind>, int, IReadOnlySet<ProphecySoulDevourKind>, IReadOnlyList<ProphecySoulDevourKind>> rerollFunc)
+        Func<IReadOnlyList<ProphecySoulDevourKind>, int, IReadOnlySet<ProphecySoulDevourKind>,
+            IReadOnlyList<ProphecySoulDevourKind>> rerollFunc)
     {
         _owner = owner;
         _options = options;
@@ -67,9 +75,11 @@ internal sealed partial class RefreshableProphecySelectionScreen : Control, IOve
         string subtitle,
         int refreshCost,
         bool allowRefresh,
-        Func<IReadOnlyList<ProphecySoulDevourKind>, int, IReadOnlySet<ProphecySoulDevourKind>, IReadOnlyList<ProphecySoulDevourKind>> rerollFunc)
+        Func<IReadOnlyList<ProphecySoulDevourKind>, int, IReadOnlySet<ProphecySoulDevourKind>,
+            IReadOnlyList<ProphecySoulDevourKind>> rerollFunc)
     {
-        return new RefreshableProphecySelectionScreen(owner, options, title, subtitle, refreshCost, allowRefresh, rerollFunc);
+        return new RefreshableProphecySelectionScreen(owner, options, title, subtitle, refreshCost, allowRefresh,
+            rerollFunc);
     }
 
     public Task<RefreshableProphecySelectionResult> WaitForResult()
@@ -231,7 +241,7 @@ internal sealed partial class RefreshableProphecySelectionScreen : Control, IOve
             holderButton.AddThemeStyleboxOverride("pressed", empty);
             holderButton.AddThemeStyleboxOverride("focus", empty);
             holderButton.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-            holderButton.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
+            holderButton.MouseDefaultCursorShape = CursorShape.PointingHand;
             cardRoot.AddChild(holderButton);
 
             var titleBar = new PanelContainer
@@ -289,8 +299,10 @@ internal sealed partial class RefreshableProphecySelectionScreen : Control, IOve
             descriptionPanel.AddChild(description);
 
             SetOptionVisualState(optionRoot, titleBar, descriptionPanel, cardRoot, false);
-            holderButton.MouseEntered += () => SetOptionVisualState(optionRoot, titleBar, descriptionPanel, cardRoot, true);
-            holderButton.MouseExited += () => SetOptionVisualState(optionRoot, titleBar, descriptionPanel, cardRoot, false);
+            holderButton.MouseEntered +=
+                () => SetOptionVisualState(optionRoot, titleBar, descriptionPanel, cardRoot, true);
+            holderButton.MouseExited +=
+                () => SetOptionVisualState(optionRoot, titleBar, descriptionPanel, cardRoot, false);
             holderButton.Pressed += () => OnOptionSelected(capturedIndex);
         }
 

@@ -171,7 +171,8 @@ public class PersonMascotGirlMimi : CooldownPersonRelicBase
 
     private static string GetTokenChoiceSubtitlePrefix()
     {
-        return new LocString("relics", $"{ModelDb.Relic<PersonMascotGirlMimi>().Id.Entry}.selectionScreenSubtitlePrefix")
+        return new LocString("relics",
+                $"{ModelDb.Relic<PersonMascotGirlMimi>().Id.Entry}.selectionScreenSubtitlePrefix")
             .GetRawText();
     }
 

@@ -88,7 +88,8 @@ public sealed class TokenExclusiveOriginalConsciousness : AstralPartyRelicModel
 
         var orderedCandidates = DeterministicMultiplayerChoiceHelper.OrderDeterministically(
             candidates,
-            static entry => $"{entry.Index:D4}|{(entry.Card.CanonicalInstance ?? entry.Card).Id.Entry}|{entry.Card.CurrentUpgradeLevel:D2}",
+            static entry =>
+                $"{entry.Index:D4}|{(entry.Card.CanonicalInstance ?? entry.Card).Id.Entry}|{entry.Card.CurrentUpgradeLevel:D2}",
             MainFile.ModId,
             Id.Entry,
             Owner.RunState?.Rng.StringSeed,

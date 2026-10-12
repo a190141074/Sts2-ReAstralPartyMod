@@ -49,7 +49,7 @@ public sealed partial class AstralContentModeSwitchScreen : Control, ICapstoneSc
 
     public static AstralContentModeSwitchScreen GetOrCreate()
     {
-        if (_instance == null || !GodotObject.IsInstanceValid(_instance))
+        if (_instance == null || !IsInstanceValid(_instance))
             _instance = new AstralContentModeSwitchScreen();
 
         _instance.SetCloseAction(static () => ModScreenService.Close());

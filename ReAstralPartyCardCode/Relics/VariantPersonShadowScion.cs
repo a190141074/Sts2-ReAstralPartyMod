@@ -26,6 +26,7 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
     [SavedProperty] public int AstralParty_VariantPersonShadowScionPendingTransferredStarLight { get; set; }
 
     protected override string RelicId => "variant_person_shadow_scion";
+
     protected override int CounterValue
     {
         get => AstralParty_VariantPersonShadowScionCounter;
@@ -51,7 +52,8 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeFallenHeavenlyKing>(Owner);
+        await PersonMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeFallenHeavenlyKing>(Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -64,7 +66,8 @@ public sealed class VariantPersonShadowScion : CooldownPersonRelicBase
         {
             AstralParty_VariantPersonShadowScionPendingTransferredStarLight = 0;
             Flash();
-            await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, pendingTransferredStarLight, Owner.Creature, null, false);
+            await PowerCmd.Apply<EffectsStarlightPower>(Owner.Creature, pendingTransferredStarLight, Owner.Creature,
+                null, false);
             MainFile.Logger.Info(
                 $"[VariantPersonShadowScion] granted deferred transferred Starlight | owner={Owner.NetId} | amount={pendingTransferredStarLight}.");
         }

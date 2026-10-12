@@ -106,7 +106,8 @@ public sealed class TreasureBucketPower : AstralPartyPowerModel
 
     private Player? ResolveKillerPlayer()
     {
-        return Owner?.CombatState?.Players.FirstOrDefault(player => player.NetId == AstralParty_TreasureBucketLastHostileDealerNetId);
+        return Owner?.CombatState?.Players.FirstOrDefault(player =>
+            player.NetId == AstralParty_TreasureBucketLastHostileDealerNetId);
     }
 
     private static RelicModel? ResolveDeterministicTokenReward(Player owner)
@@ -128,13 +129,11 @@ public sealed class TreasureBucketPower : AstralPartyPowerModel
 
         var candidates = TokenRelicRegistry.GetAvailableTokenRelicsByRarity(owner.RunState, rarity);
         if (candidates.Count == 0)
-        {
             candidates = TokenRelicRegistry.GetAvailableTokenRelicsByRarity(owner.RunState, RelicRarity.Uncommon)
                 .Concat(TokenRelicRegistry.GetAvailableTokenRelicsByRarity(owner.RunState, RelicRarity.Common))
                 .Concat(TokenRelicRegistry.GetAvailableTokenRelicsByRarity(owner.RunState, RelicRarity.Rare))
                 .DistinctBy(static relic => relic.CanonicalInstance?.Id ?? relic.Id)
                 .ToList();
-        }
 
         return PersonMultiplayerEffectHelper.CreateDeterministicRelicChoiceOptions(
             candidates,

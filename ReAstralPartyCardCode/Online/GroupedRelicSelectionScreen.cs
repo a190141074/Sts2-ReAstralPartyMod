@@ -21,14 +21,21 @@ internal sealed partial class GroupedRelicSelectionScreen : Control, IOverlayScr
     private const float GroupCardHeight = 330f;
     private const float GroupIconSize = 148f;
     private const float RelicIconSize = 120f;
-    private const string GroupBackgroundPath = "res://ReAstralPartyMod/images/background/starting_person_pelic_selection_screen.png";
+
+    private const string GroupBackgroundPath =
+        "res://ReAstralPartyMod/images/background/starting_person_pelic_selection_screen.png";
+
     private const string CommonRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_blue.png";
     private const string UncommonRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_purple.png";
     private const string RareRelicBasePath = "res://ReAstralPartyMod/images/ui/relic_base_gold.png";
     private const string OptionBackgroundPath = "res://ReAstralPartyMod/images/ui/relic_background.png";
 
-    private readonly TaskCompletionSource<RelicModel?> _completionSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private readonly TaskCompletionSource _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly TaskCompletionSource<RelicModel?> _completionSource =
+        new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+    private readonly TaskCompletionSource
+        _overlayClosedSource = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
     private readonly Player _owner;
     private readonly IReadOnlyList<RelicModel> _allOptions;
     private readonly IReadOnlyList<AncientRelicGroupOption> _groupOptions;
@@ -59,7 +66,9 @@ internal sealed partial class GroupedRelicSelectionScreen : Control, IOverlayScr
 
     public NetScreenType ScreenType => NetScreenType.None;
     public bool UseSharedBackstop => true;
-    public Control? DefaultFocusedControl => _buttonsByIndex.OrderBy(pair => pair.Key).Select(pair => pair.Value).FirstOrDefault();
+
+    public Control? DefaultFocusedControl =>
+        _buttonsByIndex.OrderBy(pair => pair.Key).Select(pair => pair.Value).FirstOrDefault();
 
     private GroupedRelicSelectionScreen(
         Player owner,
@@ -386,7 +395,8 @@ internal sealed partial class GroupedRelicSelectionScreen : Control, IOverlayScr
 
         var count = new Label
         {
-            Text = string.Format(ProphecySoulDevourRegistry.AncientRelicGroupCountText.GetFormattedText(), group.Relics.Count),
+            Text = string.Format(ProphecySoulDevourRegistry.AncientRelicGroupCountText.GetFormattedText(),
+                group.Relics.Count),
             HorizontalAlignment = HorizontalAlignment.Center,
             MouseFilter = MouseFilterEnum.Ignore
         };
@@ -582,7 +592,8 @@ internal sealed partial class GroupedRelicSelectionScreen : Control, IOverlayScr
         NHoverTipSet.Remove(owner);
     }
 
-    private static void SetGroupCardHoverState(PanelContainer panel, TextureRect icon, PanelContainer descriptionPanel, bool active)
+    private static void SetGroupCardHoverState(PanelContainer panel, TextureRect icon, PanelContainer descriptionPanel,
+        bool active)
     {
         panel.AddThemeStyleboxOverride("panel", CreateGroupPanelStyle(active));
         descriptionPanel.AddThemeStyleboxOverride("panel", CreateDescriptionPanelStyle(active));
@@ -604,10 +615,14 @@ internal sealed partial class GroupedRelicSelectionScreen : Control, IOverlayScr
         button.AddThemeColorOverride("font_hover_color", new Color(0.08f, 0.08f, 0.08f));
         button.AddThemeColorOverride("font_pressed_color", new Color(0.08f, 0.08f, 0.08f));
         button.AddThemeColorOverride("font_focus_color", new Color(0.08f, 0.08f, 0.08f));
-        button.AddThemeStyleboxOverride("normal", CreateBottomButtonStyle(new Color(0.96f, 0.82f, 0.2f), new Color(1f, 0.91f, 0.5f)));
-        button.AddThemeStyleboxOverride("hover", CreateBottomButtonStyle(new Color(1f, 0.86f, 0.26f), new Color(1f, 0.95f, 0.58f)));
-        button.AddThemeStyleboxOverride("pressed", CreateBottomButtonStyle(new Color(0.92f, 0.76f, 0.14f), new Color(1f, 0.88f, 0.45f)));
-        button.AddThemeStyleboxOverride("focus", CreateBottomButtonStyle(new Color(1f, 0.86f, 0.26f), new Color(1f, 0.95f, 0.58f)));
+        button.AddThemeStyleboxOverride("normal",
+            CreateBottomButtonStyle(new Color(0.96f, 0.82f, 0.2f), new Color(1f, 0.91f, 0.5f)));
+        button.AddThemeStyleboxOverride("hover",
+            CreateBottomButtonStyle(new Color(1f, 0.86f, 0.26f), new Color(1f, 0.95f, 0.58f)));
+        button.AddThemeStyleboxOverride("pressed",
+            CreateBottomButtonStyle(new Color(0.92f, 0.76f, 0.14f), new Color(1f, 0.88f, 0.45f)));
+        button.AddThemeStyleboxOverride("focus",
+            CreateBottomButtonStyle(new Color(1f, 0.86f, 0.26f), new Color(1f, 0.95f, 0.58f)));
         return button;
     }
 

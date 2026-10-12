@@ -32,7 +32,8 @@ public class PersonFengShui : PersonRelicBase
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeFortuneMischance>(Owner);
+        await PersonMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeFortuneMischance>(Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -40,11 +41,14 @@ public class PersonFengShui : PersonRelicBase
         if (Owner?.Creature?.CombatState == null)
             return;
 
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeFortuneMischance>(Owner);
+        await PersonMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeFortuneMischance>(Owner);
         await PowerCmd.SetAmount<FengShuiNodePower>(Owner.Creature, 1m, Owner.Creature, null);
 
         var alreadyExists = Owner.PlayerCombatState?.AllCards.Any(card =>
-            card.Owner == Owner && (card.CanonicalInstance?.Id ?? card.Id) == ModelDb.GetId<SkillFortuneMischance>()) == true;
+                                card.Owner == Owner && (card.CanonicalInstance?.Id ?? card.Id) ==
+                                ModelDb.GetId<SkillFortuneMischance>()) ==
+                            true;
         if (alreadyExists)
             return;
 

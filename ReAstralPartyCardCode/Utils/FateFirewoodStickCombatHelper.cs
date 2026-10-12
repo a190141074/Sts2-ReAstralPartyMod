@@ -61,7 +61,8 @@ internal static class FateFirewoodStickCombatHelper
         if (owner == null || ownerCreature == null)
             return;
 
-        var ownerNode = NodePowerRollHelper.RollNodeValue(owner, sourceCard, "fate_firewood_owner", MinNodeValue, MaxNodeValue);
+        var ownerNode =
+            NodePowerRollHelper.RollNodeValue(owner, sourceCard, "fate_firewood_owner", MinNodeValue, MaxNodeValue);
         var targetNode = RollTargetNodeValue(owner, target, sourceCard, shouldTransferOnSuccess);
 
         await PowerCmd.SetAmount<FateFirewoodNodePower>(ownerCreature, ownerNode, ownerCreature, sourceCard);
@@ -71,7 +72,8 @@ internal static class FateFirewoodStickCombatHelper
         {
             if (ownerNode >= targetNode)
             {
-                await ResolveSuccess(choiceContext, sourceCard, ownerCreature, target, hiroRelic, shouldTransferOnSuccess);
+                await ResolveSuccess(choiceContext, sourceCard, ownerCreature, target, hiroRelic,
+                    shouldTransferOnSuccess);
                 return;
             }
 
@@ -84,10 +86,12 @@ internal static class FateFirewoodStickCombatHelper
         }
     }
 
-    private static int RollTargetNodeValue(Player owner, Creature target, CardModel sourceCard, bool shouldTransferOnSuccess)
+    private static int RollTargetNodeValue(Player owner, Creature target, CardModel sourceCard,
+        bool shouldTransferOnSuccess)
     {
         if (target.Player != null)
-            return NodePowerRollHelper.RollNodeValue(target.Player, sourceCard, "fate_firewood_target_ally", MinNodeValue, MaxNodeValue);
+            return NodePowerRollHelper.RollNodeValue(target.Player, sourceCard, "fate_firewood_target_ally",
+                MinNodeValue, MaxNodeValue);
 
         return DeterministicMultiplayerChoiceHelper.RollDeterministically(
             MinNodeValue,
@@ -115,7 +119,6 @@ internal static class FateFirewoodStickCombatHelper
             .Sum(hiroRelic.GetWithPowerAmount);
         var successDamage = StableNumericStateHelper.FloorToNonNegativeInt(totalWithAmount * 0.5m);
         if (successDamage > 0)
-        {
             await CreatureCmd.Damage(
                 choiceContext,
                 target,
@@ -123,7 +126,6 @@ internal static class FateFirewoodStickCombatHelper
                 ValueProp.Move,
                 ownerCreature,
                 sourceCard);
-        }
 
         if (shouldTransferOnSuccess)
             await hiroRelic.TryTransferWithPowerAndRegainCard(target, sourceCard);

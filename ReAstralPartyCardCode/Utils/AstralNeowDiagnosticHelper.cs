@@ -132,12 +132,14 @@ internal static class AstralNeowDiagnosticHelper
 
     private static string FormatSnapshotForLog(Snapshot snapshot)
     {
-        return $"seed={snapshot.Seed} act={snapshot.ActIndex} floor={snapshot.Floor} room={snapshot.RoomType} roomKind={snapshot.RoomKind} event={snapshot.EventId} players={string.Join(",", snapshot.PlayerNetIds)} refreshAncient={snapshot.RefreshAncientLoaded}";
+        return
+            $"seed={snapshot.Seed} act={snapshot.ActIndex} floor={snapshot.Floor} room={snapshot.RoomType} roomKind={snapshot.RoomKind} event={snapshot.EventId} players={string.Join(",", snapshot.PlayerNetIds)} refreshAncient={snapshot.RefreshAncientLoaded}";
     }
 
     private static string FormatSnapshotForBody(Snapshot snapshot)
     {
-        return $"Seed：{snapshot.Seed}\nAct：{snapshot.ActIndex}\nFloor：{snapshot.Floor}\n房间：{snapshot.RoomType}\nRoomType：{snapshot.RoomKind}\n事件：{snapshot.EventId}\n玩家：{string.Join(", ", snapshot.PlayerNetIds)}\nRefreshAncient：{snapshot.RefreshAncientLoaded}";
+        return
+            $"Seed：{snapshot.Seed}\nAct：{snapshot.ActIndex}\nFloor：{snapshot.Floor}\n房间：{snapshot.RoomType}\nRoomType：{snapshot.RoomKind}\n事件：{snapshot.EventId}\n玩家：{string.Join(", ", snapshot.PlayerNetIds)}\nRefreshAncient：{snapshot.RefreshAncientLoaded}";
     }
 
     private static bool TryAcquireToast(string key)
@@ -296,17 +298,16 @@ internal static class AstralNeowDiagnosticHelper
 
     private static bool IsEventOptionButtonNode(Node node)
     {
-        return node is NEventOptionButton || string.Equals(node.GetType().Name, nameof(NEventOptionButton), StringComparison.Ordinal);
+        return node is NEventOptionButton ||
+               string.Equals(node.GetType().Name, nameof(NEventOptionButton), StringComparison.Ordinal);
     }
 
     private static IEnumerable<RelicModel> EnumerateRelicsFromObject(object instance)
     {
         var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
         foreach (var field in instance.GetType().GetFields(flags))
-        {
-            foreach (var relic in EnumerateRelicsFromValue(field.GetValue(instance)))
-                yield return relic;
-        }
+        foreach (var relic in EnumerateRelicsFromValue(field.GetValue(instance)))
+            yield return relic;
 
         foreach (var property in instance.GetType().GetProperties(flags))
         {
@@ -343,10 +344,8 @@ internal static class AstralNeowDiagnosticHelper
             yield break;
 
         foreach (var entry in enumerable)
-        {
             if (entry is RelicModel nestedRelic)
                 yield return nestedRelic;
-        }
     }
 
     private sealed record Snapshot(

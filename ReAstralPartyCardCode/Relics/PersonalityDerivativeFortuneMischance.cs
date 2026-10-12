@@ -16,7 +16,9 @@ public class PersonalityDerivativeFortuneMischance : AstralPartyRelicModel
     private const int MaxStacks = 9;
 
     [SavedProperty] public int AstralParty_PersonalityDerivativeFortuneMischanceStacks { get; set; }
-    [SavedProperty] public int AstralParty_PersonalityDerivativeFortuneMischanceLastGrantedTotalFloor { get; set; } = -1;
+
+    [SavedProperty]
+    public int AstralParty_PersonalityDerivativeFortuneMischanceLastGrantedTotalFloor { get; set; } = -1;
 
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

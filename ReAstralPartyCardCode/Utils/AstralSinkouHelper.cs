@@ -37,7 +37,8 @@ internal static class AstralSinkouHelper
         if (owner?.Creature?.CombatState == null || amount <= 0m)
             return 0m;
 
-        var ratio = Math.Min(MaxAttackBonusRatio, BaseAttackBonusRatio + GetTotalEnemyBurnStacks(owner) * AttackBonusPerBurnRatio);
+        var ratio = Math.Min(MaxAttackBonusRatio,
+            BaseAttackBonusRatio + GetTotalEnemyBurnStacks(owner) * AttackBonusPerBurnRatio);
         if (ratio <= 0m)
             return 0m;
 

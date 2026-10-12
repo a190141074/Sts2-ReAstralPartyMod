@@ -170,7 +170,8 @@ public sealed class PersonBionicJasmineDoppelganger : CooldownPersonRelicBase,
 
         Flash();
         await PowerCmd.Apply<StrengthPower>(Owner.Creature, -1m, Owner.Creature, null);
-        await PowerCmd.Apply<DexterityPower>(Owner.Creature, -GetOpeningDexterityLossForCurrentAct(), Owner.Creature, null);
+        await PowerCmd.Apply<DexterityPower>(Owner.Creature, -GetOpeningDexterityLossForCurrentAct(), Owner.Creature,
+            null);
 
         if (AstralParty_PersonBionicJasmineDoppelgangerPersistentStrengthBonuses > 0)
             await PowerCmd.Apply<StrengthPower>(

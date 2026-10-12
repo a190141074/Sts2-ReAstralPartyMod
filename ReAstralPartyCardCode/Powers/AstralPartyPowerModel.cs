@@ -75,7 +75,8 @@ public abstract partial class AstralPartyPowerModel : ModPowerTemplate
 
     public virtual bool IsInstanced => false;
 
-    public override PowerInstanceType InstanceType => IsInstanced ? PowerInstanceType.Instanced : PowerInstanceType.None;
+    public override PowerInstanceType InstanceType =>
+        IsInstanced ? PowerInstanceType.Instanced : PowerInstanceType.None;
 
     public virtual Task BeforeSideTurnStart(
         PlayerChoiceContext choiceContext,
@@ -92,10 +93,11 @@ public abstract partial class AstralPartyPowerModel : ModPowerTemplate
         ICombatState combatState)
     {
         return BeforeSideTurnStart(choiceContext, side, combatState as CombatState
-            ?? Owner?.CombatState as CombatState
-            ?? Owner?.Player?.Creature?.CombatState as CombatState
-            ?? Owner?.PetOwner?.Creature?.CombatState as CombatState
-            ?? throw new InvalidOperationException("Expected CombatState for legacy power hook bridge."));
+                                                        ?? Owner?.CombatState as CombatState
+                                                        ?? Owner?.Player?.Creature?.CombatState as CombatState
+                                                        ?? Owner?.PetOwner?.Creature?.CombatState as CombatState
+                                                        ?? throw new InvalidOperationException(
+                                                            "Expected CombatState for legacy power hook bridge."));
     }
 
     public virtual Task AfterSideTurnStart(CombatSide side, CombatState combatState)
@@ -109,10 +111,11 @@ public abstract partial class AstralPartyPowerModel : ModPowerTemplate
         ICombatState combatState)
     {
         return AfterSideTurnStart(side, combatState as CombatState
-            ?? Owner?.CombatState as CombatState
-            ?? Owner?.Player?.Creature?.CombatState as CombatState
-            ?? Owner?.PetOwner?.Creature?.CombatState as CombatState
-            ?? throw new InvalidOperationException("Expected CombatState for legacy power hook bridge."));
+                                        ?? Owner?.CombatState as CombatState
+                                        ?? Owner?.Player?.Creature?.CombatState as CombatState
+                                        ?? Owner?.PetOwner?.Creature?.CombatState as CombatState
+                                        ?? throw new InvalidOperationException(
+                                            "Expected CombatState for legacy power hook bridge."));
     }
 
     public virtual Task AfterTurnEnd(PlayerChoiceContext choiceContext, CombatSide side)

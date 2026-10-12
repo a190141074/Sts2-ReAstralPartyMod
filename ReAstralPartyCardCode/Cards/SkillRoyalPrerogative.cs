@@ -11,7 +11,6 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillRoyalPrerogative : AstralPartyCardModel
 {
@@ -56,4 +55,3 @@ public class SkillRoyalPrerogative : AstralPartyCardModel
                 CardCmd.ApplyKeyword(card, AstralKeywords.AstralTemporary);
     }
 }
-

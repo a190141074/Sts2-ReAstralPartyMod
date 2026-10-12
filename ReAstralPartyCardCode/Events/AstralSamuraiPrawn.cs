@@ -21,8 +21,9 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
     private const string MusicPath = "res://ReAstralPartyMod/audios/events/astral_samurai_prawn.wav";
     private const string RunDataKey = "astral_samurai_prawn";
     private const int FlowCount = 11;
+
     private static readonly string[] CorrectOptions =
-    ["LOOK_COMBO", "KING_POWER", "HP_4", "USE_SKILL", "GAWU", "MOVE", "ONE", "LIGHTNING", "HP_2", "STUNNED", "HOW"];
+        ["LOOK_COMBO", "KING_POWER", "HP_4", "USE_SKILL", "GAWU", "MOVE", "ONE", "LIGHTNING", "HP_2", "STUNNED", "HOW"];
 
     private static RunSavedData<AstralSamuraiPrawnRunData> _runData = null!;
     private static bool _registered;
@@ -39,11 +40,12 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
                 RunDataKey, static () => new AstralSamuraiPrawnRunData(),
                 new RunSavedDataOptions { WritePolicy = RunSavedDataWritePolicy.WhenNonDefault });
         }
+
         // BeforeRoomEntered runs before the target room starts its event/music logic.
         // MapRoom skips this hook, so the track survives the event's map selection page.
-        RitsuLibFramework.SubscribeLifecycle<RoomEnteringEvent>(_ => StopActiveMusic("next_room"), replayCurrentState: false);
-        RitsuLibFramework.SubscribeLifecycle<RunEndedEvent>(_ => StopActiveMusic(), replayCurrentState: false);
-        RitsuLibFramework.SubscribeLifecycle<MainMenuReadyEvent>(_ => StopActiveMusic(), replayCurrentState: false);
+        RitsuLibFramework.SubscribeLifecycle<RoomEnteringEvent>(_ => StopActiveMusic("next_room"), false);
+        RitsuLibFramework.SubscribeLifecycle<RunEndedEvent>(_ => StopActiveMusic(), false);
+        RitsuLibFramework.SubscribeLifecycle<MainMenuReadyEvent>(_ => StopActiveMusic(), false);
         _registered = true;
     }
 
@@ -59,6 +61,7 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
                 progress = new AstralSamuraiPrawnProgress();
                 data.Players[key] = progress;
             }
+
             _runData.Set(run, data);
             return progress;
         }
@@ -92,7 +95,10 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
         return Task.CompletedTask;
     }
 
-    internal static void StopActiveMusic(string reason = "session_cleanup") => _activeMusicEvent?.StopMusic(reason);
+    internal static void StopActiveMusic(string reason = "session_cleanup")
+    {
+        _activeMusicEvent?.StopMusic(reason);
+    }
 
     private void StopMusic(string reason)
     {
@@ -104,9 +110,10 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
             return;
 
         // Explicit stop gives diagnostics for file playback; no adaptive plan can restart it.
-        var stopped = handle.TryStop(allowFadeOut: false);
+        var stopped = handle.TryStop(false);
         handle.Dispose();
-        MainFile.Logger.Info($"[SamuraiPrawnMusic] stop reason={reason} stopped={stopped} released={handle.IsReleased}");
+        MainFile.Logger.Info(
+            $"[SamuraiPrawnMusic] stop reason={reason} stopped={stopped} released={handle.IsReleased}");
     }
 
     protected override IReadOnlyList<EventOption> GenerateInitialOptions()
@@ -122,7 +129,8 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
         else if (progress.Flow >= FlowCount)
             SetEventState(PageDescription("REWARD"), CreateRewardOptions());
         else
-            SetEventState(PageDescription(progress.Flow == 0 ? "INITIAL" : $"FLOW_{progress.Flow + 1}"), GenerateInitialOptions());
+            SetEventState(PageDescription(progress.Flow == 0 ? "INITIAL" : $"FLOW_{progress.Flow + 1}"),
+                GenerateInitialOptions());
     }
 
     private IReadOnlyList<EventOption> CreateFlowOptions()
@@ -175,7 +183,8 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
     {
         return
         [
-            new EventOption(this, Progress.Perfect ? GrantCursedSword : null, ModOptionKey("REWARD", "CURSED_SWORD"), ModelDb.Relic<TokenExclusiveCursedSword>().HoverTips),
+            new EventOption(this, Progress.Perfect ? GrantCursedSword : null, ModOptionKey("REWARD", "CURSED_SWORD"),
+                ModelDb.Relic<TokenExclusiveCursedSword>().HoverTips),
             new EventOption(this, Progress.Perfect ? UpgradeTwoAttacks : null, ModOptionKey("REWARD", "TWO_ATTACKS")),
             new EventOption(this, GrantGeneralReward, ModOptionKey("REWARD", "GENERAL"))
         ];
@@ -201,7 +210,8 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
         {
             var selected = await CardSelectCmd.FromDeckGeneric(
                 Owner,
-                new CardSelectorPrefs(new LocString("events", "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_SAMURAI_PRAWN.select_attacks"),
+                new CardSelectorPrefs(
+                    new LocString("events", "RE_ASTRAL_PARTY_MOD_EVENT_ASTRAL_SAMURAI_PRAWN.select_attacks"),
                     Math.Min(2, candidates.Count), Math.Min(2, candidates.Count))
                 {
                     Cancelable = false,
@@ -209,7 +219,8 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
                 },
                 card => card.IsUpgradable && card.Type == CardType.Attack,
                 null!);
-            await EventDeckCardMutationHelper.Upgrade(Owner, selected.Take(2).ToList(), "astral_samurai_prawn.two_attacks");
+            await EventDeckCardMutationHelper.Upgrade(Owner, selected.Take(2).ToList(),
+                "astral_samurai_prawn.two_attacks");
         }
 
         Finish(candidates.Count == 0 ? "NO_ATTACKS_FINISH" : "TWO_ATTACKS_FINISH");
@@ -223,10 +234,13 @@ public sealed class AstralSamuraiPrawn : AstralPartyEventModel
         await PersonMultiplayerEffectHelper.GainGoldDeterministic(30m, Owner);
         var candidates = EventDeckCardHelper.GetRunDeckCards(Owner)
             .Where(static candidate => candidate.Type == CardType.Attack && candidate.IsUpgradable).ToList();
-        var card = candidates.Count == 0 ? null : candidates[AstralStableRandom.Index(
-            Owner.RunState, candidates.Count, Id.Entry, Owner.NetId, "general_attack_upgrade")];
+        var card = candidates.Count == 0
+            ? null
+            : candidates[AstralStableRandom.Index(
+                Owner.RunState, candidates.Count, Id.Entry, Owner.NetId, "general_attack_upgrade")];
         if (card != null)
-            await EventDeckCardMutationHelper.UpgradeSingleWithSmithPreview(Owner, card, "astral_samurai_prawn.general");
+            await EventDeckCardMutationHelper.UpgradeSingleWithSmithPreview(Owner, card,
+                "astral_samurai_prawn.general");
         Finish(card == null ? "GOLD_FINISH" : "GENERAL_FINISH");
     }
 

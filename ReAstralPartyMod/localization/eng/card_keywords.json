@@ -1,6 +1,6 @@
 {
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_PASSING_THROUGH.title":"Passing Through",
-  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_PASSING_THROUGH.description":"You pass through when your Node equals the ones digit of your player index after sorting players by NetId.",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_PASSING_THROUGH.title": "Passing Through",
+  "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_PASSING_THROUGH.description": "You pass through when your Node equals the ones digit of your player index after sorting players by NetId.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.title": "Astral Event",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_EVENT.description": "A special card originating from the Astral Party event system.",
   "RE_ASTRAL_PARTY_MOD_KEYWORD_ASTRAL_STEPS.title": "Steps",

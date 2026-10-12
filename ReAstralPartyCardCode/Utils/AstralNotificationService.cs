@@ -29,7 +29,7 @@ internal static class AstralNotificationService
 {
     public static void ShowInfo(AstralNotificationModule module, string body, string? title = null)
     {
-        if (!IsEnabled(module)) 
+        if (!IsEnabled(module))
             return;
 
         Callable.From(() => RitsuToastService.ShowInfo(body, title)).CallDeferred();
@@ -154,7 +154,8 @@ internal static class AstralNotificationService
         {
             AstralNotificationArea.PersonaRelic => ReAstralPartyModSettingsManager.EnablePersonaRelicNotifications,
             AstralNotificationArea.TokenRelic => ReAstralPartyModSettingsManager.EnableTokenRelicNotifications,
-            AstralNotificationArea.NeowDiagnostics => ReAstralPartyModSettingsManager.EnableNeowDiagnosticsNotifications,
+            AstralNotificationArea.NeowDiagnostics =>
+                ReAstralPartyModSettingsManager.EnableNeowDiagnosticsNotifications,
             _ => ReAstralPartyModSettingsManager.EnableMultiplayerNotifications
         };
     }

@@ -10,7 +10,6 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillIronVirgin : AstralPartyCardModel
 {
@@ -48,4 +47,3 @@ public class SkillIronVirgin : AstralPartyCardModel
             await AstralTemporaryStrengthPower.Apply(Owner.Creature, BoundaryStrengthBonus, this, Owner.Creature, this);
     }
 }
-

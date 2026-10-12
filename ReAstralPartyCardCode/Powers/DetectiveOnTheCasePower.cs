@@ -72,7 +72,7 @@ public sealed class DetectiveOnTheCasePower : AstralPartyPowerModel
         if (Owner == null)
             return;
 
-        var desired = System.Math.Min(Amount, MaxStacks);
+        var desired = Math.Min(Amount, MaxStacks);
         var delta = desired - _appliedStrength;
         if (delta == 0m)
             return;

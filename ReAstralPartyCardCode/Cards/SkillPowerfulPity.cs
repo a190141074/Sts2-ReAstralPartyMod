@@ -17,7 +17,6 @@ using MegaCrit.Sts2.Core.Models.Events;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillPowerfulPity : AstralPartyCardModel
 {
@@ -152,4 +151,3 @@ public class SkillPowerfulPity : AstralPartyCardModel
         return selectedCards.ToList();
     }
 }
-

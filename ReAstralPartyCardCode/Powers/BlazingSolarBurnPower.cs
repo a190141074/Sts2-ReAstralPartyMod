@@ -38,6 +38,7 @@ public class BlazingSolarBurnPower : AstralPartyPowerModel
 
         // Force the 6-arg CreatureCmd.Damage overload; the 5-arg cardSource overload crashes on null in this runtime.
         using (DebuffDamageContextHelper.Enter())
+        {
             await CreatureCmd.Damage(
                 new ThrowingPlayerChoiceContext(),
                 Owner,
@@ -46,6 +47,7 @@ public class BlazingSolarBurnPower : AstralPartyPowerModel
                 (Creature?)damageDealer,
                 (MegaCrit.Sts2.Core.Models.CardModel?)null
             );
+        }
 
         if (!Owner.IsAlive)
             return;

@@ -72,7 +72,8 @@ public sealed class TokenPurpleFlyingStar : AstralPartyRelicModel
             return;
 
         Flash();
-        var enemies = EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature).ToList();
+        var enemies = EventCombatTargetHelper.GetAliveNonSummonEnemies(Owner.Creature.CombatState, Owner.Creature)
+            .ToList();
         foreach (var enemy in enemies)
         {
             await CreatureCmdCompat.Damage(
@@ -86,7 +87,8 @@ public sealed class TokenPurpleFlyingStar : AstralPartyRelicModel
             await RecordEnemyHit();
         }
 
-        await PowerCmd.Apply(ModelDb.Power<EffectsStarlightPower>().ToMutable(), Owner.Creature, StarLightAmount, Owner.Creature, null, false);
+        await PowerCmd.Apply(ModelDb.Power<EffectsStarlightPower>().ToMutable(), Owner.Creature, StarLightAmount,
+            Owner.Creature, null, false);
     }
 
     private async Task RecordEnemyHit()

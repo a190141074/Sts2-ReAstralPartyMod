@@ -91,7 +91,8 @@ public class DodgeStancePower : AstralPartyPowerModel
 
         data.PendingWeaknessInsightGain = false;
         if (data.HadCounterBeforeDodge)
-            await CounterPower.TryTriggerCounter(choiceContext, Owner, data.PendingCounterDealer, data.PendingCounterDamage, this);
+            await CounterPower.TryTriggerCounter(choiceContext, Owner, data.PendingCounterDealer,
+                data.PendingCounterDamage, this);
 
         if (data.PendingDodgeBlockGain > 0m)
             await CreatureCmd.GainBlock(Owner, data.PendingDodgeBlockGain, ValueProp.Move, null);
@@ -137,7 +138,8 @@ public class DodgeStancePower : AstralPartyPowerModel
         {
             data.PendingWeaknessInsightGain = false;
             if (data.HadCounterBeforeDodge)
-                await CounterPower.TryTriggerCounter(choiceContext, Owner, data.PendingCounterDealer, data.PendingCounterDamage, this);
+                await CounterPower.TryTriggerCounter(choiceContext, Owner, data.PendingCounterDealer,
+                    data.PendingCounterDamage, this);
 
             if (data.PendingDodgeBlockGain > 0m)
                 await CreatureCmd.GainBlock(Owner, data.PendingDodgeBlockGain, ValueProp.Move, null);

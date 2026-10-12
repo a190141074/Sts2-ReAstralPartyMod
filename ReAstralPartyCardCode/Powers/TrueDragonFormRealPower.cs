@@ -15,11 +15,20 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Powers;
 
 public sealed class TrueDragonFormRealPower : AstralPartyPowerModel
 {
-    private sealed class Data { public decimal GrantedScales; public bool StrengthApplied; }
+    private sealed class Data
+    {
+        public decimal GrantedScales;
+        public bool StrengthApplied;
+    }
+
     protected override string PowerId => "true_dragon_form_real_power";
     public override PowerType Type => PowerType.Buff;
     public override PowerStackType StackType => PowerStackType.None;
-    protected override object InitInternalData() => new Data();
+
+    protected override object InitInternalData()
+    {
+        return new Data();
+    }
 
     public override async Task AfterApplied(Creature? applier, CardModel? cardSource)
     {
@@ -38,7 +47,8 @@ public sealed class TrueDragonFormRealPower : AstralPartyPowerModel
         data.GrantedScales += 1m;
     }
 
-    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, MegaCrit.Sts2.Core.Entities.Players.Player player)
+    public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext,
+        MegaCrit.Sts2.Core.Entities.Players.Player player)
     {
         if (Owner?.Player != player) return;
         var data = GetInternalData<Data>();

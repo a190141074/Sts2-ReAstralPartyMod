@@ -116,7 +116,9 @@ internal static class StokovStarterBundleHelper
             var starterRelic = ModelDb.GetById<RelicModel>(ModelDb.GetId(bundle.StarterRelicType));
             var starterRelicId = (starterRelic.CanonicalInstance?.Id ?? starterRelic.Id).ToString();
             trackedStarterRelicIds.Add(starterRelicId);
-            if (owner.Relics.All(relic => (relic.CanonicalInstance?.Id ?? relic.Id) != (starterRelic.CanonicalInstance?.Id ?? starterRelic.Id)))
+            if (owner.Relics.All(relic =>
+                    (relic.CanonicalInstance?.Id ?? relic.Id) !=
+                    (starterRelic.CanonicalInstance?.Id ?? starterRelic.Id)))
                 await PersonMultiplayerEffectHelper.ObtainRelicDeterministic(owner, starterRelic);
 
             var canonicalCard = ModelDb.GetById<CardModel>(ModelDb.GetId(bundle.UpgradeableStarterCardType));
@@ -141,7 +143,8 @@ internal static class StokovStarterBundleHelper
         return stokov.GetTrackedStarterCardIds().Contains(id.ToString());
     }
 
-    public static async Task TryPropagateStarterCardUpgradeAsync(VariantPersonStokov stokov, CardModel transformedOriginal)
+    public static async Task TryPropagateStarterCardUpgradeAsync(VariantPersonStokov stokov,
+        CardModel transformedOriginal)
     {
         if (!VariantPersonStokov.TryEnterCardPropagation())
             return;
@@ -278,5 +281,4 @@ internal static class StokovStarterBundleHelper
         upgradedId = ModelId.none;
         return false;
     }
-
 }

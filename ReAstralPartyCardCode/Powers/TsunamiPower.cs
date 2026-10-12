@@ -21,7 +21,7 @@ public sealed class TsunamiPower : AstralPartyPowerModel
         decimal amount,
         ValueProp props,
         Creature? dealer,
-        MegaCrit.Sts2.Core.Models.CardModel? cardSource)
+        CardModel? cardSource)
     {
         if (target != Owner || amount <= 0m || Amount <= 0m)
             return 0m;

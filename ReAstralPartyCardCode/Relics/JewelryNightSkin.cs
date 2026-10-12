@@ -72,5 +72,4 @@ public class JewelryNightSkin : AstralPartyRelicModel
         AstralParty_JewelryNightSkinLastProcessedRound = 0;
         await AstralMoveAgainDisplayHelper.Sync(Owner);
     }
-
 }

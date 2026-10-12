@@ -23,14 +23,19 @@ public sealed class PersonalityDerivativeDollMaking : AstralPartyRelicModel
     [SavedProperty] public int AstralParty_PersonalityDerivativeDollMakingStacks { get; set; }
     [SavedProperty] public bool AstralParty_PersonalityDerivativeDollMakingComplete { get; set; }
     public bool IsComplete => AstralParty_PersonalityDerivativeDollMakingComplete;
+
     public override LocString Title => new("relics", IsComplete
         ? "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_COMPLETE.title"
         : "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_MAKING.title");
+
     public override RelicRarity Rarity => RelicRarity.Ancient;
     public override bool ShouldReceiveCombatHooks => true;
     public override bool ShowCounter => true;
     public override int DisplayAmount => AstralParty_PersonalityDerivativeDollMakingStacks;
-    protected override string IconBasePath => $"res://ReAstralPartyMod/images/relic/{(IsComplete ? "personality_derivative_doll_complete" : "personality_derivative_doll_making")}";
+
+    protected override string IconBasePath =>
+        $"res://ReAstralPartyMod/images/relic/{(IsComplete ? "personality_derivative_doll_complete" : "personality_derivative_doll_making")}";
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromPower<EffectsStarlightPower>(),
@@ -42,15 +47,19 @@ public sealed class PersonalityDerivativeDollMaking : AstralPartyRelicModel
     public override async Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, Player player)
     {
         if (Owner?.Creature?.CombatState == null || player == Owner) return;
-        if (!AstralPassingThroughHelper.IsPassingThrough(Owner, player, (int)Owner.Creature.GetPowerAmount<HannaNodePower>())) return;
-        AstralParty_PersonalityDerivativeDollMakingStacks = Math.Min(7, AstralParty_PersonalityDerivativeDollMakingStacks + 1);
+        if (!AstralPassingThroughHelper.IsPassingThrough(Owner, player,
+                (int)Owner.Creature.GetPowerAmount<HannaNodePower>())) return;
+        AstralParty_PersonalityDerivativeDollMakingStacks =
+            Math.Min(7, AstralParty_PersonalityDerivativeDollMakingStacks + 1);
         await PowerCmd.Apply<EffectsStarlightPower>(choiceContext, Owner.Creature, 1m, Owner.Creature, null, false);
         if (Owner.Creature.GetPower<AstralLevitationPower>() != null)
-            await PowerCmd.Apply<EffectsStarlightPower>(choiceContext, player.Creature, 3m, Owner.Creature, null, false);
+            await PowerCmd.Apply<EffectsStarlightPower>(choiceContext, player.Creature, 3m, Owner.Creature, null,
+                false);
         if (AstralParty_PersonalityDerivativeDollMakingStacks >= 7)
             AstralParty_PersonalityDerivativeDollMakingComplete = true;
         if (AstralParty_PersonalityDerivativeDollMakingComplete)
-            await AstralTemporaryDexterityPower.Apply(choiceContext, player.Creature, 2m, this, Owner.Creature, null, false);
+            await AstralTemporaryDexterityPower.Apply(choiceContext, player.Creature, 2m, this, Owner.Creature, null,
+                false);
         Flash();
         InvokeDisplayAmountChanged();
     }

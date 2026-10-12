@@ -1,8 +1,8 @@
 {
-  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.title":"节点",
-  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.description":"每回合开始时，随机刷新为[blue]1[/blue]到[blue]10[/blue]。",
-  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.title":"漂浮",
-  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.description":"获得[blue]2[/blue]点临时[green]敏捷[/green]；受到敌方攻击的未被格挡伤害减少[blue]50%[/blue]；暂时免疫负面效果，但不会免疫获得负面效果；诅咒牌时回到抽牌堆。",
+  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.title": "节点",
+  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.description": "每回合开始时，随机刷新为[blue]1[/blue]到[blue]10[/blue]。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.title": "漂浮",
+  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.description": "获得[blue]2[/blue]点临时[green]敏捷[/green]；受到敌方攻击的未被格挡伤害减少[blue]50%[/blue]；暂时免疫负面效果，但不会免疫获得负面效果；诅咒牌时回到抽牌堆。",
   "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_STARLIGHT_POWER.title": "星光",
   "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_STARLIGHT_POWER.description": "本场战斗结束后，获得等同于[gold]星光[/gold]层数的[gold]金币[/gold]。",
   "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_STARLIGHT_POWER.smartDescription": "本场战斗结束后，获得等同于层数的[gold]金币[/gold]。",

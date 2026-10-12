@@ -21,7 +21,7 @@ internal static class SavedPropertyCacheBootstrap
         _verificationScheduled = true;
         RitsuLibFramework.SubscribeLifecycle<ModelRegistryInitializedEvent>(
             _ => LogVerification(assembly),
-            replayCurrentState: true);
+            true);
     }
 
     private static void LogVerification(Assembly assembly)

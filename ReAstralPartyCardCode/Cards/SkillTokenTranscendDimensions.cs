@@ -21,7 +21,7 @@ public sealed class SkillTokenTranscendDimensions : PersonSkillCardModel
         CardType.Skill,
         CardRarity.Token,
         TargetType.Self,
-        showInCardLibrary: false)
+        false)
     {
     }
 
@@ -66,10 +66,8 @@ public sealed class SkillTokenTranscendDimensions : PersonSkillCardModel
             return -1;
 
         for (var i = 0; i < pileCards.Count; i++)
-        {
             if (ReferenceEquals(pileCards[i], card))
                 return i;
-        }
 
         return -1;
     }

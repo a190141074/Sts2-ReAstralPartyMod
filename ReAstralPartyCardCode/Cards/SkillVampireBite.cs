@@ -13,7 +13,6 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillVampireBite : AstralPartyCardModel
 {
@@ -51,4 +50,3 @@ public class SkillVampireBite : AstralPartyCardModel
         await PowerCmd.Apply<BloodthirstPower>(Owner.Creature, 1m, Owner.Creature, this, false);
     }
 }
-

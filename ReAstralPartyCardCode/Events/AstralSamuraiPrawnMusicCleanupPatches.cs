@@ -7,11 +7,17 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Events;
 [HarmonyPatch(typeof(RunManager), nameof(RunManager.CleanUp))]
 internal static class AstralSamuraiPrawnMusicRunCleanupPatch
 {
-    private static void Prefix() => AstralSamuraiPrawn.StopActiveMusic();
+    private static void Prefix()
+    {
+        AstralSamuraiPrawn.StopActiveMusic();
+    }
 }
 
 [HarmonyPatch(typeof(RunManager), nameof(RunManager.LocalPlayerDisconnected))]
 internal static class AstralSamuraiPrawnMusicLocalDisconnectPatch
 {
-    private static void Prefix() => AstralSamuraiPrawn.StopActiveMusic();
+    private static void Prefix()
+    {
+        AstralSamuraiPrawn.StopActiveMusic();
+    }
 }

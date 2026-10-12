@@ -24,10 +24,22 @@ public sealed class PersonHannaTono : CooldownPersonRelicBase
 {
     [SavedProperty] public int AstralParty_PersonHannaTonoCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonHannaTonoPendingCombatStartCard { get; set; }
-    protected override int CounterValue { get => AstralParty_PersonHannaTonoCounter; set => AstralParty_PersonHannaTonoCounter = value; }
-    protected override bool PendingCombatStartCard { get => AstralParty_PersonHannaTonoPendingCombatStartCard; set => AstralParty_PersonHannaTonoPendingCombatStartCard = value; }
+
+    protected override int CounterValue
+    {
+        get => AstralParty_PersonHannaTonoCounter;
+        set => AstralParty_PersonHannaTonoCounter = value;
+    }
+
+    protected override bool PendingCombatStartCard
+    {
+        get => AstralParty_PersonHannaTonoPendingCombatStartCard;
+        set => AstralParty_PersonHannaTonoPendingCombatStartCard = value;
+    }
+
     protected override int BaseMaxCounter => 4;
     public override RelicRarity Rarity => RelicRarity.Ancient;
+
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
     [
         HoverTipFactory.FromCard<SkillMagicLevitation>(),
@@ -48,7 +60,8 @@ public sealed class PersonHannaTono : CooldownPersonRelicBase
         if (Owner?.Creature != null)
         {
             PlayerChoiceContext context = Owner.Creature.CombatState != null && LocalContext.NetId.HasValue
-                ? new HookPlayerChoiceContext(this, LocalContext.NetId.Value, Owner.Creature.CombatState, GameActionType.Combat)
+                ? new HookPlayerChoiceContext(this, LocalContext.NetId.Value, Owner.Creature.CombatState,
+                    GameActionType.Combat)
                 : new ThrowingPlayerChoiceContext();
             await PowerCmd.SetAmount<HannaNodePower>(context, Owner.Creature, 10m, Owner.Creature, null);
         }

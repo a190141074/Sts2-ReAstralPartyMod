@@ -1,8 +1,8 @@
 {
-  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.title":"Node",
-  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.description":"At turn start, randomly refresh to [blue]1[/blue]–[blue]10[/blue].",
-  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.title":"Levitation",
-  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.description":"Gain [blue]2[/blue] temporary Dexterity; reduce unblocked damage from enemy attacks by [blue]50%[/blue]; temporarily ignore negative effects, but do not prevent gaining them; return Curse cards to the draw pile.",
+  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.title": "Node",
+  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.description": "At turn start, randomly refresh to [blue]1[/blue]–[blue]10[/blue].",
+  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.title": "Levitation",
+  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.description": "Gain [blue]2[/blue] temporary Dexterity; reduce unblocked damage from enemy attacks by [blue]50%[/blue]; temporarily ignore negative effects, but do not prevent gaining them; return Curse cards to the draw pile.",
   "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_STARLIGHT_POWER.title": "StarLight",
   "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_STARLIGHT_POWER.description": "After this combat, gain Gold equal to this power's amount.",
   "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_STARLIGHT_POWER.smartDescription": "After this combat, gain Gold equal to this power's amount.",

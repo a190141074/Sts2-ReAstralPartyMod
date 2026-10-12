@@ -40,7 +40,8 @@
 
 - 适合：回合结束收尾、衰减、计数推进、清理状态。
 - 默认先分清这是玩家自己的结束，还是整个 side 的结束。
-- 如果是直接 patch `Hook.AfterTurnEnd`，当前新版分支不要默认按旧双参 target 写；先对照运行时 `sts2.xml` 或 RitsuLib lifecycle patch 已验证的 target 形状。
+- 如果是直接 patch `Hook.AfterTurnEnd`，当前新版分支不要默认按旧双参 target 写；先对照运行时 `sts2.xml` 或 RitsuLib
+  lifecycle patch 已验证的 target 形状。
 
 ### `AfterCardChangedPiles(...)`
 
@@ -127,15 +128,15 @@
 - 默认先看：`AstralPartyCardModel.AfterCardChangedPiles(...)`
 - 适合：某张卡进 Hand / Discard / Exhaust 后触发
 - 对照：
-  - `EnigmaticTheAcknowledgment`
-  - `EnigmaticTheTwist`
-  - `EnigmaticTheInfinitum`
+	- `EnigmaticTheAcknowledgment`
+	- `EnigmaticTheTwist`
+	- `EnigmaticTheInfinitum`
 
 ### 人格 / token 遗物桥接
 
 - 默认先看：
-  - `TokenRelicBridgeHelper`
-  - `TokenRelicBridgePower`
+	- `TokenRelicBridgeHelper`
+	- `TokenRelicBridgePower`
 - 适合：把 token relic 的战斗时机桥接到 power / 受击对象上
 - 比直接再补一套 patch 更稳的原因：仓库已经限定了允许转发的 override 面。
 
@@ -143,8 +144,8 @@
 
 - 默认先看：`CooldownPersonaRelicBase`
 - 关键入口：
-  - `BeforeSideTurnStart(...)`
-  - `AfterTurnEnd(...)`
+	- `BeforeSideTurnStart(...)`
+	- `AfterTurnEnd(...)`
 - 适合：按回合推进计数、在满足冷却时机时发牌
 - 统一语义：首次战斗第1个自身回合单独发放1张；“每3回合”之后在第4、7、10……个持有者自身回合开始时发放1张。计数只推进持有者自身回合，不按全局回合、其他玩家回合或敌方回合计数。
 
@@ -157,8 +158,8 @@
 ### 常规“整 side turn 开始”
 
 - 默认先看：
-  - `BeforeSideTurnStart(...)`
-  - `AfterSideTurnStart(...)`
+	- `BeforeSideTurnStart(...)`
+	- `AfterSideTurnStart(...)`
 - 适合：side 级预处理或 side 级开场状态
 
 ### 战斗开始一次性状态注入

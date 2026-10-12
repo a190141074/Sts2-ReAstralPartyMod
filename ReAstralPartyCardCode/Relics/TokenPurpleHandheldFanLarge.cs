@@ -45,5 +45,4 @@ public class TokenPurpleHandheldFanLarge : AstralPartyRelicModel
 
         await PowerCmd.Apply<EffectsMarkPower>(target, 1m, Owner.Creature, cardPlay.Card, false);
     }
-
 }

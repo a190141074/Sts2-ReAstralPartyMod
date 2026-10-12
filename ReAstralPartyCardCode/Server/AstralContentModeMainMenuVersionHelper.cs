@@ -32,10 +32,12 @@ internal static class AstralContentModeMainMenuVersionHelper
         }
         catch (Exception ex)
         {
-            MainFile.Logger.Warn($"[astral_content_mode_main_menu_version] Failed to read manifest version: {ex.Message}");
+            MainFile.Logger.Warn(
+                $"[astral_content_mode_main_menu_version] Failed to read manifest version: {ex.Message}");
         }
 
-        _cachedVersion = typeof(MainFile).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+        _cachedVersion = typeof(MainFile).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                             ?.InformationalVersion
                          ?? typeof(MainFile).Assembly.GetName().Version?.ToString()
                          ?? "unknown";
         return _cachedVersion;

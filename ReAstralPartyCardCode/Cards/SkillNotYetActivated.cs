@@ -48,7 +48,9 @@ public class SkillNotYetActivated : PersonSkillCardModel
         creativeAi.EnergyCost.UpgradeBy(-1);
         subroutine.EnergyCost.UpgradeBy(-1);
 
-        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(creativeAi, true, CardPilePosition.Top, this);
-        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(subroutine, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(creativeAi, true, CardPilePosition.Top,
+            this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(subroutine, true, CardPilePosition.Top,
+            this);
     }
 }

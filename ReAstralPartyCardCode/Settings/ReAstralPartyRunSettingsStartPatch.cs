@@ -11,11 +11,13 @@ public sealed class ReAstralPartyRunSettingsStartPatch : IPatchMethod
 {
     public static string PatchId => "re_astral_party_run_settings_start_patch";
     public static bool IsCritical => false;
-    public static string Description => "Initialize Final Arena distortion components for fresh runs before startup UI reads them";
+
+    public static string Description =>
+        "Initialize Final Arena distortion components for fresh runs before startup UI reads them";
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(NGame), "StartRun", [typeof(RunState)])];
+        return [new ModPatchTarget(typeof(NGame), "StartRun", [typeof(RunState)])];
     }
 
     public static void Postfix(RunState runState, ref Task __result)
@@ -38,7 +40,7 @@ public sealed class ReAstralPartyRunSettingsStartPatch : IPatchMethod
         var netRole = LobbyGameplayNetRoleHelper.GetCurrentRole();
         await FinalArenaSeriesHelper.EnsureInitializedAndAppliedAsync(
             runState,
-            broadcastIfHost: netRole != LobbyGameplayNetRole.Client,
-            allowGenerateIfMissing: true);
+            netRole != LobbyGameplayNetRole.Client,
+            true);
     }
 }

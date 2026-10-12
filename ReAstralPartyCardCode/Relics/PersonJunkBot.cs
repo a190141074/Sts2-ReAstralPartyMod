@@ -184,12 +184,10 @@ public class PersonJunkBot : CooldownPersonRelicBase
         var markedCoords = GetMarkedCoords();
         var shouldRegenerate = markedCoords == null;
         if (markedCoords != null)
-        {
             shouldRegenerate = !markedCoords.TrueForAll(coord =>
                 map.HasPoint(coord)
                 && map.GetPoint(coord) is { } point
                 && point.PointType is MapPointType.Monster or MapPointType.Elite);
-        }
 
         if (shouldRegenerate)
         {
@@ -221,7 +219,8 @@ public class PersonJunkBot : CooldownPersonRelicBase
         {
             var point = map.GetPoint(coord);
             if (point == null)
-                throw new InvalidOperationException($"Loaded a junk bot map with coordinate {coord}, but the generated map does not contain that coordinate!");
+                throw new InvalidOperationException(
+                    $"Loaded a junk bot map with coordinate {coord}, but the generated map does not contain that coordinate!");
             if (!point.Quests.Any(q => q is PersonJunkBot))
                 point.AddQuest(this);
         }

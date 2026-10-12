@@ -27,20 +27,41 @@ internal static class ProphecySoulDevourRegistry
         Create(ProphecySoulDevourKind.EnergySavingStrategy, ProphecySoulDevourPersistence.Permanent, true)
     ];
 
-    private static readonly IReadOnlyDictionary<ProphecySoulDevourKind, ProphecySoulDevourDefinition> DefinitionsByKind =
-        Definitions.ToDictionary(static definition => definition.Kind);
+    private static readonly IReadOnlyDictionary<ProphecySoulDevourKind, ProphecySoulDevourDefinition>
+        DefinitionsByKind =
+            Definitions.ToDictionary(static definition => definition.Kind);
 
     public static IReadOnlyList<ProphecySoulDevourDefinition> All => Definitions;
-    public static LocString SelectionHeader => new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.selectionScreenHeader");
-    public static LocString SelectionSubtitle => new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.selectionScreenSubtitle");
-    public static LocString RefreshButtonText => new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.selectionScreenRefresh");
-    public static LocString AncientRuinsRestSiteDescription => new("rest_site_ui", "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_PROPHECY_SOUL_DEVOUR_ANCIENT_RUINS.description");
-    public static LocString HiddenStrikeRelicGroupTitle => new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicGroupTitle");
-    public static LocString HiddenStrikeRelicGroupSubtitle => new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicGroupSubtitle");
-    public static LocString HiddenStrikeRelicRelicTitle => new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicRelicTitle");
-    public static LocString HiddenStrikeRelicRelicSubtitle => new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicRelicSubtitle");
-    public static LocString HiddenStrikeRelicSkip => new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicSkip");
-    public static LocString AncientRelicGroupCountText => new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicGroupCount");
+
+    public static LocString SelectionHeader =>
+        new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.selectionScreenHeader");
+
+    public static LocString SelectionSubtitle =>
+        new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.selectionScreenSubtitle");
+
+    public static LocString RefreshButtonText =>
+        new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.selectionScreenRefresh");
+
+    public static LocString AncientRuinsRestSiteDescription => new("rest_site_ui",
+        "OPTION_RE_ASTRAL_PARTY_MOD_OPTION_PROPHECY_SOUL_DEVOUR_ANCIENT_RUINS.description");
+
+    public static LocString HiddenStrikeRelicGroupTitle => new("relics",
+        "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicGroupTitle");
+
+    public static LocString HiddenStrikeRelicGroupSubtitle => new("relics",
+        "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicGroupSubtitle");
+
+    public static LocString HiddenStrikeRelicRelicTitle => new("relics",
+        "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicRelicTitle");
+
+    public static LocString HiddenStrikeRelicRelicSubtitle => new("relics",
+        "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicRelicSubtitle");
+
+    public static LocString HiddenStrikeRelicSkip =>
+        new("relics", "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicSkip");
+
+    public static LocString AncientRelicGroupCountText => new("relics",
+        "RE_ASTRAL_PARTY_MOD_RELIC_PROPHECY_SOUL_DEVOUR.hiddenStrikeRelicGroupCount");
 
     public static ProphecySoulDevourDefinition Get(ProphecySoulDevourKind kind)
     {

@@ -30,8 +30,7 @@ public class SkillFortuneMischance : AstralPartyCardModel, IModRightClickableCar
     private const string ActiveColor = "#ffffff";
     private const string InactiveColor = "#888888";
 
-    [SavedProperty]
-    private bool _damageMode { get; set; }
+    [SavedProperty] private bool _damageMode { get; set; }
 
     public override IEnumerable<CardKeyword> CanonicalKeywords =>
         [CardKeyword.Eternal, CardKeyword.Retain, AstralKeywords.AstralUnique];
@@ -40,7 +39,8 @@ public class SkillFortuneMischance : AstralPartyCardModel, IModRightClickableCar
 
     protected override bool IsPlayable =>
         Owner != null
-        && Owner.GetRelic<PersonalityDerivativeFortuneMischance>()?.AstralParty_PersonalityDerivativeFortuneMischanceStacks >= 1;
+        && Owner.GetRelic<PersonalityDerivativeFortuneMischance>()
+            ?.AstralParty_PersonalityDerivativeFortuneMischanceStacks >= 1;
 
     public override TargetType TargetType => _damageMode ? TargetType.AnyEnemy : TargetType.AnyPlayer;
 
@@ -86,11 +86,15 @@ public class SkillFortuneMischance : AstralPartyCardModel, IModRightClickableCar
     {
     }
 
-    public bool CanHandleRightClickLocal(ModRightClickContext context) =>
-        context.Model == this && context.Trigger.Source == ModRightClickSource.HandCard;
+    public bool CanHandleRightClickLocal(ModRightClickContext context)
+    {
+        return context.Model == this && context.Trigger.Source == ModRightClickSource.HandCard;
+    }
 
-    public bool CanExecuteRightClick(ModRightClickExecutionContext context) =>
-        context.Model == this && Owner != null && context.Trigger.Source == ModRightClickSource.HandCard;
+    public bool CanExecuteRightClick(ModRightClickExecutionContext context)
+    {
+        return context.Model == this && Owner != null && context.Trigger.Source == ModRightClickSource.HandCard;
+    }
 
     public async Task OnRightClick(ModRightClickExecutionContext context)
     {

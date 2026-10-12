@@ -15,7 +15,6 @@ using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillUnstoppable : AstralPartyCardModel
 {
@@ -116,4 +115,3 @@ public class SkillUnstoppable : AstralPartyCardModel
         return BonusMudTruckOnesDigits.Contains(onesDigit);
     }
 }
-

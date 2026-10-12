@@ -25,7 +25,8 @@ internal static class EventDeckCardHelper
     public static List<CardModel> GetRunDeckCards(Player owner)
     {
         if (owner.RunState == null)
-            MainFile.Logger.Warn($"[EventDeckCardHelper] Owner {owner.NetId} has no RunState; using Player.Deck fallback.");
+            MainFile.Logger.Warn(
+                $"[EventDeckCardHelper] Owner {owner.NetId} has no RunState; using Player.Deck fallback.");
 
         var cards = TryGetCardsFromPlayerDeck(owner);
         if (cards.Count > 0)
@@ -95,7 +96,6 @@ internal static class EventDeckCardHelper
         var beforeDeckCount = owner.Deck?.Cards.Count ?? -1;
         var removedFromDeck = false;
         if (card.Pile?.Type == PileType.Deck)
-        {
             try
             {
                 await CardPileCmd.RemoveFromDeck(card, showPreview);
@@ -106,12 +106,8 @@ internal static class EventDeckCardHelper
                 MainFile.Logger.Warn(
                     $"[EventDeckCardHelper] CardPileCmd.RemoveFromDeck failed for '{card.Id.Entry}' owner {owner.NetId}: {ex.Message}");
             }
-        }
 
-        if (!removedFromDeck)
-        {
-            removedFromDeck = TryRemoveCardFromPlayerDeck(owner, card);
-        }
+        if (!removedFromDeck) removedFromDeck = TryRemoveCardFromPlayerDeck(owner, card);
 
         var removedFromRunState = !owner.RunState?.ContainsCard(card) ?? true;
         if (!removedFromRunState)
@@ -122,15 +118,11 @@ internal static class EventDeckCardHelper
         var afterDeckCount = owner.Deck?.Cards.Count ?? -1;
 
         if (removed)
-        {
             MainFile.Logger.Info(
                 $"[EventDeckCardHelper] Removed card '{card.Id.Entry}' from run deck for owner {owner.NetId} | deckCount={beforeDeckCount}->{afterDeckCount}.");
-        }
         else
-        {
             MainFile.Logger.Warn(
                 $"[EventDeckCardHelper] Failed to remove card '{card.Id.Entry}' from run deck for owner {owner.NetId} | deckCount={beforeDeckCount}->{afterDeckCount}.");
-        }
 
         return removed;
     }
@@ -159,7 +151,8 @@ internal static class EventDeckCardHelper
         var cards = ExtractCards(deck.Cards, owner);
         if (cards.Count > 0)
         {
-            MainFile.Logger.Info($"[EventDeckCardHelper] Resolved run deck via Player.Deck.Cards for owner {owner.NetId}.");
+            MainFile.Logger.Info(
+                $"[EventDeckCardHelper] Resolved run deck via Player.Deck.Cards for owner {owner.NetId}.");
             return cards;
         }
 
@@ -262,9 +255,9 @@ internal static class EventDeckCardHelper
         var result = await CardPileCmd.Add(card, owner.Deck, CardPilePosition.Bottom, null, false);
         var addedCard = result.cardAdded;
         var inTargetDeck = result.success
-                            && ReferenceEquals(addedCard.Owner, owner)
-                            && owner.Deck.Cards.Contains(addedCard)
-                            && addedCard.Pile == owner.Deck;
+                           && ReferenceEquals(addedCard.Owner, owner)
+                           && owner.Deck.Cards.Contains(addedCard)
+                           && addedCard.Pile == owner.Deck;
         if (!inTargetDeck)
         {
             MainFile.Logger.Error(

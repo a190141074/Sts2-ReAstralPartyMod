@@ -32,9 +32,7 @@ public sealed class VariantPersonTerraprisma : PersonRelicBase
             || cardSource?.Owner != Owner
             || cardSource.Type != CardType.Attack
             || cardSource is TerraprismaCard)
-        {
             return 1m;
-        }
 
         return 0.5m;
     }
@@ -53,5 +51,4 @@ public sealed class VariantPersonTerraprisma : PersonRelicBase
 
         await PowerCmd.Apply<LoadTerraprismaPower>(Owner.Creature, 1m, Owner.Creature, null, false);
     }
-
 }

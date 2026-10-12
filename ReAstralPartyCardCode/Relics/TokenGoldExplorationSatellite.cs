@@ -22,6 +22,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 public class TokenGoldExplorationSatellite : AstralPartyRelicModel
 {
     private const int HandThreshold = 6;
+
     private static readonly SavedAttachedState<TokenGoldExplorationSatellite, bool> PendingRailgun =
         new($"{MainFile.ModId}_token_gold_exploration_satellite_pending_railgun", _ => false);
 

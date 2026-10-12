@@ -32,13 +32,26 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
     [SavedProperty] public bool AstralParty_PersonLegendaryThiefPendingCombatStartCard { get; set; }
     [SavedProperty] public int AstralParty_PersonLegendaryThiefAppliedDexterity { get; set; }
 
-    protected override int CounterValue { get => AstralParty_PersonLegendaryThiefCounter; set => AstralParty_PersonLegendaryThiefCounter = value; }
-    protected override bool PendingCombatStartCard { get => AstralParty_PersonLegendaryThiefPendingCombatStartCard; set => AstralParty_PersonLegendaryThiefPendingCombatStartCard = value; }
+    protected override int CounterValue
+    {
+        get => AstralParty_PersonLegendaryThiefCounter;
+        set => AstralParty_PersonLegendaryThiefCounter = value;
+    }
+
+    protected override bool PendingCombatStartCard
+    {
+        get => AstralParty_PersonLegendaryThiefPendingCombatStartCard;
+        set => AstralParty_PersonLegendaryThiefPendingCombatStartCard = value;
+    }
+
     protected override int BaseMaxCounter => 4;
     public override RelicRarity Rarity => RelicRarity.Ancient;
 
     protected override IEnumerable<IHoverTip> ExtraHoverTips =>
-    [HoverTipFactory.FromCard<SkillSleightOfHand>(), HoverTipFactory.FromPower<WindfallHitsPower>(), HoverTipFactory.FromPower<EffectsStarlightPower>(), HoverTipFactory.FromPower<DexterityPower>()];
+    [
+        HoverTipFactory.FromCard<SkillSleightOfHand>(), HoverTipFactory.FromPower<WindfallHitsPower>(),
+        HoverTipFactory.FromPower<EffectsStarlightPower>(), HoverTipFactory.FromPower<DexterityPower>()
+    ];
 
     public override async Task BeforeCombatStart()
     {
@@ -62,17 +75,21 @@ public sealed class PersonLegendaryThief : CooldownPersonRelicBase
     {
         if (Owner?.Creature == null || cardPlay.Card.Owner != Owner || cardPlay.Card.Type != CardType.Attack)
             return;
-        await PowerCmd.Apply<WindfallHitsPower>(choiceContext, Owner.Creature, 1m, Owner.Creature, cardPlay.Card, false);
+        await PowerCmd.Apply<WindfallHitsPower>(choiceContext, Owner.Creature, 1m, Owner.Creature, cardPlay.Card,
+            false);
     }
 
-    public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
+    public override decimal ModifyDamageAdditive(Creature? target, decimal amount, ValueProp props, Creature? dealer,
+        CardModel? cardSource)
     {
-        if (Owner?.Creature == null || dealer != Owner.Creature || cardSource?.Owner != Owner || cardSource.Type != CardType.Attack)
+        if (Owner?.Creature == null || dealer != Owner.Creature || cardSource?.Owner != Owner ||
+            cardSource.Type != CardType.Attack)
             return 0m;
         return amount > 0m ? -1m : 0m;
     }
 
-    public override async Task AfterDeath(PlayerChoiceContext choiceContext, Creature target, bool wasRemovalPrevented, float deathAnimLength)
+    public override async Task AfterDeath(PlayerChoiceContext choiceContext, Creature target, bool wasRemovalPrevented,
+        float deathAnimLength)
     {
         if (Owner?.Creature == null || target != Owner.Creature || wasRemovalPrevented)
             return;

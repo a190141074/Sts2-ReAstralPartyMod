@@ -56,7 +56,7 @@ public class AbsoluteFormPower : AstralPartyPowerModel
         if (!player.Creature.IsAlive)
             return;
 
-        PlayerCmd.EndTurn(player, canBackOut: false);
+        PlayerCmd.EndTurn(player, false);
     }
 
     private int GetCurseIntervalRounds()

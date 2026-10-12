@@ -134,7 +134,7 @@ public class VariantPersonSara : CooldownPersonRelicBase
         AstralParty_VariantPersonSaraCharge = 0;
         await AstralDivinePersonaHelper.SyncSaraChargeDisplay(Owner, 0);
         RefreshShatterStarDamageDisplays();
-        await PendingExtraTurnQueuePower.EnqueueSaraChargeExtraTurn(Owner, grantEnergyOnExtraTurnStart: true);
+        await PendingExtraTurnQueuePower.EnqueueSaraChargeExtraTurn(Owner, true);
         MainFile.Logger.Info(
             $"[VariantPersonSara] Queued Sara extra turn from 21 charge | owner={Owner?.NetId} | pending={PendingExtraTurnQueuePower.GetPendingCount(Owner)}");
     }

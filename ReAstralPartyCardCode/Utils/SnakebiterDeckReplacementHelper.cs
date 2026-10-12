@@ -95,7 +95,8 @@ internal static class SnakebiterDeckReplacementHelper
 
         foreach (var memberName in RunDeckMemberNames)
         {
-            var member = runState.GetType().GetMember(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+            var member = runState.GetType().GetMember(memberName,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .FirstOrDefault();
             if (member == null)
                 continue;

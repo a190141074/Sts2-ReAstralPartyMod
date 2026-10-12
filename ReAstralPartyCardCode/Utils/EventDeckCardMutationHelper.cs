@@ -55,7 +55,8 @@ internal static class EventDeckCardMutationHelper
 
         if (UpgradeWithPreviewMethod != null && HorizontalLayoutPreviewStyle != null)
         {
-            UpgradeWithPreviewMethod.Invoke(null, new object?[] { new[] { cardToMutate }, HorizontalLayoutPreviewStyle });
+            UpgradeWithPreviewMethod.Invoke(null,
+                new object?[] { new[] { cardToMutate }, HorizontalLayoutPreviewStyle });
         }
         else
         {
@@ -94,7 +95,7 @@ internal static class EventDeckCardMutationHelper
 
         try
         {
-            return Enum.Parse(previewStyleType, "HorizontalLayout", ignoreCase: false);
+            return Enum.Parse(previewStyleType, "HorizontalLayout", false);
         }
         catch
         {
@@ -161,10 +162,8 @@ internal static class EventDeckCardMutationHelper
 
         var selectedIndexes = GetStableDeckIndexes(owner, fallbackCards);
         if (selectedIndexes.Count != fallbackCards.Count)
-        {
             Log.Warn(
                 $"[{MainFile.ModId}] Deck mutation index resolution mismatch before sync | owner={owner.NetId} | context={context} | kind={mutationKind} | selected={fallbackCards.Count} | resolved={selectedIndexes.Count}");
-        }
 
         var runManager = RunManager.Instance;
         var netService = runManager?.NetService;

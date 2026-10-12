@@ -70,7 +70,8 @@ internal static class StunGunMindSyncHelper
         if (recordedMindStacks <= 0)
             return;
 
-        await PowerCmd.Apply<MindPower>(stunGun.Owner.Creature, recordedMindStacks, stunGun.Owner.Creature, null, false);
+        await PowerCmd.Apply<MindPower>(stunGun.Owner.Creature, recordedMindStacks, stunGun.Owner.Creature, null,
+            false);
     }
 
     private static async Task SyncCombatMindDelta(

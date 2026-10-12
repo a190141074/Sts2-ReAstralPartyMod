@@ -16,11 +16,15 @@ public sealed class WindfallHitsEnchantment : ModEnchantmentTemplate
         IconPath = "res://ReAstralPartyMod/images/enchantments/windfall_hits_enchantment.png"
     };
 
-    public override bool CanEnchantCardType(CardType cardType) =>
-        cardType is CardType.Attack or CardType.Skill or CardType.Power;
+    public override bool CanEnchantCardType(CardType cardType)
+    {
+        return cardType is CardType.Attack or CardType.Skill or CardType.Power;
+    }
 
-    public override bool CanEnchant(CardModel card) =>
-        base.CanEnchant(card) && CanEnchantCardType(card.Type) && card.Enchantment == null;
+    public override bool CanEnchant(CardModel card)
+    {
+        return base.CanEnchant(card) && CanEnchantCardType(card.Type) && card.Enchantment == null;
+    }
 
     public override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay? cardPlay)
     {
@@ -47,6 +51,7 @@ public sealed class WindfallHitsEnchantment : ModEnchantmentTemplate
 
         // Native temporary-enchantment lifecycle: keep the instance, disable it after first use.
         Status = EnchantmentStatus.Disabled;
-        MainFile.Logger.Info($"[LegendaryThief] WindfallHits resolved: owner={owner.NetId} card={cardPlay.Card.CanonicalInstance?.Id ?? cardPlay.Card.Id} play={cardPlay.PlayIndex} result={amount} status={Status}");
+        MainFile.Logger.Info(
+            $"[LegendaryThief] WindfallHits resolved: owner={owner.NetId} card={cardPlay.Card.CanonicalInstance?.Id ?? cardPlay.Card.Id} play={cardPlay.PlayIndex} result={amount} status={Status}");
     }
 }

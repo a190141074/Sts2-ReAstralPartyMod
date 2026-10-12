@@ -762,11 +762,11 @@
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_PERPETUAL_MOTION_MACHINE.title": "【永动机】",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_PERPETUAL_MOTION_MACHINE.description": "· 战斗开始时获得1点敏捷，且在面对BOSS时，该效果翻倍。\n· 回合开始时，若[gold]充能[/gold]层数低于6，则使[gold]充能[/gold]层数变为6。",
   "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ELECTROMAGNETIC_GUN.title": "【电磁炮】",
-  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ELECTROMAGNETIC_GUN.description": "· 战斗开始时获得1点力量，且在Boss战开始时，该效果翻倍。\n· 打出攻击牌后，消耗4层[gold]充能[/gold]，对命中的首个目标及目标最近的两名敌人，追加攻击牌[blue]50%基础面板+力量层数[/blue]的伤害。"
-  ,"RE_ASTRAL_PARTY_MOD_RELIC_PERSON_HANNA_TONO.title":"【人格：汉娜】"
-  ,"RE_ASTRAL_PARTY_MOD_RELIC_PERSON_HANNA_TONO.description":"· 每[blue]3[/blue]回合开始，将[blue]1[/blue]张[gold]漂浮魔法[/gold]加入你手中。\n· 回合开始时，若[gold]节点[/gold]大于等于[blue]6[/blue]，获得[blue]1[/blue]点[gold]星光[/gold]；若拥有人偶完成，额外获得[blue]1[/blue]层[gold]永恒星光[/gold]。"
-  ,"RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_MAKING.title":"【人格衍生：人偶制作】"
-  ,"RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_MAKING.description":"· 每回合开始，若[gold]经过[/gold]其他玩家，获得[blue]1[/blue]点[gold]星光[/gold]和[blue]1[/blue]层[gold]人偶制作[/gold]。\n· 若此时拥有[gold]漂浮[/gold]，使该玩家获得[blue]3[/blue]点[gold]星光[/gold]。\n· 当[gold]人偶制作[/gold]达到[blue]7[/blue]层时，永久获得人偶完成。"
-  ,"RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_COMPLETE.title":"【人格衍生：人偶完成】"
-  ,"RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_COMPLETE.description":"· 每回合开始，若[gold]经过[/gold]其他玩家，获得[blue]1[/blue]点[gold]星光[/gold]和[blue]1[/blue]层[gold]人偶制作[/gold]。\n· 若此时拥有[gold]漂浮[/gold]，使该玩家获得[blue]3[/blue]点[gold]星光[/gold]。\n· [purple]若经过其他玩家，使该玩家本回合获得[blue]2[/blue]点临时[green]敏捷[/green]。[/purple]"
+  "RE_ASTRAL_PARTY_MOD_RELIC_TOKEN_GOLD_ELECTROMAGNETIC_GUN.description": "· 战斗开始时获得1点力量，且在Boss战开始时，该效果翻倍。\n· 打出攻击牌后，消耗4层[gold]充能[/gold]，对命中的首个目标及目标最近的两名敌人，追加攻击牌[blue]50%基础面板+力量层数[/blue]的伤害。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_HANNA_TONO.title": "【人格：汉娜】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSON_HANNA_TONO.description": "· 每[blue]3[/blue]回合开始，将[blue]1[/blue]张[gold]漂浮魔法[/gold]加入你手中。\n· 回合开始时，若[gold]节点[/gold]大于等于[blue]6[/blue]，获得[blue]1[/blue]点[gold]星光[/gold]；若拥有人偶完成，额外获得[blue]1[/blue]层[gold]永恒星光[/gold]。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_MAKING.title": "【人格衍生：人偶制作】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_MAKING.description": "· 每回合开始，若[gold]经过[/gold]其他玩家，获得[blue]1[/blue]点[gold]星光[/gold]和[blue]1[/blue]层[gold]人偶制作[/gold]。\n· 若此时拥有[gold]漂浮[/gold]，使该玩家获得[blue]3[/blue]点[gold]星光[/gold]。\n· 当[gold]人偶制作[/gold]达到[blue]7[/blue]层时，永久获得人偶完成。",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_COMPLETE.title": "【人格衍生：人偶完成】",
+  "RE_ASTRAL_PARTY_MOD_RELIC_PERSONALITY_DERIVATIVE_DOLL_COMPLETE.description": "· 每回合开始，若[gold]经过[/gold]其他玩家，获得[blue]1[/blue]点[gold]星光[/gold]和[blue]1[/blue]层[gold]人偶制作[/gold]。\n· 若此时拥有[gold]漂浮[/gold]，使该玩家获得[blue]3[/blue]点[gold]星光[/gold]。\n· [purple]若经过其他玩家，使该玩家本回合获得[blue]2[/blue]点临时[green]敏捷[/green]。[/purple]"
 }

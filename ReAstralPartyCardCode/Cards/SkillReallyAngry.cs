@@ -8,7 +8,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Relics;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillReallyAngry : AstralPartyCardModel
 {
@@ -32,4 +31,3 @@ public class SkillReallyAngry : AstralPartyCardModel
         return Task.CompletedTask;
     }
 }
-

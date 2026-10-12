@@ -20,8 +20,18 @@ public sealed class PersonXiaoLeiDoppelganger : CooldownPersonRelicBase
     [SavedProperty] public int AstralParty_PersonXiaoLeiDoppelgangerCounter { get; set; } = 1;
     [SavedProperty] public bool AstralParty_PersonXiaoLeiDoppelgangerPendingCombatStartCard { get; set; }
 
-    protected override int CounterValue { get => AstralParty_PersonXiaoLeiDoppelgangerCounter; set => AstralParty_PersonXiaoLeiDoppelgangerCounter = value; }
-    protected override bool PendingCombatStartCard { get => AstralParty_PersonXiaoLeiDoppelgangerPendingCombatStartCard; set => AstralParty_PersonXiaoLeiDoppelgangerPendingCombatStartCard = value; }
+    protected override int CounterValue
+    {
+        get => AstralParty_PersonXiaoLeiDoppelgangerCounter;
+        set => AstralParty_PersonXiaoLeiDoppelgangerCounter = value;
+    }
+
+    protected override bool PendingCombatStartCard
+    {
+        get => AstralParty_PersonXiaoLeiDoppelgangerPendingCombatStartCard;
+        set => AstralParty_PersonXiaoLeiDoppelgangerPendingCombatStartCard = value;
+    }
+
     protected override int BaseMaxCounter => 3;
     public override RelicRarity Rarity => RelicRarity.Ancient;
 

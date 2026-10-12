@@ -15,7 +15,6 @@ using MegaCrit.Sts2.Core.Models.Powers;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillBite : AstralPartyCardModel
 {
@@ -108,4 +107,3 @@ public class SkillBite : AstralPartyCardModel
             false);
     }
 }
-

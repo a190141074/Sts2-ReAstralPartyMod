@@ -88,7 +88,7 @@ public class TokenGoldArcaneCodex : AstralPartyRelicModel
             cardPlay.Card,
             this,
             CardPilePosition.Top,
-            setFreeThisTurn: true);
+            true);
     }
 
     private void ResetTurnState()

@@ -83,7 +83,8 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
             AstralParty_PvzUltimateHyperSpacetimeNutPendingIntangibleCount = 0;
             Flash();
             await PowerCmd.Apply<IntangiblePower>(Owner.Creature, pending, Owner.Creature, null, false);
-            MainFile.Logger.Info($"[PvzUltimateNut] Granted pending intangible | owner={Owner.NetId} | stacks={pending}");
+            MainFile.Logger.Info(
+                $"[PvzUltimateNut] Granted pending intangible | owner={Owner.NetId} | stacks={pending}");
         }
 
         await PowerCmd.Apply<ArtifactPower>(Owner.Creature, 1m, Owner.Creature, null, false);
@@ -103,7 +104,8 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
         }
     }
 
-    public override decimal ModifyHpLostAfterOsty(Creature target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
+    public override decimal ModifyHpLostAfterOsty(Creature target, decimal amount, ValueProp props, Creature? dealer,
+        CardModel? cardSource)
     {
         var ownerCreature = Owner?.Creature;
         if (ownerCreature == null || !PvzNutRelicHelper.IsOwnedByTarget(target, ownerCreature))
@@ -112,7 +114,8 @@ public class PvzUltimateHyperSpacetimeNut : AstralPartyRelicModel
         if (PvzNutRelicHelper.IsEnemyAttackSource(ownerCreature, dealer, cardSource))
         {
             AstralParty_PvzUltimateHyperSpacetimeNutDamageEventOrdinal++;
-            if (PvzNutRelicHelper.ShouldNegateEnemyAttack(Owner!, AstralParty_PvzUltimateHyperSpacetimeNutDamageEventOrdinal))
+            if (PvzNutRelicHelper.ShouldNegateEnemyAttack(Owner!,
+                    AstralParty_PvzUltimateHyperSpacetimeNutDamageEventOrdinal))
             {
                 AstralParty_PvzUltimateHyperSpacetimeNutPendingImmunityRewardCount++;
                 MainFile.Logger.Info(

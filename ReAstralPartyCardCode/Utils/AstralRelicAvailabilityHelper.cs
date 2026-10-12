@@ -63,7 +63,7 @@ public static class AstralRelicAvailabilityHelper
         return FilterVisibleRelics(
             bannedRelicIds,
             mode,
-            enableJewelryRelics: mode != AstralContentMode.Vanilla,
+            mode != AstralContentMode.Vanilla,
             relics);
     }
 

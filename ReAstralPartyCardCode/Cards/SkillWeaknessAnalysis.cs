@@ -61,7 +61,8 @@ public class SkillWeaknessAnalysis : AstralPartyCardModel
         var owner = Owner;
         var ownerCreature = owner?.Creature;
         var target = cardPlay.Target;
-        if (owner == null || ownerCreature == null || target == null || !target.IsAlive || target.Side == ownerCreature.Side)
+        if (owner == null || ownerCreature == null || target == null || !target.IsAlive ||
+            target.Side == ownerCreature.Side)
             return;
 
         IncrementUsesThisTurn();
@@ -87,7 +88,8 @@ public class SkillWeaknessAnalysis : AstralPartyCardModel
         await MosesCombatHelper.ReplaceStance(owner, this, chooseDodge);
     }
 
-    public override Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, MegaCrit.Sts2.Core.Entities.Players.Player player)
+    public override Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext,
+        MegaCrit.Sts2.Core.Entities.Players.Player player)
     {
         if (Owner == null || player != Owner)
             return Task.CompletedTask;

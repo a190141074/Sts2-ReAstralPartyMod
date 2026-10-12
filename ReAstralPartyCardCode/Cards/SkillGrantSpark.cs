@@ -64,6 +64,7 @@ public class SkillGrantSpark : AstralPartyCardModel
 
         var cardToAdd = Owner.Creature.CombatState.CreateCard(selectedCard.CanonicalInstance ?? selectedCard, Owner);
         CardCmd.Upgrade(cardToAdd);
-        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(cardToAdd, true, CardPilePosition.Top, this);
+        await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(cardToAdd, true, CardPilePosition.Top,
+            this);
     }
 }

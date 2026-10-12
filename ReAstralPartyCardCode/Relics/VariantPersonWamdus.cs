@@ -119,7 +119,8 @@ public sealed class VariantPersonWamdus : CooldownPersonRelicBase, IRelicExtraIc
         if (amount <= 0)
             return;
 
-        AstralParty_VariantPersonWamdusManaAmplification = Math.Max(0, AstralParty_VariantPersonWamdusManaAmplification) + amount;
+        AstralParty_VariantPersonWamdusManaAmplification =
+            Math.Max(0, AstralParty_VariantPersonWamdusManaAmplification) + amount;
         NotifyDisplayChanged();
     }
 

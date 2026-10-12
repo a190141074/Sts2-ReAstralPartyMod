@@ -20,7 +20,7 @@ public sealed class DevConsoleCommandNotificationPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(DevConsole), "ProcessCommand", [typeof(string)])];
+        return [new ModPatchTarget(typeof(DevConsole), "ProcessCommand", [typeof(string)])];
     }
 
     public static void Postfix(string inputValue, CmdResult __result)
@@ -33,7 +33,8 @@ public sealed class DevConsoleCommandNotificationPatch : IPatchMethod
             return;
 
         var commandName = commandText.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(commandName) || string.Equals(commandName, "help", StringComparison.OrdinalIgnoreCase))
+        if (string.IsNullOrWhiteSpace(commandName) ||
+            string.Equals(commandName, "help", StringComparison.OrdinalIgnoreCase))
             return;
 
         var runState = RunManager.Instance?.DebugOnlyGetState();

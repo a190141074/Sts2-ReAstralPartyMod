@@ -22,22 +22,31 @@ internal static class NeowOptionInjectionHelper
 {
     private const string CandidatePoolVersion = "v1";
     private static readonly object SyncLock = new();
+
     private const string AbsoluteFormTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.ABSOLUTE_FORM";
+
     private const string ProphecySoulDevourTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_SOUL_DEVOUR";
+
     private const string ProphecyReplicantGroupTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.PROPHECY_REPLICANT_GROUP";
+
     private const string TetraWarforgeTextKey =
         "RE_ASTRAL_PARTY_MOD_ANCIENT_NEOW.pages.INITIAL.options.TETRA_WARFORGE";
+
     private const string AbsoluteFormIconPath =
         "res://ReAstralPartyMod/images/powers/absolute_form_power.png";
+
     private const string ProphecySoulDevourIconPath =
         "res://ReAstralPartyMod/images/relic/prophecy_soul_devour.png";
+
     private const string ProphecyReplicantGroupIconPath =
         "res://ReAstralPartyMod/images/relic/prophecy_replicant_group.png";
+
     private const string TetraWarforgeIconPath =
         "res://ReAstralPartyMod/images/relic/tetra_holo_sphere.png";
+
     private static readonly string[] CardCollectionMemberNames =
     [
         "Cards",
@@ -86,6 +95,7 @@ internal static class NeowOptionInjectionHelper
             CreateTetraWarforgeHoverTips,
             ChooseTetraHoloSphere)
     ];
+
     private static readonly Dictionary<string, string> SelectedCandidateKeysByRun = [];
 
     public static void Register()
@@ -93,13 +103,11 @@ internal static class NeowOptionInjectionHelper
         MainFile.Logger.Info(
             "[NeowOptionInjectionHelper] Registering randomized custom Neow option pool through RitsuLib ancient-option registry.");
         foreach (var candidate in CandidateDefinitions)
-        {
             RitsuLibFramework.RegisterAncientOption<Neow>(
                 MainFile.ModId,
                 ModAncientOptionRule.Single(
                     ancient => candidate.CreateOption(ancient),
                     ancient => IsCandidateSelected(ancient, candidate.StableKey)));
-        }
     }
 
     internal static IReadOnlyList<EventOption> EnsureSelectedCustomOptionPresent(
@@ -127,10 +135,8 @@ internal static class NeowOptionInjectionHelper
     public static string? ResolveCustomNeowOptionIconPath(string? textKey)
     {
         foreach (var candidate in CandidateDefinitions)
-        {
             if (string.Equals(textKey, candidate.TextKey, StringComparison.OrdinalIgnoreCase))
                 return candidate.IconPath;
-        }
 
         return null;
     }
@@ -156,12 +162,16 @@ internal static class NeowOptionInjectionHelper
         var configuredSelectionMode = ReAstralPartyModSettingsManager.GetNeowExtraOptionSelectionMode(runState);
         if (configuredSelectionMode != NeowExtraOptionSelectionMode.DefaultRandom)
         {
-            var forcedKey = ReAstralPartyModSettingsManager.TryGetForcedNeowExtraOptionStableKey(configuredSelectionMode);
+            var forcedKey =
+                ReAstralPartyModSettingsManager.TryGetForcedNeowExtraOptionStableKey(configuredSelectionMode);
             if (!string.IsNullOrWhiteSpace(forcedKey))
             {
                 var forcedRunKey = GetRunKey(runState, ancient.Owner);
                 lock (SyncLock)
+                {
                     SelectedCandidateKeysByRun[forcedRunKey] = forcedKey;
+                }
+
                 return forcedKey;
             }
         }
@@ -175,7 +185,8 @@ internal static class NeowOptionInjectionHelper
         {
             if (SelectedCandidateKeysByRun.TryGetValue(runKey, out var cachedKey))
             {
-                if (eligibleCandidates.Any(candidate => string.Equals(candidate.StableKey, cachedKey, StringComparison.Ordinal)))
+                if (eligibleCandidates.Any(candidate =>
+                        string.Equals(candidate.StableKey, cachedKey, StringComparison.Ordinal)))
                     return cachedKey;
 
                 SelectedCandidateKeysByRun.Remove(runKey);

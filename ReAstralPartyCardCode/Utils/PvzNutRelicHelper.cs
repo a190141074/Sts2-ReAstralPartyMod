@@ -11,6 +11,7 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 internal static class PvzNutRelicHelper
 {
     private const string UltimateNutAttackImmunityContext = "pvz_ultimate_hyper_spacetime_nut_attack_immunity";
+
     private static readonly IReadOnlyList<RelicModel> RareNutRelics =
     [
         ModelDb.Relic<PvzRareHyperTemporalNut>(),
@@ -20,6 +21,7 @@ internal static class PvzNutRelicHelper
         ModelDb.Relic<PvzRareGoldenNut>(),
         ModelDb.Relic<PvzRareDestructionNut>()
     ];
+
     private static readonly ModelId DistinguishedCapeId = new("RELIC", "DISTINGUISHED_CAPE");
     private static readonly ModelId BeatingRemnantId = new("RELIC", "BEATING_REMNANT");
     private static readonly ModelId BufferShieldId = ModelDb.GetId<TokenGoldBufferShield>();

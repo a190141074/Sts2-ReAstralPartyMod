@@ -36,10 +36,8 @@ internal static class DeterministicTypeCatalog
                 .ToArray();
 
             foreach (var loaderException in exception.LoaderExceptions.OfType<Exception>())
-            {
                 MainFile.Logger.Warn(
                     $"[DeterministicTypeCatalog] Reflection type load skipped for assembly '{assembly.GetName().Name}': {loaderException.GetType().Name}: {loaderException.Message}");
-            }
 
             if (loadableTypes.Length > 0)
                 return loadableTypes;

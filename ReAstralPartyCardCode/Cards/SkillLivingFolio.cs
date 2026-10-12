@@ -18,7 +18,6 @@ using STS2RitsuLib.Cards.DynamicVars;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillLivingFolio : AstralPartyCardModel
 {

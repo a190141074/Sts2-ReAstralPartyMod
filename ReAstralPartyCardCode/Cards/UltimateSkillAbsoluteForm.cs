@@ -45,8 +45,10 @@ public class UltimateSkillAbsoluteForm : UltimateSkillCardModel
 
         var alivePlayers = EventCombatTargetHelper.GetAlivePlayers(CombatState).ToList();
         if (AbsoluteFormHelper.HasFullFormSetAcrossAllRunDecks(CombatState as MegaCrit.Sts2.Core.Combat.CombatState
-            ?? Owner.Creature.CombatState as MegaCrit.Sts2.Core.Combat.CombatState
-            ?? throw new InvalidOperationException("Expected CombatState for AbsoluteFormHelper.")))
+                                                               ?? Owner.Creature.CombatState as
+                                                                   MegaCrit.Sts2.Core.Combat.CombatState
+                                                               ?? throw new InvalidOperationException(
+                                                                   "Expected CombatState for AbsoluteFormHelper.")))
         {
             await AbsoluteFormHelper.AutoPlayAllFormsForPlayer(choiceContext, Owner);
         }
@@ -60,6 +62,6 @@ public class UltimateSkillAbsoluteForm : UltimateSkillCardModel
         }
 
         if (Owner.Creature.IsAlive)
-            PlayerCmd.EndTurn(Owner, canBackOut: false);
+            PlayerCmd.EndTurn(Owner, false);
     }
 }

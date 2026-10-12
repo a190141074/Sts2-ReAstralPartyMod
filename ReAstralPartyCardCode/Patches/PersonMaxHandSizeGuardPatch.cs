@@ -23,10 +23,8 @@ public class PersonMaxHandSizeGuardPatch
         var originalAmount = __result;
         __result = guardedAmount;
         if (_guardLogCount++ < 8)
-        {
             MainFile.Logger?.Info(
                 $"[{MainFile.ModId}] Persona max-hand-size guard raised {player.NetId} from {originalAmount} to {guardedAmount}.");
-        }
     }
 
     private static int ApplyDirectRelicModifiers(Player player, int currentMaxHandSize)

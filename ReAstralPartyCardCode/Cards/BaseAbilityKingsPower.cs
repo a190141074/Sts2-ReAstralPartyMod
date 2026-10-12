@@ -35,6 +35,7 @@ public class BaseAbilityKingsPower : BaseAbilityCardModel
             return;
 
         await CreatureCmd.Damage(choiceContext, Owner.Creature, 4m, ValueProp.Unblockable | ValueProp.Unpowered, this);
-        await PowerCmd.Apply(ModelDb.Power<KingsPowerStrengthPower>().ToMutable(), Owner.Creature, 1m, Owner.Creature, this, false);
+        await PowerCmd.Apply(ModelDb.Power<KingsPowerStrengthPower>().ToMutable(), Owner.Creature, 1m, Owner.Creature,
+            this, false);
     }
 }

@@ -12,7 +12,6 @@ using MegaCrit.Sts2.Core.ValueProps;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool), StableEntryStem = "skill_famous_blade_doppelganger")]
 public class SkillFamousBladeDoppelganger : AstralPartyCardModel
 {
@@ -39,7 +38,8 @@ public class SkillFamousBladeDoppelganger : AstralPartyCardModel
 
     protected override bool ShouldAutoApplyCooldownEnchantment => true;
 
-    protected override string DefaultPortraitPath => "res://ReAstralPartyMod/images/card_portraits/skill_famous_blade_doppelganger.png";
+    protected override string DefaultPortraitPath =>
+        "res://ReAstralPartyMod/images/card_portraits/skill_famous_blade_doppelganger.png";
 
     protected override string ResolveActivePortraitPath()
     {

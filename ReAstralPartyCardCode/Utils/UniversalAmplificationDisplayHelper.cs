@@ -13,13 +13,14 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 internal static class UniversalAmplificationDisplayHelper
 {
     private static readonly AsyncLocal<int> RefreshDepth = new();
+
     public static decimal GetStableAttackAmplification(Player? player)
     {
         if (player?.Creature == null)
             return 0m;
 
         var creature = player.Creature;
-        decimal total = 0m;
+        var total = 0m;
 
         total += creature.GetPowerAmount<ChannelEnergyAttackBoostPower>();
         total += creature.GetPowerAmount<BaiZeBlessingPower>() > 0m
@@ -31,7 +32,8 @@ internal static class UniversalAmplificationDisplayHelper
 
         if (player.GetRelic<TokenPurpleBasicScope>() != null)
             total += 2m;
-        if (player.GetRelic<TokenGoldArtKnifeSharp>() != null && ArtKnifeActivationHelper.IsActivationSatisfied(creature))
+        if (player.GetRelic<TokenGoldArtKnifeSharp>() != null &&
+            ArtKnifeActivationHelper.IsActivationSatisfied(creature))
             total += creature.GetPowerAmount<EffectsHealPower>();
 
         return Math.Max(0m, total);
@@ -43,7 +45,7 @@ internal static class UniversalAmplificationDisplayHelper
             return 0m;
 
         var creature = player.Creature;
-        decimal total = 0m;
+        var total = 0m;
 
         total += creature.GetPowerAmount<EsotericEmpowerPower>();
         total += creature.GetPowerAmount<SurveyFindsPower>() * 3m;
@@ -139,5 +141,4 @@ internal static class UniversalAmplificationDisplayHelper
             return 1m;
         return 0m;
     }
-
 }

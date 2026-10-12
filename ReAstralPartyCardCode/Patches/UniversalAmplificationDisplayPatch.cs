@@ -19,11 +19,17 @@ public sealed class UniversalAmplificationDisplayApplyPowerWithContextPatch : IP
     public static string Description => "Refresh amplification displays after context-aware power applications";
     public static bool IsCritical => false;
 
-    public static ModPatchTarget[] GetTargets() =>
-    [
-        new(typeof(PowerCmd), nameof(PowerCmd.Apply),
-            [typeof(PlayerChoiceContext), typeof(PowerModel), typeof(Creature), typeof(decimal), typeof(Creature), typeof(CardModel), typeof(bool)])
-    ];
+    public static ModPatchTarget[] GetTargets()
+    {
+        return
+        [
+            new ModPatchTarget(typeof(PowerCmd), nameof(PowerCmd.Apply),
+            [
+                typeof(PlayerChoiceContext), typeof(PowerModel), typeof(Creature), typeof(decimal), typeof(Creature),
+                typeof(CardModel), typeof(bool)
+            ])
+        ];
+    }
 
     public static void Postfix(PlayerChoiceContext choiceContext, Creature target, ref Task __result)
     {
@@ -35,7 +41,8 @@ public sealed class UniversalAmplificationDisplayApplyPowerWithContextPatch : IP
     private static async Task ContinueAfterOriginal(Task originalTask, Player player, PlayerChoiceContext choiceContext)
     {
         await originalTask;
-        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player, choiceContext: choiceContext);
+        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player,
+            choiceContext: choiceContext);
     }
 }
 
@@ -45,11 +52,17 @@ public sealed class UniversalAmplificationDisplayModifyAmountWithContextPatch : 
     public static string Description => "Refresh amplification displays after context-aware power amount changes";
     public static bool IsCritical => false;
 
-    public static ModPatchTarget[] GetTargets() =>
-    [
-        new(typeof(PowerCmd), nameof(PowerCmd.ModifyAmount),
-            [typeof(PlayerChoiceContext), typeof(PowerModel), typeof(decimal), typeof(Creature), typeof(CardModel), typeof(bool)])
-    ];
+    public static ModPatchTarget[] GetTargets()
+    {
+        return
+        [
+            new ModPatchTarget(typeof(PowerCmd), nameof(PowerCmd.ModifyAmount),
+            [
+                typeof(PlayerChoiceContext), typeof(PowerModel), typeof(decimal), typeof(Creature), typeof(CardModel),
+                typeof(bool)
+            ])
+        ];
+    }
 
     public static void Postfix(PlayerChoiceContext choiceContext, PowerModel power, ref Task<int> __result)
     {
@@ -58,10 +71,12 @@ public sealed class UniversalAmplificationDisplayModifyAmountWithContextPatch : 
             __result = ContinueAfterOriginal(__result, player, choiceContext);
     }
 
-    private static async Task<int> ContinueAfterOriginal(Task<int> originalTask, Player player, PlayerChoiceContext choiceContext)
+    private static async Task<int> ContinueAfterOriginal(Task<int> originalTask, Player player,
+        PlayerChoiceContext choiceContext)
     {
         var result = await originalTask;
-        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player, choiceContext: choiceContext);
+        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player,
+            choiceContext: choiceContext);
         return result;
     }
 }
@@ -76,10 +91,13 @@ public sealed class UniversalAmplificationDisplayApplyPowerPatch : IPatchMethod
     {
         return
         [
-            new(
+            new ModPatchTarget(
                 typeof(PowerCmd),
                 nameof(PowerCmd.Apply),
-                [typeof(PowerModel), typeof(Creature), typeof(decimal), typeof(Creature), typeof(CardModel), typeof(bool)])
+                [
+                    typeof(PowerModel), typeof(Creature), typeof(decimal), typeof(Creature), typeof(CardModel),
+                    typeof(bool)
+                ])
         ];
     }
 
@@ -98,21 +116,25 @@ public sealed class UniversalAmplificationDisplayApplyPowerPatch : IPatchMethod
         PlayerChoiceContext? choiceContext = null)
     {
         await originalTask;
-        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player, choiceContext: choiceContext);
+        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player,
+            choiceContext: choiceContext);
     }
 }
 
 public sealed class UniversalAmplificationDisplaySetPowerAmountPatch : IPatchMethod
 {
     public static string PatchId => "universal_amplification_display_set_power_amount_patch";
-    public static string Description => "Refresh universal amplification display powers after power amounts are modified";
+
+    public static string Description =>
+        "Refresh universal amplification display powers after power amounts are modified";
+
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
         return
         [
-            new(
+            new ModPatchTarget(
                 typeof(PowerCmd),
                 nameof(PowerCmd.ModifyAmount),
                 [typeof(PowerModel), typeof(decimal), typeof(Creature), typeof(CardModel), typeof(bool)])
@@ -134,7 +156,8 @@ public sealed class UniversalAmplificationDisplaySetPowerAmountPatch : IPatchMet
         PlayerChoiceContext? choiceContext = null)
     {
         var result = await originalTask;
-        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player, choiceContext: choiceContext);
+        await UniversalAmplificationDisplayHelper.RefreshAmplificationDisplayPowers(player,
+            choiceContext: choiceContext);
         return result;
     }
 }
@@ -147,7 +170,7 @@ public sealed class UniversalAmplificationDisplayRemovePowerPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(PowerCmd), nameof(PowerCmd.Remove), [typeof(PowerModel)])];
+        return [new ModPatchTarget(typeof(PowerCmd), nameof(PowerCmd.Remove), [typeof(PowerModel)])];
     }
 
     public static void Postfix(PowerModel power, ref Task __result)
@@ -176,7 +199,11 @@ public sealed class UniversalAmplificationDisplayObtainRelicPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(RelicCmd), nameof(RelicCmd.Obtain), [typeof(RelicModel), typeof(Player), typeof(int)])];
+        return
+        [
+            new ModPatchTarget(typeof(RelicCmd), nameof(RelicCmd.Obtain),
+                [typeof(RelicModel), typeof(Player), typeof(int)])
+        ];
     }
 
     public static void Postfix(Player player, ref Task __result)
@@ -199,7 +226,7 @@ public sealed class UniversalAmplificationDisplayRemoveRelicPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(RelicCmd), nameof(RelicCmd.Remove), [typeof(RelicModel)])];
+        return [new ModPatchTarget(typeof(RelicCmd), nameof(RelicCmd.Remove), [typeof(RelicModel)])];
     }
 
     public static void Postfix(RelicModel relic, ref Task __result)
@@ -221,12 +248,15 @@ public sealed class UniversalAmplificationDisplayRemoveRelicPatch : IPatchMethod
 public sealed class UniversalAmplificationDisplayHealPatch : IPatchMethod
 {
     public static string PatchId => "universal_amplification_display_heal_patch";
-    public static string Description => "Refresh universal amplification display powers after healing changes stable amplification totals";
+
+    public static string Description =>
+        "Refresh universal amplification display powers after healing changes stable amplification totals";
+
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(CreatureCmd), nameof(CreatureCmd.Heal))];
+        return [new ModPatchTarget(typeof(CreatureCmd), nameof(CreatureCmd.Heal))];
     }
 
     public static void Postfix(Creature creature, ref Task __result)
@@ -248,12 +278,15 @@ public sealed class UniversalAmplificationDisplayHealPatch : IPatchMethod
 public sealed class UniversalAmplificationDisplaySetCurrentHpPatch : IPatchMethod
 {
     public static string PatchId => "universal_amplification_display_set_current_hp_patch";
-    public static string Description => "Refresh universal amplification display powers after HP changes affect stable relic amplification";
+
+    public static string Description =>
+        "Refresh universal amplification display powers after HP changes affect stable relic amplification";
+
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(CreatureCmd), nameof(CreatureCmd.SetCurrentHp))];
+        return [new ModPatchTarget(typeof(CreatureCmd), nameof(CreatureCmd.SetCurrentHp))];
     }
 
     public static void Postfix(Creature creature, ref Task __result)
@@ -282,7 +315,7 @@ public sealed class UniversalAmplificationDisplayAfterTurnEndPatch : IPatchMetho
     {
         return
         [
-            new(typeof(Hook), nameof(Hook.AfterTurnEnd),
+            new ModPatchTarget(typeof(Hook), nameof(Hook.AfterTurnEnd),
                 [typeof(ICombatState), typeof(CombatSide), typeof(IEnumerable<Creature>)])
         ];
     }

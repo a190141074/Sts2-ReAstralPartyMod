@@ -24,7 +24,7 @@ public sealed class AbyssalTentacleMonster : ModMonsterTemplate
     [SavedProperty(SerializationCondition.SaveIfNotTypeDefault)]
     public int AstralParty_AbyssalTentacleIndex { get; set; }
 
-    public override LocString Title => MonsterModel.L10NMonsterLookup("RE_ASTRAL_PARTY_MOD_MONSTER_ABYSSAL_TENTACLE.name");
+    public override LocString Title => L10NMonsterLookup("RE_ASTRAL_PARTY_MOD_MONSTER_ABYSSAL_TENTACLE.name");
 
     public override int MinInitialHp => 1;
 
@@ -60,7 +60,7 @@ public static class AbyssalTentacleCombatHelper
 
         var model = (AbyssalTentacleMonster)ModelDb.Monster<AbyssalTentacleMonster>().ToMutable();
         model.AstralParty_AbyssalTentacleIndex = GetLivingTentacles(owner).Count;
-        var tentacle = combatState.CreateCreature(model, owner.Creature.Side, slot: null);
+        var tentacle = combatState.CreateCreature(model, owner.Creature.Side, null);
         await PlayerCmd.AddPet(tentacle, owner);
         await MegaCrit.Sts2.Core.Commands.CreatureCmd.SetMaxHp(tentacle, 1m);
         await MegaCrit.Sts2.Core.Commands.CreatureCmd.SetCurrentHp(tentacle, 1m);
@@ -146,7 +146,8 @@ public static class AbyssalTentacleCombatHelper
         if (room == null)
             return;
 
-        foreach (var tentacle in owner.Creature.Pets.Where(creature => creature.Monster is AbyssalTentacleMonster).ToList())
+        foreach (var tentacle in owner.Creature.Pets.Where(creature => creature.Monster is AbyssalTentacleMonster)
+                     .ToList())
         {
             var node = room.GetCreatureNode(tentacle);
             if (node == null)
@@ -237,7 +238,7 @@ public static class AbyssalTentacleCombatHelper
     {
         var column = index % 4;
         var row = index / 4;
-        return new Vector2(92f + column * 66f, -72f + (column % 2) * 112f - row * 54f);
+        return new Vector2(92f + column * 66f, -72f + column % 2 * 112f - row * 54f);
     }
 
     public static bool IsIsolatedDamage(

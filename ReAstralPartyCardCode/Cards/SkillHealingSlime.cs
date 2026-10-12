@@ -10,7 +10,6 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillHealingSlime : AstralPartyCardModel
 {
@@ -55,4 +54,3 @@ public class SkillHealingSlime : AstralPartyCardModel
         );
     }
 }
-

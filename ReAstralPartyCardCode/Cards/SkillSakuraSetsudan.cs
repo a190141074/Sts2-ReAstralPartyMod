@@ -23,7 +23,7 @@ public sealed class SkillSakuraSetsudan : AstralPartyCardModel
     }
 
     protected override IEnumerable<MegaCrit.Sts2.Core.Localization.DynamicVars.DynamicVar> CanonicalVars =>
-        [new MegaCrit.Sts2.Core.Localization.DynamicVars.DamageVar(2m, MegaCrit.Sts2.Core.ValueProps.ValueProp.Move)];
+        [new MegaCrit.Sts2.Core.Localization.DynamicVars.DamageVar(2m, ValueProp.Move)];
 
     protected override string DefaultPortraitPath =>
         "res://ReAstralPartyMod/images/card_portraits/skill_sakura_setsudan.png";

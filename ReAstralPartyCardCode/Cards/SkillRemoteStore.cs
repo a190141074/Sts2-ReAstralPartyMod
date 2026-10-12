@@ -68,7 +68,8 @@ public sealed class SkillRemoteStore : AstralPartyCardModel
         {
             var canonicalCard = selectedCard.CanonicalInstance ?? selectedCard;
             var freshCard = combatState.CreateCard(canonicalCard, owner);
-            await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(freshCard, true, CardPilePosition.Top, this);
+            await PersonMultiplayerEffectHelper.AddGeneratedCardToHandAndNotify(freshCard, true, CardPilePosition.Top,
+                this);
         }
     }
 }
@@ -82,7 +83,8 @@ internal static class RemoteStoreCardHelper
         typeof(ColorlessCardPool)
     ];
 
-    public static IReadOnlyList<RemoteStoreCardOffer> BuildDeterministicOffer(MegaCrit.Sts2.Core.Entities.Players.Player owner, string contextId)
+    public static IReadOnlyList<RemoteStoreCardOffer> BuildDeterministicOffer(
+        MegaCrit.Sts2.Core.Entities.Players.Player owner, string contextId)
     {
         var ownedIds = new HashSet<ModelId>();
         var offers = new List<RemoteStoreCardOffer>(10);

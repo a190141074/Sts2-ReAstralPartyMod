@@ -16,7 +16,11 @@ public sealed class PersonSkillNaturalObtainFilterPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(CardCreationOptions), nameof(CardCreationOptions.GetPossibleCards), [typeof(MegaCrit.Sts2.Core.Entities.Players.Player)])];
+        return
+        [
+            new ModPatchTarget(typeof(CardCreationOptions), nameof(CardCreationOptions.GetPossibleCards),
+                [typeof(Player)])
+        ];
     }
 
     public static IEnumerable<CardModel> Postfix(IEnumerable<CardModel> __result, Player player)

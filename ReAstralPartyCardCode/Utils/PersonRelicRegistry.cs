@@ -119,7 +119,7 @@ public static class PersonRelicRegistry
 
     public static IReadOnlyList<RelicModel> GetAvailablePersonRelics(Player owner)
     {
-        return GetAvailablePersonRelics(owner, bannedPersonRelicIds: null);
+        return GetAvailablePersonRelics(owner, null);
     }
 
     public static IReadOnlyList<RelicModel> GetAvailablePersonaRelics(Player owner)

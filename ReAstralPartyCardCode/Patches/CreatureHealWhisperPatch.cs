@@ -16,7 +16,7 @@ public sealed class CreatureHealWhisperPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(CreatureCmd), nameof(CreatureCmd.Heal))];
+        return [new ModPatchTarget(typeof(CreatureCmd), nameof(CreatureCmd.Heal))];
     }
 
     public static bool Prefix(Creature creature, ref decimal amount)

@@ -31,7 +31,8 @@ public class PersonalityDerivativeBookOfHeaven : AstralPartyRelicModel
     public override async Task AfterObtained()
     {
         await base.AfterObtained();
-        AstralParty_PersonalityDerivativeBookOfHeavenStacks = Math.Max(AstralParty_PersonalityDerivativeBookOfHeavenStacks, 1);
+        AstralParty_PersonalityDerivativeBookOfHeavenStacks =
+            Math.Max(AstralParty_PersonalityDerivativeBookOfHeavenStacks, 1);
         InvokeDisplayAmountChanged();
     }
 

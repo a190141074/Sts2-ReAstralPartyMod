@@ -52,4 +52,3 @@ public class FengShuiNodePower : AstralPartyPowerModel
             derivative.AddStacksCapped(1);
     }
 }
-

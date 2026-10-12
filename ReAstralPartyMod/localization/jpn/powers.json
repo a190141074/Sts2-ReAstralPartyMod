@@ -1,8 +1,8 @@
 {
-  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.title":"ノード",
-  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.description":"ターン開始時、[blue]1[/blue]～[blue]10[/blue]に更新する。",
-  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.title":"浮遊",
-  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.description":"[blue]2[/blue]一時敏捷性を得る。敵の攻撃によるブロックされなかったダメージを[blue]50%[/blue]減らす。負の効果を一時的に無効化するが、付与自体は防がない。呪いカードは山札に戻る。",
+  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.title": "ノード",
+  "RE_ASTRAL_PARTY_MOD_POWER_HANNA_NODE_POWER.description": "ターン開始時、[blue]1[/blue]～[blue]10[/blue]に更新する。",
+  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.title": "浮遊",
+  "RE_ASTRAL_PARTY_MOD_POWER_ASTRAL_LEVITATION_POWER.description": "[blue]2[/blue]一時敏捷性を得る。敵の攻撃によるブロックされなかったダメージを[blue]50%[/blue]減らす。負の効果を一時的に無効化するが、付与自体は防がない。呪いカードは山札に戻る。",
   "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_STARLIGHT_POWER.title": "星光",
   "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_STARLIGHT_POWER.description": "この戦闘の後、获得金币はこのパワーの量に等しい。",
   "RE_ASTRAL_PARTY_MOD_POWER_EFFECTS_STARLIGHT_POWER.smartDescription": "この戦闘の後、获得金币はこのパワーの量に等しい。",

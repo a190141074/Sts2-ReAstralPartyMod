@@ -12,7 +12,6 @@ using ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillNinjutsuCombo : AstralPartyCardModel
 {
@@ -65,4 +64,3 @@ public class SkillNinjutsuCombo : AstralPartyCardModel
             this);
     }
 }
-

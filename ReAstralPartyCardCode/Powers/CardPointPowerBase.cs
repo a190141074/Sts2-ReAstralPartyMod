@@ -165,12 +165,10 @@ public abstract class CardPointPowerBase : AstralPartyPowerModel
         var spentPointAmount = ConsumePendingPointSpend(cardPlay.Card);
         if (spentPointAmount <= 0m &&
             ReferenceEquals(CardPointPowerResolver.ResolveHighestPriorityPointPower(Owner, cardPlay.Card), this))
-        {
             spentPointAmount = CalculatePriorityPointSpend(
                 GetPrePointResolvedCost(cardPlay.Card),
                 Amount,
                 GetMinimumCostAfterPriorityPointSpend(cardPlay.Card));
-        }
         if (spentPointAmount <= 0m)
             return;
 

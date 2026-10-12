@@ -20,6 +20,7 @@ public sealed class RealmOfDeathPower : AstralPartyPowerModel
     private const decimal MaxHpRewardPercent = 0.1m;
 
     [SavedProperty] public string AstralParty_RealmOfDeathMarkedTargetCombatIdRaw { get; set; } = string.Empty;
+
     public uint AstralParty_RealmOfDeathMarkedTargetCombatId
     {
         get => uint.TryParse(AstralParty_RealmOfDeathMarkedTargetCombatIdRaw, out var value) ? value : 0u;
@@ -98,9 +99,7 @@ public sealed class RealmOfDeathPower : AstralPartyPowerModel
             || Owner?.Player == null
             || AstralParty_RealmOfDeathMarkedTargetCombatId == 0u
             || creature.CombatId != AstralParty_RealmOfDeathMarkedTargetCombatId)
-        {
             return;
-        }
 
         AstralParty_RealmOfDeathMarkedTargetCombatId = 0u;
         await PowerCmd.Remove(this);

@@ -22,7 +22,6 @@ public class CollectorsCardYouHaveMeToo : AstralPartyCardModel
 
     protected override void OnUpgrade()
     {
-        
     }
 
     protected override async Task OnPlay(PlayerChoiceContext choiceContext, CardPlay cardPlay)

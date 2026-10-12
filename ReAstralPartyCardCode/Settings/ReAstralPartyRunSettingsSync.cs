@@ -44,20 +44,6 @@ public sealed class ReAstralPartyRunSettingsSnapshot
     public bool EnablePureAngelMode { get; set; } = true;
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public List<string> BannedRelicIdsSerialized { get; set; } = [];
 
     public List<string> BannedPersonRelicIdsSerialized
@@ -202,9 +188,12 @@ internal static class ReAstralPartyRunSettingsSync
         snapshot.TokenSeriesMode = lobbySnapshot.TokenSeriesMode;
         snapshot.EnableMechTideMode = lobbySnapshot.EnableMechTideMode;
         snapshot.EnableExtremeMode = lobbySnapshot.EnableExtremeMode;
-        snapshot.BannedRelicIdsSerialized = [.. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(
-            lobbySnapshot.BannedRelicIdsSerialized)]
-        ;
+        snapshot.BannedRelicIdsSerialized =
+            [
+                .. ReAstralPartyModSettingsManager.SanitizeSerializedBannedRelicIds(
+                    lobbySnapshot.BannedRelicIdsSerialized)
+            ]
+            ;
         return snapshot;
     }
 
@@ -234,11 +223,14 @@ internal static class ReAstralPartyRunSettingsSync
             TokenSeriesMode = ReAstralPartyModSettingsManager.TokenSeriesMode,
             EnableMechTideMode = ReAstralPartyModSettingsManager.EnableMechTideMode,
             EnablePureAngelMode = ReAstralPartyModSettingsManager.EnablePureAngelMode,
-            BannedRelicIdsSerialized = [.. ReAstralPartyModSettingsManager.GetBannedRelicIds(null)
-                .Where(static id => id != MegaCrit.Sts2.Core.Models.ModelId.none)
-                .Select(static id => id.ToString())
-                .Distinct(StringComparer.Ordinal)
-                .OrderBy(static id => id, StringComparer.Ordinal)]
+            BannedRelicIdsSerialized =
+            [
+                .. ReAstralPartyModSettingsManager.GetBannedRelicIds(null)
+                    .Where(static id => id != MegaCrit.Sts2.Core.Models.ModelId.none)
+                    .Select(static id => id.ToString())
+                    .Distinct(StringComparer.Ordinal)
+                    .OrderBy(static id => id, StringComparer.Ordinal)
+            ]
         };
     }
 
@@ -347,7 +339,8 @@ internal static class ReAstralPartyRunSettingsSync
     {
         var netMode = RunManager.Instance?.NetService?.Type.ToString() ?? "Unknown";
         var runKey = StartingPersonRelicSelectionPatch.GetRunKey(runState);
-        var personaWindow = StartingPersonRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out var reason);
+        var personaWindow =
+            StartingPersonRelicSelectionPatch.ShouldOpenStartingPersonaRelicSelection(runState, out var reason);
         MainFile.Logger.Info(
             $"{MainFile.ModId} settings sync established before persona ready flow: source={source}, runKey={runKey}, netMode={netMode}, persona_window_open={personaWindow}, persona_gate_reason={reason}");
     }
@@ -402,5 +395,3 @@ internal static class ReAstralPartyRunSettingsSync
         }
     }
 }
-
-

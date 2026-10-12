@@ -24,7 +24,7 @@ public sealed class ExtremeModeTurnLimitPatch : IPatchMethod
     {
         return
         [
-            new(typeof(Hook), nameof(Hook.AfterTurnEnd),
+            new ModPatchTarget(typeof(Hook), nameof(Hook.AfterTurnEnd),
                 [typeof(ICombatState), typeof(CombatSide), typeof(IEnumerable<Creature>)])
         ];
     }
@@ -46,7 +46,8 @@ public sealed class ExtremeModeTurnLimitPatch : IPatchMethod
             return;
 
         var combatManager = CombatManager.Instance;
-        if (combatManager == null || !combatManager.IsInProgress || combatManager.IsEnding || combatManager.IsAboutToLose)
+        if (combatManager == null || !combatManager.IsInProgress || combatManager.IsEnding ||
+            combatManager.IsAboutToLose)
             return;
         if (combatState.RunState.IsGameOver)
             return;

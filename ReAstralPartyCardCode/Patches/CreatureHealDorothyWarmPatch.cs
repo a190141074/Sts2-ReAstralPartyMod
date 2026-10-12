@@ -13,7 +13,7 @@ public sealed class CreatureHealDorothyWarmPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(CreatureCmd), nameof(CreatureCmd.Heal))];
+        return [new ModPatchTarget(typeof(CreatureCmd), nameof(CreatureCmd.Heal))];
     }
 
     public static void Postfix(Creature creature, decimal amount, ref Task __result)

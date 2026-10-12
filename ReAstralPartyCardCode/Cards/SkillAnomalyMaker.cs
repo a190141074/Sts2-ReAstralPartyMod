@@ -8,7 +8,6 @@ using MegaCrit.Sts2.Core.Models.CardPools;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillAnomalyMaker : AstralPartyCardModel
 {
@@ -58,4 +57,3 @@ public class SkillAnomalyMaker : AstralPartyCardModel
         await CardCmd.AutoPlay(choiceContext, cardToPlay, Owner.Creature, AutoPlayType.Default, false, true);
     }
 }
-

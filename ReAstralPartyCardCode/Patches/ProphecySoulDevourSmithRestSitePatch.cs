@@ -19,7 +19,7 @@ public sealed class ProphecySoulDevourSmithRestSitePatch : IPatchMethod
     {
         return
         [
-            new(
+            new ModPatchTarget(
                 typeof(SmithRestSiteOption),
                 nameof(SmithRestSiteOption.OnSelect),
                 [])

@@ -34,7 +34,8 @@ public sealed class AstralLevitationPower : AstralPartyPowerModel
             await CardPileCmd.Add(card, PileType.Draw, CardPilePosition.Bottom, this, false);
     }
 
-    public override decimal ModifyDamageMultiplicative(Creature? target, decimal amount, ValueProp props, Creature? dealer, CardModel? cardSource)
+    public override decimal ModifyDamageMultiplicative(Creature? target, decimal amount, ValueProp props,
+        Creature? dealer, CardModel? cardSource)
     {
         if (target != Owner || dealer == null || dealer.Side == Owner?.Side || amount <= 0m)
             return 1m;

@@ -200,7 +200,7 @@ public static class CreatureCmdCompat
             target,
             amount,
             props,
-            dealer: null,
+            null,
             cardSource);
     }
 
@@ -241,7 +241,8 @@ public static class CreatureCmdCompat
         Creature dealer,
         CardModel? cardSource)
     {
-        return MegaCrit.Sts2.Core.Commands.CreatureCmd.Damage(choiceContext, targets, amount, props, dealer, cardSource);
+        return MegaCrit.Sts2.Core.Commands.CreatureCmd.Damage(choiceContext, targets, amount, props, dealer,
+            cardSource);
     }
 
     public static Task GainBlock(

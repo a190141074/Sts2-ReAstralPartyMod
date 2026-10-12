@@ -26,29 +26,29 @@
 1. 先查 `B:\Documents\re-astral-party-mod\logs\saves\mod_data\DevMode\instances\*\session.log`
 2. 再查 `B:\Documents\re-astral-party-mod\logs\godot*.log`
 3. 先分类：
-   - `GetRawText: Key '...' not found`
-   - `Localization formatting error`
+	- `GetRawText: Key '...' not found`
+	- `Localization formatting error`
 4. 再决定是修 key / entry / table / locale，还是修格式变量与注值链
 
 固定 checklist：
 
 1. 三语都查：
-   - `zhs`
-   - `eng`
-   - `jpn`
+	- `zhs`
+	- `eng`
+	- `jpn`
 2. 不要只看主描述，至少一起查：
-   - `title`
-   - `description`
-   - `smartDescription`
-   - `remoteDescription`
-   - `flavor`
-   - `stats_*`
-   - `select_prompt`
+	- `title`
+	- `description`
+	- `smartDescription`
+	- `remoteDescription`
+	- `flavor`
+	- `stats_*`
+	- `select_prompt`
 3. 对 power 额外检查：
-   - `Description`
-   - `SmartDescriptionLocKey`
-   - `GetDescriptionLocKey()`
-   - `GetSmartDescriptionLocKey()`
+	- `Description`
+	- `SmartDescriptionLocKey`
+	- `GetDescriptionLocKey()`
+	- `GetSmartDescriptionLocKey()`
 4. 只要 `smartDescription` 有变量，占位符默认视为不安全，先确认当前 UI 链是否显式注值。
 
 ## 新异格 / 新人格 / 成套内容
@@ -59,8 +59,8 @@
 2. 不只检查 relic，要把同套的 relic / card / power 一起看。
 3. 默认先删除不必要的显式命名 override 这个念头，再判断是否真要手写。
 4. 如果保留 override，逐项核对：
-   - 默认链为什么不适用
-   - 会不会和同套其他子件的命名结果不一致
+	- 默认链为什么不适用
+	- 会不会和同套其他子件的命名结果不一致
 5. 至少搜索一次运行时真实 entry、代码 id、本地化 key 是否一致。
 
 最低检查面：
@@ -102,11 +102,11 @@
 1. 先看 `logs\godot*.log` 最早的 `[ERROR]`
 2. 先分是 loader / manifest 红字，还是 patch apply 红字
 3. 如果是 manifest：
-   - 先补 `min_game_version`
-   - 再把旧字符串 `dependencies` 改成当前分支对象写法，并补 `min_version`
+	- 先补 `min_game_version`
+	- 再把旧字符串 `dependencies` 改成当前分支对象写法，并补 `min_version`
 4. 如果是 patch apply：
-   - 先对照运行时 `sts2.xml` / `STS2-RitsuLib.xml`
-   - 再对照 `RitsuLib-code` 里对应 lifecycle patch 的 target 列表
+	- 先对照运行时 `sts2.xml` / `STS2-RitsuLib.xml`
+	- 再对照 `RitsuLib-code` 里对应 lifecycle patch 的 target 列表
 5. 最后才怀疑业务逻辑本身
 
 固定 checklist：
@@ -143,11 +143,11 @@
 
 1. 先确认这是“玩法设置”还是“通用设置”
 2. 如果是玩法设置，再确认它是否需要：
-   - 全局设置页
-   - 房间玩法面板
-   - lobby snapshot
-   - run snapshot
-   - runtime getter / patch
+	- 全局设置页
+	- 房间玩法面板
+	- lobby snapshot
+	- run snapshot
+	- runtime getter / patch
 3. 如果涉及 `原版模式 / 整合包模式`，优先把可编辑 / 锁定 / 隐藏规则收口到 `AstralContentModeRegistry`
 4. 再检查旧设置、旧 lobby、旧 run snapshot 的缺字段回退值
 5. 最后才补单个业务实现

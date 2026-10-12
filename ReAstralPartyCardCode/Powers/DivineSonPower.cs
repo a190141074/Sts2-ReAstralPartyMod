@@ -29,7 +29,8 @@ public class DivineSonPower : AstralPartyPowerModel
 
         var bonus = 1m;
         if (WarforgeEnchantmentHelper.CountsAsAttack(cardSource) && Owner.Player != null
-            && AstralDivinePersonaHelper.GetStrongestBookOfHeavenStacks(Owner.Player) >= 7)
+                                                                 && AstralDivinePersonaHelper
+                                                                     .GetStrongestBookOfHeavenStacks(Owner.Player) >= 7)
             bonus += 1m;
 
         return bonus;

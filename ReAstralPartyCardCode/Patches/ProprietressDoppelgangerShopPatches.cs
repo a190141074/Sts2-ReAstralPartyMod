@@ -7,7 +7,8 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Patches;
 
 internal static class ProprietressDoppelgangerShopPatchHelper
 {
-    public static async Task<(bool, int)> HandlePostPurchaseAsync(Task<(bool, int)> originalTask, MerchantInventory? inventory)
+    public static async Task<(bool, int)> HandlePostPurchaseAsync(Task<(bool, int)> originalTask,
+        MerchantInventory? inventory)
     {
         var result = await originalTask;
         if (!result.Item1 || inventory?.Player == null || result.Item2 <= 0)
@@ -26,7 +27,10 @@ public sealed class ProprietressDoppelgangerShopRelicPurchasePatch : IPatchMetho
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(MerchantRelicEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])];
+        return
+        [
+            new ModPatchTarget(typeof(MerchantRelicEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])
+        ];
     }
 
     public static Task<(bool, int)> Postfix(Task<(bool, int)> __result, MerchantInventory? inventory)
@@ -43,7 +47,10 @@ public sealed class ProprietressDoppelgangerShopCardPurchasePatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(MerchantCardEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])];
+        return
+        [
+            new ModPatchTarget(typeof(MerchantCardEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])
+        ];
     }
 
     public static Task<(bool, int)> Postfix(Task<(bool, int)> __result, MerchantInventory? inventory)
@@ -60,7 +67,10 @@ public sealed class ProprietressDoppelgangerShopPotionPurchasePatch : IPatchMeth
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(MerchantPotionEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])];
+        return
+        [
+            new ModPatchTarget(typeof(MerchantPotionEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])
+        ];
     }
 
     public static Task<(bool, int)> Postfix(Task<(bool, int)> __result, MerchantInventory? inventory)
@@ -72,12 +82,19 @@ public sealed class ProprietressDoppelgangerShopPotionPurchasePatch : IPatchMeth
 public sealed class ProprietressDoppelgangerShopRemovalPurchasePatch : IPatchMethod
 {
     public static string PatchId => "proprietress_doppelganger_shop_removal_purchase";
-    public static string Description => "Process Proprietress doppelganger bonuses after successful card removal purchases";
+
+    public static string Description =>
+        "Process Proprietress doppelganger bonuses after successful card removal purchases";
+
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(MerchantCardRemovalEntry), "OnTryPurchase", [typeof(MerchantInventory), typeof(bool)])];
+        return
+        [
+            new ModPatchTarget(typeof(MerchantCardRemovalEntry), "OnTryPurchase",
+                [typeof(MerchantInventory), typeof(bool)])
+        ];
     }
 
     public static Task<(bool, int)> Postfix(Task<(bool, int)> __result, MerchantInventory? inventory)

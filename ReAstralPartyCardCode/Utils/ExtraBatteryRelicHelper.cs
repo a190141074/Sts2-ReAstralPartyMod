@@ -6,11 +6,12 @@ namespace ReAstralPartyMod.ReAstralPartyCardCode.Utils;
 
 public static class ExtraBatteryRelicHelper
 {
-    public static int GetAdjustedCooldownMaxCounter(Player? owner, int baseMaxCounter, PersonRelicBase? sourceRelic = null)
+    public static int GetAdjustedCooldownMaxCounter(Player? owner, int baseMaxCounter,
+        PersonRelicBase? sourceRelic = null)
     {
         var adjustedCounter = baseMaxCounter;
 
-        if (owner?.GetRelic<Relics.TokenGoldExtraBattery>() != null)
+        if (owner?.GetRelic<TokenGoldExtraBattery>() != null)
             adjustedCounter--;
 
         if (sourceRelic is VariantPersonSara && owner?.GetRelic<JewelryNightSkin>() != null)
@@ -27,7 +28,7 @@ public static class ExtraBatteryRelicHelper
 
     public static int GetAdjustedBionicJasmineStepThreshold(Player? owner, int baseThreshold)
     {
-        var adjustedThreshold = owner?.GetRelic<Relics.TokenGoldExtraBattery>() == null
+        var adjustedThreshold = owner?.GetRelic<TokenGoldExtraBattery>() == null
             ? baseThreshold
             : Math.Max(1, (int)Math.Ceiling(baseThreshold * 0.75m));
 

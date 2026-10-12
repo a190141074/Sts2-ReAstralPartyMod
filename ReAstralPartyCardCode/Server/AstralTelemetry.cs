@@ -117,8 +117,10 @@ internal static class AstralTelemetry
     private static readonly object ConfigLock = new();
     private static readonly HashSet<string> SubmittedRunIds = new(StringComparer.Ordinal);
     private static readonly Dictionary<string, RunTelemetryState> ActiveRuns = new(StringComparer.Ordinal);
+
     private static readonly ConcurrentDictionary<string, IReadOnlyDictionary<string, string>> LocalizationTableCache =
         new(StringComparer.OrdinalIgnoreCase);
+
     private static TelemetryConfig? _cachedConfig;
     private static ITelemetryClient? _telemetryClient;
     private static bool _applicantRegistered;
@@ -303,9 +305,9 @@ internal static class AstralTelemetry
             return;
 
         _lifecycleBridgeRegistered = true;
-        RitsuLibFramework.SubscribeLifecycle<RunStartedEvent>(OnRunStarted, replayCurrentState: false);
-        RitsuLibFramework.SubscribeLifecycle<RunLoadedEvent>(OnRunLoaded, replayCurrentState: false);
-        RitsuLibFramework.SubscribeLifecycle<RunEndedEvent>(OnRunEndedFromLifecycle, replayCurrentState: false);
+        RitsuLibFramework.SubscribeLifecycle<RunStartedEvent>(OnRunStarted, false);
+        RitsuLibFramework.SubscribeLifecycle<RunLoadedEvent>(OnRunLoaded, false);
+        RitsuLibFramework.SubscribeLifecycle<RunEndedEvent>(OnRunEndedFromLifecycle, false);
     }
 
     private static void OnRunStarted(RunStartedEvent evt)
@@ -544,9 +546,11 @@ internal static class AstralTelemetry
                 MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Upload skipped for netMode={gameType}");
                 return;
             }
+
             if (gameType is not (NetGameType.Singleplayer or NetGameType.Host or NetGameType.None))
             {
-                MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Upload skipped for unsupported netMode={gameType}");
+                MainFile.Logger.Warn(
+                    $"[{MainFile.ModId}][Telemetry] Upload skipped for unsupported netMode={gameType}");
                 return;
             }
 
@@ -558,7 +562,8 @@ internal static class AstralTelemetry
                 return;
 
             PublishPayload(payload, serializableRun);
-            MainFile.Logger.Info($"[{MainFile.ModId}][Telemetry] Queued run={payload.Run.RunId} via RitsuLib telemetry.");
+            MainFile.Logger.Info(
+                $"[{MainFile.ModId}][Telemetry] Queued run={payload.Run.RunId} via RitsuLib telemetry.");
             ShowTelemetrySuccessToast();
         }
         catch (Exception ex)
@@ -587,8 +592,8 @@ internal static class AstralTelemetry
             TelemetryApi.CaptureVanillaRunHistory(
                 ApplicantId,
                 JsonSerializer.SerializeToNode(serializableRun, JsonOptions) ?? new JsonObject(),
-                applicantPayload: BuildRunHistoryModPayload(payload),
-                properties: BuildRunHistoryProperties(payload));
+                BuildRunHistoryModPayload(payload),
+                BuildRunHistoryProperties(payload));
     }
 
     private static RunEndedPayload? BuildPayload(RunState? runState, SerializableRun serializableRun, bool isVictory,
@@ -1202,8 +1207,10 @@ internal static class AstralTelemetry
                 .With("persona_skill_use_count", player.PersonSkillUseCount)
                 .With("obtained_tokens", player.ObtainedTokens.ToArray())
                 .With("obtained_token_labels", player.ObtainedTokens.Select(GetRelicLabel).ToArray())
-                .With("obtained_token_labels_zhs", player.ObtainedTokens.Select(tokenId => GetRelicLabel(tokenId, "zhs")).ToArray())
-                .With("obtained_token_labels_en", player.ObtainedTokens.Select(tokenId => GetRelicLabel(tokenId, "eng")).ToArray())
+                .With("obtained_token_labels_zhs",
+                    player.ObtainedTokens.Select(tokenId => GetRelicLabel(tokenId, "zhs")).ToArray())
+                .With("obtained_token_labels_en",
+                    player.ObtainedTokens.Select(tokenId => GetRelicLabel(tokenId, "eng")).ToArray())
                 .With("is_victory", payload.Run.IsVictory)
                 .With("run_time", payload.Run.RunTime)
                 .With("ascension", payload.Run.Ascension)
@@ -1252,7 +1259,8 @@ internal static class AstralTelemetry
             return null;
 
         var normalizedLocale = NormalizeLocale(locale);
-        if (string.Equals(normalizedLocale, NormalizeLocale(GetCurrentClientLocale()), StringComparison.OrdinalIgnoreCase))
+        if (string.Equals(normalizedLocale, NormalizeLocale(GetCurrentClientLocale()),
+                StringComparison.OrdinalIgnoreCase))
             return GetLocalizedTitle(group, modelId);
 
         var table = GetLocalizationTable(group, normalizedLocale);
@@ -1314,7 +1322,8 @@ internal static class AstralTelemetry
 
             var path = Path.Combine(modDirectory, "ReAstralPartyMod", "localization", locale, $"{group}.json");
             if (!File.Exists(path))
-                path = Path.Combine(Directory.GetParent(modDirectory)?.FullName ?? modDirectory, "ReAstralPartyMod", "localization", locale, $"{group}.json");
+                path = Path.Combine(Directory.GetParent(modDirectory)?.FullName ?? modDirectory, "ReAstralPartyMod",
+                    "localization", locale, $"{group}.json");
             if (!File.Exists(path))
                 return new Dictionary<string, string>(StringComparer.Ordinal);
 
@@ -1325,16 +1334,15 @@ internal static class AstralTelemetry
 
             var dictionary = new Dictionary<string, string>(StringComparer.Ordinal);
             foreach (var property in document.RootElement.EnumerateObject())
-            {
                 if (property.Value.ValueKind == JsonValueKind.String)
                     dictionary[property.Name] = property.Value.GetString() ?? string.Empty;
-            }
 
             return dictionary;
         }
         catch (Exception ex)
         {
-            MainFile.Logger.Warn($"[{MainFile.ModId}][Telemetry] Failed to load localization table locale={locale} group={group}: {ex.Message}");
+            MainFile.Logger.Warn(
+                $"[{MainFile.ModId}][Telemetry] Failed to load localization table locale={locale} group={group}: {ex.Message}");
             return new Dictionary<string, string>(StringComparer.Ordinal);
         }
     }
@@ -1400,7 +1408,8 @@ internal static class PersonSkillRegistry
         ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_PANDA_MENG"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_BIG_EATER",
         ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_POISONED_APPLE"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_CONCEALING_OPERATION",
         ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_PROPRIETRESS"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_TRANSFER",
-        ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_KATANA_MASTER_DOPPELGANGER"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE_DOPPELGANGER",
+        ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_KATANA_MASTER_DOPPELGANGER"] =
+            "RE_ASTRAL_PARTY_MOD_CARD_SKILL_FAMOUS_BLADE_DOPPELGANGER",
         ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_SHADOW_SCION"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_POWERFUL_PITY",
         ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_SLIME_LULU"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_HEALING_SLIME",
         ["RE_ASTRAL_PARTY_MOD_RELIC_PERSON_SOCIAL_FEAR_NUN"] = "RE_ASTRAL_PARTY_MOD_CARD_SKILL_IRON_VIRGIN",

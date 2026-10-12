@@ -10,13 +10,17 @@ public sealed class StokovStarterRelicUpgradePatch : IPatchMethod
 {
     public static string PatchId => "stokov_starter_relic_upgrade_patch";
 
-    public static string Description => "Propagate Touch of Orobas starter relic upgrades across the Stokov starter bundle";
+    public static string Description =>
+        "Propagate Touch of Orobas starter relic upgrades across the Stokov starter bundle";
 
     public static bool IsCritical => false;
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(RelicCmd), nameof(RelicCmd.Replace), [typeof(RelicModel), typeof(RelicModel)])];
+        return
+        [
+            new ModPatchTarget(typeof(RelicCmd), nameof(RelicCmd.Replace), [typeof(RelicModel), typeof(RelicModel)])
+        ];
     }
 
     public sealed class ReplaceState

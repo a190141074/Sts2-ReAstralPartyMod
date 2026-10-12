@@ -33,6 +33,7 @@ public class BaseAbilityEyeForAnEye : BaseAbilityCardModel
         if (Owner?.Creature == null)
             return;
 
-        await PowerCmd.Apply(ModelDb.Power<EyeForAnEyePower>().ToMutable(), Owner.Creature, 1m, Owner.Creature, this, false);
+        await PowerCmd.Apply(ModelDb.Power<EyeForAnEyePower>().ToMutable(), Owner.Creature, 1m, Owner.Creature, this,
+            false);
     }
 }

@@ -53,7 +53,8 @@ public sealed class PersonSherryTachibana : PersonRelicBase
             await AddMightyThrowToHand();
     }
 
-    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature? dealer, DamageResult result,
+    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature? dealer,
+        DamageResult result,
         ValueProp props, Creature target, CardModel? cardSource)
     {
         if (Owner?.Creature is not { } ownerCreature || AstralParty_PersonSherryTachibanaFirstAttackTriggered)
@@ -70,7 +71,7 @@ public sealed class PersonSherryTachibana : PersonRelicBase
 
         Flash();
         await PowerCmd.Apply<DetectiveOnTheCasePower>(ownerCreature,
-            System.Math.Min(1m, DetectiveOnTheCasePower.MaxStacks - current), ownerCreature, cardSource, false);
+            Math.Min(1m, DetectiveOnTheCasePower.MaxStacks - current), ownerCreature, cardSource, false);
     }
 
     private async Task EnsureDetectivePower()

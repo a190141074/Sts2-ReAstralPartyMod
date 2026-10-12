@@ -17,11 +17,13 @@ public sealed class SkillFateFirewoodStickYi : AstralPartyCardModel
 {
     protected override bool ShouldAutoApplyCooldownEnchantment => false;
 
-    protected override string PortraitBasePath => "res://ReAstralPartyMod/images/card_portraits/skill_fate_firewood_stick";
+    protected override string PortraitBasePath =>
+        "res://ReAstralPartyMod/images/card_portraits/skill_fate_firewood_stick";
 
     protected override string FrameBasePath => PortraitBasePath;
 
-    public override IEnumerable<CardKeyword> CanonicalKeywords => [CardKeyword.Retain, AstralKeywords.FateFirewoodStickDuel];
+    public override IEnumerable<CardKeyword> CanonicalKeywords =>
+        [CardKeyword.Retain, AstralKeywords.FateFirewoodStickDuel];
 
     protected override bool IsPlayable => FateFirewoodStickCombatHelper.HasLivingEnemyTarget(Owner);
 
@@ -31,7 +33,7 @@ public sealed class SkillFateFirewoodStickYi : AstralPartyCardModel
         HoverTipFactory.FromPower<FateFirewoodNodePower>()
     ];
 
-    public SkillFateFirewoodStickYi() : base(1, CardType.Attack, CardRarity.Ancient, TargetType.AnyEnemy, showInCardLibrary: false)
+    public SkillFateFirewoodStickYi() : base(1, CardType.Attack, CardRarity.Ancient, TargetType.AnyEnemy, false)
     {
     }
 

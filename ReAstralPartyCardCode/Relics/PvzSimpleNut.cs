@@ -24,6 +24,7 @@ public class PvzSimpleNut : AstralPartyRelicModel
     [SavedProperty] public bool AstralParty_PvzSimpleNutExhaustedThisRun { get; set; }
     [SavedProperty] public int AstralParty_PvzSimpleNutResolvedMilestoneCount { get; set; }
     [SavedProperty] public int AstralParty_PvzSimpleNutPendingChoiceCount { get; set; }
+
     [SavedProperty]
     private string AstralParty_PvzSimpleNutPendingRewardRelicIdsSerialized
     {
@@ -38,6 +39,7 @@ public class PvzSimpleNut : AstralPartyRelicModel
                 _pendingRewardRelicIds.Add(id);
         }
     }
+
     [SavedProperty]
     private string AstralParty_PvzSimpleNutRunDamageTaken
     {
@@ -88,8 +90,10 @@ public class PvzSimpleNut : AstralPartyRelicModel
         var beforePendingRewardCount = _pendingRewardRelicIds.Count;
 
         _runDamageTaken += result.UnblockedDamage;
-        var totalTriggeredMilestones = StableNumericStateHelper.FloorDivisionToNonNegativeInt(_runDamageTaken, DamageThreshold);
-        var accountedMilestones = AstralParty_PvzSimpleNutResolvedMilestoneCount + AstralParty_PvzSimpleNutPendingChoiceCount +
+        var totalTriggeredMilestones =
+            StableNumericStateHelper.FloorDivisionToNonNegativeInt(_runDamageTaken, DamageThreshold);
+        var accountedMilestones = AstralParty_PvzSimpleNutResolvedMilestoneCount +
+                                  AstralParty_PvzSimpleNutPendingChoiceCount +
                                   _pendingRewardRelicIds.Count;
         var newlyPendingChoices = Math.Max(0, totalTriggeredMilestones - accountedMilestones);
         if (newlyPendingChoices > 0)
@@ -150,20 +154,19 @@ public class PvzSimpleNut : AstralPartyRelicModel
                TryDequeuePendingRewardRelic(out var pendingReward) &&
                pendingReward != null)
         {
-            if (PersonMultiplayerEffectHelper.IsRelicBannedForOwner(Owner, pendingReward))
-            {
-                break;
-            }
+            if (PersonMultiplayerEffectHelper.IsRelicBannedForOwner(Owner, pendingReward)) break;
 
             room.AddExtraReward(Owner, new RelicReward(pendingReward.ToMutable(), Owner));
             AstralParty_PvzSimpleNutResolvedMilestoneCount += 1;
-            MainFile.Logger.Info($"[PvzSimpleNut] Added selected rare nut to combat reward | owner={Owner.NetId} | reward={pendingReward.Id.Entry} | resolvedMilestones={AstralParty_PvzSimpleNutResolvedMilestoneCount} | pendingChoices={AstralParty_PvzSimpleNutPendingChoiceCount} | pendingRewards={_pendingRewardRelicIds.Count}");
+            MainFile.Logger.Info(
+                $"[PvzSimpleNut] Added selected rare nut to combat reward | owner={Owner.NetId} | reward={pendingReward.Id.Entry} | resolvedMilestones={AstralParty_PvzSimpleNutResolvedMilestoneCount} | pendingChoices={AstralParty_PvzSimpleNutPendingChoiceCount} | pendingRewards={_pendingRewardRelicIds.Count}");
 
             var rewardOptions = PvzNutRelicHelper.GetAvailableRareNutChoices(Owner);
             if (rewardOptions.Count == 0)
             {
                 AstralParty_PvzSimpleNutExhaustedThisRun = true;
-                MainFile.Logger.Info($"[PvzSimpleNut] All rare nuts obtained; relic exhausted | owner={Owner.NetId} | resolvedMilestones={AstralParty_PvzSimpleNutResolvedMilestoneCount}");
+                MainFile.Logger.Info(
+                    $"[PvzSimpleNut] All rare nuts obtained; relic exhausted | owner={Owner.NetId} | resolvedMilestones={AstralParty_PvzSimpleNutResolvedMilestoneCount}");
             }
         }
 
@@ -173,7 +176,8 @@ public class PvzSimpleNut : AstralPartyRelicModel
     private decimal GetNextMilestoneThreshold()
     {
         return PvzNutRelicHelper.GetNextRunDamageThreshold(
-            AstralParty_PvzSimpleNutResolvedMilestoneCount + AstralParty_PvzSimpleNutPendingChoiceCount + _pendingRewardRelicIds.Count,
+            AstralParty_PvzSimpleNutResolvedMilestoneCount + AstralParty_PvzSimpleNutPendingChoiceCount +
+            _pendingRewardRelicIds.Count,
             DamageThreshold);
     }
 

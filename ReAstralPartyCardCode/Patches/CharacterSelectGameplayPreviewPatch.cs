@@ -19,13 +19,13 @@ internal static class CharacterSelectGameplayPreviewPatchRegistrar
 {
     public static void TryRegister(DynamicPatchBuilder builder)
     {
-        var targetType = AccessTools.TypeByName("MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen");
+        var targetType =
+            AccessTools.TypeByName("MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NCharacterSelectScreen");
         if (targetType == null)
             return;
 
         var readyMethod = AccessTools.DeclaredMethod(targetType, "_Ready", Type.EmptyTypes);
         if (readyMethod != null)
-        {
             builder.Add(
                 readyMethod,
                 postfix: DynamicPatchBuilder.FromMethod(
@@ -34,36 +34,33 @@ internal static class CharacterSelectGameplayPreviewPatchRegistrar
                 isCritical: false,
                 description: "UI patch: inject a draggable lobby gameplay-settings window into character select",
                 patchId: "character_select_gameplay_preview");
-        }
 
         var exitTreeMethod = AccessTools.DeclaredMethod(targetType, "_ExitTree", Type.EmptyTypes);
         if (exitTreeMethod != null)
-        {
             builder.Add(
                 exitTreeMethod,
-                prefix: DynamicPatchBuilder.FromMethod(
+                DynamicPatchBuilder.FromMethod(
                     typeof(CharacterSelectGameplayPreviewExitPatch),
                     nameof(CharacterSelectGameplayPreviewExitPatch.Prefix)),
                 isCritical: false,
                 description: "UI patch: clear lobby gameplay-settings state when character select closes",
                 patchId: "character_select_gameplay_preview_exit");
-        }
 
-        var loadGameScreenType = AccessTools.TypeByName("MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NMultiplayerLoadGameScreen");
+        var loadGameScreenType =
+            AccessTools.TypeByName("MegaCrit.Sts2.Core.Nodes.Screens.CharacterSelect.NMultiplayerLoadGameScreen");
         if (loadGameScreenType != null)
         {
             var processMethod = AccessTools.DeclaredMethod(loadGameScreenType, "_Process", [typeof(double)]);
             if (processMethod != null)
-            {
                 builder.Add(
                     processMethod,
-                    prefix: DynamicPatchBuilder.FromMethod(
+                    DynamicPatchBuilder.FromMethod(
                         typeof(CharacterSelectGameplayPreviewLoadGameRegistrationPatch),
                         nameof(CharacterSelectGameplayPreviewLoadGameRegistrationPatch.Prefix)),
                     isCritical: false,
-                    description: "UI patch: register lobby gameplay-settings handlers before load-game screen inbound lobby packets are processed",
+                    description:
+                    "UI patch: register lobby gameplay-settings handlers before load-game screen inbound lobby packets are processed",
                     patchId: "character_select_gameplay_preview_load_game_register");
-            }
         }
     }
 }
@@ -660,11 +657,15 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
     private void RegisterHover(Control control, string title, string description)
     {
-        _hoverTipsByControl[control] = [new HoverTip(new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.hover_title"), description)
-        {
-            Id = $"reastralparty.lobby_panel.{control.Name}.{title}",
-            IsInstanced = true
-        }];
+        _hoverTipsByControl[control] =
+        [
+            new HoverTip(new LocString("settings_ui", "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.hover_title"),
+                description)
+            {
+                Id = $"reastralparty.lobby_panel.{control.Name}.{title}",
+                IsInstanced = true
+            }
+        ];
         control.MouseEntered += () => ShowHoverTip(control);
         control.MouseExited += () => HideHoverTip(control);
     }
@@ -717,7 +718,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             _requestRetryAccumulator = 0d;
             _secondsSinceSnapshotUpdate = 0d;
             _hasReceivedSnapshotForCurrentSession = false;
-            MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview observed lobby change; role={role} hostNetId={LobbyGameplayNetRoleHelper.GetHostNetId(lobby)} localNetId={LobbyGameplayNetRoleHelper.GetLocalNetId(lobby)} players={lobby?.Players.Count ?? 0}.");
+            MainFile.Logger.Info(
+                $"{MainFile.ModId} lobby gameplay preview observed lobby change; role={role} hostNetId={LobbyGameplayNetRoleHelper.GetHostNetId(lobby)} localNetId={LobbyGameplayNetRoleHelper.GetLocalNetId(lobby)} players={lobby?.Players.Count ?? 0}.");
         }
 
         if (netServiceChanged)
@@ -733,7 +735,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
 
         if (roleChanged)
         {
-            MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview role transition: {_lastKnownRole} -> {role}.");
+            MainFile.Logger.Info(
+                $"{MainFile.ModId} lobby gameplay preview role transition: {_lastKnownRole} -> {role}.");
             _lastKnownRole = role;
             _initialRoleSyncPerformed = false;
             _requestRetryAccumulator = 0d;
@@ -762,7 +765,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             if (!LobbyGameplaySettingsSync.TryGetSnapshot(out _))
             {
                 LobbyGameplaySettingsSync.InitializeFromPersistent(ReAstralPartyModSettingsManager.ReadLocalSettings());
-                MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay preview initialized authoritative host snapshot from persistent settings.");
+                MainFile.Logger.Info(
+                    $"{MainFile.ModId} lobby gameplay preview initialized authoritative host snapshot from persistent settings.");
             }
 
             _hasReceivedSnapshotForCurrentSession = true;
@@ -817,11 +821,11 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             var variantPersonasAvailability = AstralContentModeRegistry.GetAvailability(
                 currentMode,
                 AstralGameplaySettingKey.VariantPersonas,
-                roomSurface: true);
+                true);
             var allVariantPersonasAvailability = AstralContentModeRegistry.GetAvailability(
                 currentMode,
                 AstralGameplaySettingKey.AllVariantPersonas,
-                roomSurface: true);
+                true);
             var personaSelectionEnabled = snapshot.EnableStartingPersonaSelection;
             var variantPersonasEnabled = snapshot.EnableVariantPersonas;
             var normalizedNeowSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
@@ -851,8 +855,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             {
                 _variantPersonasToggle.ButtonPressed = snapshot.EnableVariantPersonas;
                 _variantPersonasToggle.Disabled = !isEditable
-                    || variantPersonasAvailability != AstralModeAvailability.Editable
-                    || !personaSelectionEnabled;
+                                                  || variantPersonasAvailability != AstralModeAvailability.Editable
+                                                  || !personaSelectionEnabled;
                 _variantPersonasToggle.Text = snapshot.EnableVariantPersonas ? "ON" : "OFF";
                 SetRowVisible(_variantPersonasToggle, variantPersonasAvailability != AstralModeAvailability.Hidden);
             }
@@ -901,9 +905,10 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             {
                 _allVariantPersonasToggle.ButtonPressed = snapshot.EnableAllVariantPersonas;
                 _allVariantPersonasToggle.Disabled = !isEditable
-                    || allVariantPersonasAvailability != AstralModeAvailability.Editable
-                    || !personaSelectionEnabled
-                    || !variantPersonasEnabled;
+                                                     || allVariantPersonasAvailability !=
+                                                     AstralModeAvailability.Editable
+                                                     || !personaSelectionEnabled
+                                                     || !variantPersonasEnabled;
                 _allVariantPersonasToggle.Text = snapshot.EnableAllVariantPersonas ? "ON" : "OFF";
                 SetRowVisible(
                     _allVariantPersonasToggle,
@@ -940,7 +945,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             {
                 var footer = role switch
                 {
-                    LobbyGameplayNetRole.Host or LobbyGameplayNetRole.Singleplayer => GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_host"),
+                    LobbyGameplayNetRole.Host or LobbyGameplayNetRole.Singleplayer => GetText(
+                        "RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_host"),
                     LobbyGameplayNetRole.Client => GetText("RE_ASTRAL_PARTY_MOD_SETTINGS.lobby_panel.footer_client"),
                     _ => "联机状态同步中，暂时只读。"
                 };
@@ -999,7 +1005,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 "Lobby",
                 BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (lobbyProperty != null && typeof(StartRunLobby).IsAssignableFrom(lobbyProperty.PropertyType))
-            {
                 try
                 {
                     if (lobbyProperty.GetValue(current) is StartRunLobby lobby)
@@ -1009,7 +1014,6 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 {
                     // Ignore and keep walking the parent chain.
                 }
-            }
 
             current = current.GetParent();
         }
@@ -1029,16 +1033,19 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             Variant.From(snapshot.EnableJewelryRelics), Variant.From(snapshot.EnableNeowExtraOption),
             Variant.From(snapshot.EnableCollectorsCards),
             Variant.From((int)snapshot.NeowExtraOptionSelectionMode),
-            Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableVariantPersonas), Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
+            Variant.From(snapshot.EnableAllPersonas), Variant.From(snapshot.EnableVariantPersonas),
+            Variant.From(snapshot.EnableAllVariantPersonas), Variant.From(snapshot.EnableExtremeMode),
             Variant.From((int)snapshot.StartingPersonMode), Variant.From((int)snapshot.TokenSeriesMode),
             Variant.From(snapshot.EnableMechTideMode));
     }
 
-    private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint, bool enableStartingAstralRelicStore, bool enableStartingPersonaSelection,
+    private void ApplySnapshotDeferred(int currentContentMode, bool enableStartingInitialPoint,
+        bool enableStartingAstralRelicStore, bool enableStartingPersonaSelection,
         bool enableJewelryRelics, bool enableNeowExtraOption,
         bool enableCollectorsCards,
         int neowExtraOptionSelectionMode,
-        bool enableAllPersonas, bool enableVariantPersonas, bool enableAllVariantPersonas, bool enableExtremeMode, int startingPersonaMode, int tokenSeriesMode,
+        bool enableAllPersonas, bool enableVariantPersonas, bool enableAllVariantPersonas, bool enableExtremeMode,
+        int startingPersonaMode, int tokenSeriesMode,
         bool enableMechTideMode)
     {
         ApplySnapshotToUi(new LobbyGameplaySettingsSnapshot
@@ -1052,9 +1059,10 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             EnableJewelryRelics = enableJewelryRelics,
             EnableNeowExtraOption = enableNeowExtraOption,
             EnableCollectorsCards = enableCollectorsCards,
-            NeowExtraOptionSelectionMode = Enum.IsDefined(typeof(NeowExtraOptionSelectionMode), neowExtraOptionSelectionMode)
-                ? (NeowExtraOptionSelectionMode)neowExtraOptionSelectionMode
-                : NeowExtraOptionSelectionMode.DefaultRandom,
+            NeowExtraOptionSelectionMode =
+                Enum.IsDefined(typeof(NeowExtraOptionSelectionMode), neowExtraOptionSelectionMode)
+                    ? (NeowExtraOptionSelectionMode)neowExtraOptionSelectionMode
+                    : NeowExtraOptionSelectionMode.DefaultRandom,
             EnableAllPersonas = enableAllPersonas,
             EnableVariantPersonas = enableVariantPersonas,
             EnableAllVariantPersonas = enableAllVariantPersonas,
@@ -1217,10 +1225,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private static int IndexOfStartingPersonaMode(StartingPersonMode mode)
     {
         for (var i = 0; i < StartingPersonaModes.Length; i++)
-        {
             if (StartingPersonaModes[i] == mode)
                 return i;
-        }
 
         return 0;
     }
@@ -1228,10 +1234,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private static int IndexOfTokenSeriesMode(TokenSeriesMode mode)
     {
         for (var i = 0; i < TokenSeriesModes.Length; i++)
-        {
             if (TokenSeriesModes[i] == mode)
                 return i;
-        }
 
         return 0;
     }
@@ -1239,10 +1243,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private static int IndexOfNeowExtraOptionSelectionMode(NeowExtraOptionSelectionMode mode)
     {
         for (var i = 0; i < NeowExtraOptionSelectionModes.Length; i++)
-        {
             if (NeowExtraOptionSelectionModes[i] == mode)
                 return i;
-        }
 
         return 0;
     }
@@ -1275,10 +1277,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private int IndexOfVisibleNeowExtraOptionSelectionMode(NeowExtraOptionSelectionMode mode)
     {
         for (var i = 0; i < _visibleNeowExtraOptionSelectionModes.Count; i++)
-        {
             if (_visibleNeowExtraOptionSelectionModes[i] == mode)
                 return i;
-        }
 
         return 0;
     }
@@ -1310,7 +1310,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
             case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: true } when TryBeginResize():
                 AcceptEvent();
                 break;
-            case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false } when _interactionMode != PanelInteractionMode.None:
+            case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false }
+                when _interactionMode != PanelInteractionMode.None:
                 EndInteraction();
                 AcceptEvent();
                 break;
@@ -1328,7 +1329,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 BeginMove();
                 AcceptEvent();
                 break;
-            case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false } when _interactionMode == PanelInteractionMode.Move:
+            case InputEventMouseButton { ButtonIndex: MouseButton.Left, Pressed: false }
+                when _interactionMode == PanelInteractionMode.Move:
                 EndInteraction();
                 AcceptEvent();
                 break;
@@ -1361,7 +1363,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         switch (_interactionMode)
         {
             case PanelInteractionMode.Move:
-                GlobalPosition = ClampPositionToViewport(_interactionPositionStart + (mousePosition - _interactionMouseStart), Size);
+                GlobalPosition =
+                    ClampPositionToViewport(_interactionPositionStart + (mousePosition - _interactionMouseStart), Size);
                 break;
             case PanelInteractionMode.None:
                 break;
@@ -1386,22 +1389,25 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
                 targetWidth = _interactionSizeStart.X + delta.X;
                 break;
             case PanelInteractionMode.ResizeTop:
-                targetWidth = _interactionSizeStart.X - (delta.Y * PanelAspectRatio);
+                targetWidth = _interactionSizeStart.X - delta.Y * PanelAspectRatio;
                 break;
             case PanelInteractionMode.ResizeBottom:
-                targetWidth = _interactionSizeStart.X + (delta.Y * PanelAspectRatio);
+                targetWidth = _interactionSizeStart.X + delta.Y * PanelAspectRatio;
                 break;
             case PanelInteractionMode.ResizeTopLeft:
             case PanelInteractionMode.ResizeBottomRight:
             case PanelInteractionMode.ResizeTopRight:
             case PanelInteractionMode.ResizeBottomLeft:
-                var horizontal = _interactionMode is PanelInteractionMode.ResizeLeft or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeBottomLeft
+                var horizontal = _interactionMode is PanelInteractionMode.ResizeLeft
+                    or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeBottomLeft
                     ? -delta.X
                     : delta.X;
-                var vertical = _interactionMode is PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeTopRight
+                var vertical = _interactionMode is PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeTopLeft
+                    or PanelInteractionMode.ResizeTopRight
                     ? -delta.Y * PanelAspectRatio
                     : delta.Y * PanelAspectRatio;
-                targetWidth = _interactionSizeStart.X + (Mathf.Abs(horizontal) >= Mathf.Abs(vertical) ? horizontal : vertical);
+                targetWidth = _interactionSizeStart.X +
+                              (Mathf.Abs(horizontal) >= Mathf.Abs(vertical) ? horizontal : vertical);
                 break;
         }
 
@@ -1410,10 +1416,12 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         var targetSize = new Vector2(clampedWidth, clampedWidth / PanelAspectRatio);
         var targetPosition = startRect.Position;
 
-        if (_interactionMode is PanelInteractionMode.ResizeLeft or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeBottomLeft)
+        if (_interactionMode is PanelInteractionMode.ResizeLeft or PanelInteractionMode.ResizeTopLeft
+            or PanelInteractionMode.ResizeBottomLeft)
             targetPosition.X = startRect.End.X - targetSize.X;
 
-        if (_interactionMode is PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeTopRight)
+        if (_interactionMode is PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeTopLeft
+            or PanelInteractionMode.ResizeTopRight)
             targetPosition.Y = startRect.End.Y - targetSize.Y;
 
         targetPosition = ClampPositionToViewport(targetPosition, targetSize);
@@ -1541,7 +1549,7 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         var viewportHeight = GetViewportRect().Size.Y;
         var maxVisibleHeight = Math.Max(
             PanelCollapsedHeight,
-            viewportHeight - (PanelViewportMargin * 2f));
+            viewportHeight - PanelViewportMargin * 2f);
         var displayedHeight = Math.Min(sanitizedExpanded.Y, maxVisibleHeight);
         return new Vector2(sanitizedExpanded.X, displayedHeight);
     }
@@ -1560,8 +1568,8 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
     private float GetMaxExpandedWidthForCurrentViewport(PanelInteractionMode mode)
     {
         var viewport = GetViewportRect().Size;
-        var availableWidth = Math.Max(PanelMinWidth, viewport.X - (PanelViewportMargin * 2f));
-        var availableHeight = Math.Max(PanelCollapsedHeight, viewport.Y - (PanelViewportMargin * 2f));
+        var availableWidth = Math.Max(PanelMinWidth, viewport.X - PanelViewportMargin * 2f);
+        var availableHeight = Math.Max(PanelCollapsedHeight, viewport.Y - PanelViewportMargin * 2f);
         var widthFromHeight = availableHeight * PanelAspectRatio;
         var maxWidth = Math.Min(availableWidth, widthFromHeight);
 
@@ -1571,17 +1579,23 @@ internal sealed partial class CharacterSelectGameplayPreviewPanel : Control
         var anchor = _interactionPositionStart;
         var startRect = new Rect2(_interactionPositionStart, _interactionSizeStart);
 
-        if (mode is PanelInteractionMode.ResizeLeft or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeBottomLeft)
+        if (mode is PanelInteractionMode.ResizeLeft or PanelInteractionMode.ResizeTopLeft
+            or PanelInteractionMode.ResizeBottomLeft)
             maxWidth = Math.Min(maxWidth, Math.Max(PanelMinWidth, startRect.End.X - PanelViewportMargin));
 
-        if (mode is PanelInteractionMode.ResizeRight or PanelInteractionMode.ResizeTopRight or PanelInteractionMode.ResizeBottomRight)
+        if (mode is PanelInteractionMode.ResizeRight or PanelInteractionMode.ResizeTopRight
+            or PanelInteractionMode.ResizeBottomRight)
             maxWidth = Math.Min(maxWidth, Math.Max(PanelMinWidth, viewport.X - anchor.X - PanelViewportMargin));
 
-        if (mode is PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeTopLeft or PanelInteractionMode.ResizeTopRight)
-            maxWidth = Math.Min(maxWidth, Math.Max(PanelMinWidth, (startRect.End.Y - PanelViewportMargin) * PanelAspectRatio));
+        if (mode is PanelInteractionMode.ResizeTop or PanelInteractionMode.ResizeTopLeft
+            or PanelInteractionMode.ResizeTopRight)
+            maxWidth = Math.Min(maxWidth,
+                Math.Max(PanelMinWidth, (startRect.End.Y - PanelViewportMargin) * PanelAspectRatio));
 
-        if (mode is PanelInteractionMode.ResizeBottom or PanelInteractionMode.ResizeBottomLeft or PanelInteractionMode.ResizeBottomRight)
-            maxWidth = Math.Min(maxWidth, Math.Max(PanelMinWidth, (viewport.Y - anchor.Y - PanelViewportMargin) * PanelAspectRatio));
+        if (mode is PanelInteractionMode.ResizeBottom or PanelInteractionMode.ResizeBottomLeft
+            or PanelInteractionMode.ResizeBottomRight)
+            maxWidth = Math.Min(maxWidth,
+                Math.Max(PanelMinWidth, (viewport.Y - anchor.Y - PanelViewportMargin) * PanelAspectRatio));
 
         return Math.Max(PanelMinWidth, maxWidth);
     }

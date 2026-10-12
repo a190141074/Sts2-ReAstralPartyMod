@@ -16,7 +16,7 @@ public sealed class PlayerLoseGoldUnexpectedWealthPatch : IPatchMethod
 
     public static ModPatchTarget[] GetTargets()
     {
-        return [new(typeof(PlayerCmd), nameof(PlayerCmd.LoseGold))];
+        return [new ModPatchTarget(typeof(PlayerCmd), nameof(PlayerCmd.LoseGold))];
     }
 
     public static void Postfix(decimal amount, Player player, GoldLossType goldLossType, ref Task __result)

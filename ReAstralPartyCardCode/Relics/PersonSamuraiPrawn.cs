@@ -73,7 +73,8 @@ public class PersonKatanaMasterDoppelganger : LegacyCooldownPersonRelicBase
         await base.AfterObtained();
         AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered = false;
 
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntentDoppelganger>(Owner);
+        await PersonMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntentDoppelganger>(Owner);
     }
 
     public override async Task BeforeCombatStart()
@@ -92,7 +93,8 @@ public class PersonKatanaMasterDoppelganger : LegacyCooldownPersonRelicBase
         AstralParty_PersonKatanaMasterDoppelgangerFirstAttackTriggered = false;
     }
 
-    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature? dealer, DamageResult result,
+    public override async Task AfterDamageGiven(PlayerChoiceContext choiceContext, Creature? dealer,
+        DamageResult result,
         ValueProp props, Creature target, CardModel? cardSource)
     {
         if (Owner?.Creature == null)
@@ -148,7 +150,8 @@ public class PersonKatanaMasterDoppelganger : LegacyCooldownPersonRelicBase
         if (Owner == null || Owner.GetRelic<PersonalityDerivativeSwordIntentDoppelganger>() != null)
             return;
 
-        await PersonMultiplayerEffectHelper.ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntentDoppelganger>(Owner);
+        await PersonMultiplayerEffectHelper
+            .ObtainDerivativeRelicIfMissing<PersonalityDerivativeSwordIntentDoppelganger>(Owner);
     }
 
     private async Task EnsureHandCostCapPower()

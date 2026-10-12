@@ -14,5 +14,8 @@ public static class ChargeTokenRegistry
         ModelDb.GetId<TokenGoldPerpetualMotionMachine>(), ModelDb.GetId<TokenGoldElectromagneticGun>()
     ];
 
-    public static bool IsChargeToken(RelicModel relic) => Ids.Contains(relic.CanonicalInstance?.Id ?? relic.Id);
+    public static bool IsChargeToken(RelicModel relic)
+    {
+        return Ids.Contains(relic.CanonicalInstance?.Id ?? relic.Id);
+    }
 }

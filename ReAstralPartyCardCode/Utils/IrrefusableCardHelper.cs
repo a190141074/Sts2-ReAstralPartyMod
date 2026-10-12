@@ -33,6 +33,7 @@ internal static class IrrefusableCardHelper
     private const string TransferActionKey = "irrefusable_pending_transfer_batch";
     private static readonly JsonSerializerOptions TransferSnapshotJsonOptions = new(JsonSerializerDefaults.Web);
     private static readonly HashSet<CardModel> PlayedFromHand = [];
+
     private static readonly RitsuLibManagedNetActionDescriptor<IrrefusableTransferActionPayload> TransferAction =
         new(
             MainFile.ModId,
@@ -41,6 +42,7 @@ internal static class IrrefusableCardHelper
             DeserializeTransferAction,
             ExecuteTransferAction,
             GameActionType.NonCombat);
+
     private static RunSavedData<IrrefusableRunData> _runData = null!;
     private static bool _registered;
 
@@ -205,7 +207,8 @@ internal static class IrrefusableCardHelper
         IrrefusablePendingTransferBatch batch)
     {
         var source = runState.Players.FirstOrDefault(player => player.NetId == batch.SourcePlayerNetId);
-        if (source == null || batch.Transfers.Count == 0 || batch.Transfers.Any(transfer => transfer.CardSnapshot == null))
+        if (source == null || batch.Transfers.Count == 0 ||
+            batch.Transfers.Any(transfer => transfer.CardSnapshot == null))
         {
             MainFile.Logger.Warn(
                 $"[Irrefusable] transfer batch retained | batch={batch.BatchId} | reason={(source == null ? "source_missing" : "snapshot_missing")}.");
@@ -237,7 +240,8 @@ internal static class IrrefusableCardHelper
             $"[Irrefusable] managed transfer batch requested | batch={batch.BatchId} | source={source.NetId} | target={batch.TargetPlayerNetId} | count={payload.Transfers.Count}.");
     }
 
-    private static async Task ExecuteTransferAction(RitsuLibManagedNetActionContext<IrrefusableTransferActionPayload> context)
+    private static async Task ExecuteTransferAction(
+        RitsuLibManagedNetActionContext<IrrefusableTransferActionPayload> context)
     {
         var payload = context.Message;
         var runState = context.Player.RunState as RunState ?? RunManager.Instance?.DebugOnlyGetState();
@@ -286,7 +290,8 @@ internal static class IrrefusableCardHelper
             .Select(transfer => new
             {
                 Transfer = transfer,
-                Original = batch.Transfers.FirstOrDefault(item => item.TransferId == transfer.TransferId)?.OriginalSourceDeckIndex ?? int.MaxValue
+                Original = batch.Transfers.FirstOrDefault(item => item.TransferId == transfer.TransferId)
+                    ?.OriginalSourceDeckIndex ?? int.MaxValue
             })
             .OrderBy(item => item.Original)
             .ThenBy(item => item.Transfer.Sequence)
@@ -403,7 +408,8 @@ internal static class IrrefusableCardHelper
 
         if (!batch.StarlightGranted)
         {
-            source.GetRelic<VariantPersonShadowScion>()?.AccumulatePendingTransferredStarlight(batch.AppliedTransferIds.Count);
+            source.GetRelic<VariantPersonShadowScion>()
+                ?.AccumulatePendingTransferredStarlight(batch.AppliedTransferIds.Count);
             batch.StarlightGranted = true;
         }
 
@@ -419,7 +425,7 @@ internal static class IrrefusableCardHelper
             ? CurseCombatsRemaining
             : StandardCombatsRemaining;
         var lifetime = card.GetOrCreateCapability<IrrefusableLifetimeCapability>();
-        lifetime.Initialize(transferId, totalCombats, combatsSeen: 1);
+        lifetime.Initialize(transferId, totalCombats, 1);
     }
 
     private static byte[] SerializeTransferAction(IrrefusableTransferActionPayload payload)
@@ -430,7 +436,8 @@ internal static class IrrefusableCardHelper
         writer.WriteULong(payload.TargetPlayerNetId);
         writer.WriteInt(payload.Transfers.Count);
         EnsureTransferPayloadWithinLimit(writer);
-        foreach (var transfer in payload.Transfers.OrderBy(transfer => transfer.Sequence).ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal))
+        foreach (var transfer in payload.Transfers.OrderBy(transfer => transfer.Sequence)
+                     .ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal))
         {
             ArgumentNullException.ThrowIfNull(transfer.CardSnapshot);
             WriteTransferString(writer, transfer.TransferId, "transfer id");
@@ -462,7 +469,6 @@ internal static class IrrefusableCardHelper
             throw new InvalidOperationException($"Invalid Irrefusable transfer batch count: {count}.");
 
         for (var index = 0; index < count; index++)
-        {
             actionPayload.Transfers.Add(new IrrefusablePendingTransfer
             {
                 TransferId = ReadTransferString(reader, "transfer id"),
@@ -471,7 +477,6 @@ internal static class IrrefusableCardHelper
                 OriginalSourceDeckIndex = reader.ReadInt(),
                 CardSnapshot = reader.Read<SerializableCard>()
             });
-        }
 
         return actionPayload;
     }
@@ -497,9 +502,7 @@ internal static class IrrefusableCardHelper
         if (byteCount < 0
             || byteCount > RitsuLibManagedNetActions.MaxPayloadBytes
             || reader.Buffer.Length * 8 - reader.BitPosition < (long)byteCount * 8)
-        {
             throw new InvalidOperationException($"Invalid Irrefusable {fieldName} length: {byteCount}.");
-        }
 
         var bytes = new byte[byteCount];
         reader.ReadBytes(bytes, byteCount);
@@ -513,14 +516,16 @@ internal static class IrrefusableCardHelper
                 $"Irrefusable managed transfer payload exceeds {RitsuLibManagedNetActions.MaxPayloadBytes} bytes.");
     }
 
-    private static bool IsSourceDeckIndexPending(IrrefusableRunData data, ulong sourcePlayerNetId, int originalDeckIndex)
+    private static bool IsSourceDeckIndexPending(IrrefusableRunData data, ulong sourcePlayerNetId,
+        int originalDeckIndex)
     {
         return data.PendingTransferBatches.Any(batch => batch.Transfers.Any(transfer =>
             transfer.SourcePlayerNetId == sourcePlayerNetId
             && transfer.OriginalSourceDeckIndex == originalDeckIndex));
     }
 
-    private static int CountEarlierPendingDeckRemovals(IrrefusableRunData data, ulong sourcePlayerNetId, int originalDeckIndex)
+    private static int CountEarlierPendingDeckRemovals(IrrefusableRunData data, ulong sourcePlayerNetId,
+        int originalDeckIndex)
     {
         return data.PendingTransferBatches
             .SelectMany(batch => batch.Transfers)
@@ -535,11 +540,13 @@ internal static class IrrefusableCardHelper
         return payloadTransfers
             .OrderBy(transfer => transfer.Sequence)
             .ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal)
-            .Select(transfer => (transfer.TransferId, transfer.Sequence, transfer.SourceDeckIndex, transfer.OriginalSourceDeckIndex))
+            .Select(transfer => (transfer.TransferId, transfer.Sequence, transfer.SourceDeckIndex,
+                transfer.OriginalSourceDeckIndex))
             .SequenceEqual(batchTransfers
                 .OrderBy(transfer => transfer.Sequence)
                 .ThenBy(transfer => transfer.TransferId, StringComparer.Ordinal)
-                .Select(transfer => (transfer.TransferId, transfer.Sequence, transfer.SourceDeckIndex, transfer.OriginalSourceDeckIndex)));
+                .Select(transfer => (transfer.TransferId, transfer.Sequence, transfer.SourceDeckIndex,
+                    transfer.OriginalSourceDeckIndex)));
     }
 
     private static CardModel? FindDeckCardByIndex(Player owner, int deckIndex)
@@ -560,7 +567,7 @@ internal static class IrrefusableCardHelper
     private static bool MatchesTransferSnapshot(CardModel card, SerializableCard snapshot)
     {
         return JsonSerializer.Serialize(card.ToSerializable(), TransferSnapshotJsonOptions)
-            == JsonSerializer.Serialize(snapshot, TransferSnapshotJsonOptions);
+               == JsonSerializer.Serialize(snapshot, TransferSnapshotJsonOptions);
     }
 
     private static async Task<bool> RemoveDeckCardOfficial(Player owner, CardModel card, string reason)
@@ -618,7 +625,6 @@ internal static class IrrefusableCardHelper
             ? data
             : new IrrefusableRunData();
     }
-
 }
 
 internal sealed class IrrefusableCardLifecycle : HookedSingletonModel

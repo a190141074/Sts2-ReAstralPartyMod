@@ -37,7 +37,8 @@ public class JewelryMiniatureMilen : AstralPartyRelicModel
         AstralParty_JewelryMiniatureMilenTriggeredThisTurn = false;
     }
 
-    public override Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext, MegaCrit.Sts2.Core.Entities.Players.Player player)
+    public override Task AfterPlayerTurnStart(PlayerChoiceContext choiceContext,
+        MegaCrit.Sts2.Core.Entities.Players.Player player)
     {
         if (player == Owner)
             AstralParty_JewelryMiniatureMilenTriggeredThisTurn = false;

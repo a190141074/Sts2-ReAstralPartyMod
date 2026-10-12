@@ -136,12 +136,6 @@ public sealed class LobbyGameplaySettingsSnapshot
     public bool EnableMechTideMode { get; set; }
 
 
-
-
-
-
-
-
     public bool EnableStartingPersonaSelection
     {
         get => EnableStartingPersonSelection;
@@ -215,11 +209,14 @@ public sealed class LobbyGameplaySettingsSnapshot
             StartingPersonMode = ReAstralPartyModSettingsManager.ConfiguredStartingPersonaMode,
             TokenSeriesMode = ReAstralPartyModSettingsManager.TokenSeriesMode,
             EnableMechTideMode = ReAstralPartyModSettingsManager.EnableMechTideMode,
-            BannedRelicIdsSerialized = [.. ReAstralPartyModSettingsManager.GetBannedRelicIds(null)
-                .Where(static id => id != ModelId.none)
-                .Select(static id => id.ToString())
-                .Distinct(StringComparer.Ordinal)
-                .OrderBy(static id => id, StringComparer.Ordinal)]
+            BannedRelicIdsSerialized =
+            [
+                .. ReAstralPartyModSettingsManager.GetBannedRelicIds(null)
+                    .Where(static id => id != ModelId.none)
+                    .Select(static id => id.ToString())
+                    .Distinct(StringComparer.Ordinal)
+                    .OrderBy(static id => id, StringComparer.Ordinal)
+            ]
         };
     }
 }
@@ -262,7 +259,8 @@ internal static class LobbyGameplaySettingsSync
 
     public static void InitializeFromPersistent(ReAstralPartyModSettings settings)
     {
-        SetSnapshotInternal(LobbyGameplaySettingsSnapshot.FromPersistent(settings), "initialize_from_persistent", false);
+        SetSnapshotInternal(LobbyGameplaySettingsSnapshot.FromPersistent(settings), "initialize_from_persistent",
+            false);
     }
 
     public static LobbyGameplaySettingsSnapshot BuildDefaultSnapshot()
@@ -294,8 +292,9 @@ internal static class LobbyGameplaySettingsSync
             updated = (_currentSnapshot ?? BuildFallbackSnapshot()).Clone();
             mutator(updated);
             SanitizeSnapshot(updated);
-            updated.NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
-                updated.NeowExtraOptionSelectionMode);
+            updated.NeowExtraOptionSelectionMode =
+                ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(
+                    updated.NeowExtraOptionSelectionMode);
             _currentSnapshot = updated.Clone();
         }
 
@@ -313,7 +312,9 @@ internal static class LobbyGameplaySettingsSync
             netService = _registeredNetService;
         }
 
-        if (snapshot == null || netService == null || LobbyGameplayNetRoleHelper.GetCurrentRole(netService) != LobbyGameplayNetRole.Host || !netService.IsConnected)
+        if (snapshot == null || netService == null ||
+            LobbyGameplayNetRoleHelper.GetCurrentRole(netService) != LobbyGameplayNetRole.Host ||
+            !netService.IsConnected)
             return;
 
         netService.SendMessage(new AstralLobbyGameplaySettingsSnapshotMessage(snapshot));
@@ -328,7 +329,9 @@ internal static class LobbyGameplaySettingsSync
             netService = _registeredNetService;
         }
 
-        if (netService == null || LobbyGameplayNetRoleHelper.GetCurrentRole(netService) != LobbyGameplayNetRole.Client || !netService.IsConnected)
+        if (netService == null ||
+            LobbyGameplayNetRoleHelper.GetCurrentRole(netService) != LobbyGameplayNetRole.Client ||
+            !netService.IsConnected)
             return;
 
         var hostNetId = LobbyGameplayNetRoleHelper.GetHostNetId(netService);
@@ -344,7 +347,8 @@ internal static class LobbyGameplaySettingsSync
         netService ??= RunManager.Instance?.NetService;
         if (netService == null)
         {
-            MainFile.Logger.Info($"{MainFile.ModId} lobby gameplay settings message handler registration skipped because NetService was not ready.");
+            MainFile.Logger.Info(
+                $"{MainFile.ModId} lobby gameplay settings message handler registration skipped because NetService was not ready.");
             return;
         }
 
@@ -441,7 +445,8 @@ internal static class LobbyGameplaySettingsSync
             snapshot = _currentSnapshot?.Clone();
         }
 
-        if (netService == null || LobbyGameplayNetRoleHelper.GetCurrentRole(netService) != LobbyGameplayNetRole.Host || !netService.IsConnected || snapshot == null)
+        if (netService == null || LobbyGameplayNetRoleHelper.GetCurrentRole(netService) != LobbyGameplayNetRole.Host ||
+            !netService.IsConnected || snapshot == null)
             return;
 
         netService.SendMessage(new AstralLobbyGameplaySettingsSnapshotMessage(snapshot), senderId);
@@ -475,7 +480,6 @@ internal static class LobbyGameplaySettingsSync
         netService.UnregisterMessageHandler<AstralLobbyGameplaySettingsSnapshotMessage>(HandleSnapshotMessage);
         netService.UnregisterMessageHandler<AstralLobbyGameplaySettingsRequestMessage>(HandleRequestMessage);
     }
-
 }
 
 public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketSerializable
@@ -554,7 +558,8 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
     {
         var schemaVersion = reader.ReadInt();
         if (schemaVersion != SchemaVersion)
-            throw new InvalidOperationException($"{MainFile.ModId} received unsupported lobby gameplay snapshot schema {schemaVersion}.");
+            throw new InvalidOperationException(
+                $"{MainFile.ModId} received unsupported lobby gameplay snapshot schema {schemaVersion}.");
 
         var rawMode = reader.ReadEnum<AstralContentMode>();
         CurrentContentMode = AstralContentModeRegistry.NormalizeMode(rawMode);
@@ -565,7 +570,8 @@ public struct AstralLobbyGameplaySettingsSnapshotMessage : INetMessage, IPacketS
         EnableNeowExtraOption = reader.ReadBool();
         EnableCollectorsCards = reader.ReadBool();
         var rawNeowMode = reader.ReadEnum<NeowExtraOptionSelectionMode>();
-        NeowExtraOptionSelectionMode = ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(rawNeowMode);
+        NeowExtraOptionSelectionMode =
+            ReAstralPartyModSettingsManager.NormalizeNeowExtraOptionSelectionMode(rawNeowMode);
 
         EnableAllPersonas = reader.ReadBool();
         EnableVariantPersonas = reader.ReadBool();

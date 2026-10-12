@@ -150,7 +150,7 @@ public class SamuraiPrawnHandCostCapPower : AstralPartyPowerModel
         if (card.Type != CardType.Attack)
             return;
 
-        decimal energyDiscountAmount = 0m;
+        var energyDiscountAmount = 0m;
         if (!card.EnergyCost.CostsX)
         {
             var currentEnergyCost = card.EnergyCost.GetResolved();
@@ -158,7 +158,7 @@ public class SamuraiPrawnHandCostCapPower : AstralPartyPowerModel
                 energyDiscountAmount = currentEnergyCost - CostCap;
         }
 
-        decimal starDiscountAmount = 0m;
+        var starDiscountAmount = 0m;
         if (!card.HasStarCostX)
         {
             var currentStarCost = card.GetStarCostWithModifiers();

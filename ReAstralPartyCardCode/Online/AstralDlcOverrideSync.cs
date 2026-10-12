@@ -105,7 +105,8 @@ internal struct AstralDlcOverrideMessage : INetMessage, IPacketSerializable
     {
         var schemaVersion = reader.ReadInt();
         if (schemaVersion != SchemaVersion)
-            throw new InvalidOperationException($"{MainFile.ModId} received unsupported astraldlc override schema {schemaVersion}.");
+            throw new InvalidOperationException(
+                $"{MainFile.ModId} received unsupported astraldlc override schema {schemaVersion}.");
 
         var count = reader.ReadInt();
         _openSeries = new List<TokenSeriesAvailabilityHelper.TokenSeries>(Math.Max(0, count));

@@ -13,7 +13,6 @@ using MegaCrit.Sts2.Core.Models.Cards;
 
 namespace ReAstralPartyMod.ReAstralPartyCardCode.cards;
 
-
 [RegisterCard(typeof(PersonSkillCardPool))]
 public class SkillRemoteIntrusion : AstralPartyCardModel
 {
@@ -52,4 +51,3 @@ public class SkillRemoteIntrusion : AstralPartyCardModel
             false);
     }
 }
-

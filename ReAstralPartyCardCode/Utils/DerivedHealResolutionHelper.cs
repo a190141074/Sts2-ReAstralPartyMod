@@ -132,10 +132,8 @@ internal static class DerivedHealResolutionHelper
                 state.PendingWarms.Clear();
 
                 if (pass == 1 || currentEntryCount >= 4)
-                {
                     MainFile.Logger.Info(
                         $"[{MainFile.ModId}] [DerivedHealResolution] Flushing derived heal queue | reason={reason} | pass={pass} | halfLifeTargets={halfLifeEntries.Length} | warmTargets={warmEntries.Length}");
-                }
 
                 await PersonMultiplayerEffectHelper.RunAsDerivedSupportPower(async () =>
                 {

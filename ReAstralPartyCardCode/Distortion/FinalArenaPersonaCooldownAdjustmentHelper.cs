@@ -27,7 +27,8 @@ internal static class FinalArenaPersonaCooldownAdjustmentHelper
             }
     }
 
-    public static int ApplyCooldownMaxCounterAdjustment(Player? owner, PersonRelicBase? sourceRelic, int adjustedCounter)
+    public static int ApplyCooldownMaxCounterAdjustment(Player? owner, PersonRelicBase? sourceRelic,
+        int adjustedCounter)
     {
         if (owner == null ||
             sourceRelic == null ||
