@@ -82,6 +82,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include=".gitignore" />
 		<Content Include="description\eng.md" />
 		<Content Include="description\zhs.md" />
 		<Content Include="README.md"/>

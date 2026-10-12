@@ -42,4 +42,9 @@ ReAstralPartyMod/images/card_portraits/*_beta*.png
 .claude/
 .tmp-inspect/
 .tmp*/
+
+# ai
 .codex_tmp/
+.codex
+.claude
+.agents
